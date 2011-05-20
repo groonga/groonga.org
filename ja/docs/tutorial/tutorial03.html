@@ -1,0 +1,185 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>3.3. さまざまな種類をもったデータの保存 &mdash; groonga 1.2.1 documentation</title>
+    
+    <link rel="stylesheet" href="../static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.2.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../static/jquery.js"></script>
+    <script type="text/javascript" src="../static/underscore.js"></script>
+    <script type="text/javascript" src="../static/doctools.js"></script>
+    <script type="text/javascript" src="../static/translations.js"></script>
+    <link rel="top" title="groonga 1.2.1 documentation" href="../index.html" />
+    <link rel="up" title="3. チュートリアル" href="../tutorial.html" />
+    <link rel="next" title="3.4. さまざまな検索条件の指定" href="tutorial04.html" />
+    <link rel="prev" title="3.2. ネットワークを通じた利用" href="tutorial02.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="tutorial04.html" title="3.4. さまざまな検索条件の指定"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="tutorial02.html" title="3.2. ネットワークを通じた利用"
+             accesskey="P">前へ</a> |</li>
+        <li><a href="../index.html">groonga 1.2.1 documentation</a> &raquo;</li>
+          <li><a href="../tutorial.html" accesskey="U">3. チュートリアル</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="id1">
+<h1>3.3. さまざまな種類をもったデータの保存<a class="headerlink" href="#id1" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p>groongaでは、さまざまなデータを格納させることが出来ます。</p>
+<div class="section" id="id2">
+<h2>3.3.1. データ型<a class="headerlink" href="#id2" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>groongaでは、数値（整数・小数）や文字列や時刻や経緯度などの情報を格納することができます。</p>
+<p>ここでは、Int32型のカラムに整数を格納、Float型のカラムに浮動小数点の小数を、ShortText型のカラムに文字列を、Time型のカラムに時間を格納する例を示します。経緯度の格納については、のちのチュートリアルで触れます。</p>
+<p>その他のデータ型の一覧は、 <a class="reference internal" href="../type.html"><em>データ型</em></a> を参照してください。</p>
+<p>実行例</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; table_create --name Type --flags TABLE_HASH_KEY --key_type ShortText
+[[0,1294292421.12314,0.058638912],true]
+&gt; column_create --table Type --name number --type Int32
+[[0,1294292421.38263,0.049456503],true]
+&gt; column_create --table Type --name float --type Float
+[[0,1294292421.63286,0.049592924],true]
+&gt; column_create --table Type --name string --type ShortText
+&gt; column_create --table Type --name time --type Time
+&gt; load --table Type
+&gt; [{&quot;_key&quot;:&quot;sample&quot;,&quot;number&quot;:12345,&quot;float&quot;:42.195,&quot;string&quot;:&quot;GROONGA&quot;,&quot;time&quot;:1234567890.12}]
+&gt; select --table Type
+</pre></div>
+</div>
+</div>
+<div class="section" id="id3">
+<h2>3.3.2. テーブル型<a class="headerlink" href="#id3" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>table_createで作成したテーブルを、カラムの型として使うことが出来ます。</p>
+<p>また、output_columnsにおいて「.」を区切りとして、参照先のテーブルに存在するカラムを指定すると、指定したカラムの値を表示することができます。</p>
+<p>ここでは、先のチュートリアルで作成したSiteテーブルに手を加え、どのサイトをリンクしているのかを保存してみましょう。</p>
+<p>他のテーブルを参照するカラムにデータを入力する場合には、参照先のテーブルの_keyカラムの値を代入する必要があります。</p>
+<p>実行例</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; column_create --table Site --name link --type Site
+[[0,1294292421.88324,1.758091494],true]
+[[0,1294292423.64139,0.096956537],true]
+[[0,1294292423.73839,0.001444368],1]
+[[0,1294292423.73987,0.000161184],[[[1],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;time&quot;,&quot;Time&quot;],[&quot;string&quot;,&quot;ShortText&quot;],[&quot;number&quot;,&quot;Int32&quot;],[&quot;float&quot;,&quot;Float&quot;]],[1,&quot;sample&quot;,1234567890.0,&quot;GROONGA&quot;,12345,42.195]]]]
+[[0,1294292423.74005,0.057032974],true]
+&gt; load --table Site
+&gt; [{&quot;_key&quot;:&quot;http://example.org/&quot;,&quot;link&quot;:&quot;http://example.net/&quot;}]
+[[0,1294292423.99784,0.200585743],1]
+&gt; select --table Site --output_columns _key,title,link._key,link.title --query title:@this
+[[0,1294292424.39909,0.000545272],[[[1],[[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;],[&quot;link._key&quot;,&quot;ShortText&quot;],[&quot;link.title&quot;,&quot;ShortText&quot;]],[&quot;http://example.org/&quot;,&quot;This is test record 1!&quot;,&quot;http://example.net/&quot;,&quot;test record 2.&quot;]]]]
+</pre></div>
+</div>
+<p>このように、linkカラムに他のサイトへの参照を保存することができました。また、参照先の_keyとtitleカラムの内容を表示することができました。</p>
+</div>
+<div class="section" id="id4">
+<h2>3.3.3. ベクターカラム<a class="headerlink" href="#id4" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>column_createコマンドでカラムを作成するとき、&#8211;flagsオプションでCOLUMN_VECTORフラグを指定すると、複数の値を配列で格納できるカラムが作成されます。</p>
+<p>テーブル型で配列を格納するカラムは、1対多の参照関係を表すのに有効です。</p>
+<p>テーブル型のチュートリアルでは、Siteテーブルに手を加え、どのサイトをリンクしているのかを保存しました。しかし、通常は1つのサイトから多くのサイトにリンクが張られています。複数のリンク情報を格納するために、複数の参照関係を保存するカラムを作成してみましょう。</p>
+<p>他のテーブルを参照するベクターカラムにデータを入力する場合には、参照先のテーブルの_keyカラムの値の「配列」を代入する必要があります。</p>
+<p>実行例</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; column_create --table Site --name links --flags COLUMN_VECTOR --type Site
+[[0,1294292424.60248,0.062420461],true]
+&gt; load --table Site
+&gt; [{&quot;_key&quot;:&quot;http://example.org/&quot;,&quot;links&quot;:[&quot;http://example.net/&quot;,&quot;http://example.org/&quot;,&quot;http://example.com/&quot;]}]
+[[0,1294292424.86574,0.200708196],1]
+&gt; select --table Site --output_columns _key,title,links._key,links.title --query title:@this
+[[0,1294292425.26717,0.000522302],[[[1],[[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;],[&quot;links._key&quot;,&quot;ShortText&quot;],[&quot;links.title&quot;,&quot;ShortText&quot;]],[&quot;http://example.org/&quot;,&quot;This is test record 1!&quot;,[&quot;http://example.net/&quot;,&quot;http://example.org/&quot;,&quot;http://example.com/&quot;],[&quot;test record 2.&quot;,&quot;This is test record 1!&quot;,&quot;test test record three.&quot;]]]]]
+</pre></div>
+</div>
+<p>このように、複数の参照関係が保存できました。また、output_columnsによって、複数の参照先のカラム値も表示させることができました。</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">3.3. さまざまな種類をもったデータの保存</a><ul>
+<li><a class="reference internal" href="#id2">3.3.1. データ型</a></li>
+<li><a class="reference internal" href="#id3">3.3.2. テーブル型</a></li>
+<li><a class="reference internal" href="#id4">3.3.3. ベクターカラム</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="tutorial02.html"
+                        title="前の章へ">3.2. ネットワークを通じた利用</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="tutorial04.html"
+                        title="次の章へ">3.4. さまざまな検索条件の指定</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../sources/tutorial/tutorial03.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="tutorial04.html" title="3.4. さまざまな検索条件の指定"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="tutorial02.html" title="3.2. ネットワークを通じた利用"
+             >前へ</a> |</li>
+        <li><a href="../index.html">groonga 1.2.1 documentation</a> &raquo;</li>
+          <li><a href="../tutorial.html" >3. チュートリアル</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009-2011, Brazil, Inc.
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre/47a94f723e80 で生成しました。
+    </div>
+  </body>
+</html>

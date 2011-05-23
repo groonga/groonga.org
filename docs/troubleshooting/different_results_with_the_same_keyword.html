@@ -6,9 +6,9 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>7.1. 同じ検索キーワードなのに全文検索結果が異なる &mdash; groonga 1.2.1 documentation</title>
+    <title>7.1. 同じ検索キーワードなのに全文検索結果が異なる &mdash; groonga v1.2.1 documentation</title>
     
-    <link rel="stylesheet" href="../static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
@@ -23,12 +23,25 @@
     <script type="text/javascript" src="../static/jquery.js"></script>
     <script type="text/javascript" src="../static/underscore.js"></script>
     <script type="text/javascript" src="../static/doctools.js"></script>
-    <link rel="top" title="groonga 1.2.1 documentation" href="../index.html" />
+    <link rel="shortcut icon" href="../static/favicon.ico"/>
+    <link rel="top" title="groonga v1.2.1 documentation" href="../index.html" />
     <link rel="up" title="7. トラブルシューティング" href="../troubleshooting.html" />
     <link rel="next" title="8. groonga開発者向け情報" href="../developer.html" />
     <link rel="prev" title="7. トラブルシューティング" href="../troubleshooting.html" /> 
   </head>
   <body>
+<div class="header">
+  <h1 class="title">
+    <a id="top-link" href="../index.html/../">
+      <span class="title">groonga</span>
+      <span class="title-separator">-</span>
+      <span class="title-short-description">An open-source fulltext search engine and column store.</span>
+      <span class="title-catch-phrase">It lets you write high-performance applications that requires fulltext search.</span>
+    </a>
+  </h1>
+</div>
+  
+
     <div class="related">
       <h3>Navigation</h3>
       <ul>
@@ -41,7 +54,14 @@
         <li class="right" >
           <a href="../troubleshooting.html" title="7. トラブルシューティング"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">groonga 1.2.1 documentation</a> &raquo;</li>
+  <li class="other-languages">
+    <ul class="other-languages">
+      <li class="other-language"><a href="../../ja/docs/troubleshooting/different_results_with_the_same_keyword.html"><img src="../static/jp.png" alt="日本語"></a></li>
+    </ul>
+  </li>
+  
+        <li><a href="../index.html">groonga v1.2.1 documentation</a> &raquo;</li>
+
           <li><a href="../troubleshooting.html" accesskey="U">7. トラブルシューティング</a> &raquo;</li> 
       </ul>
     </div>  
@@ -51,8 +71,8 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="different-results-with-the-same-keyword">
-<span id="id1"></span><h1>7.1. 同じ検索キーワードなのに全文検索結果が異なる<a class="headerlink" href="#different-results-with-the-same-keyword" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="id1">
+<h1>7.1. 同じ検索キーワードなのに全文検索結果が異なる<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
 <p>同じ検索キーワードでも一緒に指定するクエリによっては全文検索の結果が異なることがあります。ここでは、その原因と対策方法を説明します。</p>
 <div class="section" id="id2">
 <h2>7.1.1. 例<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
@@ -92,7 +112,7 @@ column_create Terms blog_body COLUMN_INDEX|WITH_POSITION Blogs body
 </div>
 <div class="section" id="id3">
 <h2>7.1.2. 原因<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
-<p>このような挙動になるのは全文検索時に複数の検索の挙動を使い分けているからです。ここでは簡単に説明するので、詳細は <a class="reference internal" href="../spec/search.html#spec-search"><em>検索</em></a> を参照してください。</p>
+<p>このような挙動になるのは全文検索時に複数の検索の挙動を使い分けているからです。ここでは簡単に説明するので、詳細は <a class="reference internal" href="../spec/search.html"><em>検索</em></a> を参照してください。</p>
 <p>検索の挙動には以下の3種類があります。</p>
 <ol class="arabic simple">
 <li>完全一致検索</li>
@@ -117,7 +137,7 @@ column_create Terms blog_body COLUMN_INDEX|WITH_POSITION Blogs body
 <div class="section" id="id4">
 <h2>7.1.3. 対策方法1: トークナイザーを変更する<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
 <p>TokenMecabトークナイザーは事前に準備した辞書を用いてトークナイズするため、再現率よりも適合率を重視したトークナイザーと言えます。一方、TokenBigramなど、N-gram系のトークナイザーは適合率を重視したトークナイザーと言えます。例えば、TokenMecabの場合「東京都」で「京都」に完全一致することはありませんが、TokenBigramでは完全一致します。一方、TokenMecabでは「東京都民」に完全一致しませんが、TokenBigramでは完全一致します。</p>
-<p>このようにN-gram系のトークナイザーを指定することにより再現率をあげることができますが、適合率が下がり検索ノイズが含まれる可能性が高くなります。この度合いを調整するためには <a class="reference internal" href="../commands/select.html#select"><em>select</em></a> のmatch_columnsで使用する索引毎に重み付けを指定します。</p>
+<p>このようにN-gram系のトークナイザーを指定することにより再現率をあげることができますが、適合率が下がり検索ノイズが含まれる可能性が高くなります。この度合いを調整するためには <a class="reference internal" href="../commands/select.html"><em>select</em></a> のmatch_columnsで使用する索引毎に重み付けを指定します。</p>
 <p>ここでも、前述の例を使って具体例を示します。まず、TokenBigramを用いた索引を追加します。:</p>
 <div class="highlight-none"><div class="highlight"><pre>table_create Bigram TABLE_PAT_KEY|KEY_NORMALIZE ShortText --default_tokenizer TokenBigram
 column_create Bigram blog_body COLUMN_INDEX|WITH_POSITION Blogs body
@@ -222,7 +242,14 @@ column_create Bigram blog_body COLUMN_INDEX|WITH_POSITION Blogs body
         <li class="right" >
           <a href="../troubleshooting.html" title="7. トラブルシューティング"
              >previous</a> |</li>
-        <li><a href="../index.html">groonga 1.2.1 documentation</a> &raquo;</li>
+  <li class="other-languages">
+    <ul class="other-languages">
+      <li class="other-language"><a href="../../ja/docs/troubleshooting/different_results_with_the_same_keyword.html"><img src="../static/jp.png" alt="日本語"></a></li>
+    </ul>
+  </li>
+  
+        <li><a href="../index.html">groonga v1.2.1 documentation</a> &raquo;</li>
+
           <li><a href="../troubleshooting.html" >7. トラブルシューティング</a> &raquo;</li> 
       </ul>
     </div>

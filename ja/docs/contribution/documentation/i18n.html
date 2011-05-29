@@ -1,0 +1,308 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>3.2. 国際化 &mdash; groonga v1.2.2ドキュメント</title>
+    
+    <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
+    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../static/doctools.js"></script>
+    <script type="text/javascript" src="../../static/translations.js"></script>
+    <link rel="shortcut icon" href="../../static/favicon.ico"/>
+    <link rel="top" title="groonga v1.2.2ドキュメント" href="../../index.html" />
+    <link rel="up" title="3. ドキュメント関連のコントリビュート方法" href="../documentation.html" />
+    <link rel="prev" title="3.1. C API" href="c-api.html" /> 
+      <meta property="fb:page_id" content="201193596592346" />
+    <meta property="fb:admins" content="kouhei.sutou" />
+    <meta property="og:type" content="product" />
+    <meta property="og:image" content="http://groonga.org/images/groonga.png" />
+    <meta property="og:site_name" content="groonga" />
+    <script src="http://connect.facebook.net/ja_JP/all.js"></script>
+
+    <script>
+    window.fbAsyncInit = function() {
+      FB.init({
+         appId  : null,
+         status : true, // check login status
+         cookie : true, // enable cookies to allow the server to access the session
+         xfbml  : true  // parse XFBML
+      });
+    };
+    </script>
+  </head>
+
+    <body>
+    <div id="fb-root"></div>
+
+<div class="header">
+  <h1 class="title">
+    <a id="top-link" href="../..../../">
+      <span class="project">groonga</span>
+      <span class="separator">-</span>
+      <span class="description">オープンソースのカラムストア機能付き全文検索エンジン</span>
+    </a>
+  </h1>
+
+      <div class="facebook-buttons">
+      <fb:like href="http://www.facebook.com/pages/groonga/201193596592346"
+               layout="standard"
+               width="290"></fb:like>
+    </div>
+    <div class="other-language-links">
+
+    <ul>
+      <li><a href="../../../../docs/contribution/documentation/i18n.html"><img src="../../static/us.png" alt="English"></a></li>
+    </ul>
+  </div>
+</div>
+  
+
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="c-api.html" title="3.1. C API"
+             accesskey="P">前へ</a> |</li>
+        <li><a href="../../index.html">groonga v1.2.2ドキュメント</a> &raquo;</li>
+          <li><a href="../../contribution.html" >9. groongaへのコントリビュート方法</a> &raquo;</li>
+          <li><a href="../documentation.html" accesskey="U">3. ドキュメント関連のコントリビュート方法</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="i18n">
+<h1>3.2. 国際化<a class="headerlink" href="#i18n" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p>今のところ、groongaには日本語でのドキュメントしかありません。1.2.2からgettextベースの <a class="reference internal" href="#sphinx-i18n-feature">Sphinx I18N feature</a> を使ってドキュメントの国際化対応を始めました。この仕組みではベースの言語として英語を使い、日本語などの他の言語には英語からその言語に翻訳します。すべてのドキュメントはdoc/source/以下において、それをSphinxで処理します。</p>
+<p>しかし、今のところ、doc/source/では日本語を使っています。そのため、まずは、doc/source/以下にある日本語のドキュメントを英語に翻訳する必要があります。ドキュメントを翻訳して、パッチを送ってくれるととても喜びます。</p>
+<div class="section" id="translation-flow">
+<h2>3.2.1. 翻訳の流れ<a class="headerlink" href="#translation-flow" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>doc/source/*.txtを更新したら、翻訳を始めます。</p>
+<p>これが翻訳の流れです:</p>
+<ol class="arabic simple">
+<li>groongaのリポジトリをcloneします。</li>
+<li>.poファイルを更新します。</li>
+<li>.poファイルを編集します。</li>
+<li>HTMLファイルを生成します。</li>
+<li>HTMLの出力を確認します。</li>
+<li>翻訳が完了するまで、2.-4.を繰り返します。</li>
+<li>翻訳作業の成果をgroongaプロジェクトに送ってください！</li>
+</ol>
+<p>上記の流れを実行するコマンドラインです。詳細は以降のセクションで説明します。</p>
+<div class="highlight-none"><div class="highlight"><pre># Please fork https://github.com/groonga/groonga on GitHub
+% git clone https://github.com/${YOUR_GITHUB_ACCOUNT}/groonga.git
+% ./autogen.sh
+% ./configure
+% cd doc/locale/${LANGUAGE}/LC_MESSAGES # ${LANGUAGE} is language code such as &#39;ja&#39;.
+% make update # *.po are updated
+% editor *.po # translate *.po # you can use your favorite editor
+% cd ..
+% make html
+% browser html/index.html # confirm translation
+% git add LC_MESSAGES/*.po
+% git commit
+% git push
+</pre></div>
+</div>
+</div>
+<div class="section" id="how-to-clone-groonga-repository">
+<h2>3.2.2. groongaリポジトリのcloneの仕方<a class="headerlink" href="#how-to-clone-groonga-repository" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>はじめに、GitHub上のgroongaリポジトリをforkしてください。 <a class="reference external" href="https://github.com/groonga/groonga">https://github.com/groonga/groonga</a> にアクセスして <cite>Fork</cite> ボタンを押すだけです。これで自分のgroongaリポジトリをcloneすることができます。:</p>
+<div class="highlight-none"><div class="highlight"><pre>% git clone https://github.com/${YOUR_GITHUB_ACCOUNT}/groonga.git
+</pre></div>
+</div>
+<p>cloneした後はconfigureする必要があります。:</p>
+<div class="highlight-none"><div class="highlight"><pre>% cd groonga
+% ./autogen.sh
+% ./configure
+</pre></div>
+</div>
+<p>この作業は初回セットアップ時のみだけの作業です。</p>
+<p>以上の作業で問題があった場合は、 <a class="reference external" href="http://packages.groonga.org/source/groonga/">http://packages.groonga.org/source/groonga/</a> にあるソースファイルを利用してもよいです。</p>
+</div>
+<div class="section" id="how-to-update-po-files">
+<h2>3.2.3. .poファイルの更新の仕方<a class="headerlink" href="#how-to-update-po-files" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>doc/locale/${LANGUAGE}/LC_MESSAGESディレクトリで <cite>make update</cite> を実行すると.poファイルを更新できます。（`${LANGUAGE}` は&#8217;ja&#8217;など自分の言語の言語コードに置き換えてください。）:</p>
+<div class="highlight-none"><div class="highlight"><pre>% cd doc/locale/ja/LC_MESSAGES
+% make update
+</pre></div>
+</div>
+</div>
+<div class="section" id="how-to-edit-po">
+<h2>3.2.4. .poの編集の仕方<a class="headerlink" href="#how-to-edit-po" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>.poファイルを編集するためのツールがあります。.poファイルは単なるテキストなので好きなエディタで編集できます。以下は.poファイルの編集に特化したエディタのリストです。</p>
+<dl class="docutils">
+<dt>Emacs&#8217;s <a class="reference external" href="http://www.gnu.org/s/hello/manual/gettext/PO-Mode.html">po-mode</a></dt>
+<dd>gettextに同梱されています。</dd>
+<dt><a class="reference external" href="http://www.poedit.net/">Poedit</a></dt>
+<dd>.po専用エディタです。たくさんのプラットフォームで動作します。</dd>
+<dt>gted</dt>
+<dd>これも.po専用エディタです。Eclipseプラグインとして実装されています。</dd>
+</dl>
+</div>
+<div class="section" id="how-to-generate-html-files">
+<h2>3.2.5. HTMLファイルの生成方法<a class="headerlink" href="#how-to-generate-html-files" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>doc/locale/${LANGUAGE}/LC_MESSAGESディレクトリで <cite>make html</cite> を実行すると更新した.poファイルを使ってHTMLファイルを生成できます。（`${LANGUAGE}` は&#8217;ja&#8217;など自分の言語の言語コードに置き換えてください。）:</p>
+<div class="highlight-none"><div class="highlight"><pre>% cd doc/locale/ja/
+% make html
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">.moファイルは <cite>make html</cite> で自動的に更新されるので、.moファイルのことを気にする必要はありません。</p>
+</div>
+</div>
+<div class="section" id="how-to-confirm-html-output">
+<h2>3.2.6. HTML出力の確認の仕方<a class="headerlink" href="#how-to-confirm-html-output" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>HTMLファイルはdoc/locale/${LANGUAGE}/html/以下に出力されます。（`${LANGUAGE}` は&#8217;ja&#8217;など自分の言語の言語コードに置き換えてください。）好きなブラウザで出力されたHTMLを確認してください。:</p>
+<div class="highlight-none"><div class="highlight"><pre>% firefox doc/locale/ja/html/index.html
+</pre></div>
+</div>
+</div>
+<div class="section" id="how-to-send-your-works">
+<h2>3.2.7. 翻訳の成果の送り方<a class="headerlink" href="#how-to-send-your-works" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>翻訳の成果はGitHubのpull requestかメールで送ってください。メールで送る場合はパッチでも.poファイルそのものでも構いません。</p>
+<div class="section" id="how-to-send-pull-request">
+<h3>3.2.7.1. pull requestの送り方<a class="headerlink" href="#how-to-send-pull-request" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>pull requestを送るためのコマンドライン:</p>
+<div class="highlight-none"><div class="highlight"><pre>% git add doc/locale/ja/LC_MESSAGES/*.po
+% git commit
+% git push
+</pre></div>
+</div>
+<p>これでGitHub上でpull requestを送る準備ができました。あとは、GitHub上の自分のリポジトリのページへアクセスして <cite>Pull Request</cite> ボタンを押すだけです。</p>
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<p class="last"><a class="reference external" href="http://help.github.com/pull-requests/">Help.GitHub - Sending pull requests</a>.</p>
+</div>
+</div>
+<div class="section" id="how-to-send-patch">
+<h3>3.2.7.2. パッチの送り方<a class="headerlink" href="#how-to-send-patch" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>パッチを作るためのコマンドライン</p>
+<div class="highlight-none"><div class="highlight"><pre>% git add doc/locale/ja/LC_MESSAGES/*.po
+% git commit
+% git format-patch origin/master
+</pre></div>
+</div>
+<p>カレントディレクトリに000X-YYY.patchという名前のファイルができていると思います。これをgroongaプロジェクトに送ってください！</p>
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<p class="last"><a class="reference internal" href="../../community.html"><em>コミュニティ</em></a> describes our contact information.</p>
+</div>
+</div>
+<div class="section" id="how-to-send-po-files">
+<h3>3.2.7.3. .poファイルの送り方<a class="headerlink" href="#how-to-send-po-files" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>doc/locale/${LANGUAGE}/LC_MESSAGES/以下を.tar.gzや.zipなどでアーカイブにしてgroongaプロジェクトに送ってください！（`${LANGUAGE}` は&#8217;ja&#8217;など自分の言語の言語コードに置き換えてください。）こちらでアーカイブの中の内容をマージします。</p>
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<p class="last"><a class="reference internal" href="../../community.html"><em>コミュニティ</em></a> describes our contact information.</p>
+</div>
+</div>
+</div>
+<div class="section" id="how-to-add-new-language">
+<h2>3.2.8. 新しい言語の追加方法<a class="headerlink" href="#how-to-add-new-language" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>新しい翻訳対象の言語を追加するコマンドライン:</p>
+<div class="highlight-none"><div class="highlight"><pre>% cd doc/locale
+% make add LOCALE=${LANGUAGE} # specify your language code such as &#39;de&#39;.
+</pre></div>
+</div>
+<p><cite>${LANGUAGE}</cite> は&#8217;ja&#8217;などの自分の言語の言語コードに置き換えてください。</p>
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<p class="last"><a class="reference external" href="http://www.loc.gov/standards/iso639-2/php/English_list.php">Codes for the Representation of Names of Languages</a>.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">3.2. 国際化</a><ul>
+<li><a class="reference internal" href="#translation-flow">3.2.1. 翻訳の流れ</a></li>
+<li><a class="reference internal" href="#how-to-clone-groonga-repository">3.2.2. groongaリポジトリのcloneの仕方</a></li>
+<li><a class="reference internal" href="#how-to-update-po-files">3.2.3. .poファイルの更新の仕方</a></li>
+<li><a class="reference internal" href="#how-to-edit-po">3.2.4. .poの編集の仕方</a></li>
+<li><a class="reference internal" href="#how-to-generate-html-files">3.2.5. HTMLファイルの生成方法</a></li>
+<li><a class="reference internal" href="#how-to-confirm-html-output">3.2.6. HTML出力の確認の仕方</a></li>
+<li><a class="reference internal" href="#how-to-send-your-works">3.2.7. 翻訳の成果の送り方</a><ul>
+<li><a class="reference internal" href="#how-to-send-pull-request">3.2.7.1. pull requestの送り方</a></li>
+<li><a class="reference internal" href="#how-to-send-patch">3.2.7.2. パッチの送り方</a></li>
+<li><a class="reference internal" href="#how-to-send-po-files">3.2.7.3. .poファイルの送り方</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-add-new-language">3.2.8. 新しい言語の追加方法</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="c-api.html"
+                        title="前の章へ">3.1. C API</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../sources/contribution/documentation/i18n.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="c-api.html" title="3.1. C API"
+             >前へ</a> |</li>
+        <li><a href="../../index.html">groonga v1.2.2ドキュメント</a> &raquo;</li>
+          <li><a href="../../contribution.html" >9. groongaへのコントリビュート方法</a> &raquo;</li>
+          <li><a href="../documentation.html" >3. ドキュメント関連のコントリビュート方法</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009-2011, Brazil, Inc.
+    </div>
+  </body>
+</html>

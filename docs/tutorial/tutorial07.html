@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>4.7. match_columnsパラメータ &mdash; groonga v1.2.2 documentation</title>
+    <title>4.7. match_columnsパラメータ &mdash; groonga v1.2.3 documentation</title>
     
     <link rel="stylesheet" href="../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.2.2',
+        VERSION:     '1.2.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,27 +24,15 @@
     <script type="text/javascript" src="../static/underscore.js"></script>
     <script type="text/javascript" src="../static/doctools.js"></script>
     <link rel="shortcut icon" href="../static/favicon.ico"/>
-    <link rel="top" title="groonga v1.2.2 documentation" href="../index.html" />
+    <link rel="top" title="groonga v1.2.3 documentation" href="../index.html" />
     <link rel="up" title="4. チュートリアル" href="../tutorial.html" />
     <link rel="next" title="4.8. 主キーによる前方一致検索" href="tutorial08.html" />
     <link rel="prev" title="4.6. タグ検索・参照関係の逆引き" href="tutorial06.html" /> 
-      <meta property="fb:page_id" content="201193596592346" />
+      <meta property="fb:page_id" content="groonga" />
     <meta property="fb:admins" content="kouhei.sutou" />
     <meta property="og:type" content="product" />
     <meta property="og:image" content="http://groonga.org/images/groonga.png" />
     <meta property="og:site_name" content="groonga" />
-    <script src="http://connect.facebook.net/en_US/all.js"></script>
-
-    <script>
-    window.fbAsyncInit = function() {
-      FB.init({
-         appId  : null,
-         status : true, // check login status
-         cookie : true, // enable cookies to allow the server to access the session
-         xfbml  : true  // parse XFBML
-      });
-    };
-    </script>
 
     <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
   </head>
@@ -87,7 +75,7 @@
         <li class="right" >
           <a href="tutorial06.html" title="4.6. タグ検索・参照関係の逆引き"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">groonga v1.2.2 documentation</a> &raquo;</li>
+        <li><a href="../index.html">groonga v1.2.3 documentation</a> &raquo;</li>
           <li><a href="../tutorial.html" accesskey="U">4. チュートリアル</a> &raquo;</li> 
       </ul>
     </div>  
@@ -109,35 +97,35 @@
 インデックス用のIndexBlog1テーブルも作り、titleカラムのインデックス用にindex_titleカラム、messageカラムのインデック用にindex_messageカラムと、それぞれ1カラムごとに1つずつ追加しています。</p>
 <p>実行例</p>
 <div class="highlight-none"><div class="highlight"><pre>&gt; table_create --name Blog1 --flags TABLE_HASH_KEY --key_type ShortText
-[[0,1294292405.5139,0.046640501],true]
+[[0,1308820990.03354,0.035673804],true]
 &gt; column_create --table Blog1 --name title --flags COLUMN_SCALAR --type ShortText
-[[0,1294292405.76135,0.05035077],true]
+[[0,1308820990.27064,0.039038327],true]
 &gt; column_create --table Blog1 --name message --flags COLUMN_SCALAR --type ShortText
-[[0,1294292406.01251,0.049535938],true]
+[[0,1308820990.51063,0.02746529],true]
 &gt; table_create --name IndexBlog1 --flags TABLE_PAT_KEY|KEY_NORMALIZE --key_type ShortText --default_tokenizer TokenBigram
-[[0,1294292406.2629,0.040450231],true]
+[[0,1308820990.73983,0.050621344],true]
 &gt; column_create --table IndexBlog1 --name index_title --flags COLUMN_INDEX|WITH_POSITION --type Blog1 --source title
-[[0,1294292406.50413,0.089260402],true]
+[[0,1308820990.99215,0.0775106330000001],true]
 &gt; column_create --table IndexBlog1 --name index_message --flags COLUMN_INDEX|WITH_POSITION --type Blog1 --source message
-[[0,1294292406.7942,0.116405104],true]
 &gt; load --table Blog1
+[[0,1308820991.2714,0.374852452],true]
 &gt; [
 &gt; {&quot;_key&quot;:&quot;grn1&quot;,&quot;title&quot;:&quot;groonga test&quot;,&quot;message&quot;:&quot;groonga message&quot;},
 &gt; {&quot;_key&quot;:&quot;grn2&quot;,&quot;title&quot;:&quot;baseball result&quot;,&quot;message&quot;:&quot;rakutan eggs 4 - 4 groonga moritars&quot;},
 &gt; {&quot;_key&quot;:&quot;grn3&quot;,&quot;title&quot;:&quot;groonga message&quot;,&quot;message&quot;:&quot;none&quot;}
 &gt; ]
-[[0,1294292407.11144,1.001433691],3]
+[[0,1308820991.64629,1.006391124],3]
 </pre></div>
 </div>
 <p>match_columnsオプションで、検索対象のカラムを複数指定することが出来ます。検索する文字列はqueryオプションで指定します。これを使うことで、タイトルと本文を全文検索することができます。</p>
 <p>実際に検索してみましょう。</p>
 <p>実行例</p>
 <div class="highlight-none"><div class="highlight"><pre>&gt; select --table Blog1 --match_columns title||message --query groonga
-[[0,1294292408.31388,0.000823528],[[[3],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;],[&quot;message&quot;,&quot;ShortText&quot;]],[1,&quot;grn1&quot;,&quot;groonga test&quot;,&quot;groonga message&quot;],[3,&quot;grn3&quot;,&quot;groonga message&quot;,&quot;none&quot;],[2,&quot;grn2&quot;,&quot;baseball result&quot;,&quot;rakutan eggs 4 - 4 groonga moritars&quot;]]]]
+[[0,1308820992.85475,0.000567046],[[[3],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;],[&quot;message&quot;,&quot;ShortText&quot;]],[1,&quot;grn1&quot;,&quot;groonga test&quot;,&quot;groonga message&quot;],[3,&quot;grn3&quot;,&quot;groonga message&quot;,&quot;none&quot;],[2,&quot;grn2&quot;,&quot;baseball result&quot;,&quot;rakutan eggs 4 - 4 groonga moritars&quot;]]]]
 &gt; select --table Blog1 --match_columns title||message --query message
-[[0,1294292408.5178,0.000566064],[[[2],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;],[&quot;message&quot;,&quot;ShortText&quot;]],[3,&quot;grn3&quot;,&quot;groonga message&quot;,&quot;none&quot;],[1,&quot;grn1&quot;,&quot;groonga test&quot;,&quot;groonga message&quot;]]]]
+[[0,1308820993.05879,0.000509674],[[[2],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;],[&quot;message&quot;,&quot;ShortText&quot;]],[3,&quot;grn3&quot;,&quot;groonga message&quot;,&quot;none&quot;],[1,&quot;grn1&quot;,&quot;groonga test&quot;,&quot;groonga message&quot;]]]]
 &gt; select --table Blog1 --match_columns title --query message
-[[0,1294292408.72074,0.0004798],[[[1],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;],[&quot;message&quot;,&quot;ShortText&quot;]],[3,&quot;grn3&quot;,&quot;groonga message&quot;,&quot;none&quot;]]]]
+[[0,1308820993.26226,0.000493886],[[[1],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;],[&quot;message&quot;,&quot;ShortText&quot;]],[3,&quot;grn3&quot;,&quot;groonga message&quot;,&quot;none&quot;]]]]
 </pre></div>
 </div>
 </div>
@@ -147,32 +135,32 @@
 <p>共通のインデックスを用いても、titleカラムのみでの検索、messageカラムのみでの検索、titleもしくはmessageカラムでの検索、全ての検索を行うことができます。</p>
 <p>実行例</p>
 <div class="highlight-none"><div class="highlight"><pre>&gt; table_create --name Blog2 --flags TABLE_HASH_KEY --key_type ShortText
-[[0,1294292408.92333,0.107518903],true]
+[[0,1308820993.46608,0.05057593],true]
 &gt; column_create --table Blog2 --name title --flags COLUMN_SCALAR --type ShortText
-[[0,1294292409.23168,0.050369538],true]
+[[0,1308820993.71836,0.038892177],true]
 &gt; column_create --table Blog2 --name message --flags COLUMN_SCALAR --type ShortText
-[[0,1294292409.48288,0.049530167],true]
+[[0,1308820993.95896,0.050752981],true]
 &gt; table_create --name IndexBlog2 --flags TABLE_PAT_KEY|KEY_NORMALIZE --key_type ShortText --default_tokenizer TokenBigram
-[[0,1294292409.73325,0.04885075],true]
+[[0,1308820994.21131,0.038689527],true]
 &gt; column_create --table IndexBlog2 --name index_blog --flags COLUMN_INDEX|WITH_POSITION|WITH_SECTION --type Blog2 --source title,message
-[[0,1294292409.98288,0.105489516],true]
+[[0,1308820994.45174,0.089530422],true]
 &gt; load --table Blog2
 &gt; [
 &gt; {&quot;_key&quot;:&quot;grn1&quot;,&quot;title&quot;:&quot;groonga test&quot;,&quot;message&quot;:&quot;groonga message&quot;},
 &gt; {&quot;_key&quot;:&quot;grn2&quot;,&quot;title&quot;:&quot;baseball result&quot;,&quot;message&quot;:&quot;rakutan eggs 4 - 4 groonga moritars&quot;},
 &gt; {&quot;_key&quot;:&quot;grn3&quot;,&quot;title&quot;:&quot;groonga message&quot;,&quot;message&quot;:&quot;none&quot;}
 &gt; ]
-[[0,1294292410.28918,1.001414874],3]
+[[0,1308820994.74295,1.006034383],3]
 </pre></div>
 </div>
 <p>実際に検索してみましょう。結果は上の例と同じになります。</p>
 <p>実行例</p>
 <div class="highlight-none"><div class="highlight"><pre>&gt; select --table Blog2 --match_columns title||message --query groonga
-[[0,1294292411.49151,0.000575701],[[[3],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;],[&quot;message&quot;,&quot;ShortText&quot;]],[1,&quot;grn1&quot;,&quot;groonga test&quot;,&quot;groonga message&quot;],[2,&quot;grn2&quot;,&quot;baseball result&quot;,&quot;rakutan eggs 4 - 4 groonga moritars&quot;],[3,&quot;grn3&quot;,&quot;groonga message&quot;,&quot;none&quot;]]]]
+[[0,1308820995.95094,0.000554864],[[[3],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;],[&quot;message&quot;,&quot;ShortText&quot;]],[1,&quot;grn1&quot;,&quot;groonga test&quot;,&quot;groonga message&quot;],[2,&quot;grn2&quot;,&quot;baseball result&quot;,&quot;rakutan eggs 4 - 4 groonga moritars&quot;],[3,&quot;grn3&quot;,&quot;groonga message&quot;,&quot;none&quot;]]]]
 &gt; select --table Blog2 --match_columns title||message --query message
-[[0,1294292411.69532,0.000523916],[[[2],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;],[&quot;message&quot;,&quot;ShortText&quot;]],[1,&quot;grn1&quot;,&quot;groonga test&quot;,&quot;groonga message&quot;],[3,&quot;grn3&quot;,&quot;groonga message&quot;,&quot;none&quot;]]]]
+[[0,1308820996.1552,0.000481635],[[[2],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;],[&quot;message&quot;,&quot;ShortText&quot;]],[1,&quot;grn1&quot;,&quot;groonga test&quot;,&quot;groonga message&quot;],[3,&quot;grn3&quot;,&quot;groonga message&quot;,&quot;none&quot;]]]]
 &gt; select --table Blog2 --match_columns title --query message
-[[0,1294292411.89825,0.000508446],[[[1],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;],[&quot;message&quot;,&quot;ShortText&quot;]],[3,&quot;grn3&quot;,&quot;groonga message&quot;,&quot;none&quot;]]]]
+[[0,1308820996.35865,0.000473223],[[[1],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;],[&quot;message&quot;,&quot;ShortText&quot;]],[3,&quot;grn3&quot;,&quot;groonga message&quot;,&quot;none&quot;]]]]
 </pre></div>
 </div>
 </div>
@@ -247,12 +235,23 @@
         <li class="right" >
           <a href="tutorial06.html" title="4.6. タグ検索・参照関係の逆引き"
              >previous</a> |</li>
-        <li><a href="../index.html">groonga v1.2.2 documentation</a> &raquo;</li>
+        <li><a href="../index.html">groonga v1.2.3 documentation</a> &raquo;</li>
           <li><a href="../tutorial.html" >4. チュートリアル</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2009-2011, Brazil, Inc.
     </div>
+      <script src="http://connect.facebook.net/en_US/all.js"></script>
+
+    <script>
+      FB.init({
+         appId  : null,
+         status : true, // check login status
+         cookie : true, // enable cookies to allow the server to access the session
+         xfbml  : true  // parse XFBML
+      });
+    </script>
   </body>
+
 </html>

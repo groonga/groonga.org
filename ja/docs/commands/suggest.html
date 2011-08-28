@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>5.2.20. suggest &mdash; groonga v1.2.4ドキュメント</title>
+    <title>6.2.20. suggest &mdash; groonga v1.2.5ドキュメント</title>
     
     <link rel="stylesheet" href="../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.2.4',
+        VERSION:     '1.2.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,12 +25,12 @@
     <script type="text/javascript" src="../static/doctools.js"></script>
     <script type="text/javascript" src="../static/translations.js"></script>
     <link rel="shortcut icon" href="../static/favicon.ico"/>
-    <link rel="top" title="groonga v1.2.4ドキュメント" href="../index.html" />
-    <link rel="up" title="5.2. コマンド" href="../commands.html" />
-    <link rel="next" title="5.2.21. table_create" href="table_create.html" />
-    <link rel="prev" title="5.2.19. status" href="status.html" /> 
-      <meta property="fb:page_id" content="groonga" />
-    <meta property="fb:admins" content="kouhei.sutou" />
+    <link rel="top" title="groonga v1.2.5ドキュメント" href="../index.html" />
+    <link rel="up" title="6.2. コマンド" href="../commands.html" />
+    <link rel="next" title="6.2.21. table_create" href="table_create.html" />
+    <link rel="prev" title="6.2.19. status" href="status.html" /> 
+      <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
+    <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
     <meta property="og:type" content="product" />
     <meta property="og:image" content="http://groonga.org/images/groonga.png" />
     <meta property="og:site_name" content="groonga" />
@@ -71,14 +71,14 @@
           <a href="../genindex.html" title="総合索引"
              accesskey="I">索引</a></li>
         <li class="right" >
-          <a href="table_create.html" title="5.2.21. table_create"
+          <a href="table_create.html" title="6.2.21. table_create"
              accesskey="N">次へ</a> |</li>
         <li class="right" >
-          <a href="status.html" title="5.2.19. status"
+          <a href="status.html" title="6.2.19. status"
              accesskey="P">前へ</a> |</li>
-        <li><a href="../index.html">groonga v1.2.4ドキュメント</a> &raquo;</li>
-          <li><a href="../reference.html" >5. リファレンスマニュアル</a> &raquo;</li>
-          <li><a href="../commands.html" accesskey="U">5.2. コマンド</a> &raquo;</li> 
+        <li><a href="../index.html">groonga v1.2.5ドキュメント</a> &raquo;</li>
+          <li><a href="../reference.html" >6. リファレンスマニュアル</a> &raquo;</li>
+          <li><a href="../commands.html" accesskey="U">6.2. コマンド</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -88,68 +88,231 @@
           <div class="body">
             
   <div class="section" id="suggest">
-<h1>5.2.20. suggest<a class="headerlink" href="#suggest" title="このヘッドラインへのパーマリンク">¶</a></h1>
-<p>** 未だ仕様は確定しておりません。利用のためには特定のデータを持つテーブルが必要となります。 **</p>
-<div class="section" id="id1">
-<h2>5.2.20.1. 名前<a class="headerlink" href="#id1" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>suggest - 指定したクエリに対する補完・修正・提案を行う。</p>
+<h1>6.2.20. suggest<a class="headerlink" href="#suggest" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">サジェスト機能の仕様はまだ確定していません。仕様は変更される可能性があります。</p>
 </div>
-<div class="section" id="id2">
-<h2>5.2.20.2. 書式<a class="headerlink" href="#id2" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="highlight-none"><div class="highlight"><pre>suggest types table column query
+<div class="section" id="name">
+<h2>6.2.20.1. 名前<a class="headerlink" href="#name" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>suggest - 指定されたクエリに対する補完・補正・提案候補を返す。</p>
+</div>
+<div class="section" id="synopsis">
+<h2>6.2.20.2. 書式<a class="headerlink" href="#synopsis" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<div class="highlight-none"><div class="highlight"><pre>suggest types table column query [sortby [output_columns [offset [limit [frequency_threshold [conditional_probability_threshold [prefix_search]]]]]]]
 </pre></div>
 </div>
 </div>
-<div class="section" id="id3">
-<h2>5.2.20.3. 説明<a class="headerlink" href="#id3" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>suggestコマンドは、指定したクエリに対して補完・修正・提案を行います。</p>
-<p>補完とは、クエリの未入力・未変換部分を補うことです。修正とは、クエリ内のミスタイプや誤変換を修正することです。提案とは、さらなる絞込みを行うための候補となるクエリを提案することです。</p>
+<div class="section" id="description">
+<h2>6.2.20.3. 説明<a class="headerlink" href="#description" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>suggestコマンドは指定されたクエリに対する補完・補正・提案候補を返します。</p>
+<p>補完・補正・提案については <a class="reference internal" href="../suggest/introduction.html"><em>はじめに</em></a> を参照してください。</p>
 </div>
-<div class="section" id="id4">
-<h2>5.2.20.4. 引数<a class="headerlink" href="#id4" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p><tt class="docutils literal"><span class="pre">types</span></tt></p>
+<div class="section" id="options">
+<h2>6.2.20.4. オプション<a class="headerlink" href="#options" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">types</span></tt></dt>
+<dd><p class="first">suggestコマンドでどの種類の候補を返すかを指定します。</p>
+<p>指定できる種類は以下の通りです。</p>
 <blockquote>
-<div><p>補完・修正・提案のいずれを行うかを、パイプ('|')で組み合わせたシンボル名で指定します(例: correct|suggest)</p>
-<p><tt class="docutils literal"><span class="pre">complete</span></tt></p>
-<blockquote>
-<div>補完を行います。</div></blockquote>
-<p><tt class="docutils literal"><span class="pre">correct</span></tt></p>
-<blockquote>
-<div>修正を行います。</div></blockquote>
-<p><tt class="docutils literal"><span class="pre">suggest</span></tt></p>
-<blockquote>
-<div>提案を行います。</div></blockquote>
+<div><dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">complete</span></tt></dt>
+<dd>補完を実行します。</dd>
+<dt><tt class="docutils literal"><span class="pre">correct</span></tt></dt>
+<dd>補正を実行します。</dd>
+<dt><tt class="docutils literal"><span class="pre">suggest</span></tt></dt>
+<dd>提案を実行します。</dd>
+</dl>
 </div></blockquote>
-<p><tt class="docutils literal"><span class="pre">table</span></tt></p>
-<blockquote>
-<div>基礎となるデータが格納されているテーブル名を指定します。</div></blockquote>
-<p><tt class="docutils literal"><span class="pre">column</span></tt></p>
-<blockquote>
-<div>基礎となるデータが格納されているテーブルにおいて、「ヨミガナ」が格納されているカラム名を指定します。</div></blockquote>
-<p><tt class="docutils literal"><span class="pre">query</span></tt></p>
-<blockquote>
-<div>補完・修正・提案の対象となるクエリを指定します。</div></blockquote>
+<p>1つ以上の種類を指定できます。複数の種類を指定する場合は <tt class="docutils literal"><span class="pre">|</span></tt> で区切ります。以下が例です。:</p>
+<blockquote class="last">
+<div><p>補正候補を返します:</p>
+<div class="highlight-none"><div class="highlight"><pre>correct
+</pre></div>
 </div>
-<div class="section" id="id5">
-<h2>5.2.20.5. 返値<a class="headerlink" href="#id5" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="section" id="json">
-<h3>5.2.20.5.1. json形式<a class="headerlink" href="#json" title="このヘッドラインへのパーマリンク">¶</a></h3>
-<div class="highlight-none"><div class="highlight"><pre>{&quot;タイプ1&quot;:[[&quot;候補1&quot;, 候補1のスコア], [&quot;候補2&quot;, 候補2のスコア], ...], ...}
-
-``タイプ``
-
-  types引数に指定した値。
-
-``候補``
-
-  補完・修正・提案の候補。
-
-``候補のスコア``
-
-  補完・修正・提案として優れたものほど高くなる数値。結果は、スコア順にソートされている。
+<p>補正候補と提案候補を返します:</p>
+<div class="highlight-none"><div class="highlight"><pre>correct|suggest
+</pre></div>
+</div>
+<p>補完候補と補正候補と提案候補を返します:</p>
+<div class="highlight-none"><div class="highlight"><pre>complete|correct|suggest
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">table</span></tt></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">item_${データセット名}</span></tt> というフォーマットのテーブル名を指定します。例えば、以下のコマンドでデータセットを作成した場合はテーブル名として <tt class="docutils literal"><span class="pre">item_query</span></tt> を指定します:</p>
+<div class="last highlight-none"><div class="highlight"><pre>groonga-suggest-create-dataset /tmp/db-path query
+</pre></div>
+</div>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">column</span></tt></dt>
+<dd><tt class="docutils literal"><span class="pre">table</span></tt> で指定したテーブルにあるふりがな情報を含むカラムを指定します。ふりがなはカタカナで指定します。</dd>
+<dt><tt class="docutils literal"><span class="pre">query</span></tt></dt>
+<dd>補完・補正・提案対象のクエリを指定します。</dd>
+<dt><tt class="docutils literal"><span class="pre">sortby</span></tt></dt>
+<dd><p class="first">ソートキーを指定します。</p>
+<dl class="last docutils">
+<dt>Default:</dt>
+<dd><tt class="docutils literal"><span class="pre">-_score</span></tt></dd>
+</dl>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">output_columns</span></tt></dt>
+<dd><p class="first">出力するカラムを指定します。</p>
+<dl class="last docutils">
+<dt>Default:</dt>
+<dd><tt class="docutils literal"><span class="pre">_key,_score</span></tt></dd>
+</dl>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">offset</span></tt></dt>
+<dd><p class="first">返されるレコードのオフセットを指定します。</p>
+<dl class="last docutils">
+<dt>Default:</dt>
+<dd><tt class="docutils literal"><span class="pre">0</span></tt></dd>
+</dl>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">limit</span></tt></dt>
+<dd><p class="first">返されるレコード数を指定します。</p>
+<dl class="last docutils">
+<dt>Default:</dt>
+<dd><tt class="docutils literal"><span class="pre">10</span></tt></dd>
+</dl>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">frequency_threshold</span></tt></dt>
+<dd><p class="first">出現頻度に対する閾値を指定します。返されるレコードの <tt class="docutils literal"><span class="pre">_score</span></tt> 値は <tt class="docutils literal"><span class="pre">frequency_threshold</span></tt> 以上になります。</p>
+<dl class="last docutils">
+<dt>Default:</dt>
+<dd><tt class="docutils literal"><span class="pre">100</span></tt></dd>
+</dl>
+</dd>
+</dl>
+<p><tt class="docutils literal"><span class="pre">conditional_probability_threshold</span></tt></p>
+<blockquote>
+<div><p>条件付き確率に対する閾値を指定します。学習データに対して条件付き確率を使います。ここで使う条件付き確率は、入力した <tt class="docutils literal"><span class="pre">query</span></tt> と同じ入力があったときにクエリが検索された確率です。返されるレコードの条件付き確率は <tt class="docutils literal"><span class="pre">conditional_probability_threshold</span></tt> 以上になります。</p>
+<dl class="docutils">
+<dt>Default:</dt>
+<dd><tt class="docutils literal"><span class="pre">0.2</span></tt></dd>
+</dl>
+</div></blockquote>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">prefix_search</span></tt></dt>
+<dd><p class="first">補完時に前方一致検索を実行するかどうかを指定します。</p>
+<p>指定可能な値は以下の通りです。</p>
+<blockquote>
+<div><dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">yes</span></tt></dt>
+<dd>常に前方一致検索を実行します。</dd>
+<dt><tt class="docutils literal"><span class="pre">no</span></tt></dt>
+<dd>前方一致検索を実行しません。</dd>
+<dt><tt class="docutils literal"><span class="pre">auto</span></tt></dt>
+<dd>他の検索でレコードが見つからない場合のみ前方一致検索を実行します。</dd>
+</dl>
+</div></blockquote>
+<dl class="last docutils">
+<dt>Default:</dt>
+<dd><tt class="docutils literal"><span class="pre">auto</span></tt></dd>
+</dl>
+</dd>
+</dl>
+</div>
+<div class="section" id="return-value">
+<h2>6.2.20.5. 返値<a class="headerlink" href="#return-value" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<div class="section" id="json-format">
+<h3>6.2.20.5.1. JSON形式<a class="headerlink" href="#json-format" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>返されるJSON形式は以下の通りです:</p>
+<div class="highlight-none"><div class="highlight"><pre>{&quot;type1&quot;: [[&quot;candidate1&quot;, score of candidate1],
+           [&quot;candidate2&quot;, score of candidate2],
+           ...],
+ &quot;type2&quot;: [[&quot;candidate1&quot;, score of candidate1],
+           [&quot;candidate2&quot;, score of candidate2],
+           ...],
+ ...}
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">type</span></tt></p>
+<blockquote>
+<div><tt class="docutils literal"><span class="pre">types</span></tt> で指定した値。</div></blockquote>
+<p><tt class="docutils literal"><span class="pre">candidate</span></tt></p>
+<blockquote>
+<div>補完・補正・提案候補。</div></blockquote>
+<p><tt class="docutils literal"><span class="pre">score</span> <span class="pre">of</span> <span class="pre">candidate</span></tt></p>
+<blockquote>
+<div>対応する <tt class="docutils literal"><span class="pre">candidate</span></tt> のスコアです。スコアが高いほど補完・補正・提案候補として有力という意味になります。デフォルトでは候補は <tt class="docutils literal"><span class="pre">score</span> <span class="pre">of</span> <span class="pre">candidate</span></tt> の降順でソートされています。</div></blockquote>
+</div>
+</div>
+<div class="section" id="example">
+<h2>6.2.20.6. 例<a class="headerlink" href="#example" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>以下は補完用の学習データです。</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; load --table event_query --each &#39;suggest_preparer(_id, type, item, sequence, time, pair_query)&#39;
+&gt; [
+&gt; {&quot;sequence&quot;: &quot;1&quot;, &quot;time&quot;: 1312950803.86057, &quot;item&quot;: &quot;e&quot;},
+&gt; {&quot;sequence&quot;: &quot;1&quot;, &quot;time&quot;: 1312950803.96857, &quot;item&quot;: &quot;en&quot;},
+&gt; {&quot;sequence&quot;: &quot;1&quot;, &quot;time&quot;: 1312950804.26057, &quot;item&quot;: &quot;eng&quot;},
+&gt; {&quot;sequence&quot;: &quot;1&quot;, &quot;time&quot;: 1312950804.56057, &quot;item&quot;: &quot;engi&quot;},
+&gt; {&quot;sequence&quot;: &quot;1&quot;, &quot;time&quot;: 1312950804.76057, &quot;item&quot;: &quot;engin&quot;},
+&gt; {&quot;sequence&quot;: &quot;1&quot;, &quot;time&quot;: 1312950805.86057, &quot;item&quot;: &quot;engine&quot;, &quot;type&quot;: &quot;submit&quot;}
+&gt; ]
+[[0,1313562872.82845,1.577141877],6]
+</pre></div>
+</div>
+<p>以下は補正用の学習データです。</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; load --table event_query --each &#39;suggest_preparer(_id, type, item, sequence, time, pair_query)&#39;
+&gt; [
+&gt; {&quot;sequence&quot;: &quot;2&quot;, &quot;time&quot;: 1312950803.86057, &quot;item&quot;: &quot;s&quot;},
+&gt; {&quot;sequence&quot;: &quot;2&quot;, &quot;time&quot;: 1312950803.96857, &quot;item&quot;: &quot;sa&quot;},
+&gt; {&quot;sequence&quot;: &quot;2&quot;, &quot;time&quot;: 1312950804.26057, &quot;item&quot;: &quot;sae&quot;},
+&gt; {&quot;sequence&quot;: &quot;2&quot;, &quot;time&quot;: 1312950804.56057, &quot;item&quot;: &quot;saer&quot;},
+&gt; {&quot;sequence&quot;: &quot;2&quot;, &quot;time&quot;: 1312950804.76057, &quot;item&quot;: &quot;saerc&quot;},
+&gt; {&quot;sequence&quot;: &quot;2&quot;, &quot;time&quot;: 1312950805.76057, &quot;item&quot;: &quot;saerch&quot;, &quot;type&quot;: &quot;submit&quot;},
+&gt; {&quot;sequence&quot;: &quot;2&quot;, &quot;time&quot;: 1312950809.76057, &quot;item&quot;: &quot;serch&quot;},
+&gt; {&quot;sequence&quot;: &quot;2&quot;, &quot;time&quot;: 1312950810.86057, &quot;item&quot;: &quot;search&quot;, &quot;type&quot;: &quot;submit&quot;}
+&gt; ]
+[[0,1313562874.6075,2.004191545],8]
+</pre></div>
+</div>
+<p>以下は提案用の学習データです。</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; load --table event_query --each &#39;suggest_preparer(_id, type, item, sequence, time, pair_query)&#39;
+&gt; [
+&gt; {&quot;sequence&quot;: &quot;3&quot;, &quot;time&quot;: 1312950803.86057, &quot;item&quot;: &quot;search engine&quot;, &quot;type&quot;: &quot;submit&quot;},
+&gt; {&quot;sequence&quot;: &quot;3&quot;, &quot;time&quot;: 1312950808.86057, &quot;item&quot;: &quot;web search realtime&quot;, &quot;type&quot;: &quot;submit&quot;}
+&gt; ]
+[[0,1313562876.81305,0.801821271],2]
+</pre></div>
+</div>
+<p>以下は補完例です。</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; suggest --table item_query --column kana --types complete --threshold 1 --query en
+[[0,1313562877.81745,0.001827712],{&quot;complete&quot;:[[1],[[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;_score&quot;,&quot;Int32&quot;]],[&quot;engine&quot;,1]]}]
+</pre></div>
+</div>
+<p>以下は補正例です。</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; suggest --table item_query --column kana --types correct --threshold 1 --query saerch
+[[0,1313562878.02203,0.000442789],{&quot;correct&quot;:[[1],[[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;_score&quot;,&quot;Int32&quot;]],[&quot;search&quot;,1]]}]
+</pre></div>
+</div>
+<p>以下は提案例です。</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; suggest --table item_query --column kana --types suggest --threshold 1 --query search
+[[0,1313562878.22422,0.000812428],{&quot;suggest&quot;:[[2],[[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;_score&quot;,&quot;Int32&quot;]],[&quot;search engine&quot;,1],[&quot;web search realtime&quot;,1]]}]
+</pre></div>
+</div>
+<p>以下は補完・補正・提案を混ぜた例です。</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; suggest --table item_query --column kana --types complete|correct|suggest --threshold 1 --query search
+[[0,1313562878.42973,0.001223259],{&quot;complete&quot;:[[2],[[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;_score&quot;,&quot;Int32&quot;]],[&quot;search&quot;,2],[&quot;search engine&quot;,2]],&quot;correct&quot;:[[1],[[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;_score&quot;,&quot;Int32&quot;]],[&quot;search&quot;,2]],&quot;suggest&quot;:[[2],[[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;_score&quot;,&quot;Int32&quot;]],[&quot;search engine&quot;,1],[&quot;web search realtime&quot;,1]]}]
 </pre></div>
 </div>
 </div>
+<div class="section" id="see-also">
+<h2>6.2.20.7. 参考<a class="headerlink" href="#see-also" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<ul class="simple">
+<li><a class="reference internal" href="../suggest.html"><em>サジェスト</em></a></li>
+<li><a class="reference internal" href="../executables/groonga-suggest-create-dataset.html"><em>groonga-suggest-create-dataset</em></a></li>
+</ul>
 </div>
 </div>
 
@@ -161,25 +324,27 @@
         <div class="sphinxsidebarwrapper">
   <h3><a href="../index.html">目次</a></h3>
   <ul>
-<li><a class="reference internal" href="#">5.2.20. suggest</a><ul>
-<li><a class="reference internal" href="#id1">5.2.20.1. 名前</a></li>
-<li><a class="reference internal" href="#id2">5.2.20.2. 書式</a></li>
-<li><a class="reference internal" href="#id3">5.2.20.3. 説明</a></li>
-<li><a class="reference internal" href="#id4">5.2.20.4. 引数</a></li>
-<li><a class="reference internal" href="#id5">5.2.20.5. 返値</a><ul>
-<li><a class="reference internal" href="#json">5.2.20.5.1. json形式</a></li>
+<li><a class="reference internal" href="#">6.2.20. suggest</a><ul>
+<li><a class="reference internal" href="#name">6.2.20.1. 名前</a></li>
+<li><a class="reference internal" href="#synopsis">6.2.20.2. 書式</a></li>
+<li><a class="reference internal" href="#description">6.2.20.3. 説明</a></li>
+<li><a class="reference internal" href="#options">6.2.20.4. オプション</a></li>
+<li><a class="reference internal" href="#return-value">6.2.20.5. 返値</a><ul>
+<li><a class="reference internal" href="#json-format">6.2.20.5.1. JSON形式</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#example">6.2.20.6. 例</a></li>
+<li><a class="reference internal" href="#see-also">6.2.20.7. 参考</a></li>
 </ul>
 </li>
 </ul>
 
   <h4>前のトピックへ</h4>
   <p class="topless"><a href="status.html"
-                        title="前の章へ">5.2.19. status</a></p>
+                        title="前の章へ">6.2.19. status</a></p>
   <h4>次のトピックへ</h4>
   <p class="topless"><a href="table_create.html"
-                        title="次の章へ">5.2.21. table_create</a></p>
+                        title="次の章へ">6.2.21. table_create</a></p>
   <h3>このページ</h3>
   <ul class="this-page-menu">
     <li><a href="../sources/commands/suggest.txt"
@@ -209,14 +374,14 @@
           <a href="../genindex.html" title="総合索引"
              >索引</a></li>
         <li class="right" >
-          <a href="table_create.html" title="5.2.21. table_create"
+          <a href="table_create.html" title="6.2.21. table_create"
              >次へ</a> |</li>
         <li class="right" >
-          <a href="status.html" title="5.2.19. status"
+          <a href="status.html" title="6.2.19. status"
              >前へ</a> |</li>
-        <li><a href="../index.html">groonga v1.2.4ドキュメント</a> &raquo;</li>
-          <li><a href="../reference.html" >5. リファレンスマニュアル</a> &raquo;</li>
-          <li><a href="../commands.html" >5.2. コマンド</a> &raquo;</li> 
+        <li><a href="../index.html">groonga v1.2.5ドキュメント</a> &raquo;</li>
+          <li><a href="../reference.html" >6. リファレンスマニュアル</a> &raquo;</li>
+          <li><a href="../commands.html" >6.2. コマンド</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

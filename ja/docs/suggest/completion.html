@@ -1,0 +1,351 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>5.3. 補完 &mdash; groonga v1.2.5ドキュメント</title>
+    
+    <link rel="stylesheet" href="../static/groonga.css" type="text/css" />
+    <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.2.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../static/jquery.js"></script>
+    <script type="text/javascript" src="../static/underscore.js"></script>
+    <script type="text/javascript" src="../static/doctools.js"></script>
+    <script type="text/javascript" src="../static/translations.js"></script>
+    <link rel="shortcut icon" href="../static/favicon.ico"/>
+    <link rel="top" title="groonga v1.2.5ドキュメント" href="../index.html" />
+    <link rel="up" title="5. サジェスト" href="../suggest.html" />
+    <link rel="next" title="5.4. 補正" href="correction.html" />
+    <link rel="prev" title="5.2. チュートリアル" href="tutorial.html" /> 
+      <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
+    <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
+    <meta property="og:type" content="product" />
+    <meta property="og:image" content="http://groonga.org/images/groonga.png" />
+    <meta property="og:site_name" content="groonga" />
+
+    <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
+  </head>
+
+    <body>
+    <div id="fb-root"></div>
+
+<div class="header">
+  <h1 class="title">
+    <a id="top-link" href="../../">
+      <span class="project">groonga</span>
+      <span class="separator">-</span>
+      <span class="description">オープンソースのカラムストア機能付き全文検索エンジン</span>
+    </a>
+  </h1>
+
+      <div class="facebook-buttons">
+      <fb:like href="http://www.facebook.com/pages/groonga/201193596592346"
+               layout="standard"
+               width="290"></fb:like>
+    </div>
+    <div class="other-language-links">
+
+    <ul>
+      <li><a href="../../../docs/suggest/completion.html"><img src="../static/us.png" alt="English"></a></li>
+    </ul>
+  </div>
+</div>
+  
+
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="correction.html" title="5.4. 補正"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="tutorial.html" title="5.2. チュートリアル"
+             accesskey="P">前へ</a> |</li>
+        <li><a href="../index.html">groonga v1.2.5ドキュメント</a> &raquo;</li>
+          <li><a href="../suggest.html" accesskey="U">5. サジェスト</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="completion">
+<h1>5.3. 補完<a class="headerlink" href="#completion" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p>このセクションでは以下の補完機能について説明します。:</p>
+<ul class="simple">
+<li>どのように動作するか</li>
+<li>使い方</li>
+<li>学習方法</li>
+</ul>
+<div class="section" id="how-it-works">
+<h2>5.3.1. どのように動作するか<a class="headerlink" href="#how-it-works" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>補完機能は補完される語を計算するために3種類の検索を使います。</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>登録されている語を前方一致RK検索。</li>
+<li>学習したデータを共起検索。</li>
+<li>登録されている語を前方一致検索。（実行しないこともある）</li>
+</ol>
+</div></blockquote>
+<div class="section" id="prefix-rk-search">
+<h3>5.3.1.1. 前方一致RK検索<a class="headerlink" href="#prefix-rk-search" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>RKはローマ字（Romaji）とカタカナ（Katakana）を意味しています。前方一致RK検索は登録されている語をユーザの入力から前方一致検索します。このとき、ユーザの入力はローマ字でもカタカナでもひらがなでも構いません。この機能は日本語を検索するときに便利です。</p>
+<p>例えば、&quot;日本&quot;という語が登録されているとします。そして、その読みとして&quot;ニホン&quot;（カタカナにしないといけません）が登録されているとします。このとき、ユーザの入力が&quot;ni&quot;でも&quot;二&quot;でも&quot;に&quot;でも&quot;日本&quot;を見つけることができます。</p>
+</div>
+<div class="section" id="cooccurrence-search">
+<h3>5.3.1.2. 共起検索<a class="headerlink" href="#cooccurrence-search" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>共起検索は入力途中のユーザのクエリから登録されている語を見つけます。共起検索では検索データベースとしてユーザの入力シーケンスを使います。これはクエリログやアクセスログなどから学習します。</p>
+<p>例えば、以下のようなユーザの入力シーケンスがあるとします。</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">入力</th>
+<th class="head">検索実行</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>s</td>
+<td>していない</td>
+</tr>
+<tr class="row-odd"><td>se</td>
+<td>していない</td>
+</tr>
+<tr class="row-even"><td>sea</td>
+<td>していない</td>
+</tr>
+<tr class="row-odd"><td>sear</td>
+<td>していない</td>
+</tr>
+<tr class="row-even"><td>searc</td>
+<td>していない</td>
+</tr>
+<tr class="row-odd"><td>search</td>
+<td>した</td>
+</tr>
+<tr class="row-even"><td>e</td>
+<td>していない</td>
+</tr>
+<tr class="row-odd"><td>en</td>
+<td>していない</td>
+</tr>
+<tr class="row-even"><td>eng</td>
+<td>していない</td>
+</tr>
+<tr class="row-odd"><td>engi</td>
+<td>していない</td>
+</tr>
+<tr class="row-even"><td>engin</td>
+<td>していない</td>
+</tr>
+<tr class="row-odd"><td>engine</td>
+<td>していない</td>
+</tr>
+<tr class="row-even"><td>enginen</td>
+<td>していない（入力ミス！）</td>
+</tr>
+<tr class="row-odd"><td>engine</td>
+<td>した</td>
+</tr>
+</tbody>
+</table>
+<p>groongaは以下のような補完ペアを作ります。:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="33%" />
+<col width="67%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">入力</th>
+<th class="head">補完語</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>s</td>
+<td>search</td>
+</tr>
+<tr class="row-odd"><td>se</td>
+<td>search</td>
+</tr>
+<tr class="row-even"><td>sea</td>
+<td>search</td>
+</tr>
+<tr class="row-odd"><td>sear</td>
+<td>search</td>
+</tr>
+<tr class="row-even"><td>searc</td>
+<td>search</td>
+</tr>
+<tr class="row-odd"><td>e</td>
+<td>engine</td>
+</tr>
+<tr class="row-even"><td>en</td>
+<td>engine</td>
+</tr>
+<tr class="row-odd"><td>eng</td>
+<td>engine</td>
+</tr>
+<tr class="row-even"><td>engi</td>
+<td>engine</td>
+</tr>
+<tr class="row-odd"><td>engin</td>
+<td>engine</td>
+</tr>
+<tr class="row-even"><td>engine</td>
+<td>engine</td>
+</tr>
+<tr class="row-odd"><td>enginen</td>
+<td>engine</td>
+</tr>
+</tbody>
+</table>
+<p>ユーザが検索を実行する前のすべての入力（例では&quot;s&quot;、&quot;se&quot;など）を検索を実行した語（例では&quot;search&quot;）に対応付けます。</p>
+<p>厳密に言うとこの説明は正しくありません。なぜならタイムスタンプに関することを省略しているからです。groongaは本当は「ユーザが検索を実行する前のすべての入力を」使いません。厳密には「ユーザが検索を実行する前の1分以内の入力のみ」を使います。検索実行時から1分より前の入力は使われません。</p>
+<p>ユーザが&quot;sea&quot;と入力したら、共起検索は&quot;search&quot;を返します。なぜなら、「入力」カラムには&quot;sea&quot;という値があり、対応する「補完語」カラムには&quot;search&quot;という値が入っているからです。</p>
+</div>
+<div class="section" id="prefix-search">
+<h3>5.3.1.3. 前方一致検索<a class="headerlink" href="#prefix-search" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>前方一致検索はユーザが入力した文字列から始まる登録済みの語を検索します。この検索は前方一致RK検索とは違ってローマ字、カタカナ、ひらがなを特別扱いしません。</p>
+<p>この検索はいつも実行されるわけではありません。この検索は明示的に実行するように指示するか、前方一致RK検索と共起検索の両方がなにもヒットしないときのみ実行されます。</p>
+<p>例えば、&quot;search&quot;が登録されているとします。ユーザは&quot;s&quot;、&quot;se&quot;、&quot;sea&quot;、&quot;sear&quot;、&quot;searc&quot;、&quot;search&quot;のどれでも&quot;search&quot;を補完候補として利用できます。</p>
+</div>
+</div>
+<div class="section" id="how-to-use">
+<h2>5.3.2. 使い方<a class="headerlink" href="#how-to-use" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>groongaは補完機能を使うために <a class="reference internal" href="../commands/suggest.html"><em>suggest</em></a> コマンドを用意しています。 <cite>--type complete</cite> オプションを使うと補完機能を利用できます。</p>
+<p>例えば、&quot;en&quot;と入力したときの補完結果を取得するコマンドは以下のようになります。:</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; suggest --table item_query --column kana --types complete --threshold 1 --query en
+[[0,1313131879.64588,0.000913584],{&quot;complete&quot;:[[1],[[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;_score&quot;,&quot;Int32&quot;]],[&quot;engine&quot;,1]]}]
+</pre></div>
+</div>
+</div>
+<div class="section" id="how-it-learns">
+<h2>5.3.3. 学習方法<a class="headerlink" href="#how-it-learns" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>共起検索は学習データを使います。学習データはクエリログやアクセスログなどを元に作成します。学習データを作成するには、タイムスタンプ付きの入力シーケンスと、タイムスタンプ付きの検索実行時の入力内容が必要です。</p>
+<p>例えば、ユーザが&quot;engine&quot;で検索したいとします。ユーザが以下のようなシーケンスで検索クエリを入力したとします。:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>2011-08-10T13:33:23+09:00: e</li>
+<li>2011-08-10T13:33:23+09:00: en</li>
+<li>2011-08-10T13:33:24+09:00: eng</li>
+<li>2011-08-10T13:33:24+09:00: engi</li>
+<li>2011-08-10T13:33:24+09:00: engin</li>
+<li>2011-08-10T13:33:25+09:00: engine （検索実行！）</li>
+</ol>
+</div></blockquote>
+<p>以下のコマンドでこの入力シーケンスから学習できます。:</p>
+<div class="highlight-none"><div class="highlight"><pre>load --table event_query --each &#39;suggest_preparer(_id, type, item, sequence, time, pair_query)&#39;
+[
+{&quot;sequence&quot;: &quot;1&quot;, &quot;time&quot;: 1312950803.86057, &quot;item&quot;: &quot;e&quot;},
+{&quot;sequence&quot;: &quot;1&quot;, &quot;time&quot;: 1312950803.96857, &quot;item&quot;: &quot;en&quot;},
+{&quot;sequence&quot;: &quot;1&quot;, &quot;time&quot;: 1312950804.26057, &quot;item&quot;: &quot;eng&quot;},
+{&quot;sequence&quot;: &quot;1&quot;, &quot;time&quot;: 1312950804.56057, &quot;item&quot;: &quot;engi&quot;},
+{&quot;sequence&quot;: &quot;1&quot;, &quot;time&quot;: 1312950804.76057, &quot;item&quot;: &quot;engin&quot;},
+{&quot;sequence&quot;: &quot;1&quot;, &quot;time&quot;: 1312950805.86057, &quot;item&quot;: &quot;engine&quot;, &quot;type&quot;: &quot;submit&quot;}
+]
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">5.3. 補完</a><ul>
+<li><a class="reference internal" href="#how-it-works">5.3.1. どのように動作するか</a><ul>
+<li><a class="reference internal" href="#prefix-rk-search">5.3.1.1. 前方一致RK検索</a></li>
+<li><a class="reference internal" href="#cooccurrence-search">5.3.1.2. 共起検索</a></li>
+<li><a class="reference internal" href="#prefix-search">5.3.1.3. 前方一致検索</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-use">5.3.2. 使い方</a></li>
+<li><a class="reference internal" href="#how-it-learns">5.3.3. 学習方法</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="tutorial.html"
+                        title="前の章へ">5.2. チュートリアル</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="correction.html"
+                        title="次の章へ">5.4. 補正</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../sources/suggest/completion.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="correction.html" title="5.4. 補正"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="tutorial.html" title="5.2. チュートリアル"
+             >前へ</a> |</li>
+        <li><a href="../index.html">groonga v1.2.5ドキュメント</a> &raquo;</li>
+          <li><a href="../suggest.html" >5. サジェスト</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009-2011, Brazil, Inc.
+    </div>
+      <script src="http://connect.facebook.net/ja_JP/all.js"></script>
+
+    <script>
+      FB.init({
+         appId  : null,
+         status : true, // check login status
+         cookie : true, // enable cookies to allow the server to access the session
+         xfbml  : true  // parse XFBML
+      });
+    </script>
+  </body>
+
+</html>

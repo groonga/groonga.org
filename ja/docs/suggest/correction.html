@@ -1,0 +1,278 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>5.4. 補正 &mdash; groonga v1.2.5ドキュメント</title>
+    
+    <link rel="stylesheet" href="../static/groonga.css" type="text/css" />
+    <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.2.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../static/jquery.js"></script>
+    <script type="text/javascript" src="../static/underscore.js"></script>
+    <script type="text/javascript" src="../static/doctools.js"></script>
+    <script type="text/javascript" src="../static/translations.js"></script>
+    <link rel="shortcut icon" href="../static/favicon.ico"/>
+    <link rel="top" title="groonga v1.2.5ドキュメント" href="../index.html" />
+    <link rel="up" title="5. サジェスト" href="../suggest.html" />
+    <link rel="next" title="5.5. 提案" href="suggestion.html" />
+    <link rel="prev" title="5.3. 補完" href="completion.html" /> 
+      <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
+    <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
+    <meta property="og:type" content="product" />
+    <meta property="og:image" content="http://groonga.org/images/groonga.png" />
+    <meta property="og:site_name" content="groonga" />
+
+    <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
+  </head>
+
+    <body>
+    <div id="fb-root"></div>
+
+<div class="header">
+  <h1 class="title">
+    <a id="top-link" href="../../">
+      <span class="project">groonga</span>
+      <span class="separator">-</span>
+      <span class="description">オープンソースのカラムストア機能付き全文検索エンジン</span>
+    </a>
+  </h1>
+
+      <div class="facebook-buttons">
+      <fb:like href="http://www.facebook.com/pages/groonga/201193596592346"
+               layout="standard"
+               width="290"></fb:like>
+    </div>
+    <div class="other-language-links">
+
+    <ul>
+      <li><a href="../../../docs/suggest/correction.html"><img src="../static/us.png" alt="English"></a></li>
+    </ul>
+  </div>
+</div>
+  
+
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="suggestion.html" title="5.5. 提案"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="completion.html" title="5.3. 補完"
+             accesskey="P">前へ</a> |</li>
+        <li><a href="../index.html">groonga v1.2.5ドキュメント</a> &raquo;</li>
+          <li><a href="../suggest.html" accesskey="U">5. サジェスト</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="correction">
+<h1>5.4. 補正<a class="headerlink" href="#correction" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p>このセクションでは以下の補正機能について説明します。:</p>
+<ul class="simple">
+<li>どのように動作するか</li>
+<li>使い方</li>
+<li>学習方法</li>
+</ul>
+<div class="section" id="how-it-works">
+<h2>5.4.1. どのように動作するか<a class="headerlink" href="#how-it-works" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>補正機能は補正した語を計算するために3種類の検索を使います。:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>学習したデータを共起検索。</li>
+<li>登録されている語を類似検索。（実行しないこともある）</li>
+</ol>
+</div></blockquote>
+<div class="section" id="cooccurrence-search">
+<h3>5.4.1.1. 共起検索<a class="headerlink" href="#cooccurrence-search" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>共起検索はユーザの間違って入力した文字列から登録済みの語を検索します。共起検索ではユーザがどのように検索を実行したかを使います。ユーザがどのように検索したかはクエリログやアクセスログから学習します。</p>
+<p>例えば、ユーザが以下のように検索を実行したとします。:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="41%" />
+<col width="59%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">クエリ</th>
+<th class="head">時刻</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>serach （入力ミス！）</td>
+<td>2011-08-10T22:20:50+09:00</td>
+</tr>
+<tr class="row-odd"><td>search （修正！）</td>
+<td>2011-08-10T22:20:52+09:00</td>
+</tr>
+</tbody>
+</table>
+<p>上記の検索実行ログから以下のような補正ペアを作ります。</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="33%" />
+<col width="67%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">入力</th>
+<th class="head">補正された語</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>serach</td>
+<td>search</td>
+</tr>
+</tbody>
+</table>
+<p>1分以内の連続して実行された検索をユーザが入力を補正したものとみなします。検索を実行した間の入力途中の入力シーケンスは、補正用の学習データとしては利用しません。</p>
+<p>ユーザが&quot;serach&quot;と入力した場合、共起検索は&quot;saerch&quot;を返します。なぜなら、&quot;serach&quot;が「入力」カラムにあり、対応する「補正される語」カラムの値が&quot;search&quot;だからです。</p>
+</div>
+<div class="section" id="similar-search">
+<h3>5.4.1.2. 類似検索<a class="headerlink" href="#similar-search" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>類似検索はユーザの入力をトークナイズし、同じトークンを含んだ登録済みの語を検索します。トークナイズにはTokenBigramトークナイザーを使います。これは <a class="reference internal" href="../executables/groonga-suggest-create-dataset.html"><em>groonga-suggest-create-dataset</em></a> が作るサジェストデータセットスキーマではデフォルトトークナイザーとしてTokenBigramトークナイザーを使っているからです。</p>
+<p>例えば、&quot;search engine&quot;という語が登録されているとします。ユーザが&quot;web search service&quot;や&quot;sound engine&quot;などで検索すると&quot;search engine&quot;が補正候補になります。なぜなら、&quot;search engine&quot;と&quot;web search engine&quot;は&quot;search&quot;という同じトークンを持つからです。また、&quot;search engine&quot;と&quot;sound engine&quot;は&quot;engine&quot;という同じトークンを持っています。</p>
+<p>&quot;search engine&quot;は&quot;search&quot;トークンと&quot;engine&quot;トークンにトークナイズされます。（groongaのTokenBigramトークナイザーは連続するアルファベットと数字を2文字にトークナイズしません。これは検索ノイズを減らす為です。確実に2文字でトークナイズするためにはTokenBigramSplitSymbolAlphaDigitを使います。）&quot;web search service&quot;は&quot;web&quot;トークンと&quot;search&quot;トークンと&quot;service&quot;トークンにトークナイズされます。&quot;sound engine&quot;は&quot;sound&quot;トークンと&quot;engine&quot;トークンにトークナイズされます。</p>
+</div>
+</div>
+<div class="section" id="how-to-use">
+<h2>5.4.2. 使い方<a class="headerlink" href="#how-to-use" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>groongaは補正機能を使うために <a class="reference internal" href="../commands/suggest.html"><em>suggest</em></a> コマンドを用意しています。 <cite>--type correct</cite> オプションを使うと補正機能を利用できます。</p>
+<p>例えば、&quot;saerch&quot;と入力した時の補正結果取得するコマンドは以下のようになります。:</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; suggest --table item_query --column kana --types correction --threshold 1 --query saerch
+[[0,1313131812.39207,0.000783031],{&quot;correct&quot;:[[1],[[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;_score&quot;,&quot;Int32&quot;]],[&quot;search&quot;,1]]}]
+</pre></div>
+</div>
+</div>
+<div class="section" id="how-it-learns">
+<h2>5.4.3. 学習方法<a class="headerlink" href="#how-it-learns" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>共起検索は学習データを使います。学習データはクエリログやアクセスログから作ります。学習データを作るためにはユーザが検索を実行したときの検索クエリとタイムスタンプが必要です。</p>
+<p>例えば、ユーザが&quot;search&quot;で検索したかったとします。しかし、ユーザは正しい&quot;search&quot;というクエリで検索を実行する前に間違って&quot;saerch&quot;で検索してしまいました。このユーザの入力シーケンスは以下のようになります。:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>2011-08-10T13:33:23+09:00: s</li>
+<li>2011-08-10T13:33:23+09:00: sa</li>
+<li>2011-08-10T13:33:24+09:00: sae</li>
+<li>2011-08-10T13:33:24+09:00: saer</li>
+<li>2011-08-10T13:33:24+09:00: saerc</li>
+<li>2011-08-10T13:33:25+09:00: saerch （検索実行！）</li>
+<li>2011-08-10T13:33:29+09:00: serch （修正中…）</li>
+<li>2011-08-10T13:33:30+09:00: search （検索実行！）</li>
+</ol>
+</div></blockquote>
+<p>以下のコマンドでこの入力シーケンスから学習できます。:</p>
+<div class="highlight-none"><div class="highlight"><pre>load --table event_query --each &#39;suggest_preparer(_id, type, item, sequence, time, pair_query)&#39;
+[
+{&quot;sequence&quot;: &quot;1&quot;, &quot;time&quot;: 1312950803.86057, &quot;item&quot;: &quot;s&quot;},
+{&quot;sequence&quot;: &quot;1&quot;, &quot;time&quot;: 1312950803.96857, &quot;item&quot;: &quot;sa&quot;},
+{&quot;sequence&quot;: &quot;1&quot;, &quot;time&quot;: 1312950804.26057, &quot;item&quot;: &quot;sae&quot;},
+{&quot;sequence&quot;: &quot;1&quot;, &quot;time&quot;: 1312950804.56057, &quot;item&quot;: &quot;saer&quot;},
+{&quot;sequence&quot;: &quot;1&quot;, &quot;time&quot;: 1312950804.76057, &quot;item&quot;: &quot;saerc&quot;},
+{&quot;sequence&quot;: &quot;1&quot;, &quot;time&quot;: 1312950805.76057, &quot;item&quot;: &quot;saerch&quot;, &quot;type&quot;: &quot;submit&quot;},
+{&quot;sequence&quot;: &quot;1&quot;, &quot;time&quot;: 1312950809.76057, &quot;item&quot;: &quot;serch&quot;},
+{&quot;sequence&quot;: &quot;1&quot;, &quot;time&quot;: 1312950810.86057, &quot;item&quot;: &quot;search&quot;, &quot;type&quot;: &quot;submit&quot;}
+]
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">5.4. 補正</a><ul>
+<li><a class="reference internal" href="#how-it-works">5.4.1. どのように動作するか</a><ul>
+<li><a class="reference internal" href="#cooccurrence-search">5.4.1.1. 共起検索</a></li>
+<li><a class="reference internal" href="#similar-search">5.4.1.2. 類似検索</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-use">5.4.2. 使い方</a></li>
+<li><a class="reference internal" href="#how-it-learns">5.4.3. 学習方法</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="completion.html"
+                        title="前の章へ">5.3. 補完</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="suggestion.html"
+                        title="次の章へ">5.5. 提案</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../sources/suggest/correction.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="suggestion.html" title="5.5. 提案"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="completion.html" title="5.3. 補完"
+             >前へ</a> |</li>
+        <li><a href="../index.html">groonga v1.2.5ドキュメント</a> &raquo;</li>
+          <li><a href="../suggest.html" >5. サジェスト</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009-2011, Brazil, Inc.
+    </div>
+      <script src="http://connect.facebook.net/ja_JP/all.js"></script>
+
+    <script>
+      FB.init({
+         appId  : null,
+         status : true, // check login status
+         cookie : true, // enable cookies to allow the server to access the session
+         xfbml  : true  // parse XFBML
+      });
+    </script>
+  </body>
+
+</html>

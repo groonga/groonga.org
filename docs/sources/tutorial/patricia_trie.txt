@@ -1,0 +1,52 @@
+.. -*- rst -*-
+
+.. highlightlang:: none
+
+.. groonga-command
+.. table_remove PatPrefix
+.. table_remove PatSuffix
+
+パトリシア木による前方一致検索
+==============================
+
+groongaのテーブルは、テーブル作成時にパトリシア木オプションを指定すると、前方一致検索を行うことができます。また、追加のオプションを指定することにより、主キーの後方一致検索をも行うことができます。
+
+主キーによる前方一致検索
+------------------------
+
+table_createコマンドのflagsオプションにTABLE_PAT_KEYを指定することで、主キーによる前方一致検索ができるようになります。
+
+.. groonga-command
+.. include:: ../example/tutorial/patricia_trie-1.log
+..
+.. table_create --name PatPrefix --flags TABLE_PAT_KEY --key_type ShortText
+.. load --table PatPrefix
+.. [
+.. {"_key":"ひろゆき"},
+.. {"_key":"まろゆき"},
+.. {"_key":"ひろあき"}
+.. ]
+.. select --table PatPrefix --query _key:@ひろ
+
+主キーによる後方一致検索
+------------------------
+
+table_createコマンドのflagsオプションにTABLE_PAT_KEYとKEY_WITH_SISを指定することで、主キーによる前方一致検索・後方一致検索の両方が可能となります。
+
+KEY_WITH_SISフラグを付与すると、データを追加する際に後方一致用のレコードも追加されてしまいます。そのため、単純に検索すると、元のレコードに加えて自動的に追加されたレコードまでヒットしてしまいます。元のレコードのみ検索するために、一工夫必要になります。
+
+例えば、元のレコードと自動的に追加されたレコードとの区別をつけるために、元のレコードであることを示すoriginalカラムを追加して、検索時にはoriginalカラムが ``true`` も検索条件に加えます。
+
+.. groonga-command
+.. include:: ../example/tutorial/patricia_trie-2.log
+..
+.. table_create --name PatSuffix --flags TABLE_PAT_KEY|KEY_WITH_SIS --key_type ShortText
+.. column_create --table PatSuffix --name original --type Bool
+.. load --table PatSuffix
+.. [
+.. {"_key":"ひろゆき","original":true},
+.. {"_key":"まろゆき","original":true},
+.. {"_key":"ひろあき","original":true}
+.. ]
+.. select --table PatSuffix --query _key:@ゆき
+.. select --table PatSuffix --query "_key:@ゆき original:true"

@@ -1,0 +1,263 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>4.4. さまざまな検索条件の指定 &mdash; groonga v1.2.5 documentation</title>
+    
+    <link rel="stylesheet" href="../static/groonga.css" type="text/css" />
+    <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.2.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../static/jquery.js"></script>
+    <script type="text/javascript" src="../static/underscore.js"></script>
+    <script type="text/javascript" src="../static/doctools.js"></script>
+    <link rel="shortcut icon" href="../static/favicon.ico"/>
+    <link rel="top" title="groonga v1.2.5 documentation" href="../index.html" />
+    <link rel="up" title="4. チュートリアル" href="../tutorial.html" />
+    <link rel="next" title="4.5. ドリルダウン" href="drilldown.html" />
+    <link rel="prev" title="4.3. さまざまな種類をもったデータの保存" href="data.html" /> 
+      <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
+    <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
+    <meta property="og:type" content="product" />
+    <meta property="og:image" content="http://groonga.org/images/groonga.png" />
+    <meta property="og:site_name" content="groonga" />
+
+    <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
+  </head>
+
+    <body>
+    <div id="fb-root"></div>
+
+<div class="header">
+  <h1 class="title">
+    <a id="top-link" href="../../">
+      <span class="project">groonga</span>
+      <span class="separator">-</span>
+      <span class="description">An open-source fulltext search engine and column store.</span>
+    </a>
+  </h1>
+
+      <div class="facebook-buttons">
+      <fb:like href="http://www.facebook.com/pages/groonga/201193596592346"
+               layout="standard"
+               width="290"></fb:like>
+    </div>
+    <div class="other-language-links">
+
+    <ul>
+      <li><a href="../../ja/docs/tutorial/search.html"><img src="../static/jp.png" alt="日本語"></a></li>
+    </ul>
+  </div>
+</div>
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="drilldown.html" title="4.5. ドリルダウン"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="data.html" title="4.3. さまざまな種類をもったデータの保存"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">groonga v1.2.5 documentation</a> &raquo;</li>
+          <li><a href="../tutorial.html" accesskey="U">4. チュートリアル</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="id1">
+<h1>4.4. さまざまな検索条件の指定<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<p>groongaは、JavaScriptに似た文法での条件絞込や、計算した値を用いたソートを行うことができます。また、位置情報(緯度・経度)を用いた絞込・ソートを行うことができます。</p>
+<div class="section" id="javascript">
+<h2>4.4.1. JavaScriptに似た文法での絞込・全文検索<a class="headerlink" href="#javascript" title="Permalink to this headline">¶</a></h2>
+<p>selectコマンドのfilterパラメータは、queryパラメータと同様に、レコードの検索条件を指定します。filterパラメータとqueryパラメータが異なる点は、filterパラメータには、JavaScriptの式に似た文法で条件を指定する点です。</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; select --table Site --filter &quot;_id &lt;= 1&quot; --output_columns _id,_key
+[[0,1317212733.77852,0.000333188],[[[1],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;]],[1,&quot;http://example.org/&quot;]]]]
+</pre></div>
+</div>
+<p>ここで、filterパラメータには</p>
+<blockquote>
+<div>_id &lt;= 1</div></blockquote>
+<p>という条件を指定しています。この場合は_idの値が1以下のレコードが検索結果として得られます。</p>
+<p>また、&amp;&amp; や || を使って、条件のAND・OR指定をすることもできます。</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; select --table Site --filter &quot;_id &gt;= 4 &amp;&amp; _id &lt;= 6&quot; --output_columns _id,_key
+[[0,1317212733.97986,0.000297681],[[[3],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;]],[4,&quot;http://example.net/afr&quot;],[5,&quot;http://example.org/aba&quot;],[6,&quot;http://example.com/rab&quot;]]]]
+&gt; select --table Site --filter &quot;_id &lt;= 2 || _id &gt;= 7&quot; --output_columns _id,_key
+[[0,1317212734.18118,0.000250524],[[[5],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;]],[1,&quot;http://example.org/&quot;],[2,&quot;http://example.net/&quot;],[7,&quot;http://example.net/atv&quot;],[8,&quot;http://example.org/gat&quot;],[9,&quot;http://example.com/vdw&quot;]]]]
+</pre></div>
+</div>
+<p>queryパラメータとfilterパラメータを同時に指定すると、両者の条件をともに満たすレコードが結果として返ります。</p>
+</div>
+<div class="section" id="scorer">
+<h2>4.4.2. scorerを利用したソート<a class="headerlink" href="#scorer" title="Permalink to this headline">¶</a></h2>
+<p>selectコマンドのscorerパラメータは、
+全文検索を行った結果の各レコードに対して処理を行うためのパラメータです。</p>
+<p>filterパラメータと同様に、
+JavaScriptの式に似たな文法で様々な条件を指定することができます。</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; select --table Site --filter &quot;1&quot; --scorer &quot;_score = rand()&quot; --output_columns _id,_key,_score --sortby _score
+[[0,1317212734.38283,0.000354558],[[[9],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;_score&quot;,&quot;Int32&quot;]],[6,&quot;http://example.com/rab&quot;,424238335],[9,&quot;http://example.com/vdw&quot;,596516649],[7,&quot;http://example.net/atv&quot;,719885386],[2,&quot;http://example.net/&quot;,846930886],[8,&quot;http://example.org/gat&quot;,1649760492],[3,&quot;http://example.com/&quot;,1681692777],[4,&quot;http://example.net/afr&quot;,1714636915],[1,&quot;http://example.org/&quot;,1804289383],[5,&quot;http://example.org/aba&quot;,1957747793]]]]
+&gt; select --table Site --filter &quot;1&quot; --scorer &quot;_score = rand()&quot; --output_columns _id,_key,_score --sortby _score
+[[0,1317212734.58497,0.000350529],[[[9],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;_score&quot;,&quot;Int32&quot;]],[4,&quot;http://example.net/afr&quot;,783368690],[2,&quot;http://example.net/&quot;,1025202362],[5,&quot;http://example.org/aba&quot;,1102520059],[1,&quot;http://example.org/&quot;,1189641421],[3,&quot;http://example.com/&quot;,1350490027],[8,&quot;http://example.org/gat&quot;,1365180540],[9,&quot;http://example.com/vdw&quot;,1540383426],[7,&quot;http://example.net/atv&quot;,1967513926],[6,&quot;http://example.com/rab&quot;,2044897763]]]]
+</pre></div>
+</div>
+<p>検索結果には、'_score'という名前の、全文検索のスコアが代入されている仮想的なカラムが付与されることをチュートリアル中ソートの項目で説明しました。</p>
+<p>上記の実行例では、scorerパラメータに</p>
+<blockquote>
+<div>_score = rand()</div></blockquote>
+<p>という条件を指定しています。ここでは、rand()という乱数を返す関数を用いて、全文検索のスコアを乱数で上書きしています。</p>
+<p>sortbyパラメータには、</p>
+<blockquote>
+<div>_score</div></blockquote>
+<p>を指定しています。これは、スコア順に昇順にソートすることを意味しています。</p>
+<p>よって、上記のクエリは実行されるたびに検索結果の並び順がランダムに変わります。</p>
+</div>
+<div class="section" id="id2">
+<h2>4.4.3. 位置情報を用いた絞込・ソート<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p>groongaでは、位置情報（経緯度）を保存することができます。また、保存した経緯度を用いて絞込やソートができます。</p>
+<p>位置情報を保存するためのカラムの型として、TokyoGeoPoint/WGS84GeoPointの２つの型があります。前者は日本測地系、後者は世界測地系(WGS84相当)の経緯度を保存します。</p>
+<p>経緯度は以下のいずれかの形式の文字列として指定します。</p>
+<ul class="simple">
+<li>&quot;[緯度のミリ秒]x[経度のミリ秒]&quot;（例: &quot;128452975x503157902&quot;）</li>
+<li>&quot;[緯度のミリ秒],[経度のミリ秒]&quot;（例: &quot;128452975,503157902&quot;）</li>
+<li>&quot;[緯度の小数表記の度数]x[経度の小数表記の度数]&quot;（例: &quot;35.6813819x139.7660839&quot;）</li>
+<li>&quot;[緯度の小数表記の度数],[経度の小数表記の度数]&quot;（例: &quot;35.6813819x139.7660839&quot;）</li>
+</ul>
+<p>ここでは、ためしに東京駅と新宿駅とついて、世界測地系での位置情報を保存してみましょう。東京駅は緯度が35度40分52.975秒、経度が139度45分57.902秒です。新宿駅は緯度が35度41分27.316秒、経度が139度42分0.929秒です。よって、ミリ秒表記の場合はそれぞれ&quot;128452975x503157902&quot;/&quot;128487316x502920929&quot;となります。度数表記の場合はそれぞれ&quot;35.6813819x139.7660839&quot;/&quot;35.6909211x139.7002581&quot;となります。ここではミリ秒表記で登録しましょう。</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; column_create --table Site --name location --type WGS84GeoPoint
+[[0,1317212734.78744,0.047997601],true]
+&gt; load --table Site
+&gt; [
+&gt;  {&quot;_key&quot;:&quot;http://example.org/&quot;,&quot;location&quot;:&quot;128452975x503157902&quot;}
+&gt;  {&quot;_key&quot;:&quot;http://example.net/&quot;,&quot;location&quot;:&quot;128487316x502920929&quot;},
+&gt; ]
+[[0,1317212735.0361,0.801149613],2]
+&gt; select --table Site --query &quot;_id:1 OR _id:2&quot; --output_columns _key,location
+[[0,1317212736.03775,0.000261897],[[[2],[[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;location&quot;,&quot;WGS84GeoPoint&quot;]],[&quot;http://example.org/&quot;,&quot;128452975x503157902&quot;],[&quot;http://example.net/&quot;,&quot;128487316x502920929&quot;]]]]
+</pre></div>
+</div>
+<p>scorerパラメータにおいて、 <a class="reference internal" href="../functions/geo_distance.html"><em>geo_distance</em></a> 関数を用いることにより、２点間の距離を計算することができます。</p>
+<p>ここでは、秋葉原駅からの距離を表示させてみましょう。世界測地系では、秋葉原駅の位置は緯度が35度41分55.259秒、経度が139度46分27.188秒です。よって、geo_distance関数に与える文字列は&quot;128515259x503187188&quot;となります。</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; select --table Site --query &quot;_id:1 OR _id:2&quot; --output_columns _key,location,_score --scorer &#39;_score = geo_distance(location, &quot;128515259x503187188&quot;)&#39;
+[[0,1317212736.23918,0.000393211],[[[2],[[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;location&quot;,&quot;WGS84GeoPoint&quot;],[&quot;_score&quot;,&quot;Int32&quot;]],[&quot;http://example.org/&quot;,&quot;128452975x503157902&quot;,2054],[&quot;http://example.net/&quot;,&quot;128487316x502920929&quot;,6720]]]]
+</pre></div>
+</div>
+<p>この結果を見ると、東京駅と秋葉原駅は2054m、秋葉原駅と新宿駅は6720m離れているようです。</p>
+<p>geo_distance関数は、_scoreを通じてソートでも用いることができます。</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; select --table Site --query &quot;_id:1 OR _id:2&quot; --output_columns _key,location,_score --scorer &#39;_score = geo_distance(location, &quot;128515259x503187188&quot;)&#39; --sortby -_score
+[[0,1317212736.44102,0.000345608],[[[2],[[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;location&quot;,&quot;WGS84GeoPoint&quot;],[&quot;_score&quot;,&quot;Int32&quot;]],[&quot;http://example.net/&quot;,&quot;128487316x502920929&quot;,6720],[&quot;http://example.org/&quot;,&quot;128452975x503157902&quot;,2054]]]]
+</pre></div>
+</div>
+<p>「ある地点から何m以内に存在する」といった絞込も可能です。</p>
+<p>filterパラメータにおいて、 <a class="reference internal" href="../functions/geo_in_circle.html"><em>geo_in_circle</em></a> 関数を用いることにより、２点間の距離が指定のm以下におさまるかどうかを判定することができます。</p>
+<p>たとえば、秋葉原駅から5000m以内にあるレコードを検索してみましょう。</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; select --table Site --output_columns _key,location --filter &#39;geo_in_circle(location, &quot;128515259x503187188&quot;, 5000)&#39;
+[[0,1317212736.64335,0.000245378],[[[1],[[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;location&quot;,&quot;WGS84GeoPoint&quot;]],[&quot;http://example.org/&quot;,&quot;128452975x503157902&quot;]]]]
+</pre></div>
+</div>
+<p>また、経緯度が指定の矩形領域内であるかどうかを判定する <a class="reference internal" href="../functions/geo_in_rectangle.html"><em>geo_in_rectangle</em></a> 関数も存在します。</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">4.4. さまざまな検索条件の指定</a><ul>
+<li><a class="reference internal" href="#javascript">4.4.1. JavaScriptに似た文法での絞込・全文検索</a></li>
+<li><a class="reference internal" href="#scorer">4.4.2. scorerを利用したソート</a></li>
+<li><a class="reference internal" href="#id2">4.4.3. 位置情報を用いた絞込・ソート</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="data.html"
+                        title="previous chapter">4.3. さまざまな種類をもったデータの保存</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="drilldown.html"
+                        title="next chapter">4.5. ドリルダウン</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../sources/tutorial/search.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="drilldown.html" title="4.5. ドリルダウン"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="data.html" title="4.3. さまざまな種類をもったデータの保存"
+             >previous</a> |</li>
+        <li><a href="../index.html">groonga v1.2.5 documentation</a> &raquo;</li>
+          <li><a href="../tutorial.html" >4. チュートリアル</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009-2011, Brazil, Inc.
+    </div>
+      <script src="http://connect.facebook.net/en_US/all.js"></script>
+
+    <script>
+      FB.init({
+         appId  : null,
+         status : true, // check login status
+         cookie : true, // enable cookies to allow the server to access the session
+         xfbml  : true  // parse XFBML
+      });
+    </script>
+  </body>
+
+</html>

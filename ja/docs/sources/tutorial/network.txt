@@ -4,45 +4,46 @@
 
 .. groonga-include : introduction.txt
 
-ネットワークを通じた利用
-========================
+How to use groonga with network
+===============================
 
-groongaはネットワークを通じて利用することができます。groonga独自プロトコルもしくはHTTPのどちらかを選択してgroongaを起動することにより、groongaはネットワーク接続を待ち受けます。
+You can use groonga with network. When you run groonga by using the groonga original protocol or HTTP, groonga accepts connection for network.
 
-groonga専用プロトコルによる通信
--------------------------------
+Connect with groonga's original protocol
+----------------------------------------
 
-groongaデーモンの起動
-^^^^^^^^^^^^^^^^^^^^^
+Run groonga daemon
+^^^^^^^^^^^^^^^^^^
 
-書式 ::
+Form::
 
-  groonga [-p ポート番号] -d DBパス名
+  groonga [-p PORT_NUMBER] -d DB_PATH_NAME
 
-既存のデータベースのフルパス名をDBパス名に指定します。
-groongaがデーモンモードで起動し、指定したポート番号でgroongaの専用プロトコルを用いた通信をすることができます。
-(ポート番号を省略した場合は10041が使用されます)
+The DB_PATH_NAME is set the full-path of existing database.
+With this form, you can run groonga as a daemon and connect by
+with groonga original protocol on PORT_NUMBER.
+(The port number is 10041 when you don't specify PORT_NUMBER.)
 
-実行例::
+Execution example::
 
   % groonga -d /tmp/groonga-databases/introduction.db
   12345
   %
 
-デーモンモードで起動後、プロセス番号が表示されます。
+Groonga shows its process ID on daemon mode.
 
-groongaサーバへの接続
-^^^^^^^^^^^^^^^^^^^^^
+Connect to groonga server
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
-書式 ::
+Form::
 
-  groonga [-p ポート番号] -c [対象ホスト名またはIPアドレス]
+  groonga [-p PORT_NUMBER] -c [HOST_NAME_OR_IP_ADDRESS]
 
-対象ホストで動作しているgroongaサーバに接続します。
+This command connects to groonga server running at specified HOST_NAME_OR_IP_ADDRESS.
 
-対象ホスト名を省略した場合はlocalhostに対して接続し、対象ポート番号を省略した場合は10041ポートに対して接続します。
+When you don't specify HOST_NAME_OR_IP_ADDRESS, this command connects to groonga server running at localhost. When you don't specify PORT_NUMBER, 10041 is used.
 
-接続に成功すると対話モードに入り、標準入力からコマンドを読み込んで順次実行します。
+Groonga runs in interactive mode after connect to groonga server successfully. Groonga reads command from standard input and evaluates it repeatedly.
 
 .. groonga-command
 .. include:: ../example/tutorial/network-1.log
@@ -51,10 +52,10 @@ groongaサーバへの接続
 .. .. > ctrl-d
 .. .. %
 
-groongaデーモンの終了
-^^^^^^^^^^^^^^^^^^^^^
+Terminate groonga daemon
+^^^^^^^^^^^^^^^^^^^^^^^^
 
-groongaデーモンにshutdownコマンドを発行することにより、終了させることができます。
+You can terminate groonga daemon with shutdown command.
 
 .. groonga-command
 .. include:: ../example/tutorial/network-2.log
@@ -62,41 +63,41 @@ groongaデーモンにshutdownコマンドを発行することにより、終�
 .. .. > shutdown
 .. .. %
 
-HTTPによる通信
---------------
+Connect with HTTP
+-----------------
 
-groongaをHTTP経由で利用したい場合には、HTTPプロトコルモードで起動します。
+You need to run groonga in HTTP protocol mode when you want to use groonga via HTTP.
 
-書式 ::
+Form::
 
-  groonga [-p ポート番号] -d --protocol http DBパス名
+  groonga [-p PORT_NUMBER] -d --protocol http DB_PATH_NAME
 
-protocolオプションで、groongaが受け付けるプロトコルを指定できます。httpを指定すると、groongaはHTTPプロトコルでの通信を受け付けます。
+`--protocol` option specifies a protocol of groonga server. `http` means that groonga accepts connections via HTTP.
 
-HTML管理ツール
-^^^^^^^^^^^^^^
+Administration tool based on HTML
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-コマンド実行後、http://[IPアドレスまたはホスト名]:[ポート番号]/ というURLにブラウザからアクセスすると、HTML管理ツールが表示されます。ブラウザは、JavaScriptの実行が有効になっている必要があります。
+You can access administration tool based on HTML at `http://[HOST_NAME_OR_IP_ADDRESS]:[PORT_NUMBER]/` after the above command is ran. Your browser must enables JavaScript.
 
-HTTPでのコマンド実行
-^^^^^^^^^^^^^^^^^^^^
+Run command with HTTP
+^^^^^^^^^^^^^^^^^^^^^
 
-groongaがHTTPプロトコルモードで起動されているとき、「/d/コマンド名」というURLにアクセスすると、コマンドを実行することが出来ます。
+You can run command at `/d/COMMAND_NAME` when groonga is ran in HTTP protocol mode.
 
-コマンドのオプションは、HTTPのGETパラメータで渡します。つまり、「?オプション=値&オプション=値 …」という書式になります。
+Command options are passed as HTTP's GET parameters. They are in `?OPTION=VALUE&OPTION=VALUE&...` form.
 
 .. groonga-command
 .. include:: ../example/tutorial/network-3.log
-.. .. http://[IPまたはホスト名]:[ポート番号]/d/status
-.. .. 実行される処理：
+.. .. http://[HOST_NAME_OR_IP_ADDRESS]:[PORT_NUMBER]/d/status
+.. .. Executed command:
 .. status
 .. .. 
-.. .. http://[IPまたはホスト名]:[ポート番号]/d/select?table=Site&query=title:@this
-.. .. 実行される処理：
+.. .. http://[HOST_NAME_OR_IP_ADDRESS]:[PORT_NUMBER]/d/select?table=Site&query=title:@this
+.. .. Executed command:
 .. select --table Site --query title:@this
 
 
-セキュリティ
-------------
+Security
+--------
 
-groongaのネットワークサービスにはは認証機能がありません。誰でもデータベースの内容を閲覧・修正することができます。iptablesなどを用いて、アクセス元IPアドレスを制限することを薦めます。
+Network service of groonga doesn't support authentication. Everyone can view and modify the database. We recommend that you restrict client accesses by IP address. You can use iptables or any similar tool for it.

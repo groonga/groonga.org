@@ -7,173 +7,173 @@
 .. table_remove Site
 .. table_remove Terms
 
-基本的な操作
-============
+Fundamental operation
+=====================
 
-groongaは、Cのライブラリとして使用する方法と、groonga実行ファイルを通して使用する方法があります。
+You can use groonga as a library of programming language C or an executable file.
+This tutorial explains how to use groonga as an executable file.
+Using its file, you can create and operate databases, start and connect to server, and so on.
 
-本チュートリアルでは、groonga実行ファイルを使用する方法について説明します。
+Create database
+---------------
 
-groonga実行ファイルを使って、DBの作成・操作・サーバの起動・サーバへの接続などの操作が行えます。
+You can create a new database in the following command.
 
-DBの作成
---------
+Form ::
 
-以下のようなコマンドを実行すると、データベースを新規に作成することができます。
+  groonga -n DB_PATH_NAME
 
-書式 ::
+'-n' option specifies to create a database. DB_PATH_NAME specifies full-path of new database.
 
-  groonga -n データベースパス名
+Groonga starts as interactive mode after you create a database with this command, and so groonga accepts commands from standard input. This mode is terminated with Ctrl-d.
 
--nオプションは、データベースを作ることを示します。
-
-データベースパス名には、新しく作成するデータベースのフルパス名を指定します。
-
-上記コマンドでデータベースを作成すると、そのまま対話モードと呼ばれるコマンドを受け付けるモードになります。Ctrlキーを押しながらdキーを押すと、対話モードから抜けることができます。
-
-実行例::
+Execution example::
 
   % groonga -n /tmp/tutorial.db
   > ctrl-d
   %
 
-DBの操作
---------
+Operate database
+----------------
 
-書式 ::
+Form ::
 
-  groonga DBパス名 [コマンド]
+  groonga DB_PATH_NAME [COMMAND]
 
-既存のデータベースのフルパス名をDBパス名に指定します。
-コマンドを指定すると、実行結果を返します。
+DB_PATH_NAME specifies full-path of existing database.
+If COMMAND is specified, result of COMMAND is returned.
 
-コマンドを指定しない場合には、対話モードに入ります。
-対話モードでは、標準入力からコマンドを読み込み、順次実行します。
-本チュートリアルでは、対話モードを主に使用します。
+With no COMMAND, this command starts groonga as interactive-mode.
+Groonga of this mode reads a command from standard input evaluates it repeatedly.
+This tutorial uses interactive-mode mainly.
 
-たとえば、statusというコマンドを実行してみましょう。statusコマンドは、groongaの実行状態を返すコマンドです。
+For example, we will run the `status` command.
+This command returns status of groonga's execution.
 
 .. groonga-command
 .. include:: ../example/tutorial/introduction-1.log
 .. .. % groonga -n /tmp/groonga-databases/introduction.db
 .. status
 
-以上のように、コマンドの実行結果は基本的にjson形式で返却されます。jsonの配列の0番目の要素に、エラーコードや実行時間などの情報が入ります。jsonの配列の1番目の様子に、コマンドの実行結果が入ります。
+The mentioned above, results of executed commands are generally JSON style.
+The first element in a array of JSON has information of error-code, execution time, and so on.
+The second element has a result of exectuted command.
 
-コマンド
+Commands
 --------
 
-groonga実行ファイルやgroongaサーバを介して様々なコマンドを実行して、DBを操作することができます。
-コマンドは以下の書式のうちいずれかで与えることができます。 ::
+You can operate database with various commands via execution file of groonga or groonga server.
+There are forms of commands in the following::
 
- 書式1: コマンド名 引数1 引数2 ..
+ Form1: COMMAND ARGUMENT1 ARGUMENT2 ..
 
- 書式2: コマンド名 --引数名1 値1 --引数名2 値2 ..
+ Form2: COMMAND --ARAGUMENT1 VALUE1 --ARGUMENT2 VALUE2 ..
 
-書式1と2は混ぜて使うことができます。
+You can mix these forms in commands running.
 
-書式2において、空白や、記号「"'()\」のうちいずれかを含む値を指定したい場合は、シングルクォート(')かダブルクォート(")で値を囲みます。
+In Form2, if you want to specify a value including some spaces or symbols("'()/), you should enclose its value with single-quote or double-quote.
 
-詳しくは、 :doc:`/executables/groonga` のコマンドの項を参考にしてください。
+For detail, you can see paragraph of "command" in :doc:`/executables/groonga`.
 
-主なコマンド
-------------
+Basicaly commands
+-----------------
 
  :doc:`/commands/status`
-  groongaプロセスの状態を表示します。
+  Show status of groonga process.
  :doc:`/commands/table_list`
-  DBに定義されているテーブルのリストを表示します。
+  Show lists of tables defined in a database.
  :doc:`/commands/column_list`
-  テーブルに定義されているカラムのリストを表示します。
+  Show lists of columns defined in a table.
  :doc:`/commands/table_create`
-  DBにテーブルを追加します。
+  Add table to a database.
  :doc:`/commands/column_create`
-  テーブルにカラムを追加します。
+  Add column to a table.
  :doc:`/commands/select`
-  テーブルに含まれるレコードを検索して表示します。
+  Search and show records included a table.
  :doc:`/commands/load`
-  テーブルにレコードを挿入します。
+  Insert record to a table.
 
-テーブルの作成
---------------
+Create table
+------------
 
-:doc:`/commands/table_create` コマンドを使用してテーブルを作成します。
+:doc:`/commands/table_create` creates table.
 
-groongaでは、多くの場合テーブルを作成する際に主キーが必要となります。また、主キーには型と、その格納方法を指定する必要があります。
+In using groonga, to creating tables generally needed master key.
+Master key should be specified the types and the way to store.
 
-型については、のちのチュートリアルで触れます。データの種類をあらわしているもの、とイメージしてください。
+We're going to explain the types in tutorial after.
+Please imagine it as expressing sort of data.
+How to store master key defines speed of search with master key and advisability of begins-with-match search. This is also explained in this tutorial later.
 
-主キーの格納方法によって、主キーでの検索速度や、前方一致検索の可否が決まります。これも、のちのチュートリアルで触れます。
-
-ここでは、ShortText型の主キー値を持ち、主キーの格納方法はHASHである、'Site'という名前のテーブルを作成します。
+For example, we create 'Site' table. This table has master key of ShortText type, and the way to store its key is HASH.
 
 .. groonga-command
 .. include:: ../example/tutorial/introduction-2.log
 .. table_create --name Site --flags TABLE_HASH_KEY --key_type ShortText
 
-検索
-----
+Search
+------
 
-:doc:`/commands/select` コマンドを用いて、テーブルの中身を表示することができます。
+:doc:`/commands/select` shows contents of table.
 
 .. groonga-command
 .. include:: ../example/tutorial/introduction-3.log
 .. select --table Site
 
-selectにテーブル名を指定すると、指定したテーブルの中身を10件表示します。[0]は検索されたレコードの件数、["_id","Uint32"]は値がUInt32型である"_id'という名前のカラム、["_key","ShortText"]は値がShortText型である'_key'という名前のカラムを示しています。
+With name of a table, 'select' command shows 10 contents of its table. [0] shows the number of searched records. ["_id","Uint32"] is column named "_id" and type of this column's value is UInt32. ["_key","ShortText"] is "_key" column, type of this column's value is ShortText.
 
-table_createコマンドで作成したテーブルには、最初から'_id'/'_key'という２つのカラムがあります。'_id'はgroongaが自動的に付与するID番号が格納されるカラムです。'_key'は主キーが格納されるカラムです。これらのカラム名を変更することはできません。
+'table_create' command creates table including two columns, '_id' and '_key' first. '_id' has ID-number given automatically by groonga. '_key' column is stored master key. You cannot modify this column's name.
 
-カラムの作成
-------------
+Create columns
+--------------
 
-:doc:`/commands/column_create` コマンドを用いて、カラムを作成することができます。
+:doc:`/commands/column_create` command create columns.
 
-ShortText型の値を持つ、'comment'という名前のカラムを'Site'テーブルに追加しましょう。
+We add a column named 'comment' that lets us store value whose type is ShortText.
 
 .. groonga-command
 .. include:: ../example/tutorial/introduction-4.log
 .. column_create --table Site --name title --flags COLUMN_SCALAR --type ShortText
 .. select --table Site
 
-COLUMN_SCALARについては、通常のカラムであることを示しています。
+COLUMN_SCALAR means this is normal column.
 
-全文検索用の語彙表の作成
-------------------------
+Create terminology table with fulltext-searching
+------------------------------------------------
 
-このチュートリアルでは、groongaに登録したデータを用いた全文検索を行います。
+This tutorial explains fulltext searching with entried data in groonga table.
 
-全文検索を行う場合は、まず語彙表を作成する必要があります。
-語彙表とは、文書の中にある単語が主キーとなるテーブルです。
-ここでは、ShortText型の主キー値を持つ、'Terms'という名前のテーブルを作成しました。
+We need terminology table in fulltext-searching.
+Terminology table is a table whose master key's values are words in text.
+We create 'Terms' table, it has type of master key value is ShortText.
 
 .. groonga-command
 .. include:: ../example/tutorial/introduction-5.log
 .. table_create --name Terms --flags TABLE_PAT_KEY|KEY_NORMALIZE --key_type ShortText --default_tokenizer TokenBigram
 
-この実行例には、多くのパラメータが指定されています。本チュートリアルでは、これらをすべて理解する必要はありません。以下に簡単な説明を記しますが、読み飛ばしてもらってかまいません。
+Many parameters is specified in this execution example.
+You don't hove to understand all parameters.
+There are the simple explaination, but you can skipped.
 
-実行例にある、TABLE_PAT_KEY|KEY_NORMALIZEという値は、主キー値をパトリシア木に格納し、各語彙を正規化して登録することを示しています。
+In this examples, 'TABLE_PAT_KEY|KEY_NORMALIZE' stores master key in patricia-trie and entries each teminology after nomalized.
+The 'default_tokenizer' parametar specifies the way to tokenize target texts. In this examples, we specifies 'TokenBigram' as this parameter, and so we choose 'N-gram' generally called.
 
-実行例にある、TokenBigramという値は、 語彙表として使用するテーブルは、対象の文書をトークナイズする方式を、default_tokenizerパラメータで与えます。この例ではTokenBigramを指定しています。よって、一般的にN-gramと呼ばれるようなインデックス方式を選択しています。
+Create index-column with fulltext search
+----------------------------------------
 
-全文検索用のインデックスカラムの作成
-------------------------------------
-
-Siteテーブルのtitleカラムを全文検索の対象としたいとしましょう。その場合には、語彙表にインデックス型のカラムを作成します。
+We will fulltext search 'title' column in 'Site' table. In this case, we create column whose type index in terminology table.
 
 .. groonga-command
 .. include:: ../example/tutorial/introduction-6.log
 .. column_create --table Terms --name blog_title --flags COLUMN_INDEX|WITH_POSITION --type Site --source title
 
-Siteテーブルのtitleカラムを検索対象とする、'blog_title'という名前のインデックス型カラムをTermsテーブルに作成しました。インデックス対象となるテーブルをtypeに、インデックス対象となるカラムをsourceに指定します。
+This command creates index column 'blog_title' in 'Term' table. '--type' option specifies target indexed table, and '--source' option does target index column.
+In execution example, 'COLUMN_INDEX|WITH_POSITION' for '--flags' option specifies that this column is index column for storing information of terminology existing position. This option should be specified 'COLUMN_INDEX|WITH_POSITION' in generally fulltext searching. This tutorial does not deal with the reason why store information of terminology existing position.
 
-実行例のflagsのCOLUMN_INDEX|WITH_POSITIONという値は、語彙の位置情報を格納するインデックス型のカラムであることを示しています。通常の全文検索インデックスでは、COLUMN_INDEX|WITH_POSITIONを指定してください。語彙の位置情報を格納する意味については、本チュートリアルでは触れません。
+Load data
+---------
 
-データのロード
---------------
-
-:doc:`/commands/load` コマンドを使用します。loadコマンドでは、jsonで受け取ったデータをテーブルに格納します。
+:doc:`/commands/load` is used to load data for groonga database. This command stores json-formatted data in a table.
 
 .. groonga-command
 .. include:: ../example/tutorial/introduction-7.log
@@ -190,76 +190,78 @@ Siteテーブルのtitleカラムを検索対象とする、'blog_title'とい�
 .. {"_key":"http://example.com/vdw","title":"test test record nine."},
 .. ]
 
-selectコマンドで、データが入っていることを確認しましょう。
+Let's make sure that its table has data with 'select' command.
 
 .. groonga-command
 .. include:: ../example/tutorial/introduction-8.log
 .. select --table Site
 
-データの検索
-------------
+Search data
+-----------
 
-groongaでは、'_id'カラムと'_key'カラムの値はテーブル中で一意です。よって、それを用いて検索してみましょう。
+'_id' and '_key' columns are unique in groonga's table, so let's search data in table using these columns.
 
-selectコマンドにおいて、queryパラメータを用いるとデータの検索を行うことができます。
+You can search data using 'select' command with 'query' parameter.
 
 .. groonga-command
 .. include:: ../example/tutorial/introduction-9.log
 .. select --table Site --query _id:1
 
-queryパラメータに与えた「_id:1」というのは、'_id'という名前のカラムに'1'という値が入っているレコードを検索する、という意味です。
+'_id:1' specified 'query' parameter means to search records whose '_id' column has '1'.
 
-_keyでも検索してみましょう。
+Let's search records with '_key' column.
 
 .. groonga-command
 .. include:: ../example/tutorial/introduction-10.log
 .. select --table Site --query "_key:\"http://example.org/\""
 
-queryパラメータに与えた「_key:\"http://example.org/\"」というのは、'_key'という名前のカラムに'"http://example.org/"'という値が入っているレコードを検索する、という意味です。
+'_key:\"http://example.org/\"' specified 'query' parameter means to search records whose '_key' column has '"http://example.org/"'.
 
-全文検索
---------
 
-queryパラメータでは、インデックスを用いた全文検索を行うこともできます。
+Fulltext searching
+------------------
+
+Using 'query' parameter, you can fulltext search with index.
 
 .. groonga-command
 .. include:: ../example/tutorial/introduction-11.log
 .. select --table Site --query title:@this
 
-titleカラムに対して、'this'という文字列で全文検索を行った結果を返します。
+This command shows result of fulltext searching by string 'this' for 'title' column.
 
-queryパラメータに与えた「title:@this」というのが、'title'という名前のカラムに'this'という文字列が含まれているレコードを検索する、という意味です。
+"title:@this" specified 'query' parameter means to search records whose 'title' column including 'this' string.
 
-selectコマンドには、match_columnsというパラメータが存在します。これを指定すると、query内にカラム名を指定しない条件があった場合、match_columnsで指定されたカラムに対しての検索であることを示します。[1]_
+'select' command has parameter 'match_columns'.
 
-match_columnsパラメータに'title'、queryパラメータに'this'という文字列を指定すると、上記のクエリと同じ結果を得ることができます。
+If this parameter is specified, it means to search in columns specified 'match_columns' when 'query' parameter doesn't specify column-name condition.[1]_
+
+If you specify 'match_columns' is 'title' and 'query' is 'this', you can take same result as above query.
 
 .. groonga-command
 .. include:: ../example/tutorial/introduction-12.log
 .. select --table Site --match_columns title --query this
 
-出力カラムの指定
-----------------
+Specify output column
+---------------------
 
-selectコマンドにおいて、output_columnsパラメータを用いることで、検索結果で表示するカラムを指定することが出来ます。
+'output_columns' parameter in 'select' command specifies columns shown in result of search.
 
-複数のカラムを指定する場合は、カンマ(,)区切りで指定します。
+If you want to specify some columns, you should separate column names by comma(,).
 
 .. groonga-command
 .. include:: ../example/tutorial/introduction-13.log
 .. select --table Site --output_columns _key,title,_score --query title:@test
 
-groongaの検索結果には、「_score」という名前のカラムが追加されています。このカラムは、全文検索の条件が合致する文書ほど高い数値が入ります。
+"_score" column is added to The groonga's result. This column has the higher number, the more condition of fulltext seaching matches text.
 
+Ranges to display
+-----------------
 
-表示範囲指定
-------------
+'select' command can display result in only specified ranges using 'offset' and 'limit' parameter. This parameters is useful when you want to show only a page in much result of searching.
 
-selectコマンドにおいて、offset,limitパラメータを用いることで、検索結果から指定された範囲のみを表示することが出来ます。大量の検索結果をページで分けて、1ページ分のみを表示したい場合に有効です。
+'offset' parameter specifies starting point of result. If you want 'select' command to return from first records, this parameter specifies '0'.
 
-offsetパラメータには、検索結果を返す始点を指定します。1件目から結果を返す場合には、0を指定します。
-
-limitパラメータには、検索結果を何件表示するのかを指定します。
+'limit' parameter specifies how many records of searching result.
 
 .. groonga-command
 .. include:: ../example/tutorial/introduction-14.log
@@ -267,30 +269,29 @@ limitパラメータには、検索結果を何件表示するのかを指定し
 .. select --table Site --offset 3 --limit 3
 .. select --table Site --offset 7 --limit 3
 
-並び替え
---------
+Sort
+-----
 
-selectコマンドにおいて、sortbyパラメータを用いることで、検索結果を並び替えることが出来ます。
+If you use 'sortby' parameter in 'select' command, this command sorts result of searching.
 
-sortbyパラメータにカラム名を指定することで、そのカラムの値で昇順にソートします。また、カラム名の前にハイフン（-）を付けることで、降順にソートすることも出来ます。
+When 'sortby' parameter specifies column name, result is sorted in ascending-order to its column's value. This 'select' command also sort in descending-order when you add hyphen(-) before column name.
 
 .. groonga-command
 .. include:: ../example/tutorial/introduction-15.log
 .. select --table Site --sortby -_id
 
-出力カラムの指定で紹介した「_score」カラムは、ソートの条件としても使うことができます。
+For condition of sort, you can use '_score' column introduced in the paragraph of "Specify output column".
 
 .. groonga-command
 .. include:: ../example/tutorial/introduction-16.log
 .. select --table Site --query title:@test --output_columns _id,_score,title --sortby _score
 
-ソートするカラム名を複数指定したい場合は、カンマ(,)区切りで指定します。複数のカラムを指定した場合、最初のカラムで同一の値のレコードがあった場合に、次のカラムの値でソートさせることができます。
+If you want to specify some column names, you should use comma(,) between these names. In this case, when same value of records is existed in first column, this command sorts result of searching to value of second column.
 
 .. groonga-command
 .. include:: ../example/tutorial/introduction-17.log
 .. select --table Site --query title:@test --output_columns _id,_score,title --sortby _score,_id
 
-.. rubric:: 脚注
+.. rubric:: footnote
 
-.. [1] 現在のバージョンでは、全文検索インデックスが存在する場合にのみ、match_columnsパラメータを利用することができます。通常のカラムでの絞り込みには利用できません。
-
+.. [1] In now groonga's version, you can only use 'match_columns' parameter in the case of existing index of fulltext searching. This parameter cannot be use in searching for ordinary columns.

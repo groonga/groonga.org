@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>7.6.2. geo_distance &mdash; groonga v1.2.8ドキュメント</title>
+    <title>7.6.2. geo_distance &mdash; groonga v1.2.9ドキュメント</title>
     
     <link rel="stylesheet" href="../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.2.8',
+        VERSION:     '1.2.9',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../static/doctools.js"></script>
     <script type="text/javascript" src="../static/translations.js"></script>
     <link rel="shortcut icon" href="../static/favicon.ico"/>
-    <link rel="top" title="groonga v1.2.8ドキュメント" href="../index.html" />
+    <link rel="top" title="groonga v1.2.9ドキュメント" href="../index.html" />
     <link rel="up" title="7.6. 組み込み関数一覧" href="../functions.html" />
     <link rel="next" title="7.6.3. geo_in_circle" href="geo_in_circle.html" />
     <link rel="prev" title="7.6.1. edit_distance" href="edit_distance.html" /> 
@@ -76,7 +76,7 @@
         <li class="right" >
           <a href="edit_distance.html" title="7.6.1. edit_distance"
              accesskey="P">前へ</a> |</li>
-        <li><a href="../index.html">groonga v1.2.8ドキュメント</a> &raquo;</li>
+        <li><a href="../index.html">groonga v1.2.9ドキュメント</a> &raquo;</li>
           <li><a href="../reference.html" >7. リファレンスマニュアル</a> &raquo;</li>
           <li><a href="../functions.html" accesskey="U">7.6. 組み込み関数一覧</a> &raquo;</li> 
       </ul>
@@ -95,15 +95,18 @@
 </div>
 <div class="section" id="id2">
 <h2>7.6.2.2. 書式<a class="headerlink" href="#id2" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="highlight-none"><div class="highlight"><pre>geo_distance(point1, point2)
+<div class="highlight-none"><div class="highlight"><pre>geo_distance(point1, point2[, approximate_type])
 </pre></div>
 </div>
 </div>
 <div class="section" id="id3">
 <h2>7.6.2.3. 説明<a class="headerlink" href="#id3" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <p>groonga組込関数の一つであるgeo_distanceについて説明します。組込関数は、script形式のgrn_expr中で呼び出すことができます。</p>
-<p>geo_distance() 関数は、point1に指定した座標とpoint2に指定した座標の間の距離(近似値)を求めます。
-geo_distance()の他に、距離計算アルゴリズムの異なる、geo_distance2()、geo_distance3()が使用できます。それぞれ、長方形近似、球面近似、ヒュベニの距離計算式によって距離を算出します。</p>
+<p>geo_distance() 関数は、point1に指定した座標とpoint2に指定した座標の間の距離(近似値)を求めます。</p>
+<p>... note:</p>
+<div class="highlight-none"><div class="highlight"><pre>geo_distance()の他に、距離計算アルゴリズムの異なる、geo_distance2()、geo_distance3()がありましたが、1.2.9から非推奨になりました。 ``geo_distance2()`` の代わりに ``geo_distance(point1, point2, &quot;sphere&quot;)`` を、 ``geo_distance3()`` の代わりに ``geo_distance(point1, point2, &quot;ellipsoid&quot;)`` を使ってください。
+</pre></div>
+</div>
 </div>
 <div class="section" id="id4">
 <h2>7.6.2.4. 引数<a class="headerlink" href="#id4" title="このヘッドラインへのパーマリンク">¶</a></h2>
@@ -113,6 +116,26 @@ geo_distance()の他に、距離計算アルゴリズムの異なる、geo_dista
 <p><tt class="docutils literal"><span class="pre">point2</span></tt></p>
 <blockquote>
 <div>距離を求める2点のうちもう一つを指定します。GeoPoint型の値、あるいは座標を示す文字列を指定できます。</div></blockquote>
+<p><tt class="docutils literal"><span class="pre">approximate_type</span></tt></p>
+<blockquote>
+<div><p>距離を求めるために地形をどのように近似するかを指定します。指定できる値は以下の通りです。</p>
+<p><tt class="docutils literal"><span class="pre">&quot;rectangle&quot;</span></tt></p>
+<blockquote>
+<div><p>方形近似で近似します。単純な計算式で距離を求めることができるため高速ですが、極付近では誤差が大きくなります。</p>
+<p><tt class="docutils literal"><span class="pre">&quot;rect&quot;</span></tt> と省略して指定することもできます。</p>
+<p>この近似方法がデフォルト値です。 <tt class="docutils literal"><span class="pre">approximate_type</span></tt> を省略した場合は方形近似になります。</p>
+</div></blockquote>
+<p><tt class="docutils literal"><span class="pre">&quot;sphere&quot;</span></tt></p>
+<blockquote>
+<div><p>球面近似で近似します。 <tt class="docutils literal"><span class="pre">&quot;rectangle&quot;</span></tt> よりも遅くなりますが、誤差は小さいです。</p>
+<p><tt class="docutils literal"><span class="pre">&quot;sphr&quot;</span></tt> と省略して指定することもできます。</p>
+</div></blockquote>
+<p><tt class="docutils literal"><span class="pre">&quot;ellipsoid&quot;</span></tt></p>
+<blockquote>
+<div><p>楕円体近似で近似します。距離の計算にはヒュベニの距離計算式を用います。 <tt class="docutils literal"><span class="pre">&quot;sphere&quot;</span></tt> よりも遅くなりますが、誤差は小さくなります。</p>
+<p><tt class="docutils literal"><span class="pre">&quot;ellip&quot;</span></tt> と省略して指定することもできます。</p>
+</div></blockquote>
+</div></blockquote>
 </div>
 <div class="section" id="id6">
 <h2>7.6.2.5. 返値<a class="headerlink" href="#id6" title="このヘッドラインへのパーマリンク">¶</a></h2>
@@ -121,7 +144,19 @@ geo_distance()の他に、距離計算アルゴリズムの異なる、geo_dista
 <div class="section" id="id7">
 <h2>7.6.2.6. 例<a class="headerlink" href="#id7" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <div class="highlight-none"><div class="highlight"><pre>geo_distance(pos, &quot;150x150&quot;)
-100
+100.0
+
+# 方形近似を利用
+geo_distance(pos, &quot;150x150&quot;, &quot;rectangle&quot;)
+100.0
+
+# 球面近似を利用
+geo_distance(pos, &quot;150x150&quot;, &quot;sphere&quot;)
+100.0
+
+# 楕円体近似を利用
+geo_distance(pos, &quot;150x150&quot;, &quot;ellipsoid&quot;)
+100.0
 </pre></div>
 </div>
 <p class="rubric">脚注</p>
@@ -193,7 +228,7 @@ geo_distance()の他に、距離計算アルゴリズムの異なる、geo_dista
         <li class="right" >
           <a href="edit_distance.html" title="7.6.1. edit_distance"
              >前へ</a> |</li>
-        <li><a href="../index.html">groonga v1.2.8ドキュメント</a> &raquo;</li>
+        <li><a href="../index.html">groonga v1.2.9ドキュメント</a> &raquo;</li>
           <li><a href="../reference.html" >7. リファレンスマニュアル</a> &raquo;</li>
           <li><a href="../functions.html" >7.6. 組み込み関数一覧</a> &raquo;</li> 
       </ul>

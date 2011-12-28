@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>1. The characteristics of groonga &mdash; groonga v1.2.8 documentation</title>
+    <title>1. Characteristics of groonga &mdash; groonga v1.2.9 documentation</title>
     
     <link rel="stylesheet" href="static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '1.2.8',
+        VERSION:     '1.2.9',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,9 +24,9 @@
     <script type="text/javascript" src="static/underscore.js"></script>
     <script type="text/javascript" src="static/doctools.js"></script>
     <link rel="shortcut icon" href="static/favicon.ico"/>
-    <link rel="top" title="groonga v1.2.8 documentation" href="index.html" />
+    <link rel="top" title="groonga v1.2.9 documentation" href="index.html" />
     <link rel="next" title="2. Install" href="install.html" />
-    <link rel="prev" title="groonga ドキュメント" href="index.html" /> 
+    <link rel="prev" title="groonga documentation" href="index.html" /> 
       <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
     <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
     <meta property="og:type" content="product" />
@@ -72,9 +72,9 @@
           <a href="install.html" title="2. Install"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="index.html" title="groonga ドキュメント"
+          <a href="index.html" title="groonga documentation"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">groonga v1.2.8 documentation</a> &raquo;</li> 
+        <li><a href="index.html">groonga v1.2.9 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -83,45 +83,52 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="the-characteristics-of-groonga">
-<h1>1. The characteristics of groonga<a class="headerlink" href="#the-characteristics-of-groonga" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="the-successor-to-the-senna-that-is-an-embeddable-full-text-search-engine">
-<h2>1.1. The successor to the Senna that is an embeddable full text search engine<a class="headerlink" href="#the-successor-to-the-senna-that-is-an-embeddable-full-text-search-engine" title="Permalink to this headline">¶</a></h2>
-<p>Groonga is developed as the successor project to Senna. Senna is an embeddable full text search engine and it is used widely. Groonga takes over from Senna's characteristics that are fast, high precision and high flexibility. We started to develop groonga to improve those Senna' characteristics.</p>
+  <div class="section" id="characteristics-of-groonga">
+<h1>1. Characteristics of groonga<a class="headerlink" href="#characteristics-of-groonga" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="groonga-overview">
+<h2>1.1. Groonga overview<a class="headerlink" href="#groonga-overview" title="Permalink to this headline">¶</a></h2>
+<p>Groonga is a fast and accurate full text search engine based on inverted index. One of the characteristics of groonga is that a newly registered document instantly appears in search results. Also, groonga allows updates without read locks. These characteristics result in superior performance on real-time applications.</p>
+<p>Groonga is also a column-oriented database management system (DBMS). Compared with well-known row-oriented systems, such as MySQL and PostgreSQL, column-oriented systems are more suited for aggregate queries. Due to this advantage, groonga can cover weakness of row-oriented systems.</p>
+<p>The basic functions of groonga are provided in a C library. Also, libraries for using groonga in other languages, such as Ruby, are provided by related projects. In addition, groonga-based storage engines are provided for MySQL and PostgreSQL. These libraries and storage engines allow any application to use groonga. See <a class="reference external" href="http://groonga.org/users/">usage examples</a>.</p>
 </div>
-<div class="section" id="groonga-server-supports-multi-protocols-such-as-http">
-<h2>1.2. Groonga server supports multi-protocols such as HTTP<a class="headerlink" href="#groonga-server-supports-multi-protocols-such-as-http" title="Permalink to this headline">¶</a></h2>
-<p>Senna is an component for an application that supports full text search. Groonga can be a server that provides search service. The groonga server supports HTTP, memcached binary protocol and gqtp (groonga query transfer protocol). Clients can search by those protocols via TCP/IP connection. It makes easy to use on a rental server that can install a library.</p>
-<p>Groonga also can be used as a C library like Senna.</p>
+<div class="section" id="full-text-search-and-instant-update">
+<h2>1.2. Full text search and Instant update<a class="headerlink" href="#full-text-search-and-instant-update" title="Permalink to this headline">¶</a></h2>
+<p>In widely used DBMSs, updates are immediately processed, for example, a newly registered record appears in the result of the next query. In contrast, some full text search engines do not support instant updates, because it is difficult to dynamically update inverted indexes, the underlying data structure.</p>
+<p>Groonga also uses inverted indexes but supports instant updates. In addition, groonga allows you to search documents even when updating the document collection. Due to these superior characteristics, groonga is very flexible as a full text search engine. Also, groonga always shows good performance because it divides a large task, inverted index merging, into smaller tasks.</p>
 </div>
-<div class="section" id="fast-data-update">
-<h2>1.3. Fast data update<a class="headerlink" href="#fast-data-update" title="Permalink to this headline">¶</a></h2>
-<p>Senna that is predecessor of groonga is a full text search engine without storage. Senna was commonly used with MySQL or PostgreSQL. Tritonn is a custom MyISAM storage engine that uses Senna as full text search engine. Ludia is a extension module for a PostgreSQL to use Senna as full text search engine. But those approaches can't fully utilize the performance characteristics of Senna. Senna can update index without read lock.</p>
-<p>For example, MyISAM acquires table lock while updating records in many cases. In those cases, data update by MyISAM is a bottleneck however Senna updates an index full text search fast.</p>
-<p>Groonga implements a storage that doesn't acquires read lock to realize search service that has immediacy.</p>
+<div class="section" id="column-store-and-aggregate-query">
+<h2>1.3. Column store and aggregate query<a class="headerlink" href="#column-store-and-aggregate-query" title="Permalink to this headline">¶</a></h2>
+<p>People can collect more than enough data in the Internet era. However, it is difficult to extract informative knowledge from a large database, and such a task requires a many-sided analysis through trial and error. For example, search refinement by date, time and location may reveal hidden patterns. Aggregate queries are useful to perform this kind of tasks.</p>
+<p>An aggregate query groups search results by specified column values and then counts the number of records in each group. For example, an aggregate query in which a location column is specified counts the number of records per location. Making a graph from the result of an aggregate query against a date column is an easy way to visualize changes over time. Also, a combination of refinement by location and an aggregate query against a date column allows visualization of changes over time in specific location. Thus refinement and aggregation are important to perform data mining.</p>
+<p>A column-oriented architecture allows groonga to efficiently process aggregate queries because a column-oriented database, which stores records by column, allows an aggregate query to access only a specified column. On the other hand, an aggregate query on a row-oriented database, which stores records by row, has to access neighbor columns, even though those columns are not required.</p>
 </div>
-<div class="section" id="storage-that-can-be-shared-with-multi-processes-and-multi-threads">
-<h2>1.4. Storage that can be shared with multi-processes and multi-threads<a class="headerlink" href="#storage-that-can-be-shared-with-multi-processes-and-multi-threads" title="Permalink to this headline">¶</a></h2>
-<p>Groonga's storage file can be shared with multi-processes and multi-threads. It doesn't require explicit lock.</p>
-<p><a class="reference external" href="http://mroonga.github.com/">Mroonga</a> that is the successor to the Tritonn is implemented as a MySQL pruggable storage engine. Groonga's storage files that are opened by mroonga can also be shared with groonga server. For example, you can update your data via SQL and search your data via HTTP.</p>
+<div class="section" id="inverted-index-and-tokenizer">
+<h2>1.4. Inverted index and tokenizer<a class="headerlink" href="#inverted-index-and-tokenizer" title="Permalink to this headline">¶</a></h2>
+<p>An inverted index is a traditional data structure used for large-scale full text search. A search engine based on inverted index extracts index terms from a document when it is added. Then in retrieval, a query is divided into index terms to find documents containing those index terms. In this way, index terms play an important role in full text search and thus the way of extracting index terms is a key to a better search engine.</p>
+<p>A tokenizer is a module to extract index terms. A Japanese full text search engine commonly uses a word-based tokenizer (hereafter referred to as a word tokenizer) and/or a character-based n-gram tokenizer (hereafter referred to as an n-gram tokenizer). A word tokenizer-based search engine is superior in time, space and precision, which is the fraction of relevant documents in a search result. On the other hand, an n-gram tokenizer-based search engine is superior in recall, which is the fraction of retrieved documents in the perfect search result. The best choice depends on the application in practice.</p>
+<p>Groonga supports both word and n-gram tokenizers. The simplest built-in tokenizer uses spaces as word delimiters. Built-in n-gram tokenizers (n = 1, 2, 3) are also available by default. In addition, a yet another built-in word tokenizer is available if MeCab, a part-of-speech and morphological analyzer, is embedded. Note that a tokenizer is pluggable and you can develop your own tokenizer, such as a tokenizer based on another part-of-speech tagger or a named-entity recognizer.</p>
 </div>
-<div class="section" id="fast-aggregate-query-processing-such-as-drilldown">
-<h2>1.5. Fast aggregate query processing such as drilldown<a class="headerlink" href="#fast-aggregate-query-processing-such-as-drilldown" title="Permalink to this headline">¶</a></h2>
-<p>Groonga's storage uses column oriented database model that stores data for each column. Column oriented database is suitable for fast aggregate query processing such as OLAP.</p>
-<p>&quot;Drilldown&quot; is a processing that groups full text search result by each specified column values and counts number of records in each group. Groonga does the processing fast because groonga uses column oriented database.</p>
+<div class="section" id="sharable-storage-and-read-lock-free">
+<h2>1.5. Sharable storage and read lock-free<a class="headerlink" href="#sharable-storage-and-read-lock-free" title="Permalink to this headline">¶</a></h2>
+<p>Multi-core processors are mainstream today and the number of cores per processor is increasing. In order to exploit multiple cores, executing multiple queries in parallel or dividing a query into sub-queries for parallel processing is becoming more important.</p>
+<p>A database of groonga can be shared with multiple threads/processes. Also, multiple threads/processes can execute read queries in parallel even when another thread/process is executing an update query because groonga uses read lock-free data structures. This feature is suited to a real-time application that needs to update a database while executing read queries. In addition, groonga allows you to build flexible systems. For example, a database can receive read queries through the built-in HTTP server of groonga while accepting update queries through MySQL.</p>
 </div>
-<div class="section" id="improved-senna-s-inverted-index-implementation">
-<h2>1.6. Improved Senna's inverted index implementation<a class="headerlink" href="#improved-senna-s-inverted-index-implementation" title="Permalink to this headline">¶</a></h2>
-<p>Groonga's inverted index is the improved Senna's inverted index. It is more faster and more versatile.</p>
-<p>Groonga can also process some complex queries fast by utilizing inverted index. Those queries are difficult to process with SQL and RDB. For example, tag search and drilldown can be processed fast by utilizing inverted index.</p>
+<div class="section" id="geo-location-latitude-and-longitude-search">
+<h2>1.6. Geo-location (latitude and longitude) search<a class="headerlink" href="#geo-location-latitude-and-longitude-search" title="Permalink to this headline">¶</a></h2>
+<p>Location services are getting more convenient because of mobile devices with GPS. For example, if you are going to have lunch or dinner at a nearby restaurant, a local search service for restaurants may be very useful, and for such services, fast geo-location search is becoming more important.</p>
+<p>Groonga provides inverted index-based fast geo-location search, which supports a query to find points in a rectangle or circle. Groonga gives high priority to points near the center of an area. Also, groonga supports distance measurement and you can sort points by distance from any point.</p>
 </div>
-<div class="section" id="geolocation-latitude-and-longitude-search">
-<h2>1.7. Geolocation (latitude and longitude) search<a class="headerlink" href="#geolocation-latitude-and-longitude-search" title="Permalink to this headline">¶</a></h2>
-<p>Groonga supports geolocation search. Supported geodetic systems are Japan geodetic system and world geodetic system (WGS 84). Supported geolocation refinement region types are circle and rectangle. Groonga also supports distance between two coordinates.</p>
+<div class="section" id="groonga-library">
+<h2>1.7. Groonga library<a class="headerlink" href="#groonga-library" title="Permalink to this headline">¶</a></h2>
+<p>The basic functions of groonga are provided in a C library and any application can use groonga as a full text search engine or a column-oriented database. Also, libraries for languages other than C/C++, such as Ruby, are provided in related projects. See <a class="reference external" href="http://groonga.org/related-projects.html">related projects</a> for details.</p>
 </div>
-<div class="section" id="auto-query-cache-mechanism">
-<h2>1.8. Auto query cache mechanism<a class="headerlink" href="#auto-query-cache-mechanism" title="Permalink to this headline">¶</a></h2>
-<p>Groonga caches reference queries automatically.</p>
+<div class="section" id="groonga-server">
+<h2>1.8. Groonga server<a class="headerlink" href="#groonga-server" title="Permalink to this headline">¶</a></h2>
+<p>Groonga provides a built-in server command which supports HTTP, the memcached binary protocol and the groonga query transfer protocol (gqtp). Also, a groonga server supports query caching, which significantly reduces response time for repeated read queries. Using this command, groonga is available even on a server that does not allow you to install new libraries.</p>
+</div>
+<div class="section" id="groonga-storage-engine">
+<h2>1.9. Groonga storage engine<a class="headerlink" href="#groonga-storage-engine" title="Permalink to this headline">¶</a></h2>
+<p>Groonga works not only as an independent column-oriented DBMS but also as storage engines of well-known DBMSs. For example, <a class="reference external" href="http://mroonga.github.com/">mroonga</a> is a MySQL pluggable storage engine using groonga. By using mroonga, you can use groonga for column-oriented storage and full text search. A combination of a built-in storage engine, MyISAM or InnoDB, and a groonga-based full text search engine is also available. All the combinations have good and bad points and the best one depends on the application. See <a class="reference external" href="http://groonga.org/related-projects.html">related projects</a> for details.</p>
 </div>
 </div>
 
@@ -133,22 +140,23 @@
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">1. The characteristics of groonga</a><ul>
-<li><a class="reference internal" href="#the-successor-to-the-senna-that-is-an-embeddable-full-text-search-engine">1.1. The successor to the Senna that is an embeddable full text search engine</a></li>
-<li><a class="reference internal" href="#groonga-server-supports-multi-protocols-such-as-http">1.2. Groonga server supports multi-protocols such as HTTP</a></li>
-<li><a class="reference internal" href="#fast-data-update">1.3. Fast data update</a></li>
-<li><a class="reference internal" href="#storage-that-can-be-shared-with-multi-processes-and-multi-threads">1.4. Storage that can be shared with multi-processes and multi-threads</a></li>
-<li><a class="reference internal" href="#fast-aggregate-query-processing-such-as-drilldown">1.5. Fast aggregate query processing such as drilldown</a></li>
-<li><a class="reference internal" href="#improved-senna-s-inverted-index-implementation">1.6. Improved Senna's inverted index implementation</a></li>
-<li><a class="reference internal" href="#geolocation-latitude-and-longitude-search">1.7. Geolocation (latitude and longitude) search</a></li>
-<li><a class="reference internal" href="#auto-query-cache-mechanism">1.8. Auto query cache mechanism</a></li>
+<li><a class="reference internal" href="#">1. Characteristics of groonga</a><ul>
+<li><a class="reference internal" href="#groonga-overview">1.1. Groonga overview</a></li>
+<li><a class="reference internal" href="#full-text-search-and-instant-update">1.2. Full text search and Instant update</a></li>
+<li><a class="reference internal" href="#column-store-and-aggregate-query">1.3. Column store and aggregate query</a></li>
+<li><a class="reference internal" href="#inverted-index-and-tokenizer">1.4. Inverted index and tokenizer</a></li>
+<li><a class="reference internal" href="#sharable-storage-and-read-lock-free">1.5. Sharable storage and read lock-free</a></li>
+<li><a class="reference internal" href="#geo-location-latitude-and-longitude-search">1.6. Geo-location (latitude and longitude) search</a></li>
+<li><a class="reference internal" href="#groonga-library">1.7. Groonga library</a></li>
+<li><a class="reference internal" href="#groonga-server">1.8. Groonga server</a></li>
+<li><a class="reference internal" href="#groonga-storage-engine">1.9. Groonga storage engine</a></li>
 </ul>
 </li>
 </ul>
 
   <h4>Previous topic</h4>
   <p class="topless"><a href="index.html"
-                        title="previous chapter">groonga ドキュメント</a></p>
+                        title="previous chapter">groonga documentation</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="install.html"
                         title="next chapter">2. Install</a></p>
@@ -184,9 +192,9 @@
           <a href="install.html" title="2. Install"
              >next</a> |</li>
         <li class="right" >
-          <a href="index.html" title="groonga ドキュメント"
+          <a href="index.html" title="groonga documentation"
              >previous</a> |</li>
-        <li><a href="index.html">groonga v1.2.8 documentation</a> &raquo;</li> 
+        <li><a href="index.html">groonga v1.2.9 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

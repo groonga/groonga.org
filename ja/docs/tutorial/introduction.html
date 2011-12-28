@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>4.1. 基本的な操作 &mdash; groonga v1.2.8ドキュメント</title>
+    <title>4.1. 基本的な操作 &mdash; groonga v1.2.9ドキュメント</title>
     
     <link rel="stylesheet" href="../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.2.8',
+        VERSION:     '1.2.9',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../static/doctools.js"></script>
     <script type="text/javascript" src="../static/translations.js"></script>
     <link rel="shortcut icon" href="../static/favicon.ico"/>
-    <link rel="top" title="groonga v1.2.8ドキュメント" href="../index.html" />
+    <link rel="top" title="groonga v1.2.9ドキュメント" href="../index.html" />
     <link rel="up" title="4. チュートリアル" href="../tutorial.html" />
     <link rel="next" title="4.2. ネットワークを通じた利用" href="network.html" />
     <link rel="prev" title="4. チュートリアル" href="../tutorial.html" /> 
@@ -76,7 +76,7 @@
         <li class="right" >
           <a href="../tutorial.html" title="4. チュートリアル"
              accesskey="P">前へ</a> |</li>
-        <li><a href="../index.html">groonga v1.2.8ドキュメント</a> &raquo;</li>
+        <li><a href="../index.html">groonga v1.2.9ドキュメント</a> &raquo;</li>
           <li><a href="../tutorial.html" accesskey="U">4. チュートリアル</a> &raquo;</li> 
       </ul>
     </div>  
@@ -86,124 +86,103 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="fundamental-operation">
-<h1>4.1. 基本的な操作<a class="headerlink" href="#fundamental-operation" title="このヘッドラインへのパーマリンク">¶</a></h1>
-<p>groongaは、Cのライブラリとして使用する方法と、groonga実行ファイルを通して使用する方法があります。本チュートリアルでは、groonga実行ファイルを使用する方法について説明します。groonga実行ファイルを使って、DBの作成・操作・サーバの起動・サーバへの接続などの操作が行えます。</p>
-<div class="section" id="create-database">
-<h2>4.1.1. DBの作成<a class="headerlink" href="#create-database" title="このヘッドラインへのパーマリンク">¶</a></h2>
+  <div class="section" id="basic-operations">
+<h1>4.1. 基本的な操作<a class="headerlink" href="#basic-operations" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p>groongaには、Cのライブラリとして使用する方法と、groonga実行ファイルを通して使用する方法があります。本チュートリアルでは、groonga実行ファイルを使用する方法について説明します。groonga実行ファイルを使って、データベースの作成・操作・サーバの起動・サーバへの接続などの操作が行えます。</p>
+<div class="section" id="create-a-database">
+<h2>4.1.1. データベースの作成<a class="headerlink" href="#create-a-database" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <p>以下のようなコマンドを実行すると、データベースを新規に作成することができます。</p>
 <p>書式:</p>
 <div class="highlight-none"><div class="highlight"><pre>groonga -n DB_PATH_NAME
 </pre></div>
 </div>
-<p>-nオプションは、データベースを作ることを示します。データベースパス名には、新しく作成するデータベースのフルパス名を指定します。</p>
-<p>上記コマンドでデータベースを作成すると、そのまま対話モードと呼ばれるコマンドを受け付けるモードになります。Ctrlキーを押しながらdキーを押すと、対話モードから抜けることができます。</p>
+<p>-nオプションは、データベースを作ることを指示します。DB_PATH_NAMEには、新しく作成するデータベースのパスを指定します。指定されたパスが既に存在するときはコマンドが失敗するので注意してください。</p>
+<p>上記コマンドは、データベースを作成してから、コマンドの入力を受け付ける対話モードに入ります。Ctrlキーを押しながらdキーを押すと、対話モードから抜けることができます。</p>
 <p>実行例:</p>
 <div class="highlight-none"><div class="highlight"><pre>% groonga -n /tmp/tutorial.db
-&gt; ctrl-d
+&gt; Ctrl-d
 %
 </pre></div>
 </div>
 </div>
-<div class="section" id="operate-database">
-<h2>4.1.2. DBの操作<a class="headerlink" href="#operate-database" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<div class="section" id="operate-a-database">
+<h2>4.1.2. データベースの操作<a class="headerlink" href="#operate-a-database" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <p>書式:</p>
 <div class="highlight-none"><div class="highlight"><pre>groonga DB_PATH_NAME [COMMAND]
 </pre></div>
 </div>
-<p>既存のデータベースのフルパス名をDBパス名に指定します。コマンドを指定すると、実行結果を返します。</p>
-<p>コマンドを指定しない場合には、対話モードに入ります。対話モードでは、標準入力からコマンドを読み込み、順次実行します。本チュートリアルでは、対話モードを主に使用します。</p>
-<p>たとえば、statusというコマンドを実行してみましょう。statusコマンドは、groongaの実行状態を返すコマンドです。</p>
+<p>操作対象のデータベースのパスをDB_PATH_NAMEに指定します。</p>
+<p>COMMAND が指定された場合、COMMAND を実行した後、実行結果を返します。指定されなかった場合には、対話モードに入ります。対話モードでは、標準入力からコマンドを読み込み、順次実行します。本チュートリアルでは、対話モードを主に使用します。</p>
+<p>Let's try to see the status of a groonga process by using a <a class="reference internal" href="../commands/status.html"><em>status</em></a> command.</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre>&gt; table_create --name Type --flags TABLE_HASH_KEY --key_type ShortText
-[[0,1317212791.02322,0.03942904],true]
-&gt; column_create --table Type --name number --type Int32
-[[0,1317212791.26314,0.124383285],true]
-&gt; column_create --table Type --name float --type Float
-[[0,1317212791.58803,0.027924039],true]
-&gt; column_create --table Type --name string --type ShortText
-[[0,1317212791.81654,0.040399047],true]
-&gt; column_create --table Type --name time --type Time
-[[0,1317212792.05751,0.027354067],true]
-&gt; load --table Type
-&gt; [{&quot;_key&quot;:&quot;sample&quot;,&quot;number&quot;:12345,&quot;float&quot;:42.195,&quot;string&quot;:&quot;GROONGA&quot;,&quot;time&quot;:1234567890.12}]
-[[0,1317212792.28516,0.200775839],1]
-&gt; select --table Type
-[[0,1317212792.68655,0.000199477],[[[1],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;time&quot;,&quot;Time&quot;],[&quot;string&quot;,&quot;ShortText&quot;],[&quot;number&quot;,&quot;Int32&quot;],[&quot;float&quot;,&quot;Float&quot;]],[1,&quot;sample&quot;,1234567890.12,&quot;GROONGA&quot;,12345,42.195]]]]
+<div class="highlight-none"><div class="highlight"><pre>% groonga -n /tmp/groonga-databases/introduction.db
+&gt; status
+[[0,1322616280.40348,0.000158121],{&quot;alloc_count&quot;:127,&quot;starttime&quot;:1322616279,&quot;uptime&quot;:1,&quot;version&quot;:&quot;1.2.8-9-gbf05b82&quot;,&quot;n_queries&quot;:0,&quot;cache_hit_rate&quot;:0.0,&quot;command_version&quot;:1,&quot;default_command_version&quot;:1,&quot;max_command_version&quot;:2}]
 </pre></div>
 </div>
-<p>以上のように、コマンドの実行結果は基本的にjson形式で返却されます。jsonの配列の0番目の要素に、エラーコードや実行時間などの情報が入ります。jsonの配列の1番目の様子に、コマンドの実行結果が入ります。</p>
+<p>以上のように、コマンドの実行結果は基本的にjson形式の配列として返却されます。配列の先頭には、エラーコードや実行時間などの情報が入ります。2番目の要素には、コマンドによって指定された操作の実行結果が入ります。</p>
 </div>
-<div class="section" id="commands">
-<h2>4.1.3. コマンド<a class="headerlink" href="#commands" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>groonga実行ファイルやgroongaサーバを介して様々なコマンドを実行して、DBを操作することができます。コマンドは以下の書式のうちいずれかで与えることができます。</p>
-<div class="highlight-none"><div class="highlight"><pre>Form1: COMMAND ARGUMENT1 ARGUMENT2 ..
+<div class="section" id="command-format">
+<h2>4.1.3. コマンドの書式<a class="headerlink" href="#command-format" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>データベースを操作するコマンドには、以下の書式で引数を与えます。:</p>
+<div class="highlight-none"><div class="highlight"><pre>Form_1: COMMAND VALUE_1 VALUE_2 ..
 
-Form2: COMMAND --ARAGUMENT1 VALUE1 --ARGUMENT2 VALUE2 ..
+Form_2: COMMAND --NAME_1 VALUE_1 --NAME_2 VALUE_2 ..
 </pre></div>
 </div>
-<p>書式1と2は混ぜて使うことができます。</p>
-<p>書式2において、空白や、記号「&quot;'()」のうちいずれかを含む値を指定したい場合は、シングルクォート(')かダブルクォート(&quot;)で値を囲みます。</p>
+<p>書式1では値を適切な順番で渡す必要があります。このような引数は、位置によって値の意味が決まるため、位置固定引数などと呼ばれることもあります。</p>
+<p>書式2では値を名前と一緒に渡します。そのため、任意の順序で引数を指定することができます。このような引数は、名前付き引数やキーワード引数と呼ばれることもあります。</p>
+<p>空白や特殊な記号「&quot;'()」を含む値を指定したいときは、シングルクォート(')かダブルクォート(&quot;)で値を囲むようにしてください。</p>
 <p>詳しくは、 <a class="reference internal" href="../executables/groonga.html"><em>groonga実行ファイル</em></a> のコマンドの項を参考にしてください。</p>
 </div>
-<div class="section" id="basicaly-commands">
-<h2>4.1.4. 主なコマンド<a class="headerlink" href="#basicaly-commands" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<div class="section" id="basic-commands">
+<h2>4.1.4. 主なコマンド<a class="headerlink" href="#basic-commands" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <blockquote>
 <div><dl class="docutils">
 <dt><a class="reference internal" href="../commands/status.html"><em>status</em></a></dt>
-<dd>groongaプロセスの状態を表示します。</dd>
+<dd>shows status of a groonga process.</dd>
 <dt><a class="reference internal" href="../commands/table_list.html"><em>table_list</em></a></dt>
-<dd>DBに定義されているテーブルのリストを表示します。</dd>
+<dd>shows a list of tables in a database.</dd>
 <dt><a class="reference internal" href="../commands/column_list.html"><em>column_list</em></a></dt>
-<dd>テーブルに定義されているカラムのリストを表示します。</dd>
+<dd>shows a list of columns in a table.</dd>
 <dt><a class="reference internal" href="../commands/table_create.html"><em>table_create</em></a></dt>
-<dd>DBにテーブルを追加します。</dd>
+<dd>adds a table to a database.</dd>
 <dt><a class="reference internal" href="../commands/column_create.html"><em>column_create</em></a></dt>
-<dd>テーブルにカラムを追加します。</dd>
+<dd>adds a column to a table.</dd>
 <dt><a class="reference internal" href="../commands/select.html"><em>select</em></a></dt>
-<dd>テーブルに含まれるレコードを検索して表示します。</dd>
+<dd>searches records from a table and shows the result.</dd>
 <dt><a class="reference internal" href="../commands/load.html"><em>load</em></a></dt>
-<dd>テーブルにレコードを挿入します。</dd>
+<dd>inserts records to a table.</dd>
 </dl>
 </div></blockquote>
 </div>
-<div class="section" id="create-table">
-<h2>4.1.5. テーブルの作成<a class="headerlink" href="#create-table" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<div class="section" id="create-a-table">
+<h2>4.1.5. テーブルの作成<a class="headerlink" href="#create-a-table" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <p><a class="reference internal" href="../commands/table_create.html"><em>table_create</em></a> コマンドを使用してテーブルを作成します。</p>
-<p>groongaでは、多くの場合テーブルを作成する際に主キーが必要となります。また、主キーには型と、その格納方法を指定する必要があります。</p>
-<p>型については、のちのチュートリアルで触れます。データの種類をあらわしているもの、とイメージしてください。主キーの格納方法によって、主キーでの検索速度や、前方一致検索の可否が決まります。これも、のちのチュートリアルで触れます。</p>
-<p>ここでは、ShortText型の主キー値を持ち、主キーの格納方法はHASHである、'Site'という名前のテーブルを作成します。</p>
+<p>groongaのテーブルには基本的に主キーが必要であり、テーブルを作成する際には型と格納方法も併せて指定する必要があります。</p>
+<p>型については後で説明するので、ここではデータの種類を表しているものという程度に考えてください。主キーの格納方法は、主キーを条件とする検索にかかる時間や、前方一致検索の可否などを左右します。こちらも後で説明します。</p>
+<p>それでは、'Site'という名前のテーブルを作成してみましょう。主キーについては、型がShortTextで格納方法はHASHとしています。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre>&gt; column_create --table Site --name link --type Site
-[[0,1317212792.88872,0.060705006],true]
-&gt; load --table Site
-&gt; [{&quot;_key&quot;:&quot;http://example.org/&quot;,&quot;link&quot;:&quot;http://example.net/&quot;}]
-[[0,1317212793.14984,0.200481934],1]
-&gt; select --table Site --output_columns _key,title,link._key,link.title --query title:@this
-[[0,1317212793.55084,0.000485897],[[[1],[[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;],[&quot;link._key&quot;,&quot;ShortText&quot;],[&quot;link.title&quot;,&quot;ShortText&quot;]],[&quot;http://example.org/&quot;,&quot;This is test record 1!&quot;,&quot;http://example.net/&quot;,&quot;test record 2.&quot;]]]]
+<div class="highlight-none"><div class="highlight"><pre>&gt; table_create --name Site --flags TABLE_HASH_KEY --key_type ShortText
+[[0,1322616280.60791,0.01234375],true]
 </pre></div>
 </div>
 </div>
-<div class="section" id="search">
-<h2>4.1.6. 検索<a class="headerlink" href="#search" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<div class="section" id="view-a-table">
+<h2>4.1.6. テーブルの表示<a class="headerlink" href="#view-a-table" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <p><a class="reference internal" href="../commands/select.html"><em>select</em></a> コマンドを用いて、テーブルの中身を表示することができます。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre>&gt; column_create --table Site --name links --flags COLUMN_VECTOR --type Site
-[[0,1317212793.75262,0.049658904],true]
-&gt; load --table Site
-&gt; [{&quot;_key&quot;:&quot;http://example.org/&quot;,&quot;links&quot;:[&quot;http://example.net/&quot;,&quot;http://example.org/&quot;,&quot;http://example.com/&quot;]}]
-[[0,1317212794.00274,0.200473621],1]
-&gt; select --table Site --output_columns _key,title,links._key,links.title --query title:@this
-[[0,1317212794.40349,0.000384272],[[[1],[[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;],[&quot;links._key&quot;,&quot;ShortText&quot;],[&quot;links.title&quot;,&quot;ShortText&quot;]],[&quot;http://example.org/&quot;,&quot;This is test record 1!&quot;,[&quot;http://example.net/&quot;,&quot;http://example.org/&quot;,&quot;http://example.com/&quot;],[&quot;test record 2.&quot;,&quot;This is test record 1!&quot;,&quot;test test record three.&quot;]]]]]
+<div class="highlight-none"><div class="highlight"><pre>&gt; select --table Site
+[[0,1322616280.82196,0.000451873],[[[0],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;]]]]]
 </pre></div>
 </div>
-<p>selectにテーブル名を指定すると、指定したテーブルの中身を10件表示します。[0]は検索されたレコードの件数、[&quot;_id&quot;,&quot;Uint32&quot;]は値がUInt32型である&quot;_id'という名前のカラム、[&quot;_key&quot;,&quot;ShortText&quot;]は値がShortText型である'_key'という名前のカラムを示しています。</p>
-<p>table_createコマンドで作成したテーブルには、最初から'_id'/'_key'という２つのカラムがあります。'_id'はgroongaが自動的に付与するID番号が格納されるカラムです。'_key'は主キーが格納されるカラムです。これらのカラム名を変更することはできません。</p>
+<p>selectにテーブル名のみを指定すると、指定したテーブルの中身を10件まで表示します。実行結果の[0]はテーブルに含まれるレコードの数を示しています。今回は何も登録されていないため0件です。レコード数の次に表示されている配列はテーブルの構成を示しています。[&quot;_id&quot;,&quot;Uint32&quot;]はUInt32型の値を持つ'_id'という名前のカラム、[&quot;_key&quot;,&quot;ShortText&quot;]はShortText型の値を持つ'_key'という名前のカラムをそれぞれ表しています。</p>
+<p>table_createコマンドで作成したテーブルには、最初から'_id', '_key'という2つのカラムがあります。'_id'はgroongaが自動的に付与するID番号が格納されるカラムです。'_key'は主キーが格納されるカラムです。これらのカラム名を変更することはできません。</p>
 </div>
-<div class="section" id="create-columns">
-<h2>4.1.7. カラムの作成<a class="headerlink" href="#create-columns" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<div class="section" id="create-a-column">
+<h2>4.1.7. カラムの作成<a class="headerlink" href="#create-a-column" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <p><a class="reference internal" href="../commands/column_create.html"><em>column_create</em></a> コマンドを用いて、カラムを作成することができます。</p>
-<p>ShortText型の値を持つ、'comment'という名前のカラムを'Site'テーブルに追加しましょう。</p>
+<p>Let's add a column of ShortText to store titles. You may give a descriptive name 'title' to the column.</p>
 <p>実行例:</p>
 <div class="highlight-none"><div class="highlight"><pre>&gt; column_create --table Site --name title --flags COLUMN_SCALAR --type ShortText
 [[0,1317212712.91734,0.077833747],true]
@@ -211,33 +190,36 @@ Form2: COMMAND --ARAGUMENT1 VALUE1 --ARGUMENT2 VALUE2 ..
 [[0,1317212713.19572,0.000121119],[[[0],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;]]]]]
 </pre></div>
 </div>
-<p>COLUMN_SCALARについては、通常のカラムであることを示しています。</p>
+<p>COLUMN_SCALAR は'comment'を通常のカラムとして作成することを指示しています。</p>
 </div>
-<div class="section" id="create-terminology-table-with-fulltext-searching">
-<h2>4.1.8. 全文検索用の語彙表の作成<a class="headerlink" href="#create-terminology-table-with-fulltext-searching" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>このチュートリアルでは、groongaに登録したデータを用いた全文検索を行います。</p>
-<p>全文検索を行う場合は、まず語彙表を作成する必要があります。語彙表とは、文書の中にある単語が主キーとなるテーブルです。ここでは、ShortText型の主キー値を持つ、'Terms'という名前のテーブルを作成しました。</p>
+<div class="section" id="create-a-lexicon-table-for-full-text-searches">
+<h2>4.1.8. 全文検索用の語彙表の作成<a class="headerlink" href="#create-a-lexicon-table-for-full-text-searches" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>そろそろ全文検索の使い方について見ていきましょう。</p>
+<p>Groonga uses an inverted index to provide fast full text search. So, the first step is to create a lexicon table which stores an inverted index, also known as postings lists. The primary key of this table is associated with a vocabulary made up of index terms and each record stores postings lists for one index term.</p>
+<p>以下の例では、'Terms'という名前のテーブルを転置インデックスとして作成しています。索引語を格納するため、主キーの型はShortTextです。</p>
 <p>実行例:</p>
 <div class="highlight-none"><div class="highlight"><pre>&gt; table_create --name Terms --flags TABLE_PAT_KEY|KEY_NORMALIZE --key_type ShortText --default_tokenizer TokenBigram
 [[0,1317212713.39679,0.092312046],true]
 </pre></div>
 </div>
 <p>この実行例には、多くのパラメータが指定されています。本チュートリアルでは、これらをすべて理解する必要はありません。以下に簡単な説明を記しますが、読み飛ばしてもらってかまいません。</p>
-<p>実行例にある、TABLE_PAT_KEY|KEY_NORMALIZEという値は、主キー値をパトリシア木に格納し、各語彙を正規化して登録することを示しています。実行例にある、TokenBigramという値は、 語彙表として使用するテーブルは、対象の文書をトークナイズする方式を、default_tokenizerパラメータで与えます。この例ではTokenBigramを指定しています。よって、一般的にN-gramと呼ばれるようなインデックス方式を選択しています。</p>
+<p>The 'TABLE_PAT_KEY' flag specifies to store index terms in a patricia trie. The 'KEY_NORMALIZE' flag specifies to normalize index terms. In this example, both flags are validated by using a '|'. The 'default_tokenizer' parameter specifies a method for tokenizing text. This example specifies 'TokenBigram' that is generally called 'N-gram'.</p>
 </div>
-<div class="section" id="create-index-column-with-fulltext-search">
-<h2>4.1.9. 全文検索用のインデックスカラムの作成<a class="headerlink" href="#create-index-column-with-fulltext-search" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>Siteテーブルのtitleカラムを全文検索の対象としたいとしましょう。その場合には、語彙表にインデックス型のカラムを作成します。</p>
+<div class="section" id="create-an-index-column-for-full-text-search">
+<h2>4.1.9. 全文検索用のインデックスカラムの作成<a class="headerlink" href="#create-an-index-column-for-full-text-search" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>The second step is to create an index column, which allows you to search records from its associated column. That is to say this step specifies which column needs an index.</p>
+<p>それでは、Siteテーブルのtitleカラムを全文検索の対象とするべく、インデックス型のカラムを作成してみましょう。</p>
 <p>実行例:</p>
 <div class="highlight-none"><div class="highlight"><pre>&gt; column_create --table Terms --name blog_title --flags COLUMN_INDEX|WITH_POSITION --type Site --source title
 [[0,1317212713.68994,0.19739078],true]
 </pre></div>
 </div>
-<p>Siteテーブルのtitleカラムを検索対象とする、'blog_title'という名前のインデックス型カラムをTermsテーブルに作成しました。インデックス対象となるテーブルをtypeに、インデックス対象となるカラムをsourceに指定します。実行例のflagsのCOLUMN_INDEX|WITH_POSITIONという値は、語彙の位置情報を格納するインデックス型のカラムであることを示しています。通常の全文検索インデックスでは、COLUMN_INDEX|WITH_POSITIONを指定してください。語彙の位置情報を格納する意味については、本チュートリアルでは触れません。</p>
+<p>Siteテーブルのtitleカラムを検索対象とする、'blog_title'という名前のインデックス型カラムをTermsテーブルに作成しました。インデックス対象となるテーブルをtypeに、インデックス対象となるカラムをsourceに指定します。実行例のflagsのCOLUMN_INDEX|WITH_POSITIONという値は、索引語の位置情報を格納するインデックス型のカラムであることを示しています。通常の全文検索インデックスでは、COLUMN_INDEX|WITH_POSITIONを指定してください。索引語の位置情報を格納する意味については、本チュートリアルでは触れません。</p>
 </div>
 <div class="section" id="load-data">
 <h2>4.1.10. データのロード<a class="headerlink" href="#load-data" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p><a class="reference internal" href="../commands/load.html"><em>load</em></a> コマンドを使用します。loadコマンドでは、jsonで受け取ったデータをテーブルに格納します。</p>
+<p><a class="reference internal" href="../commands/load.html"><em>load</em></a> コマンドを使用します。loadコマンドでは、json形式で受け取ったデータをテーブルに格納します。</p>
+<p>以下の例では9つのレコードをSiteテーブルに格納します。</p>
 <p>実行例:</p>
 <div class="highlight-none"><div class="highlight"><pre>&gt; load --table Site
 &gt; [
@@ -263,7 +245,7 @@ Form2: COMMAND --ARAGUMENT1 VALUE1 --ARGUMENT2 VALUE2 ..
 </div>
 <div class="section" id="search-data">
 <h2>4.1.11. データの検索<a class="headerlink" href="#search-data" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>groongaでは、'_id'カラムと'_key'カラムの値はテーブル中で一意です。よって、それを用いて検索してみましょう。</p>
+<p>データの準備もできたので全文検索を試してみたいところですが、その前に、'_id'カラムと'_key'カラムを用いた検索を行ってみましょう。これらのカラムは値を指定すればレコードが一意に決まります。</p>
 <p>selectコマンドにおいて、queryパラメータを用いるとデータの検索を行うことができます。</p>
 <p>実行例:</p>
 <div class="highlight-none"><div class="highlight"><pre>&gt; select --table Site --query _id:1
@@ -279,18 +261,16 @@ Form2: COMMAND --ARAGUMENT1 VALUE1 --ARGUMENT2 VALUE2 ..
 </div>
 <p>queryパラメータに与えた「_key:&quot;<a class="reference external" href="http://example.org/">http://example.org/</a>&quot;」というのは、'_key'という名前のカラムに'&quot;<a class="reference external" href="http://example.org/">http://example.org/</a>&quot;'という値が入っているレコードを検索する、という意味です。</p>
 </div>
-<div class="section" id="fulltext-searching">
-<h2>4.1.12. 全文検索<a class="headerlink" href="#fulltext-searching" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<div class="section" id="full-text-search">
+<h2>4.1.12. 全文検索<a class="headerlink" href="#full-text-search" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <p>queryパラメータでは、インデックスを用いた全文検索を行うこともできます。</p>
 <p>実行例:</p>
 <div class="highlight-none"><div class="highlight"><pre>&gt; select --table Site --query title:@this
 [[0,1317212717.10303,0.000581287],[[[1],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;]],[1,&quot;http://example.org/&quot;,&quot;This is test record 1!&quot;]]]]
 </pre></div>
 </div>
-<p>titleカラムに対して、'this'という文字列で全文検索を行った結果を返します。</p>
-<p>queryパラメータに与えた「title:&#64;this」というのが、'title'という名前のカラムに'this'という文字列が含まれているレコードを検索する、という意味です。</p>
-<p>selectコマンドには、match_columnsというパラメータが存在します。</p>
-<p>これを指定すると、query内にカラム名を指定しない条件があった場合、match_columnsで指定されたカラムに対しての検索であることを示します。[1]_</p>
+<p>queryパラメータに与えた「title:&#64;this」は、'title'という名前のカラムに'this'という文字列が含まれているレコードを検索する、という意味を持ちます。この例では1つのレコードが検索条件に該当しています。転置インデックスを作成するときにKEY_NORMALIZEという値を指定したため、大文字と小文字の違いが吸収されていることに注意してください。</p>
+<p>selectコマンドには、match_columnsというパラメータが存在します。このパラメータはデフォルトで検索対象にするカラムを指定するもので、カラム名を指定しない検索条件にのみ適用されます。[1]_</p>
 <p>match_columnsパラメータに'title'、queryパラメータに'this'という文字列を指定すると、上記のクエリと同じ結果を得ることができます。</p>
 <p>実行例:</p>
 <div class="highlight-none"><div class="highlight"><pre>&gt; select --table Site --match_columns title --query this
@@ -298,22 +278,20 @@ Form2: COMMAND --ARAGUMENT1 VALUE1 --ARGUMENT2 VALUE2 ..
 </pre></div>
 </div>
 </div>
-<div class="section" id="specify-output-column">
-<h2>4.1.13. 出力カラムの指定<a class="headerlink" href="#specify-output-column" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>selectコマンドにおいて、output_columnsパラメータを用いることで、検索結果で表示するカラムを指定することが出来ます。</p>
-<p>複数のカラムを指定する場合は、カンマ(,)区切りで指定します。</p>
+<div class="section" id="specify-output-columns">
+<h2>4.1.13. 出力カラムの指定<a class="headerlink" href="#specify-output-columns" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>selectコマンドにおいて、output_columnsパラメータを用いることで、検索結果に含めるカラムを指定することができます。複数のカラムを指定する場合は、カンマ(,)区切りで指定します。</p>
 <p>実行例:</p>
 <div class="highlight-none"><div class="highlight"><pre>&gt; select --table Site --output_columns _key,title,_score --query title:@test
 [[0,1317212717.50916,0.00060758],[[[9],[[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;],[&quot;_score&quot;,&quot;Int32&quot;]],[&quot;http://example.org/&quot;,&quot;This is test record 1!&quot;,1],[&quot;http://example.net/&quot;,&quot;test record 2.&quot;,1],[&quot;http://example.com/&quot;,&quot;test test record three.&quot;,2],[&quot;http://example.net/afr&quot;,&quot;test record four.&quot;,1],[&quot;http://example.org/aba&quot;,&quot;test test test record five.&quot;,3],[&quot;http://example.com/rab&quot;,&quot;test test test test record six.&quot;,4],[&quot;http://example.net/atv&quot;,&quot;test test test record seven.&quot;,3],[&quot;http://example.org/gat&quot;,&quot;test test record eight.&quot;,2],[&quot;http://example.com/vdw&quot;,&quot;test test record nine.&quot;,2]]]]
 </pre></div>
 </div>
-<p>groongaの検索結果には、「_score」という名前のカラムが追加されています。このカラムは、全文検索の条件が合致する文書ほど高い数値が入ります。</p>
+<p>この例では、「_score」という名前のカラムを含む3つのカラムを指定しています。「_score」という名前のカラムはgroongaの検索結果に含まれるカラムです。このカラムには、全文検索の条件に合致する文書ほど高い数値が入ります。</p>
 </div>
-<div class="section" id="ranges-to-display">
-<h2>4.1.14. 表示範囲指定<a class="headerlink" href="#ranges-to-display" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>selectコマンドにおいて、offset,limitパラメータを用いることで、検索結果から指定された範囲のみを表示することが出来ます。大量の検索結果をページで分けて、1ページ分のみを表示したい場合に有用です。</p>
-<p>offsetパラメータには、検索結果を返す始点を指定します。1件目から結果を返す場合には、0を指定します。</p>
-<p>limitパラメータには、検索結果を何件表示するのかを指定します。</p>
+<div class="section" id="specify-output-ranges">
+<h2>4.1.14. 表示範囲指定<a class="headerlink" href="#specify-output-ranges" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>selectコマンドにおいて、offset,limitパラメータを用いることで、検索結果から指定された範囲のみを表示することができます。大量の検索結果をページで分けて、1ページ分のみを表示したい場合に有用です。</p>
+<p>offsetパラメータには、検索結果を返す始点を指定します。1件目から結果を返す場合には、0を指定します。limitパラメータには、検索結果の表示件数を指定します。</p>
 <p>実行例:</p>
 <div class="highlight-none"><div class="highlight"><pre>&gt; select --table Site --offset 0 --limit 3
 [[0,1317212717.71574,0.000238544],[[[9],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;]],[1,&quot;http://example.org/&quot;,&quot;This is test record 1!&quot;],[2,&quot;http://example.net/&quot;,&quot;test record 2.&quot;],[3,&quot;http://example.com/&quot;,&quot;test test record three.&quot;]]]]
@@ -326,8 +304,8 @@ Form2: COMMAND --ARAGUMENT1 VALUE1 --ARGUMENT2 VALUE2 ..
 </div>
 <div class="section" id="sort">
 <h2>4.1.15. 並び替え<a class="headerlink" href="#sort" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>selectコマンドにおいて、sortbyパラメータを用いることで、検索結果を並び替えることが出来ます。</p>
-<p>sortbyパラメータにカラム名を指定することで、そのカラムの値で昇順にソートします。また、カラム名の前にハイフン（-）を付けることで、降順にソートすることも出来ます。</p>
+<p>selectコマンドにおいて、sortbyパラメータを用いることで、検索結果を並び替えることができます。</p>
+<p>sortbyパラメータにカラム名を指定することで、そのカラムの値で昇順にソートします。また、カラム名の前にハイフン（-）を付けることで、降順にソートすることもできます。</p>
 <p>実行例:</p>
 <div class="highlight-none"><div class="highlight"><pre>&gt; select --table Site --sortby -_id
 [[0,1317212718.32565,0.000385755],[[[9],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;]],[9,&quot;http://example.com/vdw&quot;,&quot;test test record nine.&quot;],[8,&quot;http://example.org/gat&quot;,&quot;test test record eight.&quot;],[7,&quot;http://example.net/atv&quot;,&quot;test test test record seven.&quot;],[6,&quot;http://example.com/rab&quot;,&quot;test test test test record six.&quot;],[5,&quot;http://example.org/aba&quot;,&quot;test test test record five.&quot;],[4,&quot;http://example.net/afr&quot;,&quot;test record four.&quot;],[3,&quot;http://example.com/&quot;,&quot;test test record three.&quot;],[2,&quot;http://example.net/&quot;,&quot;test record 2.&quot;],[1,&quot;http://example.org/&quot;,&quot;This is test record 1!&quot;]]]]
@@ -364,20 +342,20 @@ Form2: COMMAND --ARAGUMENT1 VALUE1 --ARGUMENT2 VALUE2 ..
   <h3><a href="../index.html">目次</a></h3>
   <ul>
 <li><a class="reference internal" href="#">4.1. 基本的な操作</a><ul>
-<li><a class="reference internal" href="#create-database">4.1.1. DBの作成</a></li>
-<li><a class="reference internal" href="#operate-database">4.1.2. DBの操作</a></li>
-<li><a class="reference internal" href="#commands">4.1.3. コマンド</a></li>
-<li><a class="reference internal" href="#basicaly-commands">4.1.4. 主なコマンド</a></li>
-<li><a class="reference internal" href="#create-table">4.1.5. テーブルの作成</a></li>
-<li><a class="reference internal" href="#search">4.1.6. 検索</a></li>
-<li><a class="reference internal" href="#create-columns">4.1.7. カラムの作成</a></li>
-<li><a class="reference internal" href="#create-terminology-table-with-fulltext-searching">4.1.8. 全文検索用の語彙表の作成</a></li>
-<li><a class="reference internal" href="#create-index-column-with-fulltext-search">4.1.9. 全文検索用のインデックスカラムの作成</a></li>
+<li><a class="reference internal" href="#create-a-database">4.1.1. データベースの作成</a></li>
+<li><a class="reference internal" href="#operate-a-database">4.1.2. データベースの操作</a></li>
+<li><a class="reference internal" href="#command-format">4.1.3. コマンドの書式</a></li>
+<li><a class="reference internal" href="#basic-commands">4.1.4. 主なコマンド</a></li>
+<li><a class="reference internal" href="#create-a-table">4.1.5. テーブルの作成</a></li>
+<li><a class="reference internal" href="#view-a-table">4.1.6. テーブルの表示</a></li>
+<li><a class="reference internal" href="#create-a-column">4.1.7. カラムの作成</a></li>
+<li><a class="reference internal" href="#create-a-lexicon-table-for-full-text-searches">4.1.8. 全文検索用の語彙表の作成</a></li>
+<li><a class="reference internal" href="#create-an-index-column-for-full-text-search">4.1.9. 全文検索用のインデックスカラムの作成</a></li>
 <li><a class="reference internal" href="#load-data">4.1.10. データのロード</a></li>
 <li><a class="reference internal" href="#search-data">4.1.11. データの検索</a></li>
-<li><a class="reference internal" href="#fulltext-searching">4.1.12. 全文検索</a></li>
-<li><a class="reference internal" href="#specify-output-column">4.1.13. 出力カラムの指定</a></li>
-<li><a class="reference internal" href="#ranges-to-display">4.1.14. 表示範囲指定</a></li>
+<li><a class="reference internal" href="#full-text-search">4.1.12. 全文検索</a></li>
+<li><a class="reference internal" href="#specify-output-columns">4.1.13. 出力カラムの指定</a></li>
+<li><a class="reference internal" href="#specify-output-ranges">4.1.14. 表示範囲指定</a></li>
 <li><a class="reference internal" href="#sort">4.1.15. 並び替え</a></li>
 </ul>
 </li>
@@ -423,7 +401,7 @@ Form2: COMMAND --ARAGUMENT1 VALUE1 --ARGUMENT2 VALUE2 ..
         <li class="right" >
           <a href="../tutorial.html" title="4. チュートリアル"
              >前へ</a> |</li>
-        <li><a href="../index.html">groonga v1.2.8ドキュメント</a> &raquo;</li>
+        <li><a href="../index.html">groonga v1.2.9ドキュメント</a> &raquo;</li>
           <li><a href="../tutorial.html" >4. チュートリアル</a> &raquo;</li> 
       </ul>
     </div>

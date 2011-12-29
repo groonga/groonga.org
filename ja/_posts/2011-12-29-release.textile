@@ -1,0 +1,55 @@
+---
+layout: post.ja
+title: groonga 1.2.9リリース
+---
+h2. groonga 1.2.9リリース
+
+今日は今年最後の肉の日ですね。
+
+"groonga 1.2.9":/ja/docs/news.html#release-1-2-9 がリリースされました！
+
+それぞれの環境毎のインストール方法: "インストール":/ja/docs/install.html
+
+今回、 "groongaの特長をまとめたページ":/ja/docs/characteristic.html をより実情にあわせたものに更新しました。もうgroongaを使っている方でも知らないことがあると思うので、ぜひ確認してみてください！
+
+h3. MessagePack対応開始
+
+groongaはこれまでJSON/XML/TSVで検索結果を返すことができましたが、今回からMessagePackでも返すことができるようになりました。（ただし、主要なコマンドだけ。まだMessagePackで返せないコマンドもある。）
+
+JSONではデータ量が多い・パースに時間がかかるという場合はMessagePack出力を試してみてください。HTTPで使っている場合は以下のように「.msgpack」という拡張子をつけるとMessagePack形式で返ってきます。
+
+<pre>
+http://localhost:10041/d/select.msgpack?...
+</pre>
+
+コマンドラインやgqtpで使っている場合は以下のように「--output_type msgpack」を指定してください。
+
+<pre>
+select --output_type msgpack ...
+</pre>
+
+h3. 管理画面にスループットグラフを追加
+
+HTTPサーバーとしてgroongaを起動すると「http://localhost:10041/」で管理画面がでてきますが、このページに、そのgroongaサーバーのスループットをリアルタイムで描画するグラフを追加しました。動画の方がよさそうな気がしますが、スクリーンショットです。こんな感じになります。
+
+!/images/groonga-admin/throughput-graph.png(管理画面のスループットグラフ)!
+
+HTTPで利用していて「今この瞬間のスループット」を知りたいときは便利じゃないかと思います。ただ、データは蓄積していないので「ここ1週間のスループット」などは見れません。そういうものに関しては、別のサービス管理ツールや統計情報を視覚化するツールを利用してください。
+
+なお、今回のリリースからMunin用のスループット生成プラグイン（groonga_throughput）も付属しています。これを使うとHTTPサーバーとして使っている場合でもgqtpサーバーとして使っている場合でもグラフを作成できます。
+
+h3. レコードの一括削除に対応
+
+これまでのdeleteコマンドはIDまたはキー指定で1つずつレコードを削除することしかできませんでしたが、今回から条件にマッチしたレコードをまとめて削除できるようになりました。selectコマンドの--filterオプションがそのまま使えるので、これで条件を指定して削除してください。以下はusersテーブルの中からdeletedカラムの値がtrueのレコードを全て削除する例です。
+
+<pre>
+delete users --filter 'deleted == true'
+</pre>
+
+h3. 変更点
+
+1.2.8からの変更点: "1.2.9リリース - 2011/12/29":/ja/docs/news.html#release-1-2-9
+
+h3. さいごに
+
+それでは、よいお年をお迎えください！

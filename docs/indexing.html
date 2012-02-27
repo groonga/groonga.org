@@ -1,0 +1,261 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>7.8. Indexing &mdash; groonga v1.3.1 documentation</title>
+    
+    <link rel="stylesheet" href="static/groonga.css" type="text/css" />
+    <link rel="stylesheet" href="static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="static/jquery.js"></script>
+    <script type="text/javascript" src="static/underscore.js"></script>
+    <script type="text/javascript" src="static/doctools.js"></script>
+    <link rel="shortcut icon" href="static/favicon.ico"/>
+    <link rel="top" title="groonga v1.3.1 documentation" href="index.html" />
+    <link rel="up" title="7. リファレンスマニュアル" href="reference.html" />
+    <link rel="next" title="7.9. Log" href="log.html" />
+    <link rel="prev" title="7.7.6. rand" href="functions/rand.html" /> 
+      <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
+    <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
+    <meta property="og:type" content="product" />
+    <meta property="og:image" content="http://groonga.org/images/groonga.png" />
+    <meta property="og:site_name" content="groonga" />
+
+    <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
+  </head>
+
+    <body>
+    <div id="fb-root"></div>
+
+<div class="header">
+  <h1 class="title">
+    <a id="top-link" href="./../">
+      <span class="project">groonga</span>
+      <span class="separator">-</span>
+      <span class="description">An open-source fulltext search engine and column store.</span>
+    </a>
+  </h1>
+
+      <div class="facebook-buttons">
+      <fb:like href="http://www.facebook.com/pages/groonga/201193596592346"
+               layout="standard"
+               width="290"></fb:like>
+    </div>
+    <div class="other-language-links">
+
+    <ul>
+      <li><a href="../ja/docs/indexing.html"><img src="static/jp.png" alt="日本語"></a></li>
+    </ul>
+  </div>
+</div>
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="log.html" title="7.9. Log"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="functions/rand.html" title="7.7.6. rand"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">groonga v1.3.1 documentation</a> &raquo;</li>
+          <li><a href="reference.html" accesskey="U">7. リファレンスマニュアル</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="indexing">
+<h1>7.8. Indexing<a class="headerlink" href="#indexing" title="Permalink to this headline">¶</a></h1>
+<p>Groonga supports both online index construction and offline
+index construction since 1.3.1.</p>
+<div class="section" id="online-index-construction">
+<h2>7.8.1. Online index construction<a class="headerlink" href="#online-index-construction" title="Permalink to this headline">¶</a></h2>
+<p>In online index construction, registered documents can be
+searchable quickly while indexing. But indexing requires
+more cost rather than indexing by offline index
+construction.</p>
+<p>Online index construction is suitable for a search system
+that values freshness. For example, a search system for
+tweets, news, blog posts and so on will value
+freshness. Online index construction can make fresh
+documents searchable and keep searchable while indexing.</p>
+</div>
+<div class="section" id="offline-index-construction">
+<h2>7.8.2. Offline index construction<a class="headerlink" href="#offline-index-construction" title="Permalink to this headline">¶</a></h2>
+<p>In offline index construction, indexing cost is less than
+indexing cost by online index construction. Indexing time
+will be shorter. Index will be smaller. Resources required
+for indexing will be smaller. But a registering document
+cannot be searchable until all registered documents are
+indexed.</p>
+<p>Offline index construction is suitable for a search system
+that values less required resources. If a search system
+doesn't value freshness, offline index construction will be
+suitable. For example, a reference manual search system
+doesn't value freshness because a reference manual will be
+updated only at a release.</p>
+</div>
+<div class="section" id="how-to-use">
+<h2>7.8.3. How to use<a class="headerlink" href="#how-to-use" title="Permalink to this headline">¶</a></h2>
+<p>Groonga uses online index construction by default. We
+register a document, we can search it quickly.</p>
+<p>Groonga uses offline index construction by adding an index
+to a column that already has data.</p>
+<p>We define a schema:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; table_create Tweets TABLE_NO_KEY
+[[0,1330339027.61804,0.000236272811889648],true]
+&gt; column_create Tweets content COLUMN_SCALAR ShortText
+[[0,1330339027.81905,0.000560760498046875],true]
+&gt; table_create Lexicon TABLE_HASH_KEY|KEY_NORMALIZE ShortText --default_tokenizer TokenBigram
+[[0,1330339028.02028,0.000248432159423828],true]
+</pre></div>
+</div>
+<p>We register data:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; load --table Tweets
+&gt; [
+&gt; {&quot;content&quot;:&quot;Hello!&quot;},
+&gt; {&quot;content&quot;:&quot;I just start it!&quot;},
+&gt; {&quot;content&quot;:&quot;I&#39;m sleepy... Have a nice day... Good night...&quot;}
+&gt; ]
+[[0,1330339028.22155,1.00183534622192],3]
+</pre></div>
+</div>
+<p>We search without index. We get no result:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; select Tweets --match_columns content --query &#39;good nice&#39;
+[[0,1330339029.42452,0.000802278518676758],[[[0],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;content&quot;,&quot;ShortText&quot;]]]]]
+</pre></div>
+</div>
+<p>We create index for <tt class="docutils literal"><span class="pre">Tweets.content</span></tt>. Already registered
+data in <tt class="docutils literal"><span class="pre">Tweets.content</span></tt> are indexed by offline index
+construction:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; column_create Lexicon tweet COLUMN_INDEX|WITH_POSITION Tweets content
+[[0,1330339029.62682,0.00742125511169434],true]
+</pre></div>
+</div>
+<p>We search with index. We get a matched record:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; select Tweets --match_columns content --query &#39;good nice&#39;
+[[0,1330339029.83545,0.000765085220336914],[[[1],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;content&quot;,&quot;ShortText&quot;]],[3,&quot;I&#39;m sleepy... Have a nice day... Good night...&quot;]]]]
+</pre></div>
+</div>
+<p>We register data again. They are indexed by online index
+construction:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; load --table Tweets
+&gt; [
+&gt; {&quot;content&quot;:&quot;Good morning! Nice day.&quot;},
+&gt; {&quot;content&quot;:&quot;Let&#39;s go shopping.&quot;}
+&gt; ]
+[[0,1330339030.03821,0.801372528076172],2]
+</pre></div>
+</div>
+<p>We can also get newly registered records by searching:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; select Tweets --match_columns content --query &#39;good nice&#39;
+[[0,1330339031.04064,0.000650644302368164],[[[2],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;content&quot;,&quot;ShortText&quot;]],[3,&quot;I&#39;m sleepy... Have a nice day... Good night...&quot;],[4,&quot;Good morning! Nice day.&quot;]]]]
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">7.8. Indexing</a><ul>
+<li><a class="reference internal" href="#online-index-construction">7.8.1. Online index construction</a></li>
+<li><a class="reference internal" href="#offline-index-construction">7.8.2. Offline index construction</a></li>
+<li><a class="reference internal" href="#how-to-use">7.8.3. How to use</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="functions/rand.html"
+                        title="previous chapter">7.7.6. rand</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="log.html"
+                        title="next chapter">7.9. Log</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="sources/indexing.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="log.html" title="7.9. Log"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="functions/rand.html" title="7.7.6. rand"
+             >previous</a> |</li>
+        <li><a href="index.html">groonga v1.3.1 documentation</a> &raquo;</li>
+          <li><a href="reference.html" >7. リファレンスマニュアル</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009-2012, Brazil, Inc.
+    </div>
+      <script src="http://connect.facebook.net/en_US/all.js"></script>
+
+    <script>
+      FB.init({
+         appId  : null,
+         status : true, // check login status
+         cookie : true, // enable cookies to allow the server to access the session
+         xfbml  : true  // parse XFBML
+      });
+    </script>
+  </body>
+
+</html>

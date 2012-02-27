@@ -1,0 +1,239 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>7.8. インデックス構築 &mdash; groonga v1.3.1ドキュメント</title>
+    
+    <link rel="stylesheet" href="static/groonga.css" type="text/css" />
+    <link rel="stylesheet" href="static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="static/jquery.js"></script>
+    <script type="text/javascript" src="static/underscore.js"></script>
+    <script type="text/javascript" src="static/doctools.js"></script>
+    <script type="text/javascript" src="static/translations.js"></script>
+    <link rel="shortcut icon" href="static/favicon.ico"/>
+    <link rel="top" title="groonga v1.3.1ドキュメント" href="index.html" />
+    <link rel="up" title="7. リファレンスマニュアル" href="reference.html" />
+    <link rel="next" title="7.9. Log" href="log.html" />
+    <link rel="prev" title="7.7.6. rand" href="functions/rand.html" /> 
+      <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
+    <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
+    <meta property="og:type" content="product" />
+    <meta property="og:image" content="http://groonga.org/images/groonga.png" />
+    <meta property="og:site_name" content="groonga" />
+
+    <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
+  </head>
+
+    <body>
+    <div id="fb-root"></div>
+
+<div class="header">
+  <h1 class="title">
+    <a id="top-link" href="./../">
+      <span class="project">groonga</span>
+      <span class="separator">-</span>
+      <span class="description">オープンソースのカラムストア機能付き全文検索エンジン</span>
+    </a>
+  </h1>
+
+      <div class="facebook-buttons">
+      <fb:like href="http://www.facebook.com/pages/groonga/201193596592346"
+               layout="standard"
+               width="290"></fb:like>
+    </div>
+    <div class="other-language-links">
+
+    <ul>
+      <li><a href="../../docs/indexing.html"><img src="static/us.png" alt="English"></a></li>
+    </ul>
+  </div>
+</div>
+  
+
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="log.html" title="7.9. Log"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="functions/rand.html" title="7.7.6. rand"
+             accesskey="P">前へ</a> |</li>
+        <li><a href="index.html">groonga v1.3.1ドキュメント</a> &raquo;</li>
+          <li><a href="reference.html" accesskey="U">7. リファレンスマニュアル</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="indexing">
+<h1>7.8. インデックス構築<a class="headerlink" href="#indexing" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p>groongaは1.3.1から動的なインデックス構築方法と静的なインデックス構築方法を両方サポートしています。</p>
+<div class="section" id="online-index-construction">
+<h2>7.8.1. 動的なインデックス構築方法<a class="headerlink" href="#online-index-construction" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>動的なインデックス構築方法では、登録された文書はインデックス構築中にすぐに検索できるようになります。しかし、静的なインデックス構築方法に比べてコストがかかります。</p>
+<p>動的なインデックス構築方法は鮮度が重要な検索システムに適しています。例えば、つぶやきやニュースやブログ記事などを検索するシステムは鮮度が重要になるでしょう。動的なインデックス構築方法はできたばかりの文書を検索できるようにし、インデックス構築中も検索できます。</p>
+</div>
+<div class="section" id="offline-index-construction">
+<h2>7.8.2. 静的なインデックス構築方法<a class="headerlink" href="#offline-index-construction" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>静的なインデックス構築方法では、動的なインデックス構築方法よりもインデックス構築にかかるコストが小さくなります。インデックス構築時間は短くなるでしょう。インデックスは小さくなるでしょう。インデックス構築に必要なリソースは少なくなるでしょう。しかし、登録中の文書は登録しようとしている全ての文書のインデックス構築が終わるまで検索できません。</p>
+<p>静的なインデックス構築方法は消費リソースが少ないことが重要な検索システムに適しています。鮮度が重要でないシステムであれば静的なインデックス構築方法が適しているでしょう。例えば、リファレンスマニュアルを検索するシステムは鮮度を重視しません。これは、リファレンスマニュアルはリリース時にだけ更新されるだけだからです。</p>
+</div>
+<div class="section" id="how-to-use">
+<h2>7.8.3. 使い方<a class="headerlink" href="#how-to-use" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>groongaはデフォルトで動的なインデックス構築方法を使います。文書を登録するとすぐに検索できるようになります。</p>
+<p>すでにデータが格納されているカラムにインデックスを追加した場合は静的なインデックス構築方法を使います。</p>
+<p>スキーマを定義します。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; table_create Tweets TABLE_NO_KEY
+[[0,1330339027.61804,0.000236272811889648],true]
+&gt; column_create Tweets content COLUMN_SCALAR ShortText
+[[0,1330339027.81905,0.000560760498046875],true]
+&gt; table_create Lexicon TABLE_HASH_KEY|KEY_NORMALIZE ShortText --default_tokenizer TokenBigram
+[[0,1330339028.02028,0.000248432159423828],true]
+</pre></div>
+</div>
+<p>データを登録します:</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; load --table Tweets
+&gt; [
+&gt; {&quot;content&quot;:&quot;Hello!&quot;},
+&gt; {&quot;content&quot;:&quot;I just start it!&quot;},
+&gt; {&quot;content&quot;:&quot;I&#39;m sleepy... Have a nice day... Good night...&quot;}
+&gt; ]
+[[0,1330339028.22155,1.00183534622192],3]
+</pre></div>
+</div>
+<p>インデックスなしで検索します。これは何もヒットしません:</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; select Tweets --match_columns content --query &#39;good nice&#39;
+[[0,1330339029.42452,0.000802278518676758],[[[0],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;content&quot;,&quot;ShortText&quot;]]]]]
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">Tweets.content</span></tt> 用のインデックスを作成します。すでに <tt class="docutils literal"><span class="pre">Tweets.content</span></tt> に登録されているデータは静的なインデックス構築方法でインデックスを構築します:</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; column_create Lexicon tweet COLUMN_INDEX|WITH_POSITION Tweets content
+[[0,1330339029.62682,0.00742125511169434],true]
+</pre></div>
+</div>
+<p>インデックスありで検索します。1件ヒットします:</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; select Tweets --match_columns content --query &#39;good nice&#39;
+[[0,1330339029.83545,0.000765085220336914],[[[1],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;content&quot;,&quot;ShortText&quot;]],[3,&quot;I&#39;m sleepy... Have a nice day... Good night...&quot;]]]]
+</pre></div>
+</div>
+<p>もう一度データを登録します。このデータ用のインデックスは動的なインデックス構築方法で構築します。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; load --table Tweets
+&gt; [
+&gt; {&quot;content&quot;:&quot;Good morning! Nice day.&quot;},
+&gt; {&quot;content&quot;:&quot;Let&#39;s go shopping.&quot;}
+&gt; ]
+[[0,1330339030.03821,0.801372528076172],2]
+</pre></div>
+</div>
+<p>検索すると新しく登録されたレコードもヒットします:</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; select Tweets --match_columns content --query &#39;good nice&#39;
+[[0,1330339031.04064,0.000650644302368164],[[[2],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;content&quot;,&quot;ShortText&quot;]],[3,&quot;I&#39;m sleepy... Have a nice day... Good night...&quot;],[4,&quot;Good morning! Nice day.&quot;]]]]
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">7.8. インデックス構築</a><ul>
+<li><a class="reference internal" href="#online-index-construction">7.8.1. 動的なインデックス構築方法</a></li>
+<li><a class="reference internal" href="#offline-index-construction">7.8.2. 静的なインデックス構築方法</a></li>
+<li><a class="reference internal" href="#how-to-use">7.8.3. 使い方</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="functions/rand.html"
+                        title="前の章へ">7.7.6. rand</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="log.html"
+                        title="次の章へ">7.9. Log</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="sources/indexing.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="log.html" title="7.9. Log"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="functions/rand.html" title="7.7.6. rand"
+             >前へ</a> |</li>
+        <li><a href="index.html">groonga v1.3.1ドキュメント</a> &raquo;</li>
+          <li><a href="reference.html" >7. リファレンスマニュアル</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009-2012, Brazil, Inc.
+    </div>
+      <script src="http://connect.facebook.net/ja_JP/all.js"></script>
+
+    <script>
+      FB.init({
+         appId  : null,
+         status : true, // check login status
+         cookie : true, // enable cookies to allow the server to access the session
+         xfbml  : true  // parse XFBML
+      });
+    </script>
+  </body>
+
+</html>

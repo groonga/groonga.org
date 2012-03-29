@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>4.1. Basic operations &mdash; groonga v2.0.0 documentation</title>
+    <title>4.1. Basic operations &mdash; groonga v2.0.1 documentation</title>
     
     <link rel="stylesheet" href="../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '2.0.0',
+        VERSION:     '2.0.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,14 +24,14 @@
     <script type="text/javascript" src="../static/underscore.js"></script>
     <script type="text/javascript" src="../static/doctools.js"></script>
     <link rel="shortcut icon" href="../static/favicon.ico"/>
-    <link rel="top" title="groonga v2.0.0 documentation" href="../index.html" />
+    <link rel="top" title="groonga v2.0.1 documentation" href="../index.html" />
     <link rel="up" title="4. Tutorial" href="../tutorial.html" />
-    <link rel="next" title="4.2. How to use groonga with network" href="network.html" />
+    <link rel="next" title="4.2. Remote access" href="network.html" />
     <link rel="prev" title="4. Tutorial" href="../tutorial.html" /> 
       <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
     <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
     <meta property="og:type" content="product" />
-    <meta property="og:image" content="http://groonga.org/images/groonga.png" />
+    <meta property="og:image" content="http://groonga.org/images/logos/groonga-icon-full-size.png" />
     <meta property="og:site_name" content="groonga" />
 
     <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
@@ -57,7 +57,7 @@
     <div class="other-language-links">
 
     <ul>
-      <li><a href="../../ja/docs/tutorial/introduction.html"><img src="../static/jp.png" alt="日本語"></a></li>
+      <li><a href="../../ja/docs/tutorial/introduction.html"><img src="../static/jp.png" alt="日本語">日本語版はこちら</a></li>
     </ul>
   </div>
 </div>
@@ -70,12 +70,12 @@
           <a href="../genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="network.html" title="4.2. How to use groonga with network"
+          <a href="network.html" title="4.2. Remote access"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="../tutorial.html" title="4. Tutorial"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">groonga v2.0.0 documentation</a> &raquo;</li>
+        <li><a href="../index.html">groonga v2.0.1 documentation</a> &raquo;</li>
           <li><a href="../tutorial.html" accesskey="U">4. Tutorial</a> &raquo;</li> 
       </ul>
     </div>  
@@ -87,39 +87,39 @@
             
   <div class="section" id="basic-operations">
 <h1>4.1. Basic operations<a class="headerlink" href="#basic-operations" title="Permalink to this headline">¶</a></h1>
-<p>The groonga package provides a C library (libgroonga) and a command line tool (groonga). This tutorial explains how to use the groonga command, with which you can create/operate databases, start a server, establish a connection with a server, etc.</p>
+<p>A groonga package provides a C library (libgroonga) and a command line tool (groonga). This tutorial explains how to use the command line tool, with which you can create/operate databases, start a server, establish a connection with a server, etc.</p>
 <div class="section" id="create-a-database">
 <h2>4.1.1. Create a database<a class="headerlink" href="#create-a-database" title="Permalink to this headline">¶</a></h2>
-<p>You can create a new database with the following command.</p>
+<p>The first step to using groonga is to create a new database. The following shows how to do it.</p>
 <p>Form:</p>
-<div class="highlight-none"><div class="highlight"><pre>groonga -n DB_PATH_NAME
+<div class="highlight-none"><div class="highlight"><pre>groonga -n DB_PATH
 </pre></div>
 </div>
-<p>The '-n' option specifies to create a new database. DB_PATH_NAME specifies the path of the new database. Note that this command fails if the specified path already exists.</p>
-<p>This command creates a database and then enters into interactive mode in which groonga prompts you to enter commands for operating that database. You can terminate this mode with Ctrl-d.</p>
+<p>The <cite>-n</cite> option specifies to create a new database and DB_PATH specifies the path of the new database. Actually, a database consists of a series of files and DB_PATH specifies the file which will be the entrance to the new database. DB_PATH also specifies the path prefix for other files. Note that database creation fails if DB_PATH points to an existing file.</p>
+<p>This command creates a new database and then enters into interactive mode in which groonga prompts you to enter commands for operating that database. You can terminate this mode with Ctrl-d.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>% groonga -n /tmp/tutorial.db
-&gt; Ctrl-d
-%
+<div class="highlight-none"><div class="highlight"><pre>% groonga -n /tmp/groonga-databases/introduction.db
 </pre></div>
 </div>
+<p>After this database creation, you can find a series of files in /tmp/groonga-databases.</p>
 </div>
 <div class="section" id="operate-a-database">
 <h2>4.1.2. Operate a database<a class="headerlink" href="#operate-a-database" title="Permalink to this headline">¶</a></h2>
+<p>The following shows how to operate an existing database.</p>
 <p>Form:</p>
-<div class="highlight-none"><div class="highlight"><pre>groonga DB_PATH_NAME [COMMAND]
+<div class="highlight-none"><div class="highlight"><pre>groonga DB_PATH [COMMAND]
 </pre></div>
 </div>
-<p>DB_PATH_NAME specifies the path of a target database.</p>
-<p>If COMMAND is specified, groonga executes COMMAND and returns the result. Otherwise, groonga starts in interactive mode that reads commands from the standard input and execute them one by one. This tutorial focuses on the interactive mode.</p>
-<p>Let's try to see the status of a groonga process by using a <a class="reference internal" href="../commands/status.html"><em>status</em></a> command.</p>
+<p>DB_PATH specifies the path of a target database. This command fails if the specified database does not exist.</p>
+<p>If COMMAND is specified, groonga executes COMMAND and returns the result. Otherwise, groonga starts in interactive mode that reads commands from the standard input and executes them one by one. This tutorial focuses on the interactive mode.</p>
+<p>Let's see the status of a groonga process by using a <a class="reference internal" href="../commands/status.html"><em>status</em></a> command.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>% groonga -n /tmp/groonga-databases/introduction.db
+<div class="highlight-none"><div class="highlight"><pre>% groonga /tmp/groonga-databases/introduction.db
 &gt; status
-[[0,1322616280.40348,0.000158121],{&quot;alloc_count&quot;:127,&quot;starttime&quot;:1322616279,&quot;uptime&quot;:1,&quot;version&quot;:&quot;1.2.8-9-gbf05b82&quot;,&quot;n_queries&quot;:0,&quot;cache_hit_rate&quot;:0.0,&quot;command_version&quot;:1,&quot;default_command_version&quot;:1,&quot;max_command_version&quot;:2}]
+[[0,1332484898.47079,0.000113010406494141],{&quot;alloc_count&quot;:151,&quot;starttime&quot;:1332484898,&quot;uptime&quot;:0,&quot;version&quot;:&quot;2.0.0-250-g5a3cf19&quot;,&quot;n_queries&quot;:0,&quot;cache_hit_rate&quot;:0.0,&quot;command_version&quot;:1,&quot;default_command_version&quot;:1,&quot;max_command_version&quot;:2}]
 </pre></div>
 </div>
-<p>As shown in the above example, a command basically returns a JSON array. The first element contains an error code, execution time, etc. The second element is the result of an operation.</p>
+<p>As shown in the above example, a command returns a JSON array. The first element contains an error code, execution time, etc. The second element is the result of an operation.</p>
 </div>
 <div class="section" id="command-format">
 <h2>4.1.3. Command format<a class="headerlink" href="#command-format" title="Permalink to this headline">¶</a></h2>
@@ -157,68 +157,44 @@ Form_2: COMMAND --NAME_1 VALUE_1 --NAME_2 VALUE_2 ..
 </div>
 <div class="section" id="create-a-table">
 <h2>4.1.5. Create a table<a class="headerlink" href="#create-a-table" title="Permalink to this headline">¶</a></h2>
-<p>A <a class="reference internal" href="../commands/table_create.html"><em>table_create</em></a> command creates a table.</p>
-<p>In most cases, a table of groonga has a primary key which must be specified with its data type and index type.</p>
-<p>There are various data types such as integers, floating-point numbers, etc. The index type determines the search performance and the availability of prefix searches. We will explain the details later.</p>
-<p>Let's create a 'Site' table which has a primary key of ShortText. In this example, the index type is HASH.</p>
+<p>A <a class="reference internal" href="../commands/table_create.html"><em>table_create</em></a> command creates a new table.</p>
+<p>In most cases, a table has a primary key which must be specified with its data type and index type.</p>
+<p>There are various data types such as integers, strings, etc. See also <a class="reference internal" href="../type.html"><em>データ型</em></a> for more details. The index type determines the search performance and the availability of prefix searches. The details will be described later.</p>
+<p>Let's create a table. The following example creates a table with a primary key. The <cite>name</cite> parameter specifies the name of the table. The <cite>flags</cite> parameter specifies the index type for the primary key. The <cite>key_type</cite> parameter specifies the data type of the primary key.</p>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre>&gt; table_create --name Site --flags TABLE_HASH_KEY --key_type ShortText
-[[0,1322616280.60791,0.01234375],true]
+[[0,1332484898.674,0.0103404521942139],true]
 </pre></div>
 </div>
+<p>The second element of the result indicates that the operation succeeded.</p>
 </div>
 <div class="section" id="view-a-table">
 <h2>4.1.6. View a table<a class="headerlink" href="#view-a-table" title="Permalink to this headline">¶</a></h2>
-<p>A <a class="reference internal" href="../commands/select.html"><em>select</em></a> command shows contents of table.</p>
+<p>A <a class="reference internal" href="../commands/select.html"><em>select</em></a> command can enumerate records in a table.</p>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre>&gt; select --table Site
-[[0,1322616280.82196,0.000451873],[[[0],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;]]]]]
+[[0,1332484898.88587,0.000526189804077148],[[[0],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;]]]]]
 </pre></div>
 </div>
-<p>When only a table is specified, the 'select' command returns the first (at most) 10 records of that table. &quot;[0]&quot; in the result shows the number of records in the 'Site' table. The next array is a list of columns. [&quot;_id&quot;,&quot;Uint32&quot;] is a column of UInt32, named &quot;_id&quot;. [&quot;_key&quot;,&quot;ShortText&quot;] is a column of ShortText, named &quot;_key&quot;.</p>
-<p>The above two columns, '_id' and '_key', are the necessary columns. The '_id' column stores IDs those are automatically allocated by groonga. The '_key' column is associated with the primary key. You are not allowed to rename these columns.</p>
+<p>When only a table name is specified with a <cite>table</cite> parameter, a <a class="reference internal" href="../commands/select.html"><em>select</em></a> command returns the first (at most) 10 records in the table. [0] in the result shows the number of records in the table. The next array is a list of columns. [&quot;_id&quot;,&quot;Uint32&quot;] is a column of UInt32, named _id. [&quot;_key&quot;,&quot;ShortText&quot;] is a column of ShortText, named _key.</p>
+<p>The above two columns, _id and _key, are the necessary columns. The _id column stores IDs those are automatically allocated by groonga. The _key column is associated with the primary key. You are not allowed to rename these columns.</p>
 </div>
 <div class="section" id="create-a-column">
 <h2>4.1.7. Create a column<a class="headerlink" href="#create-a-column" title="Permalink to this headline">¶</a></h2>
-<p>A <a class="reference internal" href="../commands/column_create.html"><em>column_create</em></a> command adds a column to a table.</p>
-<p>Let's add a column of ShortText to store titles. You may give a descriptive name 'title' to the column.</p>
+<p>A <a class="reference internal" href="../commands/column_create.html"><em>column_create</em></a> command creates a new column.</p>
+<p>Let's add a column. The following example adds a column to the Site table. The <cite>table</cite> parameter specifies the target table. The <cite>name</cite> parameter specifies the name of the column. The <cite>type</cite> parameter specifies the data type of the column.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>&gt; column_create --table Site --name title --flags COLUMN_SCALAR --type ShortText
-[[0,1317212712.91734,0.077833747],true]
+<div class="highlight-none"><div class="highlight"><pre>&gt; column_create --table Site --name title --type ShortText
+[[0,1332484899.08879,0.00948214530944824],true]
 &gt; select --table Site
-[[0,1317212713.19572,0.000121119],[[[0],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;]]]]]
+[[0,1332484899.29974,0.000299215316772461],[[[0],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;]]]]]
 </pre></div>
 </div>
-<p>The COLUMN_SCALAR flag specifies to add a regular column.</p>
 </div>
-<div class="section" id="create-a-lexicon-table-for-full-text-searches">
-<h2>4.1.8. Create a lexicon table for full text searches<a class="headerlink" href="#create-a-lexicon-table-for-full-text-searches" title="Permalink to this headline">¶</a></h2>
-<p>Let's go on to how to make a full text search.</p>
-<p>Groonga uses an inverted index to provide fast full text search. So, the first step is to create a lexicon table which stores an inverted index, also known as postings lists. The primary key of this table is associated with a vocabulary made up of index terms and each record stores postings lists for one index term.</p>
-<p>The following shows a command which creates a lexicon table named 'Terms'. The data type of its primary key is ShortText.</p>
-<p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>&gt; table_create --name Terms --flags TABLE_PAT_KEY|KEY_NORMALIZE --key_type ShortText --default_tokenizer TokenBigram
-[[0,1317212713.39679,0.092312046],true]
-</pre></div>
-</div>
-<p>The table_create command takes many parameters but you don't need to understand all of them. Please skip the next paragraph if you are not interested in how it works.</p>
-<p>The 'TABLE_PAT_KEY' flag specifies to store index terms in a patricia trie. The 'KEY_NORMALIZE' flag specifies to normalize index terms. In this example, both flags are validated by using a '|'. The 'default_tokenizer' parameter specifies a method for tokenizing text. This example specifies 'TokenBigram' that is generally called 'N-gram'.</p>
-</div>
-<div class="section" id="create-an-index-column-for-full-text-search">
-<h2>4.1.9. Create an index column for full text search<a class="headerlink" href="#create-an-index-column-for-full-text-search" title="Permalink to this headline">¶</a></h2>
-<p>The second step is to create an index column, which allows you to search records from its associated column. That is to say this step specifies which column needs an index.</p>
-<p>Let's create an index column for the 'title' column in the 'Site' table.</p>
-<p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>&gt; column_create --table Terms --name blog_title --flags COLUMN_INDEX|WITH_POSITION --type Site --source title
-[[0,1317212713.68994,0.19739078],true]
-</pre></div>
-</div>
-<p>This command creates an index column 'blog_title' in the 'Terms' table. The '--type' option specifies a target table and the '--source' option specifies a target column. Then, the 'COLUMN_INDEX' flag specifies to create an index column and the 'WITH_POSITION' flag specifies to create a full inverted index, which contains the positions of each index term. This combination 'COLUMN_INDEX|WITH_POSITION' is recommended for the general purpose.</p>
-</div>
-<div class="section" id="load-data">
-<h2>4.1.10. Load data<a class="headerlink" href="#load-data" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="load-records">
+<h2>4.1.8. Load records<a class="headerlink" href="#load-records" title="Permalink to this headline">¶</a></h2>
 <p>A <a class="reference internal" href="../commands/load.html"><em>load</em></a> command loads JSON-formatted records into a table.</p>
-<p>The following adds nine records to the 'Site' table.</p>
+<p>The following example loads nine records into the Site table.</p>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre>&gt; load --table Site
 &gt; [
@@ -232,101 +208,131 @@ Form_2: COMMAND --NAME_1 VALUE_1 --NAME_2 VALUE_2 ..
 &gt; {&quot;_key&quot;:&quot;http://example.org/gat&quot;,&quot;title&quot;:&quot;test test record eight.&quot;},
 &gt; {&quot;_key&quot;:&quot;http://example.com/vdw&quot;,&quot;title&quot;:&quot;test test record nine.&quot;},
 &gt; ]
-[[0,1317212714.08816,2.203527402],9]
+[[0,1332484899.50234,2.20460820198059],9]
 </pre></div>
 </div>
+<p>The second element of the result indicates how many records were successfully loaded. In this case, all the records are successfully loaded.</p>
 <p>Let's make sure that these records are correctly stored.</p>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre>&gt; select --table Site
-[[0,1317212716.49285,0.000270908],[[[9],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;]],[1,&quot;http://example.org/&quot;,&quot;This is test record 1!&quot;],[2,&quot;http://example.net/&quot;,&quot;test record 2.&quot;],[3,&quot;http://example.com/&quot;,&quot;test test record three.&quot;],[4,&quot;http://example.net/afr&quot;,&quot;test record four.&quot;],[5,&quot;http://example.org/aba&quot;,&quot;test test test record five.&quot;],[6,&quot;http://example.com/rab&quot;,&quot;test test test test record six.&quot;],[7,&quot;http://example.net/atv&quot;,&quot;test test test record seven.&quot;],[8,&quot;http://example.org/gat&quot;,&quot;test test record eight.&quot;],[9,&quot;http://example.com/vdw&quot;,&quot;test test record nine.&quot;]]]]
+[[0,1332484901.90868,0.000381231307983398],[[[9],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;]],[1,&quot;http://example.org/&quot;,&quot;This is test record 1!&quot;],[2,&quot;http://example.net/&quot;,&quot;test record 2.&quot;],[3,&quot;http://example.com/&quot;,&quot;test test record three.&quot;],[4,&quot;http://example.net/afr&quot;,&quot;test record four.&quot;],[5,&quot;http://example.org/aba&quot;,&quot;test test test record five.&quot;],[6,&quot;http://example.com/rab&quot;,&quot;test test test test record six.&quot;],[7,&quot;http://example.net/atv&quot;,&quot;test test test record seven.&quot;],[8,&quot;http://example.org/gat&quot;,&quot;test test record eight.&quot;],[9,&quot;http://example.com/vdw&quot;,&quot;test test record nine.&quot;]]]]
 </pre></div>
 </div>
 </div>
-<div class="section" id="search-data">
-<h2>4.1.11. Search data<a class="headerlink" href="#search-data" title="Permalink to this headline">¶</a></h2>
-<p>Before a full text search, let's try to search data by '_id' and '_key'. These columns work as unique keys.</p>
-<p>You can search records by using a 'select' command with a 'query' parameter.</p>
+<div class="section" id="get-a-record">
+<h2>4.1.9. Get a record<a class="headerlink" href="#get-a-record" title="Permalink to this headline">¶</a></h2>
+<p>A <a class="reference internal" href="../commands/select.html"><em>select</em></a> command can search records in a table.</p>
+<p>If a search condition is specified with a <cite>query</cite> parameter, a <a class="reference internal" href="../commands/select.html"><em>select</em></a> command searches records matching the search condition and returns the matched records.</p>
+<p>Let's get a record having a specified record ID. The following example gets the first record in the Site table. More precisely, the <cite>query</cite> parameter specifies a record whose _id column stores 1.</p>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre>&gt; select --table Site --query _id:1
-[[0,1317212716.69871,0.000308514],[[[1],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;]],[1,&quot;http://example.org/&quot;,&quot;This is test record 1!&quot;]]]]
+[[0,1332484902.11683,0.000809431076049805],[[[1],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;]],[1,&quot;http://example.org/&quot;,&quot;This is test record 1!&quot;]]]]
 </pre></div>
 </div>
-<p>'_id:1' specifies to search a record whose ID is 1.</p>
-<p>Next, let's search a record by a primary key.</p>
+<p>Next, let's get a record having a specified key. The following example gets the record whose primary key is &quot;<a class="reference external" href="http://example.org/">http://example.org/</a>&quot;. More precisely, the <cite>query</cite> parameter specifies a record whose _key column stores &quot;<a class="reference external" href="http://example.org/">http://example.org/</a>&quot;.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>&gt; select --table Site --query &quot;_key:\&quot;http://example.org/\&quot;&quot;
-[[0,1317212716.9005,0.000478343],[[[1],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;]],[1,&quot;http://example.org/&quot;,&quot;This is test record 1!&quot;]]]]
+<div class="highlight-none"><div class="highlight"><pre>&gt; select --table Site --query &#39;_key:&quot;http://example.org/&quot;&#39;
+[[0,1332484902.32106,0.000850200653076172],[[[1],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;]],[1,&quot;http://example.org/&quot;,&quot;This is test record 1!&quot;]]]]
 </pre></div>
 </div>
-<p>'_key:&quot;<a class="reference external" href="http://example.org/">http://example.org/</a>&quot;' specifies to search a record whose primary key is &quot;<a class="reference external" href="http://example.org/">http://example.org/</a>&quot;.</p>
+</div>
+<div class="section" id="create-a-lexicon-table-for-full-text-search">
+<h2>4.1.10. Create a lexicon table for full text search<a class="headerlink" href="#create-a-lexicon-table-for-full-text-search" title="Permalink to this headline">¶</a></h2>
+<p>Let's go on to how to make full text search.</p>
+<p>Groonga uses an inverted index to provide fast full text search. So, the first step is to create a lexicon table which stores an inverted index, also known as postings lists. The primary key of this table is associated with a vocabulary made up of index terms and each record stores postings lists for one index term.</p>
+<p>The following shows a command which creates a lexicon table named Terms. The data type of its primary key is ShortText.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; table_create --name Terms --flags TABLE_PAT_KEY|KEY_NORMALIZE --key_type ShortText --default_tokenizer TokenBigram
+[[0,1332484902.52532,0.00777173042297363],true]
+</pre></div>
+</div>
+<p>The <a class="reference internal" href="../commands/table_create.html"><em>table_create</em></a> command takes many parameters but you don't need to understand all of them. Please skip the next paragraph if you are not interested in how it works.</p>
+<p>The TABLE_PAT_KEY flag specifies to store index terms in a patricia trie. The KEY_NORMALIZE flag specifies to normalize index terms. In this example, both flags are validated by using a '|'. The <cite>default_tokenizer</cite> parameter specifies the method for tokenizing text. This example uses TokenBigram that is generally called N-gram.</p>
+</div>
+<div class="section" id="create-an-index-column-for-full-text-search">
+<h2>4.1.11. Create an index column for full text search<a class="headerlink" href="#create-an-index-column-for-full-text-search" title="Permalink to this headline">¶</a></h2>
+<p>The second step is to create an index column, which allows you to search records from its associated column. That is to say this step specifies which column needs an index.</p>
+<p>Let's create an index column. The following example creates an index column for a column in the Site table.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; column_create --table Terms --name blog_title --flags COLUMN_INDEX|WITH_POSITION --type Site --source title
+[[0,1332484902.73511,0.0202178955078125],true]
+</pre></div>
+</div>
+<p>The <cite>table</cite> parameter specifies the index table and the <cite>name</cite> parameter specifies the index column. The <cite>type</cite> parameter specifies the target table and the <cite>source</cite> parameter specifies the target column. The COLUMN_INDEX flag specifies to create an index column and the WITH_POSITION flag specifies to create a full inverted index, which contains the positions of each index term. This combination, COLUMN_INDEX|WITH_POSITION, is recommended for the general purpose.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">You can create a lexicon table and index columns before/during/after loading records. If a target column already has records, groonga creates an inverted index in a static manner. In contrast, if you load records into an already indexed column, groonga updates the inverted index in a dynamic manner.</p>
+</div>
 </div>
 <div class="section" id="full-text-search">
 <h2>4.1.12. Full text search<a class="headerlink" href="#full-text-search" title="Permalink to this headline">¶</a></h2>
-<p>It's time to make a full text search. You can make a full text search query with the same 'query' parameter.</p>
+<p>It's time. You can make full text search with a <a class="reference internal" href="../commands/select.html"><em>select</em></a> command.</p>
+<p>A query for full text search is specified with a <cite>query</cite> parameter. The following example searches records whose &quot;title&quot; column contains &quot;this&quot;. The '&#64;' specifies to make full text search. Note that a lower case query matches upper case and capitalized terms in a record if KEY_NORMALIZE was specified when creating a lexcon table.</p>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre>&gt; select --table Site --query title:@this
-[[0,1317212717.10303,0.000581287],[[[1],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;]],[1,&quot;http://example.org/&quot;,&quot;This is test record 1!&quot;]]]]
+[[0,1332484902.95678,0.000878334045410156],[[[1],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;]],[1,&quot;http://example.org/&quot;,&quot;This is test record 1!&quot;]]]]
 </pre></div>
 </div>
-<p>This command searches records whose 'title' column contains a string 'this'. In this case, only one record matches this query. Note that the lower case query 'this' matches a capitalized 'This' in the 1st record because 'KEY_NORMALIZE' was specified in lexicon column creation.</p>
-<p>The 'select' command has an optional parameter 'match_columns'. This parameter specifies default target columns and it is used when target columns are not specified in a query.[1]_</p>
-<p>A combination of '--match_columns title' and '--query this' brings you the same result that '--query title:&#64;this' does.</p>
+<p>In this example, the first record matches the query because its title contains &quot;This&quot;, that is the capitalized form of the query.</p>
+<p>A <a class="reference internal" href="../commands/select.html"><em>select</em></a> command accepts an optional parameter, named <cite>match_columns</cite>, that specifies the default target columns. This parameter is used if target columns are not specified in a query. <a class="footnote-reference" href="#id2" id="id1">[1]</a></p>
+<p>The combination of &quot;<cite>--match_columns</cite> title&quot; and &quot;<cite>--query</cite> this&quot; brings you the same result that &quot;<cite>--query</cite> title:&#64;this&quot; does.</p>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre>&gt; select --table Site --match_columns title --query this
-[[0,1317212717.30596,0.000716439],[[[1],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;]],[1,&quot;http://example.org/&quot;,&quot;This is test record 1!&quot;]]]]
+[[0,1332484903.16096,0.000757932662963867],[[[1],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;]],[1,&quot;http://example.org/&quot;,&quot;This is test record 1!&quot;]]]]
 </pre></div>
 </div>
 </div>
 <div class="section" id="specify-output-columns">
 <h2>4.1.13. Specify output columns<a class="headerlink" href="#specify-output-columns" title="Permalink to this headline">¶</a></h2>
-<p>An 'output_columns' parameter in a 'select' command specifies columns to be shown in the search result. If you want to specify more than one columns, please separate column names by commas (,).</p>
+<p>An <cite>output_columns</cite> parameter of a <a class="reference internal" href="../commands/select.html"><em>select</em></a> command specifies columns to appear in the search result. If you want to specify more than one columns, please separate column names by commas (',').</p>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre>&gt; select --table Site --output_columns _key,title,_score --query title:@test
-[[0,1317212717.50916,0.00060758],[[[9],[[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;],[&quot;_score&quot;,&quot;Int32&quot;]],[&quot;http://example.org/&quot;,&quot;This is test record 1!&quot;,1],[&quot;http://example.net/&quot;,&quot;test record 2.&quot;,1],[&quot;http://example.com/&quot;,&quot;test test record three.&quot;,2],[&quot;http://example.net/afr&quot;,&quot;test record four.&quot;,1],[&quot;http://example.org/aba&quot;,&quot;test test test record five.&quot;,3],[&quot;http://example.com/rab&quot;,&quot;test test test test record six.&quot;,4],[&quot;http://example.net/atv&quot;,&quot;test test test record seven.&quot;,3],[&quot;http://example.org/gat&quot;,&quot;test test record eight.&quot;,2],[&quot;http://example.com/vdw&quot;,&quot;test test record nine.&quot;,2]]]]
+[[0,1332484903.36506,0.000709056854248047],[[[9],[[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;],[&quot;_score&quot;,&quot;Int32&quot;]],[&quot;http://example.org/&quot;,&quot;This is test record 1!&quot;,1],[&quot;http://example.net/&quot;,&quot;test record 2.&quot;,1],[&quot;http://example.com/&quot;,&quot;test test record three.&quot;,2],[&quot;http://example.net/afr&quot;,&quot;test record four.&quot;,1],[&quot;http://example.org/aba&quot;,&quot;test test test record five.&quot;,3],[&quot;http://example.com/rab&quot;,&quot;test test test test record six.&quot;,4],[&quot;http://example.net/atv&quot;,&quot;test test test record seven.&quot;,3],[&quot;http://example.org/gat&quot;,&quot;test test record eight.&quot;,2],[&quot;http://example.com/vdw&quot;,&quot;test test record nine.&quot;,2]]]]
 </pre></div>
 </div>
-<p>This command specifies three output columns including the '_score' column, which stores the relevance score of each record.</p>
+<p>This example specifies three output columns including the _score column, which stores the relevance score of each record.</p>
 </div>
 <div class="section" id="specify-output-ranges">
 <h2>4.1.14. Specify output ranges<a class="headerlink" href="#specify-output-ranges" title="Permalink to this headline">¶</a></h2>
-<p>A 'select' command returns a part of its search result if 'offset' and/or 'limit' parameters are specified. These parameters are useful to paginate a search result, a widely-used interface which shows a search result on a page by page basis.</p>
-<p>An 'offset' parameter specifies the starting point and a 'limit' parameter specifies the maximum number of records to be returned. If you need the first record in a search result, the offset parameter must be 0 or omitted.</p>
+<p>A <a class="reference internal" href="../commands/select.html"><em>select</em></a> command returns a part of its search result if <cite>offset</cite> and/or <cite>limit</cite> parameters are specified. These parameters are useful to paginate a search result, a widely-used interface which shows a search result on a page by page basis.</p>
+<p>An <cite>offset</cite> parameter specifies the starting point and a <cite>limit</cite> parameter specifies the maximum number of records to be returned. If you need the first record in a search result, the offset parameter must be 0 or omitted.</p>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre>&gt; select --table Site --offset 0 --limit 3
-[[0,1317212717.71574,0.000238544],[[[9],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;]],[1,&quot;http://example.org/&quot;,&quot;This is test record 1!&quot;],[2,&quot;http://example.net/&quot;,&quot;test record 2.&quot;],[3,&quot;http://example.com/&quot;,&quot;test test record three.&quot;]]]]
+[[0,1332484903.57505,0.000303268432617188],[[[9],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;]],[1,&quot;http://example.org/&quot;,&quot;This is test record 1!&quot;],[2,&quot;http://example.net/&quot;,&quot;test record 2.&quot;],[3,&quot;http://example.com/&quot;,&quot;test test record three.&quot;]]]]
 &gt; select --table Site --offset 3 --limit 3
-[[0,1317212717.91925,0.00023617],[[[9],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;]],[4,&quot;http://example.net/afr&quot;,&quot;test record four.&quot;],[5,&quot;http://example.org/aba&quot;,&quot;test test test record five.&quot;],[6,&quot;http://example.com/rab&quot;,&quot;test test test test record six.&quot;]]]]
+[[0,1332484903.77936,0.000320196151733398],[[[9],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;]],[4,&quot;http://example.net/afr&quot;,&quot;test record four.&quot;],[5,&quot;http://example.org/aba&quot;,&quot;test test test record five.&quot;],[6,&quot;http://example.com/rab&quot;,&quot;test test test test record six.&quot;]]]]
 &gt; select --table Site --offset 7 --limit 3
-[[0,1317212718.12219,0.00019999],[[[9],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;]],[8,&quot;http://example.org/gat&quot;,&quot;test test record eight.&quot;],[9,&quot;http://example.com/vdw&quot;,&quot;test test record nine.&quot;]]]]
+[[0,1332484903.98409,0.000294685363769531],[[[9],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;]],[8,&quot;http://example.org/gat&quot;,&quot;test test record eight.&quot;],[9,&quot;http://example.com/vdw&quot;,&quot;test test record nine.&quot;]]]]
 </pre></div>
 </div>
 </div>
-<div class="section" id="sort">
-<h2>4.1.15. Sort<a class="headerlink" href="#sort" title="Permalink to this headline">¶</a></h2>
-<p>A 'select' command sorts its result when used with a 'sortby' parameter.</p>
-<p>A 'sortby' parameter specifies a column as a sorting creteria. A search result is arranged in ascending order of the column values. If you want to sort a search result in reverse order, please add a leading hyphen (-) to the column name of a parameter.</p>
+<div class="section" id="sort-a-search-result">
+<h2>4.1.15. Sort a search result<a class="headerlink" href="#sort-a-search-result" title="Permalink to this headline">¶</a></h2>
+<p>A <a class="reference internal" href="../commands/select.html"><em>select</em></a> command sorts its result when used with a <cite>sortby</cite> parameter.</p>
+<p>A <cite>sortby</cite> parameter specifies a column as a sorting creteria. A search result is arranged in ascending order of the column values. If you want to sort a search result in reverse order, please add a leading hyphen ('-') to the column name in a parameter.</p>
+<p>The following example shows records in the Site table in reverse order.</p>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre>&gt; select --table Site --sortby -_id
-[[0,1317212718.32565,0.000385755],[[[9],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;]],[9,&quot;http://example.com/vdw&quot;,&quot;test test record nine.&quot;],[8,&quot;http://example.org/gat&quot;,&quot;test test record eight.&quot;],[7,&quot;http://example.net/atv&quot;,&quot;test test test record seven.&quot;],[6,&quot;http://example.com/rab&quot;,&quot;test test test test record six.&quot;],[5,&quot;http://example.org/aba&quot;,&quot;test test test record five.&quot;],[4,&quot;http://example.net/afr&quot;,&quot;test record four.&quot;],[3,&quot;http://example.com/&quot;,&quot;test test record three.&quot;],[2,&quot;http://example.net/&quot;,&quot;test record 2.&quot;],[1,&quot;http://example.org/&quot;,&quot;This is test record 1!&quot;]]]]
+[[0,1332484904.18805,0.000293493270874023],[[[9],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;]],[9,&quot;http://example.com/vdw&quot;,&quot;test test record nine.&quot;],[8,&quot;http://example.org/gat&quot;,&quot;test test record eight.&quot;],[7,&quot;http://example.net/atv&quot;,&quot;test test test record seven.&quot;],[6,&quot;http://example.com/rab&quot;,&quot;test test test test record six.&quot;],[5,&quot;http://example.org/aba&quot;,&quot;test test test record five.&quot;],[4,&quot;http://example.net/afr&quot;,&quot;test record four.&quot;],[3,&quot;http://example.com/&quot;,&quot;test test record three.&quot;],[2,&quot;http://example.net/&quot;,&quot;test record 2.&quot;],[1,&quot;http://example.org/&quot;,&quot;This is test record 1!&quot;]]]]
 </pre></div>
 </div>
-<p>You can use the '_score' column as a sorting criteria for ranking a search result.</p>
+<p>The next example uses the _score column as the sorting criteria for ranking the search result. The result is sorted in relevance order.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>&gt; select --table Site --query title:@test --output_columns _id,_score,title --sortby _score
-[[0,1317212718.5331,0.000667311],[[[9],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_score&quot;,&quot;Int32&quot;],[&quot;title&quot;,&quot;ShortText&quot;]],[1,1,&quot;This is test record 1!&quot;],[2,1,&quot;test record 2.&quot;],[4,1,&quot;test record four.&quot;],[3,2,&quot;test test record three.&quot;],[9,2,&quot;test test record nine.&quot;],[8,2,&quot;test test record eight.&quot;],[7,3,&quot;test test test record seven.&quot;],[5,3,&quot;test test test record five.&quot;],[6,4,&quot;test test test test record six.&quot;]]]]
+<div class="highlight-none"><div class="highlight"><pre>&gt; select --table Site --query title:@test --output_columns _id,_score,title --sortby -_score
+[[0,1332484904.39402,0.000802755355834961],[[[9],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_score&quot;,&quot;Int32&quot;],[&quot;title&quot;,&quot;ShortText&quot;]],[6,4,&quot;test test test test record six.&quot;],[5,3,&quot;test test test record five.&quot;],[7,3,&quot;test test test record seven.&quot;],[8,2,&quot;test test record eight.&quot;],[3,2,&quot;test test record three.&quot;],[9,2,&quot;test test record nine.&quot;],[1,1,&quot;This is test record 1!&quot;],[4,1,&quot;test record four.&quot;],[2,1,&quot;test record 2.&quot;]]]]
 </pre></div>
 </div>
-<p>If you want to specify more than one columns, please separate column names by commas. In such a case, a search result is sorted in order of the column values in the first column, and then records having the same values in the first column are sorted in order of the second column values.</p>
+<p>If you want to specify more than one columns, please separate column names by commas (','). In such a case, a search result is sorted in order of the values in the first column, and then records having the same values in the first column are sorted in order of the second column values.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>&gt; select --table Site --query title:@test --output_columns _id,_score,title --sortby _score,_id
-[[0,1317212718.73819,0.00069225],[[[9],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_score&quot;,&quot;Int32&quot;],[&quot;title&quot;,&quot;ShortText&quot;]],[1,1,&quot;This is test record 1!&quot;],[2,1,&quot;test record 2.&quot;],[4,1,&quot;test record four.&quot;],[3,2,&quot;test test record three.&quot;],[8,2,&quot;test test record eight.&quot;],[9,2,&quot;test test record nine.&quot;],[5,3,&quot;test test test record five.&quot;],[7,3,&quot;test test test record seven.&quot;],[6,4,&quot;test test test test record six.&quot;]]]]
+<div class="highlight-none"><div class="highlight"><pre>&gt; select --table Site --query title:@test --output_columns _id,_score,title --sortby -_score,_id
+[[0,1332484904.60132,0.000498056411743164],[[[9],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_score&quot;,&quot;Int32&quot;],[&quot;title&quot;,&quot;ShortText&quot;]],[6,4,&quot;test test test test record six.&quot;],[5,3,&quot;test test test record five.&quot;],[7,3,&quot;test test test record seven.&quot;],[3,2,&quot;test test record three.&quot;],[8,2,&quot;test test record eight.&quot;],[9,2,&quot;test test record nine.&quot;],[1,1,&quot;This is test record 1!&quot;],[2,1,&quot;test record 2.&quot;],[4,1,&quot;test record four.&quot;]]]]
 </pre></div>
 </div>
 <p class="rubric">footnote</p>
-<table class="docutils footnote" frame="void" id="id1" rules="none">
+<table class="docutils footnote" frame="void" id="id2" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label">[1]</td><td>Currently, a 'match_columns' parameter is available iff there exists an inverted index for full text search. A 'match_columns' parameter for a regular column is not supported.</td></tr>
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>Currently, a <cite>match_columns</cite> parameter is available iff there exists an inverted index for full text search. A <cite>match_columns</cite> parameter for a regular column is not supported.</td></tr>
 </tbody>
 </table>
 </div>
@@ -348,14 +354,14 @@ Form_2: COMMAND --NAME_1 VALUE_1 --NAME_2 VALUE_2 ..
 <li><a class="reference internal" href="#create-a-table">4.1.5. Create a table</a></li>
 <li><a class="reference internal" href="#view-a-table">4.1.6. View a table</a></li>
 <li><a class="reference internal" href="#create-a-column">4.1.7. Create a column</a></li>
-<li><a class="reference internal" href="#create-a-lexicon-table-for-full-text-searches">4.1.8. Create a lexicon table for full text searches</a></li>
-<li><a class="reference internal" href="#create-an-index-column-for-full-text-search">4.1.9. Create an index column for full text search</a></li>
-<li><a class="reference internal" href="#load-data">4.1.10. Load data</a></li>
-<li><a class="reference internal" href="#search-data">4.1.11. Search data</a></li>
+<li><a class="reference internal" href="#load-records">4.1.8. Load records</a></li>
+<li><a class="reference internal" href="#get-a-record">4.1.9. Get a record</a></li>
+<li><a class="reference internal" href="#create-a-lexicon-table-for-full-text-search">4.1.10. Create a lexicon table for full text search</a></li>
+<li><a class="reference internal" href="#create-an-index-column-for-full-text-search">4.1.11. Create an index column for full text search</a></li>
 <li><a class="reference internal" href="#full-text-search">4.1.12. Full text search</a></li>
 <li><a class="reference internal" href="#specify-output-columns">4.1.13. Specify output columns</a></li>
 <li><a class="reference internal" href="#specify-output-ranges">4.1.14. Specify output ranges</a></li>
-<li><a class="reference internal" href="#sort">4.1.15. Sort</a></li>
+<li><a class="reference internal" href="#sort-a-search-result">4.1.15. Sort a search result</a></li>
 </ul>
 </li>
 </ul>
@@ -365,7 +371,7 @@ Form_2: COMMAND --NAME_1 VALUE_1 --NAME_2 VALUE_2 ..
                         title="previous chapter">4. Tutorial</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="network.html"
-                        title="next chapter">4.2. How to use groonga with network</a></p>
+                        title="next chapter">4.2. Remote access</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="../sources/tutorial/introduction.txt"
@@ -395,12 +401,12 @@ Form_2: COMMAND --NAME_1 VALUE_1 --NAME_2 VALUE_2 ..
           <a href="../genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="network.html" title="4.2. How to use groonga with network"
+          <a href="network.html" title="4.2. Remote access"
              >next</a> |</li>
         <li class="right" >
           <a href="../tutorial.html" title="4. Tutorial"
              >previous</a> |</li>
-        <li><a href="../index.html">groonga v2.0.0 documentation</a> &raquo;</li>
+        <li><a href="../index.html">groonga v2.0.1 documentation</a> &raquo;</li>
           <li><a href="../tutorial.html" >4. Tutorial</a> &raquo;</li> 
       </ul>
     </div>

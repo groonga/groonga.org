@@ -7,70 +7,149 @@
 .. groonga-command
 .. database: tutorial
 
-さまざまな種類をもったデータの保存
-==================================
+Various data types
+==================
 
-groongaでは、さまざまなデータを格納させることが出来ます。
+Groonga is a full text search engine but also serves as a column-oriented data store. Groonga supports various data types, such as numeric types, string types, date and time type, longitude and latitude types, etc. This tutorial shows a list of data types and explains how to use them.
 
-データ型
+Overview
 --------
 
-groongaでは、数値（整数・小数）や文字列や時刻や経緯度などの情報を格納することができます。
+The basic data types of groonga are roughly divided into 5 groups --- boolean type, numeric types, string types, date/time type and longitude/latitude types. The numeric types are further divided according to whether integer or floating point number, signed or unsigned and the number of bits allocated to each integer. The string types are further divided according to the maximum length. The longitude/latitude types are further divided according to the geographic coordinate system. For more details, see :doc:`/type`.
 
-ここでは、Int32型のカラムに整数を格納、Float型のカラムに浮動小数点の小数を、ShortText型のカラムに文字列を、Time型のカラムに時間を格納する例を示します。経緯度の格納については、のちのチュートリアルで触れます。
+In addition, groonga supports reference types and vector types. Reference types are designed for accessing other tables. Vector types are designed for storing a variable number of values in one element.
 
-その他のデータ型の一覧は、 :doc:`/type` を参照してください。
+First, let's create a table for this tutorial.
 
 .. groonga-command
 .. include:: ../example/tutorial/data-1.log
-.. table_create --name Type --flags TABLE_HASH_KEY --key_type ShortText
-.. column_create --table Type --name number --type Int32
-.. column_create --table Type --name float --type Float
-.. column_create --table Type --name string --type ShortText
-.. column_create --table Type --name time --type Time
-.. load --table Type
-.. [{"_key":"sample","number":12345,"float":42.195,"string":"GROONGA","time":1234567890.12}]
-.. select --table Type
+.. table_create --name ToyBox --flags TABLE_HASH_KEY --key_type ShortText
 
+Boolean type
+------------
 
-テーブル型
-----------
+The boolean type is used to store true or false. To create a boolean type column, specify Bool to the `type` parameter of :doc:`/commands/column_create` command. The default value of the boolean type is false.
 
-table_createで作成したテーブルを、カラムの型として使うことが出来ます。
-
-また、output_columnsにおいて「.」を区切りとして、参照先のテーブルに存在するカラムを指定すると、指定したカラムの値を表示することができます。
-
-ここでは、先のチュートリアルで作成したSiteテーブルに手を加え、どのサイトをリンクしているのかを保存してみましょう。
-
-他のテーブルを参照するカラムにデータを入力する場合には、参照先のテーブルの_keyカラムの値を代入する必要があります。
+The following example creates a boolean type column and adds three records. Note that the third record has the default value because no value is specified.
 
 .. groonga-command
 .. include:: ../example/tutorial/data-2.log
+.. column_create --table ToyBox --name is_animal --type Bool
+.. load --table ToyBox
+.. [
+.. {"_key":"Monkey","is_animal":true}
+.. {"_key":"Flower","is_animal":false}
+.. {"_key":"Block"}
+.. ]
+.. select --table ToyBox --output_columns _key,is_animal
+
+Numeric types
+-------------
+
+The numeric types are divided into integer types and a floating point number type. The integer types are further divided into the signed integer types and unsigned integer types. In addition, you can choose the number of bits allocated to each integer. For more details, see :doc:`/type`. The default value of the numeric types is 0.
+
+The following example creates an Int8 column and a Float column, and then updates existing records. The :doc:`/commands/load` command updates the weight column as expected. On the other hand, the price column values are different from the specified values because 15.9 is not an integer and 200 is too large. 15.9 is converted to 15 by removing the fractional part. 200 causes an overflow and the result becomes -56. Note that the result of an overflow/underflow is undefined.
+
+.. groonga-command
+.. include:: ../example/tutorial/data-3.log
+.. column_create --table ToyBox --name price --type Int8
+.. column_create --table ToyBox --name weight --type Float
+.. load --table ToyBox
+.. [
+.. {"_key":"Monkey","price":15.9}
+.. {"_key":"Flower","price":200,"weight":0.13}
+.. {"_key":"Block","weight":25.7}
+.. ]
+.. select --table ToyBox --output_columns _key,price,weight
+
+String types
+------------
+
+The string types are divided according to the maximum length. For more details, see :doc:`/type`. The default value is the zero-length string.
+
+The following example creates a ShortText column and updates existing records. The third record has the default value because not updated.
+
+.. groonga-command
+.. include:: ../example/tutorial/data-4.log
+.. column_create --table ToyBox --name name --type ShortText
+.. load --table ToyBox
+.. [
+.. {"_key":"Monkey","name":"Grease"}
+.. {"_key":"Flower","name":"Rose"}
+.. ]
+.. select --table ToyBox --output_columns _key,name
+
+Date and time type
+------------------
+
+The date and time type of groonga is Time. Actually, a Time column stores a date and time as the number of microseconds since the Epoch, 1970-01-01 00:00:00. A Time value can represent a date and time before the Epoch because the actual data type is a signed integer. Note that :doc:`/commands/load` and :doc:`/commands/select commands use a decimal number to represent a data and time in seconds. The default value is 0.0, which means the Epoch.
+
+The following example creates a Time column and updates existing records. The first record has the default value because not updated.
+
+.. groonga-command
+.. include:: ../example/tutorial/data-5.log
+.. column_create --table ToyBox --name time --type Time
+.. load --table ToyBox
+.. [
+.. {"_key":"Flower","time":1234567890.1234569999}
+.. {"_key":"Block","time":-1234567890}
+.. ]
+.. select --table ToyBox --output_columns _key,time
+
+Longitude and latitude types
+----------------------------
+
+The longitude and latitude types are divided according to the geographic coordinate system. For more details, see :doc:`/type`. To represent a longitude and latitude, groonga uses a string formatted as follows:
+
+* "longitude x latitude" in milliseconds (e.g.: "128452975x503157902")
+* "longitude x latitude" in degrees (e.g.: "35.6813819x139.7660839")
+
+A number with/without a decimal point represents a longitude or latitude in milliseconds/degrees respectively. Note that a combination of a number with a decimal point and a number without a decimal point (e.g. 35.1x139) must not be used. A comma (',') is also available as a delimiter. The default value is "0x0".
+
+The following example creates a WGS84GeoPoint column and updates existing records. The second record has the default value because not updated.
+
+.. groonga-command
+.. include:: ../example/tutorial/data-6.log
+.. column_create --table ToyBox --name location --type WGS84GeoPoint
+.. load --table ToyBox
+.. [
+.. {"_key":"Monkey","location":"128452975x503157902"}
+.. {"_key":"Block","location":"35.6813819x139.7660839"}
+.. ]
+.. select --table ToyBox --output_columns _key,location
+
+Reference types
+---------------
+
+Groonga supports a reference column, which stores references to records in its associated table. In practice, a reference column stores the IDs of the referred records in the associated table and enables access to those records.
+
+You can specify a column in the associated table to the `output_columns` parameter of a :doc:`/commands/select` command. The format is "Src.Dest" where Src is the name of the reference column and Dest is the name of the target column. If only the reference column is specified, it is handled as "Src._key". Note that if a reference does not point to a valid record, a :doc:`/commands/select` command outputs the default value of the target column.
+
+The following example adds a reference column to the Site table that was created in the previous tutorial. The new column, named link, is designed for storing links among records in the Site table.
+
+.. groonga-command
+.. include:: ../example/tutorial/data-7.log
 .. column_create --table Site --name link --type Site
 .. load --table Site
 .. [{"_key":"http://example.org/","link":"http://example.net/"}]
 .. select --table Site --output_columns _key,title,link._key,link.title --query title:@this
 
-このように、linkカラムに他のサイトへの参照を保存することができました。また、参照先の_keyとtitleカラムの内容を表示することができました。
+The `type` parameter of the :doc:`/commands/column_create` command specifies the table to be associated with the reference column. In this example, the reference column is associated with the own table. Then, the :doc:`/commands/load` command registers a link from "http://example.org" to "http://example.net". Note that a reference column requires the primary key, not the ID, of the record to be referred to. After that, the link is confirmed by the :doc:`/commands/select` command. In this case, the primary key and the title of the referred record are output because link._key and link.title are specified to the `output_columns` parameter.
 
-ベクターカラム
---------------
+Vector types
+------------
 
-column_createコマンドでカラムを作成するとき、--flagsオプションでCOLUMN_VECTORフラグを指定すると、複数の値を配列で格納できるカラムが作成されます。
+Groonga supports a vector column, in which each element can store a variable number of values. To create a vector column, specify the COLUMN_VECTOR flag to the `flags` parameter of a :doc:`/commands/column_create` command. A vector column is useful to represent a many-to-many relationship.
 
-テーブル型で配列を格納するカラムは、1対多の参照関係を表すのに有効です。
-
-テーブル型のチュートリアルでは、Siteテーブルに手を加え、どのサイトをリンクしているのかを保存しました。しかし、通常は1つのサイトから多くのサイトにリンクが張られています。複数のリンク情報を格納するために、複数の参照関係を保存するカラムを作成してみましょう。
-
-他のテーブルを参照するベクターカラムにデータを入力する場合には、参照先のテーブルの_keyカラムの値の「配列」を代入する必要があります。
+The previous example used a regular column, so each record could have at most one link. Obviously, the specification is insufficient because a site usually has more than one links. To solve this problem, the following example uses a vector column.
 
 .. FIXME: _idの配列ではダメなのかどうか。検証する。
 
 .. groonga-command
-.. include:: ../example/tutorial/data-3.log
+.. include:: ../example/tutorial/data-8.log
 .. column_create --table Site --name links --flags COLUMN_VECTOR --type Site
 .. load --table Site
 .. [{"_key":"http://example.org/","links":["http://example.net/","http://example.org/","http://example.com/"]}]
 .. select --table Site --output_columns _key,title,links._key,links.title --query title:@this
 
-このように、複数の参照関係が保存できました。また、output_columnsによって、複数の参照先のカラム値も表示させることができました。
+The only difference at the first step is the `flags` parameter that specifies to create a vector column. The `type` parameter of the :doc:`/commands/column_create` command is the same as in the previous example. Then, the :doc:`/commands/load` command registers three links from "http://example.org/" to "http://example.net/", "http://example.org/" and "http://example.com/". After that, the links are confirmed by the :doc:`/commands/select` command. In this case, the primary keys and the titles are output as arrays because links._key and links.title are specified to the `output_columns` parameter.

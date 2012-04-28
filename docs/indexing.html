@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>7.8. Indexing &mdash; groonga v2.0.1 documentation</title>
+    <title>7.8. Indexing &mdash; groonga v2.0.2 documentation</title>
     
     <link rel="stylesheet" href="static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '2.0.1',
+        VERSION:     '2.0.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="static/underscore.js"></script>
     <script type="text/javascript" src="static/doctools.js"></script>
     <link rel="shortcut icon" href="static/favicon.ico"/>
-    <link rel="top" title="groonga v2.0.1 documentation" href="index.html" />
+    <link rel="top" title="groonga v2.0.2 documentation" href="index.html" />
     <link rel="up" title="7. リファレンスマニュアル" href="reference.html" />
     <link rel="next" title="7.9. Log" href="log.html" />
     <link rel="prev" title="7.7.6. rand" href="functions/rand.html" /> 
@@ -75,7 +75,7 @@
         <li class="right" >
           <a href="functions/rand.html" title="7.7.6. rand"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">groonga v2.0.1 documentation</a> &raquo;</li>
+        <li><a href="index.html">groonga v2.0.2 documentation</a> &raquo;</li>
           <li><a href="reference.html" accesskey="U">7. リファレンスマニュアル</a> &raquo;</li> 
       </ul>
     </div>  
@@ -125,11 +125,11 @@ to a column that already has data.</p>
 <p>We define a schema:</p>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre>&gt; table_create Tweets TABLE_NO_KEY
-[[0,1330339027.61804,0.000236272811889648],true]
+[[0,1335519575.12183,0.000383138656616211],true]
 &gt; column_create Tweets content COLUMN_SCALAR ShortText
-[[0,1330339027.81905,0.000560760498046875],true]
+[[0,1335519575.32371,0.000842571258544922],true]
 &gt; table_create Lexicon TABLE_HASH_KEY|KEY_NORMALIZE ShortText --default_tokenizer TokenBigram
-[[0,1330339028.02028,0.000248432159423828],true]
+[[0,1335519575.52538,0.000417470932006836],true]
 </pre></div>
 </div>
 <p>We register data:</p>
@@ -140,13 +140,36 @@ to a column that already has data.</p>
 &gt; {&quot;content&quot;:&quot;I just start it!&quot;},
 &gt; {&quot;content&quot;:&quot;I&#39;m sleepy... Have a nice day... Good night...&quot;}
 &gt; ]
-[[0,1330339028.22155,1.00183534622192],3]
+[[0,1335519575.72702,1.00192642211914],3]
 </pre></div>
 </div>
 <p>We search without index. We get no result:</p>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre>&gt; select Tweets --match_columns content --query &#39;good nice&#39;
-[[0,1330339029.42452,0.000802278518676758],[[[0],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;content&quot;,&quot;ShortText&quot;]]]]]
+[
+  [
+    0,
+    1335519576.93011,
+    0.000945568084716797
+  ],
+  [
+    [
+      [
+        0
+      ],
+      [
+        [
+          &quot;_id&quot;,
+          &quot;UInt32&quot;
+        ],
+        [
+          &quot;content&quot;,
+          &quot;ShortText&quot;
+        ]
+      ]
+    ]
+  ]
+]
 </pre></div>
 </div>
 <p>We create index for <tt class="docutils literal"><span class="pre">Tweets.content</span></tt>. Already registered
@@ -154,13 +177,40 @@ data in <tt class="docutils literal"><span class="pre">Tweets.content</span></tt
 construction:</p>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre>&gt; column_create Lexicon tweet COLUMN_INDEX|WITH_POSITION Tweets content
-[[0,1330339029.62682,0.00742125511169434],true]
+[[0,1335519577.13347,0.00795507431030273],true]
 </pre></div>
 </div>
 <p>We search with index. We get a matched record:</p>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre>&gt; select Tweets --match_columns content --query &#39;good nice&#39;
-[[0,1330339029.83545,0.000765085220336914],[[[1],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;content&quot;,&quot;ShortText&quot;]],[3,&quot;I&#39;m sleepy... Have a nice day... Good night...&quot;]]]]
+[
+  [
+    0,
+    1335519577.34259,
+    0.000716209411621094
+  ],
+  [
+    [
+      [
+        1
+      ],
+      [
+        [
+          &quot;_id&quot;,
+          &quot;UInt32&quot;
+        ],
+        [
+          &quot;content&quot;,
+          &quot;ShortText&quot;
+        ]
+      ],
+      [
+        3,
+        &quot;I&#39;m sleepy... Have a nice day... Good night...&quot;
+      ]
+    ]
+  ]
+]
 </pre></div>
 </div>
 <p>We register data again. They are indexed by online index
@@ -171,13 +221,44 @@ construction:</p>
 &gt; {&quot;content&quot;:&quot;Good morning! Nice day.&quot;},
 &gt; {&quot;content&quot;:&quot;Let&#39;s go shopping.&quot;}
 &gt; ]
-[[0,1330339030.03821,0.801372528076172],2]
+[[0,1335519577.54547,0.801515579223633],2]
 </pre></div>
 </div>
 <p>We can also get newly registered records by searching:</p>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre>&gt; select Tweets --match_columns content --query &#39;good nice&#39;
-[[0,1330339031.04064,0.000650644302368164],[[[2],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;content&quot;,&quot;ShortText&quot;]],[3,&quot;I&#39;m sleepy... Have a nice day... Good night...&quot;],[4,&quot;Good morning! Nice day.&quot;]]]]
+[
+  [
+    0,
+    1335519578.54813,
+    0.000664234161376953
+  ],
+  [
+    [
+      [
+        2
+      ],
+      [
+        [
+          &quot;_id&quot;,
+          &quot;UInt32&quot;
+        ],
+        [
+          &quot;content&quot;,
+          &quot;ShortText&quot;
+        ]
+      ],
+      [
+        3,
+        &quot;I&#39;m sleepy... Have a nice day... Good night...&quot;
+      ],
+      [
+        4,
+        &quot;Good morning! Nice day.&quot;
+      ]
+    ]
+  ]
+]
 </pre></div>
 </div>
 </div>
@@ -239,7 +320,7 @@ construction:</p>
         <li class="right" >
           <a href="functions/rand.html" title="7.7.6. rand"
              >previous</a> |</li>
-        <li><a href="index.html">groonga v2.0.1 documentation</a> &raquo;</li>
+        <li><a href="index.html">groonga v2.0.2 documentation</a> &raquo;</li>
           <li><a href="reference.html" >7. リファレンスマニュアル</a> &raquo;</li> 
       </ul>
     </div>

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>7.3.17. select &mdash; groonga v2.0.1 documentation</title>
+    <title>7.3.17. select &mdash; groonga v2.0.2 documentation</title>
     
     <link rel="stylesheet" href="../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '2.0.1',
+        VERSION:     '2.0.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../static/underscore.js"></script>
     <script type="text/javascript" src="../static/doctools.js"></script>
     <link rel="shortcut icon" href="../static/favicon.ico"/>
-    <link rel="top" title="groonga v2.0.1 documentation" href="../index.html" />
+    <link rel="top" title="groonga v2.0.2 documentation" href="../index.html" />
     <link rel="up" title="7.3. コマンド" href="../commands.html" />
     <link rel="next" title="7.3.18. shutdown" href="shutdown.html" />
     <link rel="prev" title="7.3.16. quit" href="quit.html" /> 
@@ -75,7 +75,7 @@
         <li class="right" >
           <a href="quit.html" title="7.3.16. quit"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">groonga v2.0.1 documentation</a> &raquo;</li>
+        <li><a href="../index.html">groonga v2.0.2 documentation</a> &raquo;</li>
           <li><a href="../reference.html" >7. リファレンスマニュアル</a> &raquo;</li>
           <li><a href="../commands.html" accesskey="U">7.3. コマンド</a> &raquo;</li> 
       </ul>
@@ -88,157 +88,640 @@
             
   <div class="section" id="select">
 <h1>7.3.17. select<a class="headerlink" href="#select" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="id1">
-<h2>7.3.17.1. 名前<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
-<p>select - テーブルの中から条件にマッチするレコードを検索して出力する</p>
+<div class="section" id="summary">
+<h2>7.3.17.1. Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">select</span></tt> searches records that are matched to specified conditions
+from a table and then outputs them.</p>
+<p><tt class="docutils literal"><span class="pre">select</span></tt> is the most important command in groonga. You need to
+understand <tt class="docutils literal"><span class="pre">select</span></tt> to use the full power of groonga.</p>
 </div>
-<div class="section" id="id2">
-<h2>7.3.17.2. 書式<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-none"><div class="highlight"><pre>select table [match_columns [query [filter [scorer [sortby [output_columns
-             [offset [limit [drilldown [drilldown_sortby [drilldown_output_columns
-             [drilldown_offset [drilldown_limit [cache
-             [match_escalation_threshold [query_expansion]]]]]]]]]]]]]]]]
+<div class="section" id="syntax">
+<h2>7.3.17.2. Syntax<a class="headerlink" href="#syntax" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">select</span></tt> has many parameters. The required parameter is only
+<tt class="docutils literal"><span class="pre">table</span></tt> and others are optional:</p>
+<div class="highlight-none"><div class="highlight"><pre>select table
+       [match_columns=null]
+       [query=null]
+       [filter=null]
+       [scorer=null]
+       [sortby=null]
+       [output_columns=&quot;_id, _key, *&quot;]
+       [offset=0]
+       [limit=10]
+       [drilldown=null]
+       [drilldown_sortby=null]
+       [drilldown_output_columns=null]
+       [drilldown_offset=0]
+       [drilldown_limit=10]
+       [cache=yes]
+       [match_escalation_threshold=0]
+       [query_expansion=null]
 </pre></div>
 </div>
 </div>
-<div class="section" id="id3">
-<h2>7.3.17.3. 説明<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
-<p>groonga組込コマンドの一つであるselectについて説明します。組込コマンドは、groonga実行ファイルの引数、標準入力、またはソケット経由でgroongaサーバにリクエストを送信することによって実行します。</p>
-<p>selectは、使用しているデータベースのテーブルの中から条件にマッチするレコードを検索して出力します。</p>
+<div class="section" id="usage">
+<h2>7.3.17.3. Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>Let's learn about <tt class="docutils literal"><span class="pre">select</span></tt> usage with examples. This section shows
+many popular usages.</p>
+<p>Here are a schema definition and sample data to show usage.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; table_create Entries TABLE_HASH_KEY ShortText
+[[0,1335594537.43378,0.000381708145141602],true]
+&gt; column_create Entries content COLUMN_SCALAR Text
+[[0,1335594537.63582,0.000931501388549805],true]
+&gt; table_create Terms TABLE_PAT_KEY|KEY_NORMALIZE ShortText --default_tokenizer TokenBigram
+[[0,1335594537.83776,0.000288009643554688],true]
+&gt; column_create Terms entries_key_index COLUMN_INDEX|WITH_POSITION Entries _key
+[[0,1335594538.03901,0.0059964656829834],true]
+&gt; column_create Terms entries_content_index COLUMN_INDEX|WITH_POSITION Entries content
+[[0,1335594538.24584,0.00617790222167969],true]
+&gt; load --table Entries
+&gt; [
+&gt; {&quot;_key&quot;: &quot;The first post!&quot;, &quot;content&quot;: &quot;Welcome! This is my first post!&quot;},
+&gt; {&quot;_key&quot;: &quot;Groonga&quot;, &quot;content&quot;: &quot;I started to use groonga. It&#39;s very fast!&quot;}
+&gt; {&quot;_key&quot;: &quot;Mroonga&quot;, &quot;content&quot;: &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;}
+&gt; ]
+</pre></div>
 </div>
-<div class="section" id="id4">
-<h2>7.3.17.4. 引数<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
-<p><tt class="docutils literal"><span class="pre">table</span></tt></p>
-<blockquote>
-<div>検索対象のテーブルを指定します。存在しないテーブルを指定した場合はエラーになります。</div></blockquote>
-<p><tt class="docutils literal"><span class="pre">match_columns</span></tt></p>
-<blockquote>
-<div><p>query引数に指定する検索条件文字列でデフォルトの検索対象となるカラムを指定します。</p>
-<blockquote>
-<div>カラム名</div></blockquote>
-<p>カラム名の後ろに'* 数値'を指定することによって、そのカラムにヒットした際のスコアに積算される重みを指定することができます。</p>
-<blockquote>
-<div>カラム名 * 重み</div></blockquote>
-<p>複数のカラムを'||'で結合して指定することもできます。</p>
-<blockquote>
-<div>カラム名1 * 重み1 || カラム名2 * 重み2</div></blockquote>
-<p>また、カラム名ではなく、検索に使用するインデックス名を指定することもできます。</p>
-</div></blockquote>
-<p><tt class="docutils literal"><span class="pre">query</span></tt></p>
-<blockquote>
-<div>以下の形式の文字列によって検索条件を指定します。</div></blockquote>
-<div class="section" id="id5">
-<h3>7.3.17.4.1. 条件式<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
-<p>以下の条件式が使用できます。</p>
-<dl class="docutils">
-<dt>文字列</dt>
-<dd>全文検索条件(デフォルト検索対象カラムの値が指定された文字列を含んでいる)</dd>
-<dt>&quot;文字列&quot;</dt>
-<dd>フレーズ検索条件(デフォルト検索対象カラムの値が指定されたフレーズを含んでいる)</dd>
-<dt>カラム名:値</dt>
-<dd>一致条件(カラム値 == 値)</dd>
-<dt>カラム名:!値</dt>
-<dd>不一致条件(カラム値 != 値)</dd>
-<dt>カラム名:&lt;値</dt>
-<dd>比較条件(カラム値 &lt; 値)</dd>
-<dt>カラム名:&gt;値</dt>
-<dd>比較条件(カラム値 &gt; 値)</dd>
-<dt>カラム名:&lt;=値</dt>
-<dd>比較条件(カラム値 &lt;= 値)</dd>
-<dt>カラム名:&gt;=値</dt>
-<dd>比較条件(カラム値 &gt;= 値)</dd>
-<dt>カラム名:&#64;文字列</dt>
-<dd>全文検索条件(カラム値が指定された文字列を含んでいる)</dd>
-</dl>
+<p>There is a table, <tt class="docutils literal"><span class="pre">Entries</span></tt>, for blog entries. An entry has title
+and content. Title is key of <tt class="docutils literal"><span class="pre">Entries</span></tt>. Content is value of
+<tt class="docutils literal"><span class="pre">Entries.content</span></tt> column.</p>
+<p><tt class="docutils literal"><span class="pre">Entries._key</span></tt> column and <tt class="docutils literal"><span class="pre">Entries.content</span></tt> column are indexed
+using <tt class="docutils literal"><span class="pre">TokenBigram</span></tt> tokenizer. So both <tt class="docutils literal"><span class="pre">Entries._key</span></tt> and
+<tt class="docutils literal"><span class="pre">Entries.content</span></tt> are fulltext search ready.</p>
+<p>OK. The schema and data for examples are ready.</p>
+<div class="section" id="simple-usage">
+<h3>7.3.17.3.1. Simple usage<a class="headerlink" href="#simple-usage" title="Permalink to this headline">¶</a></h3>
+<p>Here is the most simple usage with the above shema and data. It outputs
+all records in <tt class="docutils literal"><span class="pre">Entries</span></tt> table.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; select Entries
+[
+  [
+    0,
+    1335519592.67133,
+    0.000493049621582031
+  ],
+  [
+    [
+      [
+        3
+      ],
+      [
+        [
+          &quot;_id&quot;,
+          &quot;UInt32&quot;
+        ],
+        [
+          &quot;_key&quot;,
+          &quot;ShortText&quot;
+        ],
+        [
+          &quot;content&quot;,
+          &quot;Text&quot;
+        ]
+      ],
+      [
+        1,
+        &quot;The first post!&quot;,
+        &quot;Welcome! This is my first post!&quot;
+      ],
+      [
+        2,
+        &quot;Groonga&quot;,
+        &quot;I started to use groonga. It&#39;s very fast!&quot;
+      ],
+      [
+        3,
+        &quot;Mroonga&quot;,
+        &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;
+      ]
+    ]
+  ]
+]
+</pre></div>
 </div>
-<div class="section" id="id6">
-<h3>7.3.17.4.2. 結合演算子<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
-<p>複数の条件式を結合するために以下の演算子が使用できます。</p>
-<dl class="docutils">
-<dt>a OR b</dt>
-<dd>論理和(aとbといずれかの条件がマッチする)</dd>
-<dt>a + b</dt>
-<dd>論理積(aとbの両方がマッチする)</dd>
-<dt>a - b</dt>
-<dd>aにマッチし、bにはマッチしない</dd>
-<dt>( )</dt>
-<dd>複数の条件をまとめる</dd>
-</dl>
-<p><tt class="docutils literal"><span class="pre">filter</span></tt></p>
+<p>Why does the command output all records? There are two reasons. The
+first reason is that the command doesn't specify any search
+conditions. No search condition means all records are matched. The
+second reason is that the number of all records is 3. <tt class="docutils literal"><span class="pre">select</span></tt>
+command outputs 10 records at a maximum by default. There are only 3
+records. It is less than 10. So the command outputs all records.</p>
+</div>
+<div class="section" id="search-conditions">
+<h3>7.3.17.3.2. Search conditions<a class="headerlink" href="#search-conditions" title="Permalink to this headline">¶</a></h3>
+<p>Search conditions are specified by <tt class="docutils literal"><span class="pre">query</span></tt> or <tt class="docutils literal"><span class="pre">filter</span></tt>. You can
+also specify both <tt class="docutils literal"><span class="pre">query</span></tt> and <tt class="docutils literal"><span class="pre">filter</span></tt>. It means that selected
+records must be matched against both <tt class="docutils literal"><span class="pre">query</span></tt> and <tt class="docutils literal"><span class="pre">filter</span></tt>.</p>
+<div class="section" id="search-condition-query">
+<h4>7.3.17.3.2.1. Search condition: <tt class="docutils literal"><span class="pre">query</span></tt><a class="headerlink" href="#search-condition-query" title="Permalink to this headline">¶</a></h4>
+<p><tt class="docutils literal"><span class="pre">query</span></tt> is designed for search box in Web page. Imagine a search box
+in google.com. You specify search conditions for <tt class="docutils literal"><span class="pre">query</span></tt> as space
+separated keywords. For example, <tt class="docutils literal"><span class="pre">search</span> <span class="pre">engine</span></tt> means a matched
+record should contain two words, <tt class="docutils literal"><span class="pre">search</span></tt> and <tt class="docutils literal"><span class="pre">engine</span></tt>.</p>
+<p>Normally, <tt class="docutils literal"><span class="pre">query</span></tt> parameter is used for specifying fulltext search
+conditions. It can be used for non fulltext search conditions but
+<tt class="docutils literal"><span class="pre">filter</span></tt> is used for the propose.</p>
+<p><tt class="docutils literal"><span class="pre">query</span></tt> parameter is used with <tt class="docutils literal"><span class="pre">match_columns</span></tt> parameter when
+<tt class="docutils literal"><span class="pre">query</span></tt> parameter is used for specifying fulltext search
+conditions. <tt class="docutils literal"><span class="pre">match_columns</span></tt> specifies which columnes and indexes are
+matched against <tt class="docutils literal"><span class="pre">query</span></tt>.</p>
+<p>Here is a simple <tt class="docutils literal"><span class="pre">query</span></tt> usage example.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; select Entries --match_columns content --query fast
+[
+  [
+    0,
+    1335519592.87374,
+    0.000868797302246094
+  ],
+  [
+    [
+      [
+        2
+      ],
+      [
+        [
+          &quot;_id&quot;,
+          &quot;UInt32&quot;
+        ],
+        [
+          &quot;_key&quot;,
+          &quot;ShortText&quot;
+        ],
+        [
+          &quot;content&quot;,
+          &quot;Text&quot;
+        ]
+      ],
+      [
+        2,
+        &quot;Groonga&quot;,
+        &quot;I started to use groonga. It&#39;s very fast!&quot;
+      ],
+      [
+        3,
+        &quot;Mroonga&quot;,
+        &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;
+      ]
+    ]
+  ]
+]
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">select</span></tt> command searches records that contain a word <tt class="docutils literal"><span class="pre">fast</span></tt>
+in <tt class="docutils literal"><span class="pre">content</span></tt> column value from <tt class="docutils literal"><span class="pre">Entries</span></tt> table.</p>
+<p><tt class="docutils literal"><span class="pre">query</span></tt> has query syntax but its deatils aren't described here. See
+<a class="reference internal" href="../spec/query_syntax.html"><em>Query syntax</em></a> for datails.</p>
+</div>
+<div class="section" id="search-condition-filter">
+<h4>7.3.17.3.2.2. Search condition: <tt class="docutils literal"><span class="pre">filter</span></tt><a class="headerlink" href="#search-condition-filter" title="Permalink to this headline">¶</a></h4>
+<p><tt class="docutils literal"><span class="pre">filter</span></tt> is designed for complex search conditions. You specify
+search conditions for <tt class="docutils literal"><span class="pre">filter</span></tt> as ECMAScript like syntax.</p>
+<p>Here is a simple <tt class="docutils literal"><span class="pre">filter</span></tt> usage example.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; select Entries --filter &#39;content @ &quot;fast&quot; &amp;&amp; _key == &quot;Groonga&quot;&#39;
+[
+  [
+    0,
+    1335520300.98383,
+    0.000544071197509766
+  ],
+  [
+    [
+      [
+        1
+      ],
+      [
+        [
+          &quot;_id&quot;,
+          &quot;UInt32&quot;
+        ],
+        [
+          &quot;_key&quot;,
+          &quot;ShortText&quot;
+        ],
+        [
+          &quot;content&quot;,
+          &quot;Text&quot;
+        ]
+      ],
+      [
+        2,
+        &quot;Groonga&quot;,
+        &quot;I started to use groonga. It&#39;s very fast!&quot;
+      ]
+    ]
+  ]
+]
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">select</span></tt> command searches records that contain a word <tt class="docutils literal"><span class="pre">fast</span></tt>
+in <tt class="docutils literal"><span class="pre">content</span></tt> column value and has <tt class="docutils literal"><span class="pre">Groonga</span></tt> as <tt class="docutils literal"><span class="pre">_key</span></tt> from
+<tt class="docutils literal"><span class="pre">Entries</span></tt> table. There are three operators in the command, <tt class="docutils literal"><span class="pre">&#64;</span></tt>,
+<tt class="docutils literal"><span class="pre">&amp;&amp;</span></tt> and <tt class="docutils literal"><span class="pre">==</span></tt>. <tt class="docutils literal"><span class="pre">&#64;</span></tt> is fulltext search operator. <tt class="docutils literal"><span class="pre">&amp;&amp;</span></tt> and
+<tt class="docutils literal"><span class="pre">==</span></tt> are the same as ECMAScript. <tt class="docutils literal"><span class="pre">&amp;&amp;</span></tt> is logical AND operator and
+<tt class="docutils literal"><span class="pre">==</span></tt> is equality operator.</p>
+<p><tt class="docutils literal"><span class="pre">filter</span></tt> has more operators and syntax like grouping by <tt class="docutils literal"><span class="pre">(...)</span></tt>
+its deatils aren't described here. See <a class="reference internal" href="../spec/script_syntax.html"><em>Script Syntax</em></a> for
+datails.</p>
+</div>
+</div>
+<div class="section" id="paging">
+<h3>7.3.17.3.3. Paging<a class="headerlink" href="#paging" title="Permalink to this headline">¶</a></h3>
+<p>You can specify range of outputted records by <tt class="docutils literal"><span class="pre">offset</span></tt> and <tt class="docutils literal"><span class="pre">limit</span></tt>.
+Here is an example to output only the 2nd record.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; select Entries --offset 1 --limit 1
+[
+  [
+    0,
+    1335519593.28077,
+    0.000288248062133789
+  ],
+  [
+    [
+      [
+        3
+      ],
+      [
+        [
+          &quot;_id&quot;,
+          &quot;UInt32&quot;
+        ],
+        [
+          &quot;_key&quot;,
+          &quot;ShortText&quot;
+        ],
+        [
+          &quot;content&quot;,
+          &quot;Text&quot;
+        ]
+      ],
+      [
+        2,
+        &quot;Groonga&quot;,
+        &quot;I started to use groonga. It&#39;s very fast!&quot;
+      ]
+    ]
+  ]
+]
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">offset</span></tt> is zero-origin. <tt class="docutils literal"><span class="pre">--offset</span> <span class="pre">1</span></tt> means output range is
+started from the 2nd record.</p>
+<p><tt class="docutils literal"><span class="pre">limit</span></tt> specifies the max number of output records. <tt class="docutils literal"><span class="pre">--limit</span> <span class="pre">1</span></tt>
+means the number of output records is 1 at a maximium. If no records
+are matched, <tt class="docutils literal"><span class="pre">select</span></tt> command outputs no records.</p>
+</div>
+<div class="section" id="the-total-number-of-records">
+<h3>7.3.17.3.4. The total number of records<a class="headerlink" href="#the-total-number-of-records" title="Permalink to this headline">¶</a></h3>
+<p>You can use <tt class="docutils literal"><span class="pre">--limit</span> <span class="pre">0</span></tt> to retrieve the total number of recrods
+without any contents of records.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; select Entries --limit 0
+[
+  [
+    0,
+    1335519593.48351,
+    0.000329017639160156
+  ],
+  [
+    [
+      [
+        3
+      ],
+      [
+        [
+          &quot;_id&quot;,
+          &quot;UInt32&quot;
+        ],
+        [
+          &quot;_key&quot;,
+          &quot;ShortText&quot;
+        ],
+        [
+          &quot;content&quot;,
+          &quot;Text&quot;
+        ]
+      ]
+    ]
+  ]
+]
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">--limit</span> <span class="pre">0</span></tt> is also useful for retrieving only the number of matched
+records.</p>
+</div>
+</div>
+<div class="section" id="parameters">
+<h2>7.3.17.4. Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+<p>This section describes all parameters. Parameters are categorized.</p>
+<div class="section" id="required-parameter">
+<h3>7.3.17.4.1. Required parameter<a class="headerlink" href="#required-parameter" title="Permalink to this headline">¶</a></h3>
+<p>There is a required parameter, <tt class="docutils literal"><span class="pre">table</span></tt>.</p>
+<div class="section" id="table">
+<h4>7.3.17.4.1.1. <tt class="docutils literal"><span class="pre">table</span></tt><a class="headerlink" href="#table" title="Permalink to this headline">¶</a></h4>
+<p>It specifies a table to be searched. <tt class="docutils literal"><span class="pre">table</span></tt> must be specified.</p>
+<p>If nonexistent table is specified, an error is returned.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; select Nonexistent
+[
+  [
+    -22,
+    1335519593.68574,
+    0.000583171844482422,
+    &quot;invalid table name: &lt;Nonexistent&gt;&quot;,
+    [
+      [
+        &quot;grn_select&quot;,
+        &quot;proc.c&quot;,
+        542
+      ]
+    ]
+  ]
+]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="search-related-parameters">
+<h3>7.3.17.4.2. Search related parameters<a class="headerlink" href="#search-related-parameters" title="Permalink to this headline">¶</a></h3>
+<p>There are search related parameters. Typically, <tt class="docutils literal"><span class="pre">match_columns</span></tt> and
+<tt class="docutils literal"><span class="pre">query</span></tt> parameters are used for implementing a search
+box. <tt class="docutils literal"><span class="pre">filter</span></tt> parameters is used for implementing complex search
+feature.</p>
+<p>If both <tt class="docutils literal"><span class="pre">query</span></tt> and <tt class="docutils literal"><span class="pre">filter</span></tt> are specified, selected records must
+be matched against both <tt class="docutils literal"><span class="pre">query</span></tt> and <tt class="docutils literal"><span class="pre">filter</span></tt>. If both <tt class="docutils literal"><span class="pre">query</span></tt>
+and <tt class="docutils literal"><span class="pre">filter</span></tt> aren't specified, all records are selected.</p>
+<div class="section" id="match-columns">
+<h4>7.3.17.4.2.1. <tt class="docutils literal"><span class="pre">match_columns</span></tt><a class="headerlink" href="#match-columns" title="Permalink to this headline">¶</a></h4>
+<p>It specifies the default target column for fulltext search by
+<tt class="docutils literal"><span class="pre">query</span></tt> parameter value. A target column for fulltext search can be
+specified in <tt class="docutils literal"><span class="pre">query</span></tt> parameter. The difference between
+<tt class="docutils literal"><span class="pre">match_columns</span></tt> and <tt class="docutils literal"><span class="pre">query</span></tt> is whether weight is supported or
+not. <tt class="docutils literal"><span class="pre">match_columns</span></tt> supports weight but <tt class="docutils literal"><span class="pre">query</span></tt> doesn't.</p>
+<p>Weight is relative importance of target column. A higher weight target
+column gets more hit score rather than a lower weight target column
+when a record is matched by fulltext search. The default weight is 1.</p>
+<p>Here is a simple <tt class="docutils literal"><span class="pre">match_columns</span></tt> usage example.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; select Entries --match_columns content --query fast --output_columns &#39;_key, _score&#39;
+[
+  [
+    0,
+    1335519593.88754,
+    0.000384092330932617
+  ],
+  [
+    [
+      [
+        2
+      ],
+      [
+        [
+          &quot;_key&quot;,
+          &quot;ShortText&quot;
+        ],
+        [
+          &quot;_score&quot;,
+          &quot;Int32&quot;
+        ]
+      ],
+      [
+        &quot;Groonga&quot;,
+        1
+      ],
+      [
+        &quot;Mroonga&quot;,
+        2
+      ]
+    ]
+  ]
+]
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">--match_columns</span> <span class="pre">content</span></tt> means the default target column for
+fulltext search is <tt class="docutils literal"><span class="pre">content</span></tt> column and its weight
+is 1. <tt class="docutils literal"><span class="pre">--output_columns</span> <span class="pre">'_key,</span> <span class="pre">_score'</span></tt> means that the <tt class="docutils literal"><span class="pre">select</span></tt>
+command outputs <tt class="docutils literal"><span class="pre">_key</span></tt> value and <tt class="docutils literal"><span class="pre">_score</span></tt> value for matched
+records.</p>
+<p>Pay attention to <tt class="docutils literal"><span class="pre">_score</span></tt> value. <tt class="docutils literal"><span class="pre">_score</span></tt> value is the number of
+matched counts against <tt class="docutils literal"><span class="pre">query</span></tt> parameter value. In the example,
+<tt class="docutils literal"><span class="pre">query</span></tt> parameter value is <tt class="docutils literal"><span class="pre">fast</span></tt>. The fact that <tt class="docutils literal"><span class="pre">_score</span></tt> value
+is 1 means that <tt class="docutils literal"><span class="pre">fast</span></tt> appers in <tt class="docutils literal"><span class="pre">content</span></tt> column only once.  The
+fact that <tt class="docutils literal"><span class="pre">_score</span></tt> value is 2 means that <tt class="docutils literal"><span class="pre">fast</span></tt> appears in
+<tt class="docutils literal"><span class="pre">content</span></tt> column twice.</p>
+<p>To specify weight, <tt class="docutils literal"><span class="pre">column</span> <span class="pre">*</span> <span class="pre">weight</span></tt> syntax is used. Here is a
+weight usage example.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; select Entries --match_columns &#39;content * 2&#39; --query fast --output_columns &#39;_key, _score&#39;
+[
+  [
+    0,
+    1335519594.08917,
+    0.0003814697265625
+  ],
+  [
+    [
+      [
+        2
+      ],
+      [
+        [
+          &quot;_key&quot;,
+          &quot;ShortText&quot;
+        ],
+        [
+          &quot;_score&quot;,
+          &quot;Int32&quot;
+        ]
+      ],
+      [
+        &quot;Groonga&quot;,
+        2
+      ],
+      [
+        &quot;Mroonga&quot;,
+        4
+      ]
+    ]
+  ]
+]
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">--match_columns</span> <span class="pre">'content</span> <span class="pre">*</span> <span class="pre">2'</span></tt> means the default target column for
+fulltext search is <tt class="docutils literal"><span class="pre">content</span></tt> column and its weight is 2.</p>
+<p>Pay attention to <tt class="docutils literal"><span class="pre">_score</span></tt> value. <tt class="docutils literal"><span class="pre">_score</span></tt> value is doubled because
+weight is 2.</p>
+<p>You can specify one or more columns as the default target columns for
+fulltext search. If one or more columns are specified, fulltext search
+is done for all columns and scores are accumulated. If one of the
+columns is matched against <tt class="docutils literal"><span class="pre">query</span></tt> parameter value, the record is
+treated as matched.</p>
+<p>To specify one or more columns, <tt class="docutils literal"><span class="pre">column1</span> <span class="pre">*</span> <span class="pre">weight1</span> <span class="pre">||</span> <span class="pre">column2</span> <span class="pre">*</span>
+<span class="pre">weight2</span> <span class="pre">||</span> <span class="pre">...</span></tt> syntax is used. <tt class="docutils literal"><span class="pre">*</span> <span class="pre">weight</span></tt> can be omitted. If it is
+omitted, 1 is used for weight. Here is a one or more columns usage
+example.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>&gt; select Entries --match_columns &#39;_key * 10 || content&#39; --query groonga --output_columns &#39;_key, _score&#39;
+[
+  [
+    0,
+    1335594540.29792,
+    0.000547885894775391
+  ],
+  [
+    [
+      [
+        1
+      ],
+      [
+        [
+          &quot;_key&quot;,
+          &quot;ShortText&quot;
+        ],
+        [
+          &quot;_score&quot;,
+          &quot;Int32&quot;
+        ]
+      ],
+      [
+        &quot;Groonga&quot;,
+        11
+      ]
+    ]
+  ]
+]
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">--match_columns</span> <span class="pre">'_key</span> <span class="pre">*</span> <span class="pre">10</span> <span class="pre">||</span> <span class="pre">content'</span></tt> means the default target
+columns for fulltext search are <tt class="docutils literal"><span class="pre">_key</span></tt> and <tt class="docutils literal"><span class="pre">content</span></tt> columns and
+<tt class="docutils literal"><span class="pre">_key</span></tt> column's weight is 10 and <tt class="docutils literal"><span class="pre">content</span></tt> column's weight
+is 1. This weight allocation means <tt class="docutils literal"><span class="pre">_key</span></tt> column value is more
+important rather than <tt class="docutils literal"><span class="pre">content</span></tt> column value. In this example, title
+of blog entry is more important rather thatn content of blog entry.</p>
+</div>
+<div class="section" id="query">
+<h4>7.3.17.4.2.2. <tt class="docutils literal"><span class="pre">query</span></tt><a class="headerlink" href="#query" title="Permalink to this headline">¶</a></h4>
+<p>TODO: write short description and add example.</p>
+<p>See <a class="reference internal" href="../spec/query_syntax.html"><em>Query syntax</em></a>.</p>
+</div>
+<div class="section" id="filter">
+<h4>7.3.17.4.2.3. <tt class="docutils literal"><span class="pre">filter</span></tt><a class="headerlink" href="#filter" title="Permalink to this headline">¶</a></h4>
+<p>TODO: write short description and add example.</p>
+<p>See <a class="reference internal" href="../spec/script_syntax.html"><em>Script Syntax</em></a>.</p>
+</div>
+</div>
+<div class="section" id="advanced-search-parameters">
+<h3>7.3.17.4.3. Advanced search parameters<a class="headerlink" href="#advanced-search-parameters" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="match-escalation-threshold">
+<h4>7.3.17.4.3.1. <tt class="docutils literal"><span class="pre">match_escalation_threshold</span></tt><a class="headerlink" href="#match-escalation-threshold" title="Permalink to this headline">¶</a></h4>
+<p>TODO: add example.</p>
+<p>It specifies threshold to determine whether search storategy
+escalation is used or not. The threshold is compared against the
+number of matched records. If the number of matched records is equal
+to or less than the threshold, search storategy escalation is
+used. See <a class="reference internal" href="../spec/search.html"><em>検索</em></a> about search storategy escalation.</p>
+<p>The default threshold is 0. It means that search storategy escalation
+is used only when no records are matched.</p>
+<p>The default threshold can be customized by one of the followings.</p>
 <blockquote>
-<div><p>絞り込み条件をscript形式のgrn_expr文字列によって指定します。</p>
-<p>query引数とfilter引数をどちらも指定した場合は、両方の条件を満足するレコードのみがヒットします。どちらも指定しない場合は全件がヒットします。</p>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">--with-match-escalation-threshold</span></tt> option of configure</li>
+<li><tt class="docutils literal"><span class="pre">--match-escalation-threshold</span></tt> option of groogna command</li>
+<li><tt class="docutils literal"><span class="pre">match-escalation-threshold</span></tt> configuration item in configuration
+file</li>
+</ul>
 </div></blockquote>
-<p><tt class="docutils literal"><span class="pre">scorer</span></tt></p>
-<blockquote>
-<div><p>検索条件にマッチする全てのレコードに対して適用するgrn_exprをscript形式で指定します。</p>
-<p>scorerは、検索処理が完了し、ソート処理が実行される前に呼び出されます。従って、各レコードのスコアを操作する式を指定しておけば、検索結果のソート順序をカスタマイズできるようになります。</p>
-</div></blockquote>
-<p><tt class="docutils literal"><span class="pre">sortby</span></tt></p>
-<blockquote>
-<div><p>ソートキーとなるカラム名のリストをカンマ(',')区切りで指定します。:</p>
+</div>
+<div class="section" id="query-expansion">
+<h4>7.3.17.4.3.2. <tt class="docutils literal"><span class="pre">query_expansion</span></tt><a class="headerlink" href="#query-expansion" title="Permalink to this headline">¶</a></h4>
+<p>TODO: write in English and add example.</p>
+<p>It specifies a column that is used to expand (substitute) <tt class="docutils literal"><span class="pre">query</span></tt>
+parameter value.</p>
+<p>query_expansionパラメータには、queryパラメータに指定された文字列を置換(拡張)する条件となるテーブル・カラムを指定します。フォーマットは「${テーブル名}.${カラム名}」となります。指定するテーブルは文字列を主キーとするハッシュ型あるいはパトリシア木型のテーブルで、一つ以上の文字列型のカラムが定義されている必要があります。(ここでは置換テーブルと呼びます。)</p>
+<p>queryパラメータに指定された文字列が、指定されたテーブルの主キーと完全一致する場合、その文字列を指定されたカラム値の文字列に置換します。queryパラメータが、空白、括弧、演算子などを含む場合は、その演算子によって区切られた文字列の単位で置換が実行されます。ダブルクォート(&quot;&quot;)で括られた範囲は、その内部に空白を含んでいても一つの置換される単位と見なされます。検索文字列と置換テーブルの主キー値との比較に際して大文字小文字等を区別したくない場合には、置換テーブルを定義する際にKEY_NORMALIZEを指定します。置換後の文字列となるカラムの値には、括弧や*, ORなど、queryパラメータで利用可能な全ての演算子を指定することができます。</p>
+</div>
+</div>
+<div class="section" id="output-related-parameters">
+<h3>7.3.17.4.4. Output related parameters<a class="headerlink" href="#output-related-parameters" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="output-columns">
+<h4>7.3.17.4.4.1. <tt class="docutils literal"><span class="pre">output_columns</span></tt><a class="headerlink" href="#output-columns" title="Permalink to this headline">¶</a></h4>
+<p>TODO: write in English and add example.</p>
+<p>出力するカラム名のリストをカンマ(',')区切りで指定します。</p>
+<p>アスタリスク('*')を指定すると、全てのカラムが指定されたものとみなされます。または、script形式のgrn_expr文字列を指定します。 (デフォルトは、'_id, _key, *')</p>
+</div>
+<div class="section" id="sortby">
+<h4>7.3.17.4.4.2. <tt class="docutils literal"><span class="pre">sortby</span></tt><a class="headerlink" href="#sortby" title="Permalink to this headline">¶</a></h4>
+<p>TODO: write in English and add example.</p>
+<p>ソートキーとなるカラム名のリストをカンマ(',')区切りで指定します。:</p>
 <div class="highlight-none"><div class="highlight"><pre>[-]カラム名1, [-]カラム名2, [-]カラム名3, ...
 </pre></div>
 </div>
 <p>カラム名1の値でソートし、値が同一である場合はカラム名2でソート、と順次比較を行いソートします。カラム名の前に - を付加した場合は降順にソートします。付加しない場合には昇順にソートします。</p>
 <p>query引数またはfilter引数を指定した場合はカラム名に'_score'を使えます。'_score'を指定することでスコアでソートすることができます。query引数もfilter引数も指定していない状態で'_score'を指定するとエラーになります。</p>
-</div></blockquote>
-<p><tt class="docutils literal"><span class="pre">output_columns</span></tt></p>
-<blockquote>
-<div><p>出力するカラム名のリストをカンマ(',')区切りで指定します。</p>
-<p>アスタリスク('*')を指定すると、全てのカラムが指定されたものとみなされます。または、script形式のgrn_expr文字列を指定します。 (デフォルトは、'_id, _key, *')</p>
-</div></blockquote>
-<p><tt class="docutils literal"><span class="pre">offset</span></tt></p>
-<blockquote>
-<div>検索条件にマッチしたレコードのうち、出力対象となる最初のレコードの番号を0ベースで指定します。デフォルト値は0です。offsetに負の値を指定した場合は、ヒットした件数 + offset によって算出される値が指定されたものとみなされます。</div></blockquote>
-<p><tt class="docutils literal"><span class="pre">limit</span></tt></p>
-<blockquote>
-<div>検索条件にマッチしたレコードのうち、出力を行うレコードの件数を指定します。デフォルト値は10です。実際には、offset + limit がヒットした件数を超えない範囲でレコードが出力されます。limitに負の値を指定した場合は、ヒットした件数 + limit + 1 によって算出される値が指定されたものとみなされます。</div></blockquote>
-<p><tt class="docutils literal"><span class="pre">drilldown</span></tt></p>
-<blockquote>
-<div>グループ化のキーとなるカラム名のリストをカンマ(',')区切りで指定します。検索条件にマッチした各レコードを出力したのちに、drilldownに指定されたカラムの値が同一であるレコードをとりまとめて、それぞれについて結果レコードを出力します。</div></blockquote>
-<p><tt class="docutils literal"><span class="pre">drilldown_sortby</span></tt></p>
-<blockquote>
-<div>drilldown条件に指定されたカラムの値毎にとりまとめられたレコードについて、ソートキーとなるカラム名のリストをカンマ(',')区切りで指定します。sortbyパラメータと同様に昇降順を指定できます。</div></blockquote>
-<p><tt class="docutils literal"><span class="pre">drilldown_output_columns</span></tt></p>
-<blockquote>
-<div>drilldown条件に指定されたカラムの値毎にとりまとめられたレコードについて、出力するカラム名のリストをカンマ(',')区切りで指定します。</div></blockquote>
-<p><tt class="docutils literal"><span class="pre">drilldown_offset</span></tt></p>
-<blockquote>
-<div>drilldown条件に指定されたカラムの値毎にとりまとめられたレコードについて、出力対象となる最初のレコードの番号を0ベースで指定します。デフォルト値は0です。drilldown_offsetに負の値を指定した場合は、ヒットした件数 + drilldown_offsetによって算出される値が指定されたものとみなされます。</div></blockquote>
-<p><tt class="docutils literal"><span class="pre">drilldown_limit</span></tt></p>
-<blockquote>
-<div>drilldown条件に指定されたカラムの値毎にとりまとめられたレコードについて、出力を行うレコードの件数を指定します。デフォルト値は10です。実際には、drilldown_offset + drilldown_limit がヒットした件数を超えない範囲でレコードが出力されます。drilldown_limitに負の値を指定した場合は、ヒットした件数 + drilldown_limit + 1 によって算出される値が指定されたものとみなされます。</div></blockquote>
-<p><tt class="docutils literal"><span class="pre">cache</span></tt></p>
-<blockquote>
-<div><p>クエリキャッシュに関する動作を設定します。</p>
-<blockquote>
-<div><p><tt class="docutils literal"><span class="pre">no</span></tt></p>
+</div>
+<div class="section" id="offset">
+<h4>7.3.17.4.4.3. <tt class="docutils literal"><span class="pre">offset</span></tt><a class="headerlink" href="#offset" title="Permalink to this headline">¶</a></h4>
+<p>TODO: write in English and add example.</p>
+<p>検索条件にマッチしたレコードのうち、出力対象となる最初のレコードの番号を0ベースで指定します。デフォルト値は0です。offsetに負の値を指定した場合は、ヒットした件数 + offset によって算出される値が指定されたものとみなされます。</p>
+</div>
+<div class="section" id="limit">
+<h4>7.3.17.4.4.4. <tt class="docutils literal"><span class="pre">limit</span></tt><a class="headerlink" href="#limit" title="Permalink to this headline">¶</a></h4>
+<p>TODO: write in English and add example.</p>
+<p>検索条件にマッチしたレコードのうち、出力を行うレコードの件数を指定します。デフォルト値は10です。実際には、offset + limit がヒットした件数を超えない範囲でレコードが出力されます。limitに負の値を指定した場合は、ヒットした件数 + limit + 1 によって算出される値が指定されたものとみなされます。</p>
+</div>
+<div class="section" id="scorer">
+<h4>7.3.17.4.4.5. <tt class="docutils literal"><span class="pre">scorer</span></tt><a class="headerlink" href="#scorer" title="Permalink to this headline">¶</a></h4>
+<p>TODO: write in English and add example.</p>
+<p>検索条件にマッチする全てのレコードに対して適用するgrn_exprをscript形式で指定します。</p>
+<p>scorerは、検索処理が完了し、ソート処理が実行される前に呼び出されます。従って、各レコードのスコアを操作する式を指定しておけば、検索結果のソート順序をカスタマイズできるようになります。</p>
+</div>
+</div>
+<div class="section" id="facet-related-parameters">
+<h3>7.3.17.4.5. Facet related parameters<a class="headerlink" href="#facet-related-parameters" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="drilldown">
+<h4>7.3.17.4.5.1. <tt class="docutils literal"><span class="pre">drilldown</span></tt><a class="headerlink" href="#drilldown" title="Permalink to this headline">¶</a></h4>
+<p>TODO: write in English and add example.</p>
+<p>グループ化のキーとなるカラム名のリストをカンマ(',')区切りで指定します。検索条件にマッチした各レコードを出力したのちに、drilldownに指定されたカラムの値が同一であるレコードをとりまとめて、それぞれについて結果レコードを出力します。</p>
+</div>
+<div class="section" id="drilldown-sortby">
+<h4>7.3.17.4.5.2. <tt class="docutils literal"><span class="pre">drilldown_sortby</span></tt><a class="headerlink" href="#drilldown-sortby" title="Permalink to this headline">¶</a></h4>
+<p>TODO: write in English and add example.</p>
+<p>drilldown条件に指定されたカラムの値毎にとりまとめられたレコードについて、ソートキーとなるカラム名のリストをカンマ(',')区切りで指定します。sortbyパラメータと同様に昇降順を指定できます。</p>
+</div>
+<div class="section" id="drilldown-output-columns">
+<h4>7.3.17.4.5.3. <tt class="docutils literal"><span class="pre">drilldown_output_columns</span></tt><a class="headerlink" href="#drilldown-output-columns" title="Permalink to this headline">¶</a></h4>
+<p>TODO: write in English and add example.</p>
+<p>drilldown条件に指定されたカラムの値毎にとりまとめられたレコードについて、出力するカラム名のリストをカンマ(',')区切りで指定します。</p>
+</div>
+<div class="section" id="drilldown-offset">
+<h4>7.3.17.4.5.4. <tt class="docutils literal"><span class="pre">drilldown_offset</span></tt><a class="headerlink" href="#drilldown-offset" title="Permalink to this headline">¶</a></h4>
+<p>TODO: write in English and add example.</p>
+<p>drilldown条件に指定されたカラムの値毎にとりまとめられたレコードについて、出力対象となる最初のレコードの番号を0ベースで指定します。デフォルト値は0です。drilldown_offsetに負の値を指定した場合は、ヒットした件数 + drilldown_offsetによって算出される値が指定されたものとみなされます。</p>
+</div>
+<div class="section" id="drilldown-limit">
+<h4>7.3.17.4.5.5. <tt class="docutils literal"><span class="pre">drilldown_limit</span></tt><a class="headerlink" href="#drilldown-limit" title="Permalink to this headline">¶</a></h4>
+<p>TODO: write in English and add example.</p>
+<p>drilldown条件に指定されたカラムの値毎にとりまとめられたレコードについて、出力を行うレコードの件数を指定します。デフォルト値は10です。実際には、drilldown_offset + drilldown_limit がヒットした件数を超えない範囲でレコードが出力されます。drilldown_limitに負の値を指定した場合は、ヒットした件数 + drilldown_limit + 1 によって算出される値が指定されたものとみなされます。</p>
+</div>
+</div>
+<div class="section" id="cache-related-parameter">
+<h3>7.3.17.4.6. Cache related parameter<a class="headerlink" href="#cache-related-parameter" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="cache">
+<h4>7.3.17.4.6.1. <tt class="docutils literal"><span class="pre">cache</span></tt><a class="headerlink" href="#cache" title="Permalink to this headline">¶</a></h4>
+<p>TODO: write in English and add example.</p>
+<p>クエリキャッシュに関する動作を設定します。</p>
+<p><tt class="docutils literal"><span class="pre">no</span></tt></p>
 <blockquote>
 <div>検索結果をクエリキャッシュに残しません。キャッシュして再利用される可能性が低いクエリに対して用います。キャッシュ容量は有限です。有効なキャッシュが多くヒットするために、このパラメータは有効です。</div></blockquote>
-</div></blockquote>
-</div></blockquote>
-<p><tt class="docutils literal"><span class="pre">match_escalation_threshold</span></tt></p>
-<blockquote>
-<div><p>検索の挙動をエスカレーションするかどうかの閾値を設定します。デフォルト値は0です。デフォルト値は以下のいずれかの方法で設定できます。</p>
-<blockquote>
-<div><ul class="simple">
-<li>configureの--with-match-escalation-thresholdオプション</li>
-<li>groongaコマンド起動時の--match-escalation-thresholdオプション</li>
-<li>設定ファイル中のmatch-escalation-threshold設定項目</li>
-</ul>
-</div></blockquote>
-<p>クエリのヒット件数が閾値を越えない場合は <a class="reference internal" href="../spec/search.html"><em>検索</em></a> で説明している方法で検索方法をエスカレーションしてきます。</p>
-</div></blockquote>
-<p><tt class="docutils literal"><span class="pre">query_expansion</span></tt></p>
-<blockquote>
-<div><p>query_expansionパラメータには、queryパラメータに指定された文字列を置換(拡張)する条件となるテーブル・カラムを指定します。フォーマットは「${テーブル名}.${カラム名}」となります。指定するテーブルは文字列を主キーとするハッシュ型あるいはパトリシア木型のテーブルで、一つ以上の文字列型のカラムが定義されている必要があります。(ここでは置換テーブルと呼びます。)</p>
-<p>queryパラメータに指定された文字列が、指定されたテーブルの主キーと完全一致する場合、その文字列を指定されたカラム値の文字列に置換します。queryパラメータが、空白、括弧、演算子などを含む場合は、その演算子によって区切られた文字列の単位で置換が実行されます。ダブルクォート(&quot;&quot;)で括られた範囲は、その内部に空白を含んでいても一つの置換される単位と見なされます。検索文字列と置換テーブルの主キー値との比較に際して大文字小文字等を区別したくない場合には、置換テーブルを定義する際にKEY_NORMALIZEを指定します。置換後の文字列となるカラムの値には、括弧や*, ORなど、queryパラメータで利用可能な全ての演算子を指定することができます。</p>
-</div></blockquote>
 </div>
 </div>
-<div class="section" id="id7">
-<h2>7.3.17.5. 返値<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="id1">
+<h2>7.3.17.5. 返値<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p>TODO: write in English and add example.</p>
 <p>以下のようなjson形式で値が返却されます。</p>
 <div class="highlight-none"><div class="highlight"><pre>[[リターンコード, 処理開始時間, 処理時間], [検索結果, ドリルダウン結果]]
 </pre></div>
@@ -292,18 +775,14 @@
 <div>drilldown_output_columns, drilldown_offset, drilldown_limitによって指定された条件に従って各レコードの値が出力されます。</div></blockquote>
 </div></blockquote>
 </div>
-<div class="section" id="id8">
-<h2>7.3.17.6. 例<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h2>
-<p>テーブルEntryの全レコード・全カラムの値を出力します。:</p>
-<div class="highlight-none"><div class="highlight"><pre>select Entry
-
-[[[2],[[&quot;_id&quot;, &quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;body&quot;,&quot;ShortText&quot;]],[1,&quot;abandon&quot;,&quot;放棄する&quot;],[2,&quot;abbreviate&quot;,&quot;短縮する&quot;]]]
-</pre></div>
-</div>
-</div>
-<div class="section" id="id9">
-<h2>7.3.17.7. 関連項目<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference internal" href="../expr.html"><em>grn_expr</em></a></p>
+<div class="section" id="see-also">
+<h2>7.3.17.6. See also<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference internal" href="../spec/query_syntax.html"><em>Query syntax</em></a></li>
+<li><a class="reference internal" href="../spec/script_syntax.html"><em>Script Syntax</em></a></li>
+</ul>
+</div></blockquote>
 </div>
 </div>
 
@@ -316,17 +795,59 @@
   <h3><a href="../index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">7.3.17. select</a><ul>
-<li><a class="reference internal" href="#id1">7.3.17.1. 名前</a></li>
-<li><a class="reference internal" href="#id2">7.3.17.2. 書式</a></li>
-<li><a class="reference internal" href="#id3">7.3.17.3. 説明</a></li>
-<li><a class="reference internal" href="#id4">7.3.17.4. 引数</a><ul>
-<li><a class="reference internal" href="#id5">7.3.17.4.1. 条件式</a></li>
-<li><a class="reference internal" href="#id6">7.3.17.4.2. 結合演算子</a></li>
+<li><a class="reference internal" href="#summary">7.3.17.1. Summary</a></li>
+<li><a class="reference internal" href="#syntax">7.3.17.2. Syntax</a></li>
+<li><a class="reference internal" href="#usage">7.3.17.3. Usage</a><ul>
+<li><a class="reference internal" href="#simple-usage">7.3.17.3.1. Simple usage</a></li>
+<li><a class="reference internal" href="#search-conditions">7.3.17.3.2. Search conditions</a><ul>
+<li><a class="reference internal" href="#search-condition-query">7.3.17.3.2.1. Search condition: <tt class="docutils literal"><span class="pre">query</span></tt></a></li>
+<li><a class="reference internal" href="#search-condition-filter">7.3.17.3.2.2. Search condition: <tt class="docutils literal"><span class="pre">filter</span></tt></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id7">7.3.17.5. 返値</a></li>
-<li><a class="reference internal" href="#id8">7.3.17.6. 例</a></li>
-<li><a class="reference internal" href="#id9">7.3.17.7. 関連項目</a></li>
+<li><a class="reference internal" href="#paging">7.3.17.3.3. Paging</a></li>
+<li><a class="reference internal" href="#the-total-number-of-records">7.3.17.3.4. The total number of records</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#parameters">7.3.17.4. Parameters</a><ul>
+<li><a class="reference internal" href="#required-parameter">7.3.17.4.1. Required parameter</a><ul>
+<li><a class="reference internal" href="#table">7.3.17.4.1.1. <tt class="docutils literal"><span class="pre">table</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#search-related-parameters">7.3.17.4.2. Search related parameters</a><ul>
+<li><a class="reference internal" href="#match-columns">7.3.17.4.2.1. <tt class="docutils literal"><span class="pre">match_columns</span></tt></a></li>
+<li><a class="reference internal" href="#query">7.3.17.4.2.2. <tt class="docutils literal"><span class="pre">query</span></tt></a></li>
+<li><a class="reference internal" href="#filter">7.3.17.4.2.3. <tt class="docutils literal"><span class="pre">filter</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#advanced-search-parameters">7.3.17.4.3. Advanced search parameters</a><ul>
+<li><a class="reference internal" href="#match-escalation-threshold">7.3.17.4.3.1. <tt class="docutils literal"><span class="pre">match_escalation_threshold</span></tt></a></li>
+<li><a class="reference internal" href="#query-expansion">7.3.17.4.3.2. <tt class="docutils literal"><span class="pre">query_expansion</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#output-related-parameters">7.3.17.4.4. Output related parameters</a><ul>
+<li><a class="reference internal" href="#output-columns">7.3.17.4.4.1. <tt class="docutils literal"><span class="pre">output_columns</span></tt></a></li>
+<li><a class="reference internal" href="#sortby">7.3.17.4.4.2. <tt class="docutils literal"><span class="pre">sortby</span></tt></a></li>
+<li><a class="reference internal" href="#offset">7.3.17.4.4.3. <tt class="docutils literal"><span class="pre">offset</span></tt></a></li>
+<li><a class="reference internal" href="#limit">7.3.17.4.4.4. <tt class="docutils literal"><span class="pre">limit</span></tt></a></li>
+<li><a class="reference internal" href="#scorer">7.3.17.4.4.5. <tt class="docutils literal"><span class="pre">scorer</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#facet-related-parameters">7.3.17.4.5. Facet related parameters</a><ul>
+<li><a class="reference internal" href="#drilldown">7.3.17.4.5.1. <tt class="docutils literal"><span class="pre">drilldown</span></tt></a></li>
+<li><a class="reference internal" href="#drilldown-sortby">7.3.17.4.5.2. <tt class="docutils literal"><span class="pre">drilldown_sortby</span></tt></a></li>
+<li><a class="reference internal" href="#drilldown-output-columns">7.3.17.4.5.3. <tt class="docutils literal"><span class="pre">drilldown_output_columns</span></tt></a></li>
+<li><a class="reference internal" href="#drilldown-offset">7.3.17.4.5.4. <tt class="docutils literal"><span class="pre">drilldown_offset</span></tt></a></li>
+<li><a class="reference internal" href="#drilldown-limit">7.3.17.4.5.5. <tt class="docutils literal"><span class="pre">drilldown_limit</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cache-related-parameter">7.3.17.4.6. Cache related parameter</a><ul>
+<li><a class="reference internal" href="#cache">7.3.17.4.6.1. <tt class="docutils literal"><span class="pre">cache</span></tt></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id1">7.3.17.5. 返値</a></li>
+<li><a class="reference internal" href="#see-also">7.3.17.6. See also</a></li>
 </ul>
 </li>
 </ul>
@@ -371,7 +892,7 @@
         <li class="right" >
           <a href="quit.html" title="7.3.16. quit"
              >previous</a> |</li>
-        <li><a href="../index.html">groonga v2.0.1 documentation</a> &raquo;</li>
+        <li><a href="../index.html">groonga v2.0.2 documentation</a> &raquo;</li>
           <li><a href="../reference.html" >7. リファレンスマニュアル</a> &raquo;</li>
           <li><a href="../commands.html" >7.3. コマンド</a> &raquo;</li> 
       </ul>

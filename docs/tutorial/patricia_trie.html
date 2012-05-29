@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>4.8. パトリシア木による前方一致検索 &mdash; groonga v2.0.2 documentation</title>
+    <title>4.8. パトリシア木による前方一致検索 &mdash; groonga v2.0.3 documentation</title>
     
     <link rel="stylesheet" href="../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '2.0.2',
+        VERSION:     '2.0.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../static/underscore.js"></script>
     <script type="text/javascript" src="../static/doctools.js"></script>
     <link rel="shortcut icon" href="../static/favicon.ico"/>
-    <link rel="top" title="groonga v2.0.2 documentation" href="../index.html" />
+    <link rel="top" title="groonga v2.0.3 documentation" href="../index.html" />
     <link rel="up" title="4. Tutorial" href="../tutorial.html" />
     <link rel="next" title="4.9. 全文検索の語彙表に対する追加情報" href="lexicon.html" />
     <link rel="prev" title="4.7. match_columnsパラメータ" href="match_columns.html" /> 
@@ -75,7 +75,7 @@
         <li class="right" >
           <a href="match_columns.html" title="4.7. match_columnsパラメータ"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">groonga v2.0.2 documentation</a> &raquo;</li>
+        <li><a href="../index.html">groonga v2.0.3 documentation</a> &raquo;</li>
           <li><a href="../tutorial.html" accesskey="U">4. Tutorial</a> &raquo;</li> 
       </ul>
     </div>  
@@ -92,48 +92,48 @@
 <h2>4.8.1. 主キーによる前方一致検索<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p>table_createコマンドのflagsオプションにTABLE_PAT_KEYを指定することで、主キーによる前方一致検索ができるようになります。</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>&gt; table_create --name PatPrefix --flags TABLE_PAT_KEY --key_type ShortText
-[[0,1335519594.52747,0.000475168228149414],true]
-&gt; load --table PatPrefix
-&gt; [
-&gt; {&quot;_key&quot;:&quot;ひろゆき&quot;},
-&gt; {&quot;_key&quot;:&quot;まろゆき&quot;},
-&gt; {&quot;_key&quot;:&quot;ひろあき&quot;}
-&gt; ]
-[[0,1335519594.72892,1.00176382064819],3]
-&gt; select --table PatPrefix --query _key:@ひろ
+<div class="highlight-none"><div class="highlight"><pre>table_create --name PatPrefix --flags TABLE_PAT_KEY --key_type ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+load --table PatPrefix
 [
-  [
-    0,
-    1335519595.93126,
-    0.00059962272644043
-  ],
-  [
-    [
-      [
-        2
-      ],
-      [
-        [
-          &quot;_id&quot;,
-          &quot;UInt32&quot;
-        ],
-        [
-          &quot;_key&quot;,
-          &quot;ShortText&quot;
-        ]
-      ],
-      [
-        3,
-        &quot;ひろあき&quot;
-      ],
-      [
-        1,
-        &quot;ひろゆき&quot;
-      ]
-    ]
-  ]
+{&quot;_key&quot;:&quot;ひろゆき&quot;},
+{&quot;_key&quot;:&quot;まろゆき&quot;},
+{&quot;_key&quot;:&quot;ひろあき&quot;}
 ]
+# [[0, 1337566253.89858, 0.000355720520019531], 3]
+select --table PatPrefix --query _key:@ひろ
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         3,
+#         &quot;ひろあき&quot;
+#       ],
+#       [
+#         1,
+#         &quot;ひろゆき&quot;
+#       ]
+#     ]
+#   ]
+# ]
 </pre></div>
 </div>
 </div>
@@ -143,105 +143,105 @@
 <p>KEY_WITH_SISフラグを付与すると、データを追加する際に後方一致用のレコードも追加されてしまいます。そのため、単純に検索すると、元のレコードに加えて自動的に追加されたレコードまでヒットしてしまいます。元のレコードのみ検索するために、一工夫必要になります。</p>
 <p>例えば、元のレコードと自動的に追加されたレコードとの区別をつけるために、元のレコードであることを示すoriginalカラムを追加して、検索時にはoriginalカラムが <tt class="docutils literal"><span class="pre">true</span></tt> も検索条件に加えます。</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>&gt; table_create --name PatSuffix --flags TABLE_PAT_KEY|KEY_WITH_SIS --key_type ShortText
-[[0,1335519596.13342,0.000287294387817383],true]
-&gt; column_create --table PatSuffix --name original --type Bool
-[[0,1335519596.33446,0.000329494476318359],true]
-&gt; load --table PatSuffix
-&gt; [
-&gt; {&quot;_key&quot;:&quot;ひろゆき&quot;,&quot;original&quot;:true},
-&gt; {&quot;_key&quot;:&quot;まろゆき&quot;,&quot;original&quot;:true},
-&gt; {&quot;_key&quot;:&quot;ひろあき&quot;,&quot;original&quot;:true}
-&gt; ]
-[[0,1335519596.53576,1.00176548957825],3]
-&gt; select --table PatSuffix --query _key:@ゆき
+<div class="highlight-none"><div class="highlight"><pre>table_create --name PatSuffix --flags TABLE_PAT_KEY|KEY_WITH_SIS --key_type ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create --table PatSuffix --name original --type Bool
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+load --table PatSuffix
 [
-  [
-    0,
-    1335519597.73837,
-    0.000630855560302734
-  ],
-  [
-    [
-      [
-        4
-      ],
-      [
-        [
-          &quot;_id&quot;,
-          &quot;UInt32&quot;
-        ],
-        [
-          &quot;_key&quot;,
-          &quot;ShortText&quot;
-        ],
-        [
-          &quot;original&quot;,
-          &quot;Bool&quot;
-        ]
-      ],
-      [
-        1,
-        &quot;ひろゆき&quot;,
-        true
-      ],
-      [
-        5,
-        &quot;まろゆき&quot;,
-        true
-      ],
-      [
-        3,
-        &quot;ゆき&quot;,
-        false
-      ],
-      [
-        2,
-        &quot;ろゆき&quot;,
-        false
-      ]
-    ]
-  ]
+{&quot;_key&quot;:&quot;ひろゆき&quot;,&quot;original&quot;:true},
+{&quot;_key&quot;:&quot;まろゆき&quot;,&quot;original&quot;:true},
+{&quot;_key&quot;:&quot;ひろあき&quot;,&quot;original&quot;:true}
 ]
-&gt; select --table PatSuffix --query &quot;_key:@ゆき original:true&quot;
-[
-  [
-    0,
-    1335519597.94114,
-    0.000690460205078125
-  ],
-  [
-    [
-      [
-        2
-      ],
-      [
-        [
-          &quot;_id&quot;,
-          &quot;UInt32&quot;
-        ],
-        [
-          &quot;_key&quot;,
-          &quot;ShortText&quot;
-        ],
-        [
-          &quot;original&quot;,
-          &quot;Bool&quot;
-        ]
-      ],
-      [
-        1,
-        &quot;ひろゆき&quot;,
-        true
-      ],
-      [
-        5,
-        &quot;まろゆき&quot;,
-        true
-      ]
-    ]
-  ]
-]
+# [[0, 1337566253.89858, 0.000355720520019531], 3]
+select --table PatSuffix --query _key:@ゆき
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         4
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;original&quot;,
+#           &quot;Bool&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;ひろゆき&quot;,
+#         true
+#       ],
+#       [
+#         5,
+#         &quot;まろゆき&quot;,
+#         true
+#       ],
+#       [
+#         3,
+#         &quot;ゆき&quot;,
+#         false
+#       ],
+#       [
+#         2,
+#         &quot;ろゆき&quot;,
+#         false
+#       ]
+#     ]
+#   ]
+# ]
+select --table PatSuffix --query &quot;_key:@ゆき original:true&quot;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;original&quot;,
+#           &quot;Bool&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;ひろゆき&quot;,
+#         true
+#       ],
+#       [
+#         5,
+#         &quot;まろゆき&quot;,
+#         true
+#       ]
+#     ]
+#   ]
+# ]
 </pre></div>
 </div>
 </div>
@@ -302,7 +302,7 @@
         <li class="right" >
           <a href="match_columns.html" title="4.7. match_columnsパラメータ"
              >previous</a> |</li>
-        <li><a href="../index.html">groonga v2.0.2 documentation</a> &raquo;</li>
+        <li><a href="../index.html">groonga v2.0.3 documentation</a> &raquo;</li>
           <li><a href="../tutorial.html" >4. Tutorial</a> &raquo;</li> 
       </ul>
     </div>

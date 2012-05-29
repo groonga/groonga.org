@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>4.5. ドリルダウン &mdash; groonga v2.0.2 documentation</title>
+    <title>4.5. ドリルダウン &mdash; groonga v2.0.3 documentation</title>
     
     <link rel="stylesheet" href="../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '2.0.2',
+        VERSION:     '2.0.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../static/underscore.js"></script>
     <script type="text/javascript" src="../static/doctools.js"></script>
     <link rel="shortcut icon" href="../static/favicon.ico"/>
-    <link rel="top" title="groonga v2.0.2 documentation" href="../index.html" />
+    <link rel="top" title="groonga v2.0.3 documentation" href="../index.html" />
     <link rel="up" title="4. Tutorial" href="../tutorial.html" />
     <link rel="next" title="4.6. タグ検索・参照関係の逆引き" href="index.html" />
     <link rel="prev" title="4.4. さまざまな検索条件の指定" href="search.html" /> 
@@ -75,7 +75,7 @@
         <li class="right" >
           <a href="search.html" title="4.4. さまざまな検索条件の指定"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">groonga v2.0.2 documentation</a> &raquo;</li>
+        <li><a href="../index.html">groonga v2.0.3 documentation</a> &raquo;</li>
           <li><a href="../tutorial.html" accesskey="U">4. Tutorial</a> &raquo;</li> 
       </ul>
     </div>  
@@ -90,57 +90,533 @@
 <p>groongaでは、特定のカラム値で検索結果をグループ化することができます。これをドリルダウンと呼びます。</p>
 <p>Siteテーブルに２つのカラムを追加します。TLDドメイン名を格納するdomainカラムと、国名を格納するcountryカラムです。これらのカラムの型は、それぞれドメイン名を主キーとするSiteDomainテーブルと、国名を主キーとするSiteCountryテーブルとします。</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>&gt; table_create --name SiteDomain --flags TABLE_HASH_KEY --key_type ShortText
-[[0,1317212750.98228,0.098212593],true]
-&gt; table_create --name SiteCountry --flags TABLE_HASH_KEY --key_type ShortText
-&gt; column_create --table Site --name domain --flags COLUMN_SCALAR --type SiteDomain
-[[0,1317212751.28095,0.256200943],true]
-[[0,1317212751.53719,0.085740621],true]
-&gt; column_create --table Site --name country --flags COLUMN_SCALAR --type SiteCountry
-[[0,1317212751.82329,0.064026147],true]
-&gt; load --table Site
-&gt; [
-&gt; {&quot;_key&quot;:&quot;http://example.org/&quot;,&quot;domain&quot;:&quot;.org&quot;,&quot;country&quot;:&quot;japan&quot;},
-&gt; {&quot;_key&quot;:&quot;http://example.net/&quot;,&quot;domain&quot;:&quot;.net&quot;,&quot;country&quot;:&quot;brazil&quot;},
-&gt; {&quot;_key&quot;:&quot;http://example.com/&quot;,&quot;domain&quot;:&quot;.com&quot;,&quot;country&quot;:&quot;japan&quot;},
-&gt; {&quot;_key&quot;:&quot;http://example.net/afr&quot;,&quot;domain&quot;:&quot;.net&quot;,&quot;country&quot;:&quot;usa&quot;},
-&gt; {&quot;_key&quot;:&quot;http://example.org/aba&quot;,&quot;domain&quot;:&quot;.org&quot;,&quot;country&quot;:&quot;korea&quot;},
-&gt; {&quot;_key&quot;:&quot;http://example.com/rab&quot;,&quot;domain&quot;:&quot;.com&quot;,&quot;country&quot;:&quot;china&quot;},
-&gt; {&quot;_key&quot;:&quot;http://example.net/atv&quot;,&quot;domain&quot;:&quot;.net&quot;,&quot;country&quot;:&quot;china&quot;},
-&gt; {&quot;_key&quot;:&quot;http://example.org/gat&quot;,&quot;domain&quot;:&quot;.org&quot;,&quot;country&quot;:&quot;usa&quot;},
-&gt; {&quot;_key&quot;:&quot;http://example.com/vdw&quot;,&quot;domain&quot;:&quot;.com&quot;,&quot;country&quot;:&quot;japan&quot;}
-&gt; ]
-[[0,1317212752.0878,2.202801388],9]
+<div class="highlight-none"><div class="highlight"><pre>table_create --name SiteDomain --flags TABLE_HASH_KEY --key_type ShortText
+# [
+#   [
+#     -22,
+#     1337566253.89858,
+#     0.000355720520019531,
+#     &quot;already used name was assigned: &lt;SiteDomain&gt;&quot;,
+#     [
+#       [
+#         &quot;grn_obj_register&quot;,
+#         &quot;db.c&quot;,
+#         6572
+#       ]
+#     ]
+#   ],
+#   false
+# ]
+table_create --name SiteCountry --flags TABLE_HASH_KEY --key_type ShortText
+# [
+#   [
+#     -22,
+#     1337566253.89858,
+#     0.000355720520019531,
+#     &quot;already used name was assigned: &lt;SiteCountry&gt;&quot;,
+#     [
+#       [
+#         &quot;grn_obj_register&quot;,
+#         &quot;db.c&quot;,
+#         6572
+#       ]
+#     ]
+#   ],
+#   false
+# ]
+column_create --table Site --name domain --flags COLUMN_SCALAR --type SiteDomain
+# [
+#   [
+#     -22,
+#     1337566253.89858,
+#     0.000355720520019531,
+#     &quot;already used name was assigned: &lt;Site.domain&gt;&quot;,
+#     [
+#       [
+#         &quot;grn_obj_register&quot;,
+#         &quot;db.c&quot;,
+#         6572
+#       ]
+#     ]
+#   ],
+#   false
+# ]
+column_create --table Site --name country --flags COLUMN_SCALAR --type SiteCountry
+# [
+#   [
+#     -22,
+#     1337566253.89858,
+#     0.000355720520019531,
+#     &quot;already used name was assigned: &lt;Site.country&gt;&quot;,
+#     [
+#       [
+#         &quot;grn_obj_register&quot;,
+#         &quot;db.c&quot;,
+#         6572
+#       ]
+#     ]
+#   ],
+#   false
+# ]
+load --table Site
+[
+{&quot;_key&quot;:&quot;http://example.org/&quot;,&quot;domain&quot;:&quot;.org&quot;,&quot;country&quot;:&quot;japan&quot;},
+{&quot;_key&quot;:&quot;http://example.net/&quot;,&quot;domain&quot;:&quot;.net&quot;,&quot;country&quot;:&quot;brazil&quot;},
+{&quot;_key&quot;:&quot;http://example.com/&quot;,&quot;domain&quot;:&quot;.com&quot;,&quot;country&quot;:&quot;japan&quot;},
+{&quot;_key&quot;:&quot;http://example.net/afr&quot;,&quot;domain&quot;:&quot;.net&quot;,&quot;country&quot;:&quot;usa&quot;},
+{&quot;_key&quot;:&quot;http://example.org/aba&quot;,&quot;domain&quot;:&quot;.org&quot;,&quot;country&quot;:&quot;korea&quot;},
+{&quot;_key&quot;:&quot;http://example.com/rab&quot;,&quot;domain&quot;:&quot;.com&quot;,&quot;country&quot;:&quot;china&quot;},
+{&quot;_key&quot;:&quot;http://example.net/atv&quot;,&quot;domain&quot;:&quot;.net&quot;,&quot;country&quot;:&quot;china&quot;},
+{&quot;_key&quot;:&quot;http://example.org/gat&quot;,&quot;domain&quot;:&quot;.org&quot;,&quot;country&quot;:&quot;usa&quot;},
+{&quot;_key&quot;:&quot;http://example.com/vdw&quot;,&quot;domain&quot;:&quot;.com&quot;,&quot;country&quot;:&quot;japan&quot;}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 9]
 </pre></div>
 </div>
 <p>domainカラムとcountryカラムでドリルダウンを行う例を以下に示します。</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>&gt; select --table Site --limit 0 --drilldown domain
-[[0,1317212754.4912,0.000250704],[[[9],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;],[&quot;location&quot;,&quot;WGS84GeoPoint&quot;],[&quot;links&quot;,&quot;Site&quot;],[&quot;link&quot;,&quot;Site&quot;],[&quot;domain&quot;,&quot;SiteDomain&quot;],[&quot;country&quot;,&quot;SiteCountry&quot;]]],[[3],[[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;_nsubrecs&quot;,&quot;Int32&quot;]],[&quot;.org&quot;,3],[&quot;.net&quot;,3],[&quot;.com&quot;,3]]]]
+<div class="highlight-none"><div class="highlight"><pre>select --table Site --limit 0 --drilldown domain
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         9
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;country&quot;,
+#           &quot;SiteCountry&quot;
+#         ],
+#         [
+#           &quot;domain&quot;,
+#           &quot;SiteDomain&quot;
+#         ],
+#         [
+#           &quot;link&quot;,
+#           &quot;Site&quot;
+#         ],
+#         [
+#           &quot;links&quot;,
+#           &quot;Site&quot;
+#         ],
+#         [
+#           &quot;location&quot;,
+#           &quot;WGS84GeoPoint&quot;
+#         ],
+#         [
+#           &quot;title&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ]
+#     ],
+#     [
+#       [
+#         3
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;_nsubrecs&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;.org&quot;,
+#         3
+#       ],
+#       [
+#         &quot;.net&quot;,
+#         3
+#       ],
+#       [
+#         &quot;.com&quot;,
+#         3
+#       ]
+#     ]
+#   ]
+# ]
 </pre></div>
 </div>
 <p>テーブル型を持つカラムに対してドリルダウンを行った場合、参照先のテーブルに存在するカラム値を取得することもできます。ドリルダウンを行ったテーブルには、_nsubrecsという仮想的なカラムが追加されます。このカラムには、グループ化されたレコード数が入ります。</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>&gt; select --table Site --limit 0 --drilldown domain --drilldown_output_columns _id,_key,_nsubrecs
-[[0,1317212754.69307,0.000359614],[[[9],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;],[&quot;location&quot;,&quot;WGS84GeoPoint&quot;],[&quot;links&quot;,&quot;Site&quot;],[&quot;link&quot;,&quot;Site&quot;],[&quot;domain&quot;,&quot;SiteDomain&quot;],[&quot;country&quot;,&quot;SiteCountry&quot;]]],[[3],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;_nsubrecs&quot;,&quot;Int32&quot;]],[1,&quot;.org&quot;,3],[2,&quot;.net&quot;,3],[3,&quot;.com&quot;,3]]]]
+<div class="highlight-none"><div class="highlight"><pre>select --table Site --limit 0 --drilldown domain --drilldown_output_columns _id,_key,_nsubrecs
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         9
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;country&quot;,
+#           &quot;SiteCountry&quot;
+#         ],
+#         [
+#           &quot;domain&quot;,
+#           &quot;SiteDomain&quot;
+#         ],
+#         [
+#           &quot;link&quot;,
+#           &quot;Site&quot;
+#         ],
+#         [
+#           &quot;links&quot;,
+#           &quot;Site&quot;
+#         ],
+#         [
+#           &quot;location&quot;,
+#           &quot;WGS84GeoPoint&quot;
+#         ],
+#         [
+#           &quot;title&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ]
+#     ],
+#     [
+#       [
+#         3
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;_nsubrecs&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;.org&quot;,
+#         3
+#       ],
+#       [
+#         2,
+#         &quot;.net&quot;,
+#         3
+#       ],
+#       [
+#         3,
+#         &quot;.com&quot;,
+#         3
+#       ]
+#     ]
+#   ]
+# ]
 </pre></div>
 </div>
 <p>複数のカラムに対してドリルダウンを行うことができます。複数のカラムに対してドリルダウンを行う場合には、drilldownパラメータにカラム名をカンマ区切りで与えます。</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>&gt; select --table Site --limit 0 --drilldown domain,country
-[[0,1317212754.89542,0.000263258],[[[9],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;],[&quot;location&quot;,&quot;WGS84GeoPoint&quot;],[&quot;links&quot;,&quot;Site&quot;],[&quot;link&quot;,&quot;Site&quot;],[&quot;domain&quot;,&quot;SiteDomain&quot;],[&quot;country&quot;,&quot;SiteCountry&quot;]]],[[3],[[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;_nsubrecs&quot;,&quot;Int32&quot;]],[&quot;.org&quot;,3],[&quot;.net&quot;,3],[&quot;.com&quot;,3]],[[5],[[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;_nsubrecs&quot;,&quot;Int32&quot;]],[&quot;japan&quot;,3],[&quot;brazil&quot;,1],[&quot;usa&quot;,2],[&quot;korea&quot;,1],[&quot;china&quot;,2]]]]
+<div class="highlight-none"><div class="highlight"><pre>select --table Site --limit 0 --drilldown domain,country
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         9
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;country&quot;,
+#           &quot;SiteCountry&quot;
+#         ],
+#         [
+#           &quot;domain&quot;,
+#           &quot;SiteDomain&quot;
+#         ],
+#         [
+#           &quot;link&quot;,
+#           &quot;Site&quot;
+#         ],
+#         [
+#           &quot;links&quot;,
+#           &quot;Site&quot;
+#         ],
+#         [
+#           &quot;location&quot;,
+#           &quot;WGS84GeoPoint&quot;
+#         ],
+#         [
+#           &quot;title&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ]
+#     ],
+#     [
+#       [
+#         3
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;_nsubrecs&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;.org&quot;,
+#         3
+#       ],
+#       [
+#         &quot;.net&quot;,
+#         3
+#       ],
+#       [
+#         &quot;.com&quot;,
+#         3
+#       ]
+#     ],
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;_nsubrecs&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;japan&quot;,
+#         3
+#       ],
+#       [
+#         &quot;brazil&quot;,
+#         1
+#       ],
+#       [
+#         &quot;usa&quot;,
+#         2
+#       ],
+#       [
+#         &quot;korea&quot;,
+#         1
+#       ],
+#       [
+#         &quot;china&quot;,
+#         2
+#       ]
+#     ]
+#   ]
+# ]
 </pre></div>
 </div>
 <p>ドリルダウン結果を並びかえることができます。例えば、_nsubrecsパラメータの降順で並び替えることができます。</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>&gt; select --table Site --limit 0 --drilldown country --drilldown_sortby _nsubrecs
-[[0,1317212755.09777,0.000284575],[[[9],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;],[&quot;location&quot;,&quot;WGS84GeoPoint&quot;],[&quot;links&quot;,&quot;Site&quot;],[&quot;link&quot;,&quot;Site&quot;],[&quot;domain&quot;,&quot;SiteDomain&quot;],[&quot;country&quot;,&quot;SiteCountry&quot;]]],[[5],[[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;_nsubrecs&quot;,&quot;Int32&quot;]],[&quot;brazil&quot;,1],[&quot;korea&quot;,1],[&quot;usa&quot;,2],[&quot;china&quot;,2],[&quot;japan&quot;,3]]]]
+<div class="highlight-none"><div class="highlight"><pre>select --table Site --limit 0 --drilldown country --drilldown_sortby _nsubrecs
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         9
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;country&quot;,
+#           &quot;SiteCountry&quot;
+#         ],
+#         [
+#           &quot;domain&quot;,
+#           &quot;SiteDomain&quot;
+#         ],
+#         [
+#           &quot;link&quot;,
+#           &quot;Site&quot;
+#         ],
+#         [
+#           &quot;links&quot;,
+#           &quot;Site&quot;
+#         ],
+#         [
+#           &quot;location&quot;,
+#           &quot;WGS84GeoPoint&quot;
+#         ],
+#         [
+#           &quot;title&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ]
+#     ],
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;_nsubrecs&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;brazil&quot;,
+#         1
+#       ],
+#       [
+#         &quot;korea&quot;,
+#         1
+#       ],
+#       [
+#         &quot;usa&quot;,
+#         2
+#       ],
+#       [
+#         &quot;china&quot;,
+#         2
+#       ],
+#       [
+#         &quot;japan&quot;,
+#         3
+#       ]
+#     ]
+#   ]
+# ]
 </pre></div>
 </div>
 <p>ドリルダウン結果は、デフォルトでは10件のみ表示されます。drilldown_offsetパラメータと、drilldown_limitパラメータによって、offsetとlimitを指定することができます。</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>&gt; select --table Site --limit 0 --drilldown country --drilldown_sortby _nsubrecs --drilldown_limit 2 --drilldown_offset 2
-[[0,1317212755.29988,0.000237191],[[[9],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;],[&quot;location&quot;,&quot;WGS84GeoPoint&quot;],[&quot;links&quot;,&quot;Site&quot;],[&quot;link&quot;,&quot;Site&quot;],[&quot;domain&quot;,&quot;SiteDomain&quot;],[&quot;country&quot;,&quot;SiteCountry&quot;]]],[[5],[[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;_nsubrecs&quot;,&quot;Int32&quot;]],[&quot;usa&quot;,2],[&quot;china&quot;,2]]]]
+<div class="highlight-none"><div class="highlight"><pre>select --table Site --limit 0 --drilldown country --drilldown_sortby _nsubrecs --drilldown_limit 2 --drilldown_offset 2
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         9
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;country&quot;,
+#           &quot;SiteCountry&quot;
+#         ],
+#         [
+#           &quot;domain&quot;,
+#           &quot;SiteDomain&quot;
+#         ],
+#         [
+#           &quot;link&quot;,
+#           &quot;Site&quot;
+#         ],
+#         [
+#           &quot;links&quot;,
+#           &quot;Site&quot;
+#         ],
+#         [
+#           &quot;location&quot;,
+#           &quot;WGS84GeoPoint&quot;
+#         ],
+#         [
+#           &quot;title&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ]
+#     ],
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;_nsubrecs&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;usa&quot;,
+#         2
+#       ],
+#       [
+#         &quot;china&quot;,
+#         2
+#       ]
+#     ]
+#   ]
+# ]
 </pre></div>
 </div>
 <p>文字列型のカラムに対するドリルダウンは、他の型でのドリルダウンに比べて低速です。文字列でのドリルダウンを行いたい場合には、このチュートリアルのように、文字列型を主キーとするテーブルを別途作成し、そのテーブルを型とするカラムを作成します。</p>
@@ -192,7 +668,7 @@
         <li class="right" >
           <a href="search.html" title="4.4. さまざまな検索条件の指定"
              >previous</a> |</li>
-        <li><a href="../index.html">groonga v2.0.2 documentation</a> &raquo;</li>
+        <li><a href="../index.html">groonga v2.0.3 documentation</a> &raquo;</li>
           <li><a href="../tutorial.html" >4. Tutorial</a> &raquo;</li> 
       </ul>
     </div>

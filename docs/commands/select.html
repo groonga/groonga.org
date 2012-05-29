@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>7.3.17. select &mdash; groonga v2.0.2 documentation</title>
+    <title>7.3.17. select &mdash; groonga v2.0.3 documentation</title>
     
     <link rel="stylesheet" href="../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '2.0.2',
+        VERSION:     '2.0.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../static/underscore.js"></script>
     <script type="text/javascript" src="../static/doctools.js"></script>
     <link rel="shortcut icon" href="../static/favicon.ico"/>
-    <link rel="top" title="groonga v2.0.2 documentation" href="../index.html" />
+    <link rel="top" title="groonga v2.0.3 documentation" href="../index.html" />
     <link rel="up" title="7.3. コマンド" href="../commands.html" />
     <link rel="next" title="7.3.18. shutdown" href="shutdown.html" />
     <link rel="prev" title="7.3.16. quit" href="quit.html" /> 
@@ -75,7 +75,7 @@
         <li class="right" >
           <a href="quit.html" title="7.3.16. quit"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">groonga v2.0.2 documentation</a> &raquo;</li>
+        <li><a href="../index.html">groonga v2.0.3 documentation</a> &raquo;</li>
           <li><a href="../reference.html" >7. リファレンスマニュアル</a> &raquo;</li>
           <li><a href="../commands.html" accesskey="U">7.3. コマンド</a> &raquo;</li> 
       </ul>
@@ -125,27 +125,43 @@ understand <tt class="docutils literal"><span class="pre">select</span></tt> to 
 many popular usages.</p>
 <p>Here are a schema definition and sample data to show usage.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>&gt; table_create Entries TABLE_HASH_KEY ShortText
-[[0,1335594537.43378,0.000381708145141602],true]
-&gt; column_create Entries content COLUMN_SCALAR Text
-[[0,1335594537.63582,0.000931501388549805],true]
-&gt; table_create Terms TABLE_PAT_KEY|KEY_NORMALIZE ShortText --default_tokenizer TokenBigram
-[[0,1335594537.83776,0.000288009643554688],true]
-&gt; column_create Terms entries_key_index COLUMN_INDEX|WITH_POSITION Entries _key
-[[0,1335594538.03901,0.0059964656829834],true]
-&gt; column_create Terms entries_content_index COLUMN_INDEX|WITH_POSITION Entries content
-[[0,1335594538.24584,0.00617790222167969],true]
-&gt; load --table Entries
-&gt; [
-&gt; {&quot;_key&quot;: &quot;The first post!&quot;, &quot;content&quot;: &quot;Welcome! This is my first post!&quot;},
-&gt; {&quot;_key&quot;: &quot;Groonga&quot;, &quot;content&quot;: &quot;I started to use groonga. It&#39;s very fast!&quot;}
-&gt; {&quot;_key&quot;: &quot;Mroonga&quot;, &quot;content&quot;: &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;}
-&gt; ]
+<div class="highlight-none"><div class="highlight"><pre>table_create Entries TABLE_HASH_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries content COLUMN_SCALAR Text
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries n_likes COLUMN_SCALAR UInt32
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create Terms TABLE_PAT_KEY|KEY_NORMALIZE ShortText --default_tokenizer TokenBigram
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Terms entries_key_index COLUMN_INDEX|WITH_POSITION Entries _key
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Terms entries_content_index COLUMN_INDEX|WITH_POSITION Entries content
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+load --table Entries
+[
+{&quot;_key&quot;:    &quot;The first post!&quot;,
+ &quot;content&quot;: &quot;Welcome! This is my first post!&quot;,
+ &quot;n_likes&quot;: 5},
+{&quot;_key&quot;:    &quot;Groonga&quot;,
+ &quot;content&quot;: &quot;I started to use groonga. It&#39;s very fast!&quot;,
+ &quot;n_likes&quot;: 10},
+{&quot;_key&quot;:    &quot;Mroonga&quot;,
+ &quot;content&quot;: &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
+ &quot;n_likes&quot;: 15},
+{&quot;_key&quot;:    &quot;Good-bye Senna&quot;,
+ &quot;content&quot;: &quot;I migrated all Senna system!&quot;,
+ &quot;n_likes&quot;: 3},
+{&quot;_key&quot;:    &quot;Good-bye Tritonn&quot;,
+ &quot;content&quot;: &quot;I also migrated all Tritonn system!&quot;,
+ &quot;n_likes&quot;: 3}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 5]
 </pre></div>
 </div>
-<p>There is a table, <tt class="docutils literal"><span class="pre">Entries</span></tt>, for blog entries. An entry has title
-and content. Title is key of <tt class="docutils literal"><span class="pre">Entries</span></tt>. Content is value of
-<tt class="docutils literal"><span class="pre">Entries.content</span></tt> column.</p>
+<p>There is a table, <tt class="docutils literal"><span class="pre">Entries</span></tt>, for blog entries. An entry has title,
+content and the number of likes for the entry. Title is key of
+<tt class="docutils literal"><span class="pre">Entries</span></tt>. Content is value of <tt class="docutils literal"><span class="pre">Entries.content</span></tt> column. The
+number of likes is value of <tt class="docutils literal"><span class="pre">Entries.n_likes</span></tt> column.</p>
 <p><tt class="docutils literal"><span class="pre">Entries._key</span></tt> column and <tt class="docutils literal"><span class="pre">Entries.content</span></tt> column are indexed
 using <tt class="docutils literal"><span class="pre">TokenBigram</span></tt> tokenizer. So both <tt class="docutils literal"><span class="pre">Entries._key</span></tt> and
 <tt class="docutils literal"><span class="pre">Entries.content</span></tt> are fulltext search ready.</p>
@@ -155,57 +171,76 @@ using <tt class="docutils literal"><span class="pre">TokenBigram</span></tt> tok
 <p>Here is the most simple usage with the above shema and data. It outputs
 all records in <tt class="docutils literal"><span class="pre">Entries</span></tt> table.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>&gt; select Entries
-[
-  [
-    0,
-    1335519592.67133,
-    0.000493049621582031
-  ],
-  [
-    [
-      [
-        3
-      ],
-      [
-        [
-          &quot;_id&quot;,
-          &quot;UInt32&quot;
-        ],
-        [
-          &quot;_key&quot;,
-          &quot;ShortText&quot;
-        ],
-        [
-          &quot;content&quot;,
-          &quot;Text&quot;
-        ]
-      ],
-      [
-        1,
-        &quot;The first post!&quot;,
-        &quot;Welcome! This is my first post!&quot;
-      ],
-      [
-        2,
-        &quot;Groonga&quot;,
-        &quot;I started to use groonga. It&#39;s very fast!&quot;
-      ],
-      [
-        3,
-        &quot;Mroonga&quot;,
-        &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;
-      ]
-    ]
-  ]
-]
+<div class="highlight-none"><div class="highlight"><pre>select Entries
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;The first post!&quot;,
+#         &quot;Welcome! This is my first post!&quot;,
+#         5
+#       ],
+#       [
+#         2,
+#         &quot;Groonga&quot;,
+#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
+#         10
+#       ],
+#       [
+#         3,
+#         &quot;Mroonga&quot;,
+#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         15
+#       ],
+#       [
+#         4,
+#         &quot;Good-bye Senna&quot;,
+#         &quot;I migrated all Senna system!&quot;,
+#         3
+#       ],
+#       [
+#         5,
+#         &quot;Good-bye Tritonn&quot;,
+#         &quot;I also migrated all Tritonn system!&quot;,
+#         3
+#       ]
+#     ]
+#   ]
+# ]
 </pre></div>
 </div>
 <p>Why does the command output all records? There are two reasons. The
 first reason is that the command doesn't specify any search
 conditions. No search condition means all records are matched. The
-second reason is that the number of all records is 3. <tt class="docutils literal"><span class="pre">select</span></tt>
-command outputs 10 records at a maximum by default. There are only 3
+second reason is that the number of all records is 5. <tt class="docutils literal"><span class="pre">select</span></tt>
+command outputs 10 records at a maximum by default. There are only 5
 records. It is less than 10. So the command outputs all records.</p>
 </div>
 <div class="section" id="search-conditions">
@@ -228,45 +263,51 @@ conditions. <tt class="docutils literal"><span class="pre">match_columns</span><
 matched against <tt class="docutils literal"><span class="pre">query</span></tt>.</p>
 <p>Here is a simple <tt class="docutils literal"><span class="pre">query</span></tt> usage example.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>&gt; select Entries --match_columns content --query fast
-[
-  [
-    0,
-    1335519592.87374,
-    0.000868797302246094
-  ],
-  [
-    [
-      [
-        2
-      ],
-      [
-        [
-          &quot;_id&quot;,
-          &quot;UInt32&quot;
-        ],
-        [
-          &quot;_key&quot;,
-          &quot;ShortText&quot;
-        ],
-        [
-          &quot;content&quot;,
-          &quot;Text&quot;
-        ]
-      ],
-      [
-        2,
-        &quot;Groonga&quot;,
-        &quot;I started to use groonga. It&#39;s very fast!&quot;
-      ],
-      [
-        3,
-        &quot;Mroonga&quot;,
-        &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;
-      ]
-    ]
-  ]
-]
+<div class="highlight-none"><div class="highlight"><pre>select Entries --match_columns content --query fast
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         2,
+#         &quot;Groonga&quot;,
+#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
+#         10
+#       ],
+#       [
+#         3,
+#         &quot;Mroonga&quot;,
+#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         15
+#       ]
+#     ]
+#   ]
+# ]
 </pre></div>
 </div>
 <p>The <tt class="docutils literal"><span class="pre">select</span></tt> command searches records that contain a word <tt class="docutils literal"><span class="pre">fast</span></tt>
@@ -280,40 +321,45 @@ in <tt class="docutils literal"><span class="pre">content</span></tt> column val
 search conditions for <tt class="docutils literal"><span class="pre">filter</span></tt> as ECMAScript like syntax.</p>
 <p>Here is a simple <tt class="docutils literal"><span class="pre">filter</span></tt> usage example.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>&gt; select Entries --filter &#39;content @ &quot;fast&quot; &amp;&amp; _key == &quot;Groonga&quot;&#39;
-[
-  [
-    0,
-    1335520300.98383,
-    0.000544071197509766
-  ],
-  [
-    [
-      [
-        1
-      ],
-      [
-        [
-          &quot;_id&quot;,
-          &quot;UInt32&quot;
-        ],
-        [
-          &quot;_key&quot;,
-          &quot;ShortText&quot;
-        ],
-        [
-          &quot;content&quot;,
-          &quot;Text&quot;
-        ]
-      ],
-      [
-        2,
-        &quot;Groonga&quot;,
-        &quot;I started to use groonga. It&#39;s very fast!&quot;
-      ]
-    ]
-  ]
-]
+<div class="highlight-none"><div class="highlight"><pre>select Entries --filter &#39;content @ &quot;fast&quot; &amp;&amp; _key == &quot;Groonga&quot;&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         2,
+#         &quot;Groonga&quot;,
+#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
+#         10
+#       ]
+#     ]
+#   ]
+# ]
 </pre></div>
 </div>
 <p>The <tt class="docutils literal"><span class="pre">select</span></tt> command searches records that contain a word <tt class="docutils literal"><span class="pre">fast</span></tt>
@@ -332,40 +378,45 @@ datails.</p>
 <p>You can specify range of outputted records by <tt class="docutils literal"><span class="pre">offset</span></tt> and <tt class="docutils literal"><span class="pre">limit</span></tt>.
 Here is an example to output only the 2nd record.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>&gt; select Entries --offset 1 --limit 1
-[
-  [
-    0,
-    1335519593.28077,
-    0.000288248062133789
-  ],
-  [
-    [
-      [
-        3
-      ],
-      [
-        [
-          &quot;_id&quot;,
-          &quot;UInt32&quot;
-        ],
-        [
-          &quot;_key&quot;,
-          &quot;ShortText&quot;
-        ],
-        [
-          &quot;content&quot;,
-          &quot;Text&quot;
-        ]
-      ],
-      [
-        2,
-        &quot;Groonga&quot;,
-        &quot;I started to use groonga. It&#39;s very fast!&quot;
-      ]
-    ]
-  ]
-]
+<div class="highlight-none"><div class="highlight"><pre>select Entries --offset 1 --limit 1
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         2,
+#         &quot;Groonga&quot;,
+#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
+#         10
+#       ]
+#     ]
+#   ]
+# ]
 </pre></div>
 </div>
 <p><tt class="docutils literal"><span class="pre">offset</span></tt> is zero-origin. <tt class="docutils literal"><span class="pre">--offset</span> <span class="pre">1</span></tt> means output range is
@@ -379,35 +430,39 @@ are matched, <tt class="docutils literal"><span class="pre">select</span></tt> c
 <p>You can use <tt class="docutils literal"><span class="pre">--limit</span> <span class="pre">0</span></tt> to retrieve the total number of recrods
 without any contents of records.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>&gt; select Entries --limit 0
-[
-  [
-    0,
-    1335519593.48351,
-    0.000329017639160156
-  ],
-  [
-    [
-      [
-        3
-      ],
-      [
-        [
-          &quot;_id&quot;,
-          &quot;UInt32&quot;
-        ],
-        [
-          &quot;_key&quot;,
-          &quot;ShortText&quot;
-        ],
-        [
-          &quot;content&quot;,
-          &quot;Text&quot;
-        ]
-      ]
-    ]
-  ]
-]
+<div class="highlight-none"><div class="highlight"><pre>select Entries --limit 0
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ]
+#     ]
+#   ]
+# ]
 </pre></div>
 </div>
 <p><tt class="docutils literal"><span class="pre">--limit</span> <span class="pre">0</span></tt> is also useful for retrieving only the number of matched
@@ -425,22 +480,22 @@ records.</p>
 <p>It specifies a table to be searched. <tt class="docutils literal"><span class="pre">table</span></tt> must be specified.</p>
 <p>If nonexistent table is specified, an error is returned.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>&gt; select Nonexistent
-[
-  [
-    -22,
-    1335519593.68574,
-    0.000583171844482422,
-    &quot;invalid table name: &lt;Nonexistent&gt;&quot;,
-    [
-      [
-        &quot;grn_select&quot;,
-        &quot;proc.c&quot;,
-        542
-      ]
-    ]
-  ]
-]
+<div class="highlight-none"><div class="highlight"><pre>select Nonexistent
+# [
+#   [
+#     -22,
+#     1337566253.89858,
+#     0.000355720520019531,
+#     &quot;invalid table name: &lt;Nonexistent&gt;&quot;,
+#     [
+#       [
+#         &quot;grn_select&quot;,
+#         &quot;proc.c&quot;,
+#         542
+#       ]
+#     ]
+#   ]
+# ]
 </pre></div>
 </div>
 </div>
@@ -466,39 +521,39 @@ column gets more hit score rather than a lower weight target column
 when a record is matched by fulltext search. The default weight is 1.</p>
 <p>Here is a simple <tt class="docutils literal"><span class="pre">match_columns</span></tt> usage example.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>&gt; select Entries --match_columns content --query fast --output_columns &#39;_key, _score&#39;
-[
-  [
-    0,
-    1335519593.88754,
-    0.000384092330932617
-  ],
-  [
-    [
-      [
-        2
-      ],
-      [
-        [
-          &quot;_key&quot;,
-          &quot;ShortText&quot;
-        ],
-        [
-          &quot;_score&quot;,
-          &quot;Int32&quot;
-        ]
-      ],
-      [
-        &quot;Groonga&quot;,
-        1
-      ],
-      [
-        &quot;Mroonga&quot;,
-        2
-      ]
-    ]
-  ]
-]
+<div class="highlight-none"><div class="highlight"><pre>select Entries --match_columns content --query fast --output_columns &#39;_key, _score&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;_score&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Groonga&quot;,
+#         1
+#       ],
+#       [
+#         &quot;Mroonga&quot;,
+#         2
+#       ]
+#     ]
+#   ]
+# ]
 </pre></div>
 </div>
 <p><tt class="docutils literal"><span class="pre">--match_columns</span> <span class="pre">content</span></tt> means the default target column for
@@ -515,39 +570,39 @@ fact that <tt class="docutils literal"><span class="pre">_score</span></tt> valu
 <p>To specify weight, <tt class="docutils literal"><span class="pre">column</span> <span class="pre">*</span> <span class="pre">weight</span></tt> syntax is used. Here is a
 weight usage example.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>&gt; select Entries --match_columns &#39;content * 2&#39; --query fast --output_columns &#39;_key, _score&#39;
-[
-  [
-    0,
-    1335519594.08917,
-    0.0003814697265625
-  ],
-  [
-    [
-      [
-        2
-      ],
-      [
-        [
-          &quot;_key&quot;,
-          &quot;ShortText&quot;
-        ],
-        [
-          &quot;_score&quot;,
-          &quot;Int32&quot;
-        ]
-      ],
-      [
-        &quot;Groonga&quot;,
-        2
-      ],
-      [
-        &quot;Mroonga&quot;,
-        4
-      ]
-    ]
-  ]
-]
+<div class="highlight-none"><div class="highlight"><pre>select Entries --match_columns &#39;content * 2&#39; --query fast --output_columns &#39;_key, _score&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;_score&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Groonga&quot;,
+#         2
+#       ],
+#       [
+#         &quot;Mroonga&quot;,
+#         4
+#       ]
+#     ]
+#   ]
+# ]
 </pre></div>
 </div>
 <p><tt class="docutils literal"><span class="pre">--match_columns</span> <span class="pre">'content</span> <span class="pre">*</span> <span class="pre">2'</span></tt> means the default target column for
@@ -564,35 +619,35 @@ treated as matched.</p>
 omitted, 1 is used for weight. Here is a one or more columns usage
 example.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>&gt; select Entries --match_columns &#39;_key * 10 || content&#39; --query groonga --output_columns &#39;_key, _score&#39;
-[
-  [
-    0,
-    1335594540.29792,
-    0.000547885894775391
-  ],
-  [
-    [
-      [
-        1
-      ],
-      [
-        [
-          &quot;_key&quot;,
-          &quot;ShortText&quot;
-        ],
-        [
-          &quot;_score&quot;,
-          &quot;Int32&quot;
-        ]
-      ],
-      [
-        &quot;Groonga&quot;,
-        11
-      ]
-    ]
-  ]
-]
+<div class="highlight-none"><div class="highlight"><pre>select Entries --match_columns &#39;_key * 10 || content&#39; --query groonga --output_columns &#39;_key, _score&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;_score&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Groonga&quot;,
+#         11
+#       ]
+#     ]
+#   ]
+# ]
 </pre></div>
 </div>
 <p><tt class="docutils literal"><span class="pre">--match_columns</span> <span class="pre">'_key</span> <span class="pre">*</span> <span class="pre">10</span> <span class="pre">||</span> <span class="pre">content'</span></tt> means the default target
@@ -604,25 +659,360 @@ of blog entry is more important rather thatn content of blog entry.</p>
 </div>
 <div class="section" id="query">
 <h4>7.3.17.4.2.2. <tt class="docutils literal"><span class="pre">query</span></tt><a class="headerlink" href="#query" title="Permalink to this headline">¶</a></h4>
-<p>TODO: write short description and add example.</p>
-<p>See <a class="reference internal" href="../spec/query_syntax.html"><em>Query syntax</em></a>.</p>
+<p>It specifies the query text. Normally, it is used for fulltext search
+with <tt class="docutils literal"><span class="pre">match_columns</span></tt> parameter. <tt class="docutils literal"><span class="pre">query</span></tt> parameter is designed for
+a fulltext search form in a Web page. A query text should be formatted
+in <a class="reference internal" href="../spec/query_syntax.html"><em>Query syntax</em></a>. The syntax is similar to common search
+form like Google's search form. For example, <tt class="docutils literal"><span class="pre">word1</span> <span class="pre">word2</span></tt> means
+that groonga searches records that contain both <tt class="docutils literal"><span class="pre">word1</span></tt> and
+<tt class="docutils literal"><span class="pre">word2</span></tt>. <tt class="docutils literal"><span class="pre">word1</span> <span class="pre">OR</span> <span class="pre">word2</span></tt> means that groogna searches records that
+contain either <tt class="docutils literal"><span class="pre">word1</span></tt> or <tt class="docutils literal"><span class="pre">word2</span></tt>.</p>
+<p>Here is a simple logical and search example.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --match_columns content --query &quot;fast groonga&quot;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         2,
+#         &quot;Groonga&quot;,
+#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
+#         10
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">select</span></tt> command searches records that contain two words
+<tt class="docutils literal"><span class="pre">fast</span></tt> and <tt class="docutils literal"><span class="pre">groonga</span></tt> in <tt class="docutils literal"><span class="pre">content</span></tt> column value from <tt class="docutils literal"><span class="pre">Entries</span></tt>
+table.</p>
+<p>Here is a simple logical or search example.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --match_columns content --query &quot;groonga OR mroonga&quot;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         2,
+#         &quot;Groonga&quot;,
+#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
+#         10
+#       ],
+#       [
+#         3,
+#         &quot;Mroonga&quot;,
+#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         15
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">select</span></tt> command searches records that contain one of two words
+<tt class="docutils literal"><span class="pre">groonga</span></tt> or <tt class="docutils literal"><span class="pre">mroonga</span></tt> in <tt class="docutils literal"><span class="pre">content</span></tt> column value from
+<tt class="docutils literal"><span class="pre">Entries</span></tt> table.</p>
+<p>See <a class="reference internal" href="../spec/query_syntax.html"><em>Query syntax</em></a> for other syntax.</p>
+<p>It can be used for not only fulltext search but also other
+conditions. For example, <tt class="docutils literal"><span class="pre">column:value</span></tt> means the value of
+<tt class="docutils literal"><span class="pre">column</span></tt> column is equal to <tt class="docutils literal"><span class="pre">value</span></tt>. <tt class="docutils literal"><span class="pre">column:&lt;value</span></tt> means the
+value of <tt class="docutils literal"><span class="pre">column</span></tt> column is less than <tt class="docutils literal"><span class="pre">value</span></tt>.</p>
+<p>Here is a simple equality operator search example.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --query _key:Groonga
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         2,
+#         &quot;Groonga&quot;,
+#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
+#         10
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">select</span></tt> command searches records that <tt class="docutils literal"><span class="pre">_key</span></tt> column value is
+<tt class="docutils literal"><span class="pre">Groonga</span></tt> from <tt class="docutils literal"><span class="pre">Entries</span></tt> table.</p>
+<p>Here is a simple less than operator search example.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --query n_likes:&lt;11
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         4
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;The first post!&quot;,
+#         &quot;Welcome! This is my first post!&quot;,
+#         5
+#       ],
+#       [
+#         2,
+#         &quot;Groonga&quot;,
+#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
+#         10
+#       ],
+#       [
+#         4,
+#         &quot;Good-bye Senna&quot;,
+#         &quot;I migrated all Senna system!&quot;,
+#         3
+#       ],
+#       [
+#         5,
+#         &quot;Good-bye Tritonn&quot;,
+#         &quot;I also migrated all Tritonn system!&quot;,
+#         3
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">select</span></tt> command searches records that <tt class="docutils literal"><span class="pre">n_likes</span></tt> column value
+is less than <tt class="docutils literal"><span class="pre">11</span></tt> from <tt class="docutils literal"><span class="pre">Entries</span></tt> table.</p>
+<p>See <a class="reference internal" href="../spec/query_syntax.html"><em>Query syntax</em></a> for other operations.</p>
 </div>
 <div class="section" id="filter">
 <h4>7.3.17.4.2.3. <tt class="docutils literal"><span class="pre">filter</span></tt><a class="headerlink" href="#filter" title="Permalink to this headline">¶</a></h4>
-<p>TODO: write short description and add example.</p>
-<p>See <a class="reference internal" href="../spec/script_syntax.html"><em>Script Syntax</em></a>.</p>
+<p>It specifies the filter text. Normally, it is used for complex search
+conditions. <tt class="docutils literal"><span class="pre">filter</span></tt> can be used with <tt class="docutils literal"><span class="pre">query</span></tt> parameter. If both
+<tt class="docutils literal"><span class="pre">filter</span></tt> and <tt class="docutils literal"><span class="pre">query</span></tt> are specified, there are conbined with
+logical and. It means that matched records should be matched against
+both <tt class="docutils literal"><span class="pre">filter</span></tt> and <tt class="docutils literal"><span class="pre">query</span></tt>.</p>
+<p><tt class="docutils literal"><span class="pre">filter</span></tt> parameter is designed for complex conditions. A filter text
+should be formated in <a class="reference internal" href="../spec/script_syntax.html"><em>Script Syntax</em></a>. The syntax is
+similar to ECMAScript. For example, <tt class="docutils literal"><span class="pre">column</span> <span class="pre">==</span> <span class="pre">&quot;value&quot;</span></tt> means that
+the value of <tt class="docutils literal"><span class="pre">column</span></tt> column is equal to <tt class="docutils literal"><span class="pre">&quot;value&quot;</span></tt>. <tt class="docutils literal"><span class="pre">column</span> <span class="pre">&lt;</span>
+<span class="pre">value</span></tt> means that the value of <tt class="docutils literal"><span class="pre">column</span></tt> column is less than
+<tt class="docutils literal"><span class="pre">value</span></tt>.</p>
+<p>Here is a simple equality operator search example.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --filter &#39;_key == &quot;Groonga&quot;&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         2,
+#         &quot;Groonga&quot;,
+#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
+#         10
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">select</span></tt> command searches records that <tt class="docutils literal"><span class="pre">_key</span></tt> column value is
+<tt class="docutils literal"><span class="pre">Groonga</span></tt> from <tt class="docutils literal"><span class="pre">Entries</span></tt> table.</p>
+<p>Here is a simple less than operator search example.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --filter &#39;n_likes &lt; 11&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         4
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;The first post!&quot;,
+#         &quot;Welcome! This is my first post!&quot;,
+#         5
+#       ],
+#       [
+#         2,
+#         &quot;Groonga&quot;,
+#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
+#         10
+#       ],
+#       [
+#         4,
+#         &quot;Good-bye Senna&quot;,
+#         &quot;I migrated all Senna system!&quot;,
+#         3
+#       ],
+#       [
+#         5,
+#         &quot;Good-bye Tritonn&quot;,
+#         &quot;I also migrated all Tritonn system!&quot;,
+#         3
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">select</span></tt> command searches records that <tt class="docutils literal"><span class="pre">n_likes</span></tt> column value
+is less than <tt class="docutils literal"><span class="pre">11</span></tt> from <tt class="docutils literal"><span class="pre">Entries</span></tt> table.</p>
+<p>See <a class="reference internal" href="../spec/script_syntax.html"><em>Script Syntax</em></a> for other operators.</p>
 </div>
 </div>
 <div class="section" id="advanced-search-parameters">
 <h3>7.3.17.4.3. Advanced search parameters<a class="headerlink" href="#advanced-search-parameters" title="Permalink to this headline">¶</a></h3>
 <div class="section" id="match-escalation-threshold">
 <h4>7.3.17.4.3.1. <tt class="docutils literal"><span class="pre">match_escalation_threshold</span></tt><a class="headerlink" href="#match-escalation-threshold" title="Permalink to this headline">¶</a></h4>
-<p>TODO: add example.</p>
 <p>It specifies threshold to determine whether search storategy
 escalation is used or not. The threshold is compared against the
 number of matched records. If the number of matched records is equal
-to or less than the threshold, search storategy escalation is
-used. See <a class="reference internal" href="../spec/search.html"><em>検索</em></a> about search storategy escalation.</p>
+to or less than the threshold, the search storategy escalation is
+used. See <a class="reference internal" href="../spec/search.html"><em>検索</em></a> about the search storategy escalation.</p>
 <p>The default threshold is 0. It means that search storategy escalation
 is used only when no records are matched.</p>
 <p>The default threshold can be customized by one of the followings.</p>
@@ -634,43 +1024,816 @@ is used only when no records are matched.</p>
 file</li>
 </ul>
 </div></blockquote>
+<p>Here is a simple <tt class="docutils literal"><span class="pre">match_escalation_threshold</span></tt> usage example. The
+first <tt class="docutils literal"><span class="pre">select</span></tt> doesn't have <tt class="docutils literal"><span class="pre">match_escalation_threshold</span></tt>
+parameter. The second <tt class="docutils literal"><span class="pre">select</span></tt> has <tt class="docutils literal"><span class="pre">match_escalation_threshold</span></tt>
+parameter.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --match_columns content --query groo
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         2,
+#         &quot;Groonga&quot;,
+#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
+#         10
+#       ]
+#     ]
+#   ]
+# ]
+select Entries --match_columns content --query groo --match_escalation_threshold -1
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         0
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The first <tt class="docutils literal"><span class="pre">select</span></tt> command searches records that contain a word
+<tt class="docutils literal"><span class="pre">groo</span></tt> in <tt class="docutils literal"><span class="pre">content</span></tt> column value from <tt class="docutils literal"><span class="pre">Entries</span></tt> table. But no
+records are matched because the <tt class="docutils literal"><span class="pre">TokenBigram</span></tt> tokenizer tokenizes
+<tt class="docutils literal"><span class="pre">groonga</span></tt> to <tt class="docutils literal"><span class="pre">groonga</span></tt> not <tt class="docutils literal"><span class="pre">gr|ro|oo|on|ng|ga</span></tt>. (The
+<tt class="docutils literal"><span class="pre">TokenBigramSplitSymbolAlpha</span></tt> tokenizer tokenizes <tt class="docutils literal"><span class="pre">groonga</span></tt> to
+<tt class="docutils literal"><span class="pre">gr|ro|oo|on|ng|ga</span></tt>. See <a class="reference internal" href="../tokenizers.html"><em>Tokenizers</em></a> for details.) It means
+that <tt class="docutils literal"><span class="pre">groonga</span></tt> is indexed but <tt class="docutils literal"><span class="pre">groo</span></tt> isn't indexed. So no records
+are matched against <tt class="docutils literal"><span class="pre">groo</span></tt> by exact match. In the case, the search
+storategy escalation is used because the number of matched records (0)
+is equal to <tt class="docutils literal"><span class="pre">match_escalation_threshold</span></tt> (0). One record is matched
+against <tt class="docutils literal"><span class="pre">groo</span></tt> by unsplit search.</p>
+<p>The second <tt class="docutils literal"><span class="pre">select</span></tt> command also searches records that contain a
+word <tt class="docutils literal"><span class="pre">groo</span></tt> in <tt class="docutils literal"><span class="pre">content</span></tt> column value from <tt class="docutils literal"><span class="pre">Entries</span></tt> table. And
+it also doesn't found matched records. In this case, the search
+storategy escalation is not used because the number of matched
+records (0) is larger than <tt class="docutils literal"><span class="pre">match_escalation_threshold</span></tt> (-1). So no
+more searches aren't executed. And no records are matched.</p>
 </div>
 <div class="section" id="query-expansion">
 <h4>7.3.17.4.3.2. <tt class="docutils literal"><span class="pre">query_expansion</span></tt><a class="headerlink" href="#query-expansion" title="Permalink to this headline">¶</a></h4>
-<p>TODO: write in English and add example.</p>
-<p>It specifies a column that is used to expand (substitute) <tt class="docutils literal"><span class="pre">query</span></tt>
-parameter value.</p>
-<p>query_expansionパラメータには、queryパラメータに指定された文字列を置換(拡張)する条件となるテーブル・カラムを指定します。フォーマットは「${テーブル名}.${カラム名}」となります。指定するテーブルは文字列を主キーとするハッシュ型あるいはパトリシア木型のテーブルで、一つ以上の文字列型のカラムが定義されている必要があります。(ここでは置換テーブルと呼びます。)</p>
-<p>queryパラメータに指定された文字列が、指定されたテーブルの主キーと完全一致する場合、その文字列を指定されたカラム値の文字列に置換します。queryパラメータが、空白、括弧、演算子などを含む場合は、その演算子によって区切られた文字列の単位で置換が実行されます。ダブルクォート(&quot;&quot;)で括られた範囲は、その内部に空白を含んでいても一つの置換される単位と見なされます。検索文字列と置換テーブルの主キー値との比較に際して大文字小文字等を区別したくない場合には、置換テーブルを定義する際にKEY_NORMALIZEを指定します。置換後の文字列となるカラムの値には、括弧や*, ORなど、queryパラメータで利用可能な全ての演算子を指定することができます。</p>
+<p>It's for query expansion. Query expansion substitutes specific words
+to another words in query. Nomally, it's used for synonym search.</p>
+<p>It specifies a column that is used to substitute <tt class="docutils literal"><span class="pre">query</span></tt> parameter
+value. The format of this parameter value is
+&quot;<tt class="docutils literal"><span class="pre">${TABLE}.${COLUMN}</span></tt>&quot;. For example, &quot;<tt class="docutils literal"><span class="pre">Terms.synonym</span></tt>&quot; specifies
+<tt class="docutils literal"><span class="pre">synonym</span></tt> column in <tt class="docutils literal"><span class="pre">Terms</span></tt> table.</p>
+<p>Table for query expansion is called &quot;substitution table&quot;. Substitution
+table's key must be <tt class="docutils literal"><span class="pre">ShortText</span></tt>. So array table (<tt class="docutils literal"><span class="pre">TABLE_NO_KEY</span></tt>)
+can't be used for query expansion. Because array table doesn't have
+key.</p>
+<p>Column for query expansion is called &quot;substitution
+column&quot;. Substitution column's value type must be
+<tt class="docutils literal"><span class="pre">ShortText</span></tt>. Column type must be vector (<tt class="docutils literal"><span class="pre">COLUMN_VECTOR</span></tt>).</p>
+<p>Query expansion substitutes key of substitution table in query with
+values in substitution column. If a word in <tt class="docutils literal"><span class="pre">query</span></tt> is a key of
+substitution table, the word is substituted with substitution column
+value that is associated with the key. Substition isn't performed
+recursively. It means that substitution target words in substituted
+query aren't substituted.</p>
+<p>Here is a sample substitution table to show a simple
+<tt class="docutils literal"><span class="pre">query_expansion</span></tt> usage example.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Thesaurus TABLE_PAT_KEY|KEY_NORMALIZE ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Thesaurus synonym COLUMN_VECTOR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+load --table Thesaurus
+[
+{&quot;_key&quot;: &quot;mroonga&quot;, &quot;synonym&quot;: [&quot;mroonga&quot;, &quot;tritonn&quot;, &quot;groonga mysql&quot;]},
+{&quot;_key&quot;: &quot;groonga&quot;, &quot;synonym&quot;: [&quot;groonga&quot;, &quot;senna&quot;]}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 2]
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">Thesaurus</span></tt> substitution table has two synonyms, <tt class="docutils literal"><span class="pre">&quot;mroonga&quot;</span></tt> and
+<tt class="docutils literal"><span class="pre">&quot;groonga&quot;</span></tt>. If an user searches with <tt class="docutils literal"><span class="pre">&quot;mroonga&quot;</span></tt>, groonga
+searches with <tt class="docutils literal"><span class="pre">&quot;((mroonga)</span> <span class="pre">OR</span> <span class="pre">(tritonn)</span> <span class="pre">OR</span> <span class="pre">(groonga</span> <span class="pre">mysql))&quot;</span></tt>. If an
+user searches with <tt class="docutils literal"><span class="pre">&quot;groonga&quot;</span></tt>, groonga searchs with <tt class="docutils literal"><span class="pre">&quot;((groonga)</span>
+<span class="pre">OR</span> <span class="pre">(senna))&quot;</span></tt>. Nomrally, it's good idea that substitution table has
+<tt class="docutils literal"><span class="pre">KEY_NORMALIZE</span></tt> flag. If the flag is used, substitute target word is
+matched in case insensitive manner.</p>
+<p>Note that those synonym values include the key value such as
+<tt class="docutils literal"><span class="pre">&quot;mroonga&quot;</span></tt> and <tt class="docutils literal"><span class="pre">&quot;groonga&quot;</span></tt>. It's recommended that you include the
+key value. If you don't include key value, substituted value doesn't
+include the original substitute target value. Normally, including the
+original value is better search result. If you have a word that you
+don't want to be searched, you should not include the original
+word. For example, you can implement &quot;stop words&quot; by an empty vector
+value.</p>
+<p>Here is a simple <tt class="docutils literal"><span class="pre">query_expansion</span></tt> usage example.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --match_columns content --query &quot;mroonga&quot;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         3,
+#         &quot;Mroonga&quot;,
+#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         15
+#       ]
+#     ]
+#   ]
+# ]
+select Entries --match_columns content --query &quot;mroonga&quot; --query_expansion Thesaurus.synonym
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         3,
+#         &quot;Mroonga&quot;,
+#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         15
+#       ],
+#       [
+#         5,
+#         &quot;Good-bye Tritonn&quot;,
+#         &quot;I also migrated all Tritonn system!&quot;,
+#         3
+#       ]
+#     ]
+#   ]
+# ]
+select Entries --match_columns content --query &quot;((mroonga) OR (tritonn) OR (groonga mysql))&quot;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         3,
+#         &quot;Mroonga&quot;,
+#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         15
+#       ],
+#       [
+#         5,
+#         &quot;Good-bye Tritonn&quot;,
+#         &quot;I also migrated all Tritonn system!&quot;,
+#         3
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The first <tt class="docutils literal"><span class="pre">select</span></tt> command doesn't use query expansion. So a record
+that has <tt class="docutils literal"><span class="pre">&quot;tritonn&quot;</span></tt> isn't found. The second <tt class="docutils literal"><span class="pre">select</span></tt> command uses
+query expansion. So a record that has <tt class="docutils literal"><span class="pre">&quot;tritonn&quot;</span></tt> is found. The
+third <tt class="docutils literal"><span class="pre">select</span></tt> command doesn't use query expansion but it is same as
+the second <tt class="docutils literal"><span class="pre">select</span></tt> command. The third one uses expanded query.</p>
+<p>Each substitute value can contain any <a class="reference internal" href="../spec/query_syntax.html"><em>Query syntax</em></a> syntax
+such as <tt class="docutils literal"><span class="pre">(...)</span></tt> and <tt class="docutils literal"><span class="pre">OR</span></tt>. You can use complex substitution by
+using those syntax.</p>
+<p>Here is a complex substitution usage example that uses query syntax.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>load --table Thesaurus
+[
+{&quot;_key&quot;: &quot;popular&quot;, &quot;synonym&quot;: [&quot;popular&quot;, &quot;n_likes:&gt;=10&quot;]}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 1]
+select Entries --match_columns content --query &quot;popular&quot; --query_expansion Thesaurus.synonym
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         2,
+#         &quot;Groonga&quot;,
+#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
+#         10
+#       ],
+#       [
+#         3,
+#         &quot;Mroonga&quot;,
+#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         15
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">load</span></tt> command registers a new synonym <tt class="docutils literal"><span class="pre">&quot;popular&quot;</span></tt>. It is
+substituted with <tt class="docutils literal"><span class="pre">((popular)</span> <span class="pre">OR</span> <span class="pre">(n_likes:&gt;=10))</span></tt>. The substituted
+query means that &quot;popular&quot; is containing the word &quot;popular&quot; or 10 or
+more liked entries.</p>
+<p>The <tt class="docutils literal"><span class="pre">select</span></tt> command outputs records that <tt class="docutils literal"><span class="pre">n_likes</span></tt> column value
+is equal to or more than <tt class="docutils literal"><span class="pre">10</span></tt> from <tt class="docutils literal"><span class="pre">Entries</span></tt> table.</p>
 </div>
 </div>
 <div class="section" id="output-related-parameters">
 <h3>7.3.17.4.4. Output related parameters<a class="headerlink" href="#output-related-parameters" title="Permalink to this headline">¶</a></h3>
 <div class="section" id="output-columns">
 <h4>7.3.17.4.4.1. <tt class="docutils literal"><span class="pre">output_columns</span></tt><a class="headerlink" href="#output-columns" title="Permalink to this headline">¶</a></h4>
-<p>TODO: write in English and add example.</p>
-<p>出力するカラム名のリストをカンマ(',')区切りで指定します。</p>
-<p>アスタリスク('*')を指定すると、全てのカラムが指定されたものとみなされます。または、script形式のgrn_expr文字列を指定します。 (デフォルトは、'_id, _key, *')</p>
+<p>It specifies output columns separated by <tt class="docutils literal"><span class="pre">,</span></tt>.</p>
+<p>Here is a simple <tt class="docutils literal"><span class="pre">output_columns</span></tt> usage example.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --output_columns &#39;_id, _key&#39; --limit 1
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;The first post!&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">select</span></tt> command just outputs <tt class="docutils literal"><span class="pre">_id</span></tt> and <tt class="docutils literal"><span class="pre">_key</span></tt> column
+values.</p>
+<p><tt class="docutils literal"><span class="pre">*</span></tt> is a special value. It means that all columns that are not
+<a class="reference internal" href="../pseudo_column.html"><em>疑似カラム (pseudo_column)</em></a>.</p>
+<p>Here is a <tt class="docutils literal"><span class="pre">*</span></tt> usage example.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --output_columns &#39;_key, *&#39; --limit 1
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;The first post!&quot;,
+#         &quot;Welcome! This is my first post!&quot;,
+#         5
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">select</span></tt> command outputs <tt class="docutils literal"><span class="pre">_key</span></tt> pseudo column, <tt class="docutils literal"><span class="pre">content</span></tt>
+column and <tt class="docutils literal"><span class="pre">n_likes</span></tt> column values but doesn't output <tt class="docutils literal"><span class="pre">_id</span></tt> pseudo
+column value.</p>
+<p>The default value is <tt class="docutils literal"><span class="pre">_id,</span> <span class="pre">_key,</span> <span class="pre">*</span></tt>. It means that all column
+values except <tt class="docutils literal"><span class="pre">_score</span></tt> are outputted.</p>
 </div>
 <div class="section" id="sortby">
 <h4>7.3.17.4.4.2. <tt class="docutils literal"><span class="pre">sortby</span></tt><a class="headerlink" href="#sortby" title="Permalink to this headline">¶</a></h4>
-<p>TODO: write in English and add example.</p>
-<p>ソートキーとなるカラム名のリストをカンマ(',')区切りで指定します。:</p>
-<div class="highlight-none"><div class="highlight"><pre>[-]カラム名1, [-]カラム名2, [-]カラム名3, ...
+<p>It specifies sort keys separated by <tt class="docutils literal"><span class="pre">,</span></tt>. Each sort key is column
+name.</p>
+<p>Here is a simple <tt class="docutils literal"><span class="pre">sortby</span></tt> usage example.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --sortby &#39;n_likes, _id&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         4,
+#         &quot;Good-bye Senna&quot;,
+#         &quot;I migrated all Senna system!&quot;,
+#         3
+#       ],
+#       [
+#         5,
+#         &quot;Good-bye Tritonn&quot;,
+#         &quot;I also migrated all Tritonn system!&quot;,
+#         3
+#       ],
+#       [
+#         1,
+#         &quot;The first post!&quot;,
+#         &quot;Welcome! This is my first post!&quot;,
+#         5
+#       ],
+#       [
+#         2,
+#         &quot;Groonga&quot;,
+#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
+#         10
+#       ],
+#       [
+#         3,
+#         &quot;Mroonga&quot;,
+#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         15
+#       ]
+#     ]
+#   ]
+# ]
 </pre></div>
 </div>
-<p>カラム名1の値でソートし、値が同一である場合はカラム名2でソート、と順次比較を行いソートします。カラム名の前に - を付加した場合は降順にソートします。付加しない場合には昇順にソートします。</p>
-<p>query引数またはfilter引数を指定した場合はカラム名に'_score'を使えます。'_score'を指定することでスコアでソートすることができます。query引数もfilter引数も指定していない状態で'_score'を指定するとエラーになります。</p>
+<p>The <tt class="docutils literal"><span class="pre">select</span></tt> command sorts by <tt class="docutils literal"><span class="pre">n_likes</span></tt> column value in ascending
+order. For records that has the same <tt class="docutils literal"><span class="pre">n_likes</span></tt> are sorted by <tt class="docutils literal"><span class="pre">_id</span></tt>
+in ascending order. <tt class="docutils literal"><span class="pre">&quot;Good-bye</span> <span class="pre">Senna&quot;</span></tt> and <tt class="docutils literal"><span class="pre">&quot;Good-bye</span> <span class="pre">Tritonn&quot;</span></tt>
+are the case.</p>
+<p>If you want to sort in descending order, add <tt class="docutils literal"><span class="pre">-</span></tt> before column name.</p>
+<p>Here is a descending order <tt class="docutils literal"><span class="pre">sortby</span></tt> usage example.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --sortby &#39;-n_likes, _id&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         3,
+#         &quot;Mroonga&quot;,
+#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         15
+#       ],
+#       [
+#         2,
+#         &quot;Groonga&quot;,
+#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
+#         10
+#       ],
+#       [
+#         1,
+#         &quot;The first post!&quot;,
+#         &quot;Welcome! This is my first post!&quot;,
+#         5
+#       ],
+#       [
+#         4,
+#         &quot;Good-bye Senna&quot;,
+#         &quot;I migrated all Senna system!&quot;,
+#         3
+#       ],
+#       [
+#         5,
+#         &quot;Good-bye Tritonn&quot;,
+#         &quot;I also migrated all Tritonn system!&quot;,
+#         3
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">select</span></tt> command sorts by <tt class="docutils literal"><span class="pre">n_likes</span></tt> column value in descending
+order. But ascending order is used for sorting by <tt class="docutils literal"><span class="pre">_id</span></tt>.</p>
+<p>You can use <tt class="docutils literal"><span class="pre">_score</span></tt> pseudo column in <tt class="docutils literal"><span class="pre">sortby</span></tt> if you use
+<tt class="docutils literal"><span class="pre">query</span></tt> or <tt class="docutils literal"><span class="pre">filter</span></tt> parameter.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --match_columns content --query fast --sortby -_score --output_columns &#39;_key, _score&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;_score&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Mroonga&quot;,
+#         2
+#       ],
+#       [
+#         &quot;Groonga&quot;,
+#         1
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">select</span></tt> command sorts matched records by hit score in
+descending order and outputs record key and hit score.</p>
+<p>If you use <tt class="docutils literal"><span class="pre">_score</span></tt> without <tt class="docutils literal"><span class="pre">query</span></tt> nor <tt class="docutils literal"><span class="pre">filter</span></tt> parameters,
+it's just ignored but get a warning in log file.</p>
 </div>
 <div class="section" id="offset">
 <h4>7.3.17.4.4.3. <tt class="docutils literal"><span class="pre">offset</span></tt><a class="headerlink" href="#offset" title="Permalink to this headline">¶</a></h4>
-<p>TODO: write in English and add example.</p>
-<p>検索条件にマッチしたレコードのうち、出力対象となる最初のレコードの番号を0ベースで指定します。デフォルト値は0です。offsetに負の値を指定した場合は、ヒットした件数 + offset によって算出される値が指定されたものとみなされます。</p>
+<p>It specifies offset to determine output records range. Offset is
+zero-origin. <tt class="docutils literal"><span class="pre">--offset</span> <span class="pre">1</span></tt> means output range is started from the 2nd
+record.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --sortby _id --offset 3 --output_columns _key
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Good-bye Senna&quot;
+#       ],
+#       [
+#         &quot;Good-bye Tritonn&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">select</span></tt> command outputs from the 4th record.</p>
+<p>You can specify negative value. It means that <tt class="docutils literal"><span class="pre">the</span> <span class="pre">number</span> <span class="pre">of</span> <span class="pre">matched</span>
+<span class="pre">records</span> <span class="pre">+</span> <span class="pre">offset</span></tt>. If you have 3 matched records and specify
+<tt class="docutils literal"><span class="pre">--offset</span> <span class="pre">-2</span></tt>, you get records from the 1st (<tt class="docutils literal"><span class="pre">3</span> <span class="pre">+</span> <span class="pre">-2</span> <span class="pre">=</span> <span class="pre">1</span></tt>) record
+to the 3rd record.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --sortby _id --offset -2 --output_columns _key
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Good-bye Senna&quot;
+#       ],
+#       [
+#         &quot;Good-bye Tritonn&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">select</span></tt> command outputs from the 4th record because the total
+number of records is <tt class="docutils literal"><span class="pre">5</span></tt>.</p>
+<p>The default value is <tt class="docutils literal"><span class="pre">0</span></tt>.</p>
 </div>
 <div class="section" id="limit">
 <h4>7.3.17.4.4.4. <tt class="docutils literal"><span class="pre">limit</span></tt><a class="headerlink" href="#limit" title="Permalink to this headline">¶</a></h4>
-<p>TODO: write in English and add example.</p>
-<p>検索条件にマッチしたレコードのうち、出力を行うレコードの件数を指定します。デフォルト値は10です。実際には、offset + limit がヒットした件数を超えない範囲でレコードが出力されます。limitに負の値を指定した場合は、ヒットした件数 + limit + 1 によって算出される値が指定されたものとみなされます。</p>
+<p>It specifies the max number of output records. If the number of
+matched records is less than <tt class="docutils literal"><span class="pre">limit</span></tt>, all records are outputted.</p>
+<p>Here is a simple <tt class="docutils literal"><span class="pre">limit</span></tt> usage example.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --sortby _id --offset 2 --limit 3 --output_columns _key
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Mroonga&quot;
+#       ],
+#       [
+#         &quot;Good-bye Senna&quot;
+#       ],
+#       [
+#         &quot;Good-bye Tritonn&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">select</span></tt> command outputs the 3rd, the 4th and the 5th records.</p>
+<p>You can specify negative value. It means that <tt class="docutils literal"><span class="pre">the</span> <span class="pre">number</span> <span class="pre">of</span> <span class="pre">matched</span>
+<span class="pre">records</span> <span class="pre">+</span> <span class="pre">limit</span> <span class="pre">+</span> <span class="pre">1</span></tt>. For example, <tt class="docutils literal"><span class="pre">--limit</span> <span class="pre">-1</span></tt> outputs all
+records. It's very useful value to show all records.</p>
+<p>Here is a simple negative <tt class="docutils literal"><span class="pre">limit</span></tt> value usage example.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --limit -1
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;The first post!&quot;,
+#         &quot;Welcome! This is my first post!&quot;,
+#         5
+#       ],
+#       [
+#         2,
+#         &quot;Groonga&quot;,
+#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
+#         10
+#       ],
+#       [
+#         3,
+#         &quot;Mroonga&quot;,
+#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         15
+#       ],
+#       [
+#         4,
+#         &quot;Good-bye Senna&quot;,
+#         &quot;I migrated all Senna system!&quot;,
+#         3
+#       ],
+#       [
+#         5,
+#         &quot;Good-bye Tritonn&quot;,
+#         &quot;I also migrated all Tritonn system!&quot;,
+#         3
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">select</span></tt> command outputs all records.</p>
+<p>The default value is <tt class="docutils literal"><span class="pre">10</span></tt>.</p>
 </div>
 <div class="section" id="scorer">
 <h4>7.3.17.4.4.5. <tt class="docutils literal"><span class="pre">scorer</span></tt><a class="headerlink" href="#scorer" title="Permalink to this headline">¶</a></h4>
@@ -892,7 +2055,7 @@ parameter value.</p>
         <li class="right" >
           <a href="quit.html" title="7.3.16. quit"
              >previous</a> |</li>
-        <li><a href="../index.html">groonga v2.0.2 documentation</a> &raquo;</li>
+        <li><a href="../index.html">groonga v2.0.3 documentation</a> &raquo;</li>
           <li><a href="../reference.html" >7. リファレンスマニュアル</a> &raquo;</li>
           <li><a href="../commands.html" >7.3. コマンド</a> &raquo;</li> 
       </ul>

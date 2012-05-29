@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>4.1. 基本的な操作 &mdash; groonga v2.0.2ドキュメント</title>
+    <title>4.1. 基本的な操作 &mdash; groonga v2.0.3ドキュメント</title>
     
     <link rel="stylesheet" href="../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '2.0.2',
+        VERSION:     '2.0.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../static/doctools.js"></script>
     <script type="text/javascript" src="../static/translations.js"></script>
     <link rel="shortcut icon" href="../static/favicon.ico"/>
-    <link rel="top" title="groonga v2.0.2ドキュメント" href="../index.html" />
+    <link rel="top" title="groonga v2.0.3ドキュメント" href="../index.html" />
     <link rel="up" title="4. チュートリアル" href="../tutorial.html" />
     <link rel="next" title="4.2. リモートアクセス" href="network.html" />
     <link rel="prev" title="4. チュートリアル" href="../tutorial.html" /> 
@@ -76,7 +76,7 @@
         <li class="right" >
           <a href="../tutorial.html" title="4. チュートリアル"
              accesskey="P">前へ</a> |</li>
-        <li><a href="../index.html">groonga v2.0.2ドキュメント</a> &raquo;</li>
+        <li><a href="../index.html">groonga v2.0.3ドキュメント</a> &raquo;</li>
           <li><a href="../tutorial.html" accesskey="U">4. チュートリアル</a> &raquo;</li> 
       </ul>
     </div>  
@@ -116,8 +116,25 @@
 <p>それでは、 <a class="reference internal" href="../commands/status.html"><em>status</em></a> コマンドを実行して、groongaの実行状態を確認してみましょう。</p>
 <p>実行例:</p>
 <div class="highlight-none"><div class="highlight"><pre>% groonga /tmp/groonga-databases/introduction.db
-&gt; status
-[[0,1332484898.47079,0.000113010406494141],{&quot;alloc_count&quot;:151,&quot;starttime&quot;:1332484898,&quot;uptime&quot;:0,&quot;version&quot;:&quot;2.0.0-250-g5a3cf19&quot;,&quot;n_queries&quot;:0,&quot;cache_hit_rate&quot;:0.0,&quot;command_version&quot;:1,&quot;default_command_version&quot;:1,&quot;max_command_version&quot;:2}]
+status
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   {
+#     &quot;uptime&quot;: 0,
+#     &quot;max_command_version&quot;: 2,
+#     &quot;n_queries&quot;: 0,
+#     &quot;cache_hit_rate&quot;: 0.0,
+#     &quot;version&quot;: &quot;2.0.2-28-g74fc93a&quot;,
+#     &quot;alloc_count&quot;: 130,
+#     &quot;command_version&quot;: 1,
+#     &quot;starttime&quot;: 1337566844,
+#     &quot;default_command_version&quot;: 1
+#   }
+# ]
 </pre></div>
 </div>
 <p>以上のように、コマンドの実行結果は基本的にjson形式の配列として返却されます。配列の先頭には、エラーコードや実行時間などの情報が入ります。2番目の要素には、指示された操作の実行結果が入ります。</p>
@@ -133,7 +150,7 @@ Form_2: COMMAND --NAME_1 VALUE_1 --NAME_2 VALUE_2 ..
 <p>書式1では値を適切な順番で渡す必要があります。このような引数は、位置によって値の意味が決まるため、位置固定引数などと呼ばれることもあります。</p>
 <p>書式2では値を名前と一緒に渡します。そのため、任意の順序で引数を指定することができます。このような引数は、名前付き引数やキーワード引数と呼ばれることもあります。</p>
 <p>空白や特殊な記号（ダブルクォート、シングルクォート、および丸括弧）を含む値を指定したいときは、シングルクォート(')かダブルクォート(&quot;)で値を囲むようにしてください。</p>
-<p>詳しくは、 <a class="reference internal" href="../executables/groonga.html"><em>groonga実行ファイル</em></a> のコマンドの項を参考にしてください。</p>
+<p>詳しくは、 <a class="reference internal" href="../executables/groonga.html"><em>groongaコマンド</em></a> のコマンドの項を参考にしてください。</p>
 </div>
 <div class="section" id="basic-commands">
 <h2>4.1.4. 主なコマンド<a class="headerlink" href="#basic-commands" title="このヘッドラインへのパーマリンク">¶</a></h2>
@@ -163,8 +180,23 @@ Form_2: COMMAND --NAME_1 VALUE_1 --NAME_2 VALUE_2 ..
 <p>型には数値や文字列などがあります。ここではデータの種類を表しているものという程度に考えてください。詳細は <a class="reference internal" href="../type.html"><em>データ型</em></a> に記述されています。主キーの格納方法は、主キーを条件とする検索にかかる時間や、前方一致検索の可否などを左右します。こちらも後で説明します。</p>
 <p>それでは、テーブルを作成してみましょう。以下の例では、主キーのあるテーブルを作成します。 <cite>name</cite> 引数はテーブルの引数を指定します。 <cite>flags</cite> 引数は主キーの格納方法を指定するために使っています。 <cite>key_type</cite> 引数は主キーの型を指定します。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre>&gt; table_create --name Site --flags TABLE_HASH_KEY --key_type ShortText
-[[0,1332484898.674,0.0103404521942139],true]
+<div class="highlight-none"><div class="highlight"><pre>table_create --name Site --flags TABLE_HASH_KEY --key_type ShortText
+# [
+#   [
+#     -22,
+#     1337566253.89858,
+#     0.000355720520019531,
+#     &quot;already used name was assigned: &lt;Site&gt;&quot;,
+#     [
+#       [
+#         &quot;grn_obj_register&quot;,
+#         &quot;db.c&quot;,
+#         6572
+#       ]
+#     ]
+#   ],
+#   false
+# ]
 </pre></div>
 </div>
 <p>実行結果の第2要素は、操作が成功したことを示しています。</p>
@@ -173,8 +205,149 @@ Form_2: COMMAND --NAME_1 VALUE_1 --NAME_2 VALUE_2 ..
 <h2>4.1.6. テーブルの表示<a class="headerlink" href="#view-a-table" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <p><a class="reference internal" href="../commands/select.html"><em>select</em></a> コマンドを用いて、テーブルの中身を表示することができます。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre>&gt; select --table Site
-[[0,1332484898.88587,0.000526189804077148],[[[0],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;]]]]]
+<div class="highlight-none"><div class="highlight"><pre>select --table Site
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         9
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;country&quot;,
+#           &quot;SiteCountry&quot;
+#         ],
+#         [
+#           &quot;domain&quot;,
+#           &quot;SiteDomain&quot;
+#         ],
+#         [
+#           &quot;link&quot;,
+#           &quot;Site&quot;
+#         ],
+#         [
+#           &quot;links&quot;,
+#           &quot;Site&quot;
+#         ],
+#         [
+#           &quot;location&quot;,
+#           &quot;WGS84GeoPoint&quot;
+#         ],
+#         [
+#           &quot;title&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;http://example.org/&quot;,
+#         &quot;japan&quot;,
+#         &quot;.org&quot;,
+#         &quot;http://example.net/&quot;,
+#         [
+#           &quot;http://example.net/&quot;,
+#           &quot;http://example.org/&quot;,
+#           &quot;http://example.com/&quot;
+#         ],
+#         &quot;128452975x503157902&quot;,
+#         &quot;This is test record 1!&quot;
+#       ],
+#       [
+#         2,
+#         &quot;http://example.net/&quot;,
+#         &quot;brazil&quot;,
+#         &quot;.net&quot;,
+#         &quot;&quot;,
+#         [],
+#         &quot;128487316x502920929&quot;,
+#         &quot;test record 2.&quot;
+#       ],
+#       [
+#         3,
+#         &quot;http://example.com/&quot;,
+#         &quot;japan&quot;,
+#         &quot;.com&quot;,
+#         &quot;&quot;,
+#         [],
+#         &quot;0x0&quot;,
+#         &quot;test test record three.&quot;
+#       ],
+#       [
+#         4,
+#         &quot;http://example.net/afr&quot;,
+#         &quot;usa&quot;,
+#         &quot;.net&quot;,
+#         &quot;&quot;,
+#         [],
+#         &quot;0x0&quot;,
+#         &quot;test record four.&quot;
+#       ],
+#       [
+#         5,
+#         &quot;http://example.org/aba&quot;,
+#         &quot;korea&quot;,
+#         &quot;.org&quot;,
+#         &quot;&quot;,
+#         [],
+#         &quot;0x0&quot;,
+#         &quot;test test test record five.&quot;
+#       ],
+#       [
+#         6,
+#         &quot;http://example.com/rab&quot;,
+#         &quot;china&quot;,
+#         &quot;.com&quot;,
+#         &quot;&quot;,
+#         [],
+#         &quot;0x0&quot;,
+#         &quot;test test test test record six.&quot;
+#       ],
+#       [
+#         7,
+#         &quot;http://example.net/atv&quot;,
+#         &quot;china&quot;,
+#         &quot;.net&quot;,
+#         &quot;&quot;,
+#         [],
+#         &quot;0x0&quot;,
+#         &quot;test test test record seven.&quot;
+#       ],
+#       [
+#         8,
+#         &quot;http://example.org/gat&quot;,
+#         &quot;usa&quot;,
+#         &quot;.org&quot;,
+#         &quot;&quot;,
+#         [],
+#         &quot;0x0&quot;,
+#         &quot;test test record eight.&quot;
+#       ],
+#       [
+#         9,
+#         &quot;http://example.com/vdw&quot;,
+#         &quot;japan&quot;,
+#         &quot;.com&quot;,
+#         &quot;&quot;,
+#         [],
+#         &quot;0x0&quot;,
+#         &quot;test test record nine.&quot;
+#       ]
+#     ]
+#   ]
+# ]
 </pre></div>
 </div>
 <p><a class="reference internal" href="../commands/select.html"><em>select</em></a> にテーブル名のみを指定すると、指定したテーブルの中身を10件まで表示します。実行結果の[0]はテーブルに含まれるレコードの数を示しています。今回は何も登録されていないため0件です。レコード数の次に表示されている配列はテーブルの構成を示しています。[&quot;_id&quot;,&quot;Uint32&quot;]はUInt32型の値を持つ_idという名前のカラム、[&quot;_key&quot;,&quot;ShortText&quot;]はShortText型の値を持つ_keyという名前のカラムをそれぞれ表しています。</p>
@@ -185,10 +358,166 @@ Form_2: COMMAND --NAME_1 VALUE_1 --NAME_2 VALUE_2 ..
 <p><a class="reference internal" href="../commands/column_create.html"><em>column_create</em></a> コマンドを用いて、カラムを作成することができます。</p>
 <p>それでは、カラムを作成してみましょう。以下の例では、新しいカラムをSiteテーブルに追加します。 <cite>table</cite> 引数はテーブルの名前を指定します。 <cite>name</cite> 引数は新しいカラムの名前を指定します。 <cite>type</cite> 引数はカラムに格納する値の型を指定します。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre>&gt; column_create --table Site --name title --type ShortText
-[[0,1332484899.08879,0.00948214530944824],true]
-&gt; select --table Site
-[[0,1332484899.29974,0.000299215316772461],[[[0],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;]]]]]
+<div class="highlight-none"><div class="highlight"><pre>column_create --table Site --name title --type ShortText
+# [
+#   [
+#     -22,
+#     1337566253.89858,
+#     0.000355720520019531,
+#     &quot;already used name was assigned: &lt;Site.title&gt;&quot;,
+#     [
+#       [
+#         &quot;grn_obj_register&quot;,
+#         &quot;db.c&quot;,
+#         6572
+#       ]
+#     ]
+#   ],
+#   false
+# ]
+select --table Site
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         9
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;country&quot;,
+#           &quot;SiteCountry&quot;
+#         ],
+#         [
+#           &quot;domain&quot;,
+#           &quot;SiteDomain&quot;
+#         ],
+#         [
+#           &quot;link&quot;,
+#           &quot;Site&quot;
+#         ],
+#         [
+#           &quot;links&quot;,
+#           &quot;Site&quot;
+#         ],
+#         [
+#           &quot;location&quot;,
+#           &quot;WGS84GeoPoint&quot;
+#         ],
+#         [
+#           &quot;title&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;http://example.org/&quot;,
+#         &quot;japan&quot;,
+#         &quot;.org&quot;,
+#         &quot;http://example.net/&quot;,
+#         [
+#           &quot;http://example.net/&quot;,
+#           &quot;http://example.org/&quot;,
+#           &quot;http://example.com/&quot;
+#         ],
+#         &quot;128452975x503157902&quot;,
+#         &quot;This is test record 1!&quot;
+#       ],
+#       [
+#         2,
+#         &quot;http://example.net/&quot;,
+#         &quot;brazil&quot;,
+#         &quot;.net&quot;,
+#         &quot;&quot;,
+#         [],
+#         &quot;128487316x502920929&quot;,
+#         &quot;test record 2.&quot;
+#       ],
+#       [
+#         3,
+#         &quot;http://example.com/&quot;,
+#         &quot;japan&quot;,
+#         &quot;.com&quot;,
+#         &quot;&quot;,
+#         [],
+#         &quot;0x0&quot;,
+#         &quot;test test record three.&quot;
+#       ],
+#       [
+#         4,
+#         &quot;http://example.net/afr&quot;,
+#         &quot;usa&quot;,
+#         &quot;.net&quot;,
+#         &quot;&quot;,
+#         [],
+#         &quot;0x0&quot;,
+#         &quot;test record four.&quot;
+#       ],
+#       [
+#         5,
+#         &quot;http://example.org/aba&quot;,
+#         &quot;korea&quot;,
+#         &quot;.org&quot;,
+#         &quot;&quot;,
+#         [],
+#         &quot;0x0&quot;,
+#         &quot;test test test record five.&quot;
+#       ],
+#       [
+#         6,
+#         &quot;http://example.com/rab&quot;,
+#         &quot;china&quot;,
+#         &quot;.com&quot;,
+#         &quot;&quot;,
+#         [],
+#         &quot;0x0&quot;,
+#         &quot;test test test test record six.&quot;
+#       ],
+#       [
+#         7,
+#         &quot;http://example.net/atv&quot;,
+#         &quot;china&quot;,
+#         &quot;.net&quot;,
+#         &quot;&quot;,
+#         [],
+#         &quot;0x0&quot;,
+#         &quot;test test test record seven.&quot;
+#       ],
+#       [
+#         8,
+#         &quot;http://example.org/gat&quot;,
+#         &quot;usa&quot;,
+#         &quot;.org&quot;,
+#         &quot;&quot;,
+#         [],
+#         &quot;0x0&quot;,
+#         &quot;test test record eight.&quot;
+#       ],
+#       [
+#         9,
+#         &quot;http://example.com/vdw&quot;,
+#         &quot;japan&quot;,
+#         &quot;.com&quot;,
+#         &quot;&quot;,
+#         [],
+#         &quot;0x0&quot;,
+#         &quot;test test record nine.&quot;
+#       ]
+#     ]
+#   ]
+# ]
 </pre></div>
 </div>
 </div>
@@ -197,26 +526,167 @@ Form_2: COMMAND --NAME_1 VALUE_1 --NAME_2 VALUE_2 ..
 <p><a class="reference internal" href="../commands/load.html"><em>load</em></a> コマンドは、JSON形式のレコードを受け取り、テーブルに格納します。</p>
 <p>以下の例では9つのレコードをSiteテーブルに格納します。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre>&gt; load --table Site
-&gt; [
-&gt; {&quot;_key&quot;:&quot;http://example.org/&quot;,&quot;title&quot;:&quot;This is test record 1!&quot;},
-&gt; {&quot;_key&quot;:&quot;http://example.net/&quot;,&quot;title&quot;:&quot;test record 2.&quot;},
-&gt; {&quot;_key&quot;:&quot;http://example.com/&quot;,&quot;title&quot;:&quot;test test record three.&quot;},
-&gt; {&quot;_key&quot;:&quot;http://example.net/afr&quot;,&quot;title&quot;:&quot;test record four.&quot;},
-&gt; {&quot;_key&quot;:&quot;http://example.org/aba&quot;,&quot;title&quot;:&quot;test test test record five.&quot;},
-&gt; {&quot;_key&quot;:&quot;http://example.com/rab&quot;,&quot;title&quot;:&quot;test test test test record six.&quot;},
-&gt; {&quot;_key&quot;:&quot;http://example.net/atv&quot;,&quot;title&quot;:&quot;test test test record seven.&quot;},
-&gt; {&quot;_key&quot;:&quot;http://example.org/gat&quot;,&quot;title&quot;:&quot;test test record eight.&quot;},
-&gt; {&quot;_key&quot;:&quot;http://example.com/vdw&quot;,&quot;title&quot;:&quot;test test record nine.&quot;},
-&gt; ]
-[[0,1332484899.50234,2.20460820198059],9]
+<div class="highlight-none"><div class="highlight"><pre>load --table Site
+[
+{&quot;_key&quot;:&quot;http://example.org/&quot;,&quot;title&quot;:&quot;This is test record 1!&quot;},
+{&quot;_key&quot;:&quot;http://example.net/&quot;,&quot;title&quot;:&quot;test record 2.&quot;},
+{&quot;_key&quot;:&quot;http://example.com/&quot;,&quot;title&quot;:&quot;test test record three.&quot;},
+{&quot;_key&quot;:&quot;http://example.net/afr&quot;,&quot;title&quot;:&quot;test record four.&quot;},
+{&quot;_key&quot;:&quot;http://example.org/aba&quot;,&quot;title&quot;:&quot;test test test record five.&quot;},
+{&quot;_key&quot;:&quot;http://example.com/rab&quot;,&quot;title&quot;:&quot;test test test test record six.&quot;},
+{&quot;_key&quot;:&quot;http://example.net/atv&quot;,&quot;title&quot;:&quot;test test test record seven.&quot;},
+{&quot;_key&quot;:&quot;http://example.org/gat&quot;,&quot;title&quot;:&quot;test test record eight.&quot;},
+{&quot;_key&quot;:&quot;http://example.com/vdw&quot;,&quot;title&quot;:&quot;test test record nine.&quot;},
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 9]
 </pre></div>
 </div>
 <p>実行結果の第2要素はロードされたレコードの数を示しています。上記の操作では、すべてのレコードを問題なくロードできています。</p>
 <p>念のため、データが入っていることを確認してみましょう。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre>&gt; select --table Site
-[[0,1332484901.90868,0.000381231307983398],[[[9],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;]],[1,&quot;http://example.org/&quot;,&quot;This is test record 1!&quot;],[2,&quot;http://example.net/&quot;,&quot;test record 2.&quot;],[3,&quot;http://example.com/&quot;,&quot;test test record three.&quot;],[4,&quot;http://example.net/afr&quot;,&quot;test record four.&quot;],[5,&quot;http://example.org/aba&quot;,&quot;test test test record five.&quot;],[6,&quot;http://example.com/rab&quot;,&quot;test test test test record six.&quot;],[7,&quot;http://example.net/atv&quot;,&quot;test test test record seven.&quot;],[8,&quot;http://example.org/gat&quot;,&quot;test test record eight.&quot;],[9,&quot;http://example.com/vdw&quot;,&quot;test test record nine.&quot;]]]]
+<div class="highlight-none"><div class="highlight"><pre>select --table Site
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         9
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;country&quot;,
+#           &quot;SiteCountry&quot;
+#         ],
+#         [
+#           &quot;domain&quot;,
+#           &quot;SiteDomain&quot;
+#         ],
+#         [
+#           &quot;link&quot;,
+#           &quot;Site&quot;
+#         ],
+#         [
+#           &quot;links&quot;,
+#           &quot;Site&quot;
+#         ],
+#         [
+#           &quot;location&quot;,
+#           &quot;WGS84GeoPoint&quot;
+#         ],
+#         [
+#           &quot;title&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;http://example.org/&quot;,
+#         &quot;japan&quot;,
+#         &quot;.org&quot;,
+#         &quot;http://example.net/&quot;,
+#         [
+#           &quot;http://example.net/&quot;,
+#           &quot;http://example.org/&quot;,
+#           &quot;http://example.com/&quot;
+#         ],
+#         &quot;128452975x503157902&quot;,
+#         &quot;This is test record 1!&quot;
+#       ],
+#       [
+#         2,
+#         &quot;http://example.net/&quot;,
+#         &quot;brazil&quot;,
+#         &quot;.net&quot;,
+#         &quot;&quot;,
+#         [],
+#         &quot;128487316x502920929&quot;,
+#         &quot;test record 2.&quot;
+#       ],
+#       [
+#         3,
+#         &quot;http://example.com/&quot;,
+#         &quot;japan&quot;,
+#         &quot;.com&quot;,
+#         &quot;&quot;,
+#         [],
+#         &quot;0x0&quot;,
+#         &quot;test test record three.&quot;
+#       ],
+#       [
+#         4,
+#         &quot;http://example.net/afr&quot;,
+#         &quot;usa&quot;,
+#         &quot;.net&quot;,
+#         &quot;&quot;,
+#         [],
+#         &quot;0x0&quot;,
+#         &quot;test record four.&quot;
+#       ],
+#       [
+#         5,
+#         &quot;http://example.org/aba&quot;,
+#         &quot;korea&quot;,
+#         &quot;.org&quot;,
+#         &quot;&quot;,
+#         [],
+#         &quot;0x0&quot;,
+#         &quot;test test test record five.&quot;
+#       ],
+#       [
+#         6,
+#         &quot;http://example.com/rab&quot;,
+#         &quot;china&quot;,
+#         &quot;.com&quot;,
+#         &quot;&quot;,
+#         [],
+#         &quot;0x0&quot;,
+#         &quot;test test test test record six.&quot;
+#       ],
+#       [
+#         7,
+#         &quot;http://example.net/atv&quot;,
+#         &quot;china&quot;,
+#         &quot;.net&quot;,
+#         &quot;&quot;,
+#         [],
+#         &quot;0x0&quot;,
+#         &quot;test test test record seven.&quot;
+#       ],
+#       [
+#         8,
+#         &quot;http://example.org/gat&quot;,
+#         &quot;usa&quot;,
+#         &quot;.org&quot;,
+#         &quot;&quot;,
+#         [],
+#         &quot;0x0&quot;,
+#         &quot;test test record eight.&quot;
+#       ],
+#       [
+#         9,
+#         &quot;http://example.com/vdw&quot;,
+#         &quot;japan&quot;,
+#         &quot;.com&quot;,
+#         &quot;&quot;,
+#         [],
+#         &quot;0x0&quot;,
+#         &quot;test test record nine.&quot;
+#       ]
+#     ]
+#   ]
+# ]
 </pre></div>
 </div>
 </div>
@@ -226,14 +696,136 @@ Form_2: COMMAND --NAME_1 VALUE_1 --NAME_2 VALUE_2 ..
 <p><cite>query</cite> 引数を使って検索条件が指定された場合、 <a class="reference internal" href="../commands/select.html"><em>select</em></a> コマンドは検索条件に適合するレコードを検索し、検索結果を出力します。</p>
 <p>それでは、IDを指定してレコードを取り出してみましょう。以下の例では、Siteテーブルの先頭レコードを取り出します。正確には、 <cite>query</cite> 引数を使って _id カラムに1が格納されているレコードを要求しています。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre>&gt; select --table Site --query _id:1
-[[0,1332484902.11683,0.000809431076049805],[[[1],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;]],[1,&quot;http://example.org/&quot;,&quot;This is test record 1!&quot;]]]]
+<div class="highlight-none"><div class="highlight"><pre>select --table Site --query _id:1
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;country&quot;,
+#           &quot;SiteCountry&quot;
+#         ],
+#         [
+#           &quot;domain&quot;,
+#           &quot;SiteDomain&quot;
+#         ],
+#         [
+#           &quot;link&quot;,
+#           &quot;Site&quot;
+#         ],
+#         [
+#           &quot;links&quot;,
+#           &quot;Site&quot;
+#         ],
+#         [
+#           &quot;location&quot;,
+#           &quot;WGS84GeoPoint&quot;
+#         ],
+#         [
+#           &quot;title&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;http://example.org/&quot;,
+#         &quot;japan&quot;,
+#         &quot;.org&quot;,
+#         &quot;http://example.net/&quot;,
+#         [
+#           &quot;http://example.net/&quot;,
+#           &quot;http://example.org/&quot;,
+#           &quot;http://example.com/&quot;
+#         ],
+#         &quot;128452975x503157902&quot;,
+#         &quot;This is test record 1!&quot;
+#       ]
+#     ]
+#   ]
+# ]
 </pre></div>
 </div>
 <p>次に、主キーを指定してレコードを取り出してみましょう。以下の例では、主キーが &quot;<a class="reference external" href="http://example.org/">http://example.org/</a>&quot; のキーを取り出します。正確には、 <cite>query</cite> 引数を使って _key カラムに &quot;<a class="reference external" href="http://example.org/">http://example.org/</a>&quot; が格納されているレコードを要求しています。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre>&gt; select --table Site --query &#39;_key:&quot;http://example.org/&quot;&#39;
-[[0,1332484902.32106,0.000850200653076172],[[[1],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;]],[1,&quot;http://example.org/&quot;,&quot;This is test record 1!&quot;]]]]
+<div class="highlight-none"><div class="highlight"><pre>select --table Site --query &#39;_key:&quot;http://example.org/&quot;&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;country&quot;,
+#           &quot;SiteCountry&quot;
+#         ],
+#         [
+#           &quot;domain&quot;,
+#           &quot;SiteDomain&quot;
+#         ],
+#         [
+#           &quot;link&quot;,
+#           &quot;Site&quot;
+#         ],
+#         [
+#           &quot;links&quot;,
+#           &quot;Site&quot;
+#         ],
+#         [
+#           &quot;location&quot;,
+#           &quot;WGS84GeoPoint&quot;
+#         ],
+#         [
+#           &quot;title&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;http://example.org/&quot;,
+#         &quot;japan&quot;,
+#         &quot;.org&quot;,
+#         &quot;http://example.net/&quot;,
+#         [
+#           &quot;http://example.net/&quot;,
+#           &quot;http://example.org/&quot;,
+#           &quot;http://example.com/&quot;
+#         ],
+#         &quot;128452975x503157902&quot;,
+#         &quot;This is test record 1!&quot;
+#       ]
+#     ]
+#   ]
+# ]
 </pre></div>
 </div>
 </div>
@@ -243,8 +835,23 @@ Form_2: COMMAND --NAME_1 VALUE_1 --NAME_2 VALUE_2 ..
 <p>groongaでは転置インデックスを使って高速な全文検索を実現しています。そのため、まずは転置インデックスとして用いるテーブルを作成する必要があります。テーブルの内容は、文書に含まれる単語やN-gramなどの索引語を主キーとして、各カラムに索引語の位置情報を格納するという構成になります。結果として、主キーのカラムは全文検索における語彙表の役割を果たします。</p>
 <p>以下の例では、Termsという名前のテーブルを転置インデックスの語彙表として作成しています。索引語を格納するため、主キーの型はShortTextです。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre>&gt; table_create --name Terms --flags TABLE_PAT_KEY|KEY_NORMALIZE --key_type ShortText --default_tokenizer TokenBigram
-[[0,1332484902.52532,0.00777173042297363],true]
+<div class="highlight-none"><div class="highlight"><pre>table_create --name Terms --flags TABLE_PAT_KEY|KEY_NORMALIZE --key_type ShortText --default_tokenizer TokenBigram
+# [
+#   [
+#     -22,
+#     1337566253.89858,
+#     0.000355720520019531,
+#     &quot;already used name was assigned: &lt;Terms&gt;&quot;,
+#     [
+#       [
+#         &quot;grn_obj_register&quot;,
+#         &quot;db.c&quot;,
+#         6572
+#       ]
+#     ]
+#   ],
+#   false
+# ]
 </pre></div>
 </div>
 <p><a class="reference internal" href="../commands/table_create.html"><em>table_create</em></a> には多くの引数が指定されているものの、本チュートリアルではすべてを理解する必要はありません。以下に簡単な説明を述べますが、読み飛ばしてもらってかまいません。</p>
@@ -255,8 +862,23 @@ Form_2: COMMAND --NAME_1 VALUE_1 --NAME_2 VALUE_2 ..
 <p>次に必要なのは、インデックス型のカラムを作成することです。このカラムは、関連付けられたカラムに対する全文検索に利用されます。つまり、全文検索を行いたいカラムに対してインデックスを作成することに相当します。</p>
 <p>それでは、インデックスカラムを作成してみましょう。以下の例では、Siteテーブルのカラムに対するインデックスカラムを作成します。それでは、Siteテーブルのtitleカラムを全文検索の対象とするべく、インデックス型のカラムを作成してみましょう。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre>&gt; column_create --table Terms --name blog_title --flags COLUMN_INDEX|WITH_POSITION --type Site --source title
-[[0,1332484902.73511,0.0202178955078125],true]
+<div class="highlight-none"><div class="highlight"><pre>column_create --table Terms --name blog_title --flags COLUMN_INDEX|WITH_POSITION --type Site --source title
+# [
+#   [
+#     -22,
+#     1337566253.89858,
+#     0.000355720520019531,
+#     &quot;already used name was assigned: &lt;Terms.blog_title&gt;&quot;,
+#     [
+#       [
+#         &quot;grn_obj_register&quot;,
+#         &quot;db.c&quot;,
+#         6572
+#       ]
+#     ]
+#   ],
+#   false
+# ]
 </pre></div>
 </div>
 <p><cite>table</cite> 引数は語彙表を指定し、 <cite>name</cite> 引数はインデックスカラムを指定します。また、 <cite>type</cite> 引数はインデックスの対象となるテーブルを指定し、 <cite>source</cite> 引数はインデックスの対象となるカラムを指定します。COLUMN_INDEXフラグはインデックスカラムの作成を指示し、WITH_POSITIONフラグは各索引語の位置情報をインデックスに含めることを指示します。一般的な全文検索インデックスを作成したいときは、COLUMN_INDEX|WITH_POSITIONを指定してください。索引語の位置情報については、本チュートリアルでは触れません。</p>
@@ -270,16 +892,138 @@ Form_2: COMMAND --NAME_1 VALUE_1 --NAME_2 VALUE_2 ..
 <p>インデックスを作成したことにより、 <a class="reference internal" href="../commands/select.html"><em>select</em></a> コマンドによる全文検索が可能になります。</p>
 <p>全文検索のクエリは <cite>query</cite> 引数により指定することができます。以下の例では、titleカラムに &quot;this&quot; という文字列が含まれているレコードを検索します。 <cite>query</cite> 引数に含まれる '&#64;' は、全文検索を指示しています。語彙表の作成において KEY_NORMALIZE フラグを指定したときは、全角・半角や大文字・小文字などの違いが吸収されることに注意してください。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre>&gt; select --table Site --query title:@this
-[[0,1332484902.95678,0.000878334045410156],[[[1],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;]],[1,&quot;http://example.org/&quot;,&quot;This is test record 1!&quot;]]]]
+<div class="highlight-none"><div class="highlight"><pre>select --table Site --query title:@this
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;country&quot;,
+#           &quot;SiteCountry&quot;
+#         ],
+#         [
+#           &quot;domain&quot;,
+#           &quot;SiteDomain&quot;
+#         ],
+#         [
+#           &quot;link&quot;,
+#           &quot;Site&quot;
+#         ],
+#         [
+#           &quot;links&quot;,
+#           &quot;Site&quot;
+#         ],
+#         [
+#           &quot;location&quot;,
+#           &quot;WGS84GeoPoint&quot;
+#         ],
+#         [
+#           &quot;title&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;http://example.org/&quot;,
+#         &quot;japan&quot;,
+#         &quot;.org&quot;,
+#         &quot;http://example.net/&quot;,
+#         [
+#           &quot;http://example.net/&quot;,
+#           &quot;http://example.org/&quot;,
+#           &quot;http://example.com/&quot;
+#         ],
+#         &quot;128452975x503157902&quot;,
+#         &quot;This is test record 1!&quot;
+#       ]
+#     ]
+#   ]
+# ]
 </pre></div>
 </div>
 <p>上記の例では、&quot;This&quot; という単語を含む先頭レコードのみが検索条件に適合します。</p>
 <p><a class="reference internal" href="../commands/select.html"><em>select</em></a> コマンドには、 <cite>match_columns</cite> という引数が存在します。このパラメータはデフォルトで検索対象にするカラムを指定するもので、カラム名を指定しない検索条件にのみ適用されます。 <a class="footnote-reference" href="#id2" id="id1">[1]</a></p>
 <p>&quot;<cite>--match_columns</cite> title&quot; と &quot;<cite>--query</cite> this&quot; の組み合わせを指定すると、 &quot;<cite>--query</cite> title:&#64;this&quot; を指定したときと同じ検索条件になります。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre>&gt; select --table Site --match_columns title --query this
-[[0,1332484903.16096,0.000757932662963867],[[[1],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;]],[1,&quot;http://example.org/&quot;,&quot;This is test record 1!&quot;]]]]
+<div class="highlight-none"><div class="highlight"><pre>select --table Site --match_columns title --query this
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;country&quot;,
+#           &quot;SiteCountry&quot;
+#         ],
+#         [
+#           &quot;domain&quot;,
+#           &quot;SiteDomain&quot;
+#         ],
+#         [
+#           &quot;link&quot;,
+#           &quot;Site&quot;
+#         ],
+#         [
+#           &quot;links&quot;,
+#           &quot;Site&quot;
+#         ],
+#         [
+#           &quot;location&quot;,
+#           &quot;WGS84GeoPoint&quot;
+#         ],
+#         [
+#           &quot;title&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;http://example.org/&quot;,
+#         &quot;japan&quot;,
+#         &quot;.org&quot;,
+#         &quot;http://example.net/&quot;,
+#         [
+#           &quot;http://example.net/&quot;,
+#           &quot;http://example.org/&quot;,
+#           &quot;http://example.com/&quot;
+#         ],
+#         &quot;128452975x503157902&quot;,
+#         &quot;This is test record 1!&quot;
+#       ]
+#     ]
+#   ]
+# ]
 </pre></div>
 </div>
 </div>
@@ -287,8 +1031,80 @@ Form_2: COMMAND --NAME_1 VALUE_1 --NAME_2 VALUE_2 ..
 <h2>4.1.13. 出力カラムの指定<a class="headerlink" href="#specify-output-columns" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <p><a class="reference internal" href="../commands/select.html"><em>select</em></a> コマンドにおいて <cite>output_columns</cite> 引数を用いることで、検索結果に含めるカラムを指定することができます。複数のカラムを指定するときは、カンマ（,）区切りでカラムを列挙します。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre>&gt; select --table Site --output_columns _key,title,_score --query title:@test
-[[0,1332484903.36506,0.000709056854248047],[[[9],[[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;],[&quot;_score&quot;,&quot;Int32&quot;]],[&quot;http://example.org/&quot;,&quot;This is test record 1!&quot;,1],[&quot;http://example.net/&quot;,&quot;test record 2.&quot;,1],[&quot;http://example.com/&quot;,&quot;test test record three.&quot;,2],[&quot;http://example.net/afr&quot;,&quot;test record four.&quot;,1],[&quot;http://example.org/aba&quot;,&quot;test test test record five.&quot;,3],[&quot;http://example.com/rab&quot;,&quot;test test test test record six.&quot;,4],[&quot;http://example.net/atv&quot;,&quot;test test test record seven.&quot;,3],[&quot;http://example.org/gat&quot;,&quot;test test record eight.&quot;,2],[&quot;http://example.com/vdw&quot;,&quot;test test record nine.&quot;,2]]]]
+<div class="highlight-none"><div class="highlight"><pre>select --table Site --output_columns _key,title,_score --query title:@test
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         9
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;title&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;_score&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;http://example.org/&quot;,
+#         &quot;This is test record 1!&quot;,
+#         1
+#       ],
+#       [
+#         &quot;http://example.net/&quot;,
+#         &quot;test record 2.&quot;,
+#         1
+#       ],
+#       [
+#         &quot;http://example.com/&quot;,
+#         &quot;test test record three.&quot;,
+#         2
+#       ],
+#       [
+#         &quot;http://example.net/afr&quot;,
+#         &quot;test record four.&quot;,
+#         1
+#       ],
+#       [
+#         &quot;http://example.org/aba&quot;,
+#         &quot;test test test record five.&quot;,
+#         3
+#       ],
+#       [
+#         &quot;http://example.com/rab&quot;,
+#         &quot;test test test test record six.&quot;,
+#         4
+#       ],
+#       [
+#         &quot;http://example.net/atv&quot;,
+#         &quot;test test test record seven.&quot;,
+#         3
+#       ],
+#       [
+#         &quot;http://example.org/gat&quot;,
+#         &quot;test test record eight.&quot;,
+#         2
+#       ],
+#       [
+#         &quot;http://example.com/vdw&quot;,
+#         &quot;test test record nine.&quot;,
+#         2
+#       ]
+#     ]
+#   ]
+# ]
 </pre></div>
 </div>
 <p>上記の例では、_scoreカラムを含む3つのカラムを指定しています。_scoreカラムはgroongaの検索結果に含まれるカラムであり、全文検索の条件に合致するレコードほど高い数値が入ります。</p>
@@ -298,12 +1114,237 @@ Form_2: COMMAND --NAME_1 VALUE_1 --NAME_2 VALUE_2 ..
 <p><a class="reference internal" href="../commands/select.html"><em>select</em></a> コマンドにおいて <cite>offset</cite> 引数と <cite>limit</cite> 引数を用いることで、検索結果の一部のみを表示することができます。大量の検索結果を分割してページ単位で表示したい場合などに有用です。</p>
 <p><cite>offset</cite> 引数には、検索結果における始点を指定します。検索結果の1件目が必要な場合、 <cite>offset</cite> 引数を省略するか、0を指定するようにしてください。 <cite>limit</cite> 引数には、検索結果の表示件数を指定します。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre>&gt; select --table Site --offset 0 --limit 3
-[[0,1332484903.57505,0.000303268432617188],[[[9],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;]],[1,&quot;http://example.org/&quot;,&quot;This is test record 1!&quot;],[2,&quot;http://example.net/&quot;,&quot;test record 2.&quot;],[3,&quot;http://example.com/&quot;,&quot;test test record three.&quot;]]]]
-&gt; select --table Site --offset 3 --limit 3
-[[0,1332484903.77936,0.000320196151733398],[[[9],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;]],[4,&quot;http://example.net/afr&quot;,&quot;test record four.&quot;],[5,&quot;http://example.org/aba&quot;,&quot;test test test record five.&quot;],[6,&quot;http://example.com/rab&quot;,&quot;test test test test record six.&quot;]]]]
-&gt; select --table Site --offset 7 --limit 3
-[[0,1332484903.98409,0.000294685363769531],[[[9],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;]],[8,&quot;http://example.org/gat&quot;,&quot;test test record eight.&quot;],[9,&quot;http://example.com/vdw&quot;,&quot;test test record nine.&quot;]]]]
+<div class="highlight-none"><div class="highlight"><pre>select --table Site --offset 0 --limit 3
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         9
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;country&quot;,
+#           &quot;SiteCountry&quot;
+#         ],
+#         [
+#           &quot;domain&quot;,
+#           &quot;SiteDomain&quot;
+#         ],
+#         [
+#           &quot;link&quot;,
+#           &quot;Site&quot;
+#         ],
+#         [
+#           &quot;links&quot;,
+#           &quot;Site&quot;
+#         ],
+#         [
+#           &quot;location&quot;,
+#           &quot;WGS84GeoPoint&quot;
+#         ],
+#         [
+#           &quot;title&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;http://example.org/&quot;,
+#         &quot;japan&quot;,
+#         &quot;.org&quot;,
+#         &quot;http://example.net/&quot;,
+#         [
+#           &quot;http://example.net/&quot;,
+#           &quot;http://example.org/&quot;,
+#           &quot;http://example.com/&quot;
+#         ],
+#         &quot;128452975x503157902&quot;,
+#         &quot;This is test record 1!&quot;
+#       ],
+#       [
+#         2,
+#         &quot;http://example.net/&quot;,
+#         &quot;brazil&quot;,
+#         &quot;.net&quot;,
+#         &quot;&quot;,
+#         [],
+#         &quot;128487316x502920929&quot;,
+#         &quot;test record 2.&quot;
+#       ],
+#       [
+#         3,
+#         &quot;http://example.com/&quot;,
+#         &quot;japan&quot;,
+#         &quot;.com&quot;,
+#         &quot;&quot;,
+#         [],
+#         &quot;0x0&quot;,
+#         &quot;test test record three.&quot;
+#       ]
+#     ]
+#   ]
+# ]
+select --table Site --offset 3 --limit 3
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         9
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;country&quot;,
+#           &quot;SiteCountry&quot;
+#         ],
+#         [
+#           &quot;domain&quot;,
+#           &quot;SiteDomain&quot;
+#         ],
+#         [
+#           &quot;link&quot;,
+#           &quot;Site&quot;
+#         ],
+#         [
+#           &quot;links&quot;,
+#           &quot;Site&quot;
+#         ],
+#         [
+#           &quot;location&quot;,
+#           &quot;WGS84GeoPoint&quot;
+#         ],
+#         [
+#           &quot;title&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         4,
+#         &quot;http://example.net/afr&quot;,
+#         &quot;usa&quot;,
+#         &quot;.net&quot;,
+#         &quot;&quot;,
+#         [],
+#         &quot;0x0&quot;,
+#         &quot;test record four.&quot;
+#       ],
+#       [
+#         5,
+#         &quot;http://example.org/aba&quot;,
+#         &quot;korea&quot;,
+#         &quot;.org&quot;,
+#         &quot;&quot;,
+#         [],
+#         &quot;0x0&quot;,
+#         &quot;test test test record five.&quot;
+#       ],
+#       [
+#         6,
+#         &quot;http://example.com/rab&quot;,
+#         &quot;china&quot;,
+#         &quot;.com&quot;,
+#         &quot;&quot;,
+#         [],
+#         &quot;0x0&quot;,
+#         &quot;test test test test record six.&quot;
+#       ]
+#     ]
+#   ]
+# ]
+select --table Site --offset 7 --limit 3
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         9
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;country&quot;,
+#           &quot;SiteCountry&quot;
+#         ],
+#         [
+#           &quot;domain&quot;,
+#           &quot;SiteDomain&quot;
+#         ],
+#         [
+#           &quot;link&quot;,
+#           &quot;Site&quot;
+#         ],
+#         [
+#           &quot;links&quot;,
+#           &quot;Site&quot;
+#         ],
+#         [
+#           &quot;location&quot;,
+#           &quot;WGS84GeoPoint&quot;
+#         ],
+#         [
+#           &quot;title&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         8,
+#         &quot;http://example.org/gat&quot;,
+#         &quot;usa&quot;,
+#         &quot;.org&quot;,
+#         &quot;&quot;,
+#         [],
+#         &quot;0x0&quot;,
+#         &quot;test test record eight.&quot;
+#       ],
+#       [
+#         9,
+#         &quot;http://example.com/vdw&quot;,
+#         &quot;japan&quot;,
+#         &quot;.com&quot;,
+#         &quot;&quot;,
+#         [],
+#         &quot;0x0&quot;,
+#         &quot;test test record nine.&quot;
+#       ]
+#     ]
+#   ]
+# ]
 </pre></div>
 </div>
 </div>
@@ -313,20 +1354,305 @@ Form_2: COMMAND --NAME_1 VALUE_1 --NAME_2 VALUE_2 ..
 <p><cite>sortby</cite> 引数には、整列の基準として用いるカラムを指定します。検索結果は指定したカラムの値が昇順になるように並べ替えられます。 <cite>sortby</cite> 引数の中でカラム名の前にハイフン（-）を付けることにより、降順に並べ替えることもできます。</p>
 <p>以下の例では、Siteテーブルのレコードを逆順に表示しています。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre>&gt; select --table Site --sortby -_id
-[[0,1332484904.18805,0.000293493270874023],[[[9],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;title&quot;,&quot;ShortText&quot;]],[9,&quot;http://example.com/vdw&quot;,&quot;test test record nine.&quot;],[8,&quot;http://example.org/gat&quot;,&quot;test test record eight.&quot;],[7,&quot;http://example.net/atv&quot;,&quot;test test test record seven.&quot;],[6,&quot;http://example.com/rab&quot;,&quot;test test test test record six.&quot;],[5,&quot;http://example.org/aba&quot;,&quot;test test test record five.&quot;],[4,&quot;http://example.net/afr&quot;,&quot;test record four.&quot;],[3,&quot;http://example.com/&quot;,&quot;test test record three.&quot;],[2,&quot;http://example.net/&quot;,&quot;test record 2.&quot;],[1,&quot;http://example.org/&quot;,&quot;This is test record 1!&quot;]]]]
+<div class="highlight-none"><div class="highlight"><pre>select --table Site --sortby -_id
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         9
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;country&quot;,
+#           &quot;SiteCountry&quot;
+#         ],
+#         [
+#           &quot;domain&quot;,
+#           &quot;SiteDomain&quot;
+#         ],
+#         [
+#           &quot;link&quot;,
+#           &quot;Site&quot;
+#         ],
+#         [
+#           &quot;links&quot;,
+#           &quot;Site&quot;
+#         ],
+#         [
+#           &quot;location&quot;,
+#           &quot;WGS84GeoPoint&quot;
+#         ],
+#         [
+#           &quot;title&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         9,
+#         &quot;http://example.com/vdw&quot;,
+#         &quot;japan&quot;,
+#         &quot;.com&quot;,
+#         &quot;&quot;,
+#         [],
+#         &quot;0x0&quot;,
+#         &quot;test test record nine.&quot;
+#       ],
+#       [
+#         8,
+#         &quot;http://example.org/gat&quot;,
+#         &quot;usa&quot;,
+#         &quot;.org&quot;,
+#         &quot;&quot;,
+#         [],
+#         &quot;0x0&quot;,
+#         &quot;test test record eight.&quot;
+#       ],
+#       [
+#         7,
+#         &quot;http://example.net/atv&quot;,
+#         &quot;china&quot;,
+#         &quot;.net&quot;,
+#         &quot;&quot;,
+#         [],
+#         &quot;0x0&quot;,
+#         &quot;test test test record seven.&quot;
+#       ],
+#       [
+#         6,
+#         &quot;http://example.com/rab&quot;,
+#         &quot;china&quot;,
+#         &quot;.com&quot;,
+#         &quot;&quot;,
+#         [],
+#         &quot;0x0&quot;,
+#         &quot;test test test test record six.&quot;
+#       ],
+#       [
+#         5,
+#         &quot;http://example.org/aba&quot;,
+#         &quot;korea&quot;,
+#         &quot;.org&quot;,
+#         &quot;&quot;,
+#         [],
+#         &quot;0x0&quot;,
+#         &quot;test test test record five.&quot;
+#       ],
+#       [
+#         4,
+#         &quot;http://example.net/afr&quot;,
+#         &quot;usa&quot;,
+#         &quot;.net&quot;,
+#         &quot;&quot;,
+#         [],
+#         &quot;0x0&quot;,
+#         &quot;test record four.&quot;
+#       ],
+#       [
+#         3,
+#         &quot;http://example.com/&quot;,
+#         &quot;japan&quot;,
+#         &quot;.com&quot;,
+#         &quot;&quot;,
+#         [],
+#         &quot;0x0&quot;,
+#         &quot;test test record three.&quot;
+#       ],
+#       [
+#         2,
+#         &quot;http://example.net/&quot;,
+#         &quot;brazil&quot;,
+#         &quot;.net&quot;,
+#         &quot;&quot;,
+#         [],
+#         &quot;128487316x502920929&quot;,
+#         &quot;test record 2.&quot;
+#       ],
+#       [
+#         1,
+#         &quot;http://example.org/&quot;,
+#         &quot;japan&quot;,
+#         &quot;.org&quot;,
+#         &quot;http://example.net/&quot;,
+#         [
+#           &quot;http://example.net/&quot;,
+#           &quot;http://example.org/&quot;,
+#           &quot;http://example.com/&quot;
+#         ],
+#         &quot;128452975x503157902&quot;,
+#         &quot;This is test record 1!&quot;
+#       ]
+#     ]
+#   ]
+# ]
 </pre></div>
 </div>
 <p>次の例では、_scoreカラムを整列の基準とすることにより、検索結果のランキングをおこなっています。検索結果はクエリとの関連性が高い順に並べ替えられます。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre>&gt; select --table Site --query title:@test --output_columns _id,_score,title --sortby -_score
-[[0,1332484904.39402,0.000802755355834961],[[[9],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_score&quot;,&quot;Int32&quot;],[&quot;title&quot;,&quot;ShortText&quot;]],[6,4,&quot;test test test test record six.&quot;],[5,3,&quot;test test test record five.&quot;],[7,3,&quot;test test test record seven.&quot;],[8,2,&quot;test test record eight.&quot;],[3,2,&quot;test test record three.&quot;],[9,2,&quot;test test record nine.&quot;],[1,1,&quot;This is test record 1!&quot;],[4,1,&quot;test record four.&quot;],[2,1,&quot;test record 2.&quot;]]]]
+<div class="highlight-none"><div class="highlight"><pre>select --table Site --query title:@test --output_columns _id,_score,title --sortby -_score
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         9
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_score&quot;,
+#           &quot;Int32&quot;
+#         ],
+#         [
+#           &quot;title&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         6,
+#         4,
+#         &quot;test test test test record six.&quot;
+#       ],
+#       [
+#         5,
+#         3,
+#         &quot;test test test record five.&quot;
+#       ],
+#       [
+#         7,
+#         3,
+#         &quot;test test test record seven.&quot;
+#       ],
+#       [
+#         8,
+#         2,
+#         &quot;test test record eight.&quot;
+#       ],
+#       [
+#         3,
+#         2,
+#         &quot;test test record three.&quot;
+#       ],
+#       [
+#         9,
+#         2,
+#         &quot;test test record nine.&quot;
+#       ],
+#       [
+#         1,
+#         1,
+#         &quot;This is test record 1!&quot;
+#       ],
+#       [
+#         4,
+#         1,
+#         &quot;test record four.&quot;
+#       ],
+#       [
+#         2,
+#         1,
+#         &quot;test record 2.&quot;
+#       ]
+#     ]
+#   ]
+# ]
 </pre></div>
 </div>
 <p>整列の基準となるカラムを複数指定したいときは、カンマ（,）区切りでカラムを列挙します。複数のカラムを指定したときは、最初のカラムを基準として整列した後、最初のカラムに同じ値が格納されているレコードを次のカラムを基準として整列します。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre>&gt; select --table Site --query title:@test --output_columns _id,_score,title --sortby -_score,_id
-[[0,1332484904.60132,0.000498056411743164],[[[9],[[&quot;_id&quot;,&quot;UInt32&quot;],[&quot;_score&quot;,&quot;Int32&quot;],[&quot;title&quot;,&quot;ShortText&quot;]],[6,4,&quot;test test test test record six.&quot;],[5,3,&quot;test test test record five.&quot;],[7,3,&quot;test test test record seven.&quot;],[3,2,&quot;test test record three.&quot;],[8,2,&quot;test test record eight.&quot;],[9,2,&quot;test test record nine.&quot;],[1,1,&quot;This is test record 1!&quot;],[2,1,&quot;test record 2.&quot;],[4,1,&quot;test record four.&quot;]]]]
+<div class="highlight-none"><div class="highlight"><pre>select --table Site --query title:@test --output_columns _id,_score,title --sortby -_score,_id
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         9
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_score&quot;,
+#           &quot;Int32&quot;
+#         ],
+#         [
+#           &quot;title&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         6,
+#         4,
+#         &quot;test test test test record six.&quot;
+#       ],
+#       [
+#         5,
+#         3,
+#         &quot;test test test record five.&quot;
+#       ],
+#       [
+#         7,
+#         3,
+#         &quot;test test test record seven.&quot;
+#       ],
+#       [
+#         3,
+#         2,
+#         &quot;test test record three.&quot;
+#       ],
+#       [
+#         8,
+#         2,
+#         &quot;test test record eight.&quot;
+#       ],
+#       [
+#         9,
+#         2,
+#         &quot;test test record nine.&quot;
+#       ],
+#       [
+#         1,
+#         1,
+#         &quot;This is test record 1!&quot;
+#       ],
+#       [
+#         2,
+#         1,
+#         &quot;test record 2.&quot;
+#       ],
+#       [
+#         4,
+#         1,
+#         &quot;test record four.&quot;
+#       ]
+#     ]
+#   ]
+# ]
 </pre></div>
 </div>
 <p class="rubric">脚注</p>
@@ -407,7 +1733,7 @@ Form_2: COMMAND --NAME_1 VALUE_1 --NAME_2 VALUE_2 ..
         <li class="right" >
           <a href="../tutorial.html" title="4. チュートリアル"
              >前へ</a> |</li>
-        <li><a href="../index.html">groonga v2.0.2ドキュメント</a> &raquo;</li>
+        <li><a href="../index.html">groonga v2.0.3ドキュメント</a> &raquo;</li>
           <li><a href="../tutorial.html" >4. チュートリアル</a> &raquo;</li> 
       </ul>
     </div>

@@ -1,0 +1,308 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>7.1.5. groonga-httpd &mdash; groonga v2.0.4 documentation</title>
+    
+    <link rel="stylesheet" href="../static/groonga.css" type="text/css" />
+    <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../static/jquery.js"></script>
+    <script type="text/javascript" src="../static/underscore.js"></script>
+    <script type="text/javascript" src="../static/doctools.js"></script>
+    <link rel="shortcut icon" href="../static/favicon.ico"/>
+    <link rel="top" title="groonga v2.0.4 documentation" href="../index.html" />
+    <link rel="up" title="7.1. 実行ファイル" href="../executables.html" />
+    <link rel="next" title="7.1.6. groonga-suggest-create-dataset" href="groonga-suggest-create-dataset.html" />
+    <link rel="prev" title="7.1.4. groonga HTTPサーバー" href="groonga-http.html" /> 
+      <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
+    <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
+    <meta property="og:type" content="product" />
+    <meta property="og:image" content="http://groonga.org/images/logos/groonga-icon-full-size.png" />
+    <meta property="og:site_name" content="groonga" />
+
+    <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
+  </head>
+
+    <body>
+    <div id="fb-root"></div>
+
+<div class="header">
+  <h1 class="title">
+    <a id="top-link" href="../../">
+      <span class="project">groonga</span>
+      <span class="separator">-</span>
+      <span class="description">An open-source fulltext search engine and column store.</span>
+    </a>
+  </h1>
+
+      <div class="facebook-buttons">
+      <fb:like href="http://www.facebook.com/pages/groonga/201193596592346"
+               layout="standard"
+               width="290"></fb:like>
+    </div>
+    <div class="other-language-links">
+
+    <ul>
+      <li><a href="../../ja/docs/executables/groonga-httpd.html"><img src="../static/jp.png" alt="日本語">日本語版はこちら</a></li>
+    </ul>
+  </div>
+</div>
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="groonga-suggest-create-dataset.html" title="7.1.6. groonga-suggest-create-dataset"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="groonga-http.html" title="7.1.4. groonga HTTPサーバー"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">groonga v2.0.4 documentation</a> &raquo;</li>
+          <li><a href="../reference.html" >7. リファレンスマニュアル</a> &raquo;</li>
+          <li><a href="../executables.html" accesskey="U">7.1. 実行ファイル</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="groonga-httpd">
+<h1>7.1.5. groonga-httpd<a class="headerlink" href="#groonga-httpd" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="summary">
+<h2>7.1.5.1. Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>groonga-httpd is a program to communicate with a groonga server using the HTTP
+protocol. It functions as same as <a class="reference internal" href="groonga-http.html#groonga-server-http"><em>groonga HTTPサーバー</em></a>. Although
+<a class="reference internal" href="groonga-http.html#groonga-server-http"><em>groonga HTTPサーバー</em></a> has limited support for HTTP with a minimal built-in
+HTTP server, <em class="xref std std-ref">groonga-httpd</em> has full support for HTTP with an embedded
+nginx. All standards-compliance and features provided by nginx is also available in
+groonga-httpd. For details about nginx, see <a class="reference external" href="http://www.nginx.org/">http://www.nginx.org/</a></p>
+<p>groonga-httpd has an Web-based administration tool implemented with HTML and
+JavaScript. You can access to it from <a class="reference external" href="http://hostname:port/">http://hostname:port/</a>.</p>
+</div>
+<div class="section" id="synopsis">
+<h2>7.1.5.2. Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-none"><div class="highlight"><pre>groonga-httpd [nginx options]
+</pre></div>
+</div>
+</div>
+<div class="section" id="usage">
+<h2>7.1.5.3. Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="set-up">
+<h3>7.1.5.3.1. Set up<a class="headerlink" href="#set-up" title="Permalink to this headline">¶</a></h3>
+<p>First, you'll need to edit the groonga-httpd configuration file to specify a
+database. Edit /etc/groonga/httpd/groonga-httpd.conf to enable the
+groonga_database directive like this:</p>
+<div class="highlight-none"><div class="highlight"><pre># Match this to the file owner of groonga database files if groonga-httpd is
+# run as root.
+#user groonga;
+...
+http {
+  ...
+  # Don&#39;t change the location; currently only /d/ is supported.
+  location /d/ {
+    groonga; # &lt;= This means to turn on groonga-httpd.
+
+    # Specify an actual database and enable this.
+    groonga_database /var/lib/groonga/db/db;
+  }
+  ...
+}
+</pre></div>
+</div>
+<p>Then, run groonga-httpd. Note that the control immediately returns back to the
+console because groonga-httpd runs as a daemon process by default.:</p>
+<div class="highlight-none"><div class="highlight"><pre>% groonga-httpd
+</pre></div>
+</div>
+</div>
+<div class="section" id="request-queries">
+<h3>7.1.5.3.2. Request queries<a class="headerlink" href="#request-queries" title="Permalink to this headline">¶</a></h3>
+<p>To check, request a simple query (<a class="reference internal" href="../commands/status.html#command-status"><em>status</em></a>).</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>% curl http://localhost:10041/d/status
+[
+  [
+    0,
+    1337566253.89858,
+    0.000355720520019531
+  ],
+  {
+    &quot;uptime&quot;: 0,
+    &quot;max_command_version&quot;: 2,
+    &quot;n_queries&quot;: 0,
+    &quot;cache_hit_rate&quot;: 0.0,
+    &quot;version&quot;: &quot;2.0.3-278-g6071d65&quot;,
+    &quot;alloc_count&quot;: 145,
+    &quot;command_version&quot;: 1,
+    &quot;starttime&quot;: 1340769698,
+    &quot;default_command_version&quot;: 1
+  }
+]
+</pre></div>
+</div>
+</div>
+<div class="section" id="browse-the-administration-tool">
+<h3>7.1.5.3.3. Browse the administration tool<a class="headerlink" href="#browse-the-administration-tool" title="Permalink to this headline">¶</a></h3>
+<p>Also, you can browse Web-based administration tool at <a class="reference external" href="http://localhost:10041/">http://localhost:10041/</a>.</p>
+</div>
+<div class="section" id="shut-down">
+<h3>7.1.5.3.4. Shut down<a class="headerlink" href="#shut-down" title="Permalink to this headline">¶</a></h3>
+<p>Finally, to terminate the running groonga-httpd daemon, run this:</p>
+<div class="highlight-none"><div class="highlight"><pre>% groonga-httpd -s stop
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="configuration-directives">
+<h2>7.1.5.4. Configuration directives<a class="headerlink" href="#configuration-directives" title="Permalink to this headline">¶</a></h2>
+<p>There are two kinds of configuration directives. One is provided by nginx, the
+other is by groonga-httpd.</p>
+<p>The following directives can be used in the groonga-httpd configuration file.
+By default, it's located at /etc/groonga/httpd/groonga-httpd.conf.</p>
+<div class="section" id="groonga-specific-directives">
+<h3>7.1.5.4.1. Groonga-specific directives<a class="headerlink" href="#groonga-specific-directives" title="Permalink to this headline">¶</a></h3>
+<p>The following directives aren't provided by nginx. They are provided by
+groonga-httpd to configure groonga-httpd-specific configurations.</p>
+<div class="section" id="groonga-database">
+<h4>7.1.5.4.1.1. <tt class="docutils literal"><span class="pre">groonga_database</span></tt><a class="headerlink" href="#groonga-database" title="Permalink to this headline">¶</a></h4>
+<p>Specifies the path to a groonga database.</p>
+</div>
+</div>
+<div class="section" id="performance-related-directives">
+<h3>7.1.5.4.2. Performance-related directives<a class="headerlink" href="#performance-related-directives" title="Permalink to this headline">¶</a></h3>
+<p>The following directives are related to the performance of groonga-httpd.</p>
+<div class="section" id="worker-processes">
+<h4>7.1.5.4.2.1. <tt class="docutils literal"><span class="pre">worker_processes</span></tt><a class="headerlink" href="#worker-processes" title="Permalink to this headline">¶</a></h4>
+<p>For optimum performance, set this to be equal to the number of CPUs or cores. In
+many cases, groonga queries may be CPU-intensive work, so to fully utilize
+multi-CPU/core systems, it's essential to set this accordingly.</p>
+<p>This isn't a groonga-httpd specific directive, but an nginx's one. For details,
+see <a class="reference external" href="http://wiki.nginx.org/CoreModule#worker_processes">http://wiki.nginx.org/CoreModule#worker_processes</a>.</p>
+<p>By default, this is set to 1. It is nginx's default.</p>
+</div>
+</div>
+</div>
+<div class="section" id="available-nginx-modules">
+<h2>7.1.5.5. Available nginx modules<a class="headerlink" href="#available-nginx-modules" title="Permalink to this headline">¶</a></h2>
+<p>All standard HTTP modules except HttpRewriteModule is available.
+HttpRewriteModule is disabled to avoid to depend on PCRE (Perl Compatible
+Regular Expressions). For the list of other standard HTTP modules, see
+<a class="reference external" href="http://wiki.nginx.org/Modules">http://wiki.nginx.org/Modules</a>.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">7.1.5. groonga-httpd</a><ul>
+<li><a class="reference internal" href="#summary">7.1.5.1. Summary</a></li>
+<li><a class="reference internal" href="#synopsis">7.1.5.2. Synopsis</a></li>
+<li><a class="reference internal" href="#usage">7.1.5.3. Usage</a><ul>
+<li><a class="reference internal" href="#set-up">7.1.5.3.1. Set up</a></li>
+<li><a class="reference internal" href="#request-queries">7.1.5.3.2. Request queries</a></li>
+<li><a class="reference internal" href="#browse-the-administration-tool">7.1.5.3.3. Browse the administration tool</a></li>
+<li><a class="reference internal" href="#shut-down">7.1.5.3.4. Shut down</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#configuration-directives">7.1.5.4. Configuration directives</a><ul>
+<li><a class="reference internal" href="#groonga-specific-directives">7.1.5.4.1. Groonga-specific directives</a><ul>
+<li><a class="reference internal" href="#groonga-database">7.1.5.4.1.1. <tt class="docutils literal"><span class="pre">groonga_database</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#performance-related-directives">7.1.5.4.2. Performance-related directives</a><ul>
+<li><a class="reference internal" href="#worker-processes">7.1.5.4.2.1. <tt class="docutils literal"><span class="pre">worker_processes</span></tt></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#available-nginx-modules">7.1.5.5. Available nginx modules</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="groonga-http.html"
+                        title="previous chapter">7.1.4. groonga HTTPサーバー</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="groonga-suggest-create-dataset.html"
+                        title="next chapter">7.1.6. groonga-suggest-create-dataset</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../sources/executables/groonga-httpd.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="groonga-suggest-create-dataset.html" title="7.1.6. groonga-suggest-create-dataset"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="groonga-http.html" title="7.1.4. groonga HTTPサーバー"
+             >previous</a> |</li>
+        <li><a href="../index.html">groonga v2.0.4 documentation</a> &raquo;</li>
+          <li><a href="../reference.html" >7. リファレンスマニュアル</a> &raquo;</li>
+          <li><a href="../executables.html" >7.1. 実行ファイル</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009-2012, Brazil, Inc.
+    </div>
+      <script src="http://connect.facebook.net/en_US/all.js"></script>
+
+    <script>
+      FB.init({
+         appId  : null,
+         status : true, // check login status
+         cookie : true, // enable cookies to allow the server to access the session
+         xfbml  : true  // parse XFBML
+      });
+    </script>
+  </body>
+
+</html>

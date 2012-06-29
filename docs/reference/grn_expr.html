@@ -1,0 +1,216 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>7.7. grn_expr &mdash; groonga v2.0.4 documentation</title>
+    
+    <link rel="stylesheet" href="../static/groonga.css" type="text/css" />
+    <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../static/jquery.js"></script>
+    <script type="text/javascript" src="../static/underscore.js"></script>
+    <script type="text/javascript" src="../static/doctools.js"></script>
+    <link rel="shortcut icon" href="../static/favicon.ico"/>
+    <link rel="top" title="groonga v2.0.4 documentation" href="../index.html" />
+    <link rel="up" title="7. リファレンスマニュアル" href="../reference.html" />
+    <link rel="next" title="7.7.1. Query syntax" href="grn_expr/query_syntax.html" />
+    <link rel="prev" title="7.6. 疑似カラム (pseudo_column)" href="../pseudo_column.html" /> 
+      <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
+    <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
+    <meta property="og:type" content="product" />
+    <meta property="og:image" content="http://groonga.org/images/logos/groonga-icon-full-size.png" />
+    <meta property="og:site_name" content="groonga" />
+
+    <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
+  </head>
+
+    <body>
+    <div id="fb-root"></div>
+
+<div class="header">
+  <h1 class="title">
+    <a id="top-link" href="../../">
+      <span class="project">groonga</span>
+      <span class="separator">-</span>
+      <span class="description">An open-source fulltext search engine and column store.</span>
+    </a>
+  </h1>
+
+      <div class="facebook-buttons">
+      <fb:like href="http://www.facebook.com/pages/groonga/201193596592346"
+               layout="standard"
+               width="290"></fb:like>
+    </div>
+    <div class="other-language-links">
+
+    <ul>
+      <li><a href="../../ja/docs/reference/grn_expr.html"><img src="../static/jp.png" alt="日本語">日本語版はこちら</a></li>
+    </ul>
+  </div>
+</div>
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="grn_expr/query_syntax.html" title="7.7.1. Query syntax"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../pseudo_column.html" title="7.6. 疑似カラム (pseudo_column)"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">groonga v2.0.4 documentation</a> &raquo;</li>
+          <li><a href="../reference.html" accesskey="U">7. リファレンスマニュアル</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="grn-expr">
+<h1>7.7. grn_expr<a class="headerlink" href="#grn-expr" title="Permalink to this headline">¶</a></h1>
+<p>Grn_expr is an object that searches records with specified conditions
+and manipulates a database. It's pronounced as <tt class="docutils literal"><span class="pre">gurun</span> <span class="pre">expression</span></tt>.</p>
+<p>Conditions for searching records from a database can be represented by
+conbining condition expressions such as <tt class="docutils literal"><span class="pre">equal</span> <span class="pre">condition</span> <span class="pre">expression</span></tt>
+and <tt class="docutils literal"><span class="pre">less</span> <span class="pre">than</span> <span class="pre">condition</span> <span class="pre">expression</span></tt> with set operations such as
+<tt class="docutils literal"><span class="pre">AND</span></tt>, <tt class="docutils literal"><span class="pre">OR</span></tt> and <tt class="docutils literal"><span class="pre">NOT</span></tt>. Grn_expr executes those conditions to
+search records. You can also use advanced searches such as similar
+search and near search by grn_expr. You can also use flexible full
+text search. For example, you can control hit scores for specified
+words and improve recall by re-searching with high-recall algolithm
+dinamically. To determine whether re-searching or not, the number of
+matched rescords is used.</p>
+<p>There are three ways to create grn_expr:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Parsing <a class="reference internal" href="grn_expr/query_syntax.html"><em>Query syntax</em></a> string.</li>
+<li>Parsing <a class="reference internal" href="grn_expr/script_syntax.html"><em>Script Syntax</em></a> string.</li>
+<li>Calling grn_expr related APIs.</li>
+</ul>
+</div></blockquote>
+<p><a class="reference internal" href="grn_expr/query_syntax.html"><em>Query syntax</em></a> is for common search form in
+Internet search site. It's simple and easy to use but it has a
+limitation. You can not use all condition expressions and set
+operations in <a class="reference internal" href="grn_expr/query_syntax.html"><em>Query syntax</em></a>. You can use
+<a class="reference internal" href="grn_expr/query_syntax.html"><em>Query syntax</em></a> with <tt class="docutils literal"><span class="pre">query</span></tt> option in
+<a class="reference internal" href="../commands/select.html"><em>select</em></a>.</p>
+<p><a class="reference internal" href="grn_expr/script_syntax.html"><em>Script Syntax</em></a> is ECMAScript like
+syntax. You can use all condition expresssions and set operations in
+<a class="reference internal" href="grn_expr/script_syntax.html"><em>Script Syntax</em></a>. You can use
+<a class="reference internal" href="grn_expr/script_syntax.html"><em>Script Syntax</em></a> with <tt class="docutils literal"><span class="pre">filter</span></tt> option and
+<tt class="docutils literal"><span class="pre">scorer</span></tt> option in <a class="reference internal" href="../commands/select.html"><em>select</em></a>.</p>
+<p>You can use groonga as a library and create a grn_expr by calling
+grn_expr related APIs. You can use full features with calling APIs
+like <a class="reference internal" href="grn_expr/script_syntax.html"><em>Script Syntax</em></a>. Calling APIs is useful
+creating a custom syntax to create grn_expr. They are used in <a class="reference external" href="http://groonga.rubyforge.org/#about-rroonga">rroonga</a> that is Ruby bindings
+of groonga. Rroonga can create a grn_expr by Ruby's syntax instead of
+parsing string.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="grn_expr/query_syntax.html">7.7.1. Query syntax</a></li>
+<li class="toctree-l1"><a class="reference internal" href="grn_expr/script_syntax.html">7.7.2. Script Syntax</a></li>
+</ul>
+</div>
+<div class="section" id="see-also">
+<h2>7.7.3. See also<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference internal" href="api/grn_expr.html"><em>grn_expr</em></a>: grn_expr related APIs</li>
+</ul>
+</div></blockquote>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">7.7. grn_expr</a><ul>
+<li><a class="reference internal" href="#see-also">7.7.3. See also</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../pseudo_column.html"
+                        title="previous chapter">7.6. 疑似カラム (pseudo_column)</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="grn_expr/query_syntax.html"
+                        title="next chapter">7.7.1. Query syntax</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../sources/reference/grn_expr.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="grn_expr/query_syntax.html" title="7.7.1. Query syntax"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../pseudo_column.html" title="7.6. 疑似カラム (pseudo_column)"
+             >previous</a> |</li>
+        <li><a href="../index.html">groonga v2.0.4 documentation</a> &raquo;</li>
+          <li><a href="../reference.html" >7. リファレンスマニュアル</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009-2012, Brazil, Inc.
+    </div>
+      <script src="http://connect.facebook.net/en_US/all.js"></script>
+
+    <script>
+      FB.init({
+         appId  : null,
+         status : true, // check login status
+         cookie : true, // enable cookies to allow the server to access the session
+         xfbml  : true  // parse XFBML
+      });
+    </script>
+  </body>
+
+</html>

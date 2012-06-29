@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>7.8.2. geo_distance &mdash; groonga v2.0.3ドキュメント</title>
+    <title>7.8.2. geo_distance &mdash; groonga v2.0.4ドキュメント</title>
     
     <link rel="stylesheet" href="../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '2.0.3',
+        VERSION:     '2.0.4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../static/doctools.js"></script>
     <script type="text/javascript" src="../static/translations.js"></script>
     <link rel="shortcut icon" href="../static/favicon.ico"/>
-    <link rel="top" title="groonga v2.0.3ドキュメント" href="../index.html" />
+    <link rel="top" title="groonga v2.0.4ドキュメント" href="../index.html" />
     <link rel="up" title="7.8. 組み込み関数一覧" href="../functions.html" />
     <link rel="next" title="7.8.3. geo_in_circle" href="geo_in_circle.html" />
     <link rel="prev" title="7.8.1. edit_distance" href="edit_distance.html" /> 
@@ -76,7 +76,7 @@
         <li class="right" >
           <a href="edit_distance.html" title="7.8.1. edit_distance"
              accesskey="P">前へ</a> |</li>
-        <li><a href="../index.html">groonga v2.0.3ドキュメント</a> &raquo;</li>
+        <li><a href="../index.html">groonga v2.0.4ドキュメント</a> &raquo;</li>
           <li><a href="../reference.html" >7. リファレンスマニュアル</a> &raquo;</li>
           <li><a href="../functions.html" accesskey="U">7.8. 組み込み関数一覧</a> &raquo;</li> 
       </ul>
@@ -89,81 +89,250 @@
             
   <div class="section" id="geo-distance">
 <h1>7.8.2. geo_distance<a class="headerlink" href="#geo-distance" title="このヘッドラインへのパーマリンク">¶</a></h1>
-<div class="section" id="id1">
-<h2>7.8.2.1. 名前<a class="headerlink" href="#id1" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>geo_distance - 指定した2点の距離を計算する</p>
+<div class="section" id="summary">
+<h2>7.8.2.1. 概要<a class="headerlink" href="#summary" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">geo_distance</span></tt> は二点間の距離を計算します。</p>
 </div>
-<div class="section" id="id2">
-<h2>7.8.2.2. 書式<a class="headerlink" href="#id2" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="highlight-none"><div class="highlight"><pre>geo_distance(point1, point2[, approximate_type])
+<div class="section" id="syntax">
+<h2>7.8.2.2. 構文<a class="headerlink" href="#syntax" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">geo_distance</span></tt> は二つの点を指定します。引数 <tt class="docutils literal"><span class="pre">approximate_type</span></tt> は省略可能です。</p>
+<div class="highlight-none"><div class="highlight"><pre>geo_distance(point1, point2)
+geo_distance(point1, point2, approximate_type)
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">approximate_type</span></tt> のデフォルト値は <tt class="docutils literal"><span class="pre">&quot;rectangle&quot;</span></tt> です。 <tt class="docutils literal"><span class="pre">approximate_type</span></tt> を省略した場合、 <tt class="docutils literal"><span class="pre">geo_distance</span></tt> は二点間の距離を <tt class="docutils literal"><span class="pre">&quot;rectangle&quot;</span></tt> が指定されたものとして計算します。</p>
+</div>
+<div class="section" id="usage">
+<h2>7.8.2.3. 使い方<a class="headerlink" href="#usage" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">geo_distance</span></tt> はgroongaの組み込み関数の一つです。</p>
+<p>組み込み関数を <a class="reference internal" href="../reference/grn_expr.html"><em>grn_expr</em></a> にて使うことができます。</p>
+<p><tt class="docutils literal"><span class="pre">geo_distance</span></tt> 関数は <tt class="docutils literal"><span class="pre">point1</span></tt> と <tt class="docutils literal"><span class="pre">point2</span></tt> の座標値から二点間の距離(近似値)を計算します。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">groongaは三つの組み込み関数を距離の計算のために提供しています。 <tt class="docutils literal"><span class="pre">geo_distance()</span></tt> 、 <tt class="docutils literal"><span class="pre">geo_distance2()</span></tt> 、 <tt class="docutils literal"><span class="pre">geo_distance3()</span></tt> です。これらの違いは距離の計算アルゴリズムにあります。 <tt class="docutils literal"><span class="pre">geo_distance2()</span></tt> と <tt class="docutils literal"><span class="pre">geo_distance3()</span></tt> はバージョン1.2.9より非推奨となりました。 <tt class="docutils literal"><span class="pre">geo_distance2(point1,</span> <span class="pre">point2)</span></tt> の代りに <tt class="docutils literal"><span class="pre">geo_distance(point1,</span> <span class="pre">point2,</span> <span class="pre">&quot;sphere&quot;)</span></tt> を使用してください。 <tt class="docutils literal"><span class="pre">geo_distance3(point1,</span> <span class="pre">point2)</span></tt> の代りに <tt class="docutils literal"><span class="pre">geo_distance(point1,</span> <span class="pre">point2,</span> <span class="pre">&quot;ellipsoid&quot;)</span></tt> を使用してください。</p>
+</div>
+<p>例とともに <tt class="docutils literal"><span class="pre">geo_distance</span></tt> について学びましょう。このセクションでは簡単な例を示します。</p>
+<p>使い方を示すためのスキーマ定義とサンプルデータは以下の通りです。これらのサンプルは東京と札幌の距離の計算方法を示します。</p>
+<ol class="arabic simple">
+<li>距離の計算にlocationカラムの値を使う ( <tt class="docutils literal"><span class="pre">Stations</span></tt> テーブル)</li>
+<li>距離の計算に明示的に指定した位置を使う ( <tt class="docutils literal"><span class="pre">Geo</span></tt> テーブル)</li>
+</ol>
+<div class="section" id="using-the-column-value-of-location">
+<h3>7.8.2.3.1. locationカラムの値を使う<a class="headerlink" href="#using-the-column-value-of-location" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>使用例を示すための <tt class="docutils literal"><span class="pre">Stations</span></tt> テーブルのスキーマ定義とサンプルデータは以下の通りです。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Stations TABLE_HASH_KEY ShortText
+# [[0,0.0,0.0],true]
+column_create Stations location COLUMN_SCALAR WGS84GeoPoint
+# [[0,0.0,0.0],true]
+load --table Stations
+[
+[&quot;_key&quot;, &quot;location&quot;],
+[&quot;Tokyo&quot;, &quot;128452975x503157902&quot;],
+]
+# [[0,0.0,0.0],1]
+</pre></div>
+</div>
+<p>テーブルとして <tt class="docutils literal"><span class="pre">Stations</span></tt> があります。 <tt class="docutils literal"><span class="pre">Stations</span></tt> テーブルには <tt class="docutils literal"><span class="pre">location</span></tt> カラムが存在します。 <tt class="docutils literal"><span class="pre">location</span></tt> カラムには座標の値を保存します。東京の座標がサンプルデータとして保存されています。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Stations --output_columns _score --filter 1 --scorer &#39;_score = geo_distance(location, &quot;155047000x508862800&quot;, &quot;rectangle&quot;)&#39;
+# [
+#   [0,0.0,0.0],
+#   [
+#     [
+#       [1],
+#       [
+#         [&quot;_score&quot;,&quot;Int32&quot;]
+#       ],
+#       [830849]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>このサンプルは <tt class="docutils literal"><span class="pre">geo_distance</span></tt> が <tt class="docutils literal"><span class="pre">location</span></tt> カラムと座標値から距離を計算していることを示します。</p>
+<p>札幌の座標値は &quot;155047000x508862800&quot;です。</p>
+</div>
+<div class="section" id="using-the-explicitly-specified-value-of-location">
+<h3>7.8.2.3.2. 明示的に指定した位置を使う<a class="headerlink" href="#using-the-explicitly-specified-value-of-location" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>使用例を示すための <tt class="docutils literal"><span class="pre">Geo</span></tt> テーブルのスキーマ定義とサンプルデータは以下の通りです。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Geo TABLE_HASH_KEY ShortText
+# [[0,0.0,0.0],true]
+column_create Geo distance COLUMN_SCALAR Int32
+# [[0,0.0,0.0],true]
+load --table Geo
+[
+{&quot;_key&quot;: &quot;the record for geo_distance() result&quot;}
+]
+# [[0,0.0,0.0],1]
+</pre></div>
+</div>
+<p>テーブルとして <tt class="docutils literal"><span class="pre">Geo</span></tt> があります。 <tt class="docutils literal"><span class="pre">Geo</span></tt> テーブルには <tt class="docutils literal"><span class="pre">distance</span></tt> カラムがあります。 <tt class="docutils literal"><span class="pre">distance</span></tt> カラムは距離を保存します。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Geo --output_columns distance --scorer &#39;distance = geo_distance(&quot;128452975x503157902&quot;, &quot;155047000x508862800&quot;, &quot;rectangle&quot;)&#39;
+# [
+#   [0,0.0,0.0],
+#   [
+#     [
+#       [1],
+#       [
+#         [&quot;distance&quot;,&quot;Int32&quot;]
+#       ],
+#       [830849]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>このサンプルは <tt class="docutils literal"><span class="pre">geo_distance</span></tt> が東京の座標と札幌の座標から距離を計算していることを示します。</p>
+</div>
+</div>
+<div class="section" id="parameters">
+<h2>7.8.2.4. 引数<a class="headerlink" href="#parameters" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<div class="section" id="required-parameter">
+<h3>7.8.2.4.1. 必須引数<a class="headerlink" href="#required-parameter" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>必須引数は二つあります。 <tt class="docutils literal"><span class="pre">point1</span></tt> と <tt class="docutils literal"><span class="pre">point2</span></tt> です。</p>
+<div class="section" id="point1">
+<h4>7.8.2.4.1.1. <tt class="docutils literal"><span class="pre">point1</span></tt><a class="headerlink" href="#point1" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>計算しようとしている二点間の開始地点を指定します。</p>
+<p>GeoPoint型の値を指定することができます。 <a class="footnote-reference" href="#id2" id="id1">[1]</a></p>
+<p>GeoPoint型については <a class="reference internal" href="../type.html"><em>データ型</em></a> を参照してください。</p>
+</div>
+<div class="section" id="point2">
+<h4>7.8.2.4.1.2. <tt class="docutils literal"><span class="pre">point2</span></tt><a class="headerlink" href="#point2" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>計算しようとしている二点間の終了地点を指定します。</p>
+<p>GeoPoint型の値か座標を表す文字列を指定することができます。</p>
+<p>GeoPoint型や座標の表記については <a class="reference internal" href="../type.html"><em>データ型</em></a> を参照してください。</p>
+</div>
+</div>
+<div class="section" id="optional-parameter">
+<h3>7.8.2.4.2. 省略可能引数<a class="headerlink" href="#optional-parameter" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>省略可能な引数として <tt class="docutils literal"><span class="pre">approximate_type</span></tt> があります。</p>
+<div class="section" id="approximate-type">
+<h4>7.8.2.4.2.1. <tt class="docutils literal"><span class="pre">approximate_type</span></tt><a class="headerlink" href="#approximate-type" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>距離を計算するときに地形をどのように近似するかを指定します。</p>
+<p><tt class="docutils literal"><span class="pre">approximate_type</span></tt> の値は以下を指定することができます。</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">rectangle</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">sphere</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">ellipsoid</span></tt></li>
+</ul>
+</div></blockquote>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last"><tt class="docutils literal"><span class="pre">geo_distance</span></tt> には制限があります。子午線や日付変更線、赤道といった境界をまたぐ距離の計算を行うことができません。これはgroongaの実装上の一時的な制限ですが、将来的には修正される予定です。</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last"><tt class="docutils literal"><span class="pre">geo_distance</span></tt> には上記の制限がありますが、近似方法に <tt class="docutils literal"><span class="pre">rectangle</span></tt> を選択した場合には制限が緩和されます。二点が北半球に存在する場合に限っては距離を正しく算出することができます。</p>
+</div>
+<div class="section" id="rectangle">
+<h5>7.8.2.4.2.1.1. <tt class="docutils literal"><span class="pre">rectangle</span></tt><a class="headerlink" href="#rectangle" title="このヘッドラインへのパーマリンク">¶</a></h5>
+<p>この引数は地形を方形近似することを要求します。</p>
+<p>簡易な式で距離の計算を行うので、高速に距離を求めることができますが、極付近では誤差が増大します。</p>
+<p><tt class="docutils literal"><span class="pre">rect</span></tt> を省略表記として指定することができます。</p>
+<p>カラムの値で距離を計算するサンプルは以下の通りです。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Stations --output_columns _score --filter 1 --scorer &#39;_score = geo_distance(location, &quot;155047000x508862800&quot;, &quot;rectangle&quot;)&#39;
+# [
+#   [0,0.0,0.0],
+#   [
+#     [
+#       [1],
+#       [
+#         [&quot;_score&quot;,&quot;Int32&quot;]
+#       ],
+#       [830849]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>明示的に位置を指定して距離を計算するサンプルは以下の通りです。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Geo --output_columns distance --scorer &#39;distance = geo_distance(&quot;128452975x503157902&quot;, &quot;155047000x508862800&quot;, &quot;rectangle&quot;)&#39;
+# [
+#   [0,0.0,0.0],
+#   [
+#     [
+#       [1],
+#       [
+#         [&quot;distance&quot;,&quot;Int32&quot;]
+#       ],
+#       [830849]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last"><tt class="docutils literal"><span class="pre">geo_distance</span></tt> は方形近似をデフォルトとして使用します。 <tt class="docutils literal"><span class="pre">approximate_type</span></tt> を省略すると <tt class="docutils literal"><span class="pre">geo_distance</span></tt> は <tt class="docutils literal"><span class="pre">rectangle</span></tt> が指定されたものとして振舞います。</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last"><tt class="docutils literal"><span class="pre">geo_distance</span></tt> は <tt class="docutils literal"><span class="pre">approximate_type</span></tt> の値が <tt class="docutils literal"><span class="pre">&quot;rectangle&quot;</span></tt> であるときに <tt class="docutils literal"><span class="pre">point1</span></tt> の値として座標を表す文字列を受けつけます。もし <tt class="docutils literal"><span class="pre">sphere</span></tt> や <tt class="docutils literal"><span class="pre">ellipsoid</span></tt> と一緒に座標を表す文字列を <tt class="docutils literal"><span class="pre">point1</span></tt> へ指定した場合、 <tt class="docutils literal"><span class="pre">geo_distance</span></tt> は距離の値として0を返します。</p>
+</div>
+</div>
+<div class="section" id="sphere">
+<h5>7.8.2.4.2.1.2. <tt class="docutils literal"><span class="pre">sphere</span></tt><a class="headerlink" href="#sphere" title="このヘッドラインへのパーマリンク">¶</a></h5>
+<p>この引数は球面近似で地形を近似することを要求します。</p>
+<p>球面近似は <tt class="docutils literal"><span class="pre">rectangle</span></tt> よりも遅いです。しかし <tt class="docutils literal"><span class="pre">rectangle</span></tt> よりも誤差は小さくなります。</p>
+<p><tt class="docutils literal"><span class="pre">sphr</span></tt> を省略表記として指定することができます。</p>
+<p>カラムの値で距離を計算するサンプルは以下の通りです。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Stations --output_columns _score --filter 1 --scorer &#39;_score = geo_distance(location, &quot;155047000x508862800&quot;, &quot;sphere&quot;)&#39;
+# [
+#   [0,0.0,0.0],
+#   [
+#     [
+#       [1],
+#       [
+#         [&quot;_score&quot;,&quot;Int32&quot;]
+#       ],
+#       [830802]
+#     ]
+#   ]
+# ]
 </pre></div>
 </div>
 </div>
-<div class="section" id="id3">
-<h2>7.8.2.3. 説明<a class="headerlink" href="#id3" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>groonga組込関数の一つであるgeo_distanceについて説明します。組込関数は、script形式のgrn_expr中で呼び出すことができます。</p>
-<p>geo_distance() 関数は、point1に指定した座標とpoint2に指定した座標の間の距離(近似値)を求めます。</p>
-<p>... note:</p>
-<div class="highlight-none"><div class="highlight"><pre>geo_distance()の他に、距離計算アルゴリズムの異なる、geo_distance2()、geo_distance3()がありましたが、1.2.9から非推奨になりました。 ``geo_distance2()`` の代わりに ``geo_distance(point1, point2, &quot;sphere&quot;)`` を、 ``geo_distance3()`` の代わりに ``geo_distance(point1, point2, &quot;ellipsoid&quot;)`` を使ってください。
-</pre></div>
+<div class="section" id="ellipsoid">
+<h5>7.8.2.4.2.1.3. <tt class="docutils literal"><span class="pre">ellipsoid</span></tt><a class="headerlink" href="#ellipsoid" title="このヘッドラインへのパーマリンク">¶</a></h5>
+<p>この引数は楕円近似で地形を近似することを要求します。</p>
+<p>ヒュベニの距離計算式により距離を計算します。 <tt class="docutils literal"><span class="pre">sphere</span></tt> よりも遅いですが、 <tt class="docutils literal"><span class="pre">sphere</span></tt> より誤差は小さくなります。</p>
+<p><tt class="docutils literal"><span class="pre">ellip</span></tt> を省略表記として指定することができます。</p>
+<p>カラムの値で距離を計算するサンプルは以下の通りです。</p>
 </div>
 </div>
-<div class="section" id="id4">
-<h2>7.8.2.4. 引数<a class="headerlink" href="#id4" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p><tt class="docutils literal"><span class="pre">point1</span></tt></p>
-<blockquote>
-<div>距離を求める2点のうち一つを指定します。GeoPoint型の値を指定できます。 <a class="footnote-reference" href="#id8" id="id5">[1]</a></div></blockquote>
-<p><tt class="docutils literal"><span class="pre">point2</span></tt></p>
-<blockquote>
-<div>距離を求める2点のうちもう一つを指定します。GeoPoint型の値、あるいは座標を示す文字列を指定できます。</div></blockquote>
-<p><tt class="docutils literal"><span class="pre">approximate_type</span></tt></p>
-<blockquote>
-<div><p>距離を求めるために地形をどのように近似するかを指定します。指定できる値は以下の通りです。</p>
-<p><tt class="docutils literal"><span class="pre">&quot;rectangle&quot;</span></tt></p>
-<blockquote>
-<div><p>方形近似で近似します。単純な計算式で距離を求めることができるため高速ですが、極付近では誤差が大きくなります。</p>
-<p><tt class="docutils literal"><span class="pre">&quot;rect&quot;</span></tt> と省略して指定することもできます。</p>
-<p>この近似方法がデフォルト値です。 <tt class="docutils literal"><span class="pre">approximate_type</span></tt> を省略した場合は方形近似になります。</p>
-</div></blockquote>
-<p><tt class="docutils literal"><span class="pre">&quot;sphere&quot;</span></tt></p>
-<blockquote>
-<div><p>球面近似で近似します。 <tt class="docutils literal"><span class="pre">&quot;rectangle&quot;</span></tt> よりも遅くなりますが、誤差は小さいです。</p>
-<p><tt class="docutils literal"><span class="pre">&quot;sphr&quot;</span></tt> と省略して指定することもできます。</p>
-</div></blockquote>
-<p><tt class="docutils literal"><span class="pre">&quot;ellipsoid&quot;</span></tt></p>
-<blockquote>
-<div><p>楕円体近似で近似します。距離の計算にはヒュベニの距離計算式を用います。 <tt class="docutils literal"><span class="pre">&quot;sphere&quot;</span></tt> よりも遅くなりますが、誤差は小さくなります。</p>
-<p><tt class="docutils literal"><span class="pre">&quot;ellip&quot;</span></tt> と省略して指定することもできます。</p>
-</div></blockquote>
-</div></blockquote>
 </div>
-<div class="section" id="id6">
-<h2>7.8.2.5. 返値<a class="headerlink" href="#id6" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>指定した2点の距離をFloat型の値(単位:メートル)として返します。</p>
 </div>
-<div class="section" id="id7">
-<h2>7.8.2.6. 例<a class="headerlink" href="#id7" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="highlight-none"><div class="highlight"><pre>geo_distance(pos, &quot;150x150&quot;)
-100.0
-
-# 方形近似を利用
-geo_distance(pos, &quot;150x150&quot;, &quot;rectangle&quot;)
-100.0
-
-# 球面近似を利用
-geo_distance(pos, &quot;150x150&quot;, &quot;sphere&quot;)
-100.0
-
-# 楕円体近似を利用
-geo_distance(pos, &quot;150x150&quot;, &quot;ellipsoid&quot;)
-100.0
+<div class="section" id="return-value">
+<h2>7.8.2.5. 返値<a class="headerlink" href="#return-value" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">geo_distance</span></tt> はFloat型の値を距離として返します。単位はメートルです。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Stations --output_columns _score --filter 1 --scorer &#39;_score = geo_distance(location, &quot;155047000x508862800&quot;, &quot;ellipsoid&quot;)&#39;
+# [
+#   [0,0.0,0.0],
+#   [
+#     [
+#       [1],
+#       [
+#         [&quot;_score&quot;,&quot;Int32&quot;]
+#       ],
+#       [831438]
+#     ]
+#   ]
+# ]
 </pre></div>
 </div>
 <p class="rubric">脚注</p>
-<table class="docutils footnote" frame="void" id="id8" rules="none">
+<table class="docutils footnote" frame="void" id="id2" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id5">[1]</a></td><td>TokyoGeoPoint(日本測地系座標)かWGS84GeoPoint(世界測地系座標)のいずれかを指定できます。</td></tr>
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>日本測地系座標か世界測地系座標のいずれかを指定することができます。</td></tr>
 </tbody>
 </table>
 </div>
@@ -178,12 +347,31 @@ geo_distance(pos, &quot;150x150&quot;, &quot;ellipsoid&quot;)
   <h3><a href="../index.html">目次</a></h3>
   <ul>
 <li><a class="reference internal" href="#">7.8.2. geo_distance</a><ul>
-<li><a class="reference internal" href="#id1">7.8.2.1. 名前</a></li>
-<li><a class="reference internal" href="#id2">7.8.2.2. 書式</a></li>
-<li><a class="reference internal" href="#id3">7.8.2.3. 説明</a></li>
-<li><a class="reference internal" href="#id4">7.8.2.4. 引数</a></li>
-<li><a class="reference internal" href="#id6">7.8.2.5. 返値</a></li>
-<li><a class="reference internal" href="#id7">7.8.2.6. 例</a></li>
+<li><a class="reference internal" href="#summary">7.8.2.1. 概要</a></li>
+<li><a class="reference internal" href="#syntax">7.8.2.2. 構文</a></li>
+<li><a class="reference internal" href="#usage">7.8.2.3. 使い方</a><ul>
+<li><a class="reference internal" href="#using-the-column-value-of-location">7.8.2.3.1. locationカラムの値を使う</a></li>
+<li><a class="reference internal" href="#using-the-explicitly-specified-value-of-location">7.8.2.3.2. 明示的に指定した位置を使う</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#parameters">7.8.2.4. 引数</a><ul>
+<li><a class="reference internal" href="#required-parameter">7.8.2.4.1. 必須引数</a><ul>
+<li><a class="reference internal" href="#point1">7.8.2.4.1.1. <tt class="docutils literal"><span class="pre">point1</span></tt></a></li>
+<li><a class="reference internal" href="#point2">7.8.2.4.1.2. <tt class="docutils literal"><span class="pre">point2</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#optional-parameter">7.8.2.4.2. 省略可能引数</a><ul>
+<li><a class="reference internal" href="#approximate-type">7.8.2.4.2.1. <tt class="docutils literal"><span class="pre">approximate_type</span></tt></a><ul>
+<li><a class="reference internal" href="#rectangle">7.8.2.4.2.1.1. <tt class="docutils literal"><span class="pre">rectangle</span></tt></a></li>
+<li><a class="reference internal" href="#sphere">7.8.2.4.2.1.2. <tt class="docutils literal"><span class="pre">sphere</span></tt></a></li>
+<li><a class="reference internal" href="#ellipsoid">7.8.2.4.2.1.3. <tt class="docutils literal"><span class="pre">ellipsoid</span></tt></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#return-value">7.8.2.5. 返値</a></li>
 </ul>
 </li>
 </ul>
@@ -228,7 +416,7 @@ geo_distance(pos, &quot;150x150&quot;, &quot;ellipsoid&quot;)
         <li class="right" >
           <a href="edit_distance.html" title="7.8.1. edit_distance"
              >前へ</a> |</li>
-        <li><a href="../index.html">groonga v2.0.3ドキュメント</a> &raquo;</li>
+        <li><a href="../index.html">groonga v2.0.4ドキュメント</a> &raquo;</li>
           <li><a href="../reference.html" >7. リファレンスマニュアル</a> &raquo;</li>
           <li><a href="../functions.html" >7.8. 組み込み関数一覧</a> &raquo;</li> 
       </ul>

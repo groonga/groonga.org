@@ -5,77 +5,801 @@
 .. groonga-command
 .. database: reference_grn_expr_script_syntax
 
-Script Syntax
+Script syntax
 =============
 
-TODO: revised.
+Script syntax is a syntax to specify complex search condition. It is
+similar to ECMAScript. For example, ``_key == "book"`` means that
+groonga searches records that ``_key`` value is ``"book"``. All values
+are string in :doc:`query_syntax` but its own type in script
+syntax. For example, ``"book"`` is string, ``1`` is integer,
+``TokenBigram`` is the object whose name is ``TokenBigram`` and so on.
 
-スクリプト構文はECMAScriptに類似した構文で条件式などを表現するための構文です。ECMAScriptにある演算子に加えてgroonga独自の演算子を追加しています。
+Script syntax doesn't support full ECMAScript syntax. For example,
+script syntax doesn't support statement such as ``if`` control
+statement, ``for`` iteration statement and variable definition
+statement. Function definion is not supported too. But script syntax
+addes the original additional operators.  They are described after
+ECMAScript syntax is described.
 
-まず、ECMAScriptにあるような基本的な演算子を説明し、その後、groongaが追加した独自の演算子を説明します。
+Sample data
+-----------
 
-基本的な演算子
---------------
+Here are a schema definition and sample data to show usage.
+
+.. groonga-command
+.. include:: ../../example/reference/grn_expr/query_syntax/setup.log
+.. table_create Entries TABLE_PAT_KEY ShortText
+.. column_create Entries content COLUMN_SCALAR Text
+.. column_create Entries n_likes COLUMN_SCALAR UInt32
+.. table_create Terms TABLE_PAT_KEY|KEY_NORMALIZE ShortText --default_tokenizer TokenBigram
+.. column_create Terms entries_key_index COLUMN_INDEX|WITH_POSITION Entries _key
+.. column_create Terms entries_content_index COLUMN_INDEX|WITH_POSITION Entries content
+.. load --table Entries
+.. [
+.. {"_key":    "The first post!",
+..  "content": "Welcome! This is my first post!",
+..  "n_likes": 5},
+.. {"_key":    "Groonga",
+..  "content": "I started to use groonga. It's very fast!",
+..  "n_likes": 10},
+.. {"_key":    "Mroonga",
+..  "content": "I also started to use mroonga. It's also very fast! Really fast!",
+..  "n_likes": 15},
+.. {"_key":    "Good-bye Senna",
+..  "content": "I migrated all Senna system!",
+..  "n_likes": 3},
+.. {"_key":    "Good-bye Tritonn",
+..  "content": "I also migrated all Tritonn system!",
+..  "n_likes": 3}
+.. ]
+
+There is a table, ``Entries``, for blog entries. An entry has title,
+content and the number of likes for the entry. Title is key of
+``Entries``. Content is value of ``Entries.content`` column. The
+number of likes is value of ``Entries.n_likes`` column.
+
+``Entries._key`` column and ``Entries.content`` column are indexed
+using ``TokenBigram`` tokenizer. So both ``Entries._key`` and
+``Entries.content`` are fulltext search ready.
+
+OK. The schema and data for examples are ready.
+
+Literals
+--------
+
+Integer
+^^^^^^^
+
+Integer literal is sequence of ``0`` to ``9`` such as
+``1234567890``. ``+`` or ``-`` can be prepended as sign such as
+``+29`` and ``-29``. Integer literal must be decimal. Octal notation,
+hex and so on can't be used.
+
+The maximum value of integer literal is ``9223372036854775807`` (``= 2
+** 63 - 1``). The minimum value of integer literal is
+``-9223372036854775808`` (``= -(2 ** 63)``).
+
+Float
+^^^^^
+
+Float literal is sequence of ``0`` to ``9``, ``.`` and ``0`` to ``9``
+such as ``3.14``. ``+`` or ``-`` can be prepended as sign such as
+``+3.14`` and ``-3.14``. ``${RADIX}e${EXPORNENTIAL}`` and
+``${RADIX}E${EXPORNENTIAL}`` formats are also supported. For example,
+``314e-2`` is the same as ``3.14``.
+
+String
+^^^^^^
+
+String literal is ``"..."``. You need to escape ``"`` in literal by
+prepending ``\\'' such as ``\"``. For example, ``"Say \"Hello!\"."`` is
+a literal for ``Say "Hello!".`` string.
+
+String encoding must be the same as encoding of database. The default
+encoding is UTF-8. It can be changed by ``--with-default-encoding``
+configure option, ``--encodiong`` :doc:`/reference/executables/groonga` option
+and so on.
+
+Boolean
+^^^^^^^
+
+Boolean literal is ``true`` and ``false``. ``true`` means true and
+``false`` means false.
+
+Null
+^^^^
+
+Null literal is ``null``. Groonga doesn't support null value but null
+literal is supported.
+
+Time
+^^^^
+
+.. note::
+
+   This is the groonga original notation.
+
+Time literal doesn't exit. There are string time notation, integer
+time notation and float time notation.
+
+String time notation is ``"YYYY/MM/DD hh:mm:ss.uuuuuu"`` or
+``"YYYY-MM-DD hh:mm:ss.uuuuuu"``. ``YYYY`` is year, ``MM`` is month,
+``DD`` is day, ``hh`` is hour, ``mm`` is minute, ``ss`` is second and
+``uuuuuu`` is micro second. It is local time. For example,
+``"2012/07/23 02:41:10.436218"`` is ``2012-07-23T02:41:10.436218`` in
+ISO 8601 format.
+
+Integer time notation is the number of seconds that have elapsed since
+midnight UTC, January 1, 1970. It is also known as POSIX time. For
+example, ``1343011270`` is ``2012-07-23T02:41:10Z`` in ISO 8601 format.
+
+Float time notation is the number of seconds and micro seconds that
+have elapsed since midnight UTC, January 1, 1970. For example,
+``1343011270.436218`` is ``2012-07-23T02:41:10.436218Z`` in ISO 8601
+format.
+
+Geo point
+^^^^^^^^^
+
+.. note::
+
+   This is the groonga original notation.
+
+Geo point literal doesn't exist. There is string geo point notation.
+
+String geo point notation has the following patterns:
+
+  * ``"LATITUDE_IN_MSECxLONGITUDE_IN_MSEC"``
+  * ``"LATITUDE_IN_MSEC,LONGITUDE_IN_MSEC"``
+  * ``"LATITUDE_IN_DEGREExLONGITUDE_IN_DEGREE"``
+  * ``"LATITUDE_IN_DEGREE,LONGITUDE_IN_DEGREE"``
+
+``x`` and ``,`` can be used for separator. Latitude and longitude can
+be represented in milliseconds or degree.
+
+Array
+^^^^^
+
+Array literal is ``[element1, element2, ...]``.
+
+Object literal
+^^^^^^^^^^^^^^
+
+Object literal is ``{name1: value1, name2: value2, ...}``. Groonga
+doesn't support object literal yet.
+
+Control syntaxes
+----------------
+
+Script syntax doesn't support statement. So you cannot use control
+statement such as ``if``. You can only use ``A ? B : C`` expression as
+control syntax.
+
+``A ? B : C`` returns ``B`` if ``A`` is true, ``C`` otherwise.
+
+Here is a simple exmaple.
+
+.. groonga-command
+.. include:: ../../example/reference/grn_expr/script_syntax/simple_control_syntax_ternary_operator.log
+.. select Entries --filter 'n_likes == (_id == 1 ? 5 : 3)'
+
+The expression matches records that ``_id`` column value is equal to ``1``
+and ``n_likes`` column value is equal to ``5`` or ``_id`` column value is
+not equal to 1 and ``n_likes`` column value is equal to ``3``.
+
+Grouping
+--------
+
+Its syntax is ``(...)``. ``...`` is comma separated expression list.
+
+``(...)`` groups one ore more expressions and they can be processed as
+an expression. ``a && b || c`` means that ``a`` and ``b`` are matched
+or ``c`` is matched. ``a && (b || c)`` means that ``a`` and one of
+``b`` and ``c`` are matched.
+
+Here is a simple exmaple.
+
+.. groonga-command
+.. include:: ../../example/reference/grn_expr/script_syntax/simple_grouping.log
+.. select Entries --filter 'n_likes < 5 && content @ "senna" || content @ "fast"'
+.. select Entries --filter 'n_likes < 5 && (content @ "senna" || content @ "fast")'
+
+The first expression doesn't use grouping. It matches records that
+``n_likes < 5`` and ``content @ "senna"`` are matched or
+``content @ "fast"`` is matched.
+
+The second expression uses grouping. It matches records that ``n_likes
+< 5`` and one of ``content @ "senna"`` or ``content @ "fast"`` are
+matched.
+
+Function call
+-------------
+
+Its syntax is ``name(arugment1, argument2, ...)``.
+
+``name(argument1, argument2, ...)`` calls a function that is named
+``name`` with arguments ``argument1``, ``argument2`` and ``...``.
+
+See :doc:`/reference/functions/` for available functin list.
+
+Here is a simple exmaple.
+
+.. groonga-command
+.. include:: ../../example/reference/grn_expr/script_syntax/simple_function.log
+.. select Entries --filter 'edit_distance(_key, "Groonga") <= 1'
+
+The expression uses :doc:`/reference/functions/edit_distance`. It
+matches records that ``_key`` column value is similar to
+``"Groonga"``. Similality of ``"Groonga"`` is computed as edit
+distance. If edit distance is less than or equal to 1, the value is
+treated as similar. In this case, ``"Groonga"`` and ``"Mroonga"`` are
+treated as similar.
+
+Basic operators
+---------------
+
+Groonga supports operators defined in ECMAScript.
+
+Arithmetic operators
+^^^^^^^^^^^^^^^^^^^^
+
+Here are arithmetic operators.
+
+Addition operator
+"""""""""""""""""
+
+Its syntax is ``number1 + number2``.
+
+The operator adds ``number1`` and ``number2`` and returns the result.
+
+Here is a simple example.
+
+.. groonga-command
+.. include:: ../../example/reference/grn_expr/script_syntax/simple_addition_operator.log
+.. select Entries --filter 'n_likes == 10 + 5'
+
+The expression matches records that ``n_likes`` column value is equal
+to ``15`` (= ``10 + 5``).
+
+Subtraction operator
+""""""""""""""""""""
+
+Its syntax is ``number1 - number2``.
+
+The operator subtracts ``number2`` from ``number1`` and returns the result.
+
+Here is a simple example.
+
+.. groonga-command
+.. include:: ../../example/reference/grn_expr/script_syntax/simple_subtraction_operator.log
+.. select Entries --filter 'n_likes == 20 - 5'
+
+The expression matches records that ``n_likes`` column value is equal
+to ``15`` (= ``20 - 5``).
+
+Multiplication operator
+"""""""""""""""""""""""
+
+Its syntax is ``number1 * number2``.
+
+The operator multiplies ``number1`` and ``number2`` and returns the result.
+
+Here is a simple example.
+
+.. groonga-command
+.. include:: ../../example/reference/grn_expr/script_syntax/simple_multiplication_operator.log
+.. select Entries --filter 'n_likes == 3 * 5'
+
+The expression matches records that ``n_likes`` column value is equal
+to ``15`` (= ``3 * 5``).
+
+Division operator
+"""""""""""""""""
+
+Its syntax is ``number1 / number2`` and ``number1 % number2``.
+
+The operator divides ``number2`` by ``number1``. ``/`` returns the
+quotient of result. ``%`` returns the remainder of result.
+
+Here is simple examples.
+
+.. groonga-command
+.. include:: ../../example/reference/grn_expr/script_syntax/simple_division_operator_quotient.log
+.. select Entries --filter 'n_likes == 26 / 7'
+
+The expression matches records that ``n_likes`` column value is equal
+to ``3`` (= ``26 / 7``).
+
+.. groonga-command
+.. include:: ../../example/reference/grn_expr/script_syntax/simple_division_operator_remainder.log
+.. select Entries --filter 'n_likes == 26 % 7'
+
+The expression matches records that ``n_likes`` column value is equal
+to ``5`` (= ``26 % 7``).
+
+Logical operators
+^^^^^^^^^^^^^^^^^
+
+Here are logical operators.
+
+Logical NOT operator
+""""""""""""""""""""
+
+Its syntax is ``!condition``.
+
+The operator inverts boolean value of ``condition``.
+
+Here is a simple example.
+
+.. groonga-command
+.. include:: ../../example/reference/grn_expr/script_syntax/simple_logical_not_operator.log
+.. select Entries --filter '!(n_likes == 5)'
+
+The expression matches records that ``n_likes`` column value is not
+equal to ``5``.
+
+Logical AND operator
+""""""""""""""""""""
+
+Its syntax is ``condition1 && condition2``.
+
+The operator returns true if both of ``condition1`` and
+``condition2`` are true, false otherwise.
+
+Here is a simple example.
+
+.. groonga-command
+.. include:: ../../example/reference/grn_expr/script_syntax/simple_logical_and_operator.log
+.. select Entries --filter 'content @ "fast" && n_likes >= 10'
+
+The expression matches records that ``content`` column value has the
+word ``fast`` and ``n_likes`` column value is greater or equal to
+``10``.
+
+Logical OR operator
+"""""""""""""""""""
+
+Its syntax is ``condition1 || condition2``.
+
+The operator returns true if either ``condition1`` or ``condition2`` is
+true, false otherwise.
+
+Here is a simple example.
+
+.. groonga-command
+.. include:: ../../example/reference/grn_expr/script_syntax/simple_logical_or_operator.log
+.. select Entries --filter 'n_likes == 5 || n_likes == 10'
+
+The expression matches records that ``n_likes`` column value is equal
+to ``5`` or ``10``.
+
+Logical AND NOT operator
+""""""""""""""""""""""""
+
+Its syntax is ``condition1 &! condition2``.
+
+The operator returns true if ``condition1`` is true but ``condition2``
+is false, false otherwise. It returns difference set.
+
+Here is a simple example.
+
+.. groonga-command
+.. include:: ../../example/reference/grn_expr/script_syntax/simple_logical_but_operator.log
+.. select Entries --filter 'content @ "fast" &! content @ "mroonga"'
+
+The expression matches records that ``content`` column value has the
+word ``fast`` but doesn't have the word ``mroonga``.
+
+Bitwise operators
+^^^^^^^^^^^^^^^^^
+
+Here are bitwise operators.
+
+Bitwise NOT operator
+""""""""""""""""""""
+
+Its syntax is ``~number``.
+
+The operator returns bitwise NOT of ``number``.
+
+Here is a simple example.
+
+.. groonga-command
+.. include:: ../../example/reference/grn_expr/script_syntax/simple_bitwise_not_operator.log
+.. select Entries --filter '~n_likes == -6'
+
+The expression matches records that ``n_likes`` column value is equal
+to ``5`` because bitwise NOT of ``5`` is equal to ``-6``.
+
+Bitwise AND operator
+""""""""""""""""""""
+
+Its syntax is ``number1 & number2``.
+
+The operator returns bitwise AND between ``number1`` and ``number2``.
+
+Here is a simple example.
+
+.. groonga-command
+.. include:: ../../example/reference/grn_expr/script_syntax/simple_bitwise_and_operator.log
+.. select Entries --filter '(n_likes & 1) == 1'
+
+The expression matches records that ``n_likes`` column value is even
+number because bitwise AND between an even number and ``1`` is equal
+to ``1`` and bitwise AND between an odd number and ``1`` is equal to
+``0``.
+
+Bitwise OR operator
+^^^^^^^^^^^^^^^^^^^
+
+Its syntax is ``number1 | number2``.
+
+The operator returns bitwise OR between ``number1`` and ``number2``.
+
+Here is a simple example.
+
+.. groonga-command
+.. include:: ../../example/reference/grn_expr/script_syntax/simple_bitwise_or_operator.log
+.. select Entries --filter 'n_likes == (1 | 4)'
+
+The expression matches records that ``n_likes`` column value is equal
+to ``5`` (= ``1 | 4``).
+
+Bitwise XOR operator
+^^^^^^^^^^^^^^^^^^^^
+
+Its syntax is ``number1 ^ number2``.
+
+The operator returns bitwise XOR between ``number1`` and ``number2``.
+
+Here is a simple example.
+
+.. groonga-command
+.. include:: ../../example/reference/grn_expr/script_syntax/simple_bitwise_xor_operator.log
+.. select Entries --filter 'n_likes == (10 ^ 15)'
+
+The expression matches records that ``n_likes`` column value is equal
+to ``5`` (= ``10 ^ 15``).
+
+Shift operators
+^^^^^^^^^^^^^^^
+
+Here are shift operators.
+
+Left shift operator
+"""""""""""""""""""
+
+Its syntax is ``number1 << number2``.
+
+The operator performs a bitwise left shift operation on ``number1`` by
+``number2``.
+
+Here is a simple example.
+
+.. groonga-command
+.. include:: ../../example/reference/grn_expr/script_syntax/simple_left_shift_operator.log
+.. select Entries --filter 'n_likes == (5 << 1)'
+
+The expression matches records that ``n_likes`` column value is equal
+to ``10`` (= ``5 << 1``).
+
+Signed right shift operator
+"""""""""""""""""""""""""""
+
+Its syntax is ``number1 >> number2``.
+
+The operator shifts bits of ``number1`` to right by ``number2``. The sign
+of the result is the same as ``number1``.
+
+Here is a simple example.
+
+.. groonga-command
+.. include:: ../../example/reference/grn_expr/script_syntax/simple_signed_right_shift_operator.log
+.. select Entries --filter 'n_likes == -(-10 >> 1)'
+
+The expression matches records that ``n_likes`` column value is equal
+to ``5`` (= ``-(-10 >> 1)`` = ``-(-5)``).
+
+Unsigned right shift operator
+"""""""""""""""""""""""""""""
+
+Its syntax is ``number1 >>> number2``.
+
+The operator shifts bits of ``number1`` to right by ``number2``. The
+leftmost ``number2`` bits are filled by ``0``.
+
+Here is a simple example.
+
+.. groonga-command
+.. include:: ../../example/reference/grn_expr/script_syntax/simple_unsigned_right_shift_operator.log
+.. select Entries --filter 'n_likes == (2147483648 - (-10 >>> 1))'
+
+The expression matches records that ``n_likes`` column value is equal
+to ``5`` (= ``2147483648 - (-10 >>> 1)`` = ``2147483648 - 2147483643``).
+
+Comparison operators
+^^^^^^^^^^^^^^^^^^^^
+
+Here are comparison operators.
+
+Equal operator
+""""""""""""""
+
+Its syntax is ``object1 == object2``.
+
+The operator returns true if ``object1`` equals to ``object2``, false
+otherwise.
+
+Here is a simple example.
+
+.. groonga-command
+.. include:: ../../example/reference/grn_expr/script_syntax/simple_equal_operator.log
+.. select Entries --filter 'n_likes == 5'
+
+The expression matches records that ``n_likes`` column value is equal
+to ``5``.
+
+Not equal operator
+""""""""""""""""""
+
+Its syntax is ``object1 != object2``.
+
+The operator returns true if ``object1`` does not equal to
+``object2``, false otherwise.
+
+Here is a simple example.
+
+.. groonga-command
+.. include:: ../../example/reference/grn_expr/script_syntax/simple_not_equal_operator.log
+.. select Entries --filter 'n_likes != 5'
+
+The expression matches records that ``n_likes`` column value is not
+equal to ``5``.
+
+Less than operator
+""""""""""""""""""
 
 TODO: ...
 
-独自の演算子
-------------
+Less than or equal to operator
+""""""""""""""""""""""""""""""
 
-groongaは検索に特化した2項演算子を追加しています。独自の2項演算子は ``@`` または ``*`` ではじまります。
+TODO: ...
 
-``カラム @ 値``
-^^^^^^^^^^^^^^^
+Greater than operator
+"""""""""""""""""""""
 
-``カラム`` をソースに設定している転置索引を用いて、 ``値`` で検索します。通常は全文検索になりますが、タグ検索などもこの書式で行います。 ``query`` ではデフォルトでこの演算子を使っていることになります。
+TODO: ...
 
-``カラム @^ 値``
-^^^^^^^^^^^^^^^^
+Greater than or equal to operator
+"""""""""""""""""""""""""""""""""
 
-``カラム`` の値を ``値`` で前方一致検索します。 ``カラム`` はパトリシアツリーまたはダブル配列の主キー（ ``_key`` ）でなければいけません。
+TODO: ...
 
-``カラム @$ 値``
-^^^^^^^^^^^^^^^^
+Assignment operators
+--------------------
 
-``カラム`` の値を ``値`` で後方一致検索します。
+TODO: ...
 
-未サポートです。
+Original operators
+------------------
 
-``カラム *N "単語1 単語2 ..."``
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Script syntax adds the original binary opearators to ECMAScript
+syntax. They operate search specific operations. They are starts with
+``@`` or ``*``.
 
-``カラム`` の値の中に ``単語1`` 、 ``単語2`` 、 ``...``  が近傍にある文書を検索します。（近傍検索。） ``カラム`` には全文検索用のインデックスが設定されていなければいけません。
+.. _match-oeprator:
 
-未サポートです。
+Match operator
+^^^^^^^^^^^^^^
 
-``カラム *S "文書"``
+Its syntax is ``column @ value``.
+
+The operator searches ``value`` by inverted index of ``column``.
+Normally, full text search is operated but tag search can be operated.
+Because tag search is also implemented by inverted index.
+
+:doc:`query_syntax` uses this operator by default.
+
+Here is a simple exmaple.
+
+.. groonga-command
+.. include:: ../../example/reference/grn_expr/script_syntax/simple_match_operator.log
+.. select Entries --filter 'content @ "fast"' --output_columns content
+
+The expression matches records that contain a word ``fast`` in
+``content`` column value.
+
+.. _prefix-search-operator:
+
+Prefix search operator
+^^^^^^^^^^^^^^^^^^^^^^
+
+Its syntax is ``column @^ value``.
+
+The operator does prefix search with ``value``. Prefix search searches
+records that contain a word that starts with ``value``.
+
+You can use fast prefix search against a column. The column must be
+indexed and index table must be patricia trie table
+(``TABLE_PAT_KEY``) or double array trie table
+(``TABLE_DAT_KEY``). You can also use fast prefix search against
+``_key`` pseudo column of patricia trie table or double array trie
+table. You don't need to index ``_key``.
+
+Prefix search can be used with other table types but it causes all
+records scan. It's not problem for small records but it spends more
+time for large records.
+
+Here is a simple exmaple.
+
+.. groonga-command
+.. include:: ../../example/reference/grn_expr/script_syntax/simple_prefix_search_operator.log
+.. select Entries --filter '_key @^ "Goo"' --output_columns _key
+
+The expression matches records that contain a word that starts with
+``Goo`` in ``_key`` pseudo column value. ``Good-bye Senna`` and
+``Good-bye Tritonn`` are matched with the expression.
+
+.. _suffix-search-operator:
+
+Suffix search operator
+^^^^^^^^^^^^^^^^^^^^^^
+
+Its syntax is ``column @$ value``.
+
+This operator does suffix search with ``value``. Suffix search
+searches records that contain a word that ends with ``value``.
+
+You can use fast suffix search against a column. The column must be
+indexed and index table must be patricia trie table
+(``TABLE_PAT_KEY``) with ``KEY_WITH_SIS`` flag. You can also use fast
+suffix search against ``_key`` pseudo column of patricia trie table
+(``TABLE_PAT_KEY``) with ``KEY_WITH_SIS`` flag. You don't need to
+index ``_key``. We recommended that you use index column based fast
+suffix search instead of ``_key`` based fast suffix search. ``_key``
+based fast suffix search returns automatically registered
+substrings. (TODO: write document about suffix search and link to it
+from here.)
+
+.. note::
+
+   Fast suffix search can be used only for non-ASCII characters such
+   as hiragana in Japanese. You cannot use fast suffix search for
+   ASCII character.
+
+Suffix search can be used with other table types or patricia trie
+table without ``KEY_WITH_SIS`` flag but it causes all records
+scan. It's not problem for small records but it spends more time for
+large records.
+
+Here is a simple exmaple. It uses fast suffix search for hiragana in
+Japanese that is one of non-ASCII characters.
+
+.. groonga-command
+.. include:: ../../example/reference/grn_expr/script_syntax/simple_suffix_search_operator.log
+.. table_create Titles TABLE_NO_KEY
+.. column_create Titles content COLUMN_SCALAR ShortText
+.. table_create SuffixSearchTerms TABLE_PAT_KEY|KEY_WITH_SIS ShortText
+.. column_create SuffixSearchTerms index COLUMN_INDEX Titles content
+.. load --table Titles
+.. [
+.. {"content": "ぐるんが"},
+.. {"content": "むるんが"},
+.. {"content": "せな"},
+.. {"content": "とりとん"}
+.. ]
+.. select Titles --query 'content:$んが'
+
+The expression matches records that have value that ends with ``んが``
+in ``content`` column value. ``ぐるんが`` and ``むるんが`` are matched
+with the expression.
+
+.. _near-search-operator:
+
+Near search operator
 ^^^^^^^^^^^^^^^^^^^^
 
-``カラム`` の値が ``文書`` に類似している文書を検索します。（類似文書検索。） ``カラム`` には全文検索用のインデックスが設定されていなければいけません。
+Its syntax is ``column *N "word1 word2 ..."``.
 
-..
-   ``カラム *T "単語"``
-   ^^^^^^^^^^^^^^^^^^^^
+The operator does near search with words ``word1 word2 ...``. Near
+search searches records that contain the words and the words are
+appeared in the near distance. Near distance is always ``10`` for
+now. The unit of near distance is the number of characters in N-gram
+family tokenizers and the number of words in morphological analysis
+family tokenizers.
 
-   ???
+(TODO: Add a description about ``TokenBigram`` doesn't split ASCII
+only word into tokens. So the unit for ASCII words with
+``TokenBigram`` is the number of words even if ``TokenBigram`` is a
+N-gram family tokenizer.)
 
-``カラム *> 重み``
-^^^^^^^^^^^^^^^^^^^^
+Note that an index column for full text search must be defined for
+``column``.
 
-``カラム`` の重みを ``重み`` 分上げます。
+Here is a simple exmaple.
 
-未サポート。
+.. groonga-command
+.. include:: ../../example/reference/grn_expr/script_syntax/simple_near_search_operator.log
+.. select Entries --filter 'content *N "I fast"'      --output_columns content
+.. select Entries --filter 'content *N "I Really"'    --output_columns content
+.. select Entries --filter 'content *N "also Really"' --output_columns content
 
-``カラム *< 重み``
-^^^^^^^^^^^^^^^^^^^^
+The first expression matches records that contain ``I`` and ``fast``
+and the near distance of those words are in 10 words. So the record
+that its content is ``I also started to use mroonga. It's also very
+fast! ...`` is matched. The number of words between ``I`` and ``fast``
+is just 10.
 
-``カラム`` の重みを ``重み`` 分下げます。
+The second expression matches records that contain ``I`` and
+``Really`` and the near distance of those words are in 10 words. So
+the record that its content is ``I also started to use mroonga. It's
+also very fast! Really fast!`` is not matched. The number of words between
+``I`` and ``Really`` is 11.
 
-未サポート。
+The third expression matches records that contain ``also`` and
+``Really`` and the near distance of those words are in 10 words. So
+the record that its content is ``I also st arted to use mroonga. It's
+also very fast! Really fast!`` is matched. The number of words between
+``also`` and ``Really`` is 10.
 
-``カラム *~ 重み``
-^^^^^^^^^^^^^^^^^^^^
+.. _similar-search-operator:
 
-``カラム`` がマッチした場合、文書の検索スコアを ``重み`` 分下げます。
+Similar search
+^^^^^^^^^^^^^^
 
-未サポート。
+Its syntax is ``column *S "document"``.
+
+The operator does similar search with document ``document``. Similar
+search searches records that have similar content to
+``document``.
+
+Note that an index column for full text search must be defined for
+``column``.
+
+Here is a simple exmaple.
+
+.. groonga-command
+.. include:: ../../example/reference/grn_expr/script_syntax/simple_similar_search_operator.log
+.. select Entries --filter 'content *S "I migrated all Solr system!"' --output_columns content
+
+The expression matches records that have similar content to ``I
+migrated all Solr system!``. In this case, records that have ``I
+migrated all XXX system!`` content are matched.
+
+.. _term-extract-operator:
+
+Term extract operator
+^^^^^^^^^^^^^^^^^^^^^
+
+Its syntax is ``_key *T "document"``.
+
+The operator extracts terms from ``document``. Terms must be
+registered as keys of the table of ``_key``.
+
+Note that the table must be patricia trie (``TABLE_PAT_KEY``) or
+double array trie (``TABLE_DAT_KEY``). You can't use hash table
+(``TABLE_HASH_KEY``) and array (``TABLE_NO_KEY``) becuase they don't
+support longest common prefix search. Longest common prefix search is
+used to implement the operator.
+
+Here is a simple exmaple.
+
+.. groonga-command
+.. include:: ../../example/reference/grn_expr/script_syntax/simple_term_extract_operator.log
+.. table_create Words TABLE_PAT_KEY|KEY_NORMALIZE ShortText
+.. load --table Words
+.. [
+.. {"_key": "groonga"},
+.. {"_key": "mroonga"},
+.. {"_key": "Senna"},
+.. {"_key": "Tritonn"}
+.. ]
+.. select Words --filter '_key *T "Groonga is the successor project to Senna."' --output_columns _key
+
+The expression extrcts terms that included in document ``Groonga is
+the successor project to Senna.``. In this case, ``KEY_NORMALIZE``
+flag is specified to ``Words``. So ``Groonga`` can be extracted even
+if it is loaded as ``groonga`` into ``Words``. All of extracted terms
+are also normalized.

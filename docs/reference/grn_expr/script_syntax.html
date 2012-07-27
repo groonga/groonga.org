@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>7.7.2. Script Syntax &mdash; groonga v2.0.4 documentation</title>
+    <title>7.8.2. Script syntax &mdash; groonga v2.0.5-49-gef0de04 documentation</title>
     
     <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '2.0.4',
+        VERSION:     '2.0.5-49-gef0de04',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,10 +24,10 @@
     <script type="text/javascript" src="../../static/underscore.js"></script>
     <script type="text/javascript" src="../../static/doctools.js"></script>
     <link rel="shortcut icon" href="../../static/favicon.ico"/>
-    <link rel="top" title="groonga v2.0.4 documentation" href="../../index.html" />
-    <link rel="up" title="7.7. grn_expr" href="../grn_expr.html" />
-    <link rel="next" title="7.8. 組み込み関数一覧" href="../../functions.html" />
-    <link rel="prev" title="7.7.1. Query syntax" href="query_syntax.html" /> 
+    <link rel="top" title="groonga v2.0.5-49-gef0de04 documentation" href="../../index.html" />
+    <link rel="up" title="7.8. grn_expr" href="../grn_expr.html" />
+    <link rel="next" title="7.9. 組み込み関数一覧" href="../functions.html" />
+    <link rel="prev" title="7.8.1. Query syntax" href="query_syntax.html" /> 
       <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
     <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
     <meta property="og:type" content="product" />
@@ -70,14 +70,14 @@
           <a href="../../genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="../../functions.html" title="7.8. 組み込み関数一覧"
+          <a href="../functions.html" title="7.9. 組み込み関数一覧"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="query_syntax.html" title="7.7.1. Query syntax"
+          <a href="query_syntax.html" title="7.8.1. Query syntax"
              accesskey="P">previous</a> |</li>
-        <li><a href="../../index.html">groonga v2.0.4 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">groonga v2.0.5-49-gef0de04 documentation</a> &raquo;</li>
           <li><a href="../../reference.html" >7. リファレンスマニュアル</a> &raquo;</li>
-          <li><a href="../grn_expr.html" accesskey="U">7.7. grn_expr</a> &raquo;</li> 
+          <li><a href="../grn_expr.html" accesskey="U">7.8. grn_expr</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -87,53 +87,1757 @@
           <div class="body">
             
   <div class="section" id="script-syntax">
-<h1>7.7.2. Script Syntax<a class="headerlink" href="#script-syntax" title="Permalink to this headline">¶</a></h1>
-<p>TODO: revised.</p>
-<p>スクリプト構文はECMAScriptに類似した構文で条件式などを表現するための構文です。ECMAScriptにある演算子に加えてgroonga独自の演算子を追加しています。</p>
-<p>まず、ECMAScriptにあるような基本的な演算子を説明し、その後、groongaが追加した独自の演算子を説明します。</p>
-<div class="section" id="id1">
-<h2>7.7.2.1. 基本的な演算子<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<h1>7.8.2. Script syntax<a class="headerlink" href="#script-syntax" title="Permalink to this headline">¶</a></h1>
+<p>Script syntax is a syntax to specify complex search condition. It is
+similar to ECMAScript. For example, <tt class="docutils literal"><span class="pre">_key</span> <span class="pre">==</span> <span class="pre">&quot;book&quot;</span></tt> means that
+groonga searches records that <tt class="docutils literal"><span class="pre">_key</span></tt> value is <tt class="docutils literal"><span class="pre">&quot;book&quot;</span></tt>. All values
+are string in <a class="reference internal" href="query_syntax.html"><em>Query syntax</em></a> but its own type in script
+syntax. For example, <tt class="docutils literal"><span class="pre">&quot;book&quot;</span></tt> is string, <tt class="docutils literal"><span class="pre">1</span></tt> is integer,
+<tt class="docutils literal"><span class="pre">TokenBigram</span></tt> is the object whose name is <tt class="docutils literal"><span class="pre">TokenBigram</span></tt> and so on.</p>
+<p>Script syntax doesn't support full ECMAScript syntax. For example,
+script syntax doesn't support statement such as <tt class="docutils literal"><span class="pre">if</span></tt> control
+statement, <tt class="docutils literal"><span class="pre">for</span></tt> iteration statement and variable definition
+statement. Function definion is not supported too. But script syntax
+addes the original additional operators.  They are described after
+ECMAScript syntax is described.</p>
+<div class="section" id="sample-data">
+<h2>7.8.2.1. Sample data<a class="headerlink" href="#sample-data" title="Permalink to this headline">¶</a></h2>
+<p>Here are a schema definition and sample data to show usage.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Entries TABLE_PAT_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries content COLUMN_SCALAR Text
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries n_likes COLUMN_SCALAR UInt32
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create Terms TABLE_PAT_KEY|KEY_NORMALIZE ShortText --default_tokenizer TokenBigram
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Terms entries_key_index COLUMN_INDEX|WITH_POSITION Entries _key
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Terms entries_content_index COLUMN_INDEX|WITH_POSITION Entries content
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+load --table Entries
+[
+{&quot;_key&quot;:    &quot;The first post!&quot;,
+ &quot;content&quot;: &quot;Welcome! This is my first post!&quot;,
+ &quot;n_likes&quot;: 5},
+{&quot;_key&quot;:    &quot;Groonga&quot;,
+ &quot;content&quot;: &quot;I started to use groonga. It&#39;s very fast!&quot;,
+ &quot;n_likes&quot;: 10},
+{&quot;_key&quot;:    &quot;Mroonga&quot;,
+ &quot;content&quot;: &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
+ &quot;n_likes&quot;: 15},
+{&quot;_key&quot;:    &quot;Good-bye Senna&quot;,
+ &quot;content&quot;: &quot;I migrated all Senna system!&quot;,
+ &quot;n_likes&quot;: 3},
+{&quot;_key&quot;:    &quot;Good-bye Tritonn&quot;,
+ &quot;content&quot;: &quot;I also migrated all Tritonn system!&quot;,
+ &quot;n_likes&quot;: 3}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 5]
+</pre></div>
+</div>
+<p>There is a table, <tt class="docutils literal"><span class="pre">Entries</span></tt>, for blog entries. An entry has title,
+content and the number of likes for the entry. Title is key of
+<tt class="docutils literal"><span class="pre">Entries</span></tt>. Content is value of <tt class="docutils literal"><span class="pre">Entries.content</span></tt> column. The
+number of likes is value of <tt class="docutils literal"><span class="pre">Entries.n_likes</span></tt> column.</p>
+<p><tt class="docutils literal"><span class="pre">Entries._key</span></tt> column and <tt class="docutils literal"><span class="pre">Entries.content</span></tt> column are indexed
+using <tt class="docutils literal"><span class="pre">TokenBigram</span></tt> tokenizer. So both <tt class="docutils literal"><span class="pre">Entries._key</span></tt> and
+<tt class="docutils literal"><span class="pre">Entries.content</span></tt> are fulltext search ready.</p>
+<p>OK. The schema and data for examples are ready.</p>
+</div>
+<div class="section" id="literals">
+<h2>7.8.2.2. Literals<a class="headerlink" href="#literals" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="integer">
+<h3>7.8.2.2.1. Integer<a class="headerlink" href="#integer" title="Permalink to this headline">¶</a></h3>
+<p>Integer literal is sequence of <tt class="docutils literal"><span class="pre">0</span></tt> to <tt class="docutils literal"><span class="pre">9</span></tt> such as
+<tt class="docutils literal"><span class="pre">1234567890</span></tt>. <tt class="docutils literal"><span class="pre">+</span></tt> or <tt class="docutils literal"><span class="pre">-</span></tt> can be prepended as sign such as
+<tt class="docutils literal"><span class="pre">+29</span></tt> and <tt class="docutils literal"><span class="pre">-29</span></tt>. Integer literal must be decimal. Octal notation,
+hex and so on can't be used.</p>
+<p>The maximum value of integer literal is <tt class="docutils literal"><span class="pre">9223372036854775807</span></tt> (<tt class="docutils literal"><span class="pre">=</span> <span class="pre">2</span>
+<span class="pre">**</span> <span class="pre">63</span> <span class="pre">-</span> <span class="pre">1</span></tt>). The minimum value of integer literal is
+<tt class="docutils literal"><span class="pre">-9223372036854775808</span></tt> (<tt class="docutils literal"><span class="pre">=</span> <span class="pre">-(2</span> <span class="pre">**</span> <span class="pre">63)</span></tt>).</p>
+</div>
+<div class="section" id="float">
+<h3>7.8.2.2.2. Float<a class="headerlink" href="#float" title="Permalink to this headline">¶</a></h3>
+<p>Float literal is sequence of <tt class="docutils literal"><span class="pre">0</span></tt> to <tt class="docutils literal"><span class="pre">9</span></tt>, <tt class="docutils literal"><span class="pre">.</span></tt> and <tt class="docutils literal"><span class="pre">0</span></tt> to <tt class="docutils literal"><span class="pre">9</span></tt>
+such as <tt class="docutils literal"><span class="pre">3.14</span></tt>. <tt class="docutils literal"><span class="pre">+</span></tt> or <tt class="docutils literal"><span class="pre">-</span></tt> can be prepended as sign such as
+<tt class="docutils literal"><span class="pre">+3.14</span></tt> and <tt class="docutils literal"><span class="pre">-3.14</span></tt>. <tt class="docutils literal"><span class="pre">${RADIX}e${EXPORNENTIAL}</span></tt> and
+<tt class="docutils literal"><span class="pre">${RADIX}E${EXPORNENTIAL}</span></tt> formats are also supported. For example,
+<tt class="docutils literal"><span class="pre">314e-2</span></tt> is the same as <tt class="docutils literal"><span class="pre">3.14</span></tt>.</p>
+</div>
+<div class="section" id="string">
+<h3>7.8.2.2.3. String<a class="headerlink" href="#string" title="Permalink to this headline">¶</a></h3>
+<p>String literal is <tt class="docutils literal"><span class="pre">&quot;...&quot;</span></tt>. You need to escape <tt class="docutils literal"><span class="pre">&quot;</span></tt> in literal by
+prepending <tt class="docutils literal"><span class="pre">\\''</span> <span class="pre">such</span> <span class="pre">as</span> <span class="pre">``\&quot;</span></tt>. For example, <tt class="docutils literal"><span class="pre">&quot;Say</span> <span class="pre">\&quot;Hello!\&quot;.&quot;</span></tt> is
+a literal for <tt class="docutils literal"><span class="pre">Say</span> <span class="pre">&quot;Hello!&quot;.</span></tt> string.</p>
+<p>String encoding must be the same as encoding of database. The default
+encoding is UTF-8. It can be changed by <tt class="docutils literal"><span class="pre">--with-default-encoding</span></tt>
+configure option, <tt class="docutils literal"><span class="pre">--encodiong</span></tt> <a class="reference internal" href="../executables/groonga.html"><em>groonga command</em></a> option
+and so on.</p>
+</div>
+<div class="section" id="boolean">
+<h3>7.8.2.2.4. Boolean<a class="headerlink" href="#boolean" title="Permalink to this headline">¶</a></h3>
+<p>Boolean literal is <tt class="docutils literal"><span class="pre">true</span></tt> and <tt class="docutils literal"><span class="pre">false</span></tt>. <tt class="docutils literal"><span class="pre">true</span></tt> means true and
+<tt class="docutils literal"><span class="pre">false</span></tt> means false.</p>
+</div>
+<div class="section" id="null">
+<h3>7.8.2.2.5. Null<a class="headerlink" href="#null" title="Permalink to this headline">¶</a></h3>
+<p>Null literal is <tt class="docutils literal"><span class="pre">null</span></tt>. Groonga doesn't support null value but null
+literal is supported.</p>
+</div>
+<div class="section" id="time">
+<h3>7.8.2.2.6. Time<a class="headerlink" href="#time" title="Permalink to this headline">¶</a></h3>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This is the groonga original notation.</p>
+</div>
+<p>Time literal doesn't exit. There are string time notation, integer
+time notation and float time notation.</p>
+<p>String time notation is <tt class="docutils literal"><span class="pre">&quot;YYYY/MM/DD</span> <span class="pre">hh:mm:ss.uuuuuu&quot;</span></tt> or
+<tt class="docutils literal"><span class="pre">&quot;YYYY-MM-DD</span> <span class="pre">hh:mm:ss.uuuuuu&quot;</span></tt>. <tt class="docutils literal"><span class="pre">YYYY</span></tt> is year, <tt class="docutils literal"><span class="pre">MM</span></tt> is month,
+<tt class="docutils literal"><span class="pre">DD</span></tt> is day, <tt class="docutils literal"><span class="pre">hh</span></tt> is hour, <tt class="docutils literal"><span class="pre">mm</span></tt> is minute, <tt class="docutils literal"><span class="pre">ss</span></tt> is second and
+<tt class="docutils literal"><span class="pre">uuuuuu</span></tt> is micro second. It is local time. For example,
+<tt class="docutils literal"><span class="pre">&quot;2012/07/23</span> <span class="pre">02:41:10.436218&quot;</span></tt> is <tt class="docutils literal"><span class="pre">2012-07-23T02:41:10.436218</span></tt> in
+ISO 8601 format.</p>
+<p>Integer time notation is the number of seconds that have elapsed since
+midnight UTC, January 1, 1970. It is also known as POSIX time. For
+example, <tt class="docutils literal"><span class="pre">1343011270</span></tt> is <tt class="docutils literal"><span class="pre">2012-07-23T02:41:10Z</span></tt> in ISO 8601 format.</p>
+<p>Float time notation is the number of seconds and micro seconds that
+have elapsed since midnight UTC, January 1, 1970. For example,
+<tt class="docutils literal"><span class="pre">1343011270.436218</span></tt> is <tt class="docutils literal"><span class="pre">2012-07-23T02:41:10.436218Z</span></tt> in ISO 8601
+format.</p>
+</div>
+<div class="section" id="geo-point">
+<h3>7.8.2.2.7. Geo point<a class="headerlink" href="#geo-point" title="Permalink to this headline">¶</a></h3>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This is the groonga original notation.</p>
+</div>
+<p>Geo point literal doesn't exist. There is string geo point notation.</p>
+<p>String geo point notation has the following patterns:</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">&quot;LATITUDE_IN_MSECxLONGITUDE_IN_MSEC&quot;</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">&quot;LATITUDE_IN_MSEC,LONGITUDE_IN_MSEC&quot;</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">&quot;LATITUDE_IN_DEGREExLONGITUDE_IN_DEGREE&quot;</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">&quot;LATITUDE_IN_DEGREE,LONGITUDE_IN_DEGREE&quot;</span></tt></li>
+</ul>
+</div></blockquote>
+<p><tt class="docutils literal"><span class="pre">x</span></tt> and <tt class="docutils literal"><span class="pre">,</span></tt> can be used for separator. Latitude and longitude can
+be represented in milliseconds or degree.</p>
+</div>
+<div class="section" id="array">
+<h3>7.8.2.2.8. Array<a class="headerlink" href="#array" title="Permalink to this headline">¶</a></h3>
+<p>Array literal is <tt class="docutils literal"><span class="pre">[element1,</span> <span class="pre">element2,</span> <span class="pre">...]</span></tt>.</p>
+</div>
+<div class="section" id="object-literal">
+<h3>7.8.2.2.9. Object literal<a class="headerlink" href="#object-literal" title="Permalink to this headline">¶</a></h3>
+<p>Object literal is <tt class="docutils literal"><span class="pre">{name1:</span> <span class="pre">value1,</span> <span class="pre">name2:</span> <span class="pre">value2,</span> <span class="pre">...}</span></tt>. Groonga
+doesn't support object literal yet.</p>
+</div>
+</div>
+<div class="section" id="control-syntaxes">
+<h2>7.8.2.3. Control syntaxes<a class="headerlink" href="#control-syntaxes" title="Permalink to this headline">¶</a></h2>
+<p>Script syntax doesn't support statement. So you cannot use control
+statement such as <tt class="docutils literal"><span class="pre">if</span></tt>. You can only use <tt class="docutils literal"><span class="pre">A</span> <span class="pre">?</span> <span class="pre">B</span> <span class="pre">:</span> <span class="pre">C</span></tt> expression as
+control syntax.</p>
+<p><tt class="docutils literal"><span class="pre">A</span> <span class="pre">?</span> <span class="pre">B</span> <span class="pre">:</span> <span class="pre">C</span></tt> returns <tt class="docutils literal"><span class="pre">B</span></tt> if <tt class="docutils literal"><span class="pre">A</span></tt> is true, <tt class="docutils literal"><span class="pre">C</span></tt> otherwise.</p>
+<p>Here is a simple exmaple.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --filter &#39;n_likes == (_id == 1 ? 5 : 3)&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         3
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         4,
+#         &quot;Good-bye Senna&quot;,
+#         &quot;I migrated all Senna system!&quot;,
+#         3
+#       ],
+#       [
+#         5,
+#         &quot;Good-bye Tritonn&quot;,
+#         &quot;I also migrated all Tritonn system!&quot;,
+#         3
+#       ],
+#       [
+#         1,
+#         &quot;The first post!&quot;,
+#         &quot;Welcome! This is my first post!&quot;,
+#         5
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The expression matches records that <tt class="docutils literal"><span class="pre">_id</span></tt> column value is equal to <tt class="docutils literal"><span class="pre">1</span></tt>
+and <tt class="docutils literal"><span class="pre">n_likes</span></tt> column value is equal to <tt class="docutils literal"><span class="pre">5</span></tt> or <tt class="docutils literal"><span class="pre">_id</span></tt> column value is
+not equal to 1 and <tt class="docutils literal"><span class="pre">n_likes</span></tt> column value is equal to <tt class="docutils literal"><span class="pre">3</span></tt>.</p>
+</div>
+<div class="section" id="grouping">
+<h2>7.8.2.4. Grouping<a class="headerlink" href="#grouping" title="Permalink to this headline">¶</a></h2>
+<p>Its syntax is <tt class="docutils literal"><span class="pre">(...)</span></tt>. <tt class="docutils literal"><span class="pre">...</span></tt> is comma separated expression list.</p>
+<p><tt class="docutils literal"><span class="pre">(...)</span></tt> groups one ore more expressions and they can be processed as
+an expression. <tt class="docutils literal"><span class="pre">a</span> <span class="pre">&amp;&amp;</span> <span class="pre">b</span> <span class="pre">||</span> <span class="pre">c</span></tt> means that <tt class="docutils literal"><span class="pre">a</span></tt> and <tt class="docutils literal"><span class="pre">b</span></tt> are matched
+or <tt class="docutils literal"><span class="pre">c</span></tt> is matched. <tt class="docutils literal"><span class="pre">a</span> <span class="pre">&amp;&amp;</span> <span class="pre">(b</span> <span class="pre">||</span> <span class="pre">c)</span></tt> means that <tt class="docutils literal"><span class="pre">a</span></tt> and one of
+<tt class="docutils literal"><span class="pre">b</span></tt> and <tt class="docutils literal"><span class="pre">c</span></tt> are matched.</p>
+<p>Here is a simple exmaple.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; content @ &quot;senna&quot; || content @ &quot;fast&quot;&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         3
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         4,
+#         &quot;Good-bye Senna&quot;,
+#         &quot;I migrated all Senna system!&quot;,
+#         3
+#       ],
+#       [
+#         2,
+#         &quot;Groonga&quot;,
+#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
+#         10
+#       ],
+#       [
+#         3,
+#         &quot;Mroonga&quot;,
+#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         15
+#       ]
+#     ]
+#   ]
+# ]
+select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&quot; || content @ &quot;fast&quot;)&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         4,
+#         &quot;Good-bye Senna&quot;,
+#         &quot;I migrated all Senna system!&quot;,
+#         3
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The first expression doesn't use grouping. It matches records that
+<tt class="docutils literal"><span class="pre">n_likes</span> <span class="pre">&lt;</span> <span class="pre">5</span></tt> and <tt class="docutils literal"><span class="pre">content</span> <span class="pre">&#64;</span> <span class="pre">&quot;senna&quot;</span></tt> are matched or
+<tt class="docutils literal"><span class="pre">content</span> <span class="pre">&#64;</span> <span class="pre">&quot;fast&quot;</span></tt> is matched.</p>
+<p>The second expression uses grouping. It matches records that <tt class="docutils literal"><span class="pre">n_likes</span>
+<span class="pre">&lt;</span> <span class="pre">5</span></tt> and one of <tt class="docutils literal"><span class="pre">content</span> <span class="pre">&#64;</span> <span class="pre">&quot;senna&quot;</span></tt> or <tt class="docutils literal"><span class="pre">content</span> <span class="pre">&#64;</span> <span class="pre">&quot;fast&quot;</span></tt> are
+matched.</p>
+</div>
+<div class="section" id="function-call">
+<h2>7.8.2.5. Function call<a class="headerlink" href="#function-call" title="Permalink to this headline">¶</a></h2>
+<p>Its syntax is <tt class="docutils literal"><span class="pre">name(arugment1,</span> <span class="pre">argument2,</span> <span class="pre">...)</span></tt>.</p>
+<p><tt class="docutils literal"><span class="pre">name(argument1,</span> <span class="pre">argument2,</span> <span class="pre">...)</span></tt> calls a function that is named
+<tt class="docutils literal"><span class="pre">name</span></tt> with arguments <tt class="docutils literal"><span class="pre">argument1</span></tt>, <tt class="docutils literal"><span class="pre">argument2</span></tt> and <tt class="docutils literal"><span class="pre">...</span></tt>.</p>
+<p>See <a class="reference internal" href="../functions.html"><em>組み込み関数一覧</em></a> for available functin list.</p>
+<p>Here is a simple exmaple.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --filter &#39;edit_distance(_key, &quot;Groonga&quot;) &lt;= 1&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         2,
+#         &quot;Groonga&quot;,
+#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
+#         10
+#       ],
+#       [
+#         3,
+#         &quot;Mroonga&quot;,
+#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         15
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The expression uses <a class="reference internal" href="../functions/edit_distance.html"><em>edit_distance</em></a>. It
+matches records that <tt class="docutils literal"><span class="pre">_key</span></tt> column value is similar to
+<tt class="docutils literal"><span class="pre">&quot;Groonga&quot;</span></tt>. Similality of <tt class="docutils literal"><span class="pre">&quot;Groonga&quot;</span></tt> is computed as edit
+distance. If edit distance is less than or equal to 1, the value is
+treated as similar. In this case, <tt class="docutils literal"><span class="pre">&quot;Groonga&quot;</span></tt> and <tt class="docutils literal"><span class="pre">&quot;Mroonga&quot;</span></tt> are
+treated as similar.</p>
+</div>
+<div class="section" id="basic-operators">
+<h2>7.8.2.6. Basic operators<a class="headerlink" href="#basic-operators" title="Permalink to this headline">¶</a></h2>
+<p>Groonga supports operators defined in ECMAScript.</p>
+<div class="section" id="arithmetic-operators">
+<h3>7.8.2.6.1. Arithmetic operators<a class="headerlink" href="#arithmetic-operators" title="Permalink to this headline">¶</a></h3>
+<p>Here are arithmetic operators.</p>
+<div class="section" id="addition-operator">
+<h4>7.8.2.6.1.1. Addition operator<a class="headerlink" href="#addition-operator" title="Permalink to this headline">¶</a></h4>
+<p>Its syntax is <tt class="docutils literal"><span class="pre">number1</span> <span class="pre">+</span> <span class="pre">number2</span></tt>.</p>
+<p>The operator adds <tt class="docutils literal"><span class="pre">number1</span></tt> and <tt class="docutils literal"><span class="pre">number2</span></tt> and returns the result.</p>
+<p>Here is a simple example.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --filter &#39;n_likes == 10 + 5&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         3,
+#         &quot;Mroonga&quot;,
+#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         15
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The expression matches records that <tt class="docutils literal"><span class="pre">n_likes</span></tt> column value is equal
+to <tt class="docutils literal"><span class="pre">15</span></tt> (= <tt class="docutils literal"><span class="pre">10</span> <span class="pre">+</span> <span class="pre">5</span></tt>).</p>
+</div>
+<div class="section" id="subtraction-operator">
+<h4>7.8.2.6.1.2. Subtraction operator<a class="headerlink" href="#subtraction-operator" title="Permalink to this headline">¶</a></h4>
+<p>Its syntax is <tt class="docutils literal"><span class="pre">number1</span> <span class="pre">-</span> <span class="pre">number2</span></tt>.</p>
+<p>The operator subtracts <tt class="docutils literal"><span class="pre">number2</span></tt> from <tt class="docutils literal"><span class="pre">number1</span></tt> and returns the result.</p>
+<p>Here is a simple example.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --filter &#39;n_likes == 20 - 5&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         3,
+#         &quot;Mroonga&quot;,
+#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         15
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The expression matches records that <tt class="docutils literal"><span class="pre">n_likes</span></tt> column value is equal
+to <tt class="docutils literal"><span class="pre">15</span></tt> (= <tt class="docutils literal"><span class="pre">20</span> <span class="pre">-</span> <span class="pre">5</span></tt>).</p>
+</div>
+<div class="section" id="multiplication-operator">
+<h4>7.8.2.6.1.3. Multiplication operator<a class="headerlink" href="#multiplication-operator" title="Permalink to this headline">¶</a></h4>
+<p>Its syntax is <tt class="docutils literal"><span class="pre">number1</span> <span class="pre">*</span> <span class="pre">number2</span></tt>.</p>
+<p>The operator multiplies <tt class="docutils literal"><span class="pre">number1</span></tt> and <tt class="docutils literal"><span class="pre">number2</span></tt> and returns the result.</p>
+<p>Here is a simple example.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --filter &#39;n_likes == 3 * 5&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         3,
+#         &quot;Mroonga&quot;,
+#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         15
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The expression matches records that <tt class="docutils literal"><span class="pre">n_likes</span></tt> column value is equal
+to <tt class="docutils literal"><span class="pre">15</span></tt> (= <tt class="docutils literal"><span class="pre">3</span> <span class="pre">*</span> <span class="pre">5</span></tt>).</p>
+</div>
+<div class="section" id="division-operator">
+<h4>7.8.2.6.1.4. Division operator<a class="headerlink" href="#division-operator" title="Permalink to this headline">¶</a></h4>
+<p>Its syntax is <tt class="docutils literal"><span class="pre">number1</span> <span class="pre">/</span> <span class="pre">number2</span></tt> and <tt class="docutils literal"><span class="pre">number1</span> <span class="pre">%</span> <span class="pre">number2</span></tt>.</p>
+<p>The operator divides <tt class="docutils literal"><span class="pre">number2</span></tt> by <tt class="docutils literal"><span class="pre">number1</span></tt>. <tt class="docutils literal"><span class="pre">/</span></tt> returns the
+quotient of result. <tt class="docutils literal"><span class="pre">%</span></tt> returns the remainder of result.</p>
+<p>Here is simple examples.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --filter &#39;n_likes == 26 / 7&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         4,
+#         &quot;Good-bye Senna&quot;,
+#         &quot;I migrated all Senna system!&quot;,
+#         3
+#       ],
+#       [
+#         5,
+#         &quot;Good-bye Tritonn&quot;,
+#         &quot;I also migrated all Tritonn system!&quot;,
+#         3
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The expression matches records that <tt class="docutils literal"><span class="pre">n_likes</span></tt> column value is equal
+to <tt class="docutils literal"><span class="pre">3</span></tt> (= <tt class="docutils literal"><span class="pre">26</span> <span class="pre">/</span> <span class="pre">7</span></tt>).</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --filter &#39;n_likes == 26 % 7&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;The first post!&quot;,
+#         &quot;Welcome! This is my first post!&quot;,
+#         5
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The expression matches records that <tt class="docutils literal"><span class="pre">n_likes</span></tt> column value is equal
+to <tt class="docutils literal"><span class="pre">5</span></tt> (= <tt class="docutils literal"><span class="pre">26</span> <span class="pre">%</span> <span class="pre">7</span></tt>).</p>
+</div>
+</div>
+<div class="section" id="logical-operators">
+<h3>7.8.2.6.2. Logical operators<a class="headerlink" href="#logical-operators" title="Permalink to this headline">¶</a></h3>
+<p>Here are logical operators.</p>
+<div class="section" id="logical-not-operator">
+<h4>7.8.2.6.2.1. Logical NOT operator<a class="headerlink" href="#logical-not-operator" title="Permalink to this headline">¶</a></h4>
+<p>Its syntax is <tt class="docutils literal"><span class="pre">!condition</span></tt>.</p>
+<p>The operator inverts boolean value of <tt class="docutils literal"><span class="pre">condition</span></tt>.</p>
+<p>Here is a simple example.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --filter &#39;!(n_likes == 5)&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;The first post!&quot;,
+#         &quot;Welcome! This is my first post!&quot;,
+#         5
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The expression matches records that <tt class="docutils literal"><span class="pre">n_likes</span></tt> column value is not
+equal to <tt class="docutils literal"><span class="pre">5</span></tt>.</p>
+</div>
+<div class="section" id="logical-and-operator">
+<h4>7.8.2.6.2.2. Logical AND operator<a class="headerlink" href="#logical-and-operator" title="Permalink to this headline">¶</a></h4>
+<p>Its syntax is <tt class="docutils literal"><span class="pre">condition1</span> <span class="pre">&amp;&amp;</span> <span class="pre">condition2</span></tt>.</p>
+<p>The operator returns true if both of <tt class="docutils literal"><span class="pre">condition1</span></tt> and
+<tt class="docutils literal"><span class="pre">condition2</span></tt> are true, false otherwise.</p>
+<p>Here is a simple example.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --filter &#39;content @ &quot;fast&quot; &amp;&amp; n_likes &gt;= 10&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         2,
+#         &quot;Groonga&quot;,
+#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
+#         10
+#       ],
+#       [
+#         3,
+#         &quot;Mroonga&quot;,
+#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         15
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The expression matches records that <tt class="docutils literal"><span class="pre">content</span></tt> column value has the
+word <tt class="docutils literal"><span class="pre">fast</span></tt> and <tt class="docutils literal"><span class="pre">n_likes</span></tt> column value is greater or equal to
+<tt class="docutils literal"><span class="pre">10</span></tt>.</p>
+</div>
+<div class="section" id="logical-or-operator">
+<h4>7.8.2.6.2.3. Logical OR operator<a class="headerlink" href="#logical-or-operator" title="Permalink to this headline">¶</a></h4>
+<p>Its syntax is <tt class="docutils literal"><span class="pre">condition1</span> <span class="pre">||</span> <span class="pre">condition2</span></tt>.</p>
+<p>The operator returns true if either <tt class="docutils literal"><span class="pre">condition1</span></tt> or <tt class="docutils literal"><span class="pre">condition2</span></tt> is
+true, false otherwise.</p>
+<p>Here is a simple example.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --filter &#39;n_likes == 5 || n_likes == 10&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;The first post!&quot;,
+#         &quot;Welcome! This is my first post!&quot;,
+#         5
+#       ],
+#       [
+#         2,
+#         &quot;Groonga&quot;,
+#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
+#         10
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The expression matches records that <tt class="docutils literal"><span class="pre">n_likes</span></tt> column value is equal
+to <tt class="docutils literal"><span class="pre">5</span></tt> or <tt class="docutils literal"><span class="pre">10</span></tt>.</p>
+</div>
+<div class="section" id="logical-and-not-operator">
+<h4>7.8.2.6.2.4. Logical AND NOT operator<a class="headerlink" href="#logical-and-not-operator" title="Permalink to this headline">¶</a></h4>
+<p>Its syntax is <tt class="docutils literal"><span class="pre">condition1</span> <span class="pre">&amp;!</span> <span class="pre">condition2</span></tt>.</p>
+<p>The operator returns true if <tt class="docutils literal"><span class="pre">condition1</span></tt> is true but <tt class="docutils literal"><span class="pre">condition2</span></tt>
+is false, false otherwise. It returns difference set.</p>
+<p>Here is a simple example.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --filter &#39;content @ &quot;fast&quot; &amp;! content @ &quot;mroonga&quot;&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         2,
+#         &quot;Groonga&quot;,
+#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
+#         10
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The expression matches records that <tt class="docutils literal"><span class="pre">content</span></tt> column value has the
+word <tt class="docutils literal"><span class="pre">fast</span></tt> but doesn't have the word <tt class="docutils literal"><span class="pre">mroonga</span></tt>.</p>
+</div>
+</div>
+<div class="section" id="bitwise-operators">
+<h3>7.8.2.6.3. Bitwise operators<a class="headerlink" href="#bitwise-operators" title="Permalink to this headline">¶</a></h3>
+<p>Here are bitwise operators.</p>
+<div class="section" id="bitwise-not-operator">
+<h4>7.8.2.6.3.1. Bitwise NOT operator<a class="headerlink" href="#bitwise-not-operator" title="Permalink to this headline">¶</a></h4>
+<p>Its syntax is <tt class="docutils literal"><span class="pre">~number</span></tt>.</p>
+<p>The operator returns bitwise NOT of <tt class="docutils literal"><span class="pre">number</span></tt>.</p>
+<p>Here is a simple example.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --filter &#39;~n_likes == -6&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;The first post!&quot;,
+#         &quot;Welcome! This is my first post!&quot;,
+#         5
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The expression matches records that <tt class="docutils literal"><span class="pre">n_likes</span></tt> column value is equal
+to <tt class="docutils literal"><span class="pre">5</span></tt> because bitwise NOT of <tt class="docutils literal"><span class="pre">5</span></tt> is equal to <tt class="docutils literal"><span class="pre">-6</span></tt>.</p>
+</div>
+<div class="section" id="bitwise-and-operator">
+<h4>7.8.2.6.3.2. Bitwise AND operator<a class="headerlink" href="#bitwise-and-operator" title="Permalink to this headline">¶</a></h4>
+<p>Its syntax is <tt class="docutils literal"><span class="pre">number1</span> <span class="pre">&amp;</span> <span class="pre">number2</span></tt>.</p>
+<p>The operator returns bitwise AND between <tt class="docutils literal"><span class="pre">number1</span></tt> and <tt class="docutils literal"><span class="pre">number2</span></tt>.</p>
+<p>Here is a simple example.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --filter &#39;(n_likes &amp; 1) == 1&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         4
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         4,
+#         &quot;Good-bye Senna&quot;,
+#         &quot;I migrated all Senna system!&quot;,
+#         3
+#       ],
+#       [
+#         5,
+#         &quot;Good-bye Tritonn&quot;,
+#         &quot;I also migrated all Tritonn system!&quot;,
+#         3
+#       ],
+#       [
+#         3,
+#         &quot;Mroonga&quot;,
+#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         15
+#       ],
+#       [
+#         1,
+#         &quot;The first post!&quot;,
+#         &quot;Welcome! This is my first post!&quot;,
+#         5
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The expression matches records that <tt class="docutils literal"><span class="pre">n_likes</span></tt> column value is even
+number because bitwise AND between an even number and <tt class="docutils literal"><span class="pre">1</span></tt> is equal
+to <tt class="docutils literal"><span class="pre">1</span></tt> and bitwise AND between an odd number and <tt class="docutils literal"><span class="pre">1</span></tt> is equal to
+<tt class="docutils literal"><span class="pre">0</span></tt>.</p>
+</div>
+</div>
+<div class="section" id="bitwise-or-operator">
+<h3>7.8.2.6.4. Bitwise OR operator<a class="headerlink" href="#bitwise-or-operator" title="Permalink to this headline">¶</a></h3>
+<p>Its syntax is <tt class="docutils literal"><span class="pre">number1</span> <span class="pre">|</span> <span class="pre">number2</span></tt>.</p>
+<p>The operator returns bitwise OR between <tt class="docutils literal"><span class="pre">number1</span></tt> and <tt class="docutils literal"><span class="pre">number2</span></tt>.</p>
+<p>Here is a simple example.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --filter &#39;n_likes == (1 | 4)&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;The first post!&quot;,
+#         &quot;Welcome! This is my first post!&quot;,
+#         5
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The expression matches records that <tt class="docutils literal"><span class="pre">n_likes</span></tt> column value is equal
+to <tt class="docutils literal"><span class="pre">5</span></tt> (= <tt class="docutils literal"><span class="pre">1</span> <span class="pre">|</span> <span class="pre">4</span></tt>).</p>
+</div>
+<div class="section" id="bitwise-xor-operator">
+<h3>7.8.2.6.5. Bitwise XOR operator<a class="headerlink" href="#bitwise-xor-operator" title="Permalink to this headline">¶</a></h3>
+<p>Its syntax is <tt class="docutils literal"><span class="pre">number1</span> <span class="pre">^</span> <span class="pre">number2</span></tt>.</p>
+<p>The operator returns bitwise XOR between <tt class="docutils literal"><span class="pre">number1</span></tt> and <tt class="docutils literal"><span class="pre">number2</span></tt>.</p>
+<p>Here is a simple example.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --filter &#39;n_likes == (10 ^ 15)&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;The first post!&quot;,
+#         &quot;Welcome! This is my first post!&quot;,
+#         5
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The expression matches records that <tt class="docutils literal"><span class="pre">n_likes</span></tt> column value is equal
+to <tt class="docutils literal"><span class="pre">5</span></tt> (= <tt class="docutils literal"><span class="pre">10</span> <span class="pre">^</span> <span class="pre">15</span></tt>).</p>
+</div>
+<div class="section" id="shift-operators">
+<h3>7.8.2.6.6. Shift operators<a class="headerlink" href="#shift-operators" title="Permalink to this headline">¶</a></h3>
+<p>Here are shift operators.</p>
+<div class="section" id="left-shift-operator">
+<h4>7.8.2.6.6.1. Left shift operator<a class="headerlink" href="#left-shift-operator" title="Permalink to this headline">¶</a></h4>
+<p>Its syntax is <tt class="docutils literal"><span class="pre">number1</span> <span class="pre">&lt;&lt;</span> <span class="pre">number2</span></tt>.</p>
+<p>The operator performs a bitwise left shift operation on <tt class="docutils literal"><span class="pre">number1</span></tt> by
+<tt class="docutils literal"><span class="pre">number2</span></tt>.</p>
+<p>Here is a simple example.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --filter &#39;n_likes == (5 &lt;&lt; 1)&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         2,
+#         &quot;Groonga&quot;,
+#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
+#         10
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The expression matches records that <tt class="docutils literal"><span class="pre">n_likes</span></tt> column value is equal
+to <tt class="docutils literal"><span class="pre">10</span></tt> (= <tt class="docutils literal"><span class="pre">5</span> <span class="pre">&lt;&lt;</span> <span class="pre">1</span></tt>).</p>
+</div>
+<div class="section" id="signed-right-shift-operator">
+<h4>7.8.2.6.6.2. Signed right shift operator<a class="headerlink" href="#signed-right-shift-operator" title="Permalink to this headline">¶</a></h4>
+<p>Its syntax is <tt class="docutils literal"><span class="pre">number1</span> <span class="pre">&gt;&gt;</span> <span class="pre">number2</span></tt>.</p>
+<p>The operator shifts bits of <tt class="docutils literal"><span class="pre">number1</span></tt> to right by <tt class="docutils literal"><span class="pre">number2</span></tt>. The sign
+of the result is the same as <tt class="docutils literal"><span class="pre">number1</span></tt>.</p>
+<p>Here is a simple example.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --filter &#39;n_likes == -(-10 &gt;&gt; 1)&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;The first post!&quot;,
+#         &quot;Welcome! This is my first post!&quot;,
+#         5
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The expression matches records that <tt class="docutils literal"><span class="pre">n_likes</span></tt> column value is equal
+to <tt class="docutils literal"><span class="pre">5</span></tt> (= <tt class="docutils literal"><span class="pre">-(-10</span> <span class="pre">&gt;&gt;</span> <span class="pre">1)</span></tt> = <tt class="docutils literal"><span class="pre">-(-5)</span></tt>).</p>
+</div>
+<div class="section" id="unsigned-right-shift-operator">
+<h4>7.8.2.6.6.3. Unsigned right shift operator<a class="headerlink" href="#unsigned-right-shift-operator" title="Permalink to this headline">¶</a></h4>
+<p>Its syntax is <tt class="docutils literal"><span class="pre">number1</span> <span class="pre">&gt;&gt;&gt;</span> <span class="pre">number2</span></tt>.</p>
+<p>The operator shifts bits of <tt class="docutils literal"><span class="pre">number1</span></tt> to right by <tt class="docutils literal"><span class="pre">number2</span></tt>. The
+leftmost <tt class="docutils literal"><span class="pre">number2</span></tt> bits are filled by <tt class="docutils literal"><span class="pre">0</span></tt>.</p>
+<p>Here is a simple example.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --filter &#39;n_likes == (2147483648 - (-10 &gt;&gt;&gt; 1))&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;The first post!&quot;,
+#         &quot;Welcome! This is my first post!&quot;,
+#         5
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The expression matches records that <tt class="docutils literal"><span class="pre">n_likes</span></tt> column value is equal
+to <tt class="docutils literal"><span class="pre">5</span></tt> (= <tt class="docutils literal"><span class="pre">2147483648</span> <span class="pre">-</span> <span class="pre">(-10</span> <span class="pre">&gt;&gt;&gt;</span> <span class="pre">1)</span></tt> = <tt class="docutils literal"><span class="pre">2147483648</span> <span class="pre">-</span> <span class="pre">2147483643</span></tt>).</p>
+</div>
+</div>
+<div class="section" id="comparison-operators">
+<h3>7.8.2.6.7. Comparison operators<a class="headerlink" href="#comparison-operators" title="Permalink to this headline">¶</a></h3>
+<p>Here are comparison operators.</p>
+<div class="section" id="equal-operator">
+<h4>7.8.2.6.7.1. Equal operator<a class="headerlink" href="#equal-operator" title="Permalink to this headline">¶</a></h4>
+<p>Its syntax is <tt class="docutils literal"><span class="pre">object1</span> <span class="pre">==</span> <span class="pre">object2</span></tt>.</p>
+<p>The operator returns true if <tt class="docutils literal"><span class="pre">object1</span></tt> equals to <tt class="docutils literal"><span class="pre">object2</span></tt>, false
+otherwise.</p>
+<p>Here is a simple example.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --filter &#39;n_likes == 5&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;The first post!&quot;,
+#         &quot;Welcome! This is my first post!&quot;,
+#         5
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The expression matches records that <tt class="docutils literal"><span class="pre">n_likes</span></tt> column value is equal
+to <tt class="docutils literal"><span class="pre">5</span></tt>.</p>
+</div>
+<div class="section" id="not-equal-operator">
+<h4>7.8.2.6.7.2. Not equal operator<a class="headerlink" href="#not-equal-operator" title="Permalink to this headline">¶</a></h4>
+<p>Its syntax is <tt class="docutils literal"><span class="pre">object1</span> <span class="pre">!=</span> <span class="pre">object2</span></tt>.</p>
+<p>The operator returns true if <tt class="docutils literal"><span class="pre">object1</span></tt> does not equal to
+<tt class="docutils literal"><span class="pre">object2</span></tt>, false otherwise.</p>
+<p>Here is a simple example.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --filter &#39;n_likes != 5&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         4
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         4,
+#         &quot;Good-bye Senna&quot;,
+#         &quot;I migrated all Senna system!&quot;,
+#         3
+#       ],
+#       [
+#         5,
+#         &quot;Good-bye Tritonn&quot;,
+#         &quot;I also migrated all Tritonn system!&quot;,
+#         3
+#       ],
+#       [
+#         2,
+#         &quot;Groonga&quot;,
+#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
+#         10
+#       ],
+#       [
+#         3,
+#         &quot;Mroonga&quot;,
+#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         15
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The expression matches records that <tt class="docutils literal"><span class="pre">n_likes</span></tt> column value is not
+equal to <tt class="docutils literal"><span class="pre">5</span></tt>.</p>
+</div>
+<div class="section" id="less-than-operator">
+<h4>7.8.2.6.7.3. Less than operator<a class="headerlink" href="#less-than-operator" title="Permalink to this headline">¶</a></h4>
 <p>TODO: ...</p>
 </div>
-<div class="section" id="id2">
-<h2>7.7.2.2. 独自の演算子<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
-<p>groongaは検索に特化した2項演算子を追加しています。独自の2項演算子は <tt class="docutils literal"><span class="pre">&#64;</span></tt> または <tt class="docutils literal"><span class="pre">*</span></tt> ではじまります。</p>
-<div class="section" id="id3">
-<h3>7.7.2.2.1. <tt class="docutils literal"><span class="pre">カラム</span> <span class="pre">&#64;</span> <span class="pre">値</span></tt><a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
-<p><tt class="docutils literal"><span class="pre">カラム</span></tt> をソースに設定している転置索引を用いて、 <tt class="docutils literal"><span class="pre">値</span></tt> で検索します。通常は全文検索になりますが、タグ検索などもこの書式で行います。 <tt class="docutils literal"><span class="pre">query</span></tt> ではデフォルトでこの演算子を使っていることになります。</p>
+<div class="section" id="less-than-or-equal-to-operator">
+<h4>7.8.2.6.7.4. Less than or equal to operator<a class="headerlink" href="#less-than-or-equal-to-operator" title="Permalink to this headline">¶</a></h4>
+<p>TODO: ...</p>
 </div>
-<div class="section" id="id4">
-<h3>7.7.2.2.2. <tt class="docutils literal"><span class="pre">カラム</span> <span class="pre">&#64;^</span> <span class="pre">値</span></tt><a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
-<p><tt class="docutils literal"><span class="pre">カラム</span></tt> の値を <tt class="docutils literal"><span class="pre">値</span></tt> で前方一致検索します。 <tt class="docutils literal"><span class="pre">カラム</span></tt> はパトリシアツリーまたはダブル配列の主キー（ <tt class="docutils literal"><span class="pre">_key</span></tt> ）でなければいけません。</p>
+<div class="section" id="greater-than-operator">
+<h4>7.8.2.6.7.5. Greater than operator<a class="headerlink" href="#greater-than-operator" title="Permalink to this headline">¶</a></h4>
+<p>TODO: ...</p>
 </div>
-<div class="section" id="id5">
-<h3>7.7.2.2.3. <tt class="docutils literal"><span class="pre">カラム</span> <span class="pre">&#64;$</span> <span class="pre">値</span></tt><a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
-<p><tt class="docutils literal"><span class="pre">カラム</span></tt> の値を <tt class="docutils literal"><span class="pre">値</span></tt> で後方一致検索します。</p>
-<p>未サポートです。</p>
+<div class="section" id="greater-than-or-equal-to-operator">
+<h4>7.8.2.6.7.6. Greater than or equal to operator<a class="headerlink" href="#greater-than-or-equal-to-operator" title="Permalink to this headline">¶</a></h4>
+<p>TODO: ...</p>
 </div>
-<div class="section" id="n-1-2">
-<h3>7.7.2.2.4. <tt class="docutils literal"><span class="pre">カラム</span> <span class="pre">*N</span> <span class="pre">&quot;単語1</span> <span class="pre">単語2</span> <span class="pre">...&quot;</span></tt><a class="headerlink" href="#n-1-2" title="Permalink to this headline">¶</a></h3>
-<p><tt class="docutils literal"><span class="pre">カラム</span></tt> の値の中に <tt class="docutils literal"><span class="pre">単語1</span></tt> 、 <tt class="docutils literal"><span class="pre">単語2</span></tt> 、 <tt class="docutils literal"><span class="pre">...</span></tt>  が近傍にある文書を検索します。（近傍検索。） <tt class="docutils literal"><span class="pre">カラム</span></tt> には全文検索用のインデックスが設定されていなければいけません。</p>
-<p>未サポートです。</p>
 </div>
-<div class="section" id="s">
-<h3>7.7.2.2.5. <tt class="docutils literal"><span class="pre">カラム</span> <span class="pre">*S</span> <span class="pre">&quot;文書&quot;</span></tt><a class="headerlink" href="#s" title="Permalink to this headline">¶</a></h3>
-<p><tt class="docutils literal"><span class="pre">カラム</span></tt> の値が <tt class="docutils literal"><span class="pre">文書</span></tt> に類似している文書を検索します。（類似文書検索。） <tt class="docutils literal"><span class="pre">カラム</span></tt> には全文検索用のインデックスが設定されていなければいけません。</p>
 </div>
-<div class="section" id="id6">
-<h3>7.7.2.2.6. <tt class="docutils literal"><span class="pre">カラム</span> <span class="pre">*&gt;</span> <span class="pre">重み</span></tt><a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
-<p><tt class="docutils literal"><span class="pre">カラム</span></tt> の重みを <tt class="docutils literal"><span class="pre">重み</span></tt> 分上げます。</p>
-<p>未サポート。</p>
+<div class="section" id="assignment-operators">
+<h2>7.8.2.7. Assignment operators<a class="headerlink" href="#assignment-operators" title="Permalink to this headline">¶</a></h2>
+<p>TODO: ...</p>
 </div>
-<div class="section" id="id7">
-<h3>7.7.2.2.7. <tt class="docutils literal"><span class="pre">カラム</span> <span class="pre">*&lt;</span> <span class="pre">重み</span></tt><a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
-<p><tt class="docutils literal"><span class="pre">カラム</span></tt> の重みを <tt class="docutils literal"><span class="pre">重み</span></tt> 分下げます。</p>
-<p>未サポート。</p>
+<div class="section" id="original-operators">
+<h2>7.8.2.8. Original operators<a class="headerlink" href="#original-operators" title="Permalink to this headline">¶</a></h2>
+<p>Script syntax adds the original binary opearators to ECMAScript
+syntax. They operate search specific operations. They are starts with
+<tt class="docutils literal"><span class="pre">&#64;</span></tt> or <tt class="docutils literal"><span class="pre">*</span></tt>.</p>
+<div class="section" id="match-operator">
+<span id="match-oeprator"></span><h3>7.8.2.8.1. Match operator<a class="headerlink" href="#match-operator" title="Permalink to this headline">¶</a></h3>
+<p>Its syntax is <tt class="docutils literal"><span class="pre">column</span> <span class="pre">&#64;</span> <span class="pre">value</span></tt>.</p>
+<p>The operator searches <tt class="docutils literal"><span class="pre">value</span></tt> by inverted index of <tt class="docutils literal"><span class="pre">column</span></tt>.
+Normally, full text search is operated but tag search can be operated.
+Because tag search is also implemented by inverted index.</p>
+<p><a class="reference internal" href="query_syntax.html"><em>Query syntax</em></a> uses this operator by default.</p>
+<p>Here is a simple exmaple.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --filter &#39;content @ &quot;fast&quot;&#39; --output_columns content
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ]
+#       ],
+#       [
+#         &quot;I started to use groonga. It&#39;s very fast!&quot;
+#       ],
+#       [
+#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
 </div>
-<div class="section" id="id8">
-<h3>7.7.2.2.8. <tt class="docutils literal"><span class="pre">カラム</span> <span class="pre">*~</span> <span class="pre">重み</span></tt><a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
-<p><tt class="docutils literal"><span class="pre">カラム</span></tt> がマッチした場合、文書の検索スコアを <tt class="docutils literal"><span class="pre">重み</span></tt> 分下げます。</p>
-<p>未サポート。</p>
+<p>The expression matches records that contain a word <tt class="docutils literal"><span class="pre">fast</span></tt> in
+<tt class="docutils literal"><span class="pre">content</span></tt> column value.</p>
+</div>
+<div class="section" id="prefix-search-operator">
+<span id="id1"></span><h3>7.8.2.8.2. Prefix search operator<a class="headerlink" href="#prefix-search-operator" title="Permalink to this headline">¶</a></h3>
+<p>Its syntax is <tt class="docutils literal"><span class="pre">column</span> <span class="pre">&#64;^</span> <span class="pre">value</span></tt>.</p>
+<p>The operator does prefix search with <tt class="docutils literal"><span class="pre">value</span></tt>. Prefix search searches
+records that contain a word that starts with <tt class="docutils literal"><span class="pre">value</span></tt>.</p>
+<p>You can use fast prefix search against a column. The column must be
+indexed and index table must be patricia trie table
+(<tt class="docutils literal"><span class="pre">TABLE_PAT_KEY</span></tt>) or double array trie table
+(<tt class="docutils literal"><span class="pre">TABLE_DAT_KEY</span></tt>). You can also use fast prefix search against
+<tt class="docutils literal"><span class="pre">_key</span></tt> pseudo column of patricia trie table or double array trie
+table. You don't need to index <tt class="docutils literal"><span class="pre">_key</span></tt>.</p>
+<p>Prefix search can be used with other table types but it causes all
+records scan. It's not problem for small records but it spends more
+time for large records.</p>
+<p>Here is a simple exmaple.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --filter &#39;_key @^ &quot;Goo&quot;&#39; --output_columns _key
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Good-bye Tritonn&quot;
+#       ],
+#       [
+#         &quot;Good-bye Senna&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The expression matches records that contain a word that starts with
+<tt class="docutils literal"><span class="pre">Goo</span></tt> in <tt class="docutils literal"><span class="pre">_key</span></tt> pseudo column value. <tt class="docutils literal"><span class="pre">Good-bye</span> <span class="pre">Senna</span></tt> and
+<tt class="docutils literal"><span class="pre">Good-bye</span> <span class="pre">Tritonn</span></tt> are matched with the expression.</p>
+</div>
+<div class="section" id="suffix-search-operator">
+<span id="id2"></span><h3>7.8.2.8.3. Suffix search operator<a class="headerlink" href="#suffix-search-operator" title="Permalink to this headline">¶</a></h3>
+<p>Its syntax is <tt class="docutils literal"><span class="pre">column</span> <span class="pre">&#64;$</span> <span class="pre">value</span></tt>.</p>
+<p>This operator does suffix search with <tt class="docutils literal"><span class="pre">value</span></tt>. Suffix search
+searches records that contain a word that ends with <tt class="docutils literal"><span class="pre">value</span></tt>.</p>
+<p>You can use fast suffix search against a column. The column must be
+indexed and index table must be patricia trie table
+(<tt class="docutils literal"><span class="pre">TABLE_PAT_KEY</span></tt>) with <tt class="docutils literal"><span class="pre">KEY_WITH_SIS</span></tt> flag. You can also use fast
+suffix search against <tt class="docutils literal"><span class="pre">_key</span></tt> pseudo column of patricia trie table
+(<tt class="docutils literal"><span class="pre">TABLE_PAT_KEY</span></tt>) with <tt class="docutils literal"><span class="pre">KEY_WITH_SIS</span></tt> flag. You don't need to
+index <tt class="docutils literal"><span class="pre">_key</span></tt>. We recommended that you use index column based fast
+suffix search instead of <tt class="docutils literal"><span class="pre">_key</span></tt> based fast suffix search. <tt class="docutils literal"><span class="pre">_key</span></tt>
+based fast suffix search returns automatically registered
+substrings. (TODO: write document about suffix search and link to it
+from here.)</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Fast suffix search can be used only for non-ASCII characters such
+as hiragana in Japanese. You cannot use fast suffix search for
+ASCII character.</p>
+</div>
+<p>Suffix search can be used with other table types or patricia trie
+table without <tt class="docutils literal"><span class="pre">KEY_WITH_SIS</span></tt> flag but it causes all records
+scan. It's not problem for small records but it spends more time for
+large records.</p>
+<p>Here is a simple exmaple. It uses fast suffix search for hiragana in
+Japanese that is one of non-ASCII characters.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Titles TABLE_NO_KEY
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Titles content COLUMN_SCALAR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create SuffixSearchTerms TABLE_PAT_KEY|KEY_WITH_SIS ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create SuffixSearchTerms index COLUMN_INDEX Titles content
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+load --table Titles
+[
+{&quot;content&quot;: &quot;ぐるんが&quot;},
+{&quot;content&quot;: &quot;むるんが&quot;},
+{&quot;content&quot;: &quot;せな&quot;},
+{&quot;content&quot;: &quot;とりとん&quot;}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 4]
+select Titles --query &#39;content:$んが&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         2,
+#         &quot;むるんが&quot;
+#       ],
+#       [
+#         1,
+#         &quot;ぐるんが&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The expression matches records that have value that ends with <tt class="docutils literal"><span class="pre">んが</span></tt>
+in <tt class="docutils literal"><span class="pre">content</span></tt> column value. <tt class="docutils literal"><span class="pre">ぐるんが</span></tt> and <tt class="docutils literal"><span class="pre">むるんが</span></tt> are matched
+with the expression.</p>
+</div>
+<div class="section" id="near-search-operator">
+<span id="id3"></span><h3>7.8.2.8.4. Near search operator<a class="headerlink" href="#near-search-operator" title="Permalink to this headline">¶</a></h3>
+<p>Its syntax is <tt class="docutils literal"><span class="pre">column</span> <span class="pre">*N</span> <span class="pre">&quot;word1</span> <span class="pre">word2</span> <span class="pre">...&quot;</span></tt>.</p>
+<p>The operator does near search with words <tt class="docutils literal"><span class="pre">word1</span> <span class="pre">word2</span> <span class="pre">...</span></tt>. Near
+search searches records that contain the words and the words are
+appeared in the near distance. Near distance is always <tt class="docutils literal"><span class="pre">10</span></tt> for
+now. The unit of near distance is the number of characters in N-gram
+family tokenizers and the number of words in morphological analysis
+family tokenizers.</p>
+<p>(TODO: Add a description about <tt class="docutils literal"><span class="pre">TokenBigram</span></tt> doesn't split ASCII
+only word into tokens. So the unit for ASCII words with
+<tt class="docutils literal"><span class="pre">TokenBigram</span></tt> is the number of words even if <tt class="docutils literal"><span class="pre">TokenBigram</span></tt> is a
+N-gram family tokenizer.)</p>
+<p>Note that an index column for full text search must be defined for
+<tt class="docutils literal"><span class="pre">column</span></tt>.</p>
+<p>Here is a simple exmaple.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --filter &#39;content *N &quot;I fast&quot;&#39;      --output_columns content
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ]
+#       ],
+#       [
+#         &quot;I started to use groonga. It&#39;s very fast!&quot;
+#       ]
+#     ]
+#   ]
+# ]
+select Entries --filter &#39;content *N &quot;I Really&quot;&#39;    --output_columns content
+# [[0, 1337566253.89858, 0.000355720520019531], [[[0], [[&quot;content&quot;, &quot;Text&quot;]]]]]
+select Entries --filter &#39;content *N &quot;also Really&quot;&#39; --output_columns content
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ]
+#       ],
+#       [
+#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The first expression matches records that contain <tt class="docutils literal"><span class="pre">I</span></tt> and <tt class="docutils literal"><span class="pre">fast</span></tt>
+and the near distance of those words are in 10 words. So the record
+that its content is <tt class="docutils literal"><span class="pre">I</span> <span class="pre">also</span> <span class="pre">started</span> <span class="pre">to</span> <span class="pre">use</span> <span class="pre">mroonga.</span> <span class="pre">It's</span> <span class="pre">also</span> <span class="pre">very</span>
+<span class="pre">fast!</span> <span class="pre">...</span></tt> is matched. The number of words between <tt class="docutils literal"><span class="pre">I</span></tt> and <tt class="docutils literal"><span class="pre">fast</span></tt>
+is just 10.</p>
+<p>The second expression matches records that contain <tt class="docutils literal"><span class="pre">I</span></tt> and
+<tt class="docutils literal"><span class="pre">Really</span></tt> and the near distance of those words are in 10 words. So
+the record that its content is <tt class="docutils literal"><span class="pre">I</span> <span class="pre">also</span> <span class="pre">started</span> <span class="pre">to</span> <span class="pre">use</span> <span class="pre">mroonga.</span> <span class="pre">It's</span>
+<span class="pre">also</span> <span class="pre">very</span> <span class="pre">fast!</span> <span class="pre">Really</span> <span class="pre">fast!</span></tt> is not matched. The number of words between
+<tt class="docutils literal"><span class="pre">I</span></tt> and <tt class="docutils literal"><span class="pre">Really</span></tt> is 11.</p>
+<p>The third expression matches records that contain <tt class="docutils literal"><span class="pre">also</span></tt> and
+<tt class="docutils literal"><span class="pre">Really</span></tt> and the near distance of those words are in 10 words. So
+the record that its content is <tt class="docutils literal"><span class="pre">I</span> <span class="pre">also</span> <span class="pre">st</span> <span class="pre">arted</span> <span class="pre">to</span> <span class="pre">use</span> <span class="pre">mroonga.</span> <span class="pre">It's</span>
+<span class="pre">also</span> <span class="pre">very</span> <span class="pre">fast!</span> <span class="pre">Really</span> <span class="pre">fast!</span></tt> is matched. The number of words between
+<tt class="docutils literal"><span class="pre">also</span></tt> and <tt class="docutils literal"><span class="pre">Really</span></tt> is 10.</p>
+</div>
+<div class="section" id="similar-search">
+<span id="similar-search-operator"></span><h3>7.8.2.8.5. Similar search<a class="headerlink" href="#similar-search" title="Permalink to this headline">¶</a></h3>
+<p>Its syntax is <tt class="docutils literal"><span class="pre">column</span> <span class="pre">*S</span> <span class="pre">&quot;document&quot;</span></tt>.</p>
+<p>The operator does similar search with document <tt class="docutils literal"><span class="pre">document</span></tt>. Similar
+search searches records that have similar content to
+<tt class="docutils literal"><span class="pre">document</span></tt>.</p>
+<p>Note that an index column for full text search must be defined for
+<tt class="docutils literal"><span class="pre">column</span></tt>.</p>
+<p>Here is a simple exmaple.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --filter &#39;content *S &quot;I migrated all Solr system!&quot;&#39; --output_columns content
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ]
+#       ],
+#       [
+#         &quot;I migrated all Senna system!&quot;
+#       ],
+#       [
+#         &quot;I also migrated all Tritonn system!&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The expression matches records that have similar content to <tt class="docutils literal"><span class="pre">I</span>
+<span class="pre">migrated</span> <span class="pre">all</span> <span class="pre">Solr</span> <span class="pre">system!</span></tt>. In this case, records that have <tt class="docutils literal"><span class="pre">I</span>
+<span class="pre">migrated</span> <span class="pre">all</span> <span class="pre">XXX</span> <span class="pre">system!</span></tt> content are matched.</p>
+</div>
+<div class="section" id="term-extract-operator">
+<span id="id4"></span><h3>7.8.2.8.6. Term extract operator<a class="headerlink" href="#term-extract-operator" title="Permalink to this headline">¶</a></h3>
+<p>Its syntax is <tt class="docutils literal"><span class="pre">_key</span> <span class="pre">*T</span> <span class="pre">&quot;document&quot;</span></tt>.</p>
+<p>The operator extracts terms from <tt class="docutils literal"><span class="pre">document</span></tt>. Terms must be
+registered as keys of the table of <tt class="docutils literal"><span class="pre">_key</span></tt>.</p>
+<p>Note that the table must be patricia trie (<tt class="docutils literal"><span class="pre">TABLE_PAT_KEY</span></tt>) or
+double array trie (<tt class="docutils literal"><span class="pre">TABLE_DAT_KEY</span></tt>). You can't use hash table
+(<tt class="docutils literal"><span class="pre">TABLE_HASH_KEY</span></tt>) and array (<tt class="docutils literal"><span class="pre">TABLE_NO_KEY</span></tt>) becuase they don't
+support longest common prefix search. Longest common prefix search is
+used to implement the operator.</p>
+<p>Here is a simple exmaple.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Words TABLE_PAT_KEY|KEY_NORMALIZE ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+load --table Words
+[
+{&quot;_key&quot;: &quot;groonga&quot;},
+{&quot;_key&quot;: &quot;mroonga&quot;},
+{&quot;_key&quot;: &quot;Senna&quot;},
+{&quot;_key&quot;: &quot;Tritonn&quot;}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 4]
+select Words --filter &#39;_key *T &quot;Groonga is the successor project to Senna.&quot;&#39; --output_columns _key
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         &quot;groonga&quot;
+#       ],
+#       [
+#         &quot;senna&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The expression extrcts terms that included in document <tt class="docutils literal"><span class="pre">Groonga</span> <span class="pre">is</span>
+<span class="pre">the</span> <span class="pre">successor</span> <span class="pre">project</span> <span class="pre">to</span> <span class="pre">Senna.</span></tt>. In this case, <tt class="docutils literal"><span class="pre">KEY_NORMALIZE</span></tt>
+flag is specified to <tt class="docutils literal"><span class="pre">Words</span></tt>. So <tt class="docutils literal"><span class="pre">Groonga</span></tt> can be extracted even
+if it is loaded as <tt class="docutils literal"><span class="pre">groonga</span></tt> into <tt class="docutils literal"><span class="pre">Words</span></tt>. All of extracted terms
+are also normalized.</p>
 </div>
 </div>
 </div>
@@ -146,17 +1850,70 @@
         <div class="sphinxsidebarwrapper">
   <h3><a href="../../index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">7.7.2. Script Syntax</a><ul>
-<li><a class="reference internal" href="#id1">7.7.2.1. 基本的な演算子</a></li>
-<li><a class="reference internal" href="#id2">7.7.2.2. 独自の演算子</a><ul>
-<li><a class="reference internal" href="#id3">7.7.2.2.1. <tt class="docutils literal"><span class="pre">カラム</span> <span class="pre">&#64;</span> <span class="pre">値</span></tt></a></li>
-<li><a class="reference internal" href="#id4">7.7.2.2.2. <tt class="docutils literal"><span class="pre">カラム</span> <span class="pre">&#64;^</span> <span class="pre">値</span></tt></a></li>
-<li><a class="reference internal" href="#id5">7.7.2.2.3. <tt class="docutils literal"><span class="pre">カラム</span> <span class="pre">&#64;$</span> <span class="pre">値</span></tt></a></li>
-<li><a class="reference internal" href="#n-1-2">7.7.2.2.4. <tt class="docutils literal"><span class="pre">カラム</span> <span class="pre">*N</span> <span class="pre">&quot;単語1</span> <span class="pre">単語2</span> <span class="pre">...&quot;</span></tt></a></li>
-<li><a class="reference internal" href="#s">7.7.2.2.5. <tt class="docutils literal"><span class="pre">カラム</span> <span class="pre">*S</span> <span class="pre">&quot;文書&quot;</span></tt></a></li>
-<li><a class="reference internal" href="#id6">7.7.2.2.6. <tt class="docutils literal"><span class="pre">カラム</span> <span class="pre">*&gt;</span> <span class="pre">重み</span></tt></a></li>
-<li><a class="reference internal" href="#id7">7.7.2.2.7. <tt class="docutils literal"><span class="pre">カラム</span> <span class="pre">*&lt;</span> <span class="pre">重み</span></tt></a></li>
-<li><a class="reference internal" href="#id8">7.7.2.2.8. <tt class="docutils literal"><span class="pre">カラム</span> <span class="pre">*~</span> <span class="pre">重み</span></tt></a></li>
+<li><a class="reference internal" href="#">7.8.2. Script syntax</a><ul>
+<li><a class="reference internal" href="#sample-data">7.8.2.1. Sample data</a></li>
+<li><a class="reference internal" href="#literals">7.8.2.2. Literals</a><ul>
+<li><a class="reference internal" href="#integer">7.8.2.2.1. Integer</a></li>
+<li><a class="reference internal" href="#float">7.8.2.2.2. Float</a></li>
+<li><a class="reference internal" href="#string">7.8.2.2.3. String</a></li>
+<li><a class="reference internal" href="#boolean">7.8.2.2.4. Boolean</a></li>
+<li><a class="reference internal" href="#null">7.8.2.2.5. Null</a></li>
+<li><a class="reference internal" href="#time">7.8.2.2.6. Time</a></li>
+<li><a class="reference internal" href="#geo-point">7.8.2.2.7. Geo point</a></li>
+<li><a class="reference internal" href="#array">7.8.2.2.8. Array</a></li>
+<li><a class="reference internal" href="#object-literal">7.8.2.2.9. Object literal</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#control-syntaxes">7.8.2.3. Control syntaxes</a></li>
+<li><a class="reference internal" href="#grouping">7.8.2.4. Grouping</a></li>
+<li><a class="reference internal" href="#function-call">7.8.2.5. Function call</a></li>
+<li><a class="reference internal" href="#basic-operators">7.8.2.6. Basic operators</a><ul>
+<li><a class="reference internal" href="#arithmetic-operators">7.8.2.6.1. Arithmetic operators</a><ul>
+<li><a class="reference internal" href="#addition-operator">7.8.2.6.1.1. Addition operator</a></li>
+<li><a class="reference internal" href="#subtraction-operator">7.8.2.6.1.2. Subtraction operator</a></li>
+<li><a class="reference internal" href="#multiplication-operator">7.8.2.6.1.3. Multiplication operator</a></li>
+<li><a class="reference internal" href="#division-operator">7.8.2.6.1.4. Division operator</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#logical-operators">7.8.2.6.2. Logical operators</a><ul>
+<li><a class="reference internal" href="#logical-not-operator">7.8.2.6.2.1. Logical NOT operator</a></li>
+<li><a class="reference internal" href="#logical-and-operator">7.8.2.6.2.2. Logical AND operator</a></li>
+<li><a class="reference internal" href="#logical-or-operator">7.8.2.6.2.3. Logical OR operator</a></li>
+<li><a class="reference internal" href="#logical-and-not-operator">7.8.2.6.2.4. Logical AND NOT operator</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#bitwise-operators">7.8.2.6.3. Bitwise operators</a><ul>
+<li><a class="reference internal" href="#bitwise-not-operator">7.8.2.6.3.1. Bitwise NOT operator</a></li>
+<li><a class="reference internal" href="#bitwise-and-operator">7.8.2.6.3.2. Bitwise AND operator</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#bitwise-or-operator">7.8.2.6.4. Bitwise OR operator</a></li>
+<li><a class="reference internal" href="#bitwise-xor-operator">7.8.2.6.5. Bitwise XOR operator</a></li>
+<li><a class="reference internal" href="#shift-operators">7.8.2.6.6. Shift operators</a><ul>
+<li><a class="reference internal" href="#left-shift-operator">7.8.2.6.6.1. Left shift operator</a></li>
+<li><a class="reference internal" href="#signed-right-shift-operator">7.8.2.6.6.2. Signed right shift operator</a></li>
+<li><a class="reference internal" href="#unsigned-right-shift-operator">7.8.2.6.6.3. Unsigned right shift operator</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#comparison-operators">7.8.2.6.7. Comparison operators</a><ul>
+<li><a class="reference internal" href="#equal-operator">7.8.2.6.7.1. Equal operator</a></li>
+<li><a class="reference internal" href="#not-equal-operator">7.8.2.6.7.2. Not equal operator</a></li>
+<li><a class="reference internal" href="#less-than-operator">7.8.2.6.7.3. Less than operator</a></li>
+<li><a class="reference internal" href="#less-than-or-equal-to-operator">7.8.2.6.7.4. Less than or equal to operator</a></li>
+<li><a class="reference internal" href="#greater-than-operator">7.8.2.6.7.5. Greater than operator</a></li>
+<li><a class="reference internal" href="#greater-than-or-equal-to-operator">7.8.2.6.7.6. Greater than or equal to operator</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#assignment-operators">7.8.2.7. Assignment operators</a></li>
+<li><a class="reference internal" href="#original-operators">7.8.2.8. Original operators</a><ul>
+<li><a class="reference internal" href="#match-operator">7.8.2.8.1. Match operator</a></li>
+<li><a class="reference internal" href="#prefix-search-operator">7.8.2.8.2. Prefix search operator</a></li>
+<li><a class="reference internal" href="#suffix-search-operator">7.8.2.8.3. Suffix search operator</a></li>
+<li><a class="reference internal" href="#near-search-operator">7.8.2.8.4. Near search operator</a></li>
+<li><a class="reference internal" href="#similar-search">7.8.2.8.5. Similar search</a></li>
+<li><a class="reference internal" href="#term-extract-operator">7.8.2.8.6. Term extract operator</a></li>
 </ul>
 </li>
 </ul>
@@ -165,10 +1922,10 @@
 
   <h4>Previous topic</h4>
   <p class="topless"><a href="query_syntax.html"
-                        title="previous chapter">7.7.1. Query syntax</a></p>
+                        title="previous chapter">7.8.1. Query syntax</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="../../functions.html"
-                        title="next chapter">7.8. 組み込み関数一覧</a></p>
+  <p class="topless"><a href="../functions.html"
+                        title="next chapter">7.9. 組み込み関数一覧</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="../../sources/reference/grn_expr/script_syntax.txt"
@@ -198,14 +1955,14 @@
           <a href="../../genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="../../functions.html" title="7.8. 組み込み関数一覧"
+          <a href="../functions.html" title="7.9. 組み込み関数一覧"
              >next</a> |</li>
         <li class="right" >
-          <a href="query_syntax.html" title="7.7.1. Query syntax"
+          <a href="query_syntax.html" title="7.8.1. Query syntax"
              >previous</a> |</li>
-        <li><a href="../../index.html">groonga v2.0.4 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">groonga v2.0.5-49-gef0de04 documentation</a> &raquo;</li>
           <li><a href="../../reference.html" >7. リファレンスマニュアル</a> &raquo;</li>
-          <li><a href="../grn_expr.html" >7.7. grn_expr</a> &raquo;</li> 
+          <li><a href="../grn_expr.html" >7.8. grn_expr</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

@@ -237,7 +237,35 @@ reverse proxy is needed.
 :doc:`groonga-httpd` supports gzip compression. Here is a sample
 configuration to compress response by gzip::
 
-  TODO
+  events {
+  }
+
+  http {
+    server {
+      listen 10041;
+
+      groonga_database /PATH/TO/DATABASE;
+
+      location /d/ {
+        groonga    on;
+        gzip       on;
+        gzip_types *;
+      }
+    }
+  }
+
+Note that `gzip_types *` is specified. It's one of the important
+configuration. `gzip_types` specifies gzip target data formats by MIME
+types. :doc:`groonga-httpd` returns one of JSON, XML or MessagePack
+format data. But those formats aren't included in the default value of
+`gzip_types`. The default value of `gzip_types` is `text/html`.
+
+To compress response data from :doc:`groonga-httpd` by gzip, you need
+to specify `gzip_types *` or `gzip_types application/json text/xml
+application/x-msgpack` explicitly. `gzip_types *` is recommended.
+There are two reasons for it. The first, groonga may support more
+formats in the future. The second, all requests for the `location` are
+processed by groonga. You don't need to consider about other modules.
 
 POST
 ----

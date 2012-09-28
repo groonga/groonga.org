@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>7.2.1. Comparison &mdash; groonga v2.0.6 documentation</title>
+    <title>7.2.1. Comparison &mdash; groonga v2.0.7 documentation</title>
     
     <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '2.0.6',
+        VERSION:     '2.0.7',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../../static/underscore.js"></script>
     <script type="text/javascript" src="../../static/doctools.js"></script>
     <link rel="shortcut icon" href="../../static/favicon.ico"/>
-    <link rel="top" title="groonga v2.0.6 documentation" href="../../index.html" />
+    <link rel="top" title="groonga v2.0.7 documentation" href="../../index.html" />
     <link rel="up" title="7.2. HTTP" href="../http.html" />
     <link rel="next" title="7.2.2. groonga" href="groonga.html" />
     <link rel="prev" title="7.2. HTTP" href="../http.html" /> 
@@ -75,7 +75,7 @@
         <li class="right" >
           <a href="../http.html" title="7.2. HTTP"
              accesskey="P">previous</a> |</li>
-        <li><a href="../../index.html">groonga v2.0.6 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">groonga v2.0.7 documentation</a> &raquo;</li>
           <li><a href="../../server.html" >7. Server</a> &raquo;</li>
           <li><a href="../http.html" accesskey="U">7.2. HTTP</a> &raquo;</li> 
       </ul>
@@ -340,9 +340,35 @@ for large search response.</p>
 reverse proxy is needed.</p>
 <p><a class="reference internal" href="groonga-httpd.html"><em>groonga-httpd</em></a> supports gzip compression. Here is a sample
 configuration to compress response by gzip:</p>
-<div class="highlight-none"><div class="highlight"><pre>TODO
+<div class="highlight-none"><div class="highlight"><pre>events {
+}
+
+http {
+  server {
+    listen 10041;
+
+    groonga_database /PATH/TO/DATABASE;
+
+    location /d/ {
+      groonga    on;
+      gzip       on;
+      gzip_types *;
+    }
+  }
+}
 </pre></div>
 </div>
+<p>Note that <cite>gzip_types *</cite> is specified. It's one of the important
+configuration. <cite>gzip_types</cite> specifies gzip target data formats by MIME
+types. <a class="reference internal" href="groonga-httpd.html"><em>groonga-httpd</em></a> returns one of JSON, XML or MessagePack
+format data. But those formats aren't included in the default value of
+<cite>gzip_types</cite>. The default value of <cite>gzip_types</cite> is <cite>text/html</cite>.</p>
+<p>To compress response data from <a class="reference internal" href="groonga-httpd.html"><em>groonga-httpd</em></a> by gzip, you need
+to specify <cite>gzip_types *</cite> or <cite>gzip_types application/json text/xml
+application/x-msgpack</cite> explicitly. <cite>gzip_types *</cite> is recommended.
+There are two reasons for it. The first, groonga may support more
+formats in the future. The second, all requests for the <cite>location</cite> are
+processed by groonga. You don't need to consider about other modules.</p>
 </div>
 <div class="section" id="post">
 <h2>7.2.1.9. POST<a class="headerlink" href="#post" title="Permalink to this headline">¶</a></h2>
@@ -427,7 +453,7 @@ configuration to compress response by gzip:</p>
         <li class="right" >
           <a href="../http.html" title="7.2. HTTP"
              >previous</a> |</li>
-        <li><a href="../../index.html">groonga v2.0.6 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">groonga v2.0.7 documentation</a> &raquo;</li>
           <li><a href="../../server.html" >7. Server</a> &raquo;</li>
           <li><a href="../http.html" >7.2. HTTP</a> &raquo;</li> 
       </ul>

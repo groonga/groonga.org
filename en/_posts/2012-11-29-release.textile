@@ -1,0 +1,283 @@
+---
+layout: post.en
+title: Groonga 2.0.9 has been released
+description: Groonga 2.0.9 has been released!
+publish: false
+---
+
+h2. Groonga 2.0.9 has been released
+
+"Groonga 2.0.9":/docs/news.html#release-2-0-9 has been released!
+
+How to install: "Install":/docs/install.html
+
+There are four topics for this release.
+
+* Supported snippet_html() function
+* Supported nested index search among related table by column index
+* Supported range search by using index
+* Supported calculation across meridian, equator, the date line by geo_distance() function
+
+h3. Supported snippet_html() function
+
+This release began to support snippet_html() function which extract keyword and surrounding text.
+Note that this is experimentally supported API, so this API would be changed in the future.
+
+Use snippet_html() fuction following syntax:
+
+<pre>
+  snippet_html(column name)
+</pre>
+
+Here is the more concrete example.
+
+Schema definition:
+
+<pre>
+  table_create Documents TABLE_NO_KEY
+  column_create Documents content COLUMN_SCALAR Text
+  table_create Terms TABLE_PAT_KEY|KEY_NORMALIZE ShortText --default_tokenizer TokenBigram
+  column_create Terms documents_content_index COLUMN_INDEX|WITH_POSITION Documents content
+</pre>
+
+Sample data:
+
+<pre>
+  load --table Documents
+  [
+  ["content"],
+  ["Groonga is a fast and accurate full text search engine based on inverted index."],
+  ["Groonga is also a column-oriented database management system (DBMS)."],
+  ["Mroonga was called groonga storage engine."]
+  ]
+</pre>
+
+If you want to search 'groonga' and extract 'groonga' and surrounding text from Documents
+table, try following:
+
+Here is the query to search 'groonga' with snippet_html function.
+
+<pre>
+  select Documents --output_columns "snippet_html(content)" --command_version 2 --match_columns content --query "groonga" 
+  [
+    [0,1353893385.5454,0.000486850738525391],
+    [
+      [
+        [3],
+        [["snippet_html","null"]],
+        [["<span class=\"keyword\">Groonga</span> is a fast and accurate full text search engine based on inverted index."]],
+        [["<span class=\"keyword\">Groonga</span> is also a column-oriented database management system (DBMS)."]],
+        [["Mroonga was called <span class=\"keyword\">groonga</span> storage engine."]]
+      ]
+    ]
+  ]
+</pre>
+
+As a result, specified keyword is surrounded by @<span>@ tag, and keyword 'groonga' and surrounding text is extracted like a highlighted search results.
+
+Note that you need to specify @'--command_version 2'@ in the query.
+The reason why function call in @--output_column@ has supported from version 2.0.9.
+
+See following documentation about "snippet_html":http://groonga.org/docs/reference/functions/snippet_html.html details.
+  
+
+h3. Supported nested index search among related table by column index
+
+This release began to support nested index search among related table by column index.
+
+If there are relationships among multiple table with column index, you can search multiple table by specifing column index name.
+
+Here is the concrete example.
+
+there are tables which store blog articles, comments for articles. The table which stores articles has columns for article and comment, and the comment column refers comments table.
+The table which stores comments has columns for comment and column index to article table.
+
+In the previous release of groonga, if you want to search the articles which contain specified keyword in comment, you need to execute fulltext search for table of comment, then search the records which contains fulltext search results.
+
+Now, you can search the records by specifing the refererence column index at once.
+
+here is the sample how to use this feature.
+
+Schema definition:
+
+<pre>
+  table_create Comments TABLE_HASH_KEY UInt32
+  column_create Comments content COLUMN_SCALAR ShortText
+
+  table_create Articles TABLE_NO_KEY
+  column_create Articles content COLUMN_SCALAR Text
+  column_create Articles comment COLUMN_SCALAR Comments
+
+  table_create Lexicon TABLE_PAT_KEY|KEY_NORMALIZE ShortText --default_tokenizer TokenBigram
+  column_create Lexicon articles_content COLUMN_INDEX|WITH_POSITION Articles content
+  column_create Lexicon comments_content COLUMN_INDEX|WITH_POSITION Comments content
+
+  column_create Comments article COLUMN_INDEX Articles comment
+</pre>
+
+Sample data:
+
+<pre>
+  load --table Comments
+  [
+  {"_key": 1, "content": "I'm using groonga too!"},
+  {"_key": 2, "content": "I'm using groonga and mroonga!"},
+  {"_key": 3, "content": "I'm using mroonga too!"}
+  ]
+
+  load --table Articles
+  [
+  {"content": "Groonga is fast!", "comment": 1},
+  {"content": "Groonga is useful!"},
+  {"content": "Mroonga is fast!", "comment": 3}
+  ]
+</pre>
+
+You can write the query that search the records which contains specified keyword as a comment, then fetch the articles which refers to it.
+
+<pre>
+  select Articles --match_columns comment.content --query groonga --output_columns "_id, _score, *" 
+</pre>
+
+You need to concatinate comment column of articles table and content column of comments table with period(.) as @--match_columns@ arguments.
+
+At first, this query execute fulltext search from content of comments table, then fetch the records of articles table which refers to already searched records of comments table.
+(Because of this, if you comment out the query which create column index 'article' of comments table, you can't get intended search results.)
+
+<pre>
+  [
+    [0,1353903149.81632,0.000459432601928711],
+    [
+      [
+       [1],
+       [["_id","UInt32"],["_score","Int32"],["comment","Comments"],["content","Text"]],
+       [1,1,1,"Groonga is fast!"]
+      ]
+    ]
+  ]
+</pre>
+
+Now, you can search articles which contains specific keywords as a comment.
+
+h3. Supported range search by using index
+
+This release began to support range search by using index.
+For example, you can search date after the specified one for the column which stores the value of Time type.
+
+Here is the sample how to use this feature.
+
+Schema definition:
+
+<pre>
+  table_create Users TABLE_HASH_KEY ShortText
+  column_create Users birthday COLUMN_SCALAR Time
+  table_create Birthdays TABLE_PAT_KEY Time
+  column_create Birthdays users_birthday COLUMN_INDEX Users birthday
+</pre>
+
+Sample data:
+
+<pre>
+  load --table Users
+  [
+  {"_key": "Alice",  "birthday": "1992-02-09 00:00:00"},
+  {"_key": "Bob",    "birthday": "1988-01-04 00:00:00"},
+  {"_key": "Carlos", "birthday": "1982-12-29 00:00:00"}
+  ]
+</pre>
+
+Now, registered birthdays, you can search date after the specified one.
+
+Here is the sample query to search person who is younger than Bob.
+
+In range search, you can specify 'younger' expression as  'birthday > "1988-01-04 00:00:00"' in this case.
+
+Here is concrete example.
+
+<pre>
+  select Users --filter 'birthday > "1988-01-04 00:00:00"'
+  [
+    [0,1354069642.52512,0.000299692153930664],
+    [
+      [
+        [1],
+        [
+          ["_id","UInt32"],
+          ["_key","ShortText"],
+          ["birthday","Time"]
+        ],
+        [1,"Alice",697561200.0]
+      ]
+    ]
+  ]
+</pre>
+
+Alice is the only person who is younger than Bob, you see that search results is valid.
+
+In range search, you can specify @>@, @<@, @>=@, @<=@ operators.
+
+h3. Supported calculation across meridian, equator, the date line by geo_distance() function
+
+This release began to support calculation of the value of distance across meridian, equator, the date line by geo_distance() function.
+
+This functional enhancement is applied to the case which the way to approximate is 'rectangle'.
+
+There are some calculation method how to approximate the value of distance.
+
+Groonga supports folowing three method which has trade-offs in point of view of speed, acculacy.
+
+* "Rectangle":http://groonga.org/docs/reference/functions/geo_distance.html#rectangle
+  This regards geographical feature between specified points as level surface.
+  You can calculate the value of distance fast, but the error of distance increases as it approaches the pole.
+
+* "Sphere":http://groonga.org/docs/reference/functions/geo_distance.html#sphere
+  This regards geographical feature between specified points as spherical surface.
+  It is slower than rectangle, but the error of distance becomes smaller than rectangle.
+
+* "Ellipsoid":http://groonga.org/docs/reference/functions/geo_distance.html#ellipsoid
+  This regards geographical feature between specified points as ellipsoid.
+  It is slower than sphere, but the error of distance becomes smaller than sphere.
+
+Here is the sample how to caluculate the value of distance across meridian.
+
+This sample shows the value of distance between Paris(France) to Madrid(Spain). The geographical feature is approximated as level surface (rectangle).
+
+"175904000x8464000" means Paris(France) expressed in milliseconds. "145508000x-13291000" means Madrid(Spain) expressed in milliseconds.
+
+<pre>
+  select Geo --output_columns distance --scorer 'distance = geo_distance("175904000x8464000", "145508000x-13291000", "rectangle")'
+  [
+    [
+     0,
+     1337566253.89858,
+     0.000355720520019531
+   ],
+   [
+     [
+       [
+         1
+       ],
+       [
+         [
+           "distance",
+           "Int32" 
+         ]
+       ],
+       [
+         1051293
+       ]
+     ]
+   ]
+  ]
+</pre>
+
+See following documentation how to express "longitude and latitude in milliseconds":http://groonga.org/docs/reference/type.html
+
+See following documentation how to use "geo_distance":http://groonga.org/docs/reference/functions/geo_distance.html
+
+
+h3. Conclusion
+
+See "Release 2.0.9 2012/11/29":/docs/news.html#release-2-0-9 about detailed changes since 2.0.8.
+
+Let's search by groonga!

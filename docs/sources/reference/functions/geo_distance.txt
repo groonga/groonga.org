@@ -192,16 +192,10 @@ You can specify the value of ``approximate_type`` by one of the followings.
 
     There is a limitation about ``geo_distance``. ``geo_distance`` can not
     calculate the value of distance between two points across meridian,
-    euator or the date line.
+    equator or the date line if you use ``sphere`` or ``ellipsoid`` as
+    approximate type. There is not such a limitation for ``rectangle``.
     This is temporary limitation according to the implementation of groonga,
     but it will be fixed in the future release.
-
-.. note::
-
-    There is a limitation about ``geo_distance`` above notice.
-    But it relaxes the limitation if you use ``rectangle`` as approximate type.
-    You can calculate the correct distance if two point are placed at northern
-    hemisphere or southern hemisphere.
 
 ``rectangle``
 ...............
@@ -222,6 +216,29 @@ Here is a sample about calculating the value of distance with column value.
 Here is a sample about calculating the value of distance with explicitly specified point.
 
 .. include:: ../../example/reference/functions/geo_distance_distance_rectangle.log
+
+Here are samples about calculating the value of distance with explicitly specified point across meridian, equator, the date line.
+
+.. groonga-command
+.. include:: ../../example/reference/functions/geo_distance_distance_rectangle_across_meridian.log
+.. select Geo --output_columns distance --scorer 'distance = geo_distance("175904000x8464000", "145508000x-13291000", "rectangle")'
+
+This sample shows the value of distance across meridian.
+The return value of ``geo_distance("175904000x8464000", "145508000x-13291000", "rectangle")`` is the value of distance from Paris, Flance to Madrid, Spain.
+
+.. groonga-command
+.. include:: ../../example/reference/functions/geo_distance_distance_rectangle_across_equator.log
+.. select Geo --output_columns distance --scorer 'distance = geo_distance("146566000x-266422000", "-56880000x-172310000", "rectangle")'
+
+This sample shows the value of distance across equator.
+The return value of ``geo_distance("146566000x-266422000", "-56880000x-172310000", "rectangle")`` is the value of distance from New York, The United Status to Brasillia, Brasil.
+
+.. groonga-command
+.. include:: ../../example/reference/functions/geo_distance_distance_rectangle_across_the_date_line.log
+.. select Geo --output_columns distance --scorer 'distance = geo_distance("143660000x419009000", "135960000x-440760000", "rectangle")'
+
+This sample shows the value of distance across the date line.
+The return value of ``geo_distance("143660000x419009000", "135960000x-440760000", "rectangle")`` is the value of distance from Beijin, China to San Francisco, The United States.
 
 .. note::
 

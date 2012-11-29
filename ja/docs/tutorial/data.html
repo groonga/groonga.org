@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>4.3. いろいろなデータの保存 &mdash; groonga v2.0.8ドキュメント</title>
+    <title>4.3. いろいろなデータの保存 &mdash; groonga v2.0.9ドキュメント</title>
     
     <link rel="stylesheet" href="../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '2.0.8',
+        VERSION:     '2.0.9',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../static/doctools.js"></script>
     <script type="text/javascript" src="../static/translations.js"></script>
     <link rel="shortcut icon" href="../static/favicon.ico"/>
-    <link rel="top" title="groonga v2.0.8ドキュメント" href="../index.html" />
+    <link rel="top" title="groonga v2.0.9ドキュメント" href="../index.html" />
     <link rel="up" title="4. チュートリアル" href="../tutorial.html" />
     <link rel="next" title="4.4. さまざまな検索条件の指定" href="search.html" />
     <link rel="prev" title="4.2. リモートアクセス" href="network.html" /> 
@@ -76,7 +76,7 @@
         <li class="right" >
           <a href="network.html" title="4.2. リモートアクセス"
              accesskey="P">前へ</a> |</li>
-        <li><a href="../index.html">groonga v2.0.8ドキュメント</a> &raquo;</li>
+        <li><a href="../index.html">groonga v2.0.9ドキュメント</a> &raquo;</li>
           <li><a href="../tutorial.html" accesskey="U">4. チュートリアル</a> &raquo;</li> 
       </ul>
     </div>  
@@ -384,7 +384,7 @@ select --table ToyBox --output_columns _key,location
 <div class="section" id="reference-types">
 <h2>4.3.7. テーブル参照<a class="headerlink" href="#reference-types" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <p>groongaでは、テーブル参照のカラム、すなわち関連付けたテーブルを参照するカラムを作成できます。より正確には、カラム作成時に参照先となるテーブルとの関連付けをおこない、参照先テーブルにおけるレコードIDを格納しておくことにより、参照先のレコードにアクセスできるようにします。</p>
-<p>You can specify a column in the associated table to the <cite>output_columns</cite> parameter of a <a class="reference internal" href="../reference/commands/select.html"><em>select</em></a> command. The format is &quot;Src.Dest&quot; where Src is the name of the reference column and Dest is the name of the target column. If only the reference column is specified, it is handled as &quot;Src._key&quot;. Note that if a reference does not point to a valid record, a <a class="reference internal" href="../reference/commands/select.html"><em>select</em></a> command outputs the default value of the target column.</p>
+<p>テーブル参照のカラムがあるときは、 <tt class="xref doc docutils literal"><span class="pre">reference/command/select</span></tt> コマンドの <cite>output_columns</cite> 引数に &quot;参照元カラム.参照先カラム&quot; と指定することにより、参照先カラムの値を取り出すことができます。参照元カラムのみを指定したときは、 &quot;参照元カラム名._key&quot; と同様の扱いとなり、参照先レコードの主キーが取り出されます。テーブル参照が有効なレコードを指していないときは、参照先カラムのデフォルト値が取り出されるようになっています。</p>
 <p>ここでは、先のチュートリアルで作成したSiteテーブルにlinkという新たなカラムを作成し、サイト間のリンク関係を保存できるようにしてみましょう。</p>
 <p>実行例:</p>
 <div class="highlight-none"><div class="highlight"><pre>column_create --table Site --name link --type Site
@@ -433,7 +433,7 @@ select --table Site --output_columns _key,title,link._key,link.title --query tit
 # ]
 </pre></div>
 </div>
-<p>The <cite>type</cite> parameter of the <a class="reference internal" href="../reference/commands/column_create.html"><em>column_create</em></a> command specifies the table to be associated with the reference column. In this example, the reference column is associated with the own table. Then, the <a class="reference internal" href="../reference/commands/load.html"><em>load</em></a> command registers a link from &quot;<a class="reference external" href="http://example.org">http://example.org</a>&quot; to &quot;<a class="reference external" href="http://example.net">http://example.net</a>&quot;. Note that a reference column requires the primary key, not the ID, of the record to be referred to. After that, the link is confirmed by the <a class="reference internal" href="../reference/commands/select.html"><em>select</em></a> command. In this case, the primary key and the title of the referred record are output because link._key and link.title are specified to the <cite>output_columns</cite> parameter.</p>
+<p>テーブル参照のカラムを作成するときは、 <a class="reference internal" href="../reference/commands/column_create.html"><em>column_create</em></a> コマンドの <cite>type</cite> 引数に参照先テーブルを指定します。この例では、同じテーブルに含まれる別のレコードを参照させたいので、Siteを指定することになります。次に、 &quot;<a class="reference external" href="http://example.org/">http://example.org/</a>&quot; から &quot;<a class="reference external" href="http://example.net/">http://example.net/</a>&quot; へのリンクを登録しています。テーブル参照を作成するときは、IDではなく主キーを指定することに注意してください。最後に、リンクの内容を確認しています。この例では、  <cite>output_columns</cite> 引数に link._key と link.title を指定しているので、参照先の主キーとタイトルが表示されています。</p>
 </div>
 <div class="section" id="vector-types">
 <h2>4.3.8. ベクターカラム<a class="headerlink" href="#vector-types" title="このヘッドラインへのパーマリンク">¶</a></h2>
@@ -559,7 +559,7 @@ select --table Site --output_columns _key,title,links._key,links.title --query t
         <li class="right" >
           <a href="network.html" title="4.2. リモートアクセス"
              >前へ</a> |</li>
-        <li><a href="../index.html">groonga v2.0.8ドキュメント</a> &raquo;</li>
+        <li><a href="../index.html">groonga v2.0.9ドキュメント</a> &raquo;</li>
           <li><a href="../tutorial.html" >4. チュートリアル</a> &raquo;</li> 
       </ul>
     </div>

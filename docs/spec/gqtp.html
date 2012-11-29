@@ -1,0 +1,436 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>9.1. GQTP &mdash; groonga v2.0.9 documentation</title>
+    
+    <link rel="stylesheet" href="../static/groonga.css" type="text/css" />
+    <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.9',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../static/jquery.js"></script>
+    <script type="text/javascript" src="../static/underscore.js"></script>
+    <script type="text/javascript" src="../static/doctools.js"></script>
+    <link rel="shortcut icon" href="../static/favicon.ico"/>
+    <link rel="top" title="groonga v2.0.9 documentation" href="../index.html" />
+    <link rel="up" title="9. Specification" href="../spec.html" />
+    <link rel="next" title="9.2. 検索" href="search.html" />
+    <link rel="prev" title="9. Specification" href="../spec.html" /> 
+      <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
+    <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
+    <meta property="og:type" content="product" />
+    <meta property="og:image" content="http://groonga.org/images/logos/groonga-icon-full-size.png" />
+    <meta property="og:site_name" content="groonga" />
+
+    <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
+  </head>
+
+    <body>
+    <div id="fb-root"></div>
+
+<div class="header">
+  <h1 class="title">
+    <a id="top-link" href="../../">
+      <span class="project">groonga</span>
+      <span class="separator">-</span>
+      <span class="description">An open-source fulltext search engine and column store.</span>
+    </a>
+  </h1>
+
+      <div class="facebook-buttons">
+      <fb:like href="http://www.facebook.com/pages/groonga/201193596592346"
+               layout="standard"
+               width="290"></fb:like>
+    </div>
+    <div class="other-language-links">
+
+    <ul>
+      <li><a href="../../ja/docs/spec/gqtp.html"><img src="../static/jp.png" alt="日本語">日本語版はこちら</a></li>
+    </ul>
+  </div>
+</div>
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="search.html" title="9.2. 検索"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../spec.html" title="9. Specification"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">groonga v2.0.9 documentation</a> &raquo;</li>
+          <li><a href="../spec.html" accesskey="U">9. Specification</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="gqtp">
+<h1>9.1. GQTP<a class="headerlink" href="#gqtp" title="Permalink to this headline">¶</a></h1>
+<p>GQTP is the acronym of Groonga Query Transfer Protocol. GQTP is the
+original protocol for groonga.</p>
+<div class="section" id="protocol">
+<h2>9.1.1. Protocol<a class="headerlink" href="#protocol" title="Permalink to this headline">¶</a></h2>
+<p>GQTP is stateful client server model protocol. The following sequence
+is one processing unit:</p>
+<ul class="simple">
+<li>Client sends a request</li>
+<li>Server receives the request</li>
+<li>Server processes the request</li>
+<li>Server sends a response</li>
+<li>Client receives the response</li>
+</ul>
+<p>You can do zero or more processing units in a session.</p>
+<p>Both request and response consist of GQTP header and body. GQTP header
+is fixed size data. Body is variable size data and its size is stored
+in GQTP header. The content of body isn't defined in GQTP.</p>
+<div class="section" id="gqtp-header">
+<span id="gqtp-header-spec"></span><h3>9.1.1.1. GQTP header<a class="headerlink" href="#gqtp-header" title="Permalink to this headline">¶</a></h3>
+<p>GQTP header consists of the following unsigned integer values:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="31%" />
+<col width="14%" />
+<col width="55%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Size</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">protocol</span></tt></td>
+<td>1byte</td>
+<td>Protocol type.</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">query_type</span></tt></td>
+<td>1byte</td>
+<td>Content type of body.</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">key_length</span></tt></td>
+<td>2byte</td>
+<td>Not used.</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">level</span></tt></td>
+<td>1byte</td>
+<td>Not used.</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">flags</span></tt></td>
+<td>1byte</td>
+<td>Flags.</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">status</span></tt></td>
+<td>2byte</td>
+<td>Return code.</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">size</span></tt></td>
+<td>4byte</td>
+<td>Body size.</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">opaque</span></tt></td>
+<td>4byte</td>
+<td>Not used.</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">cas</span></tt></td>
+<td>8byte</td>
+<td>Not used.</td>
+</tr>
+</tbody>
+</table>
+<p>All header values are encoded by network byte order.</p>
+<p>The following sections describes available values of each header value.</p>
+<p>The total size of GQTP header is 24byte.</p>
+<div class="section" id="id1">
+<h4>9.1.1.1.1. <tt class="docutils literal"><span class="pre">protocol</span></tt><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h4>
+<p>The value is always <tt class="docutils literal"><span class="pre">0xc7</span></tt> in both request and response GQTP header.</p>
+</div>
+<div class="section" id="query-type">
+<h4>9.1.1.1.2. <tt class="docutils literal"><span class="pre">query_type</span></tt><a class="headerlink" href="#query-type" title="Permalink to this headline">¶</a></h4>
+<p>The value is one of the following values:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="27%" />
+<col width="16%" />
+<col width="57%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Value</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">NONE</span></tt></td>
+<td>0</td>
+<td>Free format.</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">TSV</span></tt></td>
+<td>1</td>
+<td>Tab Separated Values.</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">JSON</span></tt></td>
+<td>2</td>
+<td>JSON.</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">XML</span></tt></td>
+<td>3</td>
+<td>XML.</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">MSGPACK</span></tt></td>
+<td>4</td>
+<td>MessagePack.</td>
+</tr>
+</tbody>
+</table>
+<p>This is not used in request GQTP header.</p>
+<p>This is used in response GQTP header. Body is formatted as specified
+type.</p>
+</div>
+<div class="section" id="flags">
+<h4>9.1.1.1.3. <tt class="docutils literal"><span class="pre">flags</span></tt><a class="headerlink" href="#flags" title="Permalink to this headline">¶</a></h4>
+<p>The value is bitwise OR of the following values:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="23%" />
+<col width="17%" />
+<col width="60%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Value</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">MORE</span></tt></td>
+<td>0x01</td>
+<td>There are more data.</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">TAIL</span></tt></td>
+<td>0x02</td>
+<td>There are no more data.</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">HEAD</span></tt></td>
+<td>0x04</td>
+<td>Not used.</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">QUIET</span></tt></td>
+<td>0x08</td>
+<td>Be quiet.</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">QUIT</span></tt></td>
+<td>0x10</td>
+<td>Quit.</td>
+</tr>
+</tbody>
+</table>
+<p>You must specify <tt class="docutils literal"><span class="pre">MORE</span></tt> or <tt class="docutils literal"><span class="pre">TAIL</span></tt> flag.</p>
+<p>If you use <tt class="docutils literal"><span class="pre">MORE</span></tt> flag, you should also use <tt class="docutils literal"><span class="pre">QUIET</span></tt> flag. Because
+you don't need to show a response for your partial request.</p>
+<p>Use <tt class="docutils literal"><span class="pre">QUIT</span></tt> flag to quit this session.</p>
+</div>
+<div class="section" id="status">
+<h4>9.1.1.1.4. <tt class="docutils literal"><span class="pre">status</span></tt><a class="headerlink" href="#status" title="Permalink to this headline">¶</a></h4>
+<p>Here are available values. The new statuses will be added in the
+future.</p>
+<ul class="simple">
+<li>0: <tt class="docutils literal"><span class="pre">SUCCESS</span></tt></li>
+<li>1: <tt class="docutils literal"><span class="pre">END_OF_DATA</span></tt></li>
+<li>65535: <tt class="docutils literal"><span class="pre">UNKNOWN_ERROR</span></tt></li>
+<li>65534: <tt class="docutils literal"><span class="pre">OPERATION_NOT_PERMITTED</span></tt></li>
+<li>65533: <tt class="docutils literal"><span class="pre">NO_SUCH_FILE_OR_DIRECTORY</span></tt></li>
+<li>65532: <tt class="docutils literal"><span class="pre">NO_SUCH_PROCESS</span></tt></li>
+<li>65531: <tt class="docutils literal"><span class="pre">INTERRUPTED_FUNCTION_CALL</span></tt></li>
+<li>65530: <tt class="docutils literal"><span class="pre">INPUT_OUTPUT_ERROR</span></tt></li>
+<li>65529: <tt class="docutils literal"><span class="pre">NO_SUCH_DEVICE_OR_ADDRESS</span></tt></li>
+<li>65528: <tt class="docutils literal"><span class="pre">ARG_LIST_TOO_LONG</span></tt></li>
+<li>65527: <tt class="docutils literal"><span class="pre">EXEC_FORMAT_ERROR</span></tt></li>
+<li>65526: <tt class="docutils literal"><span class="pre">BAD_FILE_DESCRIPTOR</span></tt></li>
+<li>65525: <tt class="docutils literal"><span class="pre">NO_CHILD_PROCESSES</span></tt></li>
+<li>65524: <tt class="docutils literal"><span class="pre">RESOURCE_TEMPORARILY_UNAVAILABLE</span></tt></li>
+<li>65523: <tt class="docutils literal"><span class="pre">NOT_ENOUGH_SPACE</span></tt></li>
+<li>65522: <tt class="docutils literal"><span class="pre">PERMISSION_DENIED</span></tt></li>
+<li>65521: <tt class="docutils literal"><span class="pre">BAD_ADDRESS</span></tt></li>
+<li>65520: <tt class="docutils literal"><span class="pre">RESOURCE_BUSY</span></tt></li>
+<li>65519: <tt class="docutils literal"><span class="pre">FILE_EXISTS</span></tt></li>
+<li>65518: <tt class="docutils literal"><span class="pre">IMPROPER_LINK</span></tt></li>
+<li>65517: <tt class="docutils literal"><span class="pre">NO_SUCH_DEVICE</span></tt></li>
+<li>65516: <tt class="docutils literal"><span class="pre">NOT_A_DIRECTORY</span></tt></li>
+<li>65515: <tt class="docutils literal"><span class="pre">IS_A_DIRECTORY</span></tt></li>
+<li>65514: <tt class="docutils literal"><span class="pre">INVALID_ARGUMENT</span></tt></li>
+<li>65513: <tt class="docutils literal"><span class="pre">TOO_MANY_OPEN_FILES_IN_SYSTEM</span></tt></li>
+<li>65512: <tt class="docutils literal"><span class="pre">TOO_MANY_OPEN_FILES</span></tt></li>
+<li>65511: <tt class="docutils literal"><span class="pre">INAPPROPRIATE_I_O_CONTROL_OPERATION</span></tt></li>
+<li>65510: <tt class="docutils literal"><span class="pre">FILE_TOO_LARGE</span></tt></li>
+<li>65509: <tt class="docutils literal"><span class="pre">NO_SPACE_LEFT_ON_DEVICE</span></tt></li>
+<li>65508: <tt class="docutils literal"><span class="pre">INVALID_SEEK</span></tt></li>
+<li>65507: <tt class="docutils literal"><span class="pre">READ_ONLY_FILE_SYSTEM</span></tt></li>
+<li>65506: <tt class="docutils literal"><span class="pre">TOO_MANY_LINKS</span></tt></li>
+<li>65505: <tt class="docutils literal"><span class="pre">BROKEN_PIPE</span></tt></li>
+<li>65504: <tt class="docutils literal"><span class="pre">DOMAIN_ERROR</span></tt></li>
+<li>65503: <tt class="docutils literal"><span class="pre">RESULT_TOO_LARGE</span></tt></li>
+<li>65502: <tt class="docutils literal"><span class="pre">RESOURCE_DEADLOCK_AVOIDED</span></tt></li>
+<li>65501: <tt class="docutils literal"><span class="pre">NO_MEMORY_AVAILABLE</span></tt></li>
+<li>65500: <tt class="docutils literal"><span class="pre">FILENAME_TOO_LONG</span></tt></li>
+<li>65499: <tt class="docutils literal"><span class="pre">NO_LOCKS_AVAILABLE</span></tt></li>
+<li>65498: <tt class="docutils literal"><span class="pre">FUNCTION_NOT_IMPLEMENTED</span></tt></li>
+<li>65497: <tt class="docutils literal"><span class="pre">DIRECTORY_NOT_EMPTY</span></tt></li>
+<li>65496: <tt class="docutils literal"><span class="pre">ILLEGAL_BYTE_SEQUENCE</span></tt></li>
+<li>65495: <tt class="docutils literal"><span class="pre">SOCKET_NOT_INITIALIZED</span></tt></li>
+<li>65494: <tt class="docutils literal"><span class="pre">OPERATION_WOULD_BLOCK</span></tt></li>
+<li>65493: <tt class="docutils literal"><span class="pre">ADDRESS_IS_NOT_AVAILABLE</span></tt></li>
+<li>65492: <tt class="docutils literal"><span class="pre">NETWORK_IS_DOWN</span></tt></li>
+<li>65491: <tt class="docutils literal"><span class="pre">NO_BUFFER</span></tt></li>
+<li>65490: <tt class="docutils literal"><span class="pre">SOCKET_IS_ALREADY_CONNECTED</span></tt></li>
+<li>65489: <tt class="docutils literal"><span class="pre">SOCKET_IS_NOT_CONNECTED</span></tt></li>
+<li>65488: <tt class="docutils literal"><span class="pre">SOCKET_IS_ALREADY_SHUTDOWNED</span></tt></li>
+<li>65487: <tt class="docutils literal"><span class="pre">OPERATION_TIMEOUT</span></tt></li>
+<li>65486: <tt class="docutils literal"><span class="pre">CONNECTION_REFUSED</span></tt></li>
+<li>65485: <tt class="docutils literal"><span class="pre">RANGE_ERROR</span></tt></li>
+<li>65484: <tt class="docutils literal"><span class="pre">TOKENIZER_ERROR</span></tt></li>
+<li>65483: <tt class="docutils literal"><span class="pre">FILE_CORRUPT</span></tt></li>
+<li>65482: <tt class="docutils literal"><span class="pre">INVALID_FORMAT</span></tt></li>
+<li>65481: <tt class="docutils literal"><span class="pre">OBJECT_CORRUPT</span></tt></li>
+<li>65480: <tt class="docutils literal"><span class="pre">TOO_MANY_SYMBOLIC_LINKS</span></tt></li>
+<li>65479: <tt class="docutils literal"><span class="pre">NOT_SOCKET</span></tt></li>
+<li>65478: <tt class="docutils literal"><span class="pre">OPERATION_NOT_SUPPORTED</span></tt></li>
+<li>65477: <tt class="docutils literal"><span class="pre">ADDRESS_IS_IN_USE</span></tt></li>
+<li>65476: <tt class="docutils literal"><span class="pre">ZLIB_ERROR</span></tt></li>
+<li>65475: <tt class="docutils literal"><span class="pre">LZO_ERROR</span></tt></li>
+<li>65474: <tt class="docutils literal"><span class="pre">STACK_OVER_FLOW</span></tt></li>
+<li>65473: <tt class="docutils literal"><span class="pre">SYNTAX_ERROR</span></tt></li>
+<li>65472: <tt class="docutils literal"><span class="pre">RETRY_MAX</span></tt></li>
+<li>65471: <tt class="docutils literal"><span class="pre">INCOMPATIBLE_FILE_FORMAT</span></tt></li>
+<li>65470: <tt class="docutils literal"><span class="pre">UPDATE_NOT_ALLOWED</span></tt></li>
+<li>65469: <tt class="docutils literal"><span class="pre">TOO_SMALL_OFFSET</span></tt></li>
+<li>65468: <tt class="docutils literal"><span class="pre">TOO_LARGE_OFFSET</span></tt></li>
+<li>65467: <tt class="docutils literal"><span class="pre">TOO_SMALL_LIMIT</span></tt></li>
+<li>65466: <tt class="docutils literal"><span class="pre">CAS_ERROR</span></tt></li>
+<li>65465: <tt class="docutils literal"><span class="pre">UNSUPPORTED_COMMAND_VERSION</span></tt></li>
+</ul>
+</div>
+<div class="section" id="size">
+<h4>9.1.1.1.5. <tt class="docutils literal"><span class="pre">size</span></tt><a class="headerlink" href="#size" title="Permalink to this headline">¶</a></h4>
+<p>The size of body. The maximum body size is 4GiB because <tt class="docutils literal"><span class="pre">size</span></tt> is
+4byte unsigned integer. If you want to send 4GiB or more larger data,
+use <tt class="docutils literal"><span class="pre">MORE</span></tt> flag.</p>
+</div>
+</div>
+</div>
+<div class="section" id="example">
+<h2>9.1.2. Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
+<p>TODO</p>
+</div>
+<div class="section" id="see-also">
+<h2>9.1.3. See also<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<p>TODO</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">9.1. GQTP</a><ul>
+<li><a class="reference internal" href="#protocol">9.1.1. Protocol</a><ul>
+<li><a class="reference internal" href="#gqtp-header">9.1.1.1. GQTP header</a><ul>
+<li><a class="reference internal" href="#id1">9.1.1.1.1. <tt class="docutils literal"><span class="pre">protocol</span></tt></a></li>
+<li><a class="reference internal" href="#query-type">9.1.1.1.2. <tt class="docutils literal"><span class="pre">query_type</span></tt></a></li>
+<li><a class="reference internal" href="#flags">9.1.1.1.3. <tt class="docutils literal"><span class="pre">flags</span></tt></a></li>
+<li><a class="reference internal" href="#status">9.1.1.1.4. <tt class="docutils literal"><span class="pre">status</span></tt></a></li>
+<li><a class="reference internal" href="#size">9.1.1.1.5. <tt class="docutils literal"><span class="pre">size</span></tt></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#example">9.1.2. Example</a></li>
+<li><a class="reference internal" href="#see-also">9.1.3. See also</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../spec.html"
+                        title="previous chapter">9. Specification</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="search.html"
+                        title="next chapter">9.2. 検索</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../sources/spec/gqtp.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="search.html" title="9.2. 検索"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../spec.html" title="9. Specification"
+             >previous</a> |</li>
+        <li><a href="../index.html">groonga v2.0.9 documentation</a> &raquo;</li>
+          <li><a href="../spec.html" >9. Specification</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009-2012, Brazil, Inc.
+    </div>
+      <script src="http://connect.facebook.net/en_US/all.js"></script>
+
+    <script>
+      FB.init({
+         appId  : null,
+         status : true, // check login status
+         cookie : true, // enable cookies to allow the server to access the session
+         xfbml  : true  // parse XFBML
+      });
+    </script>
+  </body>
+
+</html>

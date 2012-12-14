@@ -180,54 +180,74 @@ Sample data (ranking data about 10,000,000 shops):
 <pre>
   load --table Shops
   [
-  ...
-  {"_key": "Shop98", "ranking": 98},
-  {"_key": "Shop99", "ranking": 99},
-  {"_key": "Carlos's shop", "ranking": 100},
-  {"_key": "Alice's shop",  "ranking": 101},
-  {"_key": "Bob's shop",    "ranking": 102},
-  {"_key": "Shop103", "ranking": 103},
-  {"_key": "Shop104", "ranking": 104},
-  {"_key": "Shop105", "ranking": 105},
+  {"_key": "Shop1", "ranking": 1},
+  {"_key": "Shop2", "ranking": 2},
+  {"_key": "Shop3", "ranking": 3},
+  {"_key": "Shop4", "ranking": 4},
+  {"_key": "Shop5", "ranking": 5},
+  {"_key": "Shop6", "ranking": 6},
+  {"_key": "Shop7", "ranking": 7},
+  {"_key": "Shop8", "ranking": 8},
+  {"_key": "Shop9", "ranking": 9},
+  {"_key": "Shop10", "ranking": 10},
+  {"_key": "Shop11", "ranking": 11},
   ...
   ]
 </pre>
 
 Now, registered shop name as a key, the value of ranking.
 
-Here is the sample query to search three shops which is higher value of ranking than Alice's shop.
+Here is the sample query to search top 10 shops of ranking.
 
-In range search, you can specify 'higher' expression as  @'ranking >= 98 && ranking < 101'@ in this case.
+In range search, you can specify 'Top 10' expression as  @'ranking <= 10@ in this case.
 
 Here is concrete example.
 
 <pre>
-  select Shops --filter 'ranking >= 98 && ranking < 101'
+  select Shops --filter 'ranking <= 10'
   [
-    [0,1355461536.3541,3.55056285858154],
+    [0,1355465886.15137,1.39784264564514],
     [
       [
-        [3],
-        [["_id","UInt32"],["_key","ShortText"],["ranking","UInt32"]],
-        [98,"Shop98",98],
-        [99,"Shop99",99],
-        [100,"Carlos's shop",100]
+        [10],
+        [
+          ["_id","UInt32"],["_key","ShortText"],["ranking","UInt32"]
+        ],
+        [1,"Shop1",1],
+        [2,"Shop2",2],
+        [3,"Shop3",3],
+        [4,"Shop4",4],
+        [5,"Shop5",5],
+        [6,"Shop6",6],
+        [7,"Shop7",7],
+        [8,"Shop8",8],
+        [9,"Shop9",9],
+        [10,"Shop10",10]
       ]
     ]
   ]
 </pre>
 
 <pre>
-  select Shops --filter 'ranking >= 98 && ranking < 101'
+  select Shops --filter 'ranking <= 10'
   [
-    [0,1355461395.8912,2.43025946617126],
+    [0,1355465837.0779,0.00165677070617676],
     [
       [
-        [3],
-        [["_id","UInt32"],["_key","ShortText"],["ranking","UInt32"]],
-        [98,"Shop98",98],
-        [99,"Shop99",99],
-        [100,"Carlos's shop",100]
+        [10],
+        [
+          ["_id","UInt32"],["_key","ShortText"],["ranking","UInt32"]
+        ],
+        [1,"Shop1",1],
+        [2,"Shop2",2],
+        [3,"Shop3",3],
+        [4,"Shop4",4],
+        [5,"Shop5",5],
+        [6,"Shop6",6],
+        [7,"Shop7",7],
+        [8,"Shop8",8],
+        [9,"Shop9",9],
+        [10,"Shop10",10]
       ]
     ]
   ]
@@ -236,23 +256,23 @@ Here is concrete example.
 The search result is same, but the execution time is different.
 
 <pre>
-    [0,1355461536.3541,3.55056285858154],
+    [0,1355465886.15137,1.39784264564514],
 </pre>
 
-In groonga 2.0.8, it takes 3.55056285858154 seconds.
+In groonga 2.0.8, it takes 1.39784264564514 seconds.
 
 <pre>
-    [0,1355461395.8912,2.43025946617126],
+    [0,1355465837.0779,0.00165677070617676],
 </pre>
 
-In groonga 2.0.9, it takes 2.43025946617126 seconds.
+In groonga 2.0.9, it takes 0.00165677070617676 seconds.
 
 See "Output Format":http://groonga.org/docs/reference/command/output_format.html about the output of groonga command details.
 
 |Version of groonga|groonga 2.0.8|groonga 2.0.9|
-|Execution time(seconds)|3.55056285858154|2.43025946617126|
+|Execution time(seconds)|1.39784264564514|0.00165677070617676|
 
-By upgrading 2.0.8 to 2.0.9, you can see the execution time is clipped to about 70%.
+By upgrading 2.0.8 to 2.0.9, you can see the execution time is clipped to about a few milliseconds.
 
 Here is the measurement environment:
 

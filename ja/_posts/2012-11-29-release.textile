@@ -159,55 +159,103 @@ h3. インデックスを利用した高速な指定範囲検索のサポート
 
 今回のリリースでは、範囲を指定した検索をインデックスを使って高速に行えるようになりました。
 
-例えば、Time型のカラムで指定した日以前の結果を高速に検索することができるようになりました。
-
-どう使うかのサンプルを誕生日を例に示します。
+どれくらい高速になったかという例を簡単なサンプルで示します。
 
 サンプルのスキーマ定義は以下の通りです。
 
 <pre>
-  table_create Users TABLE_HASH_KEY ShortText
-  column_create Users birthday COLUMN_SCALAR Time
-  table_create Birthdays TABLE_PAT_KEY Time
-  column_create Birthdays users_birthday COLUMN_INDEX Users birthday
+  table_create Shops TABLE_HASH_KEY ShortText
+  column_create Shops ranking COLUMN_SCALAR UInt32
+  
+  table_create Rankings TABLE_PAT_KEY UInt32
+  column_create Rankings shops_ranking COLUMN_INDEX Shops ranking
 </pre>
 
-以下のように個人の誕生日を登録します。
+以下のようにしてお店とそのランキングの値を登録します。高速化した結果をよりわかりやすく示すために、1000万件ほどのデータを登録します。
 
 <pre>
-  load --table Users
+  load --table Shops
   [
-  {"_key": "Alice",  "birthday": "1992-02-09 00:00:00"},
-  {"_key": "Bob",    "birthday": "1988-01-04 00:00:00"},
-  {"_key": "Carlos", "birthday": "1982-12-29 00:00:00"}
+  ...
+  {"_key": "Shop98", "ranking": 98},
+  {"_key": "Shop99", "ranking": 99},
+  {"_key": "Carlos's shop", "ranking": 100},
+  {"_key": "Alice's shop",  "ranking": 101},
+  {"_key": "Bob's shop",    "ranking": 102},
+  {"_key": "Shop103", "ranking": 103},
+  {"_key": "Shop104", "ranking": 104},
+  {"_key": "Shop105", "ranking": 105},
+  ...
   ]
 </pre>
 
-誕生日のデータを登録できたので、実際に検索してみます。ここでは、Bobの誕生日より後の誕生日の人を検索してみます。
+お店とランキングの値が登録できたので、実際に検索してみます。ここでは、Aliceのお店よりランキングが上のお店3件を検索してみます。
 
-誕生日はTime型のカラムに登録してあるので、範囲の指定にはbirthdayに対してBobの誕生日より後というのを @'birthday > "1988-01-04 00:00:00"'@ として表現します。
+範囲の指定にはrankingカラムに対して @'ranking >= 98 && ranking < 101'@ として表現します。
 
-実際の検索結果は以下のようになります。
+実際の検索結果は以下のようになります。(groonga 2.0.8の場合)
 
 <pre>
-  select Users --filter 'birthday > "1988-01-04 00:00:00"'
+  select Shops --filter 'ranking >= 98 && ranking < 101'
   [
-    [0,1354069642.52512,0.000299692153930664],
+    [0,1355461536.3541,3.55056285858154],
     [
       [
-        [1],
-        [
-          ["_id","UInt32"],
-          ["_key","ShortText"],
-          ["birthday","Time"]
-        ],
-        [1,"Alice",697561200.0]
+        [3],
+        [["_id","UInt32"],["_key","ShortText"],["ranking","UInt32"]],
+        [98,"Shop98",98],
+        [99,"Shop99",99],
+        [100,"Carlos's shop",100]
       ]
     ]
   ]
 </pre>
 
-Bobより後の誕生日は、Aliceだけなので正しく検索できていることがわかります。範囲検索では、不等号( @>,<,<=,>=@ )が使えます。
+丁度3件検索結果が取得できていることがわかります。
+
+同じようにしてgroonga 2.0.9でも検索してみます。検索結果は以下のようになります。
+
+<pre>
+  select Shops --filter 'ranking >= 98 && ranking < 101'
+  [
+    [0,1355461395.8912,2.43025946617126],
+    [
+      [
+        [3],
+        [["_id","UInt32"],["_key","ShortText"],["ranking","UInt32"]],
+        [98,"Shop98",98],
+        [99,"Shop99",99],
+        [100,"Carlos's shop",100]
+      ]
+    ]
+  ]
+</pre>
+
+検索結果は当然同じですが、実行時間が違います。実行時間は以下の部分が該当します。
+
+<pre>
+    [0,1355461536.3541,3.55056285858154],
+</pre>
+
+groonga 2.0.8の場合は3.55056285858154秒でした。
+
+<pre>
+    [0,1355461395.8912,2.43025946617126],
+</pre>
+
+一方、groonga 2.0.9の場合は2.43025946617126秒でした。
+
+groongaが出力する結果のフォーマット詳細については "出力形式":http://groonga.org/ja/docs/reference/command/output_format.html を参照してください。
+
+|groongaのバージョン|groonga 2.0.8|groonga 2.0.9|
+|実行時間(秒)|3.55056285858154|2.43025946617126|
+
+2.0.9にするだけで実行時間が7割程度に短縮できていることがわかります。
+
+測定は以下の環境で実施しました。
+
+|CPU|Intel(R) Core i7-2640M CPU @ 2.80GHz|
+|メモリ|8GB|
 
 h3. geo_distance()関数で矩形近似により境界をまたぐ二点間の距離計算をサポート
 

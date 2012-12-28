@@ -159,7 +159,7 @@ var Search = {
         hlterms.push(tmp[i].toLowerCase());
       }
       // only add if not already in the list
-      if (!$.contains(toAppend, word))
+      if (!$u.contains(toAppend, word))
         toAppend.push(word);
     };
     var highlightstring = '?highlight=' + $.urlencode(hlterms.join(" "));
@@ -226,7 +226,7 @@ var Search = {
       // search result.
       for (var i = 0; i < excluded.length; i++) {
         if (terms[excluded[i]] == file ||
-            $.contains(terms[excluded[i]] || [], file)) {
+            $u.contains(terms[excluded[i]] || [], file)) {
           valid = false;
           break;
         }

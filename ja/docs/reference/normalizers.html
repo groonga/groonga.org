@@ -1,0 +1,313 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>8.6. Normalizers &mdash; groonga v2.1.0ドキュメント</title>
+    
+    <link rel="stylesheet" href="../static/groonga.css" type="text/css" />
+    <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../static/jquery.js"></script>
+    <script type="text/javascript" src="../static/underscore.js"></script>
+    <script type="text/javascript" src="../static/doctools.js"></script>
+    <script type="text/javascript" src="../static/translations.js"></script>
+    <link rel="shortcut icon" href="../static/favicon.ico"/>
+    <link rel="top" title="groonga v2.1.0ドキュメント" href="../index.html" />
+    <link rel="up" title="8. リファレンスマニュアル" href="../reference.html" />
+    <link rel="next" title="8.7. Tokenizers" href="tokenizers.html" />
+    <link rel="prev" title="8.5. Tables" href="tables.html" /> 
+      <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
+    <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
+    <meta property="og:type" content="product" />
+    <meta property="og:image" content="http://groonga.org/images/logos/groonga-icon-full-size.png" />
+    <meta property="og:site_name" content="groonga" />
+
+    <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
+  </head>
+
+    <body>
+    <div id="fb-root"></div>
+
+<div class="header">
+  <h1 class="title">
+    <a id="top-link" href="../../">
+      <span class="project">groonga</span>
+      <span class="separator">-</span>
+      <span class="description">オープンソースのカラムストア機能付き全文検索エンジン</span>
+    </a>
+  </h1>
+
+      <div class="facebook-buttons">
+      <fb:like href="http://www.facebook.com/pages/groonga/201193596592346"
+               layout="standard"
+               width="290"></fb:like>
+    </div>
+    <div class="other-language-links">
+
+    <ul>
+      <li><a href="../../../docs/reference/normalizers.html"><img src="../static/us.png" alt="English">English page</a></li>
+    </ul>
+  </div>
+</div>
+  
+
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="tokenizers.html" title="8.7. Tokenizers"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="tables.html" title="8.5. Tables"
+             accesskey="P">前へ</a> |</li>
+        <li><a href="../index.html">groonga v2.1.0ドキュメント</a> &raquo;</li>
+          <li><a href="../reference.html" accesskey="U">8. リファレンスマニュアル</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="normalizers">
+<h1>8.6. Normalizers<a class="headerlink" href="#normalizers" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<div class="section" id="summary">
+<h2>8.6.1. 概要<a class="headerlink" href="#summary" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>Groonga has normalizer module. It is used when tokenizing text and
+storing table key. For example, <tt class="docutils literal"><span class="pre">A</span></tt> and <tt class="docutils literal"><span class="pre">a</span></tt> are processed as the
+same character after normalization.</p>
+<p>Normalizer module can be added as a plugin. You can customize text
+normalization by registering your normalizer plugins to groonga.</p>
+<p>A normalizer module is attached to a table. A table can have zero or
+one normalizer module. You can attach a normalizer module to a table
+by <em class="xref std std-ref">table-create-normalizer</em> option in
+<a class="reference internal" href="commands/table_create.html"><em>table_create</em></a>.</p>
+<p>Here is an example <tt class="docutils literal"><span class="pre">table_create</span></tt> that uses <tt class="docutils literal"><span class="pre">NormalizerAuto</span></tt>
+normalizer module:</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Dictionary TABLE_HASH_KEY ShortText --normalizer NormalizerAuto
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p>Groonga 2.0.9 or earlier doesn't have <tt class="docutils literal"><span class="pre">--normalizer</span></tt> option in
+<tt class="docutils literal"><span class="pre">table_create</span></tt>. <tt class="docutils literal"><span class="pre">KEY_NORMALIZE</span></tt> flag was used instead.</p>
+<p class="last">You can open an old database by groonga 2.1.0 or later. An old
+database means that the database is created by groonga 2.0.9 or
+earlier. But you cannot open the opened old database by groonga
+2.0.9 or earlier. Once you open the old database by groonga 2.1.0
+or later, <tt class="docutils literal"><span class="pre">KEY_NORMALIZE</span></tt> flag information in the old database is
+converted to normalizer information. So groogna 2.0.9 or earlier
+cannot find <tt class="docutils literal"><span class="pre">KEY_NORMALIZE</span></tt> flag information in the opened old
+database.</p>
+</div>
+<p>Keys of a table that has a normalizer module are normalized:</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>load --table Dictionary
+[
+{&quot;_key&quot;: &quot;Apple&quot;},
+{&quot;_key&quot;: &quot;black&quot;},
+{&quot;_key&quot;: &quot;COLOR&quot;}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 3]
+select Dictionary
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         3
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;apple&quot;
+#       ],
+#       [
+#         2,
+#         &quot;black&quot;
+#       ],
+#       [
+#         3,
+#         &quot;color&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">NormalizerAuto</span></tt> normalizer normalizes a text as a downcased text.
+For example, <tt class="docutils literal"><span class="pre">&quot;Apple&quot;</span></tt> is normalized to <tt class="docutils literal"><span class="pre">&quot;apple&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;black&quot;</span></tt> is
+normalized to <tt class="docutils literal"><span class="pre">&quot;blank&quot;</span></tt> and <tt class="docutils literal"><span class="pre">&quot;COLOR&quot;</span></tt> is normalized to
+<tt class="docutils literal"><span class="pre">&quot;color&quot;</span></tt>.</p>
+<p>If a table is a lexicon for fulltext search, tokenized tokens are
+normalized. Because tokens are stored as table keys. Table keys are
+normalized as described above.</p>
+</div>
+<div class="section" id="built-in-normalizers">
+<h2>8.6.2. Built-in normalizers<a class="headerlink" href="#built-in-normalizers" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>Here is a list of built-in-normalizers:</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">NormalizerAuto</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">NormalizerNFKC51</span></tt></li>
+</ul>
+</div></blockquote>
+<div class="section" id="normalizerauto">
+<h3>8.6.2.1. <tt class="docutils literal"><span class="pre">NormalizerAuto</span></tt><a class="headerlink" href="#normalizerauto" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>Normally you should use <tt class="docutils literal"><span class="pre">NormalizerAuto</span></tt>
+normalizer. <tt class="docutils literal"><span class="pre">NormalizerAuto</span></tt> was the normalizer for groonga 2.0.9 or
+earlier. <tt class="docutils literal"><span class="pre">KEY_NORMALIZE</span></tt> flag in <tt class="docutils literal"><span class="pre">table_create</span></tt> on groonga 2.0.9
+or earlier equals to <tt class="docutils literal"><span class="pre">--normalizer</span> <span class="pre">NormalizerAuto</span></tt> option in
+<tt class="docutils literal"><span class="pre">table</span></tt> on groonga 2.1.0 or later.</p>
+<p><tt class="docutils literal"><span class="pre">NormalizerAuto</span></tt> supports all encoding. It uses Unicode NFKC
+(Normalization Form Compatibility Composition) for UTF-8 encoding
+text. It uses encoding specific original normalization for other
+encodings. The results of those original normalization are similar to
+NFKC.</p>
+<p>For example, half-width katakana (such as U+FF76 HALFWIDTH KATAKANA
+LETTER KA) + half-width katakana voiced sound mark (U+FF9E HALFWIDTH
+KATAKANA VOICED SOUND MARK) is normalized to full-width katakana with
+voiced sound mark (U+30AC KATAKANA LETTER GA). The former is two
+chracters but the latter is one character.</p>
+<p>Here is an example that uses <tt class="docutils literal"><span class="pre">NormalizerAuto</span></tt> normalizer:</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create NormalLexicon TABLE_HASH_KEY ShortText --normalizer NormalizerAuto
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+</div>
+<div class="section" id="normalizernfkc51">
+<h3>8.6.2.2. <tt class="docutils literal"><span class="pre">NormalizerNFKC51</span></tt><a class="headerlink" href="#normalizernfkc51" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p><tt class="docutils literal"><span class="pre">NormalizerNFKC51</span></tt> normalizes texts by Unicode NFKC (Normalization
+Form Compatibility Composition) for Unicode version 5.1. It supports
+only UTF-8 encoding.</p>
+<p>Normally you don't need to use <tt class="docutils literal"><span class="pre">NormalizerNFKC51</span></tt> explicitly. You can
+use <tt class="docutils literal"><span class="pre">NormalizerAuto</span></tt> instead.</p>
+<p>Here is an example that uses <tt class="docutils literal"><span class="pre">NormalizerNFKC51</span></tt> normalizer:</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create NFKC51Lexicon TABLE_HASH_KEY ShortText --normalizer NormalizerNFKC51
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="see-also">
+<h2>8.6.3. 参考<a class="headerlink" href="#see-also" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<ul class="simple">
+<li><a class="reference internal" href="commands/table_create.html"><em>table_create</em></a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">8.6. Normalizers</a><ul>
+<li><a class="reference internal" href="#summary">8.6.1. 概要</a></li>
+<li><a class="reference internal" href="#built-in-normalizers">8.6.2. Built-in normalizers</a><ul>
+<li><a class="reference internal" href="#normalizerauto">8.6.2.1. <tt class="docutils literal"><span class="pre">NormalizerAuto</span></tt></a></li>
+<li><a class="reference internal" href="#normalizernfkc51">8.6.2.2. <tt class="docutils literal"><span class="pre">NormalizerNFKC51</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#see-also">8.6.3. 参考</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="tables.html"
+                        title="前の章へ">8.5. Tables</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="tokenizers.html"
+                        title="次の章へ">8.7. Tokenizers</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../sources/reference/normalizers.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="tokenizers.html" title="8.7. Tokenizers"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="tables.html" title="8.5. Tables"
+             >前へ</a> |</li>
+        <li><a href="../index.html">groonga v2.1.0ドキュメント</a> &raquo;</li>
+          <li><a href="../reference.html" >8. リファレンスマニュアル</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009-2012, Brazil, Inc.
+    </div>
+      <script src="http://connect.facebook.net/ja_JP/all.js"></script>
+
+    <script>
+      FB.init({
+         appId  : null,
+         status : true, // check login status
+         cookie : true, // enable cookies to allow the server to access the session
+         xfbml  : true  // parse XFBML
+      });
+    </script>
+  </body>
+
+</html>

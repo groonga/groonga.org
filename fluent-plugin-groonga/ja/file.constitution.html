@@ -1,0 +1,363 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>
+  File: 構成
+  
+    &mdash; fluent-plugin-groonga
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+
+  <link rel="stylesheet" href="css/common.css" type="text/css" media="screen" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  hasFrames = window.top.frames.main ? true : false;
+  relpath = '';
+  framesUrl = "frames.html#!" + escape(window.location.href);
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="header">
+      <div id="menu">
+  
+    <a href="alphabetical_index.html">Index</a> &raquo; 
+    <span class="title">File: 構成</span>
+  
+
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+      Class List
+    </a>
+  
+    <a class="full_list_link" id="method_list_link"
+        href="method_list.html">
+      Method List
+    </a>
+  
+    <a class="full_list_link" id="file_list_link"
+        href="file_list.html">
+      File List
+    </a>
+  
+</div>
+      <div class="clear"></div>
+    </div>
+
+    <iframe id="search_frame"></iframe>
+
+    <div id="content"><div id='filecontents'><h1>構成</h1>
+
+<p>レプリケーション対応のgroongaシステムを実装するには、いくつかのシステム構成を選ぶことができます。このドキュメントではいくつかのパターンを説明します。</p>
+
+<p>利用可能なパターンは以下の通りです。</p>
+
+<ul>
+<li>マスタースレーブレプリケーション</li>
+<li>復帰したスレーブへのデータの再送</li>
+</ul>
+
+<p>利用できないパターンは以下の通りです。</p>
+
+<ul>
+<li>マルチマスターレプリケーション</li>
+<li>自動でのスレーブ復旧</li>
+<li>動的なスレーブ追加</li>
+<li>フェイルオーバー</li>
+<li>サービスレベルを落とすSPOF（Single Point of Failure。単一障害点）がないシステム</li>
+</ul>
+
+<h2>マスタースレーブレプリケーション</h2>
+
+<p>マスタースレーブレプリケーションを利用可能です。このセクションではどのようにシステムを構成すればよいかを説明します。</p>
+
+<h3>小さいシステム</h3>
+
+<p>小さいシステムでは、2つのサーバーだけがあるとします。1つがマスターgroongaサーバーで、もうひとつがスレーブgroongaサーバーです。（ <code>table_create</code> 、 <code>column_create</code> や <code>load</code> のような）すべての更新系のコマンドをfluentdに送ります。fluentdでは、クライアントから <code>groonga</code> inputプラグインを使ってgroongaのコマンドを受け取ります。受け取ったコマンドはそのままマスターgroongaサーバーへ素通しし、マスターgroongaサーバーからのレスポンスをクライアントへ返します。 <code>groonga</code> inputプラグインは、groongaのコマンドとそのレスポンスを素通しするときに、更新系のコマンドをfluentのメッセージに変換します。fluentのメッセージは <code>groonga</code> outputプラグインでスレーブgroongaサーバーへ送られます。</p>
+
+<p>この構成のときの構成図です。</p>
+
+<pre class="code ruby"><code>            update               update
+             and                  and
+            search  +---------+  search  +---------+
++--------+ &lt;------&gt; | fluentd | &lt;------&gt; | master  |
+|        |          +---------+          | groonga |
+| client |        update |               +---------+
+|        |              \_/
+|        |  search  +---------+
++--------+ &lt;------&gt; |  slave  |
+                    | groonga |
+                    +---------+
+</code></pre>
+
+<p>fluentdはクライアント側かマスターgroongaサーバー側に置きます。データを更新するクライアントが1つの場合は、クライアント側に置くのがよいでしょう。データを更新するクライアントが複数いる場合は、マスターgroongaサーバー側に置くのがよいでしょう。</p>
+
+<p>レプリケーションを使えば、複数のサーバーで検索サービスを提供することができるため、パフォーマンスを向上できます。可用性を上げるためにレプリケーションを使うことはできません。もし、マスターgroongaサーバーかfluentdがダウンしたら、このシステムはデータを更新できません。（スレーブgroongaサーバーは稼働しているため、検索機能は利用可能です。）</p>
+
+<p>以下は設定例です。</p>
+
+<pre class="code ruby"><code># マスターgroongaサーバー用設定
+&lt;source&gt;
+  type groonga
+  protocol gqtp          # あるいは下の行を使う
+  # protocol http
+  bind 127.0.0.1         # クライアント側にfluentdを置く場合
+  # bind 192.168.0.1     # マスターgroongaサーバー側にfluentdを置く場合
+  port 10041
+  real_host 192.168.29.1 # マスターgroongaサーバーのIPアドレス
+  real_port 10041        # マスターgroongaサーバーのポート番号
+  # real_port 20041      # マスターgroongaサーバー側にfluentdを置く場合は
+                         # 違うポート番号を使うこと
+&lt;/source&gt;
+
+# スレーブgroongaサーバー
+&lt;match groonga.command.*&gt;
+  type groonga
+  protocol gqtp            # あるいは下の行を使う
+  # protocol http          # マスターgroongaサーバーとスレーブgroongaサーバーで
+                           # 違うプロトコルを使うこともできる
+  host 192.168.29.29       # スレーブgroongaサーバーのIPアドレス
+  port 10041               # スレーブgroongaサーバーのポート番号
+
+  # buffer
+  flush_interval 1s        # レプリケーションの遅延を小さくするため小さな値を使う
+
+  ## 復帰したスレーブgroongaサーバーへデータ再送をサポートするために以下の
+  ## 設定をする。
+  ## もし、スレーブgroongaサーバーがダウンするケースを考慮しなくてもよいなら、
+  ## 以下の設定は必要ありません。
+
+  ## fluentdが再起動したときのデータ再送をサポートする設定
+  # buffer_type file
+  # buffer_path /var/log/fluent/groonga.*.buffer
+  ## loadコマンドの1つのレコードが大きいときは大きな値を使います。
+  ## loadコマンドの1つのレコードが1つのチャンクになります。
+  # buffer_chunk_limit 256m
+  ## スレーブgroongaサーバーが長い間ダウンした後のデータ再送をサポートするには
+  ## 大きい値を指定してください。
+  ## 17: 約1.5日 =
+  ##       ((2 ** 0) + (2 ** 1) + ... + (2 ** 17)) / 60.0 / 60.0 / 24.0
+  ##     （デフォルト）
+  ## 18: 約3.0日 = ((2 ** 0) + ... + (2 ** 18)) / ...
+  ## 19: 約6.0日 = ((2 ** 0) + ... + (2 ** 19)) / ...
+  # retry_limit 19
+  ## たくさんのレコードをロードするときは大きな値にします。
+  ## loadコマンドの中の1つのレコードが1つのチャンクに対応します。
+  # buffer_queue_limit 10000
+&lt;/match&gt;
+</code></pre>
+
+<h4>ダウンしたfluentdを復旧する方法</h4>
+
+<p>もし、fluentdがダウンしたら、fluentdを再起動するだけで復旧します。もし、fluentdが更新系のコマンドを実行している最中にダウンしたとしたら、最後の更新系のコマンドをfluentdに再送しなければいけないかもしれません。</p>
+
+<p>fluentdが復旧するまでデータを更新することはできません。</p>
+
+<h4>ダウンしたマスターgroongaサーバーを復旧する方法</h4>
+
+<p>以下は、ダウンしたマスターgroongaサーバーを復旧する手順です。</p>
+
+<ol>
+<li>fluentdを止めます。</li>
+<li>スレーブgroongaサーバーがあるホストで <code>grndump /スレーブ/groonga/サーバー/の/データベース/のパス &gt; SLAVE_GROONGA_DUMP.grn</code> を実行します。</li>
+<li>マスターgroongaサーバーがあるホストで <code>groonga -n /マスター/groonga/サーバー/の/データベース/の/パス &lt;
+ SLAVE_GROONGA_DUMP.grn</code> を実行します。</li>
+<li>マスターgroongaサーバーを起動します。</li>
+<li>fluentdを起動します。</li>
+</ol>
+
+<p>復旧が完了するまでデータを更新することはできません。</p>
+
+<h4>ダウンしたスレーブgroongaサーバーを復旧する方法</h4>
+
+<p>以下はダウンしたスレーブgroongaサーバーを復旧する手順です。</p>
+
+<ol>
+<li>マスターgroongaサーバーがあるホストで <code>grndump /マスター/groonga/サーバー/の/データベース/の/パス &gt; MASTER_GROONGA_DUMP.grn</code> を実行します。</li>
+<li>スレーブgroongaサーバーがあるホストで <code>groonga -n /スレーブ/groonga/サーバー/の/データベース/の/パス &lt; MASTER_GROONGA_DUMP.grn</code> を実行します。</li>
+<li>スレーブgroongaサーバーを起動します。</li>
+</ol>
+
+<p>復旧中もデータを更新することができます。もし、システムが1つのマスターgroongaサーバーだけですべての検索リクエストを処理できない場合は、そのシステムはダウンします。</p>
+
+<p>fluentdのバッファキューが溢れる（ <code>buffer_queue_limit</code> 参照）前、かつ、fluentdが再送を諦める（ <code>retry_limit</code> 参照）前にスレーブgroongaサーバーを復旧する必要があります。以下は復旧が間に合わなかった時に復旧する手順です。</p>
+
+<ol>
+<li>fluentdを止めます。</li>
+<li>マスターgroongaサーバーがあるホストで <code>grndump /マスター/groonga/サーバー/の/データベース/の/パス &gt; MASTER_GROONGA_DUMP.grn</code> を実行します。</li>
+<li>スレーブgroongaサーバーがあるホストで <code>groonga -n /スレーブ/groonga/サーバー/の/データベース/の/パス &lt; MASTER_GROONGA_DUMP.grn</code> を実行します。</li>
+<li>スレーブgroongaサーバーを起動します。</li>
+<li>fluetndを起動します。</li>
+</ol>
+
+<p>復旧が完了するまでデータを更新することはできません。</p>
+
+<h3>中規模のシステム</h3>
+
+<p>中規模のシステムでは3つ以上のgroongaサーバーがいます。fluentdは2つ以上のスレーブgroongaサーバーを <code>copy</code> outputプラグインと <code>groonga</code> outputプラグインで更新します。</p>
+
+<p>この構成のときの構成図です。</p>
+
+<pre class="code ruby"><code>            update               update
+             and                  and
+            search  +---------+  search  +---------+
++--------+ &lt;------&gt; | fluentd | &lt;------&gt; | master  |
+|        |          +---------+          | groonga |
+| client |               +--------+      +---------+
+|        |                        |
++--------+  search  +---------+   |
+|        | &lt;------&gt; |  slave  | &lt;-+ update
+| client |          | groonga |   |
+|        |          +---------+   |
++--------+  search  +---------+   |
+|        | &lt;------&gt; |  slave  | &lt;-+ update
+| client |          | groonga |   |
+|        |          +---------+   |
++- ...  -+   ...        ...      ...
+</code></pre>
+
+<p>以下は設定例です。</p>
+
+<pre class="code ruby"><code># マスターgroongaサーバー用設定
+&lt;source&gt;
+  type groonga
+  protocol gqtp          # あるいは下の行を使う
+  # protocol http
+  bind 127.0.0.1         # クライアント側にfluentdを置く場合
+  # bind 192.168.0.1     # マスターgroongaサーバー側にfluentdを置く場合
+  port 10041
+  real_host 192.168.29.1 # マスターgroongaサーバーのIPアドレス
+  real_port 10041        # マスターgroongaサーバーのポート番号
+  # real_port 20041      # マスターgroongaサーバー側にfluentdを置く場合は
+                         # 違うポート番号を使うこと
+&lt;/source&gt;
+
+# スレーブgroongaサーバー用
+&lt;match groonga.command.*&gt;
+  type copy
+
+  # 最初のスレーブgroongaサーバー
+  &lt;store&gt;
+    type groonga
+    protocol gqtp            # あるいは下の行を使う
+    # protocol http          # マスターgroongaサーバーとスレーブgroongaサーバーで
+                             # 違うプロトコルを使うこともできる
+    host 192.168.29.2        # スレーブgroongaサーバーのIPアドレス
+    port 10041               # スレーブgroongaサーバーのポート番号
+
+    # buffer
+    flush_interval 1s        # レプリケーションの遅延を小さくするため小さな値を使う&quot;
+
+    ## 復帰したスレーブgroongaサーバーへデータ再送をサポートするために以下の
+    ## 設定をする。
+    ## もし、スレーブgroongaサーバーがダウンするケースを考慮しなくてもよいなら、
+    ## 以下の設定は必要ありません。
+
+    ## fluentdが再起動したときのデータ再送をサポートする設定
+    # buffer_type file
+    # buffer_path /var/log/fluent/groonga.*.buffer
+    ## loadコマンドの1つのレコードが大きいときは大きな値を使います。
+    ## loadコマンドの1つのレコードが1つのチャンクになります。
+    # buffer_chunk_limit 256m
+    ## スレーブgroongaサーバーが長い間ダウンした後のデータ再送をサポートするには
+    ## 大きい値を指定してください。
+    ## 17: 約1.5日 =
+    ##       ((2 ** 0) + (2 ** 1) + ... + (2 ** 17)) / 60.0 / 60.0 / 24.0
+    ##     （デフォルト）
+    ## 18: 約3.0日 = ((2 ** 0) + ... + (2 ** 18)) / ...
+    ## 19: 約6.0日 = ((2 ** 0) + ... + (2 ** 19)) / ...
+    # retry_limit 19
+    ## たくさんのレコードをロードするときは大きな値にします。
+    ## loadコマンドの中の1つのレコードが1つのチャンクに対応します。
+    # buffer_queue_limit 10000
+  &lt;/match&gt;
+
+  # 2番目のスレーブgroongaサーバー
+  &lt;store&gt;
+    type groonga
+    protocol gqtp            # あるいは下の行を使う
+    # protocol http          # マスターgroongaサーバーとスレーブgroongaサーバーで
+                             # 違うプロトコルを使うこともできる
+    host 192.168.29.3        # スレーブgroongaサーバーのIPアドレス
+    port 10041               # スレーブgroongaサーバーのポート番号
+
+    # buffer
+    # ...
+  &lt;/store&gt;
+
+  # さらに追加のスレーブgroongaサーバー
+  # &lt;store&gt;
+  #   type groonga
+  #   ...
+  # &lt;/store&gt;
+&lt;/match&gt;
+</code></pre>
+
+<p>TODO: ...</p>
+
+<h3>大規模システム</h3>
+
+<p>大規模なシステムでは2つ以上のスレーブgroongaサーバークラスターがあります。マスターgroongaサーバーと通信するfluentdは、スレーブgroongaサーバークラスターの中にあるfluetnd（2つ以上）を使って更新します。そのために <code>copy</code> outputプラグインと <code>forward</code> outputプラグインを使います。スレーブクラスターはfluentdを1つ持ちます。スレーブgroongaサーバークラスターのfluentdは同じクラスター内にあるスレーブgroongaサーバーを <code>copy</code> outputプラグインと <code>groonga</code> outputプラグインで更新します。</p>
+
+<p>この構成のときの構成図です。</p>
+
+<pre class="code ruby"><code>            update                 update
+             and                    and
+            search    +---------+  search  +---------+
++--------+ &lt;--------&gt; | fluentd | &lt;------&gt; | master  |
+|        |            +---------+          | groonga |
+| client |                |                +---------+
+|        |                +------------------------------+
++--------+          +----------------------------------+ |
+|        |          |        slave cluster             | |
+| client |  search  | +---------+  update  +---------+ | |
+|        | &lt;------&gt; | |  slave  | &lt;------- | fluentd | &lt;-+ update
++--------|          | | groonga |          +---------+ | |
+|        |          | +---------+   +-----------+      | |
+| client |  search  | +---------+   |                  | |
+|        | &lt;------&gt; | |  slave  | &lt;-+ update           | |
++--------|          | | groonga |   |                  | |
+|        |          | +---------+   |                  | |
+|  ...   |   ...    |     ...      ...                 | |
+                    +----------------------------------+ |
++--------+          +----------------------------------+ |
+|        |          |        slave cluster             | |
+| client |  search  | +---------+  update  +---------+ | |
+|        | &lt;------&gt; | |  slave  | &lt;------- | fluentd | &lt;-+ update
++--------|          | | groonga |          +---------+ | |
+|        |          | +---------+   +-----------+      | |
+| client |  search  | +---------+   |                  | |
+|        | &lt;------&gt; | |  slave  | &lt;-+ update           | |
++--------|          | | groonga |   |                  | |
+|        |          | +---------+   |                  | |
+|  ...   |   ...    |     ...      ...                 | |
+                    +----------------------------------+ |
+                                  ...                   ...
+</code></pre>
+
+<p>TODO: ...</p>
+</div></div>
+
+    <div id="footer">
+  Generated on Fri Dec 28 16:08:39 2012 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.8.3 (ruby-1.9.3).
+</div>
+
+  </body>
+</html>

@@ -1,0 +1,397 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+<title>
+  File: Constitution
+  
+    &mdash; fluent-plugin-groonga
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+
+  <link rel="stylesheet" href="css/common.css" type="text/css" media="screen" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  hasFrames = window.top.frames.main ? true : false;
+  relpath = '';
+  framesUrl = "frames.html#!" + escape(window.location.href);
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="header">
+      <div id="menu">
+  
+    <a href="alphabetical_index.html">Index</a> &raquo; 
+    <span class="title">File: Constitution</span>
+  
+
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+      Class List
+    </a>
+  
+    <a class="full_list_link" id="method_list_link"
+        href="method_list.html">
+      Method List
+    </a>
+  
+    <a class="full_list_link" id="file_list_link"
+        href="file_list.html">
+      File List
+    </a>
+  
+</div>
+      <div class="clear"></div>
+    </div>
+
+    <iframe id="search_frame"></iframe>
+
+    <div id="content"><div id='filecontents'><h1>Constitution</h1>
+
+<p>You can chose some system constitutions to implemented replication
+ready groonga system. This document describes some patterns.</p>
+
+<p>Here are available patterns:</p>
+
+<ul>
+<li>Master slave replication</li>
+<li>Resending data to recovered slave</li>
+</ul>
+
+<p>Here are unavailable patterns:</p>
+
+<ul>
+<li>Multi master replication</li>
+<li>Auto slave recovery</li>
+<li>Dynamic slave adding</li>
+<li>Failover</li>
+<li>No SPOF (Single Point of Failure) without downing service level</li>
+</ul>
+
+<h2>Master slave replication</h2>
+
+<p>Master slave replication is available. This section describes how to
+configure your system constitution.</p>
+
+<h3>Small system</h3>
+
+<p>In small system, you just has two servers. One is the master groonga
+server and the other is the slave groonga server. You send all update
+commands (e.g. <code>table_create</code>, <code>column_create</code>, <code>load</code> and so on.) to
+fluentd. In fluentd, the <code>groonga</code> input plugin receives commands from
+client, passes through them to master groonga server and passes
+through responses from master groonga server to client. The <code>groonga</code>
+input plugin converts update commands to fluent messages when the
+<code>groonga</code> input plugin passes through comamands and responses. The
+fluent messages are sent to slave groonga server by the <code>groonga</code>
+output plugin.</p>
+
+<p>Here is a diagram of this constitution.</p>
+
+<pre class="code ruby"><code>            update               update
+             and                  and
+            search  +---------+  search  +---------+
++--------+ &lt;------&gt; | fluentd | &lt;------&gt; | master  |
+|        |          +---------+          | groonga |
+| client |        update |               +---------+
+|        |              \_/
+|        |  search  +---------+
++--------+ &lt;------&gt; |  slave  |
+                    | groonga |
+                    +---------+
+</code></pre>
+
+<p>Fluentd should be placed at client or master groonga server. If you
+have only one client that updates data, client side is reasonable. If
+you have multiple clients that update data, master groonga server side
+is reasonable.</p>
+
+<p>You can use replication for high performance by providing search
+service with multi servers. You can&#39;t use replication for high
+availability. If master groonga server or fluentd is down, this system
+can&#39;t update data. (Searching is still available because slabe groonga
+server is alive.)</p>
+
+<p>Here is an example configuration file:</p>
+
+<pre class="code ruby"><code># For master groonga server
+&lt;source&gt;
+  type groonga
+  protocol gqtp          # Or use the below line
+  # protocol http
+  bind 127.0.0.1         # For client side fluentd
+  # bind 192.168.0.1     # For master groonga server side fluentd
+  port 10041
+  real_host 192.168.29.1 # IP address of master groonga server
+  real_port 10041        # Port number of master groonga server
+  # real_port 20041      # Use different port number
+                         # for master groonga server side fluentd
+&lt;/source&gt;
+
+# For slave groonga server
+&lt;match groonga.command.*&gt;
+  type groonga
+  protocol gqtp            # Or use the below line
+  # protocol http          # You can use different protocol for
+                           # master groonga server and slave groonga server
+  host 192.168.29.29       # IP address of slave groonga server
+  port 10041               # Port number of slave groonga server
+
+  # Buffer
+  flush_interval 1s        # Use small value for less delay replication
+
+  ## Use the following configurations to support resending data to
+  ## recovered slave groonga server. If you don't care about slave
+  ## groonga server is down case, you don't need the following
+  ## configuration.
+
+  ## For supporting resending data after fluentd is restarted
+  # buffer_type file
+  # buffer_path /var/log/fluent/groonga.*.buffer
+  ## Use large value if a record has many data in load command.
+  ## A value in load command is a chunk.
+  # buffer_chunk_limit 256m
+  ## Use large value if you want to support resending data after
+  ## slave groonga server is down long time.
+  ## 17: about 1.5day =
+  ##       ((2 ** 0) + (2 ** 1) + ... + (2 ** 17)) / 60.0 / 60.0 / 24.0
+  ##     (default)
+  ## 18: about 3.0day = ((2 ** 0) + ... + (2 ** 18)) / ...
+  ## 19: about 6.0day = ((2 ** 0) + ... + (2 ** 19)) / ...
+  # retry_limit 19
+  ## Use large value if you load many records.
+  ## A value in load command is a chunk.
+  # buffer_queue_limit 10000
+&lt;/match&gt;
+</code></pre>
+
+<h4>How to recover from fluentd down</h4>
+
+<p>If fluentd is down, you just restart fluentd. Note that you may resend
+the last command if fluentd is down while you are sending update
+commands.</p>
+
+<p>You cannot update data until fluentd is up.</p>
+
+<h4>How to recover from master groonga server down</h4>
+
+<p>Here are recover steps when master groonga server is down:</p>
+
+<ol>
+<li>Stop fluentd.</li>
+<li>Run <code>grndump /PATH/TO/SLAVE/GROONGA/SERVER/DB &gt;
+ SLAVE_GROONGA_DUMP.grn</code> on slave groonga server host.</li>
+<li>Run <code>groonga -n /PATH/TO/MASTER/GROONGA/SERVER/DB &lt;
+ SLAVE_GROONGA_DUMP.grn</code> on master groonga server.</li>
+<li>Run master groonga server.</li>
+<li>Start fluentd.</li>
+</ol>
+
+<p>You cannot update data until you finish to recover.</p>
+
+<h4>How to recover from slave groonga server down</h4>
+
+<p>Here are recover steps when slave groonga server is down:</p>
+
+<ol>
+<li>Run <code>grndump /PATH/TO/MASTER/GROONGA/SERVER/DB &gt;
+ MASTER_GROONGA_DUMP.grn</code> on master groonga server host.</li>
+<li>Run <code>groonga -n /PATH/TO/SLAVE/GROONGA/SERVER/DB &lt;
+ MASTER_GROONGA_DUMP.grn</code> on slave groonga server.</li>
+<li>Run slave groonga server.</li>
+</ol>
+
+<p>You can update data while you recover. If your system can&#39;t process
+all search requests by only master groonga server, your system will be
+down.</p>
+
+<p>You need to recover slave groonga server before fluentd&#39;s buffer queue
+is full (see <code>buffer_queue_limit</code>) or fluentd gives up retrying (see
+<code>retry_limit</code>). Here are recover steps when you cannot recover slave
+groonga server before those situations:</p>
+
+<ol>
+<li>Stop fluentd.</li>
+<li>Run <code>grndump /PATH/TO/MASTER/GROONGA/SERVER/DB &gt;
+ MASTER_GROONGA_DUMP.grn</code> on master groonga server host.</li>
+<li>Run <code>groonga -n /PATH/TO/SLAVE/GROONGA/SERVER/DB &lt;
+ MASTER_GROONGA_DUMP.grn</code> on slave groonga server host.</li>
+<li>Run slave groonga server.</li>
+<li>Start fluentd.</li>
+</ol>
+
+<p>You cannot update data until you finish to recover.</p>
+
+<h3>Medium system</h3>
+
+<p>In medium system, you have three or more slave groonga servers. Fluentd
+updates two or more slave groonga servers with the <code>copy</code> output
+plugin and the <code>groonga</code> output plugin.</p>
+
+<p>Here is a diagram of this constitution.</p>
+
+<pre class="code ruby"><code>            update               update
+             and                  and
+            search  +---------+  search  +---------+
++--------+ &lt;------&gt; | fluentd | &lt;------&gt; | master  |
+|        |          +---------+          | groonga |
+| client |               +--------+      +---------+
+|        |                        |
++--------+  search  +---------+   |
+|        | &lt;------&gt; |  slave  | &lt;-+ update
+| client |          | groonga |   |
+|        |          +---------+   |
++--------+  search  +---------+   |
+|        | &lt;------&gt; |  slave  | &lt;-+ update
+| client |          | groonga |   |
+|        |          +---------+   |
++- ...  -+   ...        ...      ...
+</code></pre>
+
+<p>Here is an example configuration file:</p>
+
+<pre class="code ruby"><code># For master groonga server
+&lt;source&gt;
+  type groonga
+  protocol gqtp          # Or use the below line
+  # protocol http
+  bind 127.0.0.1         # For client side fluentd
+  # bind 192.168.0.1     # For master groonga server side fluentd
+  port 10041
+  real_host 192.168.29.1 # IP address of master groonga server
+  real_port 10041        # Port number of master groonga server
+  # real_port 20041      # Use different port number
+                         # for master groonga server side fluentd
+&lt;/source&gt;
+
+# For slave groonga servers
+&lt;match groonga.command.*&gt;
+  type copy
+
+  # The first slave groonga server
+  &lt;store&gt;
+    type groonga
+    protocol gqtp            # Or use the below line
+    # protocol http          # You can use different protocol for
+                             # master groonga server and slave groonga server
+    host 192.168.29.2        # IP address of slave groonga server
+    port 10041               # Port number of slave groonga server
+
+    # Buffer
+    flush_interval 1s        # Use small value for less delay replication
+
+    ## Use the following configurations to support resending data to
+    ## recovered slave groonga server. If you don't care about slave
+    ## groonga server is down case, you don't need the following
+    ## configuration.
+
+    ## For supporting resending data after fluentd is restarted
+    # buffer_type file
+    # buffer_path /var/log/fluent/groonga.*.buffer
+    ## Use large value if a record has many data in load command.
+    ## A value in load command is a chunk.
+    # buffer_chunk_limit 256m
+    ## Use large value if you want to support resending data after
+    ## slave groonga server is down long time.
+    ## 17: about 1.5day =
+    ##       ((2 ** 0) + (2 ** 1) + ... + (2 ** 17)) / 60.0 / 60.0 / 24.0
+    ##     (default)
+    ## 18: about 3.0day = ((2 ** 0) + ... + (2 ** 18)) / ...
+    ## 19: about 6.0day = ((2 ** 0) + ... + (2 ** 19)) / ...
+    # retry_limit 19
+    ## Use large value if you load many records.
+    ## A value in load command is a chunk.
+    # buffer_queue_limit 10000
+  &lt;/store&gt;
+
+  # The second slave groonga server
+  &lt;store&gt;
+    type groonga
+    protocol gqtp            # Or use the below line
+    # protocol http          # You can use different protocol for
+                             # master groonga server and slave groonga server
+    host 192.168.29.3        # IP address of slave groonga server
+    port 10041               # Port number of slave groonga server
+
+    # Buffer
+    # ...
+  &lt;/store&gt;
+
+  # More slave groonga servers
+  # &lt;store&gt;
+  #   type groonga
+  #   ...
+  # &lt;/store&gt;
+&lt;/match&gt;
+</code></pre>
+
+<p>TODO: ...</p>
+
+<h3>Large system</h3>
+
+<p>In large system, you have two or more slave groonga server clusters.
+Fluentd that connects with master groonga server updates two or more
+fluentds that are in slave groonga server clusters with the <code>copy</code>
+output plugin and the <code>forward</code> output plugin. A slave cluster has a
+fluentd. Fluentd in slave groonga server clusters updates slave
+groonga server in the same slave groonga server cluster by the <code>copy</code>
+output plugin and <code>groonga</code> output plugin.</p>
+
+<p>Here is a diagram of this constitution.</p>
+
+<pre class="code ruby"><code>            update                 update
+             and                    and
+            search    +---------+  search  +---------+
++--------+ &lt;--------&gt; | fluentd | &lt;------&gt; | master  |
+|        |            +---------+          | groonga |
+| client |                |                +---------+
+|        |                +------------------------------+
++--------+          +----------------------------------+ |
+|        |          |        slave cluster             | |
+| client |  search  | +---------+  update  +---------+ | |
+|        | &lt;------&gt; | |  slave  | &lt;------- | fluentd | &lt;-+ update
++--------|          | | groonga |          +---------+ | |
+|        |          | +---------+   +-----------+      | |
+| client |  search  | +---------+   |                  | |
+|        | &lt;------&gt; | |  slave  | &lt;-+ update           | |
++--------|          | | groonga |   |                  | |
+|        |          | +---------+   |                  | |
+|  ...   |   ...    |     ...      ...                 | |
+                    +----------------------------------+ |
++--------+          +----------------------------------+ |
+|        |          |        slave cluster             | |
+| client |  search  | +---------+  update  +---------+ | |
+|        | &lt;------&gt; | |  slave  | &lt;------- | fluentd | &lt;-+ update
++--------|          | | groonga |          +---------+ | |
+|        |          | +---------+   +-----------+      | |
+| client |  search  | +---------+   |                  | |
+|        | &lt;------&gt; | |  slave  | &lt;-+ update           | |
++--------|          | | groonga |   |                  | |
+|        |          | +---------+   |                  | |
+|  ...   |   ...    |     ...      ...                 | |
+                    +----------------------------------+ |
+                                  ...                   ...
+</code></pre>
+
+<p>TODO: ...</p>
+</div></div>
+
+    <div id="footer"></div>
+
+  </body>
+</html>

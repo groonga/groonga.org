@@ -1,0 +1,155 @@
+---
+layout: post.en
+title: Groonga 2.1.2 has been released
+description: Groonga 2.1.2 has been released!
+published: false
+---
+
+h2. Groonga 2.1.2 has been released
+
+"Groonga 2.1.2":/docs/news.html#release-2-1-2 has been released!
+
+How to install: "Install":/docs/install.html
+
+There are three topics for this release.
+
+* Supported multiple query() in a select command
+* Improved to install missing MeCab dictionary for groonga-tokenizer-mecab
+* Supported Fedora 18
+
+h3. Supported multiple query() in a select command
+
+In this release, you can simplify a select command by using query() function.
+For example, you can specify @--match_columns@ and @--query@ option.
+You can do the same thing by using query() in @--filter@ option.
+
+Let's full text search 'alice' from 'User' table's 'name' column. (There is a required condition that you specify 10 as the value of weight to name column.)
+
+Here is the sample schema:
+
+<pre>
+  table_create Users TABLE_NO_KEY
+  column_create Users name COLUMN_SCALAR ShortText
+  column_create Users memo COLUMN_SCALAR ShortText
+
+  table_create Lexicon TABLE_HASH_KEY ShortText \
+    --default_tokenizer TokenBigramSplitSymbolAlphaDigit \
+    --normalizer NormalizerAuto
+  column_create Lexicon users_name COLUMN_INDEX|WITH_POSITION Users name
+  column_create Lexicon users_memo COLUMN_INDEX|WITH_POSITION Users memo
+</pre>
+
+Here is the sample data:
+
+<pre>
+  load --table Users
+  [
+  {"name": "Alice", "memo": "groonga user"},
+  {"name": "Alisa", "memo": "mroonga user"},
+  {"name": "Bob",   "memo": "rroonga user"},
+  {"name": "Tom",   "memo": "nroonga user"},
+  {"name": "Tobby", "memo": "groonga and mroonga user. mroonga is ..."},
+  ]
+</pre>
+
+Here is the difference of query which does the same thing by @--match_columns@ and @--query@ or by query() in @--filter@.
+
+Before:
+
+<pre>
+  select Users \
+    --output_columns name,_score \
+    --match_columns "name * 10" \
+    --query alice
+</pre>
+
+After:
+
+<pre>
+  select Users \
+    --output_columns name,_score \
+    --filter 'query("name * 10", "alice")'
+</pre>
+
+There is a few difference between first example and second one, so consider more concrete example such as weight spcified keyword.
+
+If you use @--query@ and @--match_columns@ combination query, you can't specify the value of weight for each keyword.
+
+<pre>
+  select Users \
+    --output_columns name,memo,_score \
+    --match_columns "memo * 10" --query "memo:@groonga OR memo:@mroonga OR memo:@user" \
+    --sortby -_score
+</pre>
+
+On the other hand, if you use query() function in @--filter@, you can specify the value of weight for each keyword.
+
+<pre>
+  select Users \
+    --output_columns name,memo,_score \
+    --filter 'query("memo * 10", "groonga") || query("memo * 20", "mroonga") || query("memo * 1", "user")' \
+    --sortby -_score
+</pre>
+
+First case, the keyword 'groonga' and 'mroonga' is equivalent:
+
+<pre>
+  [
+   ["name","ShortText"],["memo","ShortText"],["_score","Int32"]
+  ],
+  ["Tobby","groonga and mroonga user. mroonga is ...",4],
+  ["Alice","groonga user",2],
+  ["Alisa","mroonga user",2],
+  ["Bob","rroonga user",1],
+  ["Tom","nroonga user",1]
+</pre>
+
+Second case, by specifying the value of weight, the value of score for 'mroonga' is higher than the one for 'groonga'.
+
+<pre>
+  [
+   ["name","ShortText"],["memo","ShortText"],["_score","Int32"]
+  ],
+  ["Tobby","groonga and mroonga user. mroonga is ...",51],
+  ["Alisa","mroonga user",21],
+  ["Alice","groonga user",11],
+  ["Tom","nroonga user",1],
+  ["Bob","rroonga user",1]
+</pre>
+
+By using query() function, you can get intended full text search results which are controlled by the value of weight.
+
+h3. Improved to install missing MeCab dictionary for groonga-tokenizer-mecab
+
+This release began to support to install missing MeCab dictionary when installing groonga-tokenizer-mecab package.
+
+Debian/Ubuntu:
+
+<pre>
+  % sudo apt-get install -y groonga-tokenizer-mecab
+</pre>
+
+CentOS/Fedora:
+
+<pre>
+  % sudo yum install -y groonga-tokenizer-mecab
+</pre>
+
+In the previous release, there is no explicit depencency to MeCab dictionary as which MeCab dictionary you should use is according to the case.
+
+But if you use groonga with MeCab tokenizer for the first time, it is inconvenient for you.
+So we had added dependency to MeCab dictionary to install with for groonga-tokenizer-mecab package.
+
+There is no side effect if you already installed MeCab dictionary.
+
+h3. Supported Fedora 18
+
+Fedora 18 had been released at Jan 15, 2013 at last. This release began to support Fedora 18.
+
+See how to install groonga on "Fedora 18":http://groonga.org/docs/install/fedora.html#fedora-18 about detail.
+
+h3. Conclusion
+
+See "Release 2.1.2 2013/01/29":/docs/news.html#release-2-1-2 about detailed changes since 2.1.1.
+
+Let's search by groonga!

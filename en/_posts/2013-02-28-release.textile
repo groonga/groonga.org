@@ -1,0 +1,183 @@
+---
+layout: post.en
+title: Groonga 3.0.1 has been released
+description: Groonga 3.0.1 has been released!
+published: true
+---
+
+h2. Groonga 3.0.1 has been released
+
+"Groonga 3.0.1":/docs/news.html#release-3-0-1 has been released!
+
+How to install: "Install":/docs/install.html
+
+There are two topics for this release.
+
+* Supported to set Bool to reference column when loading dataset by load command
+* Supported AND operation for nested index
+
+h3. Supported to set Bool to reference column when loading dataset by load command
+
+
+In the previous release, you can't load dataset into reference column which refers Bool column by load command.
+
+For example, try following the schema and load the datasets:
+
+<pre>
+  table_create Bools TABLE_HASH_KEY Bool
+
+  table_create  Entries           TABLE_HASH_KEY ShortText
+  column_create Entries published COLUMN_SCALAR  Bools
+
+  load --table Entries
+  [
+  {"_key": "Special news!",  "published": true},
+  {"_key": "Supprise news!", "published": false}
+  ]
+</pre>
+
+For confirming whether load commands succeeds, execute select Entries:
+
+<pre>
+  [
+    [
+      [2],
+      [
+        ["_id","UInt32"],
+        ["_key","ShortText"],
+        ["published","Bools"]
+      ],
+      [1,"Special news!",false],
+      [2,"Supprise news!",false]
+    ]
+  ]
+</pre>
+
+You know the value of "published" column is not loaded properly.
+
+In this release, this limitation is fixed!
+
+See the results of 'select Entries' command. This is the intended results.
+
+<pre>
+  [
+    [
+      [2],
+      [
+        ["_id","UInt32"],
+        ["_key","ShortText"],
+        ["published","Bools"]
+      ],
+      [1,"Special news!",true],
+      [2,"Supprise news!",false]
+    ]
+  ]
+</pre>
+
+Confirm the results of 'select Bools' command.
+
+You know the value of reference column is properly set.
+
+<pre>
+  [
+    [
+      [0],
+      [
+        ["_id","UInt32"],
+        ["_key","Bool"]
+      ],
+      [1,true],
+      [2,false]
+    ]
+  ]
+</pre>
+
+h3. Supported AND operation for nested index
+
+In this release, you can execute AND search even though nested index is used.
+
+Here is the schema and data:
+
+<pre>
+  table_create Users TABLE_PAT_KEY ShortText
+  column_create Users birthday COLUMN_SCALAR Time
+  
+  table_create Files TABLE_PAT_KEY ShortText
+  column_create Files owner COLUMN_SCALAR Users
+  
+  column_create Users files_owner_index COLUMN_INDEX Files owner
+  
+  table_create Birthdays TABLE_PAT_KEY Time
+  column_create Birthdays users_birthday COLUMN_INDEX Users birthday
+  
+  load --table Users
+  [
+  {"_key": "Alice",  "birthday": "1992-02-09 00:00:00"},
+  {"_key": "Bob",    "birthday": "1988-01-04 00:00:00"},
+  {"_key": "Carlos", "birthday": "1982-12-29 00:00:00"}
+  ]
+  
+  load --table Files
+  [
+  {"_key": "/home/alice/.zshrc",                  "owner": "Alice"},
+  {"_key": "/home/bob/.bashrc",                   "owner": "Bob"},
+  {"_key": "/home/calros/public_html/index.html", "owner": "Carlos"}
+  ]
+</pre>
+
+Consider to search specific files which depends owner's birthday.
+
+There is a column index between Files table and Users table, so two tables are related by nested index.
+
+You may think that following query is good enough for such a case.
+
+<pre>
+  select Files \
+  --filter 'owner.birthday >= "1988-01-04 00:00:00" && owner.birthday < "1992-02-09 00:00:00"' \
+  --output_columns '_key, owner, owner.birthday'
+
+  [
+    [
+      [2],
+      [
+        ["_key","ShortText"],
+        ["owner","Users"],
+        ["owner.birthday","Time"]
+      ],
+      ["/home/bob/.bashrc","Bob",568220400.0],
+      ["/home/alice/.zshrc","Alice",697561200.0]
+    ]
+  ]
+</pre>
+
+As you can see, the search results is not intended.
+
+It seems that only the first condition is applied, but not the second one.
+
+It is valid that the search results contains 'Bob' is valid, but not 'Alice'.
+
+This is because that AND search is not implemented in the previous release.
+
+In this release, AND search with nested index works!
+
+<pre>
+  [
+    [
+      [1],
+      [
+        ["_key","ShortText"],
+        ["owner","Users"],
+        ["owner.birthday","Time"]
+      ],
+      ["/home/bob/.bashrc","Bob",568220400.0]
+    ]
+  ]
+</pre>
+
+You can see the condition @'&& owner.birthday < "1992-02-09 00:00:00"'@ parts also works.
+
+h3. Conclusion
+
+See "Release 3.0.1 2013/02/28":/docs/news.html#release-3-0-1 about detailed changes since 3.0.0.
+
+Let's search by groonga!

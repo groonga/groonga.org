@@ -1,0 +1,338 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>8.11.9. sub_filter &mdash; groonga v3.0.2ドキュメント</title>
+    
+    <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
+    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '3.0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../static/doctools.js"></script>
+    <script type="text/javascript" src="../../static/translations.js"></script>
+    <link rel="shortcut icon" href="../../static/favicon.ico"/>
+    <link rel="top" title="groonga v3.0.2ドキュメント" href="../../index.html" />
+    <link rel="up" title="8.11. 関数" href="../function.html" />
+    <link rel="next" title="8.12. インデックス構築" href="../indexing.html" />
+    <link rel="prev" title="8.11.8. snippet_html" href="snippet_html.html" /> 
+      <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
+    <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
+    <meta property="og:type" content="product" />
+    <meta property="og:image" content="http://groonga.org/images/logos/groonga-icon-full-size.png" />
+    <meta property="og:site_name" content="groonga" />
+
+    <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
+  </head>
+
+    <body>
+    <div id="fb-root"></div>
+
+<div class="header">
+  <h1 class="title">
+    <a id="top-link" href="../../../">
+      <span class="project">groonga</span>
+      <span class="separator">-</span>
+      <span class="description">オープンソースのカラムストア機能付き全文検索エンジン</span>
+    </a>
+  </h1>
+
+      <div class="facebook-buttons">
+      <fb:like href="http://www.facebook.com/pages/groonga/201193596592346"
+               layout="standard"
+               width="290"></fb:like>
+    </div>
+    <div class="other-language-links">
+
+    <ul>
+      <li><a href="../../../../docs/reference/functions/sub_filter.html"><img src="../../static/us.png" alt="English">English page</a></li>
+    </ul>
+  </div>
+</div>
+  
+
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../indexing.html" title="8.12. インデックス構築"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="snippet_html.html" title="8.11.8. snippet_html"
+             accesskey="P">前へ</a> |</li>
+        <li><a href="../../index.html">groonga v3.0.2ドキュメント</a> &raquo;</li>
+          <li><a href="../../reference.html" >8. リファレンスマニュアル</a> &raquo;</li>
+          <li><a href="../function.html" accesskey="U">8.11. 関数</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="sub-filter">
+<h1>8.11.9. sub_filter<a class="headerlink" href="#sub-filter" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<div class="section" id="summary">
+<h2>8.11.9.1. 概要<a class="headerlink" href="#summary" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">sub_filter</span></tt> は <tt class="docutils literal"><span class="pre">query_string</span></tt> を <tt class="docutils literal"><span class="pre">match_column</span></tt> のコンテキストで評価します。</p>
+<p><tt class="docutils literal"><span class="pre">sub_filter</span></tt> は <a class="reference internal" href="../commands/select.html"><em>select</em></a> コマンドの <tt class="docutils literal"><span class="pre">--filter</span></tt> 内でのみ指定できます。</p>
+</div>
+<div class="section" id="syntax">
+<h2>8.11.9.2. 構文<a class="headerlink" href="#syntax" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">sub_filter</span></tt> は2つの引数が必要です。 <tt class="docutils literal"><span class="pre">match_column</span></tt> と <tt class="docutils literal"><span class="pre">query_string</span></tt> です。</p>
+<div class="highlight-none"><div class="highlight"><pre>sub_filter(match_column, query_string)
+</pre></div>
+</div>
+</div>
+<div class="section" id="usage">
+<h2>8.11.9.3. 使い方<a class="headerlink" href="#usage" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>使い方を示すために使うスキーマ定義とサンプルデータは以下の通りです。</p>
+<p>サンプルスキーマ:</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Comment TABLE_PAT_KEY UInt32
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Comment name COLUMN_SCALAR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Comment content COLUMN_SCALAR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create Blog TABLE_PAT_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Blog title COLUMN_SCALAR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Blog content COLUMN_SCALAR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Blog comments COLUMN_VECTOR Comment
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Comment blog_comment_index COLUMN_INDEX Blog comments
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create Lexicon TABLE_PAT_KEY ShortText --default_tokenizer TokenBigram
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Lexicon comment_content COLUMN_INDEX|WITH_POSITION Comment content
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Lexicon comment_name COLUMN_INDEX|WITH_POSITION Comment name
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Lexicon blog_content COLUMN_INDEX|WITH_POSITION Blog content
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>サンプルデータ:</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>load --table Comment
+[
+{&quot;_key&quot;: 1, &quot;name&quot;: &quot;A&quot;, &quot;content&quot;: &quot;groonga&quot;},
+{&quot;_key&quot;: 2, &quot;name&quot;: &quot;B&quot;, &quot;content&quot;: &quot;groonga&quot;},
+{&quot;_key&quot;: 3, &quot;name&quot;: &quot;C&quot;, &quot;content&quot;: &quot;rroonga&quot;},
+{&quot;_key&quot;: 4, &quot;name&quot;: &quot;A&quot;, &quot;content&quot;: &quot;mroonga&quot;},
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 4]
+load --table Blog
+[
+{&quot;_key&quot;: &quot;groonga&#39;s blog&quot;, &quot;content&quot;: &quot;content of groonga&#39;s blog&quot;, comments: [1, 2, 3]},
+{&quot;_key&quot;: &quot;mroonga&#39;s blog&quot;, &quot;content&quot;: &quot;content of mroonga&#39;s blog&quot;, comments: [2, 3, 4]},
+{&quot;_key&quot;: &quot;rroonga&#39;s blog&quot;, &quot;content&quot;: &quot;content of rroonga&#39;s blog&quot;, comments: [3]},
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 3]
+</pre></div>
+</div>
+<dl class="docutils">
+<dt>ブログのエントリを抽出する <tt class="docutils literal"><span class="pre">sub_filter</span></tt> 関数の使用例です。</dt>
+<dd>ユーザー'A'のコメント</dd>
+</dl>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Blog --output_columns _key --filter &quot;comments.name @ \&quot;A\&quot; &amp;&amp; comments.content @ \&quot;groonga\&quot;&quot;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         &quot;groonga&#39;s blog&quot;
+#       ],
+#       [
+#         &quot;mroonga&#39;s blog&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>上記のクエリを実行すると、&quot;groonga's blog&quot;だけでなく、&quot;mroonga's blog&quot;もマッチします。ユーザー&quot;A&quot;は&quot;mroonga's blog&quot;に対しては&quot;groonga&quot;に言及していないので、これは意図していない結果です。</p>
+<p>sub_filterなしでは、以下の条件が満たされます。</p>
+<ul class="simple">
+<li>すくなくとも一つはユーザー&quot;A&quot;がコメントしたレコードがある。</li>
+<li>すくなくとも一つは&quot;groonga&quot;について言及したレコードがある。</li>
+</ul>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Blog --output_columns _key --filter &#39;sub_filter(comments, &quot;name @ \\&quot;A\\&quot; &amp;&amp; content @ \\&quot;groonga\\&quot;&quot;)&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         &quot;groonga&#39;s blog&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>一方、上記のクエリは意図した結果を返します。これは、sub_filterの引数がcommentsカラムのコンテキストで評価されるからです。</p>
+<p>sub_filterは以下の条件が満たされていることを要求します。</p>
+<ul class="simple">
+<li>ユーザー&quot;A&quot;が&quot;groonga&quot;について言及しているレコードがある。</li>
+</ul>
+</div>
+<div class="section" id="parameters">
+<h2>8.11.9.4. 引数<a class="headerlink" href="#parameters" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>必須引数は二つあります。 <tt class="docutils literal"><span class="pre">match_column</span></tt> と <tt class="docutils literal"><span class="pre">query_string</span></tt> です。</p>
+<div class="section" id="match-column">
+<h3>8.11.9.4.1. <tt class="docutils literal"><span class="pre">match_column</span></tt><a class="headerlink" href="#match-column" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<blockquote>
+<div><tt class="docutils literal"><span class="pre">match_columns</span></tt> と同様のパラメータを指定します。</div></blockquote>
+<p>match_columnについては <a class="reference internal" href="../commands/select.html#select-match-columns"><em>match_columns</em></a> を参照してください。</p>
+</div>
+<div class="section" id="query-string">
+<h3>8.11.9.4.2. <tt class="docutils literal"><span class="pre">query_string</span></tt><a class="headerlink" href="#query-string" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<blockquote>
+<div><tt class="docutils literal"><span class="pre">query</span></tt> と同様のパラメータを指定します。</div></blockquote>
+<p>query stringについては <a class="reference internal" href="../commands/select.html#select-query"><em>query</em></a> を参照してください。</p>
+</div>
+</div>
+<div class="section" id="return-value">
+<h2>8.11.9.5. 戻り値<a class="headerlink" href="#return-value" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">sub_filter</span></tt> は真偽値(trueもしくはfalse)を返します。</p>
+</div>
+<div class="section" id="see-also">
+<h2>8.11.9.6. 参考<a class="headerlink" href="#see-also" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<ul class="simple">
+<li><a class="reference internal" href="../commands/select.html"><em>select</em></a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">8.11.9. sub_filter</a><ul>
+<li><a class="reference internal" href="#summary">8.11.9.1. 概要</a></li>
+<li><a class="reference internal" href="#syntax">8.11.9.2. 構文</a></li>
+<li><a class="reference internal" href="#usage">8.11.9.3. 使い方</a></li>
+<li><a class="reference internal" href="#parameters">8.11.9.4. 引数</a><ul>
+<li><a class="reference internal" href="#match-column">8.11.9.4.1. <tt class="docutils literal"><span class="pre">match_column</span></tt></a></li>
+<li><a class="reference internal" href="#query-string">8.11.9.4.2. <tt class="docutils literal"><span class="pre">query_string</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#return-value">8.11.9.5. 戻り値</a></li>
+<li><a class="reference internal" href="#see-also">8.11.9.6. 参考</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="snippet_html.html"
+                        title="前の章へ">8.11.8. snippet_html</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="../indexing.html"
+                        title="次の章へ">8.12. インデックス構築</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../sources/reference/functions/sub_filter.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../indexing.html" title="8.12. インデックス構築"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="snippet_html.html" title="8.11.8. snippet_html"
+             >前へ</a> |</li>
+        <li><a href="../../index.html">groonga v3.0.2ドキュメント</a> &raquo;</li>
+          <li><a href="../../reference.html" >8. リファレンスマニュアル</a> &raquo;</li>
+          <li><a href="../function.html" >8.11. 関数</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009-2013, Brazil, Inc.
+    </div>
+      <script src="http://connect.facebook.net/ja_JP/all.js"></script>
+
+    <script>
+      FB.init({
+         appId  : null,
+         status : true, // check login status
+         cookie : true, // enable cookies to allow the server to access the session
+         xfbml  : true  // parse XFBML
+      });
+    </script>
+  </body>
+
+</html>

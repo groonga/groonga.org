@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>8.3.22. select &mdash; groonga v3.0.1 documentation</title>
+    <title>8.3.22. select &mdash; groonga v3.0.2 documentation</title>
     
     <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '3.0.1',
+        VERSION:     '3.0.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../../static/underscore.js"></script>
     <script type="text/javascript" src="../../static/doctools.js"></script>
     <link rel="shortcut icon" href="../../static/favicon.ico"/>
-    <link rel="top" title="groonga v3.0.1 documentation" href="../../index.html" />
+    <link rel="top" title="groonga v3.0.2 documentation" href="../../index.html" />
     <link rel="up" title="8.3. Command" href="../command.html" />
     <link rel="next" title="8.3.23. shutdown" href="shutdown.html" />
     <link rel="prev" title="8.3.21. register" href="register.html" /> 
@@ -75,7 +75,7 @@
         <li class="right" >
           <a href="register.html" title="8.3.21. register"
              accesskey="P">previous</a> |</li>
-        <li><a href="../../index.html">groonga v3.0.1 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">groonga v3.0.2 documentation</a> &raquo;</li>
           <li><a href="../../reference.html" >8. リファレンスマニュアル</a> &raquo;</li>
           <li><a href="../command.html" accesskey="U">8.3. Command</a> &raquo;</li> 
       </ul>
@@ -117,6 +117,7 @@ understand <tt class="docutils literal"><span class="pre">select</span></tt> to 
        [match_escalation_threshold=0]
        [query_expansion=null]
        [query_flags=ALLOW_PRAGMA|ALLOW_COLUMN|ALLOW_UPDATE|ALLOW_LEADING_NOT|NONE]
+       [query_expander=null]
 </pre></div>
 </div>
 </div>
@@ -1124,256 +1125,7 @@ more searches aren't executed. And no records are matched.</p>
 </div>
 <div class="section" id="query-expansion">
 <span id="id2"></span><h4>8.3.22.4.3.2. <tt class="docutils literal"><span class="pre">query_expansion</span></tt><a class="headerlink" href="#query-expansion" title="Permalink to this headline">¶</a></h4>
-<p>It's for query expansion. Query expansion substitutes specific words
-to another words in query. Nomally, it's used for synonym search.</p>
-<p>It specifies a column that is used to substitute <tt class="docutils literal"><span class="pre">query</span></tt> parameter
-value. The format of this parameter value is
-&quot;<tt class="docutils literal"><span class="pre">${TABLE}.${COLUMN}</span></tt>&quot;. For example, &quot;<tt class="docutils literal"><span class="pre">Terms.synonym</span></tt>&quot; specifies
-<tt class="docutils literal"><span class="pre">synonym</span></tt> column in <tt class="docutils literal"><span class="pre">Terms</span></tt> table.</p>
-<p>Table for query expansion is called &quot;substitution table&quot;. Substitution
-table's key must be <tt class="docutils literal"><span class="pre">ShortText</span></tt>. So array table (<tt class="docutils literal"><span class="pre">TABLE_NO_KEY</span></tt>)
-can't be used for query expansion. Because array table doesn't have
-key.</p>
-<p>Column for query expansion is called &quot;substitution
-column&quot;. Substitution column's value type must be
-<tt class="docutils literal"><span class="pre">ShortText</span></tt>. Column type must be vector (<tt class="docutils literal"><span class="pre">COLUMN_VECTOR</span></tt>).</p>
-<p>Query expansion substitutes key of substitution table in query with
-values in substitution column. If a word in <tt class="docutils literal"><span class="pre">query</span></tt> is a key of
-substitution table, the word is substituted with substitution column
-value that is associated with the key. Substition isn't performed
-recursively. It means that substitution target words in substituted
-query aren't substituted.</p>
-<p>Here is a sample substitution table to show a simple
-<tt class="docutils literal"><span class="pre">query_expansion</span></tt> usage example.</p>
-<p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>table_create Thesaurus TABLE_PAT_KEY|KEY_NORMALIZE ShortText
-# [[0, 1337566253.89858, 0.000355720520019531], true]
-column_create Thesaurus synonym COLUMN_VECTOR ShortText
-# [[0, 1337566253.89858, 0.000355720520019531], true]
-load --table Thesaurus
-[
-{&quot;_key&quot;: &quot;mroonga&quot;, &quot;synonym&quot;: [&quot;mroonga&quot;, &quot;tritonn&quot;, &quot;groonga mysql&quot;]},
-{&quot;_key&quot;: &quot;groonga&quot;, &quot;synonym&quot;: [&quot;groonga&quot;, &quot;senna&quot;]}
-]
-# [[0, 1337566253.89858, 0.000355720520019531], 2]
-</pre></div>
-</div>
-<p><tt class="docutils literal"><span class="pre">Thesaurus</span></tt> substitution table has two synonyms, <tt class="docutils literal"><span class="pre">&quot;mroonga&quot;</span></tt> and
-<tt class="docutils literal"><span class="pre">&quot;groonga&quot;</span></tt>. If an user searches with <tt class="docutils literal"><span class="pre">&quot;mroonga&quot;</span></tt>, groonga
-searches with <tt class="docutils literal"><span class="pre">&quot;((mroonga)</span> <span class="pre">OR</span> <span class="pre">(tritonn)</span> <span class="pre">OR</span> <span class="pre">(groonga</span> <span class="pre">mysql))&quot;</span></tt>. If an
-user searches with <tt class="docutils literal"><span class="pre">&quot;groonga&quot;</span></tt>, groonga searchs with <tt class="docutils literal"><span class="pre">&quot;((groonga)</span>
-<span class="pre">OR</span> <span class="pre">(senna))&quot;</span></tt>. Nomrally, it's good idea that substitution table has
-<tt class="docutils literal"><span class="pre">KEY_NORMALIZE</span></tt> flag. If the flag is used, substitute target word is
-matched in case insensitive manner.</p>
-<p>Note that those synonym values include the key value such as
-<tt class="docutils literal"><span class="pre">&quot;mroonga&quot;</span></tt> and <tt class="docutils literal"><span class="pre">&quot;groonga&quot;</span></tt>. It's recommended that you include the
-key value. If you don't include key value, substituted value doesn't
-include the original substitute target value. Normally, including the
-original value is better search result. If you have a word that you
-don't want to be searched, you should not include the original
-word. For example, you can implement &quot;stop words&quot; by an empty vector
-value.</p>
-<p>Here is a simple <tt class="docutils literal"><span class="pre">query_expansion</span></tt> usage example.</p>
-<p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>select Entries --match_columns content --query &quot;mroonga&quot;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         1
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         3,
-#         &quot;Mroonga&quot;,
-#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
-#         15
-#       ]
-#     ]
-#   ]
-# ]
-select Entries --match_columns content --query &quot;mroonga&quot; --query_expansion Thesaurus.synonym
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         2
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         3,
-#         &quot;Mroonga&quot;,
-#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
-#         15
-#       ],
-#       [
-#         5,
-#         &quot;Good-bye Tritonn&quot;,
-#         &quot;I also migrated all Tritonn system!&quot;,
-#         3
-#       ]
-#     ]
-#   ]
-# ]
-select Entries --match_columns content --query &quot;((mroonga) OR (tritonn) OR (groonga mysql))&quot;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         2
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         3,
-#         &quot;Mroonga&quot;,
-#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
-#         15
-#       ],
-#       [
-#         5,
-#         &quot;Good-bye Tritonn&quot;,
-#         &quot;I also migrated all Tritonn system!&quot;,
-#         3
-#       ]
-#     ]
-#   ]
-# ]
-</pre></div>
-</div>
-<p>The first <tt class="docutils literal"><span class="pre">select</span></tt> command doesn't use query expansion. So a record
-that has <tt class="docutils literal"><span class="pre">&quot;tritonn&quot;</span></tt> isn't found. The second <tt class="docutils literal"><span class="pre">select</span></tt> command uses
-query expansion. So a record that has <tt class="docutils literal"><span class="pre">&quot;tritonn&quot;</span></tt> is found. The
-third <tt class="docutils literal"><span class="pre">select</span></tt> command doesn't use query expansion but it is same as
-the second <tt class="docutils literal"><span class="pre">select</span></tt> command. The third one uses expanded query.</p>
-<p>Each substitute value can contain any <a class="reference internal" href="../grn_expr/query_syntax.html"><em>Query syntax</em></a> syntax
-such as <tt class="docutils literal"><span class="pre">(...)</span></tt> and <tt class="docutils literal"><span class="pre">OR</span></tt>. You can use complex substitution by
-using those syntax.</p>
-<p>Here is a complex substitution usage example that uses query syntax.</p>
-<p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>load --table Thesaurus
-[
-{&quot;_key&quot;: &quot;popular&quot;, &quot;synonym&quot;: [&quot;popular&quot;, &quot;n_likes:&gt;=10&quot;]}
-]
-# [[0, 1337566253.89858, 0.000355720520019531], 1]
-select Entries --match_columns content --query &quot;popular&quot; --query_expansion Thesaurus.synonym
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         2
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         2,
-#         &quot;Groonga&quot;,
-#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
-#         10
-#       ],
-#       [
-#         3,
-#         &quot;Mroonga&quot;,
-#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
-#         15
-#       ]
-#     ]
-#   ]
-# ]
-</pre></div>
-</div>
-<p>The <tt class="docutils literal"><span class="pre">load</span></tt> command registers a new synonym <tt class="docutils literal"><span class="pre">&quot;popular&quot;</span></tt>. It is
-substituted with <tt class="docutils literal"><span class="pre">((popular)</span> <span class="pre">OR</span> <span class="pre">(n_likes:&gt;=10))</span></tt>. The substituted
-query means that &quot;popular&quot; is containing the word &quot;popular&quot; or 10 or
-more liked entries.</p>
-<p>The <tt class="docutils literal"><span class="pre">select</span></tt> command outputs records that <tt class="docutils literal"><span class="pre">n_likes</span></tt> column value
-is equal to or more than <tt class="docutils literal"><span class="pre">10</span></tt> from <tt class="docutils literal"><span class="pre">Entries</span></tt> table.</p>
+<p>Deprecated. Use <a class="reference internal" href="#query-expander"><em>query_expander</em></a> instead.</p>
 </div>
 <div class="section" id="query-flags">
 <span id="id3"></span><h4>8.3.22.4.3.3. <tt class="docutils literal"><span class="pre">query_flags</span></tt><a class="headerlink" href="#query-flags" title="Permalink to this headline">¶</a></h4>
@@ -1658,6 +1410,259 @@ Note that <tt class="docutils literal"><span class="pre">_key:Groonga</span></tt
 column is equal to <tt class="docutils literal"><span class="pre">Groonga</span></tt>. Because <tt class="docutils literal"><span class="pre">ALLOW_COLUMN</span></tt> flag is not
 specified.</p>
 <p>See also <a class="reference internal" href="../grn_expr/query_syntax.html"><em>Query syntax</em></a>.</p>
+</div>
+<div class="section" id="query-expander">
+<span id="id4"></span><h4>8.3.22.4.3.4. <tt class="docutils literal"><span class="pre">query_expander</span></tt><a class="headerlink" href="#query-expander" title="Permalink to this headline">¶</a></h4>
+<p>It's for query expansion. Query expansion substitutes specific words
+to another words in query. Nomally, it's used for synonym search.</p>
+<p>It specifies a column that is used to substitute <tt class="docutils literal"><span class="pre">query</span></tt> parameter
+value. The format of this parameter value is
+&quot;<tt class="docutils literal"><span class="pre">${TABLE}.${COLUMN}</span></tt>&quot;. For example, &quot;<tt class="docutils literal"><span class="pre">Terms.synonym</span></tt>&quot; specifies
+<tt class="docutils literal"><span class="pre">synonym</span></tt> column in <tt class="docutils literal"><span class="pre">Terms</span></tt> table.</p>
+<p>Table for query expansion is called &quot;substitution table&quot;. Substitution
+table's key must be <tt class="docutils literal"><span class="pre">ShortText</span></tt>. So array table (<tt class="docutils literal"><span class="pre">TABLE_NO_KEY</span></tt>)
+can't be used for query expansion. Because array table doesn't have
+key.</p>
+<p>Column for query expansion is called &quot;substitution
+column&quot;. Substitution column's value type must be
+<tt class="docutils literal"><span class="pre">ShortText</span></tt>. Column type must be vector (<tt class="docutils literal"><span class="pre">COLUMN_VECTOR</span></tt>).</p>
+<p>Query expansion substitutes key of substitution table in query with
+values in substitution column. If a word in <tt class="docutils literal"><span class="pre">query</span></tt> is a key of
+substitution table, the word is substituted with substitution column
+value that is associated with the key. Substition isn't performed
+recursively. It means that substitution target words in substituted
+query aren't substituted.</p>
+<p>Here is a sample substitution table to show a simple
+<tt class="docutils literal"><span class="pre">query_expander</span></tt> usage example.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Thesaurus TABLE_PAT_KEY|KEY_NORMALIZE ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Thesaurus synonym COLUMN_VECTOR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+load --table Thesaurus
+[
+{&quot;_key&quot;: &quot;mroonga&quot;, &quot;synonym&quot;: [&quot;mroonga&quot;, &quot;tritonn&quot;, &quot;groonga mysql&quot;]},
+{&quot;_key&quot;: &quot;groonga&quot;, &quot;synonym&quot;: [&quot;groonga&quot;, &quot;senna&quot;]}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 2]
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">Thesaurus</span></tt> substitution table has two synonyms, <tt class="docutils literal"><span class="pre">&quot;mroonga&quot;</span></tt> and
+<tt class="docutils literal"><span class="pre">&quot;groonga&quot;</span></tt>. If an user searches with <tt class="docutils literal"><span class="pre">&quot;mroonga&quot;</span></tt>, groonga
+searches with <tt class="docutils literal"><span class="pre">&quot;((mroonga)</span> <span class="pre">OR</span> <span class="pre">(tritonn)</span> <span class="pre">OR</span> <span class="pre">(groonga</span> <span class="pre">mysql))&quot;</span></tt>. If an
+user searches with <tt class="docutils literal"><span class="pre">&quot;groonga&quot;</span></tt>, groonga searchs with <tt class="docutils literal"><span class="pre">&quot;((groonga)</span>
+<span class="pre">OR</span> <span class="pre">(senna))&quot;</span></tt>. Nomrally, it's good idea that substitution table has
+<tt class="docutils literal"><span class="pre">KEY_NORMALIZE</span></tt> flag. If the flag is used, substitute target word is
+matched in case insensitive manner.</p>
+<p>Note that those synonym values include the key value such as
+<tt class="docutils literal"><span class="pre">&quot;mroonga&quot;</span></tt> and <tt class="docutils literal"><span class="pre">&quot;groonga&quot;</span></tt>. It's recommended that you include the
+key value. If you don't include key value, substituted value doesn't
+include the original substitute target value. Normally, including the
+original value is better search result. If you have a word that you
+don't want to be searched, you should not include the original
+word. For example, you can implement &quot;stop words&quot; by an empty vector
+value.</p>
+<p>Here is a simple <tt class="docutils literal"><span class="pre">query_expander</span></tt> usage example.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --match_columns content --query &quot;mroonga&quot;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         3,
+#         &quot;Mroonga&quot;,
+#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         15
+#       ]
+#     ]
+#   ]
+# ]
+select Entries --match_columns content --query &quot;mroonga&quot; --query_expander Thesaurus.synonym
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         3,
+#         &quot;Mroonga&quot;,
+#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         15
+#       ],
+#       [
+#         5,
+#         &quot;Good-bye Tritonn&quot;,
+#         &quot;I also migrated all Tritonn system!&quot;,
+#         3
+#       ]
+#     ]
+#   ]
+# ]
+select Entries --match_columns content --query &quot;((mroonga) OR (tritonn) OR (groonga mysql))&quot;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         3,
+#         &quot;Mroonga&quot;,
+#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         15
+#       ],
+#       [
+#         5,
+#         &quot;Good-bye Tritonn&quot;,
+#         &quot;I also migrated all Tritonn system!&quot;,
+#         3
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The first <tt class="docutils literal"><span class="pre">select</span></tt> command doesn't use query expansion. So a record
+that has <tt class="docutils literal"><span class="pre">&quot;tritonn&quot;</span></tt> isn't found. The second <tt class="docutils literal"><span class="pre">select</span></tt> command uses
+query expansion. So a record that has <tt class="docutils literal"><span class="pre">&quot;tritonn&quot;</span></tt> is found. The
+third <tt class="docutils literal"><span class="pre">select</span></tt> command doesn't use query expansion but it is same as
+the second <tt class="docutils literal"><span class="pre">select</span></tt> command. The third one uses expanded query.</p>
+<p>Each substitute value can contain any <a class="reference internal" href="../grn_expr/query_syntax.html"><em>Query syntax</em></a> syntax
+such as <tt class="docutils literal"><span class="pre">(...)</span></tt> and <tt class="docutils literal"><span class="pre">OR</span></tt>. You can use complex substitution by
+using those syntax.</p>
+<p>Here is a complex substitution usage example that uses query syntax.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>load --table Thesaurus
+[
+{&quot;_key&quot;: &quot;popular&quot;, &quot;synonym&quot;: [&quot;popular&quot;, &quot;n_likes:&gt;=10&quot;]}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 1]
+select Entries --match_columns content --query &quot;popular&quot; --query_expander Thesaurus.synonym
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         2,
+#         &quot;Groonga&quot;,
+#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
+#         10
+#       ],
+#       [
+#         3,
+#         &quot;Mroonga&quot;,
+#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         15
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">load</span></tt> command registers a new synonym <tt class="docutils literal"><span class="pre">&quot;popular&quot;</span></tt>. It is
+substituted with <tt class="docutils literal"><span class="pre">((popular)</span> <span class="pre">OR</span> <span class="pre">(n_likes:&gt;=10))</span></tt>. The substituted
+query means that &quot;popular&quot; is containing the word &quot;popular&quot; or 10 or
+more liked entries.</p>
+<p>The <tt class="docutils literal"><span class="pre">select</span></tt> command outputs records that <tt class="docutils literal"><span class="pre">n_likes</span></tt> column value
+is equal to or more than <tt class="docutils literal"><span class="pre">10</span></tt> from <tt class="docutils literal"><span class="pre">Entries</span></tt> table.</p>
 </div>
 </div>
 <div class="section" id="output-related-parameters">
@@ -2167,8 +2172,8 @@ records. It's very useful value to show all records.</p>
 </div>
 </div>
 </div>
-<div class="section" id="id4">
-<h2>8.3.22.5. 返値<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id5">
+<h2>8.3.22.5. 返値<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
 <p>TODO: write in English and add example.</p>
 <p>以下のようなjson形式で値が返却されます。</p>
 <div class="highlight-none"><div class="highlight"><pre>[[リターンコード, 処理開始時間, 処理時間], [検索結果, ドリルダウン結果]]
@@ -2271,6 +2276,7 @@ records. It's very useful value to show all records.</p>
 <li><a class="reference internal" href="#match-escalation-threshold">8.3.22.4.3.1. <tt class="docutils literal"><span class="pre">match_escalation_threshold</span></tt></a></li>
 <li><a class="reference internal" href="#query-expansion">8.3.22.4.3.2. <tt class="docutils literal"><span class="pre">query_expansion</span></tt></a></li>
 <li><a class="reference internal" href="#query-flags">8.3.22.4.3.3. <tt class="docutils literal"><span class="pre">query_flags</span></tt></a></li>
+<li><a class="reference internal" href="#query-expander">8.3.22.4.3.4. <tt class="docutils literal"><span class="pre">query_expander</span></tt></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#output-related-parameters">8.3.22.4.4. Output related parameters</a><ul>
@@ -2295,7 +2301,7 @@ records. It's very useful value to show all records.</p>
 </li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id4">8.3.22.5. 返値</a></li>
+<li><a class="reference internal" href="#id5">8.3.22.5. 返値</a></li>
 <li><a class="reference internal" href="#see-also">8.3.22.6. See also</a></li>
 </ul>
 </li>
@@ -2341,7 +2347,7 @@ records. It's very useful value to show all records.</p>
         <li class="right" >
           <a href="register.html" title="8.3.21. register"
              >previous</a> |</li>
-        <li><a href="../../index.html">groonga v3.0.1 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">groonga v3.0.2 documentation</a> &raquo;</li>
           <li><a href="../../reference.html" >8. リファレンスマニュアル</a> &raquo;</li>
           <li><a href="../command.html" >8.3. Command</a> &raquo;</li> 
       </ul>

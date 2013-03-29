@@ -99,7 +99,10 @@
 <div class="section" id="syntax">
 <h2>8.11.6.2. 構文<a class="headerlink" href="#syntax" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <p><tt class="docutils literal"><span class="pre">query</span></tt> は2つの引数が必要です。 <tt class="docutils literal"><span class="pre">match_column</span></tt> と <tt class="docutils literal"><span class="pre">query_string</span></tt> です。</p>
+<p>引数の <tt class="docutils literal"><span class="pre">query_expander</span></tt> や <tt class="docutils literal"><span class="pre">substitution_table</span></tt> は省略可能です。</p>
 <div class="highlight-none"><div class="highlight"><pre>query(match_column, query_string)
+query(match_column, query_string, query_expander)
+query(match_column, query_string, substitution_table)
 </pre></div>
 </div>
 </div>
@@ -145,7 +148,7 @@ column_create Lexicon users_memo COLUMN_INDEX|WITH_POSITION Users memo
 # [[0, 1337566253.89858, 0.000355720520019531], 5]
 </pre></div>
 </div>
-<p><tt class="docutils literal"><span class="pre">--match_columns</span></tt> と <tt class="docutils literal"><span class="pre">--query</span></tt> 引数を使わずにキーワード'alice'を``query`` 関数を使って検索する簡単な使用例です。</p>
+<p><tt class="docutils literal"><span class="pre">--match_columns</span></tt> と <tt class="docutils literal"><span class="pre">--query</span></tt> 引数を使わずにキーワード'alice'を <tt class="docutils literal"><span class="pre">query</span></tt> 関数を使って検索する簡単な使用例です。</p>
 <p>実行例:</p>
 <div class="highlight-none"><div class="highlight"><pre>select Users --output_columns name,_score --filter &#39;query(&quot;name * 10&quot;, &quot;alice&quot;)&#39;
 # [
@@ -300,18 +303,36 @@ column_create Lexicon users_memo COLUMN_INDEX|WITH_POSITION Users memo
 </div>
 <div class="section" id="parameters">
 <h2>8.11.6.4. 引数<a class="headerlink" href="#parameters" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<div class="section" id="required-parameter">
+<h3>8.11.6.4.1. 必須引数<a class="headerlink" href="#required-parameter" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <p>必須引数は二つあります。 <tt class="docutils literal"><span class="pre">match_column</span></tt> と <tt class="docutils literal"><span class="pre">query_string</span></tt> です。</p>
 <div class="section" id="match-column">
-<h3>8.11.6.4.1. <tt class="docutils literal"><span class="pre">match_column</span></tt><a class="headerlink" href="#match-column" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<h4>8.11.6.4.1.1. <tt class="docutils literal"><span class="pre">match_column</span></tt><a class="headerlink" href="#match-column" title="このヘッドラインへのパーマリンク">¶</a></h4>
 <blockquote>
 <div><tt class="docutils literal"><span class="pre">match_columns</span></tt> と同様のパラメータを指定します。</div></blockquote>
 <p>match_columnについては <a class="reference internal" href="../commands/select.html#select-match-columns"><em>match_columns</em></a> を参照してください。</p>
 </div>
 <div class="section" id="query-string">
-<h3>8.11.6.4.2. <tt class="docutils literal"><span class="pre">query_string</span></tt><a class="headerlink" href="#query-string" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<h4>8.11.6.4.1.2. <tt class="docutils literal"><span class="pre">query_string</span></tt><a class="headerlink" href="#query-string" title="このヘッドラインへのパーマリンク">¶</a></h4>
 <blockquote>
 <div><tt class="docutils literal"><span class="pre">query</span></tt> と同様のパラメータを指定します。</div></blockquote>
 <p>query stringについては <a class="reference internal" href="../commands/select.html#select-query"><em>query</em></a> を参照してください。</p>
+</div>
+</div>
+<div class="section" id="optional-parameter">
+<h3>8.11.6.4.2. 省略可能引数<a class="headerlink" href="#optional-parameter" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>省略可能な引数として <tt class="docutils literal"><span class="pre">approximate_type</span></tt> があります。</p>
+<div class="section" id="query-expander">
+<h4>8.11.6.4.2.1. クエリー展開オブジェクト一覧<a class="headerlink" href="#query-expander" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>クエリ展開に使うプラグイン名を指定します。</p>
+<p><a class="reference internal" href="../query_expanders/tsv.html"><em>QueryExpanderTSV</em></a> は公式リリースに含まれているプラグインの1つです。</p>
+<p>詳細については <a class="reference internal" href="../query_expanders/tsv.html"><em>QueryExpanderTSV</em></a> を参照してください。</p>
+</div>
+<div class="section" id="substitution-table">
+<h4>8.11.6.4.2.2. <tt class="docutils literal"><span class="pre">置換テーブル</span></tt><a class="headerlink" href="#substitution-table" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>置換テーブルとカラム名を <tt class="docutils literal"><span class="pre">${TABLE}.${COLUMN}</span></tt> という書式でクエリ展開のために指定します。</p>
+<p>詳細については <a class="reference internal" href="../commands/select.html#query-expander"><em>クエリー展開オブジェクト一覧</em></a> を参照してください。</p>
+</div>
 </div>
 </div>
 <div class="section" id="return-value">
@@ -321,7 +342,6 @@ column_create Lexicon users_memo COLUMN_INDEX|WITH_POSITION Users memo
 <div class="section" id="todo">
 <h2>8.11.6.6. TODO<a class="headerlink" href="#todo" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <ul class="simple">
-<li>query_expansionのサポート</li>
 <li>query_flagsのサポート</li>
 </ul>
 </div>
@@ -346,8 +366,16 @@ column_create Lexicon users_memo COLUMN_INDEX|WITH_POSITION Users memo
 <li><a class="reference internal" href="#syntax">8.11.6.2. 構文</a></li>
 <li><a class="reference internal" href="#usage">8.11.6.3. 使い方</a></li>
 <li><a class="reference internal" href="#parameters">8.11.6.4. 引数</a><ul>
-<li><a class="reference internal" href="#match-column">8.11.6.4.1. <tt class="docutils literal"><span class="pre">match_column</span></tt></a></li>
-<li><a class="reference internal" href="#query-string">8.11.6.4.2. <tt class="docutils literal"><span class="pre">query_string</span></tt></a></li>
+<li><a class="reference internal" href="#required-parameter">8.11.6.4.1. 必須引数</a><ul>
+<li><a class="reference internal" href="#match-column">8.11.6.4.1.1. <tt class="docutils literal"><span class="pre">match_column</span></tt></a></li>
+<li><a class="reference internal" href="#query-string">8.11.6.4.1.2. <tt class="docutils literal"><span class="pre">query_string</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#optional-parameter">8.11.6.4.2. 省略可能引数</a><ul>
+<li><a class="reference internal" href="#query-expander">8.11.6.4.2.1. クエリー展開オブジェクト一覧</a></li>
+<li><a class="reference internal" href="#substitution-table">8.11.6.4.2.2. <tt class="docutils literal"><span class="pre">置換テーブル</span></tt></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a class="reference internal" href="#return-value">8.11.6.5. 戻り値</a></li>

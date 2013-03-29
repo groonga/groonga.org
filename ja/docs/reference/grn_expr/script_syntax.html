@@ -1402,7 +1402,601 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 </div>
 <div class="section" id="assignment-operators">
 <h2>8.10.2.7. 代入演算子<a class="headerlink" href="#assignment-operators" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>TODO: ...</p>
+<div class="section" id="addition-assignment-operator">
+<h3>8.10.2.7.1. 加算代入演算子<a class="headerlink" href="#addition-assignment-operator" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>構文は <tt class="docutils literal"><span class="pre">column</span> <span class="pre">+=</span> <span class="pre">value</span></tt> です。</p>
+<p>この演算子は <tt class="docutils literal"><span class="pre">column1</span></tt> に <tt class="docutils literal"><span class="pre">column2</span></tt> を加算代入します。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --output_columns _key,n_likes,_score --filter true --scorer &#39;_score += n_likes&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_score&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Good-bye Senna&quot;,
+#         3,
+#         4
+#       ],
+#       [
+#         &quot;Good-bye Tritonn&quot;,
+#         3,
+#         4
+#       ],
+#       [
+#         &quot;Groonga&quot;,
+#         10,
+#         11
+#       ],
+#       [
+#         &quot;Mroonga&quot;,
+#         15,
+#         16
+#       ],
+#       [
+#         &quot;The first post!&quot;,
+#         5,
+#         6
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">--filter</span></tt> による <tt class="docutils literal"><span class="pre">_score</span></tt> の値はこの場合は常に1です。その後、'_score = _score + n_likes' という加算代入演算をそれぞれのレコードへ適用します。</p>
+<p>例えば、 <tt class="docutils literal"><span class="pre">_key</span></tt> として&quot;Good-bye Senna&quot;を格納しているレコードの <tt class="docutils literal"><span class="pre">_score</span></tt> の値は3です。</p>
+<p>そのため、 <tt class="docutils literal"><span class="pre">1</span> <span class="pre">+</span> <span class="pre">3</span></tt> という式が評価されてから <tt class="docutils literal"><span class="pre">_score</span></tt> カラムへと演算結果が保存されます。</p>
+</div>
+<div class="section" id="subtraction-assignment-operator">
+<h3>8.10.2.7.2. 減算代入演算子<a class="headerlink" href="#subtraction-assignment-operator" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>構文は <tt class="docutils literal"><span class="pre">column1</span> <span class="pre">-=</span> <span class="pre">column2</span></tt> です。</p>
+<p>この演算子は <tt class="docutils literal"><span class="pre">column1</span></tt> から <tt class="docutils literal"><span class="pre">column2</span></tt> を減算代入します。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --output_columns _key,n_likes,_score --filter true --scorer &#39;_score -= n_likes&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_score&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Good-bye Senna&quot;,
+#         3,
+#         -2
+#       ],
+#       [
+#         &quot;Good-bye Tritonn&quot;,
+#         3,
+#         -2
+#       ],
+#       [
+#         &quot;Groonga&quot;,
+#         10,
+#         -9
+#       ],
+#       [
+#         &quot;Mroonga&quot;,
+#         15,
+#         -14
+#       ],
+#       [
+#         &quot;The first post!&quot;,
+#         5,
+#         -4
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">--filter</span></tt> による <tt class="docutils literal"><span class="pre">_score</span></tt> の値はこの場合は常に1です。その後、'_score = _score - n_likes' という減算代入演算をそれぞれのレコードへ適用します。</p>
+<p>例えば、 <tt class="docutils literal"><span class="pre">_key</span></tt> として&quot;Good-bye Senna&quot;を格納しているレコードの <tt class="docutils literal"><span class="pre">_score</span></tt> の値は3です。</p>
+<p>そのため、 <tt class="docutils literal"><span class="pre">1</span> <span class="pre">-</span> <span class="pre">3</span></tt> という式が評価されてから <tt class="docutils literal"><span class="pre">_score</span></tt> カラムへと演算結果が保存されます。</p>
+</div>
+<div class="section" id="multiplication-assignment-operator">
+<h3>8.10.2.7.3. 乗算代入演算子<a class="headerlink" href="#multiplication-assignment-operator" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>構文は <tt class="docutils literal"><span class="pre">column1</span> <span class="pre">*=</span> <span class="pre">column2</span></tt> です。</p>
+<p>この演算子は <tt class="docutils literal"><span class="pre">column1</span></tt> に <tt class="docutils literal"><span class="pre">column2</span></tt> を乗算演算する。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --output_columns _key,n_likes,_score --filter true --scorer &#39;_score *= n_likes&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_score&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Good-bye Senna&quot;,
+#         3,
+#         3
+#       ],
+#       [
+#         &quot;Good-bye Tritonn&quot;,
+#         3,
+#         3
+#       ],
+#       [
+#         &quot;Groonga&quot;,
+#         10,
+#         10
+#       ],
+#       [
+#         &quot;Mroonga&quot;,
+#         15,
+#         15
+#       ],
+#       [
+#         &quot;The first post!&quot;,
+#         5,
+#         5
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">--filter</span></tt> による <tt class="docutils literal"><span class="pre">_score</span></tt> の値はこの場合は常に1です。その後、'_score = _score * n_likes' という乗算代入演算をそれぞれのレコードへ適用します。</p>
+<p>例えば、 <tt class="docutils literal"><span class="pre">_key</span></tt> として&quot;Good-bye Senna&quot;を格納しているレコードの <tt class="docutils literal"><span class="pre">_score</span></tt> の値は3です。</p>
+<p>そのため、 <tt class="docutils literal"><span class="pre">1</span> <span class="pre">*</span> <span class="pre">3</span></tt> という式が評価されてから <tt class="docutils literal"><span class="pre">_score</span></tt> カラムへと演算結果が保存されます。</p>
+</div>
+<div class="section" id="division-assignment-operator">
+<h3>8.10.2.7.4. 除算代入演算子<a class="headerlink" href="#division-assignment-operator" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>構文は <tt class="docutils literal"><span class="pre">column1</span> <span class="pre">/=</span> <span class="pre">column2</span></tt> です。</p>
+<p>この演算子は <tt class="docutils literal"><span class="pre">column1</span></tt> に <tt class="docutils literal"><span class="pre">column2</span></tt> を除算代入します。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --output_columns _key,n_likes,_score --filter true --scorer &#39;_score /= n_likes&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_score&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Good-bye Senna&quot;,
+#         3,
+#         0
+#       ],
+#       [
+#         &quot;Good-bye Tritonn&quot;,
+#         3,
+#         0
+#       ],
+#       [
+#         &quot;Groonga&quot;,
+#         10,
+#         0
+#       ],
+#       [
+#         &quot;Mroonga&quot;,
+#         15,
+#         0
+#       ],
+#       [
+#         &quot;The first post!&quot;,
+#         5,
+#         0
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">--filter</span></tt> による <tt class="docutils literal"><span class="pre">_score</span></tt> の値はこの場合は常に1です。その後、'_score = _score / n_likes' という除算代入演算をそれぞれのレコードへ適用します。</p>
+<p>例えば、 <tt class="docutils literal"><span class="pre">_key</span></tt> として&quot;Good-bye Senna&quot;を格納しているレコードの <tt class="docutils literal"><span class="pre">_score</span></tt> の値は3です。</p>
+<p>そのため、 <tt class="docutils literal"><span class="pre">1</span> <span class="pre">/</span> <span class="pre">3</span></tt> という式が評価されてから <tt class="docutils literal"><span class="pre">_score</span></tt> カラムへと演算結果が保存されます。</p>
+</div>
+<div class="section" id="modulo-assignment-operator">
+<h3>8.10.2.7.5. 剰余代入演算子<a class="headerlink" href="#modulo-assignment-operator" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>構文は <tt class="docutils literal"><span class="pre">column1</span> <span class="pre">%=</span> <span class="pre">column2</span></tt> です。</p>
+<p>この演算子は <tt class="docutils literal"><span class="pre">column1</span></tt> に <tt class="docutils literal"><span class="pre">column2</span></tt> を剰余代入します。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --output_columns _key,n_likes,_score --filter true --scorer &#39;_score %= n_likes&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_score&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Good-bye Senna&quot;,
+#         3,
+#         1
+#       ],
+#       [
+#         &quot;Good-bye Tritonn&quot;,
+#         3,
+#         1
+#       ],
+#       [
+#         &quot;Groonga&quot;,
+#         10,
+#         1
+#       ],
+#       [
+#         &quot;Mroonga&quot;,
+#         15,
+#         1
+#       ],
+#       [
+#         &quot;The first post!&quot;,
+#         5,
+#         1
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">--filter</span></tt> による <tt class="docutils literal"><span class="pre">_score</span></tt> の値はこの場合は常に1です。その後、'_score = _score % n_likes' という除算代入演算をそれぞれのレコードへ適用します。</p>
+<p>例えば、 <tt class="docutils literal"><span class="pre">_key</span></tt> として&quot;Good-bye Senna&quot;を格納しているレコードの <tt class="docutils literal"><span class="pre">_score</span></tt> の値は3です。</p>
+<p>そのため、 <tt class="docutils literal"><span class="pre">1</span> <span class="pre">%</span> <span class="pre">3</span></tt> という式が評価されてから <tt class="docutils literal"><span class="pre">_score</span></tt> カラムへと演算結果が保存されます。</p>
+</div>
+<div class="section" id="bitwise-left-shift-assignment-operator">
+<h3>8.10.2.7.6. 左シフト代入演算子<a class="headerlink" href="#bitwise-left-shift-assignment-operator" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>構文は <tt class="docutils literal"><span class="pre">column1</span> <span class="pre">&lt;&lt;</span> <span class="pre">column2</span></tt> です。</p>
+<p>この演算子は <tt class="docutils literal"><span class="pre">column1</span></tt> のビットを左に <tt class="docutils literal"><span class="pre">column2</span></tt> 左ビットシフト代入演算します。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --output_columns _key,n_likes,_score --filter true --scorer &#39;_score &lt;&lt;= n_likes&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_score&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Good-bye Senna&quot;,
+#         3,
+#         8
+#       ],
+#       [
+#         &quot;Good-bye Tritonn&quot;,
+#         3,
+#         8
+#       ],
+#       [
+#         &quot;Groonga&quot;,
+#         10,
+#         1024
+#       ],
+#       [
+#         &quot;Mroonga&quot;,
+#         15,
+#         32768
+#       ],
+#       [
+#         &quot;The first post!&quot;,
+#         5,
+#         32
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">--filter</span></tt> による <tt class="docutils literal"><span class="pre">_score</span></tt> の値はこの場合は常に1です。その後、'_score = _score &lt;&lt; n_likes' という左ビットシフト代入演算をそれぞれのレコードへ適用します。</p>
+<p>例えば、 <tt class="docutils literal"><span class="pre">_key</span></tt> として&quot;Good-bye Senna&quot;を格納しているレコードの <tt class="docutils literal"><span class="pre">_score</span></tt> の値は3です。</p>
+<p>そのため、 <tt class="docutils literal"><span class="pre">1</span> <span class="pre">&lt;&lt;</span> <span class="pre">3</span></tt> という式が評価されてから <tt class="docutils literal"><span class="pre">_score</span></tt> カラムへと演算結果が保存されます。</p>
+</div>
+<div class="section" id="bitwise-signed-right-shift-assignment-operator">
+<h3>8.10.2.7.7. 符号あり右シフト代入演算子<a class="headerlink" href="#bitwise-signed-right-shift-assignment-operator" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>構文は <tt class="docutils literal"><span class="pre">column1</span> <span class="pre">&gt;&gt;=</span> <span class="pre">column2</span></tt> です。</p>
+<p>この演算子は <tt class="docutils literal"><span class="pre">column1</span></tt> のビットを <tt class="docutils literal"><span class="pre">column2</span></tt> 右ビットシフト代入演算します。</p>
+</div>
+<div class="section" id="bitwise-unsigned-right-shift-assignment-operator">
+<h3>8.10.2.7.8. 符号なし右シフト代入演算子<a class="headerlink" href="#bitwise-unsigned-right-shift-assignment-operator" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>構文は <tt class="docutils literal"><span class="pre">column1</span> <span class="pre">&gt;&gt;&gt;=</span> <span class="pre">column2</span></tt> です。</p>
+<p>この演算子は <tt class="docutils literal"><span class="pre">column1</span></tt> のビットを <tt class="docutils literal"><span class="pre">column2</span></tt> 符号なし右ビットシフト代入演算します。</p>
+</div>
+<div class="section" id="bitwise-and-assignment-operator">
+<h3>8.10.2.7.9. ビット論理積代入演算子<a class="headerlink" href="#bitwise-and-assignment-operator" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>構文は <tt class="docutils literal"><span class="pre">column1</span> <span class="pre">&amp;=</span> <span class="pre">column2</span></tt> です。</p>
+<p>この演算子は <tt class="docutils literal"><span class="pre">column1</span></tt> に <tt class="docutils literal"><span class="pre">column2</span></tt> をビット論理積代入演算します。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --output_columns _key,n_likes,_score --filter true --scorer &#39;_score &amp;= n_likes&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_score&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Good-bye Senna&quot;,
+#         3,
+#         1
+#       ],
+#       [
+#         &quot;Good-bye Tritonn&quot;,
+#         3,
+#         1
+#       ],
+#       [
+#         &quot;Groonga&quot;,
+#         10,
+#         0
+#       ],
+#       [
+#         &quot;Mroonga&quot;,
+#         15,
+#         1
+#       ],
+#       [
+#         &quot;The first post!&quot;,
+#         5,
+#         1
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">--filter</span></tt> による <tt class="docutils literal"><span class="pre">_score</span></tt> の値はこの場合は常に1です。その後、'_score = _score &amp; n_likes' というビット論理積代入演算をそれぞれのレコードへ適用します。</p>
+<p>例えば、 <tt class="docutils literal"><span class="pre">_key</span></tt> として&quot;Groonga&quot;を格納しているレコードの値は10です。</p>
+<p>そのため、 <tt class="docutils literal"><span class="pre">1</span> <span class="pre">&amp;</span> <span class="pre">10</span></tt> という式が評価されてから <tt class="docutils literal"><span class="pre">_score</span></tt> カラムへと演算結果が保存されます。</p>
+</div>
+<div class="section" id="bitwise-or-assignment-operator">
+<h3>8.10.2.7.10. ビット論理和代入演算子<a class="headerlink" href="#bitwise-or-assignment-operator" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>構文は <tt class="docutils literal"><span class="pre">column1</span> <span class="pre">|=</span> <span class="pre">column2</span></tt> です。</p>
+<p>この演算子は <tt class="docutils literal"><span class="pre">column1</span></tt> に <tt class="docutils literal"><span class="pre">column2</span></tt> をビット論理和代入演算する。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --output_columns _key,n_likes,_score --filter true --scorer &#39;_score |= n_likes&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_score&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Good-bye Senna&quot;,
+#         3,
+#         3
+#       ],
+#       [
+#         &quot;Good-bye Tritonn&quot;,
+#         3,
+#         3
+#       ],
+#       [
+#         &quot;Groonga&quot;,
+#         10,
+#         11
+#       ],
+#       [
+#         &quot;Mroonga&quot;,
+#         15,
+#         15
+#       ],
+#       [
+#         &quot;The first post!&quot;,
+#         5,
+#         5
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">--filter</span></tt> による <tt class="docutils literal"><span class="pre">_score</span></tt> の値はこの場合は常に1です。その後、'_score = _score | n_likes' というビット論理和代入演算をそれぞれのレコードへ適用します。</p>
+<p>例えば、 <tt class="docutils literal"><span class="pre">_key</span></tt> として&quot;Groonga&quot;を格納しているレコードの値は10です。</p>
+<p>そのため、 <tt class="docutils literal"><span class="pre">1</span> <span class="pre">|</span> <span class="pre">10</span></tt> という式が評価されてから <tt class="docutils literal"><span class="pre">_score</span></tt> カラムへと演算結果が保存されます。</p>
+</div>
+<div class="section" id="bitwise-xor-assignment-operator">
+<h3>8.10.2.7.11. ビット排他的論理和代入演算子<a class="headerlink" href="#bitwise-xor-assignment-operator" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>構文は <tt class="docutils literal"><span class="pre">column1</span> <span class="pre">^=</span> <span class="pre">column2</span></tt> です。</p>
+<p>この演算子は <tt class="docutils literal"><span class="pre">column1</span></tt> に <tt class="docutils literal"><span class="pre">column2</span></tt> をビット排他的論理和代入演算します。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --output_columns _key,n_likes,_score --filter true --scorer &#39;_score ^= n_likes&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_score&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Good-bye Senna&quot;,
+#         3,
+#         2
+#       ],
+#       [
+#         &quot;Good-bye Tritonn&quot;,
+#         3,
+#         2
+#       ],
+#       [
+#         &quot;Groonga&quot;,
+#         10,
+#         11
+#       ],
+#       [
+#         &quot;Mroonga&quot;,
+#         15,
+#         14
+#       ],
+#       [
+#         &quot;The first post!&quot;,
+#         5,
+#         4
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">--filter</span></tt> による <tt class="docutils literal"><span class="pre">_score</span></tt> の値はこの場合は常に1です。その後、'_score = _score ^ n_likes' という減算代入演算をそれぞれのレコードへ適用します。</p>
+<p>例えば、 <tt class="docutils literal"><span class="pre">_key</span></tt> として&quot;Good-bye Senna&quot;を格納しているレコードの <tt class="docutils literal"><span class="pre">_score</span></tt> の値は3です。</p>
+<p>そのため、 <tt class="docutils literal"><span class="pre">1</span> <span class="pre">^</span> <span class="pre">3</span></tt> という式が評価されてから <tt class="docutils literal"><span class="pre">_score</span></tt> カラムへと演算結果が保存されます。</p>
+</div>
 </div>
 <div class="section" id="original-operators">
 <h2>8.10.2.8. 独自の演算子<a class="headerlink" href="#original-operators" title="このヘッドラインへのパーマリンク">¶</a></h2>
@@ -1766,7 +2360,20 @@ select Words --filter &#39;_key *T &quot;Groonga is the successor project to Sen
 </li>
 </ul>
 </li>
-<li><a class="reference internal" href="#assignment-operators">8.10.2.7. 代入演算子</a></li>
+<li><a class="reference internal" href="#assignment-operators">8.10.2.7. 代入演算子</a><ul>
+<li><a class="reference internal" href="#addition-assignment-operator">8.10.2.7.1. 加算代入演算子</a></li>
+<li><a class="reference internal" href="#subtraction-assignment-operator">8.10.2.7.2. 減算代入演算子</a></li>
+<li><a class="reference internal" href="#multiplication-assignment-operator">8.10.2.7.3. 乗算代入演算子</a></li>
+<li><a class="reference internal" href="#division-assignment-operator">8.10.2.7.4. 除算代入演算子</a></li>
+<li><a class="reference internal" href="#modulo-assignment-operator">8.10.2.7.5. 剰余代入演算子</a></li>
+<li><a class="reference internal" href="#bitwise-left-shift-assignment-operator">8.10.2.7.6. 左シフト代入演算子</a></li>
+<li><a class="reference internal" href="#bitwise-signed-right-shift-assignment-operator">8.10.2.7.7. 符号あり右シフト代入演算子</a></li>
+<li><a class="reference internal" href="#bitwise-unsigned-right-shift-assignment-operator">8.10.2.7.8. 符号なし右シフト代入演算子</a></li>
+<li><a class="reference internal" href="#bitwise-and-assignment-operator">8.10.2.7.9. ビット論理積代入演算子</a></li>
+<li><a class="reference internal" href="#bitwise-or-assignment-operator">8.10.2.7.10. ビット論理和代入演算子</a></li>
+<li><a class="reference internal" href="#bitwise-xor-assignment-operator">8.10.2.7.11. ビット排他的論理和代入演算子</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#original-operators">8.10.2.8. 独自の演算子</a><ul>
 <li><a class="reference internal" href="#match-operator">8.10.2.8.1. マッチ演算子</a></li>
 <li><a class="reference internal" href="#prefix-search-operator">8.10.2.8.2. 前方一致検索演算子</a></li>

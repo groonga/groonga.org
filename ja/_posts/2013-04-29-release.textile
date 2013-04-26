@@ -46,72 +46,72 @@ groongaでは "サジェスト機能":http://groonga.org/ja/docs/suggest/introdu
 最初にテスト用のデータベースを作成します。
 
 <pre>
-  % mkdir -p testdb
-  % groonga -n testdb/db shutdown
+% mkdir -p testdb
+% groonga -n testdb/db shutdown
 </pre>
 
 次に、学習用のテーブルをgroonga-suggest-create-datasetコマンドで作成します。
 
 <pre>
-  % groonga-suggest-create-dataset testdb/db query
+% groonga-suggest-create-dataset testdb/db query
 </pre>
 
 最後に学習データを用意します。途中で @configuration@ テーブルの @weight@ を10にしていますね。これが、今回サポートした重みづけの指定方法です。
 
 <pre>
-  load --table event_query --each 'suggest_preparer(_id, type, item, sequence, time, pair_query)'
-  [
-  {"sequence": "1", "time": 1312950808.86057, "item": "旬 トマト", "type": "submit"}
-  {"sequence": "1", "time": 1312950808.86057, "item": "旬 さつまいも", "type": "submit"}
-  {"sequence": "1", "time": 1312950808.86057, "item": "旬 はくさい", "type": "submit"}
-  ]
+load --table event_query --each 'suggest_preparer(_id, type, item, sequence, time, pair_query)'
+[
+{"sequence": "1", "time": 1312950808.86057, "item": "旬 トマト", "type": "submit"}
+{"sequence": "1", "time": 1312950808.86057, "item": "旬 さつまいも", "type": "submit"}
+{"sequence": "1", "time": 1312950808.86057, "item": "旬 はくさい", "type": "submit"}
+]
 
-  load --table configuration
-  [
-  {"_key": "query", "weight": 10}
-  ]
+load --table configuration
+[
+{"_key": "query", "weight": 10}
+]
 
-  load --table event_query --each 'suggest_preparer(_id, type, item, sequence, time, pair_query)'
-  [
-  {"sequence": "1", "time": 1312950803.86057, "item": "旬 キャベツ", "type": "submit"},
-  ]
+load --table event_query --each 'suggest_preparer(_id, type, item, sequence, time, pair_query)'
+[
+{"sequence": "1", "time": 1312950803.86057, "item": "旬 キャベツ", "type": "submit"},
+]
 </pre>
 
 学習させた後で、「提案」機能を使ってみましょう。クエリは以下のようになります。
 
 <pre>
-  suggest --table item_query --column kana --types suggest --frequency_threshold 1 --query 旬
+suggest --table item_query --column kana --types suggest --frequency_threshold 1 --query 旬
 </pre>
 
 旬というキーワードで提案された結果は4件あって、キャベツのスコアが一番高いことがわかります。
 出現頻度を指定するための @--frequency_threshold@ をうまく調整すれば、より適切な提案ができるでしょう。
 
 <pre>
-  [
-    [0,1366613297.59312,0.000118494033813477],
-    {
-      "suggest":[[4],
-      [["_key","ShortText"],["_score","Int32"]],
-      ["旬 キャベツ",10],["旬 はくさい",1],["旬 さつまいも",1],["旬 トマト",1]]
-    }
-  ]
+[
+  [0,1366613297.59312,0.000118494033813477],
+  {
+    "suggest":[[4],
+    [["_key","ShortText"],["_score","Int32"]],
+    ["旬 キャベツ",10],["旬 はくさい",1],["旬 さつまいも",1],["旬 トマト",1]]
+  }
+]
 </pre>
 
 同じことをそれまで実現するには以下のように複数回学習させないとできなかったので、だいぶ手間が減りました。
 
 <pre>
-  load --table event_query --each 'suggest_preparer(_id, type, item, sequence, time, pair_query)'
-  [
-  {"sequence": "1", "time": 1312950803.86057, "item": "旬 キャベツ", "type": "submit"},
-  {"sequence": "1", "time": 1312950803.86057, "item": "旬 キャベツ", "type": "submit"},
-  {"sequence": "1", "time": 1312950803.86057, "item": "旬 キャベツ", "type": "submit"},
-  {"sequence": "1", "time": 1312950803.86057, "item": "旬 キャベツ", "type": "submit"},
-  {"sequence": "1", "time": 1312950803.86057, "item": "旬 キャベツ", "type": "submit"},
-  {"sequence": "1", "time": 1312950803.86057, "item": "旬 キャベツ", "type": "submit"},
-  {"sequence": "1", "time": 1312950803.86057, "item": "旬 キャベツ", "type": "submit"},
-  {"sequence": "1", "time": 1312950803.86057, "item": "旬 キャベツ", "type": "submit"},
-  {"sequence": "1", "time": 1312950803.86057, "item": "旬 キャベツ", "type": "submit"},
-  ]
+load --table event_query --each 'suggest_preparer(_id, type, item, sequence, time, pair_query)'
+[
+{"sequence": "1", "time": 1312950803.86057, "item": "旬 キャベツ", "type": "submit"},
+{"sequence": "1", "time": 1312950803.86057, "item": "旬 キャベツ", "type": "submit"},
+{"sequence": "1", "time": 1312950803.86057, "item": "旬 キャベツ", "type": "submit"},
+{"sequence": "1", "time": 1312950803.86057, "item": "旬 キャベツ", "type": "submit"},
+{"sequence": "1", "time": 1312950803.86057, "item": "旬 キャベツ", "type": "submit"},
+{"sequence": "1", "time": 1312950803.86057, "item": "旬 キャベツ", "type": "submit"},
+{"sequence": "1", "time": 1312950803.86057, "item": "旬 キャベツ", "type": "submit"},
+{"sequence": "1", "time": 1312950803.86057, "item": "旬 キャベツ", "type": "submit"},
+{"sequence": "1", "time": 1312950803.86057, "item": "旬 キャベツ", "type": "submit"},
+]
 </pre>
 
 h3. groongaのカスタマイズ版をビルドするためのパラメータの追加
@@ -121,23 +121,23 @@ h3. groongaのカスタマイズ版をビルドするためのパラメータの
 例えば、groongaが使用するスタックサイズのデフォルト値は1024になっていますが、これを変更してパッケージをビルドしたいときには、specファイルを以下のように修正する必要がありました。
 
 <pre>
-  %configure \
-    --disable-static \
-    --with-package-platform=redhat \
-    --with-stack-size=4096 \
-    --with-zlib \
-  %if %{use_lzo}
-    --with-lzo \
-  %endif
-    --with-munin-plugins
+%configure \
+  --disable-static \
+  --with-package-platform=redhat \
+  --with-stack-size=4096 \
+  --with-zlib \
+%if %{use_lzo}
+  --with-lzo \
+%endif
+  --with-munin-plugins
 </pre>
 
 今回のリリースで、以下のようにrpmbuildコマンドのパラメータとして指定できるようになり、specファイルそのものを編集する必要がなくなりました。
 
 <pre>
-  % rpmbuild --rebuild \
-    --define 'additional_configure_options --with-stach-size=4096' \
-    groonga-3.0.3-0.el6.src.rpm
+% rpmbuild --rebuild \
+  --define 'additional_configure_options --with-stach-size=4096' \
+  groonga-3.0.3-0.el6.src.rpm
 </pre>
 
 h3. Fedoraでのリリース方法の変更

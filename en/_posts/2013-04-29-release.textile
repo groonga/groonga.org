@@ -1,0 +1,155 @@
+---
+layout: post.en
+title: Groonga 3.0.3 has been released
+description: Groonga 3.0.3 has been released!
+published: false
+---
+
+
+h2. Groonga 3.0.3 has been released
+
+"Groonga 3.0.3":/docs/news.html#release-3-0-3 has been released!
+
+How to install: "Install":/docs/install.html
+
+There are two topics for this release.
+
+* Supported to learn with the value of customized weight
+* Supported to build customized groonga without changing spec file
+* Notice release process about Fedora 18
+* Supported Ubuntu 13.04 Raring Ringtail
+
+h3. Supported to learn with the value of customized weight
+
+In this release, learning with the value of customized weight has been supported.
+
+groonga supports three "suggest":http://groonga.org/docs/suggest/introduction.html related functionality such as completion, correction and suggestion.
+
+There is a need to learn properly for satisfying your demands.
+
+If you want to change the value of weight for each season, you need to re-learn some times for same data.
+
+This way has a performance penalty for big data.
+
+So, we has supported to customize the value of weight, there is no need to learn multiple times for same data.
+
+There is only one thing you need to do is customising configuration table before loading target data.
+
+Here is the concrete example such as suggesting in season vegetable.
+
+First, make database for example.
+
+<pre>
+% mkdir -p testdb
+% groonga -n testdb/db shutdown
+</pre>
+
+Second, make a table for learning by @groonga-suggest-create-dataset@ command.
+
+<pre>
+% groonga-suggest-create-dataset testdb/db query
+</pre>
+
+At last, prepare dataset for learning. Note that changing the value of weight configuration before loading "cabbage" data.
+
+<pre>
+load --table event_query --each 'suggest_preparer(_id, type, item, sequence, time, pair_query)'
+[
+{"sequence": "1", "time": 1312950808.86057, "item": "tomato in season vegetables", "type": "submit"}
+{"sequence": "1", "time": 1312950808.86057, "item": "sweet potato in season vegetables", "type": "submit"}
+{"sequence": "1", "time": 1312950808.86057, "item": "chinese cabbage in season vegetables", "type": "submit"}
+]
+
+load --table configuration
+[
+{"_key": "query", "weight": 10}
+]
+
+load --table event_query --each 'suggest_preparer(_id, type, item, sequence, time, pair_query)'
+[
+{"sequence": "1", "time": 1312950803.86057, "item": "cabbage in season vegetables", "type": "submit"},
+]
+</pre>
+
+So, let's try to use suggestion functionality. Here is the query to get suggestion result in season vegetables.
+
+<pre>
+suggest --table item_query --column kana --types suggest --frequency_threshold 1 --query season
+</pre>
+
+As a result, there are four results and you know that cabbage is in the best season by suggestion score.
+
+<pre>
+[
+  [0,1366613297.59312,0.000118494033813477],
+  {
+    "suggest":[[4],
+               [
+                 ["_key","ShortText"],["_score","Int32"]],
+                 ["cabbage in season vegetables",10],
+                 ["tomato in season vegetables",1],
+                 ["chinese cabbage in season vegetables",1],
+                 ["sweet potato in season vegetables",1]
+               ]
+  }
+]
+</pre>
+
+Previously, you need to do learning many times by followings way to achieve same effects.
+
+<pre>
+load --table event_query --each 'suggest_preparer(_id, type, item, sequence, time, pair_query)'
+[
+{"sequence": "1", "time": 1312950803.86057, "item": "cabbage in season vegetables", "type": "submit"},
+{"sequence": "1", "time": 1312950803.86057, "item": "cabbage in season vegetables", "type": "submit"},
+{"sequence": "1", "time": 1312950803.86057, "item": "cabbage in season vegetables", "type": "submit"},
+{"sequence": "1", "time": 1312950803.86057, "item": "cabbage in season vegetables", "type": "submit"},
+...
+</pre>
+
+h3. Supported to build customized groonga without changing spec file
+
+This release began to add a parameter for building customized version of groonga.
+
+For example, if you want to customize stack size which groonga uses, you need to change the spec file about @--with-stack-size=@ option.
+
+<pre>
+%configure \
+  --disable-static \
+  --with-package-platform=redhat \
+  --with-stack-size=4096 \
+  --with-zlib \
+%if %{use_lzo}
+  --with-lzo \
+%endif
+  --with-munin-plugins
+</pre>
+
+In this release, you can specify additional parameter as a rpmbuild command's one. There is no need to modify spec file directly.
+
+<pre>
+% rpmbuild --rebuild --define 'additional_configure_options --with-stach-size=4096' groonga-3.0.3-0.el6.src.rpm
+</pre>
+
+h3. Notice release process about Fedora 18
+
+Since groonga 3.0.2 release, we had stopped to provide groonga packages by self hosted yum repository.
+Instead, we only provides groonga packages via Fedora official yum repository.
+
+There is no need for Fedora users to regist groonga self hosted repository now.
+
+We cooperate with Mr. Daiki Ueno who maintaines groonga packages so far in Fedora official repository.
+
+But there is a bit time lag about two or three weeks until you can install latest release.
+
+h3. Supported Ubuntu 13.04 Raring Ringtail
+
+This release began to support Ubuntu 13.04 Raring Ringtail which is released at Apr 25, 2013.
+
+See the "install documentation":http://groonga.org/docs/install/ubuntu.html#raring-ringrail about details.
+
+h3. Conclusion
+
+See "Release 3.0.3 2013/04/29":/docs/news.html#release-3-0-3 about detailed changes since 3.0.2.
+
+Let's search by groonga!

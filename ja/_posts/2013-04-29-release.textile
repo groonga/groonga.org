@@ -1,0 +1,162 @@
+---
+layout: post.ja
+title: groonga 3.0.3リリース
+description: groonga 3.0.3をリリースしました！
+published: false
+---
+
+今日は肉の日ですね。
+
+h2. groonga 3.0.3リリース
+
+"groonga 3.0.3":/ja/docs/news.html#release-3-0-3 をリリースしました！
+
+それぞれの環境毎のインストール方法: "インストール":/ja/docs/install.html
+
+
+はじめに、利用事例の記事を書いてくれる人募集のお知らせです。(再度)
+
+これまでも、groonga.orgにて "利用事例":http://groonga.org/ja/users/ を紹介してきましたが、それとは別に、 "gihyo.jp":http://gihyo.jp/ にてgroonga関連の記事の連載を "隔週連載groonga":http://gihyo.jp/dev/clip/01/groonga としてはじめました。
+
+まだgroongaを知らない人にもWebの連載記事を通じて知ってもらいたいというのが動機です。現在第2回まで公開しています。
+
+* "第1回 全文検索エンジンgroongaを紹介します！":http://gihyo.jp/dev/clip/01/groonga/0001
+* "第2回 groongaをRuby On Railsでも使ってみた ～chikamap.comの事例から":http://gihyo.jp/dev/clip/01/groonga/0002
+      
+利用事例がつきたら終了なので、実際に使っているユーザーのみなさんに利用事例を書いてもらえたらいいなぁと思っています!
+詳細は "groonga普及のための協力のお願い":http://sourceforge.jp/projects/groonga/lists/archive/dev/2013-February/001186.html を参照してください。
+
+
+
+h3. 学習時の重み付けのカスタマイズをサポート
+
+今回のリリースでは、学習時の重みづけのカスタマイズをサポートしました。
+
+groongaでは "サジェスト機能":http://groonga.org/ja/docs/suggest/introduction.html として、補完/補正/提案の3つを提供しています。このサジェスト機能が「それらしい」結果を返すようにするには、適切な学習が必要です。
+
+例えば、「旬の野菜」で夏野菜が候補に出てきては困ります。ちょっと気が早いです。今の時期であれば、きちんと春野菜が候補にでてきて欲しいですね。
+
+単純に1度学習するだけだと重みが一緒になってしまうので、時期によって重みづけを変更したい場合には、より重要なものを複数回同じデータで学習させる必要がありました。
+これでは、学習データの規模が巨大になると非常に手間がかかってしまいます。
+
+そこで、学習時の重み付けのカスタマイズをサポートし、同じデータに対して複数回学習させなくても良いようにしました。個別に重みをカスタマイズしてからその都度データを学習させれば反映されます。
+
+それでは実際の例で試してみましょう。旬の野菜を重みつきで学習する例を以下に示します。
+
+最初にテスト用のデータベースを作成します。
+
+<pre>
+  % mkdir -p testdb
+  % groonga -n testdb/db shutdown
+</pre>
+
+次に、学習用のテーブルをgroonga-suggest-create-datasetコマンドで作成します。
+
+<pre>
+  % groonga-suggest-create-dataset testdb/db query
+</pre>
+
+最後に学習データを用意します。途中で @configuration@ テーブルの @weight@ を10にしていますね。これが、今回サポートした重みづけの指定方法です。
+
+<pre>
+  load --table event_query --each 'suggest_preparer(_id, type, item, sequence, time, pair_query)'
+  [
+  {"sequence": "1", "time": 1312950808.86057, "item": "旬 トマト", "type": "submit"}
+  {"sequence": "1", "time": 1312950808.86057, "item": "旬 さつまいも", "type": "submit"}
+  {"sequence": "1", "time": 1312950808.86057, "item": "旬 はくさい", "type": "submit"}
+  ]
+
+  load --table configuration
+  [
+  {"_key": "query", "weight": 10}
+  ]
+
+  load --table event_query --each 'suggest_preparer(_id, type, item, sequence, time, pair_query)'
+  [
+  {"sequence": "1", "time": 1312950803.86057, "item": "旬 キャベツ", "type": "submit"},
+  ]
+</pre>
+
+学習させた後で、「提案」機能を使ってみましょう。クエリは以下のようになります。
+
+<pre>
+  suggest --table item_query --column kana --types suggest --frequency_threshold 1 --query 旬
+</pre>
+
+旬というキーワードで提案された結果は4件あって、キャベツのスコアが一番高いことがわかります。
+出現頻度を指定するための @--frequency_threshold@ をうまく調整すれば、より適切な提案ができるでしょう。
+
+<pre>
+  [
+    [0,1366613297.59312,0.000118494033813477],
+    {
+      "suggest":[[4],
+      [["_key","ShortText"],["_score","Int32"]],
+      ["旬 キャベツ",10],["旬 はくさい",1],["旬 さつまいも",1],["旬 トマト",1]]
+    }
+  ]
+</pre>
+
+同じことをそれまで実現するには以下のように複数回学習させないとできなかったので、だいぶ手間が減りました。
+
+<pre>
+  load --table event_query --each 'suggest_preparer(_id, type, item, sequence, time, pair_query)'
+  [
+  {"sequence": "1", "time": 1312950803.86057, "item": "旬 キャベツ", "type": "submit"},
+  {"sequence": "1", "time": 1312950803.86057, "item": "旬 キャベツ", "type": "submit"},
+  {"sequence": "1", "time": 1312950803.86057, "item": "旬 キャベツ", "type": "submit"},
+  {"sequence": "1", "time": 1312950803.86057, "item": "旬 キャベツ", "type": "submit"},
+  {"sequence": "1", "time": 1312950803.86057, "item": "旬 キャベツ", "type": "submit"},
+  {"sequence": "1", "time": 1312950803.86057, "item": "旬 キャベツ", "type": "submit"},
+  {"sequence": "1", "time": 1312950803.86057, "item": "旬 キャベツ", "type": "submit"},
+  {"sequence": "1", "time": 1312950803.86057, "item": "旬 キャベツ", "type": "submit"},
+  {"sequence": "1", "time": 1312950803.86057, "item": "旬 キャベツ", "type": "submit"},
+  ]
+</pre>
+
+h3. groongaのカスタマイズ版をビルドするためのパラメータの追加
+
+今回のリリースでは、groongaのカスタマイズ版をビルドするためのパラメータの追加を行いました。
+
+例えば、groongaが使用するスタックサイズのデフォルト値は1024になっていますが、これを変更してパッケージをビルドしたいときには、specファイルを以下のように修正する必要がありました。
+
+<pre>
+  %configure \
+    --disable-static \
+    --with-package-platform=redhat \
+    --with-stack-size=4096 \
+    --with-zlib \
+  %if %{use_lzo}
+    --with-lzo \
+  %endif
+    --with-munin-plugins
+</pre>
+
+今回のリリースで、以下のようにrpmbuildコマンドのパラメータとして指定できるようになり、specファイルそのものを編集する必要がなくなりました。
+
+<pre>
+  % rpmbuild --rebuild \
+    --define 'additional_configure_options --with-stach-size=4096' \
+    groonga-3.0.3-0.el6.src.rpm
+</pre>
+
+h3. Fedoraでのリリース方法の変更
+
+今回のリリースからではありませんが、groonga 3.0.2のリリースから独自に提供していたyum repositoryでの提供を止め、Fedora 公式のリポジトリでのパッケージ提供へと一本化するようにしました。
+
+これまで、Fedora 公式のリポジトリからインストールできるgroongaは2.0.9と古い状態だったのですが、最新のリリースに追従するようになっています。
+これにより、インストールのときにリポジトリを登録する必要がなくなりました。
+
+ただし、これまでのように独自に提供していた場合と異なり、Fedora 公式のリポジトリへと反映されるまでにはリリースから2〜3週間程度のタイムラグがあります。
+
+h3. Ubuntu 13.04 Raring Ringtailのサポート
+
+今回のリリースでは 2013/04/25 にリリースされたばかりのUbuntu 13.04のサポートを追加しました。
+
+インストール手順は "ドキュメント":http://groonga.org/ja/docs/install/ubuntu.html#raring-ringrail を参照してください。
+
+h3. さいごに
+
+3.0.2からの詳細な変更点は "3.0.3リリース 2013/04/29":/ja/docs/news.html#release-3-0-3 を確認してください。
+
+それでは、groongaでガンガン検索してください！

@@ -1,0 +1,158 @@
+---
+layout: post.ja
+title: groonga 3.0.4リリース
+description: groonga 3.0.4をリリースしました！
+published: false
+---
+
+今日は肉の日ですね。
+
+h2. groonga 3.0.4リリース
+
+"groonga 3.0.4":/ja/docs/news.html#release-3-0-4 をリリースしました！
+
+それぞれの環境毎のインストール方法: "インストール":/ja/docs/install.html
+
+
+はじめに、利用事例の記事を書いてくれる人募集のお知らせです。(再度)
+
+これまでも、groonga.orgにて "利用事例":http://groonga.org/ja/users/ を紹介してきましたが、それとは別に、 "gihyo.jp":http://gihyo.jp/ にてgroonga関連の記事の連載を "隔週連載groonga":http://gihyo.jp/dev/clip/01/groonga としてはじめました。
+
+まだgroongaを知らない人にもWebの連載記事を通じて知ってもらいたいというのが動機です。現在第4回まで公開しています。
+
+* "第1回 全文検索エンジンgroongaを紹介します！":http://gihyo.jp/dev/clip/01/groonga/0001
+* "第2回 groongaをRuby On Railsでも使ってみた ～chikamap.comの事例から":http://gihyo.jp/dev/clip/01/groonga/0002
+* "第3回 すべてのMySQLユーザに高速な全文検索機能を！ - mroongaの紹介":http://gihyo.jp/dev/clip/01/groonga/0003
+* "第4回 rroongaを使ったソースコード検索エンジンMilkode":http://gihyo.jp/dev/clip/01/groonga/0004
+
+利用事例がつきたら終了なので、実際に使っているユーザーのみなさんに利用事例を書いてもらえたらいいなぁと思っています!
+詳細は "groonga普及のための協力のお願い":http://sourceforge.jp/projects/groonga/lists/archive/dev/2013-February/001186.html を参照してください。
+
+h3. match_columnsにてマルチセクション対応のインデックス指定をサポート
+
+今回のリリースでは、match_columnsにてマルチセクションに対応するインデックス指定をサポートしました。
+
+例えば、titleカラムとcontentカラムを含むテーブルMemosに対してカラムごとに重みづけをして検索するときのことを考えてみましょう。
+
+以下のようなスキーマ定義となるでしょう。
+
+<pre>
+table_create Memos TABLE_NO_KEY
+column_create Memos title COLUMN_SCALAR ShortText
+column_create Memos content COLUMN_SCALAR ShortText
+
+table_create Lexicon TABLE_PAT_KEY ShortText --default_tokenizer TokenBigram
+column_create Lexicon title_index COLUMN_INDEX|WITH_POSITION|WITH_SECTION Memos title
+column_create Lexicon content_index COLUMN_INDEX|WITH_POSITION|WITH_SECTION Memos content
+</pre>
+
+語彙表であるLexiconテーブルにマルチカラムインデックスを張ったとします。titleを重視したい場合のクエリは以下のようになるでしょう。
+
+<pre>
+select Memos \
+  --match_columns "Lexicon.title_index * 10 || Lexicon.content_index" \
+  --query rroonga --output_columns "title, content, _score"
+</pre>
+
+同等のことをマルチカラムインデックスに対してもできるようになりました。
+
+そのためには以下のようにスキーマ定義を変更します。
+
+<pre>
+table_create Lexicon TABLE_PAT_KEY ShortText --default_tokenizer TokenBigram
+column_create Lexicon memo_index COLUMN_INDEX|WITH_POSITION|WITH_SECTION Memos title,content
+</pre>
+
+そして、クエリでmemo_indexのあとに.(カラム名)を指定します。同等のことが以下のクエリで実現できるようになりました。
+
+<pre>
+select Memos \
+  --match_columns "Lexicon.memo_index.title * 10 || Lexicon.memo_index.content" \
+  --query rroonga \
+  --output_columns "title, content, _score"
+</pre>
+
+テーブルに複数の全文検索対象のカラムがある場合、マルチカラムインデックスを張るというのはよくあります。
+
+また、カラムに複数のトークナイザーやノーマライザーを適用し、検索のときに使用するインデックスを切り替えたいということがあります。
+
+そういった場合に単純にカラム名を指定すると、複数のインデックスを使ってしまい意図しない検索となることがあります。
+今回のリリースでカラムがマルチカラムインデックスの構成要素であった場合に、明示的に指定できるようになりました。
+
+
+h3. tokenize コマンドのサポート
+
+今回のリリースでは、tokenizeコマンドのサポートを追加しました。
+
+これまで、groongaでノーマライザーの挙動を確認するためのコマンドとしてnormalizeコマンドはあったのですが、トークナイザーの挙動を確認するためのコマンドが提供されていませんでした。
+
+今回、tokenizeコマンドを追加したことでノーマライザー、トークナイザー両方の挙動を確認することができ、意図しない検索結果となった場合の問題の切り分けがより簡単にできるようになりました。
+
+tokenizeコマンドは以下のようにして使います。
+
+tokenizeコマンドには4つの引数がありますが、必須なのはトークナイザーと対象となる文字列の2つです。
+
+例えば、TokenBigramトークナイザーで"groonga3.0.4"という文字列をトークナイズすると以下のようになります。
+
+<pre>
+> tokenize TokenBigram "groonga3.0.4"
+[
+  [0,1369290009.77065,0.000670194625854492],
+  [
+    {"value":"gr","position":0},
+    {"value":"ro","position":1},
+    {"value":"oo","position":2},
+    {"value":"on","position":3},
+    {"value":"ng","position":4},
+    {"value":"ga","position":5},
+    {"value":"a3","position":6},
+    {"value":"3.","position":7},
+    {"value":".0","position":8},
+    {"value":"0.","position":9},
+    {"value":".4","position":10},
+    {"value":"4","position":11}
+  ]
+]
+</pre>
+
+tokenizeコマンドの詳細は "ドキュメント":http://groonga.org/ja/docs/reference/commands/tokenize.html を参照してください。
+  
+もうすでに、開発版のtokenizeコマンドを使って実際の挙動を検証してくれているブログがありますので合わせて紹介します。
+
+* Y-Ken Studio はてブロ支店 "「groonga/mroongaの分かち書き機能（tokenizer）の挙動を追ってみる」":http://y-ken.hatenablog.com/entry/mroonga-tokenizer-behavior
+  
+Y.Kentaroさんは "mysql-mroongaカテゴリで他にも有益な情報をまとめて":http://y-ken.hatenablog.com/category/mysql-mroonga くれているので、参考にしてみてください。
+
+h3. Debian 8.0 (jessie)のサポート
+
+今回のリリースでは Debian 8.0 (jessie)のサポートを追加しました。
+
+これまでtestingであったwheezyが安定版としてリリースされたことによるものです。
+
+インストール手順は "ドキュメント":http://groonga.org/ja/docs/install/debian.html#jessie を参照してください。
+
+  
+h3. 週刊groonga翻訳始めます
+
+毎週木曜に "Qiita":http://qiita.com/ にてgroongaやmroonga,rroongaなどのトピックを一つ投稿するという取り組みを続けています。
+
+それなりにトピックがたまってきたので、これを翻訳して英語圏にも情報を発信していこうかと考えています。
+
+ただ、現状リソースがあまり足りていないので、ユーザのみなさんにも協力していただけたらいいなと思っています。
+
+具体的には以下のようにして作業をすすめていきたいと思います。
+
+1. Qiitaに英語圏向けのノウハウ・Tipsの投稿ページを元記事を複製して用意する(この時点では内容は日本語のまま)
+2. 記事ページをみんなでよってたかって翻訳する。このときには "「編集リクエスト」":http://blog.qiita.com/post/40808687185/patch-request-release を使って記事を更新します。
+3. 記事の翻訳が完成したら、内容に応じて "blogroonga":http://groonga.org/blog/ や "mroongaブログ":http://mroonga.org/blog/ に掲載します。  
+4. Tumblrでリブログ
+
+1,3,4はgroonga開発チームでやるとして、2.のところを手分けして実現できたら
+いいなぁと思っています。
+
+
+h3. さいごに
+
+3.0.3からの詳細な変更点は "3.0.4リリース 2013/05/29":/ja/docs/news.html#release-3-0-4 を確認してください。
+
+それでは、groongaでガンガン検索してください！

@@ -1,0 +1,118 @@
+---
+layout: post.en
+title: Groonga 3.0.4 has been released
+description: Groonga 3.0.4 has been released!
+published: false
+---
+
+
+h2. Groonga 3.0.4 has been released
+
+"Groonga 3.0.4":/docs/news.html#release-3-0-4 has been released!
+
+How to install: "Install":/docs/install.html
+
+There are three topics for this release.
+
+* Supported multiple index section in match_columns
+* Supported tokenize command experimentally
+* Supported Debian 8.0 (jessie)
+
+h3. Supported multiple index section in match_columns
+
+In this release, we began to support multiple index section in match_columns.
+
+Here is the sample schema:
+
+<pre>
+table_create Memos TABLE_NO_KEY
+column_create Memos title COLUMN_SCALAR ShortText
+column_create Memos content COLUMN_SCALAR ShortText
+
+table_create Lexicon TABLE_PAT_KEY ShortText --default_tokenizer TokenBigram
+column_create Lexicon title_index COLUMN_INDEX|WITH_POSITION|WITH_SECTION Memos title
+column_create Lexicon content_index COLUMN_INDEX|WITH_POSITION|WITH_SECTION Memos content
+</pre>
+
+In the previous release, you need to execute following query if you want to use column index of title with weight.
+
+<pre>
+select Memos \
+  --match_columns "Lexicon.title_index * 10 || Lexicon.content_index" \
+  --query rroonga --output_columns "title, content, _score"
+</pre>
+
+In this release, you can use almost same thing for multiple column index. To use this feature, you need change schema a bit.
+
+<pre>
+table_create Lexicon TABLE_PAT_KEY ShortText --default_tokenizer TokenBigram
+column_create Lexicon memo_index COLUMN_INDEX|WITH_POSITION|WITH_SECTION Memos title,content
+</pre>
+
+Then specify memo_index.(COLUMN_NAME) in the query. Here is the revised query using multiple column index:
+
+<pre>
+select Memos \
+  --match_columns "Lexicon.memo_index.title * 10 || Lexicon.memo_index.content" \
+  --query rroonga \
+  --output_columns "title, content, _score"
+</pre>
+
+There are many case which you want to apply multiple tokenizer or normalizer for each column.
+
+If you specify just column name, there is a case that multiple index is used and unwanted search results returns.
+
+In this release, you can specify specific column which is a member of multiple column index.
+
+h3. Supported tokenize command experimentally
+
+In this release, we began to support tokenize command experimentally.
+
+There is a normalize command to confirm behaviour of normalizer, on the other hand, there is no way to confirm behaviour of tokenizer.
+
+In this release, you can confirm both of normalizer and tokenizer behaviour now.
+
+Here is the syntax of tokenize command:
+
+<pre>
+tokenize tokenizer string [normalizer] [flag]
+</pre>
+
+Here is a sample of tokenize command:
+
+<pre>
+> tokenize TokenBigram "groonga3.0.4"
+[
+  [0,1369290009.77065,0.000670194625854492],
+  [
+    {"value":"gr","position":0},
+    {"value":"ro","position":1},
+    {"value":"oo","position":2},
+    {"value":"on","position":3},
+    {"value":"ng","position":4},
+    {"value":"ga","position":5},
+    {"value":"a3","position":6},
+    {"value":"3.","position":7},
+    {"value":".0","position":8},
+    {"value":"0.","position":9},
+    {"value":".4","position":10},
+    {"value":"4","position":11}
+  ]
+]
+</pre>
+
+See the following "documentation":http://groonga.org/docs/reference/commands/tokenize.html about details.
+
+h3. Supported Debian 8.0 (jessie)
+
+In this release, we began to support Debian 8.0 (jessie).
+
+See install documentation about "jessie":http://groonga.org/docs/install/debian.html#jessie
+
+Note that squeeze support will be discontinued for a while.
+
+h3. Conclusion
+
+See "Release 3.0.4 2013/05/29":/docs/news.html#release-3-0-4 about detailed changes since 3.0.3.
+
+Let's search by groonga!

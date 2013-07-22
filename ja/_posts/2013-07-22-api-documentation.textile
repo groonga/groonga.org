@@ -1,0 +1,70 @@
+---
+layout: post.ja
+title: APIドキュメント化始めました
+description: APIドキュメント化始めました
+---
+
+h2. APIドキュメント化始めました
+
+長い間懸案であった、groongaのAPIをドキュメント化する作業を始めました。
+
+始めた理由は二つあります。
+
+一つはAPIのドキュメントがないので、groongaをライブラリとして使おうとしたときにはソースを直接参照しないといけないためです。
+
+もう一つの理由は、Visual Studioでビルドするときに大量の警告メッセージが出力されるのを解消したい、というのがあります。現在mroongaをMariaDBにバンドルできるようにする作業を進めているのですが、この状態でバンドルしてもらうのは難しいです。groongaのヘッダに日本語で説明を書いているせいなので、ヘッダから日本語を追い出すことで問題を解消したいなぁというのがあります。
+
+上記からドキュメント化の作業を始めたわけですが、現状リソースがまったく足りていません。
+
+そこで、ユーザのみなさんにも協力していただけたらいいなと思っています。MariaDBへのバンドルを応援したいという人はドキュメント化作業に参加してくれると嬉しいです。
+
+では具体的にどんなことをやればいいのかを説明します。基本的には関数ごとにpull requestを送ってもらうと進めやすいです。
+
+1. groongaとgroonga.orgのリポジトリをcloneして以下のコマンドを実行します。
+
+<pre>
+% git clone git://github.com/groonga/groonga.git
+% git clone git://github.com/groonga/groonga.org.git
+% cd groonga
+% ./autogen.sh
+% ./configure --enable-document --with-groonga-org-path=(groonga.orgをcloneしたパス)
+</pre>
+
+2. include/groonga.hを眺めて日本語のコメントがついている関数を一つ探します。例:grn_ctx_open
+
+3. 関数が見つかったら、関数に対応するブランチをつくります。
+
+<pre>
+% git checkout -b grn-ctx-open
+</pre>
+
+4. 関数のコメントの内容をdoc/source/reference/api/grn_ctx.txtに移動します。移動するときに英訳とマークアップを行います。grn_ctx.txtにはすでにgtn_ctx_initの例があるのでそれを真似して下さい。
+
+5. groonga.hからはコメントを削除します。
+
+6. 対象となるファイルを更新するために以下を実行します。
+
+<pre>
+% make update-files
+</pre>
+
+7. メッセージカタログを更新するために以下を実行します。
+
+<pre>
+% make update-po
+</pre>
+
+8. ドキュメントを生成するために以下を実行します。
+
+<pre>
+% make update-document
+</pre>
+
+9. ドキュメントの生成結果を見て翻訳されていない部分を修正します。doc/locale/ja/LC_MESSAGES/po以下のメッセージカタログのmsgstrを修正することになります。
+
+10. 英語のドキュメントと日本語のドキュメントがきちんと生成できたらコミットしておきます。
+
+11. 完成です。pull requestを送りましょう。
+
+HTMLの結果を確認するにはdoc/locale/en/htmlもしくはdoc/locale/ja/html以下を参照してください。
+

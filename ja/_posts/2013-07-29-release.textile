@@ -1,0 +1,109 @@
+---
+layout: post.ja
+title: groonga 3.0.6リリース
+description: groonga 3.0.6をリリースしました！
+published: false
+---
+
+今日は肉の日ですね。
+
+h2. groonga 3.0.6リリース
+
+"groonga 3.0.6":/ja/docs/news.html#release-3-0-6 をリリースしました！
+
+それぞれの環境毎のインストール方法: "インストール":/ja/docs/install.html
+
+
+これまでも、groonga.orgにて "利用事例":http://groonga.org/ja/users/ を紹介してきましたが、それとは別に、 "gihyo.jp":http://gihyo.jp/ にてgroonga関連の記事の連載を "隔週連載groonga":http://gihyo.jp/dev/clip/01/groonga としてはじめました。
+
+まだgroongaを知らない人にもWebの連載記事を通じて知ってもらいたいというのが動機です。現在第7回まで公開しています。先月は第6回までだったので記事が一本新たに追加されました。
+
+* "第7回 [実録] MySQL向け全文検索エンジン「Tritonn」から「mroonga」への移行ガイド(2）":http://gihyo.jp/dev/clip/01/groonga/0007
+
+第一回から第六回までの過去記事については "隔週連載groonga":http://gihyo.jp/dev/clip/01/groonga のページを参照してください。
+
+h3. クエリ構文で特別な文字のエスケープのサポート
+
+今回のリリースではクエリ構文で特別な文字のエスケープのサポートをしました。
+
+クエリ構文における特別扱いされる文字の詳細については "エスケープ":http://groonga.org/ja/docs/reference/grn_expr/query_syntax.html#escape を参照してください。
+
+例えば、特別な文字の一つである @(@ そのものを検索したいときには、 @\(@ をgroongaに渡してあげれば良いことになります。
+
+ただし、実際にgroongaに渡すまでにはいくつか以下のような階層があるので使い方には注意が必要です。(下になるにつれてより低レイヤ)
+
+* シェル(bashなど)
+* groongaのコマンラインインタフェース(groongaコマンドのプロンプト)
+* groongaのクエリパーサー
+
+ここでのエスケープとはgroongaのクエリパーサーに @\(@ が渡されるようにしなければなりません。
+そのため、 @\@ をその上位層で解釈してしまう場合にはそのことを踏まえてエスケープしないといけません。
+
+この場合低レイヤから逆にたどって考えてみましょう。
+
+* groongaのクエリパーサーは @\(@ が渡される必要がある
+* groongaのコマンラインインタフェースはエスケープを解釈するので @\\\(@ が必要。
+* シェル(bashなど)もエスケープを解釈するので @\\\\\\(@ が必要。
+
+最終的にシェルのコマンドプロンプトでクエリを実行する場合には @\\\\\\(@ としなければなりません。
+
+これを具体例で確認してみましょう。サンプルデータとスキーマは以下とします。(escape.grn)
+
+<pre>
+table_create Memos TABLE_PAT_KEY ShortText
+
+table_create Contents TABLE_PAT_KEY ShortText --default_tokenizer TokenDelimit --normalizer NormalizerAuto
+column_create Contents entries_key_index COLUMN_INDEX Memos _key
+
+load --table Memos
+[
+{"_key": "(仮)"}
+]
+</pre>
+  
+サンプルデータとスキーマのファイルescape.grnをシェルのコマンドプロンプトから投入します。
+
+<pre>
+% groonga -n testdb/db < escape.grn
+</pre>
+
+この状態で @(仮@ を検索するには以下のクエリを実行します。
+
+<pre>
+% groonga testdb/db select Memos --match_columns _key --query "\\\\\\(仮"
+</pre>
+
+シングルクォートの場合には以下のクエリで検索できます。
+
+<pre>
+% groonga testdb/db select Memos --match_columns _key --query '\\\(仮'
+</pre>
+
+では、groongaのコマンドラインインタフェースから検索する場合を確認してみます。groongaのコマンドラインインタフェースの場合にはシェルによるエスケープの解釈がなくなるので、そのぶんのエスケープが不要です。
+
+<pre>
+% groonga testdb/db
+> select Memos --match_columns _key --query "\\\(仮"
+</pre>
+
+シングルクォートの場合には以下のクエリで検索できます。
+
+<pre>
+> select Memos --match_columns _key --query '\\(仮'
+</pre>
+
+h3. Fedora 19のサポート
+
+今回のリリースでは、7月2日にリリースされたFedora 19のサポートを開始しました。
+
+そのかわり、Fedora 18のサポートは終了しています。
+
+Fedoraプロジェクトにてパッケージのリリースをしていますが、Fedoraの一般ユーザが利用するリポジトリに入るまでに2週間程度のタイムラグがあるので、独自にリポジトリでもパッケージを提供しています。
+
+パッケージの内容は同じなので、独自のリポジトリからyumでインストールするのとFedoraプロジェクトからyumでインストールのに違いはありません。
+
+h3. さいごに
+
+3.0.5からの詳細な変更点は "3.0.6リリース 2013/07/29":/ja/docs/news.html#release-3-0-6 を確認してください。
+
+それでは、groongaでガンガン検索してください！

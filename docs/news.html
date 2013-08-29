@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>News &mdash; groonga v3.0.6 documentation</title>
+    <title>News &mdash; groonga v3.0.7 documentation</title>
     
     <link rel="stylesheet" href="static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '3.0.6',
+        VERSION:     '3.0.7',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="static/underscore.js"></script>
     <script type="text/javascript" src="static/doctools.js"></script>
     <link rel="shortcut icon" href="static/favicon.ico"/>
-    <link rel="top" title="groonga v3.0.6 documentation" href="index.html" /> 
+    <link rel="top" title="groonga v3.0.7 documentation" href="index.html" /> 
       <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
     <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
     <meta property="og:type" content="product" />
@@ -66,7 +66,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li><a href="index.html">groonga v3.0.6 documentation</a> &raquo;</li> 
+        <li><a href="index.html">groonga v3.0.7 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -77,10 +77,84 @@
             
   <div class="section" id="news">
 <h1>News<a class="headerlink" href="#news" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="release-3-0-6-2013-07-29">
-<span id="release-3-0-6"></span><h2>Release 3.0.6 - 2013/07/29<a class="headerlink" href="#release-3-0-6-2013-07-29" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="release-3-0-7-2013-08-29">
+<span id="release-3-0-7"></span><h2>Release 3.0.7 - 2013/08/29<a class="headerlink" href="#release-3-0-7-2013-08-29" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="improvements">
 <h3>Improvements<a class="headerlink" href="#improvements" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p class="first">[doc] Added API documentation. [groonga-dev,01593]
+[GitHub#79,#80,#81,#82,#83,#84,#85,#86,#87,#88,#89,#90,#91,#92,#93,#95,#96,#97,#98,#99,#100]
+[Patch by whombx]</p>
+</li>
+<li><dl class="first docutils">
+<dt>[table_remove] Improved not to remove patricia trie table or hash table</dt>
+<dd><p class="first last">which is still referenced. This change avoids that referenced table is removed accidentally.</p>
+</dd>
+</dl>
+</li>
+<li><p class="first">Improved to just ignore too long token (4096 bytes or more).
+This change affects when it is registered. In the previous version, it is treated as an
+error instead of a warning. [groonga-dev,01571] [Suggested by Naoya Murakami]</p>
+</li>
+<li><p class="first">Improved to show actual discarded posting term in log message.
+[groonga-dev,01621] [Reported by Naoya Murakami]</p>
+</li>
+<li><p class="first">[httpd] Supported loading data using POST method. [GitHub#101]
+[Patch by Motoi Washida]</p>
+</li>
+<li><p class="first">[httpd] Supported groonga log as <tt class="docutils literal"><span class="pre">groonga_log_path</span></tt> directive.</p>
+</li>
+<li><p class="first">[httpd] Supported groonga log level as <tt class="docutils literal"><span class="pre">groonga_log_level</span></tt> directive.</p>
+</li>
+<li><p class="first">[httpd] Supported customizing cache limit as <tt class="docutils literal"><span class="pre">groonga_cache_limit</span></tt> directive.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="fixes">
+<h3>Fixes<a class="headerlink" href="#fixes" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Fixed a bug that error in expression may cause stack overflow.
+This change avoids that groonga crashes suddenly as a result of error accumlation.</li>
+<li>Fixed a crash bug that offline index construction for vector column which has
+orphan reference causes.</li>
+<li>Fixed a but that groonga doesn't exit on error while daemon mode starts.
+For example, <tt class="docutils literal"><span class="pre">groonga</span> <span class="pre">-d</span> <span class="pre">/tmp/non-existence.db</span></tt> reproduce this bug.</li>
+<li>[dump] Fixed a bug that wrong table type is dumped.
+This bug occurs when table type is TABLE_PAT_KEY and key is reference type.</li>
+<li>Fixed a bug that the default <tt class="docutils literal"><span class="pre">--cache-limit</span></tt> value is 0.
+The default value is changed to '100'.</li>
+<li>Fixed a memory leak when <a class="reference internal" href="reference/functions/sub_filter.html"><em>sub_filter</em></a> is used.</li>
+<li>[doc] Fixed description of defrag command. [Reported by &#64;naoina]</li>
+<li>[doc] Fixed description about the way to contribute. [GitHub#77]
+[Patch by Masafumi Yokoyama]</li>
+<li>[plugin] Fixed a crash bug on multiple DB open case.
+This bug affects the case that multiple plugin is used and the same database is opened from
+multiple process. [groonga-dev,01596] [Reported by Naoya Murakami]</li>
+<li>Fixed a bug that nested match operation after <tt class="docutils literal"><span class="pre">AND</span></tt> operator doesn't work.
+The <tt class="docutils literal"><span class="pre">select</span> <span class="pre">...</span> <span class="pre">--filter</span> <span class="pre">'...</span> <span class="pre">&amp;&amp;</span> <span class="pre">nested.column</span> <span class="pre">&#64;</span> <span class="pre">&quot;keyword&quot;'</span></tt> query reproduces this bug.
+[groonga-dev,01599] [Reported by Motoi Washida]</li>
+<li>[doc] Fixed a typo about documentation of special characters.
+[Reported by Genki Takiuchi]</li>
+<li>Fixed a typo in error message when invalid character is given.
+[Reported by YOSHIDA Mitsuo]</li>
+</ul>
+</div>
+<div class="section" id="thanks">
+<h3>Thanks<a class="headerlink" href="#thanks" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>whombx</li>
+<li>&#64;naoina</li>
+<li>Masafumi Yokoyama</li>
+<li>Motoi Washida</li>
+<li>Genki Takiuchi</li>
+<li>YOSHIDA Mitsuo</li>
+</ul>
+</div>
+</div>
+<div class="section" id="release-3-0-6-2013-07-29">
+<span id="release-3-0-6"></span><h2>Release 3.0.6 - 2013/07/29<a class="headerlink" href="#release-3-0-6-2013-07-29" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>Improvements<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>[doc] Added documentation about parameter of <a class="reference internal" href="reference/functions/sub_filter.html"><em>sub_filter</em></a>
 function.</li>
@@ -94,15 +168,15 @@ function.</li>
 <li>[httpd] Updated bundled nginx version to 1.4.2.</li>
 </ul>
 </div>
-<div class="section" id="fixes">
-<h3>Fixes<a class="headerlink" href="#fixes" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id2">
+<h3>Fixes<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Fixed a crash bug when specific internal function (<tt class="docutils literal"><span class="pre">grn_obj_path()</span></tt>) is called
 for built-in proc function such as <tt class="docutils literal"><span class="pre">select</span></tt>. [Reported by Genki Takiuchi]</li>
 </ul>
 </div>
-<div class="section" id="thanks">
-<h3>Thanks<a class="headerlink" href="#thanks" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id3">
+<h3>Thanks<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Naoya Inada</li>
 <li>OBATA Akio</li>
@@ -113,8 +187,8 @@ for built-in proc function such as <tt class="docutils literal"><span class="pre
 </div>
 <div class="section" id="release-3-0-5-2013-06-29">
 <span id="release-3-0-5"></span><h2>Release 3.0.5 - 2013/06/29<a class="headerlink" href="#release-3-0-5-2013-06-29" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id1">
-<h3>Improvements<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id4">
+<h3>Improvements<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>[doc] Added summary about <tt class="docutils literal"><span class="pre">match_column</span></tt> and <tt class="docutils literal"><span class="pre">query_string</span></tt> parameters in <tt class="docutils literal"><span class="pre">query()</span></tt>.</li>
 <li>Added subrecord information to table inspection.</li>
@@ -125,8 +199,8 @@ when starting groonga server. [Reported by Kosuke Asami]</li>
 <li>[experimental] Added <a class="reference internal" href="reference/functions/html_untag.html"><em>html_untag</em></a> function.</li>
 </ul>
 </div>
-<div class="section" id="id2">
-<h3>Fixes<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id5">
+<h3>Fixes<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Fixed a crash bug of mroonga which is caused by missing lock for table creation.
 [Reported by Y.Kentaro]</li>
@@ -144,8 +218,8 @@ This bug affects the case if you assign calculated value to
 <tt class="docutils literal"><span class="pre">_score</span></tt> pseudo column for example.</li>
 </ul>
 </div>
-<div class="section" id="id3">
-<h3>Thanks<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id6">
+<h3>Thanks<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Y.Kentaro</li>
 <li>Kosuke Asami</li>
@@ -155,8 +229,8 @@ This bug affects the case if you assign calculated value to
 </div>
 <div class="section" id="release-3-0-4-2013-05-29">
 <span id="release-3-0-4"></span><h2>Release 3.0.4 - 2013/05/29<a class="headerlink" href="#release-3-0-4-2013-05-29" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id4">
-<h3>Improvements<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id7">
+<h3>Improvements<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>[tokenizer] Improved to show log message when normalized string is not given.</li>
 <li>Supported <tt class="docutils literal"><span class="pre">_key</span></tt> as an argument of <tt class="docutils literal"><span class="pre">geo_in_circle</span></tt>. [Reported by &#64;ceekz]</li>
@@ -179,8 +253,8 @@ It supports to exclude specific tables from monitoring results.</li>
 system plugins.</li>
 </ul>
 </div>
-<div class="section" id="id5">
-<h3>Fixes<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id8">
+<h3>Fixes<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>[tokenizer] Fixed a memory leak on error.</li>
 <li>Fixed a bug that empty string for similar search causes SEGV.
@@ -195,8 +269,8 @@ expressions are used.</li>
 <li>[deb] Fixed a bug that HTTP/GQTP process is excuted as root user.</li>
 </ul>
 </div>
-<div class="section" id="id6">
-<h3>Thanks<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id9">
+<h3>Thanks<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>&#64;ceekz</li>
 <li>Nakai Kanako</li>
@@ -209,8 +283,8 @@ expressions are used.</li>
 </div>
 <div class="section" id="release-3-0-3-2013-04-29">
 <span id="release-3-0-3"></span><h2>Release 3.0.3 - 2013/04/29<a class="headerlink" href="#release-3-0-3-2013-04-29" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id7">
-<h3>Improvements<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id10">
+<h3>Improvements<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>[suggest] Supported to learn with the value of customized weight
 by using <tt class="docutils literal"><span class="pre">configuration.weight</span></tt> configuration.</li>
@@ -228,8 +302,8 @@ for building customized groonga without changing spec file.</li>
 </div>
 <div class="section" id="release-3-0-2-2013-03-29">
 <span id="release-3-0-2"></span><h2>Release 3.0.2 - 2013/03/29<a class="headerlink" href="#release-3-0-2-2013-03-29" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id8">
-<h3>Improvements<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id11">
+<h3>Improvements<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Supported two or more indexes for a table key.
 This change affects to eliminate potential crash case when loading a new key
@@ -253,8 +327,8 @@ This change supports the query such as
 <tt class="docutils literal"><span class="pre">--query_expansion</span></tt> is regarded as deprecated.</li>
 </ul>
 </div>
-<div class="section" id="id9">
-<h3>Fixes<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id12">
+<h3>Fixes<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Fixed a bug that <tt class="docutils literal"><span class="pre">snippet_html(XXX),</span> <span class="pre">XXX</span></tt> fails with &quot;stack error&quot;.
 This bug affects a query such as <tt class="docutils literal"><span class="pre">--output_columns</span> <span class="pre">'snippet_html(title),</span> <span class="pre">content'</span></tt>.
@@ -270,8 +344,8 @@ Reference key size is 25 byte or lager.</li>
 This affects the case if GARBAGE does not exist.</li>
 </ul>
 </div>
-<div class="section" id="id10">
-<h3>Thanks<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id13">
+<h3>Thanks<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Hendro Wibowo</li>
 <li>hino</li>
@@ -281,8 +355,8 @@ This affects the case if GARBAGE does not exist.</li>
 </div>
 <div class="section" id="release-3-0-1-2013-02-28">
 <span id="release-3-0-1"></span><h2>Release 3.0.1 - 2013/02/28<a class="headerlink" href="#release-3-0-1-2013-02-28" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id11">
-<h3>Improvements<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id14">
+<h3>Improvements<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Supported to set Bool to reference column when loading dataset by load command.</li>
 <li>Supported AND operation for nested index.
@@ -299,8 +373,8 @@ based nested index of _key.</li>
 <li>[doc] Added missing documentation of commands such as <tt class="docutils literal"><span class="pre">column_rename</span></tt> or <tt class="docutils literal"><span class="pre">truncate</span></tt>.</li>
 </ul>
 </div>
-<div class="section" id="id12">
-<h3>Fixes<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id15">
+<h3>Fixes<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Fixed a bug that <tt class="docutils literal"><span class="pre">grn_index_cursor_next()</span></tt> returns NULL unexpectedly.
 It causes that invalid index entry is returned after deleting entries.
@@ -310,8 +384,8 @@ This bug occurs by wrong the number of found records.</li>
 <li>[httpd] Enabled default owner/group of database setting as groonga/groonga.</li>
 </ul>
 </div>
-<div class="section" id="id13">
-<h3>Thanks<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id16">
+<h3>Thanks<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>b senboku</li>
 </ul>
@@ -322,8 +396,8 @@ This bug occurs by wrong the number of found records.</li>
 <ul class="simple">
 <li>Bump version to 3.0.0!</li>
 </ul>
-<div class="section" id="id14">
-<h3>Fixes<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id17">
+<h3>Fixes<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>[deb] Fixed to install missing not EUC-JP, but UTF-8 encoding dictionary
 when <tt class="docutils literal"><span class="pre">groonga-tokenizer-mecab</span></tt> package is installed.</li>
@@ -333,8 +407,8 @@ If you use string literal for int64, this bug does not affects.</li>
 by init script is failed. [GitHub#53] [Patch by IWAI, Masaharu]</li>
 </ul>
 </div>
-<div class="section" id="id15">
-<h3>Thanks<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id18">
+<h3>Thanks<a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>IWAI, Masaharu</li>
 </ul>
@@ -342,8 +416,8 @@ by init script is failed. [GitHub#53] [Patch by IWAI, Masaharu]</li>
 </div>
 <div class="section" id="release-2-1-2-2013-01-29">
 <span id="release-2-1-2"></span><h2>Release 2.1.2 - 2013/01/29<a class="headerlink" href="#release-2-1-2-2013-01-29" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id16">
-<h3>Improvements<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id19">
+<h3>Improvements<a class="headerlink" href="#id19" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Supported multiple <tt class="docutils literal"><span class="pre">query()</span></tt> in a select command.
 For example, you can specify the keyword which has different weight such as
@@ -369,8 +443,8 @@ in <tt class="docutils literal"><span class="pre">--filter</span></tt>.</li>
 <li>[doc] Added documentation for <a class="reference internal" href="reference/functions/query.html"><em>query</em></a>.</li>
 </ul>
 </div>
-<div class="section" id="id17">
-<h3>Fixes<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id20">
+<h3>Fixes<a class="headerlink" href="#id20" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Fixed not to report an error even though MeCab tokenizer shared object
 isn't found. [groonga-dev,01174] [Reported by wing]</li>
@@ -380,8 +454,8 @@ isn't found. [groonga-dev,01174] [Reported by wing]</li>
 by select command.</li>
 </ul>
 </div>
-<div class="section" id="id18">
-<h3>Thanks<a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id21">
+<h3>Thanks<a class="headerlink" href="#id21" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>wing</li>
 </ul>
@@ -391,8 +465,8 @@ by select command.</li>
 <span id="release-2-1-1"></span><h2>Release 2.1.1 - 2012/12/29<a class="headerlink" href="#release-2-1-1-2012-12-29" title="Permalink to this headline">¶</a></h2>
 <p>This is bug fix release of 2.1.0. All of 2.1.0 users should use 2.1.1
 instead.</p>
-<div class="section" id="id19">
-<h3>Fixes<a class="headerlink" href="#id19" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id22">
+<h3>Fixes<a class="headerlink" href="#id22" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Fixed a bug that <tt class="docutils literal"><span class="pre">KEY_NORMALIZE</span></tt> information in database that is
 created by groonga 2.0.8 or ealier is dropped.</li>
@@ -419,8 +493,8 @@ version of groonga.</p>
 tokenizer. The argument of <tt class="docutils literal"><span class="pre">grn_tokenizer_query_open</span></tt> API has changed.
 This API change affects developer of tokenizer plugin.</p>
 </div>
-<div class="section" id="id20">
-<h3>Improvements<a class="headerlink" href="#id20" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id23">
+<h3>Improvements<a class="headerlink" href="#id23" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>[doc] Added documentation about <a class="reference internal" href="tutorial/match_columns.html#nested-index-search"><em>Nested index search among related table by column index</em></a>.</li>
 <li>Supported the expression as <a class="reference internal" href="reference/functions/snippet_html.html"><em>snippet_html</em></a> arguments.
@@ -442,8 +516,8 @@ of <tt class="docutils literal"><span class="pre">grn_tokenizer_query_open</span
 and double array trie for <a class="reference internal" href="tutorial/match_columns.html#nested-index-search"><em>Nested index search among related table by column index</em></a>.</li>
 </ul>
 </div>
-<div class="section" id="id21">
-<h3>Fixes<a class="headerlink" href="#id21" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id24">
+<h3>Fixes<a class="headerlink" href="#id24" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>[windows] Added missing <tt class="docutils literal"><span class="pre">O_BINARY</span></tt> flag to open file correctly.
 This change fixes the infinite loop problem about groonga HTTP server.
@@ -455,8 +529,8 @@ see <a class="reference internal" href="reference/executables/groonga.html#cmdop
 <li>Fixed a bug that <tt class="docutils literal"><span class="pre">_score</span></tt> after &quot;*&quot; is ignored in <tt class="docutils literal"><span class="pre">--output_columns</span></tt>.</li>
 </ul>
 </div>
-<div class="section" id="id22">
-<h3>Thanks<a class="headerlink" href="#id22" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id25">
+<h3>Thanks<a class="headerlink" href="#id25" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Tomoatsu Shimada</li>
 <li>Shimomura Tatsuya</li>
@@ -465,8 +539,8 @@ see <a class="reference internal" href="reference/executables/groonga.html#cmdop
 </div>
 <div class="section" id="release-2-0-9-2012-11-29">
 <span id="release-2-0-9"></span><h2>Release 2.0.9 - 2012/11/29<a class="headerlink" href="#release-2-0-9-2012-11-29" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id23">
-<h3>Improvements<a class="headerlink" href="#id23" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id26">
+<h3>Improvements<a class="headerlink" href="#id26" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Supported to calculate the value of distance accross border
 in <tt class="docutils literal"><span class="pre">geo_distance</span></tt> with <tt class="docutils literal"><span class="pre">rectangle</span></tt> as approximate type. [#1534]</li>
@@ -489,8 +563,8 @@ This change is incompatibility change, but does not affects existing program.</l
 <li>Supported range search by using index.</li>
 </ul>
 </div>
-<div class="section" id="id24">
-<h3>Fixes<a class="headerlink" href="#id24" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id27">
+<h3>Fixes<a class="headerlink" href="#id27" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Fixed to use network byte order for status code of <a class="reference internal" href="spec/gqtp.html#gqtp-header-spec"><em>GQTP header</em></a> to follow
 the normal network protocol convention.
@@ -514,8 +588,8 @@ referenced by <tt class="docutils literal"><span class="pre">select</span></tt> 
 This change not to contain such a metadata as search results.</li>
 </ul>
 </div>
-<div class="section" id="id25">
-<h3>Thanks<a class="headerlink" href="#id25" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id28">
+<h3>Thanks<a class="headerlink" href="#id28" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Tomoatsu Shimada</li>
 <li>Akio Tajima</li>
@@ -525,8 +599,8 @@ This change not to contain such a metadata as search results.</li>
 </div>
 <div class="section" id="release-2-0-8-2012-10-29">
 <span id="release-2-0-8"></span><h2>Release 2.0.8 - 2012/10/29<a class="headerlink" href="#release-2-0-8-2012-10-29" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id26">
-<h3>Improvements<a class="headerlink" href="#id26" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id29">
+<h3>Improvements<a class="headerlink" href="#id29" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>[rpm] Improved the description of server-http and httpd packages.
 [Suggested by Daiki Ueno]</li>
@@ -538,8 +612,8 @@ This change not to contain such a metadata as search results.</li>
 [Reported by serihiro]</li>
 </ul>
 </div>
-<div class="section" id="id27">
-<h3>Fixes<a class="headerlink" href="#id27" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id30">
+<h3>Fixes<a class="headerlink" href="#id30" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>[rpm] Fixed to remove needless &quot;Requires&quot; from spec file.
 [Reported by Daiki Ueno]</li>
@@ -550,8 +624,8 @@ This change not to contain such a metadata as search results.</li>
 <li>[deb] Fixed to bundle missing table plugin.</li>
 </ul>
 </div>
-<div class="section" id="id28">
-<h3>Thanks<a class="headerlink" href="#id28" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id31">
+<h3>Thanks<a class="headerlink" href="#id31" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Daiki Ueno</li>
 <li>firewood</li>
@@ -561,8 +635,8 @@ This change not to contain such a metadata as search results.</li>
 </div>
 <div class="section" id="release-2-0-7-2012-09-29">
 <span id="release-2-0-7"></span><h2>Release 2.0.7 - 2012/09/29<a class="headerlink" href="#release-2-0-7-2012-09-29" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id29">
-<h3>Improvements<a class="headerlink" href="#id29" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id32">
+<h3>Improvements<a class="headerlink" href="#id32" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>[doc] Added more descriptions about <tt class="docutils literal"><span class="pre">--query_flags</span></tt>.</li>
 <li>[doc][httpd] Added sample configuration for gzip compression.</li>
@@ -578,8 +652,8 @@ This change not to contain such a metadata as search results.</li>
 <li>Added <tt class="docutils literal"><span class="pre">min()</span></tt> function.</li>
 </ul>
 </div>
-<div class="section" id="id30">
-<h3>Fixes<a class="headerlink" href="#id30" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id33">
+<h3>Fixes<a class="headerlink" href="#id33" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Fixed to set domain to vector elements to <tt class="docutils literal"><span class="pre">load</span></tt> command. [GitHub#30]</li>
 <li>[httpd] Fixed missing NULL initialization. [Reported by &#64;Kiske]</li>
@@ -590,8 +664,8 @@ This change not to contain such a metadata as search results.</li>
 <li>Fixed a bug that Time -&gt; Float cast breaks value.</li>
 </ul>
 </div>
-<div class="section" id="id31">
-<h3>Thanks<a class="headerlink" href="#id31" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id34">
+<h3>Thanks<a class="headerlink" href="#id34" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>&#64;Kiske</li>
 </ul>
@@ -599,8 +673,8 @@ This change not to contain such a metadata as search results.</li>
 </div>
 <div class="section" id="release-2-0-6-2012-08-29">
 <span id="release-2-0-6"></span><h2>Release 2.0.6 - 2012/08/29<a class="headerlink" href="#release-2-0-6-2012-08-29" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id32">
-<h3>Improvements<a class="headerlink" href="#id32" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id35">
+<h3>Improvements<a class="headerlink" href="#id35" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>[deb][rpm] Added <tt class="docutils literal"><span class="pre">groonga-server-common</span></tt> meta package. [#1451]</li>
 <li>Supported <tt class="docutils literal"><span class="pre">--query_flags</span></tt> option to <tt class="docutils literal"><span class="pre">select</span></tt> command.</li>
@@ -621,8 +695,8 @@ This change not to contain such a metadata as search results.</li>
 <li>Supported '-WORD' in <tt class="docutils literal"><span class="pre">--query</span></tt> of the select command.</li>
 </ul>
 </div>
-<div class="section" id="id33">
-<h3>Fixes<a class="headerlink" href="#id33" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id36">
+<h3>Fixes<a class="headerlink" href="#id36" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>[doc] Fixed the execution examples. [#1428]
 [Reported by IWAI, Masaharu]</li>
@@ -637,8 +711,8 @@ by executing <tt class="docutils literal"><span class="pre">clearlock</span></tt
 [Reported by &#64;yito]</li>
 </ul>
 </div>
-<div class="section" id="id34">
-<h3>Thanks<a class="headerlink" href="#id34" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id37">
+<h3>Thanks<a class="headerlink" href="#id37" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>IWAI, Masaharu</li>
 <li>&#64;yito</li>
@@ -647,8 +721,8 @@ by executing <tt class="docutils literal"><span class="pre">clearlock</span></tt
 </div>
 <div class="section" id="release-2-0-5-2012-07-29">
 <span id="release-2-0-5"></span><h2>Release 2.0.5 - 2012/07/29<a class="headerlink" href="#release-2-0-5-2012-07-29" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id35">
-<h3>Improvements<a class="headerlink" href="#id35" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id38">
+<h3>Improvements<a class="headerlink" href="#id38" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Supported calculating the value of distance with &quot;rect&quot; or &quot;rectangle&quot;
 argument in southern hemisphere. [#1418] [#1419] [#1420] [#1421]</li>
@@ -673,8 +747,8 @@ argument in southern hemisphere. [#1418] [#1419] [#1420] [#1421]</li>
 <li>Supported to open locked database. [GitHub#21]</li>
 </ul>
 </div>
-<div class="section" id="id36">
-<h3>Fixes<a class="headerlink" href="#id36" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id39">
+<h3>Fixes<a class="headerlink" href="#id39" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Fixed a build problem about groonga-httpd on Mac OS X.
 [Reported by SHIMADA Koji]</li>
@@ -690,8 +764,8 @@ argument in southern hemisphere. [#1418] [#1419] [#1420] [#1421]</li>
 [#1429] [Reported by IWAI, Masaharu]</li>
 </ul>
 </div>
-<div class="section" id="id37">
-<h3>Thanks<a class="headerlink" href="#id37" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id40">
+<h3>Thanks<a class="headerlink" href="#id40" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>SHIMADA Koji</li>
 <li>IWAI, Masaharu</li>
@@ -700,8 +774,8 @@ argument in southern hemisphere. [#1418] [#1419] [#1420] [#1421]</li>
 </div>
 <div class="section" id="release-2-0-4-2012-06-29">
 <span id="release-2-0-4"></span><h2>Release 2.0.4 - 2012/06/29<a class="headerlink" href="#release-2-0-4-2012-06-29" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id38">
-<h3>Improvements<a class="headerlink" href="#id38" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id41">
+<h3>Improvements<a class="headerlink" href="#id41" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Supported only KyTea 0.4.2.</li>
 <li>Dropped KyTea 0.4.1 or ealier support.</li>
@@ -728,8 +802,8 @@ See <a class="reference internal" href="reference/grn_expr/query_syntax.html#con
 [GitHub#18] [Patch by IWAI, Masaharu]</li>
 </ul>
 </div>
-<div class="section" id="id39">
-<h3>Fixes<a class="headerlink" href="#id39" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id42">
+<h3>Fixes<a class="headerlink" href="#id42" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Fixed a problem that display of command prompt changes to not intended state
 by using batch mode on Mac OS X.
@@ -738,8 +812,8 @@ by using batch mode on Mac OS X.
 <li>Fixed a problem that '=R' is treated as 'OR' in <tt class="docutils literal"><span class="pre">--query</span></tt> syntax. [#1393]</li>
 </ul>
 </div>
-<div class="section" id="id40">
-<h3>Thanks<a class="headerlink" href="#id40" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id43">
+<h3>Thanks<a class="headerlink" href="#id43" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>&#64;soundkitchen</li>
 <li>IWAI, Masaharu</li>
@@ -748,8 +822,8 @@ by using batch mode on Mac OS X.
 </div>
 <div class="section" id="release-2-0-3-2012-05-29">
 <span id="release-2-0-3"></span><h2>Release 2.0.3 - 2012/05/29<a class="headerlink" href="#release-2-0-3-2012-05-29" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id41">
-<h3>Improvements<a class="headerlink" href="#id41" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id44">
+<h3>Improvements<a class="headerlink" href="#id44" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>[doc] Added about release procedure.</li>
 <li>Removed restriction that the max number of opened files is 4096.</li>
@@ -773,8 +847,8 @@ groonga-repository to groonga-release to follow RPM package name
 convension such as centos-release and fedora-release.</li>
 </ul>
 </div>
-<div class="section" id="id42">
-<h3>Fixes<a class="headerlink" href="#id42" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id45">
+<h3>Fixes<a class="headerlink" href="#id45" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>[doc] Fixed a command to update yum repository.
 [Suggested by IWAI, Masaharu]</li>
@@ -787,8 +861,8 @@ expression. [#1372]</li>
 <li>Fixed a bug that a record key registered via index source isn't normalized.</li>
 </ul>
 </div>
-<div class="section" id="id43">
-<h3>Thanks<a class="headerlink" href="#id43" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id46">
+<h3>Thanks<a class="headerlink" href="#id46" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>IWAI, Masaharu</li>
 </ul>
@@ -811,8 +885,8 @@ package sign key before updating groogna packages.</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="id44">
-<h3>Improvements<a class="headerlink" href="#id44" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id47">
+<h3>Improvements<a class="headerlink" href="#id47" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>[pkg-config] Removed needless MessagePack dependency.</li>
 <li>[rpm][fedora] Supported libedit. [#1325] [Suggested by IWAI, Masaharu]</li>
@@ -832,8 +906,8 @@ is the similar search syntax. [#1342]</li>
 package sign key.</li>
 </ul>
 </div>
-<div class="section" id="id45">
-<h3>Fixes<a class="headerlink" href="#id45" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id48">
+<h3>Fixes<a class="headerlink" href="#id48" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>[deb][rpm] Used <tt class="docutils literal"><span class="pre">--bind-address</span></tt> option instead of deprecated
 <tt class="docutils literal"><span class="pre">--address</span></tt> option.
@@ -855,8 +929,8 @@ inverted index. [#1329]</li>
 [#1340] [Reported by Shinya Kawaji]</li>
 </ul>
 </div>
-<div class="section" id="id46">
-<h3>Thanks<a class="headerlink" href="#id46" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id49">
+<h3>Thanks<a class="headerlink" href="#id49" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>IWAI, Masaharu</li>
 <li>Daiki Ueno</li>
@@ -866,8 +940,8 @@ inverted index. [#1329]</li>
 </div>
 <div class="section" id="release-2-0-1-2012-03-29">
 <span id="release-2-0-1"></span><h2>Release 2.0.1 - 2012/03/29<a class="headerlink" href="#release-2-0-1-2012-03-29" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id47">
-<h3>Improvements<a class="headerlink" href="#id47" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id50">
+<h3>Improvements<a class="headerlink" href="#id50" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Supported build in other directory.
 [#1298] [Reported by Kazuhiko]</li>
@@ -889,8 +963,8 @@ check. [#1289]</li>
 <li><tt class="docutils literal"><span class="pre">grn_snip</span></tt> uses <tt class="docutils literal"><span class="pre">grn_obj</span></tt> mechanism. [#1054]</li>
 </ul>
 </div>
-<div class="section" id="id48">
-<h3>Fixes<a class="headerlink" href="#id48" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id51">
+<h3>Fixes<a class="headerlink" href="#id51" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Fixed a bug that uninstall task doesn't uninstall installed Ruby
 scripts. [#1299] [Reported by Kazuhiko]</li>
@@ -901,8 +975,8 @@ only used by mroonga. [#1303]</li>
 <li>Fixed a bug that latin1 normalization may access unexpected memory.</li>
 </ul>
 </div>
-<div class="section" id="id49">
-<h3>Thanks<a class="headerlink" href="#id49" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id52">
+<h3>Thanks<a class="headerlink" href="#id52" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Kazuhiko</li>
 <li>Markus Elfring</li>
@@ -911,8 +985,8 @@ only used by mroonga. [#1303]</li>
 </div>
 <div class="section" id="release-2-0-0-2012-02-29">
 <span id="release-2-0-0"></span><h2>Release 2.0.0 - 2012/02/29<a class="headerlink" href="#release-2-0-0-2012-02-29" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id50">
-<h3>Improvements<a class="headerlink" href="#id50" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id53">
+<h3>Improvements<a class="headerlink" href="#id53" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>[dat] Added 0 length key check.</li>
 <li>[windows] Added missing GCC related DLLs. [groonga-dev,00686]
@@ -936,8 +1010,8 @@ only used by mroonga. [#1303]</li>
 <li>[windows] Supported MessagePack.</li>
 </ul>
 </div>
-<div class="section" id="id51">
-<h3>Fixes<a class="headerlink" href="#id51" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id54">
+<h3>Fixes<a class="headerlink" href="#id54" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>[pat] Fixed a bug that the last node can't be found. [#1258]</li>
 <li>[doc] Fixed links in Japanese page. [Reported by &#64;naoina]</li>
@@ -947,8 +1021,8 @@ only used by mroonga. [#1303]</li>
 [Reported by &#64;wareohji]</li>
 </ul>
 </div>
-<div class="section" id="id52">
-<h3>Thanks<a class="headerlink" href="#id52" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id55">
+<h3>Thanks<a class="headerlink" href="#id55" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Suzuki</li>
 <li>Daiki Ueno</li>
@@ -961,8 +1035,8 @@ only used by mroonga. [#1303]</li>
 </div>
 <div class="section" id="release-1-3-0-2012-01-29">
 <span id="release-1-3-0"></span><h2>Release 1.3.0 - 2012/01/29<a class="headerlink" href="#release-1-3-0-2012-01-29" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id53">
-<h3>Improvements<a class="headerlink" href="#id53" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id56">
+<h3>Improvements<a class="headerlink" href="#id56" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Supported dynamic DB key table change by
 GRN_DB_KEY=pat or GRN_DB_KEY=dat environment variable value.</li>
@@ -997,8 +1071,8 @@ USE_OFFLINE_INDEXER=yes environment variable.</li>
 <li>Added <tt class="docutils literal"><span class="pre">column_rename</span></tt>. [#1234]</li>
 </ul>
 </div>
-<div class="section" id="id54">
-<h3>Thanks<a class="headerlink" href="#id54" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id57">
+<h3>Thanks<a class="headerlink" href="#id57" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>montywi</li>
 <li>Masaharu IWAI</li>
@@ -1119,124 +1193,130 @@ USE_OFFLINE_INDEXER=yes environment variable.</li>
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">News</a><ul>
-<li><a class="reference internal" href="#release-3-0-6-2013-07-29">Release 3.0.6 - 2013/07/29</a><ul>
+<li><a class="reference internal" href="#release-3-0-7-2013-08-29">Release 3.0.7 - 2013/08/29</a><ul>
 <li><a class="reference internal" href="#improvements">Improvements</a></li>
 <li><a class="reference internal" href="#fixes">Fixes</a></li>
 <li><a class="reference internal" href="#thanks">Thanks</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#release-3-0-5-2013-06-29">Release 3.0.5 - 2013/06/29</a><ul>
+<li><a class="reference internal" href="#release-3-0-6-2013-07-29">Release 3.0.6 - 2013/07/29</a><ul>
 <li><a class="reference internal" href="#id1">Improvements</a></li>
 <li><a class="reference internal" href="#id2">Fixes</a></li>
 <li><a class="reference internal" href="#id3">Thanks</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#release-3-0-4-2013-05-29">Release 3.0.4 - 2013/05/29</a><ul>
+<li><a class="reference internal" href="#release-3-0-5-2013-06-29">Release 3.0.5 - 2013/06/29</a><ul>
 <li><a class="reference internal" href="#id4">Improvements</a></li>
 <li><a class="reference internal" href="#id5">Fixes</a></li>
 <li><a class="reference internal" href="#id6">Thanks</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#release-3-0-3-2013-04-29">Release 3.0.3 - 2013/04/29</a><ul>
+<li><a class="reference internal" href="#release-3-0-4-2013-05-29">Release 3.0.4 - 2013/05/29</a><ul>
 <li><a class="reference internal" href="#id7">Improvements</a></li>
+<li><a class="reference internal" href="#id8">Fixes</a></li>
+<li><a class="reference internal" href="#id9">Thanks</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#release-3-0-3-2013-04-29">Release 3.0.3 - 2013/04/29</a><ul>
+<li><a class="reference internal" href="#id10">Improvements</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#release-3-0-2-2013-03-29">Release 3.0.2 - 2013/03/29</a><ul>
-<li><a class="reference internal" href="#id8">Improvements</a></li>
-<li><a class="reference internal" href="#id9">Fixes</a></li>
-<li><a class="reference internal" href="#id10">Thanks</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#release-3-0-1-2013-02-28">Release 3.0.1 - 2013/02/28</a><ul>
 <li><a class="reference internal" href="#id11">Improvements</a></li>
 <li><a class="reference internal" href="#id12">Fixes</a></li>
 <li><a class="reference internal" href="#id13">Thanks</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#release-3-0-0-2013-02-09">Release 3.0.0 - 2013/02/09</a><ul>
-<li><a class="reference internal" href="#id14">Fixes</a></li>
-<li><a class="reference internal" href="#id15">Thanks</a></li>
+<li><a class="reference internal" href="#release-3-0-1-2013-02-28">Release 3.0.1 - 2013/02/28</a><ul>
+<li><a class="reference internal" href="#id14">Improvements</a></li>
+<li><a class="reference internal" href="#id15">Fixes</a></li>
+<li><a class="reference internal" href="#id16">Thanks</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#release-2-1-2-2013-01-29">Release 2.1.2 - 2013/01/29</a><ul>
-<li><a class="reference internal" href="#id16">Improvements</a></li>
+<li><a class="reference internal" href="#release-3-0-0-2013-02-09">Release 3.0.0 - 2013/02/09</a><ul>
 <li><a class="reference internal" href="#id17">Fixes</a></li>
 <li><a class="reference internal" href="#id18">Thanks</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#release-2-1-2-2013-01-29">Release 2.1.2 - 2013/01/29</a><ul>
+<li><a class="reference internal" href="#id19">Improvements</a></li>
+<li><a class="reference internal" href="#id20">Fixes</a></li>
+<li><a class="reference internal" href="#id21">Thanks</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#release-2-1-1-2012-12-29">Release 2.1.1 - 2012/12/29</a><ul>
-<li><a class="reference internal" href="#id19">Fixes</a></li>
+<li><a class="reference internal" href="#id22">Fixes</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#release-2-1-0-2012-12-29">Release 2.1.0 - 2012/12/29</a><ul>
-<li><a class="reference internal" href="#id20">Improvements</a></li>
-<li><a class="reference internal" href="#id21">Fixes</a></li>
-<li><a class="reference internal" href="#id22">Thanks</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#release-2-0-9-2012-11-29">Release 2.0.9 - 2012/11/29</a><ul>
 <li><a class="reference internal" href="#id23">Improvements</a></li>
 <li><a class="reference internal" href="#id24">Fixes</a></li>
 <li><a class="reference internal" href="#id25">Thanks</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#release-2-0-8-2012-10-29">Release 2.0.8 - 2012/10/29</a><ul>
+<li><a class="reference internal" href="#release-2-0-9-2012-11-29">Release 2.0.9 - 2012/11/29</a><ul>
 <li><a class="reference internal" href="#id26">Improvements</a></li>
 <li><a class="reference internal" href="#id27">Fixes</a></li>
 <li><a class="reference internal" href="#id28">Thanks</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#release-2-0-7-2012-09-29">Release 2.0.7 - 2012/09/29</a><ul>
+<li><a class="reference internal" href="#release-2-0-8-2012-10-29">Release 2.0.8 - 2012/10/29</a><ul>
 <li><a class="reference internal" href="#id29">Improvements</a></li>
 <li><a class="reference internal" href="#id30">Fixes</a></li>
 <li><a class="reference internal" href="#id31">Thanks</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#release-2-0-6-2012-08-29">Release 2.0.6 - 2012/08/29</a><ul>
+<li><a class="reference internal" href="#release-2-0-7-2012-09-29">Release 2.0.7 - 2012/09/29</a><ul>
 <li><a class="reference internal" href="#id32">Improvements</a></li>
 <li><a class="reference internal" href="#id33">Fixes</a></li>
 <li><a class="reference internal" href="#id34">Thanks</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#release-2-0-5-2012-07-29">Release 2.0.5 - 2012/07/29</a><ul>
+<li><a class="reference internal" href="#release-2-0-6-2012-08-29">Release 2.0.6 - 2012/08/29</a><ul>
 <li><a class="reference internal" href="#id35">Improvements</a></li>
 <li><a class="reference internal" href="#id36">Fixes</a></li>
 <li><a class="reference internal" href="#id37">Thanks</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#release-2-0-4-2012-06-29">Release 2.0.4 - 2012/06/29</a><ul>
+<li><a class="reference internal" href="#release-2-0-5-2012-07-29">Release 2.0.5 - 2012/07/29</a><ul>
 <li><a class="reference internal" href="#id38">Improvements</a></li>
 <li><a class="reference internal" href="#id39">Fixes</a></li>
 <li><a class="reference internal" href="#id40">Thanks</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#release-2-0-3-2012-05-29">Release 2.0.3 - 2012/05/29</a><ul>
+<li><a class="reference internal" href="#release-2-0-4-2012-06-29">Release 2.0.4 - 2012/06/29</a><ul>
 <li><a class="reference internal" href="#id41">Improvements</a></li>
 <li><a class="reference internal" href="#id42">Fixes</a></li>
 <li><a class="reference internal" href="#id43">Thanks</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#release-2-0-2-2012-04-29">Release 2.0.2 - 2012/04/29</a><ul>
+<li><a class="reference internal" href="#release-2-0-3-2012-05-29">Release 2.0.3 - 2012/05/29</a><ul>
 <li><a class="reference internal" href="#id44">Improvements</a></li>
 <li><a class="reference internal" href="#id45">Fixes</a></li>
 <li><a class="reference internal" href="#id46">Thanks</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#release-2-0-1-2012-03-29">Release 2.0.1 - 2012/03/29</a><ul>
+<li><a class="reference internal" href="#release-2-0-2-2012-04-29">Release 2.0.2 - 2012/04/29</a><ul>
 <li><a class="reference internal" href="#id47">Improvements</a></li>
 <li><a class="reference internal" href="#id48">Fixes</a></li>
 <li><a class="reference internal" href="#id49">Thanks</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#release-2-0-0-2012-02-29">Release 2.0.0 - 2012/02/29</a><ul>
+<li><a class="reference internal" href="#release-2-0-1-2012-03-29">Release 2.0.1 - 2012/03/29</a><ul>
 <li><a class="reference internal" href="#id50">Improvements</a></li>
 <li><a class="reference internal" href="#id51">Fixes</a></li>
 <li><a class="reference internal" href="#id52">Thanks</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#release-1-3-0-2012-01-29">Release 1.3.0 - 2012/01/29</a><ul>
+<li><a class="reference internal" href="#release-2-0-0-2012-02-29">Release 2.0.0 - 2012/02/29</a><ul>
 <li><a class="reference internal" href="#id53">Improvements</a></li>
-<li><a class="reference internal" href="#id54">Thanks</a></li>
+<li><a class="reference internal" href="#id54">Fixes</a></li>
+<li><a class="reference internal" href="#id55">Thanks</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#release-1-3-0-2012-01-29">Release 1.3.0 - 2012/01/29</a><ul>
+<li><a class="reference internal" href="#id56">Improvements</a></li>
+<li><a class="reference internal" href="#id57">Thanks</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#the-old-releases">The old releases</a><ul>
@@ -1274,7 +1354,7 @@ USE_OFFLINE_INDEXER=yes environment variable.</li>
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
-        <li><a href="index.html">groonga v3.0.6 documentation</a> &raquo;</li> 
+        <li><a href="index.html">groonga v3.0.7 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

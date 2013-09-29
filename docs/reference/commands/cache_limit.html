@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>8.3.4. cache_limit &mdash; groonga v3.0.7 documentation</title>
+    <title>8.3.4. cache_limit &mdash; groonga v3.0.8 documentation</title>
     
     <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '3.0.7',
+        VERSION:     '3.0.8',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../../static/underscore.js"></script>
     <script type="text/javascript" src="../../static/doctools.js"></script>
     <link rel="shortcut icon" href="../../static/favicon.ico"/>
-    <link rel="top" title="groonga v3.0.7 documentation" href="../../index.html" />
+    <link rel="top" title="groonga v3.0.8 documentation" href="../../index.html" />
     <link rel="up" title="8.3. Command" href="../command.html" />
     <link rel="next" title="8.3.5. check" href="check.html" />
     <link rel="prev" title="8.3.3. Return code" href="../command/return_code.html" /> 
@@ -75,7 +75,7 @@
         <li class="right" >
           <a href="../command/return_code.html" title="8.3.3. Return code"
              accesskey="P">previous</a> |</li>
-        <li><a href="../../index.html">groonga v3.0.7 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">groonga v3.0.8 documentation</a> &raquo;</li>
           <li><a href="../../reference.html" >8. リファレンスマニュアル</a> &raquo;</li>
           <li><a href="../command.html" accesskey="U">8.3. Command</a> &raquo;</li> 
       </ul>
@@ -87,48 +87,75 @@
           <div class="body">
             
   <div class="section" id="cache-limit">
-<h1>8.3.4. cache_limit<a class="headerlink" href="#cache-limit" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="id1">
-<h2>8.3.4.1. 名前<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
-<p>cache_limit - cacheサイズの設定・取得</p>
+<h1>8.3.4. <tt class="docutils literal"><span class="pre">cache_limit</span></tt><a class="headerlink" href="#cache-limit" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="summary">
+<h2>8.3.4.1. Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">cache_limit</span></tt> gets or sets the max number of query cache
+entries. Query cache is used only by <a class="reference internal" href="select.html"><em>select</em></a> command.</p>
+<p>If the max number of query cache entries is 100, the recent 100
+<tt class="docutils literal"><span class="pre">select</span></tt> commands are only cached. The cache expire algorithm is LRU
+(least recently used).</p>
 </div>
-<div class="section" id="id2">
-<h2>8.3.4.2. 書式<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-none"><div class="highlight"><pre>cache_limit max
+<div class="section" id="syntax">
+<h2>8.3.4.2. Syntax<a class="headerlink" href="#syntax" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">cache_limit</span></tt> has one optional parameter:</p>
+<div class="highlight-none"><div class="highlight"><pre>cache_limit [max=null]
 </pre></div>
 </div>
 </div>
-<div class="section" id="id3">
-<h2>8.3.4.3. 説明<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
-<p>groonga組込コマンドの一つであるcache_limitについて説明します。組込コマンドは、groonga実行ファイルの引数、標準入力、またはソケット経由でgroongaサーバにリクエストを送信することによって実行します。</p>
-<p>cache_limitは、クエリキャッシュの最大件数を取得したり設定したりします。</p>
+<div class="section" id="usage">
+<h2>8.3.4.3. Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>You can get the current max number of cache entries by executing
+<tt class="docutils literal"><span class="pre">cache_limit</span></tt> without parameter.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>cache_limit
+# [[0, 1337566253.89858, 0.000355720520019531], 100]
+</pre></div>
 </div>
-<div class="section" id="id4">
-<h2>8.3.4.4. 引数<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
-<p><tt class="docutils literal"><span class="pre">max</span></tt></p>
+<p>You can set the max number of cache entries by executing <tt class="docutils literal"><span class="pre">cache_limit</span></tt>
+with <tt class="docutils literal"><span class="pre">max</span></tt> parameter.</p>
+<p>Here is an example that sets <tt class="docutils literal"><span class="pre">10</span></tt> as the max number of cache
+entries.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>cache_limit 10
+# [[0, 1337566253.89858, 0.000355720520019531], 100]
+cache_limit
+# [[0, 1337566253.89858, 0.000355720520019531], 10]
+</pre></div>
+</div>
+<p>If <tt class="docutils literal"><span class="pre">max</span></tt> parameter is used, the return value is the max number of
+cache entries before <tt class="docutils literal"><span class="pre">max</span></tt> parameter is set.</p>
+</div>
+<div class="section" id="parameters">
+<h2>8.3.4.4. Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+<p>This section describes all parameters.</p>
+<div class="section" id="max">
+<h3>8.3.4.4.1. <tt class="docutils literal"><span class="pre">max</span></tt><a class="headerlink" href="#max" title="Permalink to this headline">¶</a></h3>
+<p>It specifies the max number of query cache entries as a number.</p>
+<p>If <tt class="docutils literal"><span class="pre">max</span></tt> parameter isn't specified, the current max number of query
+cache entries isn't changed. <tt class="docutils literal"><span class="pre">cache_limit</span></tt> just returns the current
+max number of query cache entries.</p>
+</div>
+</div>
+<div class="section" id="return-value">
+<h2>8.3.4.5. Return value<a class="headerlink" href="#return-value" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">cache_limit</span></tt> returns the current max number of query cache entries:</p>
+<div class="highlight-none"><div class="highlight"><pre>[[HEADER, n_entries]]
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">HEADER</span></tt></p>
 <blockquote>
-<div>クエリキャッシュの最大件数を整数で指定します。
-maxが指定されなかった場合には、クエリキャッシュの最大件数は変更せず、
-現在の設定値のみが返されます。</div></blockquote>
-</div>
-<div class="section" id="id5">
-<h2>8.3.4.5. 返値<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="json">
-<h3>8.3.4.5.1. json<a class="headerlink" href="#json" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-none"><div class="highlight"><pre>[以前の設定値]
-</pre></div>
-</div>
-<p><tt class="docutils literal"><span class="pre">以前の設定値</span></tt></p>
+<div>See <a class="reference internal" href="../command/output_format.html"><em>Output format</em></a> about <tt class="docutils literal"><span class="pre">HEADER</span></tt>.</div></blockquote>
+<p><tt class="docutils literal"><span class="pre">n_entries</span></tt></p>
 <blockquote>
-<div>すでに設定されていたクエリキャッシュの最大件数を返す。</div></blockquote>
+<div><tt class="docutils literal"><span class="pre">n_entries</span></tt> is the current max number of query cache entries. It
+is a number.</div></blockquote>
 </div>
-</div>
-<div class="section" id="id6">
-<h2>8.3.4.6. 例<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-none"><div class="highlight"><pre>cache_limit 4
-[100]
-</pre></div>
-</div>
+<div class="section" id="see-also">
+<h2>8.3.4.6. See also<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference internal" href="select.html"><em>select</em></a></li>
+</ul>
 </div>
 </div>
 
@@ -140,16 +167,16 @@ maxが指定されなかった場合には、クエリキャッシュの最大�
         <div class="sphinxsidebarwrapper">
   <h3><a href="../../index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">8.3.4. cache_limit</a><ul>
-<li><a class="reference internal" href="#id1">8.3.4.1. 名前</a></li>
-<li><a class="reference internal" href="#id2">8.3.4.2. 書式</a></li>
-<li><a class="reference internal" href="#id3">8.3.4.3. 説明</a></li>
-<li><a class="reference internal" href="#id4">8.3.4.4. 引数</a></li>
-<li><a class="reference internal" href="#id5">8.3.4.5. 返値</a><ul>
-<li><a class="reference internal" href="#json">8.3.4.5.1. json</a></li>
+<li><a class="reference internal" href="#">8.3.4. <tt class="docutils literal"><span class="pre">cache_limit</span></tt></a><ul>
+<li><a class="reference internal" href="#summary">8.3.4.1. Summary</a></li>
+<li><a class="reference internal" href="#syntax">8.3.4.2. Syntax</a></li>
+<li><a class="reference internal" href="#usage">8.3.4.3. Usage</a></li>
+<li><a class="reference internal" href="#parameters">8.3.4.4. Parameters</a><ul>
+<li><a class="reference internal" href="#max">8.3.4.4.1. <tt class="docutils literal"><span class="pre">max</span></tt></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id6">8.3.4.6. 例</a></li>
+<li><a class="reference internal" href="#return-value">8.3.4.5. Return value</a></li>
+<li><a class="reference internal" href="#see-also">8.3.4.6. See also</a></li>
 </ul>
 </li>
 </ul>
@@ -194,7 +221,7 @@ maxが指定されなかった場合には、クエリキャッシュの最大�
         <li class="right" >
           <a href="../command/return_code.html" title="8.3.3. Return code"
              >previous</a> |</li>
-        <li><a href="../../index.html">groonga v3.0.7 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">groonga v3.0.8 documentation</a> &raquo;</li>
           <li><a href="../../reference.html" >8. リファレンスマニュアル</a> &raquo;</li>
           <li><a href="../command.html" >8.3. Command</a> &raquo;</li> 
       </ul>

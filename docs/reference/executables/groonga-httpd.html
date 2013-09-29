@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>8.1.4. groonga-httpd &mdash; groonga v3.0.7 documentation</title>
+    <title>8.1.4. groonga-httpd &mdash; groonga v3.0.8 documentation</title>
     
     <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '3.0.7',
+        VERSION:     '3.0.8',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../../static/underscore.js"></script>
     <script type="text/javascript" src="../../static/doctools.js"></script>
     <link rel="shortcut icon" href="../../static/favicon.ico"/>
-    <link rel="top" title="groonga v3.0.7 documentation" href="../../index.html" />
+    <link rel="top" title="groonga v3.0.8 documentation" href="../../index.html" />
     <link rel="up" title="8.1. 実行ファイル" href="../executables.html" />
     <link rel="next" title="8.1.5. groonga HTTPサーバー" href="groonga-server-http.html" />
     <link rel="prev" title="8.1.3. groonga command" href="groonga.html" /> 
@@ -75,7 +75,7 @@
         <li class="right" >
           <a href="groonga.html" title="8.1.3. groonga command"
              accesskey="P">previous</a> |</li>
-        <li><a href="../../index.html">groonga v3.0.7 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">groonga v3.0.8 documentation</a> &raquo;</li>
           <li><a href="../../reference.html" >8. リファレンスマニュアル</a> &raquo;</li>
           <li><a href="../executables.html" accesskey="U">8.1. 実行ファイル</a> &raquo;</li> 
       </ul>
@@ -319,6 +319,44 @@ default is <tt class="docutils literal"><span class="pre">notice</span></tt>. Yo
 </pre></div>
 </div>
 </div>
+<div class="section" id="groonga-query-log-path">
+<span id="id3"></span><h4>8.1.4.4.1.7. <tt class="docutils literal"><span class="pre">groonga_query_log_path</span></tt><a class="headerlink" href="#groonga-query-log-path" title="Permalink to this headline">¶</a></h4>
+<p>Synopsis:</p>
+<div class="highlight-none"><div class="highlight"><pre>groonga_query_log_path path | off;
+</pre></div>
+</div>
+<dl class="docutils">
+<dt>Default</dt>
+<dd><tt class="docutils literal"><span class="pre">/var/log/groonga/httpd/groonga-query.log</span></tt></dd>
+<dt>Context</dt>
+<dd><tt class="docutils literal"><span class="pre">http</span></tt>, <tt class="docutils literal"><span class="pre">server</span></tt>, <tt class="docutils literal"><span class="pre">location</span></tt></dd>
+</dl>
+<p>Specifies groonga's query log path in the <tt class="docutils literal"><span class="pre">http</span></tt>, <tt class="docutils literal"><span class="pre">server</span></tt> or
+<tt class="docutils literal"><span class="pre">location</span></tt> block. The default is
+<tt class="docutils literal"><span class="pre">/var/log/groonga/httpd/groonga-query.log</span></tt>.  You can disable logging
+to specify <tt class="docutils literal"><span class="pre">off</span></tt>.</p>
+<p>Examples:</p>
+<div class="highlight-none"><div class="highlight"><pre>location /d/ {
+  groonga on;
+  # You can disable query log for groonga.
+  groonga_query_log_path off;
+}
+</pre></div>
+</div>
+<p>Query log is useful for the following cases:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Detecting slow query.</li>
+<li>Debugging.</li>
+</ul>
+</div></blockquote>
+<p>You can analyze your query log by <a class="reference external" href="https://github.com/groonga/groonga-query-log">groonga-query-log package</a>. The package provides
+useful tools.</p>
+<p>For example, there is a tool that analyzing your query log. It can
+detect slow queries from your query log. There is a tool that
+replaying same queries in your query log. It can test the new groonga
+before updating production environment.</p>
+</div>
 </div>
 <div class="section" id="performance-related-directives">
 <h3>8.1.4.4.2. Performance related directives<a class="headerlink" href="#performance-related-directives" title="Permalink to this headline">¶</a></h3>
@@ -332,11 +370,120 @@ multi-CPU/core systems, it's essential to set this accordingly.</p>
 see <a class="reference external" href="http://wiki.nginx.org/CoreModule#worker_processes">http://wiki.nginx.org/CoreModule#worker_processes</a>.</p>
 <p>By default, this is set to 1. It is nginx's default.</p>
 </div>
+<div class="section" id="proxy-cache">
+<h4>8.1.4.4.2.2. <tt class="docutils literal"><span class="pre">proxy_cache</span></tt><a class="headerlink" href="#proxy-cache" title="Permalink to this headline">¶</a></h4>
+<p>In short, you can use nginx's reverse proxy and cache mechanism
+instead of groonga's built-in query cache feature.</p>
+<div class="section" id="query-cache">
+<h5>8.1.4.4.2.2.1. Query cache<a class="headerlink" href="#query-cache" title="Permalink to this headline">¶</a></h5>
+<p>Groonga has query cache feature for <a class="reference internal" href="../commands/select.html"><em>select</em></a>
+command. The feature improves performance in many cases.</p>
+<p>Query cache feature works well on groonga-httpd except you use
+<a class="reference internal" href="../commands/cache_limit.html"><em>cache_limit</em></a> command on 2 or more
+workers. Normally, <a class="reference internal" href="../commands/cache_limit.html"><em>cache_limit</em></a> command
+isn't used. So there is no problem on many cases.</p>
+<p>Here is a description about a problem of using
+<a class="reference internal" href="../commands/cache_limit.html"><em>cache_limit</em></a> command on 2 or more workers.</p>
+<p>Groonga's query cache is available in the same process. It means that
+workers can't share the cache. If you don't change cache size, it
+isn't a big problem. If you want to change cache size by
+<a class="reference internal" href="../commands/cache_limit.html"><em>cache_limit</em></a> command, there is a problem.</p>
+<p>There is no portable ways to change cache size for all workers.</p>
+<p>For example, there are 3 workers:</p>
+<div class="highlight-none"><div class="highlight"><pre>                                   +-- worker 1
+client -- groonga-httpd (master) --+-- worker 2
+                                   +-- worker 3
+</pre></div>
+</div>
+<p>The client requests <a class="reference internal" href="../commands/cache_limit.html"><em>cache_limit</em></a> command and
+the worker 1 receives it:</p>
+<div class="highlight-none"><div class="highlight"><pre>                                   +-&gt; worker 1 (changed!)
+client -&gt; groonga-httpd (master) --+-- worker 2
+                                   +-- worker 3
+</pre></div>
+</div>
+<p>The client requests <a class="reference internal" href="../commands/cache_limit.html"><em>cache_limit</em></a> command
+again and the worker 1 receives it again:</p>
+<div class="highlight-none"><div class="highlight"><pre>                                   +-&gt; worker 1 (changed again!!!)
+client -&gt; groonga-httpd (master) --+-- worker 2
+                                   +-- worker 3
+</pre></div>
+</div>
+<p>In this case, the worker 2 and the worker 3 aren't received any
+requests. So they don't change cache size.</p>
+<p>You can't choose a worker. So you can't change cache sizes of all
+workers by <a class="reference internal" href="../commands/cache_limit.html"><em>cache_limit</em></a> command.</p>
+</div>
+<div class="section" id="reverse-proxy-and-cache">
+<h5>8.1.4.4.2.2.2. Reverse proxy and cache<a class="headerlink" href="#reverse-proxy-and-cache" title="Permalink to this headline">¶</a></h5>
+<p>You can use nginx's reverse proxy and cache feature for query cache:</p>
+<div class="highlight-none"><div class="highlight"><pre>                                                            +-- worker 1
+client -- groonga-httpd (master) -- reverse proxy + cache --+-- worker 2
+                                                            +-- worker 3
+</pre></div>
+</div>
+<p>You can use the same cache configuration for all workers but you can't
+change cache configuration dynamically by HTTP.</p>
+<p>Here is a sample configuration:</p>
+<div class="highlight-none"><div class="highlight"><pre>...
+http {
+  proxy_cache_path /var/cache/groonga-httpd levels=1:2 keys_zone=groonga:10m;
+  proxy_cache_valid 10m;
+  ...
+  # Reverse proxy and cache
+  server {
+    listen 10041;
+    ...
+    # Only select command
+    location /d/select {
+      # Pass through groonga with cache
+      proxy_cache groonga;
+      proxy_pass http://localhost:20041;
+    }
+
+    location / {
+      # Pass through groonga
+      proxy_pass http://localhost:20041;
+    }
+  }
+
+  # groonga
+  server {
+    location 20041;
+    location /d/ {
+      groonga on;
+      groonga_database /var/lib/groonga/db/db;
+    }
+  }
+  ...
+}
+</pre></div>
+</div>
+<p>See the following nginx documentations for parameter details:</p>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference external" href="http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_cache_path">http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_cache_path</a></li>
+<li><a class="reference external" href="http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_cache_valid">http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_cache_valid</a></li>
+<li><a class="reference external" href="http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_cache">http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_cache</a></li>
+<li><a class="reference external" href="http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_pass">http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_pass</a></li>
+</ul>
+</div></blockquote>
+<p>Note that you need to remove cache files created by nginx by hand
+after you load new data to groonga. For the above sample
+configuration, run the following command to remove cache files:</p>
+<div class="highlight-none"><div class="highlight"><pre>% groonga DB_PATH &lt; load.grn
+% rm -rf /var/cache/groonga-httpd/*
+</pre></div>
+</div>
+<p>If you use groonga's query cache feature, you don't need to expire
+cache by hand. It is done automatically.</p>
+</div>
+</div>
 </div>
 </div>
 <div class="section" id="available-nginx-modules">
 <h2>8.1.4.5. Available nginx modules<a class="headerlink" href="#available-nginx-modules" title="Permalink to this headline">¶</a></h2>
-<p>All standard HTTP modules is available. HttpRewriteModule is
+<p>All standard HTTP modules are available. HttpRewriteModule is
 disabled when you don't have PCRE (Perl Compatible Regular
 Expressions). For the list of standard HTTP modules, see
 <a class="reference external" href="http://wiki.nginx.org/Modules">http://wiki.nginx.org/Modules</a>.</p>
@@ -369,10 +516,16 @@ Expressions). For the list of standard HTTP modules, see
 <li><a class="reference internal" href="#groonga-base-path">8.1.4.4.1.4. <tt class="docutils literal"><span class="pre">groonga_base_path</span></tt></a></li>
 <li><a class="reference internal" href="#groonga-log-path">8.1.4.4.1.5. <tt class="docutils literal"><span class="pre">groonga_log_path</span></tt></a></li>
 <li><a class="reference internal" href="#groonga-log-level">8.1.4.4.1.6. <tt class="docutils literal"><span class="pre">groonga_log_level</span></tt></a></li>
+<li><a class="reference internal" href="#groonga-query-log-path">8.1.4.4.1.7. <tt class="docutils literal"><span class="pre">groonga_query_log_path</span></tt></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#performance-related-directives">8.1.4.4.2. Performance related directives</a><ul>
 <li><a class="reference internal" href="#worker-processes">8.1.4.4.2.1. <tt class="docutils literal"><span class="pre">worker_processes</span></tt></a></li>
+<li><a class="reference internal" href="#proxy-cache">8.1.4.4.2.2. <tt class="docutils literal"><span class="pre">proxy_cache</span></tt></a><ul>
+<li><a class="reference internal" href="#query-cache">8.1.4.4.2.2.1. Query cache</a></li>
+<li><a class="reference internal" href="#reverse-proxy-and-cache">8.1.4.4.2.2.2. Reverse proxy and cache</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -422,7 +575,7 @@ Expressions). For the list of standard HTTP modules, see
         <li class="right" >
           <a href="groonga.html" title="8.1.3. groonga command"
              >previous</a> |</li>
-        <li><a href="../../index.html">groonga v3.0.7 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">groonga v3.0.8 documentation</a> &raquo;</li>
           <li><a href="../../reference.html" >8. リファレンスマニュアル</a> &raquo;</li>
           <li><a href="../executables.html" >8.1. 実行ファイル</a> &raquo;</li> 
       </ul>

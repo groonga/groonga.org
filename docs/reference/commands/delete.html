@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>8.3.13. delete &mdash; groonga v3.0.7 documentation</title>
+    <title>8.3.13. delete &mdash; groonga v3.0.8 documentation</title>
     
     <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '3.0.7',
+        VERSION:     '3.0.8',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../../static/underscore.js"></script>
     <script type="text/javascript" src="../../static/doctools.js"></script>
     <link rel="shortcut icon" href="../../static/favicon.ico"/>
-    <link rel="top" title="groonga v3.0.7 documentation" href="../../index.html" />
+    <link rel="top" title="groonga v3.0.8 documentation" href="../../index.html" />
     <link rel="up" title="8.3. Command" href="../command.html" />
     <link rel="next" title="8.3.14. dump" href="dump.html" />
     <link rel="prev" title="8.3.12. defrag" href="defrag.html" /> 
@@ -75,7 +75,7 @@
         <li class="right" >
           <a href="defrag.html" title="8.3.12. defrag"
              accesskey="P">previous</a> |</li>
-        <li><a href="../../index.html">groonga v3.0.7 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">groonga v3.0.8 documentation</a> &raquo;</li>
           <li><a href="../../reference.html" >8. リファレンスマニュアル</a> &raquo;</li>
           <li><a href="../command.html" accesskey="U">8.3. Command</a> &raquo;</li> 
       </ul>
@@ -87,59 +87,214 @@
           <div class="body">
             
   <div class="section" id="delete">
-<h1>8.3.13. delete<a class="headerlink" href="#delete" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="id1">
-<h2>8.3.13.1. 名前<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
-<p>delete - 一件のレコードの削除</p>
+<h1>8.3.13. <tt class="docutils literal"><span class="pre">delete</span></tt><a class="headerlink" href="#delete" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="summary">
+<h2>8.3.13.1. Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">delete</span></tt> command deletes specified record of table.</p>
+<div class="section" id="cascade-delete">
+<span id="id1"></span><h3>8.3.13.1.1. Cascade delete<a class="headerlink" href="#cascade-delete" title="Permalink to this headline">¶</a></h3>
+<p>There is a case that multiple table is associated. For example, the key of one table are referenced by other table's records. In such a case, if you delete the key of one table, other table's records are also removed.</p>
+<p>Note that the type of other table's column is COLUMN_VECTOR, only the value of referencing key is removed from the vector value.</p>
 </div>
-<div class="section" id="id2">
-<h2>8.3.13.2. 書式<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="syntax">
+<h2>8.3.13.2. Syntax<a class="headerlink" href="#syntax" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-none"><div class="highlight"><pre>delete table [key [id [filter]]]
 </pre></div>
 </div>
 </div>
-<div class="section" id="id3">
-<h2>8.3.13.3. 説明<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
-<p>groonga組込コマンドの一つであるdeleteについて説明します。組込コマンドは、groonga実行ファイルの引数、標準入力、またはソケット経由でgroongaサーバにリクエストを送信することによって実行します。</p>
-<p>deleteは、使用しているデータベースのテーブルに1件のレコードを削除します。</p>
+<div class="section" id="usage">
+<h2>8.3.13.3. Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>Here are a schema definition and sample data to show usage.</p>
+<p>Delete the record from Entry table which has &quot;2&quot; as the key.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>delete Entry 2
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+select Entry
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;status&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         1,
+#         &quot;OK&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
 </div>
-<div class="section" id="id4">
-<h2>8.3.13.4. 引数<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<p>Here is the example about cascaded delete.</p>
+<p>The country column of Users table associates with Country table.</p>
+<p>&quot;Cascaded delete&quot; removes the records which matches specified key and refers that key.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Country TABLE_HASH_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create Users TABLE_HASH_KEY UInt32
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Users name COLUMN_SCALAR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Users country COLUMN_SCALAR Country
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+load --table Users
+[
+{&quot;_key&quot;: 1, &quot;name&quot;: &quot;John&quot;, country: &quot;United States&quot;}
+{&quot;_key&quot;: 2, &quot;name&quot;: &quot;Mike&quot;, country: &quot;United States&quot;}
+{&quot;_key&quot;: 3, &quot;name&quot;: &quot;Takashi&quot;, country: &quot;Japan&quot;}
+{&quot;_key&quot;: 4, &quot;name&quot;: &quot;Hanako&quot;, country: &quot;Japan&quot;}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 4]
+load --table Country
+[
+{&quot;_key&quot;: &quot;United States&quot;}
+{&quot;_key&quot;: &quot;Japan&quot;}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 2]
+delete Country &quot;United States&quot;
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+select Country
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         2,
+#         &quot;Japan&quot;
+#       ]
+#     ]
+#   ]
+# ]
+select Users
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         4
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;country&quot;,
+#           &quot;Country&quot;
+#         ],
+#         [
+#           &quot;name&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         1,
+#         &quot;&quot;,
+#         &quot;John&quot;
+#       ],
+#       [
+#         2,
+#         2,
+#         &quot;&quot;,
+#         &quot;Mike&quot;
+#       ],
+#       [
+#         3,
+#         3,
+#         &quot;Japan&quot;,
+#         &quot;Takashi&quot;
+#       ],
+#       [
+#         4,
+#         4,
+#         &quot;Japan&quot;,
+#         &quot;Hanako&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
+<div class="section" id="parameters">
+<h2>8.3.13.4. Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
 <p><tt class="docutils literal"><span class="pre">table</span></tt></p>
 <blockquote>
-<div>レコードを削除しようとするテーブルの名前を指定します。</div></blockquote>
+<div>It specifies the name of table to delete the records.</div></blockquote>
 <p><tt class="docutils literal"><span class="pre">key</span></tt></p>
 <blockquote>
-<div>削除するレコードの主キー値を指定します。主キーなしのテーブルの場合はこのパラメータを指定しても無視されます(idパラメータを代わりに指定します)。</div></blockquote>
+<div>It specifies the key of record to delete. If you use the table with TABLE_NO_KEY, the key is just ignored.
+(Use <tt class="docutils literal"><span class="pre">id</span></tt> parameter in such a case)</div></blockquote>
 <p><tt class="docutils literal"><span class="pre">id</span></tt></p>
 <blockquote>
-<div>レコードIDによってレコードを指定します。idパラメータを指定する場合は、keyパラメータを指定してはいけません。</div></blockquote>
+<div>It specifies the id of record to delete. If you specify <tt class="docutils literal"><span class="pre">id</span></tt> parameter, you must not specify <tt class="docutils literal"><span class="pre">key</span></tt> parameter.</div></blockquote>
 <p><tt class="docutils literal"><span class="pre">filter</span></tt></p>
 <blockquote>
-<div>script形式のgrn_expr文字列によってレコードを指定します。filterパラメータを指定する場合は、id及びkeyパラメータを指定してはいけません。</div></blockquote>
-<p>返値
----</p>
-<div class="section" id="json">
-<h3>8.3.13.4.1. json形式<a class="headerlink" href="#json" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-none"><div class="highlight"><pre>[成功かどうかのフラグ]
+<div>It specifies the expression of grn_expr to identify the record. If you specify <tt class="docutils literal"><span class="pre">filter</span></tt> parameter,
+you must not specify <tt class="docutils literal"><span class="pre">key</span></tt> and <tt class="docutils literal"><span class="pre">id</span></tt> parameter.</div></blockquote>
+</div>
+<div class="section" id="return-value">
+<h2>8.3.13.5. Return value<a class="headerlink" href="#return-value" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-none"><div class="highlight"><pre>[HEADER, SUCCEEDED_OR_NOT]
 </pre></div>
 </div>
-<p><tt class="docutils literal"><span class="pre">成功かどうかのフラグ</span></tt></p>
+<p><tt class="docutils literal"><span class="pre">HEADER</span></tt></p>
 <blockquote>
-<div>エラーが生じなかった場合にはtrue、エラーが生じた場合にはfalseを返す。</div></blockquote>
+<div>The format of HEADER is [0, UNIX_TIME_WHEN_COMMAND_IS_STARTED, ELAPSED_TIME].
+See <a class="reference internal" href="../command/output_format.html"><em>Output format</em></a> about HEADER.</div></blockquote>
+<p><tt class="docutils literal"><span class="pre">SUCCEEDED_OR_NOT</span></tt></p>
+<blockquote>
+<div>If command succeeded, it returns true, otherwise it returns false on error.</div></blockquote>
 </div>
-</div>
-<div class="section" id="id5">
-<h2>8.3.13.5. 例<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
-<p>テーブルEntryからレコードを削除します。:</p>
-<div class="highlight-none"><div class="highlight"><pre>delete Entry abandon
-
-[true]
-</pre></div>
-</div>
-</div>
-<div class="section" id="id6">
-<h2>8.3.13.6. 関連項目<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="see-also">
+<h2>8.3.13.6. See also<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference internal" href="load.html"><em>load</em></a></p>
 </div>
 </div>
@@ -152,16 +307,16 @@
         <div class="sphinxsidebarwrapper">
   <h3><a href="../../index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">8.3.13. delete</a><ul>
-<li><a class="reference internal" href="#id1">8.3.13.1. 名前</a></li>
-<li><a class="reference internal" href="#id2">8.3.13.2. 書式</a></li>
-<li><a class="reference internal" href="#id3">8.3.13.3. 説明</a></li>
-<li><a class="reference internal" href="#id4">8.3.13.4. 引数</a><ul>
-<li><a class="reference internal" href="#json">8.3.13.4.1. json形式</a></li>
+<li><a class="reference internal" href="#">8.3.13. <tt class="docutils literal"><span class="pre">delete</span></tt></a><ul>
+<li><a class="reference internal" href="#summary">8.3.13.1. Summary</a><ul>
+<li><a class="reference internal" href="#cascade-delete">8.3.13.1.1. Cascade delete</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id5">8.3.13.5. 例</a></li>
-<li><a class="reference internal" href="#id6">8.3.13.6. 関連項目</a></li>
+<li><a class="reference internal" href="#syntax">8.3.13.2. Syntax</a></li>
+<li><a class="reference internal" href="#usage">8.3.13.3. Usage</a></li>
+<li><a class="reference internal" href="#parameters">8.3.13.4. Parameters</a></li>
+<li><a class="reference internal" href="#return-value">8.3.13.5. Return value</a></li>
+<li><a class="reference internal" href="#see-also">8.3.13.6. See also</a></li>
 </ul>
 </li>
 </ul>
@@ -206,7 +361,7 @@
         <li class="right" >
           <a href="defrag.html" title="8.3.12. defrag"
              >previous</a> |</li>
-        <li><a href="../../index.html">groonga v3.0.7 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">groonga v3.0.8 documentation</a> &raquo;</li>
           <li><a href="../../reference.html" >8. リファレンスマニュアル</a> &raquo;</li>
           <li><a href="../command.html" >8.3. Command</a> &raquo;</li> 
       </ul>

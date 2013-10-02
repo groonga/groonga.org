@@ -88,24 +88,34 @@
           <div class="body">
             
   <div class="section" id="column-create">
-<h1>8.3.7. column_create<a class="headerlink" href="#column-create" title="このヘッドラインへのパーマリンク">¶</a></h1>
-<div class="section" id="id1">
-<h2>8.3.7.1. 名前<a class="headerlink" href="#id1" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<h1>8.3.7. <tt class="docutils literal"><span class="pre">column_create</span></tt><a class="headerlink" href="#column-create" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<div class="section" id="summary">
+<h2>8.3.7.1. 概要<a class="headerlink" href="#summary" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <p>column_create - カラムの追加</p>
+<p>groonga組込コマンドの一つであるcolumn_createについて説明します。組込コマンドは、groonga実行ファイルの引数、標準入力、またはソケット経由でgroongaサーバにリクエストを送信することによって実行します。</p>
+<p>column_createは、使用しているデータベースのテーブルに対してカラムを追加します。</p>
 </div>
-<div class="section" id="id2">
-<h2>8.3.7.2. 書式<a class="headerlink" href="#id2" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<div class="section" id="syntax">
+<h2>8.3.7.2. 構文<a class="headerlink" href="#syntax" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <div class="highlight-none"><div class="highlight"><pre>column_create table name flags type [source]
 </pre></div>
 </div>
 </div>
-<div class="section" id="id3">
-<h2>8.3.7.3. 説明<a class="headerlink" href="#id3" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>groonga組込コマンドの一つであるcolumn_createについて説明します。組込コマンドは、groonga実行ファイルの引数、標準入力、またはソケット経由でgroongaサーバにリクエストを送信することによって実行します。</p>
-<p>column_createは、使用しているデータベースのテーブルに対してカラムを追加します。</p>
+<div class="section" id="usage">
+<h2>8.3.7.3. 使い方<a class="headerlink" href="#usage" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>テーブルEntryに、ShortText型の値を格納するカラム、bodyを作成します。:</p>
+<div class="highlight-none"><div class="highlight"><pre>column_create Entry body --type ShortText
+[true]
+</pre></div>
 </div>
-<div class="section" id="id4">
-<h2>8.3.7.4. 引数<a class="headerlink" href="#id4" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>テーブルTermに、Entryテーブルのbodyカラムの値を対象とする完全転置インデックス型カラム、entry_bodyを作成します。:</p>
+<div class="highlight-none"><div class="highlight"><pre>column_create Term entry_body COLUMN_INDEX|WITH_POSITION Entry body
+[true]
+</pre></div>
+</div>
+</div>
+<div class="section" id="parameters">
+<h2>8.3.7.4. 引数<a class="headerlink" href="#parameters" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <p><tt class="docutils literal"><span class="pre">table</span></tt></p>
 <blockquote>
 <div>カラムを追加するテーブルの名前を指定します。</div></blockquote>
@@ -125,6 +135,15 @@
 <dt>2, <tt class="docutils literal"><span class="pre">COLUMN_INDEX</span></tt></dt>
 <dd>インデックス型のカラムを作成します。</dd>
 </dl>
+<p>カラムの値を圧縮するためのフラグが2つあります。ただしそれらのフラグを指定することは今のところできません。これはカラムの値を参照するときにメモリリークする問題 <a class="reference external" href="https://github.com/groonga/groonga/issues/6">GitHub#6</a> があるためです。 この問題はzlib、lzoいずれでも発生します。</p>
+<dl class="docutils">
+<dt>16, <tt class="docutils literal"><span class="pre">COMPRESS_ZLIB</span></tt></dt>
+<dd><p class="first last">予約済み。zlibを使ってカラムの値を圧縮します。このフラグはgroongaを <tt class="docutils literal"><span class="pre">--with-zlib</span></tt> つきでビルドしても使えません。</p>
+</dd>
+<dt>32, <tt class="docutils literal"><span class="pre">COMPRESS_LZO</span></tt></dt>
+<dd><p class="first last">予約済み。lzoを使ってカラムの値を圧縮します。このフラグはgroongaを <tt class="docutils literal"><span class="pre">--with-lzo</span></tt> つきでビルドしても使えません。</p>
+</dd>
+</dl>
 <p>インデックス型のカラムについては、flagsの値に以下の値を加えることによって、追加の属
 性を指定することができます。</p>
 <dl class="docutils">
@@ -143,30 +162,18 @@
 <blockquote>
 <div>インデックス型のカラムを作成した場合は、インデックス対象となるカラムをsource引数に指定します。</div></blockquote>
 </div>
-<div class="section" id="id5">
-<h2>8.3.7.5. 返値<a class="headerlink" href="#id5" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="section" id="json">
-<h3>8.3.7.5.1. json形式<a class="headerlink" href="#json" title="このヘッドラインへのパーマリンク">¶</a></h3>
-<div class="highlight-none"><div class="highlight"><pre>[成功かどうかのフラグ]
+<div class="section" id="return-value">
+<h2>8.3.7.5. 戻り値<a class="headerlink" href="#return-value" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<div class="highlight-none"><div class="highlight"><pre>[HEADER, SUCCEEDED]
 </pre></div>
 </div>
-<p><tt class="docutils literal"><span class="pre">成功かどうかのフラグ</span></tt></p>
+<p><tt class="docutils literal"><span class="pre">HEADER</span></tt></p>
 <blockquote>
-<div>エラーが生じなかった場合にはtrue、エラーが生じた場合にはfalseを返す。</div></blockquote>
-</div>
-</div>
-<div class="section" id="id6">
-<h2>8.3.7.6. 例<a class="headerlink" href="#id6" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>テーブルEntryに、ShortText型の値を格納するカラム、bodyを作成します。:</p>
-<div class="highlight-none"><div class="highlight"><pre>column_create Entry body --type ShortText
-[true]
-</pre></div>
-</div>
-<p>テーブルTermに、Entryテーブルのbodyカラムの値を対象とする完全転置インデックス型カラム、entry_bodyを作成します。:</p>
-<div class="highlight-none"><div class="highlight"><pre>column_create Term entry_body COLUMN_INDEX|WITH_POSITION Entry body
-[true]
-</pre></div>
-</div>
+<div><p>HEADERのフォーマットは  [0, UNIX_TIME_WHEN_COMMAND_IS_STARTED, ELAPSED_TIME] です。HEADERについては <a class="reference internal" href="../command/output_format.html"><em>出力形式</em></a> を参照してください。</p>
+</div></blockquote>
+<p><tt class="docutils literal"><span class="pre">SUCCEEDED</span></tt></p>
+<blockquote>
+<div>If command is succeeded, it returns true on success, false otherwise.</div></blockquote>
 </div>
 </div>
 
@@ -178,16 +185,12 @@
         <div class="sphinxsidebarwrapper">
   <h3><a href="../../index.html">目次</a></h3>
   <ul>
-<li><a class="reference internal" href="#">8.3.7. column_create</a><ul>
-<li><a class="reference internal" href="#id1">8.3.7.1. 名前</a></li>
-<li><a class="reference internal" href="#id2">8.3.7.2. 書式</a></li>
-<li><a class="reference internal" href="#id3">8.3.7.3. 説明</a></li>
-<li><a class="reference internal" href="#id4">8.3.7.4. 引数</a></li>
-<li><a class="reference internal" href="#id5">8.3.7.5. 返値</a><ul>
-<li><a class="reference internal" href="#json">8.3.7.5.1. json形式</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#id6">8.3.7.6. 例</a></li>
+<li><a class="reference internal" href="#">8.3.7. <tt class="docutils literal"><span class="pre">column_create</span></tt></a><ul>
+<li><a class="reference internal" href="#summary">8.3.7.1. 概要</a></li>
+<li><a class="reference internal" href="#syntax">8.3.7.2. 構文</a></li>
+<li><a class="reference internal" href="#usage">8.3.7.3. 使い方</a></li>
+<li><a class="reference internal" href="#parameters">8.3.7.4. 引数</a></li>
+<li><a class="reference internal" href="#return-value">8.3.7.5. 戻り値</a></li>
 </ul>
 </li>
 </ul>
@@ -201,7 +204,7 @@
   <h3>このページ</h3>
   <ul class="this-page-menu">
     <li><a href="../../sources/reference/commands/column_create.txt"
-           rel="nofollow">ソースコードを表示（英語）</a></li>
+           rel="nofollow">ソースコードを表示(英語)</a></li>
   </ul>
 <div id="searchbox" style="display: none">
   <h3>クイック検索</h3>

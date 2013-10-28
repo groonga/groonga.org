@@ -1,0 +1,52 @@
+---
+layout: post.ja
+title: Groonga 3.0.9リリース
+description: Groonga 3.0.9をリリースしました！
+published: false
+---
+
+今日は肉の日ですね。
+
+h2. Groonga 3.0.9リリース
+
+"Groonga 3.0.9":/ja/docs/news.html#release-3-0-9 をリリースしました！
+
+それぞれの環境毎のインストール方法: "インストール":/ja/docs/install.html
+
+h3. HTTPサーバーでgroonga_cache_limitディレクティブのサポート
+
+Groongaではgroonga-httpdというnginxをベースとしたHTTPサーバーを提供しています。このHTTPサーバーでキャッシュサイズをカスタマイズするためのディレクティブとしてgroonga_cache_limitを追加しました。
+
+このディレクティブを追加したことで、ワーカープロセスごとのキャッシュサイズをまとめて設定することができるようになります。
+
+例えば、locationブロック内だと次のようにして指定します。
+
+<pre>
+location /d/ {
+  groonga on;
+  # You can customize query cache limit for groonga.
+  groonga_cache_limit 100;
+}
+</pre>
+
+従来はこのディレクティブがなかったので、複数のワーカープロセスでキャッシュサイズを変更するためにcache_limitコマンドを実行しても特定のワーカープロセスに限定して設定することができませんでした。
+そのためすべてのワーカープロセスで必ずしも同じキャッシュサイズに設定できないという問題がありました。(特定のワーカープロセスが常にcache_limitを処理すると、他のワーカープロセスのキャッシュサイズが変わらないということです) この問題をgroonga_cache_limitディレクティブで、解決することができます。
+
+h3. パフォーマンスチューニングに関するドキュメントの追加
+
+Groongaのパフォーマンスチューニングに関するドキュメントを追加しました。
+Groongaを使っていて、対象となるデータ件数が増加するに従って、当初は問題にならなかったパフォーマンスの低下により何らかの対策が必要になることがあります。典型的な例がプロセスが扱えるファイル数や使用するメモリに関してです。
+
+チューニングに関しては次の "ドキュメント":http://groonga.org/ja/docs/reference/tuning.html を参照してください。
+
+h3. Ubuntu 13.10 (Saucy Salamander)のサポート
+
+今回のリリースから10月17日にリリースされたUbuntu 13.10のサポートをはじめました。
+
+具体的なインストール手順については、次の Ubuntu 13.10向けの "ドキュメント":http://groonga.org/ja/docs/install/ubuntu.html#saucy-salamander を参照してください。
+
+h3. さいごに
+
+3.0.8からの詳細な変更点は "3.0.9リリース 2013/10/29":/ja/docs/news.html#release-3-0-9 を確認してください。
+
+それでは、Groongaでガンガン検索してください！

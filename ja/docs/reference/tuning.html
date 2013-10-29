@@ -1,0 +1,315 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>8.14. Tuning &mdash; Groonga v3.0.9ドキュメント</title>
+    
+    <link rel="stylesheet" href="../static/groonga.css" type="text/css" />
+    <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '3.0.9',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../static/jquery.js"></script>
+    <script type="text/javascript" src="../static/underscore.js"></script>
+    <script type="text/javascript" src="../static/doctools.js"></script>
+    <script type="text/javascript" src="../static/translations.js"></script>
+    <link rel="shortcut icon" href="../static/favicon.ico"/>
+    <link rel="top" title="Groonga v3.0.9ドキュメント" href="../index.html" />
+    <link rel="up" title="8. リファレンスマニュアル" href="../reference.html" />
+    <link rel="next" title="8.15. API" href="api.html" />
+    <link rel="prev" title="8.13. Log" href="log.html" /> 
+      <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
+    <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
+    <meta property="og:type" content="product" />
+    <meta property="og:image" content="http://groonga.org/images/logos/groonga-icon-full-size.png" />
+    <meta property="og:site_name" content="groonga" />
+
+    <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
+  </head>
+
+    <body>
+    <div id="fb-root"></div>
+
+<div class="header">
+  <h1 class="title">
+    <a id="top-link" href="../../">
+      <span class="project">groonga</span>
+      <span class="separator">-</span>
+      <span class="description">オープンソースのカラムストア機能付き全文検索エンジン</span>
+    </a>
+  </h1>
+
+      <div class="facebook-buttons">
+      <fb:like href="http://www.facebook.com/pages/groonga/201193596592346"
+               layout="standard"
+               width="290"></fb:like>
+    </div>
+    <div class="other-language-links">
+
+    <ul>
+      <li><a href="../../../docs/reference/tuning.html"><img src="../static/us.png" alt="English">English page</a></li>
+    </ul>
+  </div>
+</div>
+  
+
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="api.html" title="8.15. API"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="log.html" title="8.13. Log"
+             accesskey="P">前へ</a> |</li>
+        <li><a href="../index.html">Groonga v3.0.9ドキュメント</a> &raquo;</li>
+          <li><a href="../reference.html" accesskey="U">8. リファレンスマニュアル</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="tuning">
+<h1>8.14. Tuning<a class="headerlink" href="#tuning" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<div class="section" id="summary">
+<h2>8.14.1. 概要<a class="headerlink" href="#summary" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>There are some tuning parameters for improving groonga performance or
+handling a large database.</p>
+</div>
+<div class="section" id="parameters">
+<h2>8.14.2. 引数<a class="headerlink" href="#parameters" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>このセクションではすべての引数について説明します。</p>
+<div class="section" id="the-max-number-of-open-files-per-process">
+<span id="tuning-max-n-open-files"></span><h3>8.14.2.1. The max number of open files per process<a class="headerlink" href="#the-max-number-of-open-files-per-process" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>This parameter is for handling a large database.</p>
+<p>Groonga creates one or more files per table and colum. If your
+database has many tables and columns, groonga process needs to open
+many files.</p>
+<p>System limits the max number of open files per process. So you need to
+relax the limitation.</p>
+<p>Here is an expression that compute how many files are opened by
+groonga:</p>
+<div class="highlight-none"><div class="highlight"><pre>3 (for DB) +
+  N tables +
+  N columns (except index clumns) +
+  (N index columns * 2) +
+  X (the number of plugins etc.)
+</pre></div>
+</div>
+<p>以下はスキーマの例です。</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Entries TABLE_HASH_KEY ShortText
+column_create Entries content COLUMN_SCALAR Text
+column_create Entries n_likes COLUMN_SCALAR UInt32
+table_create Terms TABLE_PAT_KEY|KEY_NORMALIZE ShortText --default_tokenizer TokenBigram
+column_create Terms entries_key_index COLUMN_INDEX|WITH_POSITION Entries _key
+column_create Terms entries_content_index COLUMN_INDEX|WITH_POSITION Entries content
+</pre></div>
+</div>
+<p>This example opens at least 11 files:</p>
+<div class="highlight-none"><div class="highlight"><pre>3 +
+  2 (Entries and Terms) +
+  2 (Entries.content and Entries.n_likes) +
+  4 (Terms.entries_key_index and Terms.entries_content_index) +
+  X = 11 + X
+</pre></div>
+</div>
+</div>
+<div class="section" id="memory-usage">
+<span id="tuning-memory-usage"></span><h3>8.14.2.2. メモリ使用量<a class="headerlink" href="#memory-usage" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>This parameter is for handling a large database.</p>
+<p>Groonga maps database files onto memory and accesses to them. Groonga
+doesn't maps unnecessary files onto memory until they are nneded.</p>
+<p>If you access to all data in database, all database files are mapped
+onto memory.  If total size of your database files is 6GiB, your
+groonga process uses 6GiB memory.</p>
+<p>Normally, your all database files aren't mapped onto memry. But is may
+be occurred. It is an example case that you dump your database.</p>
+<p>You must have memory and swap that is larger than database.</p>
+</div>
+</div>
+<div class="section" id="linux">
+<span id="tuning-linux"></span><h2>8.14.3. Linux<a class="headerlink" href="#linux" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>このセクションではLinux上で引数をカスタマイズする方法について説明します。</p>
+<div class="section" id="nofile">
+<span id="tuning-linux-nofile"></span><h3>8.14.3.1. nofile<a class="headerlink" href="#nofile" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>You can relax the <a class="reference internal" href="#tuning-max-n-open-files"><em>The max number of open files per process</em></a> parameter by creating
+a configuration file <tt class="docutils literal"><span class="pre">/etc/security/limits.d/groonga.conf</span></tt> that has
+the following content:</p>
+<div class="highlight-none"><div class="highlight"><pre>${USER} soft nofile ${MAX_VALUE}
+${USER} hard nofile ${MAX_VALUE}
+</pre></div>
+</div>
+<p>If you run <tt class="docutils literal"><span class="pre">groonga</span></tt> process by <tt class="docutils literal"><span class="pre">groonga</span></tt> user and your groonga
+process needs to open less than 10000 files, use the following
+configuration:</p>
+<div class="highlight-none"><div class="highlight"><pre>groonga soft nofile 10000
+groonga hard nofile 10000
+</pre></div>
+</div>
+<p>The configuration is applied after your groonga service is restarted
+or re-login as your groonga user.</p>
+</div>
+<div class="section" id="vm-overcommit-memory">
+<span id="tuning-linux-overcommit-memory"></span><h3>8.14.3.2. vm.overcommit_memory<a class="headerlink" href="#vm-overcommit-memory" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>This is <a class="reference internal" href="#tuning-memory-usage"><em>メモリ使用量</em></a> related parameter. You can handle a
+database that is larger than your memory and swap by setting
+<tt class="docutils literal"><span class="pre">vm.overcommit_memory</span></tt> kernel parameter to 1. 1 means that groonga
+can always map database files onto memory. It is no problem until
+groonga touch mapped database files that their size is larger than
+memory and swap. Groonga recommends the configuration.</p>
+<p>See <a class="reference external" href="https://www.kernel.org/doc/Documentation/vm/overcommit-accounting">Linux kernel documentaion about overcommit</a>
+about <tt class="docutils literal"><span class="pre">vm.overcommit_memory</span></tt> parameter details.</p>
+<p>You can set the configuration by putting a configuration file
+<tt class="docutils literal"><span class="pre">/etc/sysctl.d/groonga.conf</span></tt> that has the following content:</p>
+<div class="highlight-none"><div class="highlight"><pre>vm.overcommit_memory = 1
+</pre></div>
+</div>
+<p>設定した内容はシステムを再起動するか、次のコマンドを実行することで反映されます。:</p>
+<div class="highlight-none"><div class="highlight"><pre>% sudo sysctl -p
+</pre></div>
+</div>
+</div>
+<div class="section" id="vm-max-map-count">
+<span id="tuning-linux-max-map-count"></span><h3>8.14.3.3. vm.max_map_count<a class="headerlink" href="#vm-max-map-count" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>This is <a class="reference internal" href="#tuning-memory-usage"><em>メモリ使用量</em></a> related parameter. You can handle a
+16GiB or more larger size database by increasing <tt class="docutils literal"><span class="pre">vm.max_map_count</span></tt>
+kernel parameter. The parameter limits the max number of memory maps.</p>
+<p>The default value of the kernel parameter may be 65530 or 65536.
+Groonga maps 256KiB memory chunk at one time. If a database is larger
+than 16GiB, groonga reaches the limitation. (<tt class="docutils literal"><span class="pre">256KiB</span> <span class="pre">*</span> <span class="pre">65536</span> <span class="pre">=</span> <span class="pre">16GiB</span></tt>)</p>
+<p>You needs to increase the value of the kernel parameter to handle
+16GiB or more larger size database. For example, you can handle almost
+32GiB size database by <tt class="docutils literal"><span class="pre">65536</span> <span class="pre">*</span> <span class="pre">2</span> <span class="pre">=</span> <span class="pre">131072</span></tt>. You can set the
+configuration by putting a configuration file
+<tt class="docutils literal"><span class="pre">/etc/sysctl.d/groonga.conf</span></tt> that has the following content:</p>
+<div class="highlight-none"><div class="highlight"><pre>vm.max_map_count = 131072
+</pre></div>
+</div>
+<p>Note that your real confiugration file will be the following because
+you already have <tt class="docutils literal"><span class="pre">vm.overcommit_memory</span></tt> configuration:</p>
+<div class="highlight-none"><div class="highlight"><pre>vm.overcommit_memory = 1
+vm.max_map_count = 131072
+</pre></div>
+</div>
+<p>設定した内容はシステムを再起動するか、次のコマンドを実行することで反映されます。:</p>
+<div class="highlight-none"><div class="highlight"><pre>% sudo sysctl -p
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="freebsd">
+<h2>8.14.4. FreeBSD<a class="headerlink" href="#freebsd" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>このセクションではFreeBSD上で引数をカスタマイズする方法を説明します。</p>
+<div class="section" id="kern-maxfileperproc">
+<span id="tuning-freebsd-maxfilesperproc"></span><h3>8.14.4.1. kern.maxfileperproc<a class="headerlink" href="#kern-maxfileperproc" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>TODO</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">8.14. Tuning</a><ul>
+<li><a class="reference internal" href="#summary">8.14.1. 概要</a></li>
+<li><a class="reference internal" href="#parameters">8.14.2. 引数</a><ul>
+<li><a class="reference internal" href="#the-max-number-of-open-files-per-process">8.14.2.1. The max number of open files per process</a></li>
+<li><a class="reference internal" href="#memory-usage">8.14.2.2. メモリ使用量</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#linux">8.14.3. Linux</a><ul>
+<li><a class="reference internal" href="#nofile">8.14.3.1. nofile</a></li>
+<li><a class="reference internal" href="#vm-overcommit-memory">8.14.3.2. vm.overcommit_memory</a></li>
+<li><a class="reference internal" href="#vm-max-map-count">8.14.3.3. vm.max_map_count</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#freebsd">8.14.4. FreeBSD</a><ul>
+<li><a class="reference internal" href="#kern-maxfileperproc">8.14.4.1. kern.maxfileperproc</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="log.html"
+                        title="前の章へ">8.13. Log</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="api.html"
+                        title="次の章へ">8.15. API</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../sources/reference/tuning.txt"
+           rel="nofollow">ソースコードを表示（英語）</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="api.html" title="8.15. API"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="log.html" title="8.13. Log"
+             >前へ</a> |</li>
+        <li><a href="../index.html">Groonga v3.0.9ドキュメント</a> &raquo;</li>
+          <li><a href="../reference.html" >8. リファレンスマニュアル</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009-2013, Brazil, Inc.
+    </div>
+      <script src="http://connect.facebook.net/ja_JP/all.js"></script>
+
+    <script>
+      FB.init({
+         appId  : null,
+         status : true, // check login status
+         cookie : true, // enable cookies to allow the server to access the session
+         xfbml  : true  // parse XFBML
+      });
+    </script>
+  </body>
+
+</html>

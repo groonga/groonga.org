@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>5.3. Completion &mdash; groonga v3.0.8 documentation</title>
+    <title>5.3. Completion &mdash; Groonga v3.0.9 documentation</title>
     
     <link rel="stylesheet" href="../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '3.0.8',
+        VERSION:     '3.0.9',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../static/underscore.js"></script>
     <script type="text/javascript" src="../static/doctools.js"></script>
     <link rel="shortcut icon" href="../static/favicon.ico"/>
-    <link rel="top" title="groonga v3.0.8 documentation" href="../index.html" />
+    <link rel="top" title="Groonga v3.0.9 documentation" href="../index.html" />
     <link rel="up" title="5. Suggest" href="../suggest.html" />
     <link rel="next" title="5.4. Correction" href="correction.html" />
     <link rel="prev" title="5.2. Tutorial" href="tutorial.html" /> 
@@ -75,7 +75,7 @@
         <li class="right" >
           <a href="tutorial.html" title="5.2. Tutorial"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">groonga v3.0.8 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Groonga v3.0.9 documentation</a> &raquo;</li>
           <li><a href="../suggest.html" accesskey="U">5. Suggest</a> &raquo;</li> 
       </ul>
     </div>  
@@ -113,6 +113,7 @@ katakana or hiragana. It's useful for searching in Japanese.</p>
 <p>For example, there is a registered word &quot;日本&quot;. And &quot;ニホン&quot;
 (it must be katakana) is registered as its reading. An user
 can find &quot;日本&quot; by &quot;ni&quot;, &quot;二&quot; or &quot;に&quot;.</p>
+<p>If you create dataset which is named as example by <a class="reference internal" href="../reference/executables/groonga-suggest-create-dataset.html"><em>groonga-suggest-create-dataset</em></a> command, you can update pairs of registered word and its reading by loading data to '_key' and 'kana' column of item_example table explicitly for prefix RK search.</p>
 </div>
 <div class="section" id="cooccurrence-search">
 <h3>5.3.1.2. Cooccurrence search<a class="headerlink" href="#cooccurrence-search" title="Permalink to this headline">¶</a></h3>
@@ -323,6 +324,193 @@ following command:</p>
 </pre></div>
 </div>
 </div>
+<div class="section" id="how-to-update-rk-reading-data">
+<h2>5.3.4. How to update RK reading data<a class="headerlink" href="#how-to-update-rk-reading-data" title="Permalink to this headline">¶</a></h2>
+<p>Groonga requires registered word and its reading for RK search, so load such data in the advance.</p>
+<p>Here is the example to register &quot;日本&quot; which means Japanese in english.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>load --table event_query --each &#39;suggest_preparer(_id, type, item, sequence, time, pair_query)&#39;
+[
+{&quot;sequence&quot;: &quot;1&quot;, &quot;time&quot;: 1312950805.86058, &quot;item&quot;: &quot;日本&quot;, &quot;type&quot;: &quot;submit&quot;}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 1]
+</pre></div>
+</div>
+<p>Here is the example to update RK data to complete &quot;日本&quot;.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>load --table item_query
+[
+{&quot;_key&quot;:&quot;日本&quot;, &quot;kana&quot;:[&quot;ニホン&quot;, &quot;ニッポン&quot;]}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 1]
+</pre></div>
+</div>
+<p>Then you can complete registered word &quot;日本&quot; by RK input - &quot;nihon&quot;.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>suggest --table item_query --column kana --types complete --frequency_threshold 1 --query nihon
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   {
+#     &quot;complete&quot;: [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;_score&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;日本&quot;,
+#         2
+#       ]
+#     ]
+#   }
+# ]
+</pre></div>
+</div>
+<p>Without loading above RK data, you can't complete registered word &quot;日本&quot; by query - &quot;nihon&quot;.</p>
+<p>As the column type of item_query table is VECTOR_COLUMN, you can register multiple readings for registered word.</p>
+<p>This is the reason that you can also complete the registered word &quot;日本&quot; by query - &quot;nippon&quot;.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>suggest --table item_query --column kana --types complete --frequency_threshold 1 --query nippon
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   {
+#     &quot;complete&quot;: [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;_score&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;日本&quot;,
+#         2
+#       ]
+#     ]
+#   }
+# ]
+</pre></div>
+</div>
+<p>This feature is very convenient because you can search registered word even though Japanese IM is disabled.</p>
+<p>If there are multiple candidates as completed result, you can customize priority to set the value of &quot;boost&quot; column in item_query table.</p>
+<p>Here is the example to customize priority for RK search.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>load --table event_query --each &#39;suggest_preparer(_id, type, item, sequence, time, pair_query)&#39;
+[
+{&quot;sequence&quot;: &quot;1&quot;, &quot;time&quot;: 1312950805.86059, &quot;item&quot;: &quot;日本語&quot;, &quot;type&quot;: &quot;submit&quot;}
+{&quot;sequence&quot;: &quot;1&quot;, &quot;time&quot;: 1312950805.86060, &quot;item&quot;: &quot;日本人&quot;, &quot;type&quot;: &quot;submit&quot;}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 2]
+load --table item_query
+[
+{&quot;_key&quot;:&quot;日本語&quot;, &quot;kana&quot;:&quot;ニホンゴ&quot;}
+{&quot;_key&quot;:&quot;日本人&quot;, &quot;kana&quot;:&quot;ニホンジン&quot;}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 2]
+suggest --table item_query --column kana --types complete --frequency_threshold 1 --query nihon
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   {
+#     &quot;complete&quot;: [
+#       [
+#         3
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;_score&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;日本&quot;,
+#         2
+#       ],
+#       [
+#         &quot;日本人&quot;,
+#         2
+#       ],
+#       [
+#         &quot;日本語&quot;,
+#         2
+#       ]
+#     ]
+#   }
+# ]
+load --table item_query
+[
+{&quot;_key&quot;:&quot;日本人&quot;, &quot;boost&quot;: 100},
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 1]
+suggest --table item_query --column kana --types complete --frequency_threshold 1 --query nihon
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   {
+#     &quot;complete&quot;: [
+#       [
+#         3
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;_score&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;日本人&quot;,
+#         102
+#       ],
+#       [
+#         &quot;日本&quot;,
+#         2
+#       ],
+#       [
+#         &quot;日本語&quot;,
+#         2
+#       ]
+#     ]
+#   }
+# ]
+</pre></div>
+</div>
+</div>
 </div>
 
 
@@ -342,6 +530,7 @@ following command:</p>
 </li>
 <li><a class="reference internal" href="#how-to-use">5.3.2. How to use</a></li>
 <li><a class="reference internal" href="#how-it-learns">5.3.3. How it learns</a></li>
+<li><a class="reference internal" href="#how-to-update-rk-reading-data">5.3.4. How to update RK reading data</a></li>
 </ul>
 </li>
 </ul>
@@ -386,7 +575,7 @@ following command:</p>
         <li class="right" >
           <a href="tutorial.html" title="5.2. Tutorial"
              >previous</a> |</li>
-        <li><a href="../index.html">groonga v3.0.8 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Groonga v3.0.9 documentation</a> &raquo;</li>
           <li><a href="../suggest.html" >5. Suggest</a> &raquo;</li> 
       </ul>
     </div>

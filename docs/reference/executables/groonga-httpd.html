@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>8.1.4. groonga-httpd &mdash; Groonga v3.1.1 documentation</title>
+    <title>8.1.4. groonga-httpd &mdash; Groonga v3.1.2 documentation</title>
     
     <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '3.1.1',
+        VERSION:     '3.1.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../../static/underscore.js"></script>
     <script type="text/javascript" src="../../static/doctools.js"></script>
     <link rel="shortcut icon" href="../../static/favicon.ico"/>
-    <link rel="top" title="Groonga v3.1.1 documentation" href="../../index.html" />
+    <link rel="top" title="Groonga v3.1.2 documentation" href="../../index.html" />
     <link rel="up" title="8.1. 実行ファイル" href="../executables.html" />
     <link rel="next" title="8.1.5. groonga HTTPサーバー" href="groonga-server-http.html" />
     <link rel="prev" title="8.1.3. groonga-benchmark" href="groonga-benchmark.html" /> 
@@ -37,9 +37,7 @@
     <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
   </head>
 
-    <body>
-    <div id="fb-root"></div>
-
+  <body role="document">
 <div class="header">
   <h1 class="title">
     <a id="top-link" href="../../../">
@@ -63,7 +61,7 @@
 </div>
   
 
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -75,7 +73,7 @@
         <li class="right" >
           <a href="groonga-benchmark.html" title="8.1.3. groonga-benchmark"
              accesskey="P">previous</a> |</li>
-        <li><a href="../../index.html">Groonga v3.1.1 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">Groonga v3.1.2 documentation</a> &raquo;</li>
           <li><a href="../../reference.html" >8. リファレンスマニュアル</a> &raquo;</li>
           <li><a href="../executables.html" accesskey="U">8.1. 実行ファイル</a> &raquo;</li> 
       </ul>
@@ -84,13 +82,13 @@
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="groonga-httpd">
 <h1>8.1.4. groonga-httpd<a class="headerlink" href="#groonga-httpd" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="summary">
 <h2>8.1.4.1. Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
-<p>groonga-httpd is a program to communicate with a groonga server using
+<p>groonga-httpd is a program to communicate with a Groonga server using
 the HTTP protocol. It functions as same as
 <a class="reference internal" href="groonga-server-http.html"><em>groonga HTTPサーバー</em></a>. Although <a class="reference internal" href="groonga-server-http.html"><em>groonga HTTPサーバー</em></a> has
 limited support for HTTP with a minimal built-in HTTP server,
@@ -161,12 +159,32 @@ console because groonga-httpd runs as a daemon process by default.:</p>
 </pre></div>
 </div>
 </div>
+<div class="section" id="loading-data-by-post">
+<h3>8.1.4.3.3. Loading data by POST<a class="headerlink" href="#loading-data-by-post" title="Permalink to this headline">¶</a></h3>
+<p>The feature of groonga-httpd in contrast to groonga is supporting POST method.</p>
+<p>You can load data by POST JSON data.</p>
+<p>Here is an example curl command line that loads two users alice and bob to Users table:</p>
+<div class="highlight-none"><div class="highlight"><pre>% curl --data-binary &#39;[{&quot;_key&quot;: &quot;alice&quot;}, {&quot;_key&quot;: &quot;bob&quot;}]&#39; -H &quot;Content-Type: application/json&quot; &quot;http://localhost:10041/d/load?table=Users&quot;
+</pre></div>
+</div>
+<p>If you loads users from JSON file, prepare JSON file like this:</p>
+<div class="highlight-none"><div class="highlight"><pre>[
+{&quot;_key&quot;: &quot;alice&quot;},
+{&quot;_key&quot;: &quot;bob&quot;}
+]
+</pre></div>
+</div>
+<p>Then specify JSON file in curl command line:</p>
+<div class="highlight-none"><div class="highlight"><pre>% curl -X POST &#39;http://localhost:10041/d/load?table=Users&#39; -H &#39;Content-Type: application/json&#39; -d @users.json
+</pre></div>
+</div>
+</div>
 <div class="section" id="browse-the-administration-tool">
-<h3>8.1.4.3.3. Browse the administration tool<a class="headerlink" href="#browse-the-administration-tool" title="Permalink to this headline">¶</a></h3>
+<h3>8.1.4.3.4. Browse the administration tool<a class="headerlink" href="#browse-the-administration-tool" title="Permalink to this headline">¶</a></h3>
 <p>Also, you can browse Web-based administration tool at <a class="reference external" href="http://localhost:10041/">http://localhost:10041/</a>.</p>
 </div>
 <div class="section" id="shut-down">
-<h3>8.1.4.3.4. Shut down<a class="headerlink" href="#shut-down" title="Permalink to this headline">¶</a></h3>
+<h3>8.1.4.3.5. Shut down<a class="headerlink" href="#shut-down" title="Permalink to this headline">¶</a></h3>
 <p>Finally, to terminate the running groonga-httpd daemon, run this:</p>
 <div class="highlight-none"><div class="highlight"><pre>% groonga-httpd -s stop
 </pre></div>
@@ -195,7 +213,7 @@ by groonga-httpd to configure groonga-httpd specific configurations.</p>
 <dt>Context</dt>
 <dd><tt class="docutils literal"><span class="pre">location</span></tt></dd>
 </dl>
-<p>Specifies whether groonga is enabled in the <tt class="docutils literal"><span class="pre">location</span></tt> block. The
+<p>Specifies whether Groonga is enabled in the <tt class="docutils literal"><span class="pre">location</span></tt> block. The
 default is <tt class="docutils literal"><span class="pre">off</span></tt>. You need to specify <tt class="docutils literal"><span class="pre">on</span></tt> to enable groonga.</p>
 <p>Examples:</p>
 <div class="highlight-none"><div class="highlight"><pre>location /d/ {
@@ -220,7 +238,7 @@ location /d/ {
 <dt>Context</dt>
 <dd><tt class="docutils literal"><span class="pre">http</span></tt>, <tt class="docutils literal"><span class="pre">server</span></tt>, <tt class="docutils literal"><span class="pre">location</span></tt></dd>
 </dl>
-<p>Specifies the path to a groonga database. This is the required
+<p>Specifies the path to a Groonga database. This is the required
 directive.</p>
 </div>
 <div class="section" id="groonga-database-auto-create">
@@ -235,10 +253,10 @@ directive.</p>
 <dt>Context</dt>
 <dd><tt class="docutils literal"><span class="pre">http</span></tt>, <tt class="docutils literal"><span class="pre">server</span></tt>, <tt class="docutils literal"><span class="pre">location</span></tt></dd>
 </dl>
-<p>Specifies whether groonga database is created automatically or not. If
-the value is <tt class="docutils literal"><span class="pre">on</span></tt> and the groonga database specified by
-<a class="reference internal" href="#groonga-database"><em>groonga_database</em></a> doesn't exist, the groonga database is created
-automatically. If the groonga database exists, groonga-httpd does
+<p>Specifies whether Groonga database is created automatically or not. If
+the value is <tt class="docutils literal"><span class="pre">on</span></tt> and the Groonga database specified by
+<a class="reference internal" href="#groonga-database"><em>groonga_database</em></a> doesn't exist, the Groonga database is created
+automatically. If the Groonga database exists, groonga-httpd does
 nothing.</p>
 <p>If parent directory doesn't exist, parent directory is also created
 recursively.</p>
@@ -257,13 +275,13 @@ changed.</p>
 <dt>Context</dt>
 <dd><tt class="docutils literal"><span class="pre">location</span></tt></dd>
 </dl>
-<p>Specifies the base path in URI. groonga uses
+<p>Specifies the base path in URI. Groonga uses
 <tt class="docutils literal"><span class="pre">/d/command?parameter1=value1&amp;...</span></tt> path to run <tt class="docutils literal"><span class="pre">command</span></tt>. The form
 of path in used in groonga-httpd but groonga-httpd also supports
 <tt class="docutils literal"><span class="pre">/other-prefix/command?parameter1=value1&amp;...</span></tt> form. To support the
 form, groonga-httpd removes the base path from the head of request URI
 and prepend <tt class="docutils literal"><span class="pre">/d/</span></tt> to the processed request URI. By the path
-conversion, users can use custom path prefix and groonga can always
+conversion, users can use custom path prefix and Groonga can always
 uses <tt class="docutils literal"><span class="pre">/d/command?parameter1=value1&amp;...</span></tt> form.</p>
 <p>Nomally, this directive isn't needed. It is needed for per command
 configuration.</p>
@@ -302,7 +320,7 @@ location /d/ {
 <dt>Context</dt>
 <dd><tt class="docutils literal"><span class="pre">http</span></tt>, <tt class="docutils literal"><span class="pre">server</span></tt>, <tt class="docutils literal"><span class="pre">location</span></tt></dd>
 </dl>
-<p>Specifies groonga log path in the <tt class="docutils literal"><span class="pre">http</span></tt>, <tt class="docutils literal"><span class="pre">server</span></tt> or <tt class="docutils literal"><span class="pre">location</span></tt> block. The
+<p>Specifies Groonga log path in the <tt class="docutils literal"><span class="pre">http</span></tt>, <tt class="docutils literal"><span class="pre">server</span></tt> or <tt class="docutils literal"><span class="pre">location</span></tt> block. The
 default is <tt class="docutils literal"><span class="pre">/var/log/groonga/httpd/groonga.log</span></tt>.
 You can disable logging to specify <tt class="docutils literal"><span class="pre">off</span></tt>.</p>
 <p>Examples:</p>
@@ -326,7 +344,7 @@ You can disable logging to specify <tt class="docutils literal"><span class="pre
 <dt>Context</dt>
 <dd><tt class="docutils literal"><span class="pre">http</span></tt>, <tt class="docutils literal"><span class="pre">server</span></tt>, <tt class="docutils literal"><span class="pre">location</span></tt></dd>
 </dl>
-<p>Specifies groonga log level in the <tt class="docutils literal"><span class="pre">http</span></tt>, <tt class="docutils literal"><span class="pre">server</span></tt> or <tt class="docutils literal"><span class="pre">location</span></tt> block. The
+<p>Specifies Groonga log level in the <tt class="docutils literal"><span class="pre">http</span></tt>, <tt class="docutils literal"><span class="pre">server</span></tt> or <tt class="docutils literal"><span class="pre">location</span></tt> block. The
 default is <tt class="docutils literal"><span class="pre">notice</span></tt>. You can disable logging by specifying <tt class="docutils literal"><span class="pre">none</span></tt> as log level.</p>
 <p>Examples:</p>
 <div class="highlight-none"><div class="highlight"><pre>location /d/ {
@@ -349,7 +367,7 @@ default is <tt class="docutils literal"><span class="pre">notice</span></tt>. Yo
 <dt>Context</dt>
 <dd><tt class="docutils literal"><span class="pre">http</span></tt>, <tt class="docutils literal"><span class="pre">server</span></tt>, <tt class="docutils literal"><span class="pre">location</span></tt></dd>
 </dl>
-<p>Specifies groonga's query log path in the <tt class="docutils literal"><span class="pre">http</span></tt>, <tt class="docutils literal"><span class="pre">server</span></tt> or
+<p>Specifies Groonga's query log path in the <tt class="docutils literal"><span class="pre">http</span></tt>, <tt class="docutils literal"><span class="pre">server</span></tt> or
 <tt class="docutils literal"><span class="pre">location</span></tt> block. The default is
 <tt class="docutils literal"><span class="pre">/var/log/groonga/httpd/groonga-query.log</span></tt>.  You can disable logging
 to specify <tt class="docutils literal"><span class="pre">off</span></tt>.</p>
@@ -372,7 +390,7 @@ to specify <tt class="docutils literal"><span class="pre">off</span></tt>.</p>
 useful tools.</p>
 <p>For example, there is a tool that analyzing your query log. It can
 detect slow queries from your query log. There is a tool that
-replaying same queries in your query log. It can test the new groonga
+replaying same queries in your query log. It can test the new Groonga
 before updating production environment.</p>
 </div>
 </div>
@@ -382,7 +400,7 @@ before updating production environment.</p>
 <div class="section" id="worker-processes">
 <h4>8.1.4.4.2.1. <tt class="docutils literal"><span class="pre">worker_processes</span></tt><a class="headerlink" href="#worker-processes" title="Permalink to this headline">¶</a></h4>
 <p>For optimum performance, set this to be equal to the number of CPUs or cores. In
-many cases, groonga queries may be CPU-intensive work, so to fully utilize
+many cases, Groonga queries may be CPU-intensive work, so to fully utilize
 multi-CPU/core systems, it's essential to set this accordingly.</p>
 <p>This isn't a groonga-httpd specific directive, but an nginx's one. For details,
 see <a class="reference external" href="http://wiki.nginx.org/CoreModule#worker_processes">http://wiki.nginx.org/CoreModule#worker_processes</a>.</p>
@@ -401,7 +419,7 @@ see <a class="reference external" href="http://wiki.nginx.org/CoreModule#worker_
 <dt>Context</dt>
 <dd><tt class="docutils literal"><span class="pre">http</span></tt>, <tt class="docutils literal"><span class="pre">server</span></tt>, <tt class="docutils literal"><span class="pre">location</span></tt></dd>
 </dl>
-<p>Specifies groonga's limit of query cache in the <tt class="docutils literal"><span class="pre">http</span></tt>, <tt class="docutils literal"><span class="pre">server</span></tt> or
+<p>Specifies Groonga's limit of query cache in the <tt class="docutils literal"><span class="pre">http</span></tt>, <tt class="docutils literal"><span class="pre">server</span></tt> or
 <tt class="docutils literal"><span class="pre">location</span></tt> block. The default value is 100.
 You can disable query cache to specify 0 to <tt class="docutils literal"><span class="pre">groonga_cache_limit</span></tt> explicitly.</p>
 <p>Examples:</p>
@@ -416,7 +434,7 @@ You can disable query cache to specify 0 to <tt class="docutils literal"><span c
 <div class="section" id="proxy-cache">
 <h4>8.1.4.4.2.3. <tt class="docutils literal"><span class="pre">proxy_cache</span></tt><a class="headerlink" href="#proxy-cache" title="Permalink to this headline">¶</a></h4>
 <p>In short, you can use nginx's reverse proxy and cache mechanism
-instead of groonga's built-in query cache feature.</p>
+instead of Groonga's built-in query cache feature.</p>
 <div class="section" id="query-cache">
 <h5>8.1.4.4.2.3.1. Query cache<a class="headerlink" href="#query-cache" title="Permalink to this headline">¶</a></h5>
 <p>Groonga has query cache feature for <a class="reference internal" href="../commands/select.html"><em>select</em></a>
@@ -512,13 +530,13 @@ http {
 </ul>
 </div></blockquote>
 <p>Note that you need to remove cache files created by nginx by hand
-after you load new data to groonga. For the above sample
+after you load new data to Groonga. For the above sample
 configuration, run the following command to remove cache files:</p>
 <div class="highlight-none"><div class="highlight"><pre>% groonga DB_PATH &lt; load.grn
 % rm -rf /var/cache/groonga-httpd/*
 </pre></div>
 </div>
-<p>If you use groonga's query cache feature, you don't need to expire
+<p>If you use Groonga's query cache feature, you don't need to expire
 cache by hand. It is done automatically.</p>
 </div>
 </div>
@@ -537,7 +555,7 @@ Expressions). For the list of standard HTTP modules, see
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h3><a href="../../index.html">Table Of Contents</a></h3>
   <ul>
@@ -547,8 +565,9 @@ Expressions). For the list of standard HTTP modules, see
 <li><a class="reference internal" href="#usage">8.1.4.3. Usage</a><ul>
 <li><a class="reference internal" href="#set-up">8.1.4.3.1. Set up</a></li>
 <li><a class="reference internal" href="#request-queries">8.1.4.3.2. Request queries</a></li>
-<li><a class="reference internal" href="#browse-the-administration-tool">8.1.4.3.3. Browse the administration tool</a></li>
-<li><a class="reference internal" href="#shut-down">8.1.4.3.4. Shut down</a></li>
+<li><a class="reference internal" href="#loading-data-by-post">8.1.4.3.3. Loading data by POST</a></li>
+<li><a class="reference internal" href="#browse-the-administration-tool">8.1.4.3.4. Browse the administration tool</a></li>
+<li><a class="reference internal" href="#shut-down">8.1.4.3.5. Shut down</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#configuration-directives">8.1.4.4. Configuration directives</a><ul>
@@ -585,12 +604,14 @@ Expressions). For the list of standard HTTP modules, see
   <h4>Next topic</h4>
   <p class="topless"><a href="groonga-server-http.html"
                         title="next chapter">8.1.5. groonga HTTPサーバー</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../../sources/reference/executables/groonga-httpd.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../sources/reference/executables/groonga-httpd.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
       <input type="text" name="q" />
@@ -607,7 +628,7 @@ Expressions). For the list of standard HTTP modules, see
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -619,12 +640,12 @@ Expressions). For the list of standard HTTP modules, see
         <li class="right" >
           <a href="groonga-benchmark.html" title="8.1.3. groonga-benchmark"
              >previous</a> |</li>
-        <li><a href="../../index.html">Groonga v3.1.1 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">Groonga v3.1.2 documentation</a> &raquo;</li>
           <li><a href="../../reference.html" >8. リファレンスマニュアル</a> &raquo;</li>
           <li><a href="../executables.html" >8.1. 実行ファイル</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2009-2014, Brazil, Inc.
     </div>
       <script src="http://connect.facebook.net/en_US/all.js"></script>

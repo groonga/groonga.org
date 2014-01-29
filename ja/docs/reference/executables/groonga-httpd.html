@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>8.1.4. groonga-httpd &mdash; Groonga v3.1.1ドキュメント</title>
+    <title>8.1.4. groonga-httpd &mdash; Groonga v3.1.2ドキュメント</title>
     
     <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '3.1.1',
+        VERSION:     '3.1.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../../static/doctools.js"></script>
     <script type="text/javascript" src="../../static/translations.js"></script>
     <link rel="shortcut icon" href="../../static/favicon.ico"/>
-    <link rel="top" title="Groonga v3.1.1ドキュメント" href="../../index.html" />
+    <link rel="top" title="Groonga v3.1.2ドキュメント" href="../../index.html" />
     <link rel="up" title="8.1. 実行ファイル" href="../executables.html" />
     <link rel="next" title="8.1.5. groonga HTTPサーバー" href="groonga-server-http.html" />
     <link rel="prev" title="8.1.3. groonga-benchmark" href="groonga-benchmark.html" /> 
@@ -38,9 +38,7 @@
     <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
   </head>
 
-    <body>
-    <div id="fb-root"></div>
-
+  <body role="document">
 <div class="header">
   <h1 class="title">
     <a id="top-link" href="../../../">
@@ -64,7 +62,7 @@
 </div>
   
 
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>ナビゲーション</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -76,7 +74,7 @@
         <li class="right" >
           <a href="groonga-benchmark.html" title="8.1.3. groonga-benchmark"
              accesskey="P">前へ</a> |</li>
-        <li><a href="../../index.html">Groonga v3.1.1ドキュメント</a> &raquo;</li>
+        <li><a href="../../index.html">Groonga v3.1.2ドキュメント</a> &raquo;</li>
           <li><a href="../../reference.html" >8. リファレンスマニュアル</a> &raquo;</li>
           <li><a href="../executables.html" accesskey="U">8.1. 実行ファイル</a> &raquo;</li> 
       </ul>
@@ -85,13 +83,18 @@
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="groonga-httpd">
 <h1>8.1.4. groonga-httpd<a class="headerlink" href="#groonga-httpd" title="このヘッドラインへのパーマリンク">¶</a></h1>
 <div class="section" id="summary">
 <h2>8.1.4.1. 概要<a class="headerlink" href="#summary" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>groonga-httpdはgroongaサーバーとHTTPプロトコルで通信するプログラムです。 機能的には、 <a class="reference internal" href="groonga-server-http.html"><em>groonga HTTPサーバー</em></a> と同じです。 <a class="reference internal" href="groonga-server-http.html"><em>groonga HTTPサーバー</em></a> はHTTPサーバーとしては最小限の機能しか持ちませんが、groonga-httpdは <a class="reference external" href="http://www.nginx.org/">nginx</a> を組み込むことでnginxが準拠しているHTTPの仕様と機能をすべて利用できます。</p>
+<p>groonga-httpd is a program to communicate with a Groonga server using
+the HTTP protocol. It functions as same as
+<a class="reference internal" href="groonga-server-http.html"><em>groonga HTTPサーバー</em></a>. Although <a class="reference internal" href="groonga-server-http.html"><em>groonga HTTPサーバー</em></a> has
+limited support for HTTP with a minimal built-in HTTP server,
+groonga-httpd has full support for HTTP with an embedded <a class="reference external" href="http://nginx.org/">nginx</a>. All standards-compliance and features provided
+by nginx is also available in groonga-httpd.</p>
 <p>groonga-httpdにはHTML + JavaScriptで実装された管理ツールが標準で付属しています。ウェブブラウザでhttp://hostname:port/にアクセスすると、管理ツールを利用できます。</p>
 </div>
 <div class="section" id="synopsis">
@@ -153,12 +156,32 @@ http {
 </pre></div>
 </div>
 </div>
+<div class="section" id="loading-data-by-post">
+<h3>8.1.4.3.3. Loading data by POST<a class="headerlink" href="#loading-data-by-post" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>The feature of groonga-httpd in contrast to groonga is supporting POST method.</p>
+<p>You can load data by POST JSON data.</p>
+<p>Here is an example curl command line that loads two users alice and bob to Users table:</p>
+<div class="highlight-none"><div class="highlight"><pre>% curl --data-binary &#39;[{&quot;_key&quot;: &quot;alice&quot;}, {&quot;_key&quot;: &quot;bob&quot;}]&#39; -H &quot;Content-Type: application/json&quot; &quot;http://localhost:10041/d/load?table=Users&quot;
+</pre></div>
+</div>
+<p>If you loads users from JSON file, prepare JSON file like this:</p>
+<div class="highlight-none"><div class="highlight"><pre>[
+{&quot;_key&quot;: &quot;alice&quot;},
+{&quot;_key&quot;: &quot;bob&quot;}
+]
+</pre></div>
+</div>
+<p>Then specify JSON file in curl command line:</p>
+<div class="highlight-none"><div class="highlight"><pre>% curl -X POST &#39;http://localhost:10041/d/load?table=Users&#39; -H &#39;Content-Type: application/json&#39; -d @users.json
+</pre></div>
+</div>
+</div>
 <div class="section" id="browse-the-administration-tool">
-<h3>8.1.4.3.3. 管理ツールを使う<a class="headerlink" href="#browse-the-administration-tool" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<h3>8.1.4.3.4. 管理ツールを使う<a class="headerlink" href="#browse-the-administration-tool" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <p>補足ですが、 <a class="reference external" href="http://localhost:10041/">http://localhost:10041/</a> にアクセスすると管理ツールを利用できます。</p>
 </div>
 <div class="section" id="shut-down">
-<h3>8.1.4.3.4. 終了する<a class="headerlink" href="#shut-down" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<h3>8.1.4.3.5. 終了する<a class="headerlink" href="#shut-down" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <p>最後に、次のコマンドで動作中のgroonga-httpdデーモンを終了できます。</p>
 <div class="highlight-none"><div class="highlight"><pre>% groonga-httpd -s stop
 </pre></div>
@@ -184,7 +207,8 @@ http {
 <dt>Context</dt>
 <dd><tt class="docutils literal"><span class="pre">location</span></tt></dd>
 </dl>
-<p>この <tt class="docutils literal"><span class="pre">location</span></tt> ブロックでgroongaを使うかどうかを指定します。デフォルトは <tt class="docutils literal"><span class="pre">off</span></tt> です。groongaを使うためには <tt class="docutils literal"><span class="pre">on</span></tt> を指定してください。</p>
+<p>Specifies whether Groonga is enabled in the <tt class="docutils literal"><span class="pre">location</span></tt> block. The
+default is <tt class="docutils literal"><span class="pre">off</span></tt>. You need to specify <tt class="docutils literal"><span class="pre">on</span></tt> to enable groonga.</p>
 <p>例:</p>
 <div class="highlight-none"><div class="highlight"><pre>location /d/ {
   groonga on;  # Enables groonga under /d/... path
@@ -208,7 +232,8 @@ location /d/ {
 <dt>Context</dt>
 <dd><tt class="docutils literal"><span class="pre">http</span></tt>, <tt class="docutils literal"><span class="pre">server</span></tt>, <tt class="docutils literal"><span class="pre">location</span></tt></dd>
 </dl>
-<p>groongaデータベースのパスを指定します。このディレクティブは必須です。</p>
+<p>Specifies the path to a Groonga database. This is the required
+directive.</p>
 </div>
 <div class="section" id="groonga-database-auto-create">
 <span id="id2"></span><h4>8.1.4.4.1.3. <tt class="docutils literal"><span class="pre">groonga_database_auto_create</span></tt><a class="headerlink" href="#groonga-database-auto-create" title="このヘッドラインへのパーマリンク">¶</a></h4>
@@ -222,7 +247,11 @@ location /d/ {
 <dt>Context</dt>
 <dd><tt class="docutils literal"><span class="pre">http</span></tt>, <tt class="docutils literal"><span class="pre">server</span></tt>, <tt class="docutils literal"><span class="pre">location</span></tt></dd>
 </dl>
-<p>groongaのデータベースを自動で作成するかどうかを指定します。もし、この値が <tt class="docutils literal"><span class="pre">on</span></tt> で <a class="reference internal" href="#groonga-database"><em>groonga_database</em></a> に指定したgroongaのデータベースが存在しない場合は自動でgroongaのデータベースを作成します。groongaのデータベースが存在している場合は何もしません。</p>
+<p>Specifies whether Groonga database is created automatically or not. If
+the value is <tt class="docutils literal"><span class="pre">on</span></tt> and the Groonga database specified by
+<a class="reference internal" href="#groonga-database"><em>groonga_database</em></a> doesn't exist, the Groonga database is created
+automatically. If the Groonga database exists, groonga-httpd does
+nothing.</p>
 <p>もし、親ディレクトリが存在しな場合は再帰的に親ディレクトリも作成します。</p>
 <p>デフォルト値は <tt class="docutils literal"><span class="pre">on</span></tt> です。通常、この値を変更する必要はありません。</p>
 </div>
@@ -239,7 +268,14 @@ location /d/ {
 <dt>Context</dt>
 <dd><tt class="docutils literal"><span class="pre">location</span></tt></dd>
 </dl>
-<p>URIのベースパスを指定します。groongaは <tt class="docutils literal"><span class="pre">command</span></tt> を実行するために <tt class="docutils literal"><span class="pre">/d/command?parameter1=value1&amp;...</span></tt> というパスを使います。groonga-httpdでもこのパスの形式を使いますが、groonga-httpdは  <tt class="docutils literal"><span class="pre">/other-prefix/command?parameter1=value1&amp;...</span></tt> というように <tt class="docutils literal"><span class="pre">/d/</span></tt> ではなく別のプレフィックスを使った形式もサポートしています。この別の形式もサポートするために、groonga-httpdはリクエストURIの先頭からベースパスを削除し、先頭に <tt class="docutils literal"><span class="pre">/d/</span></tt> を追加します。このパスの変換をすることにより、ユーザーはプレフィックスをカスタムできるようになりますが、groongaは常に <tt class="docutils literal"><span class="pre">/d/command?parameter1=value1&amp;...</span></tt> という形式で処理できます。</p>
+<p>Specifies the base path in URI. Groonga uses
+<tt class="docutils literal"><span class="pre">/d/command?parameter1=value1&amp;...</span></tt> path to run <tt class="docutils literal"><span class="pre">command</span></tt>. The form
+of path in used in groonga-httpd but groonga-httpd also supports
+<tt class="docutils literal"><span class="pre">/other-prefix/command?parameter1=value1&amp;...</span></tt> form. To support the
+form, groonga-httpd removes the base path from the head of request URI
+and prepend <tt class="docutils literal"><span class="pre">/d/</span></tt> to the processed request URI. By the path
+conversion, users can use custom path prefix and Groonga can always
+uses <tt class="docutils literal"><span class="pre">/d/command?parameter1=value1&amp;...</span></tt> form.</p>
 <p>通常、このディレクティブを使う必要はありません。このディレクティブはコマンド毎に設定をしたい場合に使います。</p>
 <p>以下は <a class="reference internal" href="../commands/shutdown.html"><em>shutdown</em></a> コマンドに認証をかける設定例です。:</p>
 <div class="highlight-none"><div class="highlight"><pre>groonga_database /var/lib/groonga/db/db;
@@ -275,7 +311,9 @@ location /d/ {
 <dt>Context</dt>
 <dd><tt class="docutils literal"><span class="pre">http</span></tt>, <tt class="docutils literal"><span class="pre">server</span></tt>, <tt class="docutils literal"><span class="pre">location</span></tt></dd>
 </dl>
-<p>groongaのログ保存先を <tt class="docutils literal"><span class="pre">http</span></tt> 、<tt class="docutils literal"><span class="pre">server</span></tt> もしくは <tt class="docutils literal"><span class="pre">location</span></tt> ブロックで指定します。デフォルトは <tt class="docutils literal"><span class="pre">/var/log/groonga/httpd/groonga.log</span></tt> です。ログを無効にするには <tt class="docutils literal"><span class="pre">off</span></tt> を指定します。</p>
+<p>Specifies Groonga log path in the <tt class="docutils literal"><span class="pre">http</span></tt>, <tt class="docutils literal"><span class="pre">server</span></tt> or <tt class="docutils literal"><span class="pre">location</span></tt> block. The
+default is <tt class="docutils literal"><span class="pre">/var/log/groonga/httpd/groonga.log</span></tt>.
+You can disable logging to specify <tt class="docutils literal"><span class="pre">off</span></tt>.</p>
 <p>例:</p>
 <div class="highlight-none"><div class="highlight"><pre>location /d/ {
   groonga on;
@@ -297,7 +335,8 @@ location /d/ {
 <dt>Context</dt>
 <dd><tt class="docutils literal"><span class="pre">http</span></tt>, <tt class="docutils literal"><span class="pre">server</span></tt>, <tt class="docutils literal"><span class="pre">location</span></tt></dd>
 </dl>
-<p>groongaのログレベルを <tt class="docutils literal"><span class="pre">http</span></tt> 、 <tt class="docutils literal"><span class="pre">server</span></tt> もしくは <tt class="docutils literal"><span class="pre">location</span></tt> ブロックで指定します。デフォルトは <tt class="docutils literal"><span class="pre">notice</span></tt> です。 <tt class="docutils literal"><span class="pre">none</span></tt> を指定することでログを無効にできます。</p>
+<p>Specifies Groonga log level in the <tt class="docutils literal"><span class="pre">http</span></tt>, <tt class="docutils literal"><span class="pre">server</span></tt> or <tt class="docutils literal"><span class="pre">location</span></tt> block. The
+default is <tt class="docutils literal"><span class="pre">notice</span></tt>. You can disable logging by specifying <tt class="docutils literal"><span class="pre">none</span></tt> as log level.</p>
 <p>例:</p>
 <div class="highlight-none"><div class="highlight"><pre>location /d/ {
   groonga on;
@@ -319,7 +358,10 @@ location /d/ {
 <dt>Context</dt>
 <dd><tt class="docutils literal"><span class="pre">http</span></tt>, <tt class="docutils literal"><span class="pre">server</span></tt>, <tt class="docutils literal"><span class="pre">location</span></tt></dd>
 </dl>
-<p>groongaのクエリーログの保存先を <tt class="docutils literal"><span class="pre">http</span></tt> 、<tt class="docutils literal"><span class="pre">server</span></tt> もしくは <tt class="docutils literal"><span class="pre">location</span></tt> ブロックで指定します。デフォルトは <tt class="docutils literal"><span class="pre">/var/log/groonga/httpd/groonga-query.log</span></tt> です。ログを無効にするには <tt class="docutils literal"><span class="pre">off</span></tt> を指定します。</p>
+<p>Specifies Groonga's query log path in the <tt class="docutils literal"><span class="pre">http</span></tt>, <tt class="docutils literal"><span class="pre">server</span></tt> or
+<tt class="docutils literal"><span class="pre">location</span></tt> block. The default is
+<tt class="docutils literal"><span class="pre">/var/log/groonga/httpd/groonga-query.log</span></tt>.  You can disable logging
+to specify <tt class="docutils literal"><span class="pre">off</span></tt>.</p>
 <p>例:</p>
 <div class="highlight-none"><div class="highlight"><pre>location /d/ {
   groonga on;
@@ -338,7 +380,10 @@ location /d/ {
 </ul>
 </div></blockquote>
 <p><a class="reference external" href="https://github.com/groonga/groonga-query-log">groonga-query-log パッケージ</a> でクエリーログを解析できます。このパッケージは有用なツールを提供しています。</p>
-<p>例えば、クエリーログを解析するツールがあります。これを使えば、スロークエリーを見つけることができます。クエリーログ内のすべてのクエリーを再生するツールもあります。これを使えば、新しいgroongaをプロダクション環境にデプロイする前に網羅的にテストすることができます。</p>
+<p>For example, there is a tool that analyzing your query log. It can
+detect slow queries from your query log. There is a tool that
+replaying same queries in your query log. It can test the new Groonga
+before updating production environment.</p>
 </div>
 </div>
 <div class="section" id="performance-related-directives">
@@ -346,7 +391,9 @@ location /d/ {
 <p>以下のディレクティブはgronoga-httpdの性能に関連しているディレクティブです。</p>
 <div class="section" id="worker-processes">
 <h4>8.1.4.4.2.1. <tt class="docutils literal"><span class="pre">worker_processes</span></tt><a class="headerlink" href="#worker-processes" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p>最適なパフォーマンスを得るためには、CPU数あるいはコア数と同じ数になるようにこのディレクティブを設定してください。大抵の場合、groongaのクエリーはCPU負荷が高いものとなり、複数のCPU/コアを使い切るためには、このディレクティブを設定する必要があります。</p>
+<p>For optimum performance, set this to be equal to the number of CPUs or cores. In
+many cases, Groonga queries may be CPU-intensive work, so to fully utilize
+multi-CPU/core systems, it's essential to set this accordingly.</p>
 <p>このディレクティブはgroonga-httpdのディレクティブではなく、nginxのディレクティブです。詳細は、 <a class="reference external" href="http://wiki.nginx.org/CoreModule#worker_processes">http://wiki.nginx.org/CoreModule#worker_processes</a> を参照してください。</p>
 <p>デフォルトで、このディレクティブには1が設定されています。</p>
 </div>
@@ -363,7 +410,9 @@ location /d/ {
 <dt>Context</dt>
 <dd><tt class="docutils literal"><span class="pre">http</span></tt>, <tt class="docutils literal"><span class="pre">server</span></tt>, <tt class="docutils literal"><span class="pre">location</span></tt></dd>
 </dl>
-<p>Groongaのクエリキャッシュの制限を <tt class="docutils literal"><span class="pre">http</span></tt> 、 <tt class="docutils literal"><span class="pre">server</span></tt> もしくは <tt class="docutils literal"><span class="pre">location</span></tt> ブロックで指定します。デフォルトは <tt class="docutils literal"><span class="pre">100</span></tt> です。 <tt class="docutils literal"><span class="pre">0</span></tt> を指定することで <tt class="docutils literal"><span class="pre">groonga_cache_limit</span></tt> を明示的に無効にできます。</p>
+<p>Specifies Groonga's limit of query cache in the <tt class="docutils literal"><span class="pre">http</span></tt>, <tt class="docutils literal"><span class="pre">server</span></tt> or
+<tt class="docutils literal"><span class="pre">location</span></tt> block. The default value is 100.
+You can disable query cache to specify 0 to <tt class="docutils literal"><span class="pre">groonga_cache_limit</span></tt> explicitly.</p>
 <p>例:</p>
 <div class="highlight-none"><div class="highlight"><pre>location /d/ {
   groonga on;
@@ -375,7 +424,8 @@ location /d/ {
 </div>
 <div class="section" id="proxy-cache">
 <h4>8.1.4.4.2.3. <tt class="docutils literal"><span class="pre">proxy_cache</span></tt><a class="headerlink" href="#proxy-cache" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p>まとめると、groonga組み込みのクエリーキャッシュ機能の代わりにnginxのリバースプロ機とキャッシュの仕組みを使うこともできます。</p>
+<p>In short, you can use nginx's reverse proxy and cache mechanism
+instead of Groonga's built-in query cache feature.</p>
 <div class="section" id="query-cache">
 <h5>8.1.4.4.2.3.1. クエリーキャッシュ<a class="headerlink" href="#query-cache" title="このヘッドラインへのパーマリンク">¶</a></h5>
 <p>groongaは <a class="reference internal" href="../commands/select.html"><em>select</em></a> コマンド用にクエリーキャッシュ機能を提供しています。この機能は多くのケースで性能向上を実現します。</p>
@@ -457,12 +507,15 @@ http {
 <li><a class="reference external" href="http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_pass">http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_pass</a></li>
 </ul>
 </div></blockquote>
-<p>groongaに新しいデータをロードしたときは自分でnginxが作ったキャッシュファイルを削除しなければいけないことに注意してください。前述のサンプル設定では、以下のコマンドでキャッシュを消せます:</p>
+<p>Note that you need to remove cache files created by nginx by hand
+after you load new data to Groonga. For the above sample
+configuration, run the following command to remove cache files:</p>
 <div class="highlight-none"><div class="highlight"><pre>% groonga DB_PATH &lt; load.grn
 % rm -rf /var/cache/groonga-httpd/*
 </pre></div>
 </div>
-<p>groongaのクエリーキャッシュ機能を使うと、手動でキャッシュを失効する必要はありません。自動で失効します。</p>
+<p>If you use Groonga's query cache feature, you don't need to expire
+cache by hand. It is done automatically.</p>
 </div>
 </div>
 </div>
@@ -477,7 +530,7 @@ http {
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h3><a href="../../index.html">目次</a></h3>
   <ul>
@@ -487,8 +540,9 @@ http {
 <li><a class="reference internal" href="#usage">8.1.4.3. 使い方</a><ul>
 <li><a class="reference internal" href="#set-up">8.1.4.3.1. 設定をする</a></li>
 <li><a class="reference internal" href="#request-queries">8.1.4.3.2. クエリーを実行する</a></li>
-<li><a class="reference internal" href="#browse-the-administration-tool">8.1.4.3.3. 管理ツールを使う</a></li>
-<li><a class="reference internal" href="#shut-down">8.1.4.3.4. 終了する</a></li>
+<li><a class="reference internal" href="#loading-data-by-post">8.1.4.3.3. Loading data by POST</a></li>
+<li><a class="reference internal" href="#browse-the-administration-tool">8.1.4.3.4. 管理ツールを使う</a></li>
+<li><a class="reference internal" href="#shut-down">8.1.4.3.5. 終了する</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#configuration-directives">8.1.4.4. 設定ディレクティブ</a><ul>
@@ -525,12 +579,14 @@ http {
   <h4>次のトピックへ</h4>
   <p class="topless"><a href="groonga-server-http.html"
                         title="次の章へ">8.1.5. groonga HTTPサーバー</a></p>
-  <h3>このページ</h3>
-  <ul class="this-page-menu">
-    <li><a href="../../sources/reference/executables/groonga-httpd.txt"
-           rel="nofollow">ソースコードを表示（英語）</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../sources/reference/executables/groonga-httpd.txt"
+            rel="nofollow">ソースコードを表示（英語）</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>クイック検索</h3>
     <form class="search" action="../../search.html" method="get">
       <input type="text" name="q" />
@@ -547,7 +603,7 @@ http {
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>ナビゲーション</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -559,12 +615,12 @@ http {
         <li class="right" >
           <a href="groonga-benchmark.html" title="8.1.3. groonga-benchmark"
              >前へ</a> |</li>
-        <li><a href="../../index.html">Groonga v3.1.1ドキュメント</a> &raquo;</li>
+        <li><a href="../../index.html">Groonga v3.1.2ドキュメント</a> &raquo;</li>
           <li><a href="../../reference.html" >8. リファレンスマニュアル</a> &raquo;</li>
           <li><a href="../executables.html" >8.1. 実行ファイル</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2009-2014, Brazil, Inc.
     </div>
       <script src="http://connect.facebook.net/ja_JP/all.js"></script>

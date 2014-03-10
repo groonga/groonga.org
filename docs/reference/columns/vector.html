@@ -1,0 +1,837 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Vector column &mdash; Groonga v4.0.0-81-g24a75c1 documentation</title>
+    
+    <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
+    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '4.0.0-81-g24a75c1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../static/favicon.ico"/>
+    <link rel="top" title="Groonga v4.0.0-81-g24a75c1 documentation" href="../../index.html" /> 
+      <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
+    <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
+    <meta property="og:type" content="product" />
+    <meta property="og:image" content="http://groonga.org/images/logos/groonga-icon-full-size.png" />
+    <meta property="og:site_name" content="groonga" />
+
+    <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
+  </head>
+
+  <body role="document">
+<div class="header">
+  <h1 class="title">
+    <a id="top-link" href="../../../">
+      <span class="project">groonga</span>
+      <span class="separator">-</span>
+      <span class="description">An open-source fulltext search engine and column store.</span>
+    </a>
+  </h1>
+
+      <div class="facebook-buttons">
+      <fb:like href="http://www.facebook.com/pages/groonga/201193596592346"
+               layout="standard"
+               width="290"></fb:like>
+    </div>
+    <div class="other-language-links">
+
+    <ul>
+      <li><a href="../../../ja/docs/reference/columns/vector.html"><img src="../../static/jp.png" alt="日本語">日本語版はこちら</a></li>
+    </ul>
+  </div>
+</div>
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../../index.html">Groonga v4.0.0-81-g24a75c1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="vector-column">
+<h1>Vector column<a class="headerlink" href="#vector-column" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>Vector column is a data store object. It can stores zero or more
+scalar values. In short, scalar value is a single value such as number
+and string. See <tt class="xref doc docutils literal"><span class="pre">scalar</span></tt> about scalar value details.</p>
+<p>One of vector column use cases is tags store. You can use a vector
+column to store tag values.</p>
+<p>You can use vector column as index search target in the same way as
+scalar column. You can set weight for each element. The element that
+has one or more weight is matched, the record has more score rather
+than no weight case. It is a vector column specific feature. Vector
+column that can store weight is called weight vector column.</p>
+<p>You can also do full text search against each text element. But search
+score is too high when weight is used. You should use full text search
+with weight carefully.</p>
+</div>
+<div class="section" id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>There are three vector column types:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Normal vector column</li>
+<li>Reference vector column</li>
+<li>Weight vector column</li>
+</ul>
+</div></blockquote>
+<p>This section describes how to use these types.</p>
+<div class="section" id="normal-vector-column">
+<span id="id1"></span><h3>Normal vector column<a class="headerlink" href="#normal-vector-column" title="Permalink to this headline">¶</a></h3>
+<p>Normal vector column stores zero or more scalar data. For example,
+scalar data are number, string and so on.</p>
+<p>A normal vector column can store the same type elements. You can't mix
+types. For example, you can't store a number and a string in the same
+normal vector column.</p>
+<p>Normal vector column is useful when a record has multiple values with
+a key. Tags are the most popular use case.</p>
+<div class="section" id="how-to-create">
+<h4>How to create<a class="headerlink" href="#how-to-create" title="Permalink to this headline">¶</a></h4>
+<p>Use <a class="reference internal" href="../commands/column_create.html"><em>column_create</em></a> command to create a
+normal vector column. The point is <tt class="docutils literal"><span class="pre">COLUMN_VECTOR</span></tt> flag:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Bookmarks TABLE_HASH_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Bookmarks tags COLUMN_VECTOR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>You can set zero or more tags to a bookmark.</p>
+</div>
+<div class="section" id="how-to-load">
+<h4>How to load<a class="headerlink" href="#how-to-load" title="Permalink to this headline">¶</a></h4>
+<p>You can load vector data by JSON array syntax:</p>
+<div class="highlight-none"><div class="highlight"><pre>[ELEMENT1, ELEMENT2, ELEMENT3, ...]
+</pre></div>
+</div>
+<p>Let's load the following data:</p>
+<p>Here is a command that loads the data:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>load --table Bookmarks
+[
+{&quot;_key&quot;: &quot;http://groonga.org/&quot;, &quot;tags&quot;: [&quot;groonga&quot;]},
+{&quot;_key&quot;: &quot;http://mroonga.org/&quot;, &quot;tags&quot;: [&quot;mroonga&quot;, &quot;mysql&quot;, &quot;groonga&quot;]},
+{&quot;_key&quot;: &quot;http://ranguba.org/&quot;, &quot;tags&quot;: [&quot;ruby&quot;, &quot;groonga&quot;]}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 3]
+</pre></div>
+</div>
+<p>The loaded data can be outputted as JSON array syntax:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Bookmarks
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         3
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;tags&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;http://groonga.org/&quot;,
+#         [
+#           &quot;groonga&quot;
+#         ]
+#       ],
+#       [
+#         2,
+#         &quot;http://mroonga.org/&quot;,
+#         [
+#           &quot;mroonga&quot;,
+#           &quot;mysql&quot;,
+#           &quot;groonga&quot;
+#         ]
+#       ],
+#       [
+#         3,
+#         &quot;http://ranguba.org/&quot;,
+#         [
+#           &quot;ruby&quot;,
+#           &quot;groonga&quot;
+#         ]
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
+<div class="section" id="how-to-search">
+<h4>How to search<a class="headerlink" href="#how-to-search" title="Permalink to this headline">¶</a></h4>
+<p>You need to create an index to search normal vector column:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Tags TABLE_PAT_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Tags bookmark_index COLUMN_INDEX Bookmarks tags
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>There are no vector column specific way. You can create an index like
+a scalar column.</p>
+<p>You can search an element in <tt class="docutils literal"><span class="pre">tags</span></tt> like full text search syntax.</p>
+<p>With <a class="reference internal" href="../commands/select.html#select-match-columns"><em>match_columns</em></a> and <a class="reference internal" href="../commands/select.html#select-query"><em>query</em></a>:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Bookmarks --match_columns tags --query mysql --output_columns _key,tags,_score
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;tags&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;_score&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;http://mroonga.org/&quot;,
+#         [
+#           &quot;mroonga&quot;,
+#           &quot;mysql&quot;,
+#           &quot;groonga&quot;
+#         ],
+#         1
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>You can also use weight in <a class="reference internal" href="../commands/select.html#select-match-columns"><em>match_columns</em></a>:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Bookmarks --match_columns &#39;tags * 3&#39; --query mysql --output_columns _key,tags,_score
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;tags&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;_score&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;http://mroonga.org/&quot;,
+#         [
+#           &quot;mroonga&quot;,
+#           &quot;mysql&quot;,
+#           &quot;groonga&quot;
+#         ],
+#         3
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>With <a class="reference internal" href="../commands/select.html#select-filter"><em>filter</em></a>:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Bookmarks --filter &#39;tags @ &quot;msyql&quot;&#39; --output_columns _key,tags,_score
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         0
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;tags&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;_score&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="reference-vector-column">
+<span id="id2"></span><h3>Reference vector column<a class="headerlink" href="#reference-vector-column" title="Permalink to this headline">¶</a></h3>
+<p>TODO</p>
+<p>Reference vector column is space-efficient if there are many same
+value elements. Reference vector column keeps reference record IDs not
+value itself. Record ID is smaller than value itself.</p>
+<div class="section" id="id3">
+<h4>How to create<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h4>
+<p>TODO</p>
+</div>
+<div class="section" id="id4">
+<h4>How to load<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h4>
+<p>TODO</p>
+</div>
+<div class="section" id="id5">
+<h4>How to search<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h4>
+<p>TODO</p>
+</div>
+</div>
+<div class="section" id="weight-vector-column">
+<span id="id6"></span><h3>Weight vector column<a class="headerlink" href="#weight-vector-column" title="Permalink to this headline">¶</a></h3>
+<p>Weight vector column is similar to normal vector column. It can store
+elements. It can also stores weights for them. Weight is degree of
+importance of the element.</p>
+<p>Weight is positive integer. <tt class="docutils literal"><span class="pre">0</span></tt> is the default weight. It means that
+no weight.</p>
+<p>If weight is one or larger, search score is increased by the
+weight. If the weight is <tt class="docutils literal"><span class="pre">0</span></tt>, score is <tt class="docutils literal"><span class="pre">1</span></tt>. If the weight is
+<tt class="docutils literal"><span class="pre">10</span></tt>, score is <tt class="docutils literal"><span class="pre">11</span></tt> (<tt class="docutils literal"><span class="pre">=</span> <span class="pre">1</span> <span class="pre">+</span> <span class="pre">10</span></tt>).</p>
+<p>Weight vector column is useful for tuning search score. See also
+<a class="reference internal" href="../commands/select.html#select-adjuster"><em>adjuster</em></a>. You can increase search score of specific
+records.</p>
+<div class="section" id="limitations">
+<h4>Limitations<a class="headerlink" href="#limitations" title="Permalink to this headline">¶</a></h4>
+<p>There are some limitations for now. They will be resolved in the
+future.</p>
+<p>Here are limitations:</p>
+<blockquote>
+<div><ul class="simple">
+<li>You need to use string representation for element value on load.
+For example, you can't use <tt class="docutils literal"><span class="pre">29</span></tt> for number 29. You need to use
+<tt class="docutils literal"><span class="pre">&quot;29&quot;</span></tt> for number 29.</li>
+<li>You can't use reference type.</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="id7">
+<h4>How to create<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h4>
+<p>Use <a class="reference internal" href="../commands/column_create.html"><em>column_create</em></a> command to create a
+weight vector column. The point is <tt class="docutils literal"><span class="pre">COLUMN_VECTOR|WITH_WEIGHT</span></tt>
+flags:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Bookmarks TABLE_HASH_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Bookmarks tags COLUMN_VECTOR|WITH_WEIGHT ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>If you don't specify <tt class="docutils literal"><span class="pre">WITH_WEIGHT</span></tt> flag, it is just a normal vector
+column.</p>
+<p>You can set zero or more tags with weight to a bookmark.</p>
+</div>
+<div class="section" id="id8">
+<h4>How to load<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h4>
+<p>You can load vector data by JSON object syntax:</p>
+<div class="highlight-none"><div class="highlight"><pre>{&quot;ELEMENT1&quot;: WEIGHT1, &quot;ELEMENT2&quot;: WEIGHT2, &quot;ELEMENT3&quot;: WEIGHT3, ...}
+</pre></div>
+</div>
+<p>Let's load the following data:</p>
+<p>Here is a command that loads the data:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>load --table Bookmarks
+[
+{&quot;_key&quot;: &quot;http://groonga.org/&quot;,
+ &quot;tags&quot;: {&quot;groonga&quot;: 100}},
+{&quot;_key&quot;: &quot;http://mroonga.org/&quot;,
+ &quot;tags&quot;: {&quot;mroonga&quot;: 100,
+          &quot;mysql&quot;:   50,
+          &quot;groonga&quot;: 10}},
+{&quot;_key&quot;: &quot;http://ranguba.org/&quot;,
+ &quot;tags&quot;: {&quot;ruby&quot;: 100,
+          &quot;groonga&quot;: 50}}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 3]
+</pre></div>
+</div>
+<p>The loaded data can be outputted as JSON object syntax:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Bookmarks
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         3
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;tags&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;http://groonga.org/&quot;,
+#         {
+#           &quot;groonga&quot;: 100
+#         }
+#       ],
+#       [
+#         2,
+#         &quot;http://mroonga.org/&quot;,
+#         {
+#           &quot;mroonga&quot;: 100,
+#           &quot;groonga&quot;: 10,
+#           &quot;mysql&quot;: 50
+#         }
+#       ],
+#       [
+#         3,
+#         &quot;http://ranguba.org/&quot;,
+#         {
+#           &quot;ruby&quot;: 100,
+#           &quot;groonga&quot;: 50
+#         }
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
+<div class="section" id="id9">
+<h4>How to search<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h4>
+<p>You need to create an index to search weight vector column. You don't
+forget to specify <tt class="docutils literal"><span class="pre">WITH_WEIGHT</span></tt> flag to <tt class="docutils literal"><span class="pre">column_create</span></tt>:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Tags TABLE_PAT_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Tags bookmark_index COLUMN_INDEX|WITH_WEIGHT Bookmarks tags
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>There are no weight vector column specific way except <tt class="docutils literal"><span class="pre">WITH_WEIGHT</span></tt>
+flag. You can create an index like a scalar column.</p>
+<p>You can search an element in <tt class="docutils literal"><span class="pre">tags</span></tt> like full text search syntax.</p>
+<p>With <a class="reference internal" href="../commands/select.html#select-match-columns"><em>match_columns</em></a> and <a class="reference internal" href="../commands/select.html#select-query"><em>query</em></a>:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Bookmarks --match_columns tags --query groonga --output_columns _key,tags,_score
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         3
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;tags&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;_score&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;http://groonga.org/&quot;,
+#         {
+#           &quot;groonga&quot;: 100
+#         },
+#         101
+#       ],
+#       [
+#         &quot;http://mroonga.org/&quot;,
+#         {
+#           &quot;mroonga&quot;: 100,
+#           &quot;groonga&quot;: 10,
+#           &quot;mysql&quot;: 50
+#         },
+#         11
+#       ],
+#       [
+#         &quot;http://ranguba.org/&quot;,
+#         {
+#           &quot;ruby&quot;: 100,
+#           &quot;groonga&quot;: 50
+#         },
+#         51
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>You can also use weight in <a class="reference internal" href="../commands/select.html#select-match-columns"><em>match_columns</em></a>. The score is
+<tt class="docutils literal"><span class="pre">(1</span> <span class="pre">+</span> <span class="pre">weight_in_weight_vector)</span> <span class="pre">*</span> <span class="pre">weight_in_match_columns</span></tt>:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Bookmarks --match_columns &#39;tags * 3&#39; --query groonga --output_columns _key,tags,_score
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         3
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;tags&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;_score&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;http://groonga.org/&quot;,
+#         {
+#           &quot;groonga&quot;: 100
+#         },
+#         303
+#       ],
+#       [
+#         &quot;http://mroonga.org/&quot;,
+#         {
+#           &quot;mroonga&quot;: 100,
+#           &quot;groonga&quot;: 10,
+#           &quot;mysql&quot;: 50
+#         },
+#         33
+#       ],
+#       [
+#         &quot;http://ranguba.org/&quot;,
+#         {
+#           &quot;ruby&quot;: 100,
+#           &quot;groonga&quot;: 50
+#         },
+#         153
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>With <a class="reference internal" href="../commands/select.html#select-filter"><em>filter</em></a>:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Bookmarks --filter &#39;tags @ &quot;groonga&quot;&#39; --output_columns _key,tags,_score
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         3
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;tags&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;_score&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;http://groonga.org/&quot;,
+#         {
+#           &quot;groonga&quot;: 100
+#         },
+#         101
+#       ],
+#       [
+#         &quot;http://mroonga.org/&quot;,
+#         {
+#           &quot;mroonga&quot;: 100,
+#           &quot;groonga&quot;: 10,
+#           &quot;mysql&quot;: 50
+#         },
+#         11
+#       ],
+#       [
+#         &quot;http://ranguba.org/&quot;,
+#         {
+#           &quot;ruby&quot;: 100,
+#           &quot;groonga&quot;: 50
+#         },
+#         51
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
+<div class="section" id="how-to-apply-just-weight">
+<h4>How to apply just weight<a class="headerlink" href="#how-to-apply-just-weight" title="Permalink to this headline">¶</a></h4>
+<p>You can use weight in weight vector column to just increase search
+score without changing a set of matched records.</p>
+<p>Use <a class="reference internal" href="../commands/select.html#select-adjuster"><em>adjuster</em></a> for the purpose:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Bookmarks \
+  --filter true \
+  --adjuster &#39;tags @ &quot;mysql&quot; * 10 + tags @ &quot;groonga&quot; * 5&#39; \
+  --output_columns _key,tags,_score
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         3
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;tags&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;_score&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;http://groonga.org/&quot;,
+#         {
+#           &quot;groonga&quot;: 100
+#         },
+#         506
+#       ],
+#       [
+#         &quot;http://mroonga.org/&quot;,
+#         {
+#           &quot;mroonga&quot;: 100,
+#           &quot;groonga&quot;: 10,
+#           &quot;mysql&quot;: 50
+#         },
+#         566
+#       ],
+#       [
+#         &quot;http://ranguba.org/&quot;,
+#         {
+#           &quot;ruby&quot;: 100,
+#           &quot;groonga&quot;: 50
+#         },
+#         256
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">select</span></tt> command uses <tt class="docutils literal"><span class="pre">--filter</span> <span class="pre">true</span></tt>. So all records are
+matched with score 1. Then it applies <tt class="docutils literal"><span class="pre">--adjuster</span></tt>. The adjuster
+does the following:</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">tags</span> <span class="pre">&#64;</span> <span class="pre">&quot;mysql&quot;</span> <span class="pre">*</span> <span class="pre">10</span></tt> increases score by <tt class="docutils literal"><span class="pre">(1</span> <span class="pre">+</span> <span class="pre">weight)</span> <span class="pre">*</span> <span class="pre">10</span></tt>
+of records that has <tt class="docutils literal"><span class="pre">&quot;mysql&quot;</span></tt> tag.</li>
+<li><tt class="docutils literal"><span class="pre">tags</span> <span class="pre">&#64;</span> <span class="pre">&quot;groonga&quot;</span> <span class="pre">*</span> <span class="pre">5</span></tt> increases score by <tt class="docutils literal"><span class="pre">(1</span> <span class="pre">+</span> <span class="pre">weight)</span> <span class="pre">*</span> <span class="pre">5</span></tt>
+of records that has <tt class="docutils literal"><span class="pre">&quot;groonga&quot;</span></tt> tag.</li>
+</ul>
+</div></blockquote>
+<p>For example, record <tt class="docutils literal"><span class="pre">&quot;http://mroonga.org/&quot;</span></tt> has both <tt class="docutils literal"><span class="pre">&quot;mysql&quot;</span></tt> tag
+and <tt class="docutils literal"><span class="pre">&quot;groonga&quot;</span></tt> tag. So its score is increased by <tt class="docutils literal"><span class="pre">565</span></tt> (<tt class="docutils literal"><span class="pre">=</span>
+<span class="pre">((1</span> <span class="pre">+</span> <span class="pre">50)</span> <span class="pre">*</span> <span class="pre">10)</span> <span class="pre">+</span> <span class="pre">((1</span> <span class="pre">+</span> <span class="pre">10)</span> <span class="pre">*</span> <span class="pre">5)</span> <span class="pre">=</span> <span class="pre">(51</span> <span class="pre">*</span> <span class="pre">10)</span> <span class="pre">+</span> <span class="pre">(11</span> <span class="pre">*</span> <span class="pre">5)</span> <span class="pre">=</span> <span class="pre">510</span> <span class="pre">+</span> <span class="pre">55</span></tt>).
+The search score is 1 by <tt class="docutils literal"><span class="pre">--filter</span> <span class="pre">true</span></tt> before applying
+<tt class="docutils literal"><span class="pre">--adjuster</span></tt>. So the final search score is <tt class="docutils literal"><span class="pre">566</span></tt> (<tt class="docutils literal"><span class="pre">=</span> <span class="pre">1</span> <span class="pre">+</span> <span class="pre">565</span></tt>)
+of record <tt class="docutils literal"><span class="pre">&quot;http://mroonga.org/&quot;</span></tt>.</p>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Vector column</a><ul>
+<li><a class="reference internal" href="#summary">Summary</a></li>
+<li><a class="reference internal" href="#usage">Usage</a><ul>
+<li><a class="reference internal" href="#normal-vector-column">Normal vector column</a><ul>
+<li><a class="reference internal" href="#how-to-create">How to create</a></li>
+<li><a class="reference internal" href="#how-to-load">How to load</a></li>
+<li><a class="reference internal" href="#how-to-search">How to search</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#reference-vector-column">Reference vector column</a><ul>
+<li><a class="reference internal" href="#id3">How to create</a></li>
+<li><a class="reference internal" href="#id4">How to load</a></li>
+<li><a class="reference internal" href="#id5">How to search</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#weight-vector-column">Weight vector column</a><ul>
+<li><a class="reference internal" href="#limitations">Limitations</a></li>
+<li><a class="reference internal" href="#id7">How to create</a></li>
+<li><a class="reference internal" href="#id8">How to load</a></li>
+<li><a class="reference internal" href="#id9">How to search</a></li>
+<li><a class="reference internal" href="#how-to-apply-just-weight">How to apply just weight</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../sources/reference/columns/vector.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../../index.html">Groonga v4.0.0-81-g24a75c1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2009-2014, Brazil, Inc.
+    </div>
+      <script src="http://connect.facebook.net/en_US/all.js"></script>
+
+    <script>
+      FB.init({
+         appId  : null,
+         status : true, // check login status
+         cookie : true, // enable cookies to allow the server to access the session
+         xfbml  : true  // parse XFBML
+      });
+    </script>
+  </body>
+
+</html>

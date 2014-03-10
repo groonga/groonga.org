@@ -89,13 +89,30 @@
 <h1>8.3.10. <tt class="docutils literal"><span class="pre">column_rename</span></tt><a class="headerlink" href="#column-rename" title="このヘッドラインへのパーマリンク">¶</a></h1>
 <div class="section" id="summary">
 <h2>8.3.10.1. 概要<a class="headerlink" href="#summary" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p><tt class="docutils literal"><span class="pre">column_rename</span></tt> コマンドは指定したテーブルのカラム名を変更します。</p>
+<p><tt class="docutils literal"><span class="pre">column_rename</span></tt> コマンドはカラム名を変更します。</p>
+<p>It is a light operation. It just changes a relationship between name
+and the column object. It doesn't copy column values.</p>
+<p>It is a dangerous operation. You must stop all operations including
+read operations while you run <tt class="docutils literal"><span class="pre">column_rename</span></tt>. If the following case
+is occurred, Groonga process may be crashed:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Starts an operation (like <tt class="docutils literal"><span class="pre">select</span></tt>) that accesses the column to
+be renamed by the current column name. The current column name is
+called as <tt class="docutils literal"><span class="pre">the</span> <span class="pre">old</span> <span class="pre">column</span> <span class="pre">name</span></tt> in the below because the column
+name is renamed.</li>
+<li>Runs <tt class="docutils literal"><span class="pre">column_rename</span></tt>. The <tt class="docutils literal"><span class="pre">select</span></tt> is still running.</li>
+<li>The <tt class="docutils literal"><span class="pre">select</span></tt> accesses the column to be renamed by the old column
+name. But the <tt class="docutils literal"><span class="pre">select</span></tt> can't find the column by the old name
+because the column has been renamed to the new column name. It may
+crash the Groonga process.</li>
+</ul>
+</div></blockquote>
 </div>
 <div class="section" id="syntax">
 <h2>8.3.10.2. 構文<a class="headerlink" href="#syntax" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p><tt class="docutils literal"><span class="pre">column_rename</span></tt> コマンドは引数を二つとります。</p>
-<p><tt class="docutils literal"><span class="pre">table</span></tt> と <tt class="docutils literal"><span class="pre">column_name</span></tt> が必須の引数です。</p>
-<div class="highlight-none"><div class="highlight"><pre>column_rename table column
+<p><tt class="docutils literal"><span class="pre">column_rename</span></tt> コマンドは引数を3つとります。すべて必須です:</p>
+<div class="highlight-none"><div class="highlight"><pre>column_rename table name new_name
 </pre></div>
 </div>
 </div>
@@ -230,16 +247,20 @@ select Users
 <div class="section" id="parameters">
 <h2>8.3.10.4. 引数<a class="headerlink" href="#parameters" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <p>このセクションでは <tt class="docutils literal"><span class="pre">column_rename</span></tt> の引数について説明します。</p>
-<div class="section" id="required-parameter">
-<h3>8.3.10.4.1. 必須引数<a class="headerlink" href="#required-parameter" title="このヘッドラインへのパーマリンク">¶</a></h3>
-<p>必須引数は二つあります。 <tt class="docutils literal"><span class="pre">table_name</span></tt> と <tt class="docutils literal"><span class="pre">column_name</span></tt> です。</p>
-<div class="section" id="table-name">
-<h4>8.3.10.4.1.1. <tt class="docutils literal"><span class="pre">table_name</span></tt><a class="headerlink" href="#table-name" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p>テーブルの名前を指定します。</p>
+<div class="section" id="required-parameters">
+<h3>8.3.10.4.1. 必須引数<a class="headerlink" href="#required-parameters" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>All parameters are required.</p>
+<div class="section" id="table">
+<h4>8.3.10.4.1.1. <tt class="docutils literal"><span class="pre">table</span></tt><a class="headerlink" href="#table" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>It specifies the name of table that has the column to be renamed.</p>
 </div>
-<div class="section" id="column-name">
-<h4>8.3.10.4.1.2. <tt class="docutils literal"><span class="pre">column_name</span></tt><a class="headerlink" href="#column-name" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p>カラムの名前を指定します。</p>
+<div class="section" id="name">
+<h4>8.3.10.4.1.2. <tt class="docutils literal"><span class="pre">name</span></tt><a class="headerlink" href="#name" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>It specifies the column name to be renamed.</p>
+</div>
+<div class="section" id="new-name">
+<h4>8.3.10.4.1.3. <tt class="docutils literal"><span class="pre">new_name</span></tt><a class="headerlink" href="#new-name" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>It specifies the new column name.</p>
 </div>
 </div>
 </div>
@@ -250,12 +271,11 @@ select Users
 </div>
 <p><tt class="docutils literal"><span class="pre">HEADER</span></tt></p>
 <blockquote>
-<div><p>HEADERのフォーマットは  [0, UNIX_TIME_WHEN_COMMAND_IS_STARTED, ELAPSED_TIME] です。HEADERについては <a class="reference internal" href="../command/output_format.html"><em>出力形式</em></a> を参照してください。</p>
+<div><p><tt class="docutils literal"><span class="pre">HEADER</span></tt> については <a class="reference internal" href="../command/output_format.html"><em>出力形式</em></a> を参照してください。</p>
 </div></blockquote>
 <p><tt class="docutils literal"><span class="pre">SUCCEEDED_OR_NOT</span></tt></p>
 <blockquote>
-<div><p>コマンドの実行が成功するとtrueを返します。失敗するとエラーとしてfalseを返します。</p>
-</div></blockquote>
+<div>It is <tt class="docutils literal"><span class="pre">true</span></tt> on success, <tt class="docutils literal"><span class="pre">false</span></tt> otherwise.</div></blockquote>
 </div>
 </div>
 
@@ -272,9 +292,10 @@ select Users
 <li><a class="reference internal" href="#syntax">8.3.10.2. 構文</a></li>
 <li><a class="reference internal" href="#usage">8.3.10.3. 使い方</a></li>
 <li><a class="reference internal" href="#parameters">8.3.10.4. 引数</a><ul>
-<li><a class="reference internal" href="#required-parameter">8.3.10.4.1. 必須引数</a><ul>
-<li><a class="reference internal" href="#table-name">8.3.10.4.1.1. <tt class="docutils literal"><span class="pre">table_name</span></tt></a></li>
-<li><a class="reference internal" href="#column-name">8.3.10.4.1.2. <tt class="docutils literal"><span class="pre">column_name</span></tt></a></li>
+<li><a class="reference internal" href="#required-parameters">8.3.10.4.1. 必須引数</a><ul>
+<li><a class="reference internal" href="#table">8.3.10.4.1.1. <tt class="docutils literal"><span class="pre">table</span></tt></a></li>
+<li><a class="reference internal" href="#name">8.3.10.4.1.2. <tt class="docutils literal"><span class="pre">name</span></tt></a></li>
+<li><a class="reference internal" href="#new-name">8.3.10.4.1.3. <tt class="docutils literal"><span class="pre">new_name</span></tt></a></li>
 </ul>
 </li>
 </ul>

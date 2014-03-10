@@ -74,7 +74,7 @@
           <a href="ruby_load.html" title="8.3.23. ruby_load"
              accesskey="P">previous</a> |</li>
         <li><a href="../../index.html">Groonga v4.0.0 documentation</a> &raquo;</li>
-          <li><a href="../../reference.html" >8. リファレンスマニュアル</a> &raquo;</li>
+          <li><a href="../../reference.html" >8. Reference manual</a> &raquo;</li>
           <li><a href="../command.html" accesskey="U">8.3. Command</a> &raquo;</li> 
       </ul>
     </div>  
@@ -116,6 +116,7 @@ understand <tt class="docutils literal"><span class="pre">select</span></tt> to 
        [query_expansion=null]
        [query_flags=ALLOW_PRAGMA|ALLOW_COLUMN|ALLOW_UPDATE|ALLOW_LEADING_NOT|NONE]
        [query_expander=null]
+       [adjuster=null]
 </pre></div>
 </div>
 </div>
@@ -2169,6 +2170,247 @@ records. It's very useful value to show all records.</p>
 <div>検索結果をクエリキャッシュに残しません。キャッシュして再利用される可能性が低いクエリに対して用います。キャッシュ容量は有限です。有効なキャッシュが多くヒットするために、このパラメータは有効です。</div></blockquote>
 </div>
 </div>
+<div class="section" id="score-related-parameters">
+<h3>8.3.24.4.7. Score related parameters<a class="headerlink" href="#score-related-parameters" title="Permalink to this headline">¶</a></h3>
+<p>There is a score related parameter, <tt class="docutils literal"><span class="pre">adjuster</span></tt>.</p>
+<div class="section" id="adjuster">
+<span id="select-adjuster"></span><h4>8.3.24.4.7.1. <tt class="docutils literal"><span class="pre">adjuster</span></tt><a class="headerlink" href="#adjuster" title="Permalink to this headline">¶</a></h4>
+<p>It specifies one or more score adjust expressions. You need to use
+<tt class="docutils literal"><span class="pre">adjuster</span></tt> with <tt class="docutils literal"><span class="pre">query</span></tt> or <tt class="docutils literal"><span class="pre">filter</span></tt>. <tt class="docutils literal"><span class="pre">adjuster</span></tt> doesn't work
+with not searched request.</p>
+<p>You can increase score of specific records by <tt class="docutils literal"><span class="pre">adjuster</span></tt>. You can
+use <tt class="docutils literal"><span class="pre">adjuster</span></tt> to set high score for important records.</p>
+<p>For example, you can use <tt class="docutils literal"><span class="pre">adjuster</span></tt> to increase score of records
+that have <tt class="docutils literal"><span class="pre">groonga</span></tt> tag.</p>
+<p>Here is the syntax:</p>
+<div class="highlight-none"><div class="highlight"><pre>--adjuster &quot;SCORE_ADJUST_EXPRESSION1 + SCORE_ADJUST_EXPRESSION2 + ...&quot;
+</pre></div>
+</div>
+<p>Here is the <tt class="docutils literal"><span class="pre">SCORE_ADJUST_EXPRESSION</span></tt> syntax:</p>
+<div class="highlight-none"><div class="highlight"><pre>COLUMN @ &quot;KEYWORD&quot; * WEIGHT
+</pre></div>
+</div>
+<p>Note the following:</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">COLUMN</span></tt> must be indexed.</li>
+<li><tt class="docutils literal"><span class="pre">&quot;KEYWORD&quot;</span></tt> must be a string.</li>
+<li><tt class="docutils literal"><span class="pre">WEIGHT</span></tt> must be a positive integer.</li>
+</ul>
+</div></blockquote>
+<p>Here is a sample <tt class="docutils literal"><span class="pre">adjuster</span></tt> usage example that uses just one
+<tt class="docutils literal"><span class="pre">SCORE_ADJUST_EXPRESSION</span></tt>:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries \
+  --filter true \
+  --adjuster &#39;content @ &quot;groonga&quot; * 5&#39; \
+  --output_columns _key,content,_score
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;_score&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;The first post!&quot;,
+#         &quot;Welcome! This is my first post!&quot;,
+#         1
+#       ],
+#       [
+#         &quot;Groonga&quot;,
+#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
+#         6
+#       ],
+#       [
+#         &quot;Mroonga&quot;,
+#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         1
+#       ],
+#       [
+#         &quot;Good-bye Senna&quot;,
+#         &quot;I migrated all Senna system!&quot;,
+#         1
+#       ],
+#       [
+#         &quot;Good-bye Tritonn&quot;,
+#         &quot;I also migrated all Tritonn system!&quot;,
+#         1
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">select</span></tt> command matches all records. Then it applies
+<tt class="docutils literal"><span class="pre">adjuster</span></tt>. The adjuster increases score of records that have
+<tt class="docutils literal"><span class="pre">&quot;groonga&quot;</span></tt> in <tt class="docutils literal"><span class="pre">Entries.content</span></tt> column by 5. There is only one
+record that has <tt class="docutils literal"><span class="pre">&quot;groonga&quot;</span></tt> in <tt class="docutils literal"><span class="pre">Entries.content</span></tt> column.  So the
+record that its key is <tt class="docutils literal"><span class="pre">&quot;Groonga&quot;</span></tt> has score 6 (<tt class="docutils literal"><span class="pre">=</span> <span class="pre">1</span> <span class="pre">+</span> <span class="pre">5</span></tt>).</p>
+<p>You can omit <tt class="docutils literal"><span class="pre">WEIGHT</span></tt>. If you omit <tt class="docutils literal"><span class="pre">WEIGHT</span></tt>, it is treated as 1.</p>
+<p>Here is a sample <tt class="docutils literal"><span class="pre">adjuster</span></tt> usage example that omits <tt class="docutils literal"><span class="pre">WEIGHT</span></tt>:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries \
+  --filter true \
+  --adjuster &#39;content @ &quot;groonga&quot;&#39; \
+  --output_columns _key,content,_score
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;_score&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;The first post!&quot;,
+#         &quot;Welcome! This is my first post!&quot;,
+#         1
+#       ],
+#       [
+#         &quot;Groonga&quot;,
+#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
+#         2
+#       ],
+#       [
+#         &quot;Mroonga&quot;,
+#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         1
+#       ],
+#       [
+#         &quot;Good-bye Senna&quot;,
+#         &quot;I migrated all Senna system!&quot;,
+#         1
+#       ],
+#       [
+#         &quot;Good-bye Tritonn&quot;,
+#         &quot;I also migrated all Tritonn system!&quot;,
+#         1
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">adjuster</span></tt> in the <tt class="docutils literal"><span class="pre">select</span></tt> command doesn't have <tt class="docutils literal"><span class="pre">WEIGHT</span></tt>. So
+the weight is treated as 1. There is only one record that has
+<tt class="docutils literal"><span class="pre">&quot;groonga&quot;</span></tt> in <tt class="docutils literal"><span class="pre">Entries.content</span></tt> column. So the record that its
+key is <tt class="docutils literal"><span class="pre">&quot;Groonga&quot;</span></tt> has score 2 (<tt class="docutils literal"><span class="pre">=</span> <span class="pre">1</span> <span class="pre">+</span> <span class="pre">1</span></tt>).</p>
+<p>Here is a sample <tt class="docutils literal"><span class="pre">adjuster</span></tt> usage example that uses multiple
+<tt class="docutils literal"><span class="pre">SCORE_ADJUST_EXPRESSION</span></tt>:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries \
+  --filter true \
+  --adjuster &#39;content @ &quot;groonga&quot; * 5 + content @ &quot;started&quot; * 3&#39; \
+  --output_columns _key,content,_score
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;_score&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;The first post!&quot;,
+#         &quot;Welcome! This is my first post!&quot;,
+#         1
+#       ],
+#       [
+#         &quot;Groonga&quot;,
+#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
+#         9
+#       ],
+#       [
+#         &quot;Mroonga&quot;,
+#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         4
+#       ],
+#       [
+#         &quot;Good-bye Senna&quot;,
+#         &quot;I migrated all Senna system!&quot;,
+#         1
+#       ],
+#       [
+#         &quot;Good-bye Tritonn&quot;,
+#         &quot;I also migrated all Tritonn system!&quot;,
+#         1
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">adjuster</span></tt> in the <tt class="docutils literal"><span class="pre">select</span></tt> command has two
+<tt class="docutils literal"><span class="pre">SCORE_ADJUST_EXPRESSION</span></tt> s. The final increased score is sum of
+scores of these <tt class="docutils literal"><span class="pre">SCORE_ADJUST_EXPRESSION</span></tt> s. All
+<tt class="docutils literal"><span class="pre">SCORE_ADJUST_EXPRESSION</span></tt> s in the <tt class="docutils literal"><span class="pre">select</span></tt> command are applied to
+a record that its key is <tt class="docutils literal"><span class="pre">&quot;Groonga&quot;</span></tt>. So the final increased score
+of the record is sum of scores of all <tt class="docutils literal"><span class="pre">SCORE_ADJUST_EXPRESSION</span></tt> s.</p>
+<p>The first <tt class="docutils literal"><span class="pre">SCORE_ADJUST_EXPRESSION</span></tt> is <tt class="docutils literal"><span class="pre">content</span> <span class="pre">&#64;</span> <span class="pre">&quot;groonga&quot;</span> <span class="pre">*</span> <span class="pre">5</span></tt>.
+It increases score by 5.</p>
+<p>The second <tt class="docutils literal"><span class="pre">SCORE_ADJUST_EXPRESSION</span></tt> is <tt class="docutils literal"><span class="pre">content</span> <span class="pre">&#64;</span> <span class="pre">&quot;started&quot;</span> <span class="pre">*</span> <span class="pre">3</span></tt>.
+It increases score by 3.</p>
+<p>The final increased score is 9 (<tt class="docutils literal"><span class="pre">=</span> <span class="pre">1</span> <span class="pre">+</span> <span class="pre">5</span> <span class="pre">+</span> <span class="pre">3</span></tt>).</p>
+<p>A <tt class="docutils literal"><span class="pre">SCORE_ADJUST_EXPRESSION</span></tt> has a weight for <tt class="docutils literal"><span class="pre">&quot;KEYWORD&quot;</span></tt>. This
+means that increased scores of all records that has <tt class="docutils literal"><span class="pre">&quot;KEYWORD&quot;</span></tt> are
+the same value. You can change increase score for each record that has
+the same <tt class="docutils literal"><span class="pre">&quot;KEYWORD&quot;</span></tt>. It is useful to tune search score. See
+<a class="reference internal" href="../columns/vector.html#weight-vector-column"><em>Weight vector column</em></a> for details.</p>
+</div>
+</div>
 </div>
 <div class="section" id="id6">
 <h2>8.3.24.5. 返値<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
@@ -2297,6 +2539,10 @@ records. It's very useful value to show all records.</p>
 <li><a class="reference internal" href="#cache">8.3.24.4.6.1. <tt class="docutils literal"><span class="pre">cache</span></tt></a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#score-related-parameters">8.3.24.4.7. Score related parameters</a><ul>
+<li><a class="reference internal" href="#adjuster">8.3.24.4.7.1. <tt class="docutils literal"><span class="pre">adjuster</span></tt></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a class="reference internal" href="#id6">8.3.24.5. 返値</a></li>
@@ -2348,7 +2594,7 @@ records. It's very useful value to show all records.</p>
           <a href="ruby_load.html" title="8.3.23. ruby_load"
              >previous</a> |</li>
         <li><a href="../../index.html">Groonga v4.0.0 documentation</a> &raquo;</li>
-          <li><a href="../../reference.html" >8. リファレンスマニュアル</a> &raquo;</li>
+          <li><a href="../../reference.html" >8. Reference manual</a> &raquo;</li>
           <li><a href="../command.html" >8.3. Command</a> &raquo;</li> 
       </ul>
     </div>

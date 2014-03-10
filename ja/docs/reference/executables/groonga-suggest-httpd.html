@@ -89,7 +89,8 @@
 <h1>8.1.7. groonga-suggest-httpd<a class="headerlink" href="#groonga-suggest-httpd" title="このヘッドラインへのパーマリンク">¶</a></h1>
 <div class="section" id="summary">
 <h2>8.1.7.1. 概要<a class="headerlink" href="#summary" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>TODO</p>
+<p>groonga-suggest-httpd is a program to provide interface which accepts HTTP request and returns suggestion dataset, then saves logs for learning.
+groonga-suggest-httpd behaves similar in point of view of suggestion functionality, but the name of parameter is different.</p>
 </div>
 <div class="section" id="synopsis">
 <h2>8.1.7.2. 書式<a class="headerlink" href="#synopsis" title="このヘッドラインへのパーマリンク">¶</a></h2>
@@ -99,7 +100,19 @@
 </div>
 <div class="section" id="usage">
 <h2>8.1.7.3. 使い方<a class="headerlink" href="#usage" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<div class="section" id="set-up">
+<h3>8.1.7.3.1. 設定をする<a class="headerlink" href="#set-up" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>First you need to set up database for suggestion.</p>
+</div>
+<div class="section" id="launch-groonga-suggest-httpd">
+<h3>8.1.7.3.2. Launch groonga-suggest-httpd<a class="headerlink" href="#launch-groonga-suggest-httpd" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>Execute groonga-suggest-httpd command:</p>
+<p>After executing above command, groonga-suggest-httpd accepts HTTP request on 8080 port.</p>
+</div>
+<div class="section" id="request-to-groonga-suggest-httpd">
+<h3>8.1.7.3.3. Request to groonga-suggest-httpd<a class="headerlink" href="#request-to-groonga-suggest-httpd" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <p>TODO</p>
+</div>
 </div>
 <div class="section" id="options">
 <h2>8.1.7.4. Options<a class="headerlink" href="#options" title="このヘッドラインへのパーマリンク">¶</a></h2>
@@ -152,13 +165,143 @@
 </dd></dl>
 
 </div>
-<div class="section" id="parameters">
-<h2>8.1.7.5. 引数<a class="headerlink" href="#parameters" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<div class="section" id="command-line-parameters">
+<h2>8.1.7.5. Command line Parameters<a class="headerlink" href="#command-line-parameters" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <p><tt class="docutils literal"><span class="pre">database_path</span></tt> だけが必須の引数です。</p>
 <div class="section" id="database-path">
 <h3>8.1.7.5.1. <tt class="docutils literal"><span class="pre">database_path</span></tt><a class="headerlink" href="#database-path" title="このヘッドラインへのパーマリンク">¶</a></h3>
-<p>groongaデータベースのパスを指定します。</p>
+<p>Specifies the path to a Groonga database. This database must be created by <a class="reference internal" href="groonga-suggest-create-dataset.html"><em>groonga-suggest-create-dataset</em></a> command because it executes required initialization for suggestion.</p>
 </div>
+</div>
+<div class="section" id="get-parameters">
+<h2>8.1.7.6. GET Parameters<a class="headerlink" href="#get-parameters" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>groonga-suggest-httpd accepts following GET parameters.</p>
+<p>There are required parameters which depends on type of query.</p>
+<div class="section" id="required-parameters">
+<h3>8.1.7.6.1. 必須引数<a class="headerlink" href="#required-parameters" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key</th>
+<th class="head"><p class="first last">説明</p>
+</th>
+<th class="head">Note</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>q</td>
+<td>UTF-8 encoded string which user fills in form</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>t</td>
+<td>The type of query. The value of type must be complete, correct, suggest or submit. It also accepts multiple type of query which is concatinated by '|'. Note that 'submit' is invalid value when you specify multiple type of query.</td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="required-parameters-for-learning">
+<h3>8.1.7.6.2. Required parameters for learning<a class="headerlink" href="#required-parameters-for-learning" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key</th>
+<th class="head"><p class="first last">説明</p>
+</th>
+<th class="head">Note</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>s</td>
+<td>Elapsed time from 0:00 January 1, 1970</td>
+<td>Note that you need specify the value of 's' in milliseconds</td>
+</tr>
+<tr class="row-odd"><td>i</td>
+<td>Unique ID to distinct user</td>
+<td>Use session ID or IP address for example</td>
+</tr>
+<tr class="row-even"><td>l</td>
+<td>Specify the name of dataset for learning. It also accepts multiple dataset name which is concatinated by '|'</td>
+<td>Note that dataset name must be matched to following regular expression '[A-Za-z ][A-Za-z0-9 ]{0,15}'</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="required-parameters-for-suggestion">
+<h3>8.1.7.6.3. Required parameters for suggestion<a class="headerlink" href="#required-parameters-for-suggestion" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key</th>
+<th class="head"><p class="first last">説明</p>
+</th>
+<th class="head">Note</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>n</td>
+<td>Specify the name of dataset for suggestion</td>
+<td>This dataset name is used to calculate suggestion results</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="optional-parameter">
+<h3>8.1.7.6.4. 省略可能引数<a class="headerlink" href="#optional-parameter" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key</th>
+<th class="head"><p class="first last">説明</p>
+</th>
+<th class="head">Note</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>callback</td>
+<td>Specify the name of function if you prefer JSONP as response format</td>
+<td>The name of function must be matched to reqular expression '[A-Za-z ][A-Za-z0-9 ]{0,15}'</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="return-value">
+<h2>8.1.7.7. 戻り値<a class="headerlink" href="#return-value" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">groonga-suggest-httpd</span></tt> command returns following response in JSON or JSONP format.</p>
+<p>In JSON format:</p>
+<div class="highlight-none"><div class="highlight"><pre>{TYPE: [[CANDIDATE_1, SCORE_1], [CANDIDATE_2, SCORE_2], ... [CANDIDATE_N, SCORE_N]]}
+</pre></div>
+</div>
+<p>In JSONP format:</p>
+<div class="highlight-none"><div class="highlight"><pre>FUNCTION({TYPE: [[CANDIDATE_1, SCORE_1], [CANDIDATE_2, SCORE_2], ... [CANDIDATE_N, SCORE_N]]})
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">TYPE</span></tt></p>
+<blockquote>
+<div>'complete', 'correct' or 'suggest'.</div></blockquote>
+<p><tt class="docutils literal"><span class="pre">CANDIDATE_N</span></tt></p>
+<blockquote>
+<div>The string of candidate (UTF-8).</div></blockquote>
+<p><tt class="docutils literal"><span class="pre">SCORE_N</span></tt></p>
+<blockquote>
+<div>The number of score.</div></blockquote>
 </div>
 </div>
 
@@ -173,12 +316,25 @@
 <li><a class="reference internal" href="#">8.1.7. groonga-suggest-httpd</a><ul>
 <li><a class="reference internal" href="#summary">8.1.7.1. 概要</a></li>
 <li><a class="reference internal" href="#synopsis">8.1.7.2. 書式</a></li>
-<li><a class="reference internal" href="#usage">8.1.7.3. 使い方</a></li>
+<li><a class="reference internal" href="#usage">8.1.7.3. 使い方</a><ul>
+<li><a class="reference internal" href="#set-up">8.1.7.3.1. 設定をする</a></li>
+<li><a class="reference internal" href="#launch-groonga-suggest-httpd">8.1.7.3.2. Launch groonga-suggest-httpd</a></li>
+<li><a class="reference internal" href="#request-to-groonga-suggest-httpd">8.1.7.3.3. Request to groonga-suggest-httpd</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#options">8.1.7.4. Options</a></li>
-<li><a class="reference internal" href="#parameters">8.1.7.5. 引数</a><ul>
+<li><a class="reference internal" href="#command-line-parameters">8.1.7.5. Command line Parameters</a><ul>
 <li><a class="reference internal" href="#database-path">8.1.7.5.1. <tt class="docutils literal"><span class="pre">database_path</span></tt></a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#get-parameters">8.1.7.6. GET Parameters</a><ul>
+<li><a class="reference internal" href="#required-parameters">8.1.7.6.1. 必須引数</a></li>
+<li><a class="reference internal" href="#required-parameters-for-learning">8.1.7.6.2. Required parameters for learning</a></li>
+<li><a class="reference internal" href="#required-parameters-for-suggestion">8.1.7.6.3. Required parameters for suggestion</a></li>
+<li><a class="reference internal" href="#optional-parameter">8.1.7.6.4. 省略可能引数</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#return-value">8.1.7.7. 戻り値</a></li>
 </ul>
 </li>
 </ul>

@@ -1,0 +1,184 @@
+---
+layout: post.ja
+title: Groonga 4.0.1リリース
+description: Groonga 4.0.1をリリースしました！
+published: false
+---
+
+
+h2. Groonga 4.0.1リリース
+
+2月9日のメジャーアップデート以来しばらく間があきましたが、"Groonga 4.0.1":/ja/docs/news.html#release-4-0-1 をリリースしました！
+
+それぞれの環境毎のインストール方法: "インストール":/ja/docs/install.html
+
+今回、データベースの肥大化解消のために非互換な変更がはいっています。その恩恵を受けるためにはデータベースのつくりなおしが必要です。
+これにともない、新しいGroongaで一度でもデータベースを開くと、古いGroongaではデータベースを開けなくなることに注意してください。
+
+h3. データベースの肥大化を解消できるようになりました
+
+今回のリリースでは、データベースの肥大化を解消する仕組みが有効になりました。
+
+前にもそんなことを聞いた気がする人がいるかもしれないので、前回までの肥大化抑制のとりくみをおさらいしてみましょう。
+
+* 3.1.0でGRN_JA_SKIP_SAME_VALUE_PUTを追加
+
+  同じ値なら更新をスキップすることで、新たに領域を確保せず肥大化を抑制する仕組みでした。
+  ただしまだ実験的な扱いで、使いたい人は明示的に設定を変更してくださいという扱いでした。
+
+* 3.1.2でGRN_JA_SKIP_SAME_VALUE_PUT=yesが標準に
+
+  それまで使いたい人がいたら使ってね、という扱いだったのを、必ず適用するようにしました。
+  これは、3.1.0で導入して以降、効果が認められたための措置です。
+
+今回のリリースでは、可変長データの扱いを工夫することでデータベースの肥大化を解消できるようになりました。詳細については、「Groongaでの可変長データの管理方法」が図入りでわかりやすいです。
+
+* "Groongaでの可変長データの管理方法":http://www.clear-code.com/blog/2014/3/13.html
+
+ただし、後方互換とするために、肥大化抑制の恩恵を受けるためにはデータベースを新しくつくりなおす必要があります。
+
+まとめると
+
+* 4.0.0以前のデータベースは4.0.1でもそのまま開けます
+* ただし4.0.1のデータベースは以前のGroongaでは開けません
+* データベースを新しく作りなおすと肥大化抑制効果があります
+
+ということになります。
+
+実際に肥大化抑制効果をongaeshiさんが検証してくれた結果がこちらのグラフです。(このグラフもongaeshiさんが提供してくれました！ありがとうございます！)
+
+<html>
+<img src="http://d3j5vwomefv46c.cloudfront.net/photos/large/843929509.png?1394947803"/>
+</html>
+
+以前のデータベースをそのまま継続して使っているとどんどん肥大化していっていますが(4.0.0-72-continue)、データベースを新規につくりなおすと肥大化を抑制できていることがわかります。(4.0.0-72-new)
+
+h3. 重みつきベクターカラムをサポートしました
+
+今回のリリースでは、ベクターカラムにキーと値のペアを複数格納できるようになりました。これが重みつきベクターカラムです。
+
+例えば、ユーザーの属性をタグ付けするのに、これまでだと"どんな属性か"というのは以下のようにしてベクターカラムを使って複数のタグ付けすることができました。
+
+<pre>
+column_create Users tags COLUMN_VECTOR ShortText
+</pre>
+
+ただし、属性に偏りがある場合には、これだけでは不十分です。そのため属性に対応した重みは属性ごとに別のカラムを追加して重みを格納するなどの工夫が必要でした。(カラム定義だと次のようなイメージ)
+ 
+<pre>
+column_create Users tags COLUMN_VECTOR ShortText
+column_create Users tags_A COLUMN_SCALAR Int32
+column_create Users tags_B COLUMN_SCALAR Int32
+column_create Users tags_C COLUMN_SCALAR Int32...
+</pre>
+
+重みつきベクターカラムをサポートしたことで、そういったカラムをひとつにまとめることができるようになりました。(カラム定義だと次のようなイメージ)カラム定義で、WITH_WEIGHTを使うのがポイントです。
+
+<pre>
+column_create Users tags COLUMN_VECTOR|WITH_WEIGHT ShortText
+</pre>
+
+こうすることで、次のようなキーと値のペアをベクターカラムに格納できるようになります。
+
+<pre>
+{"タグA":重み1, "タグB":重み2, "タグC":重み3, ...}
+</pre>
+
+h3. 検索結果に対して重みを調整するadjusterオプションをサポートしました
+
+今回のリリースでは、selectコマンドのオプションとしてadjusterオプションをサポートしました。
+
+重みというと、これまででもmatch_columnでカラムに対する重みづけはできていたような、と思うかも知れません。どんな違いがあるのかというと次のとおりです。
+
+* match_column
+  * マッチしているカラムの検索結果に対して重みづけをすることができる
+* adjuster
+  * カラムの特定のキーについて重みづけをすることができる。
+
+今回サポートされた重みつきベクターカラムとあわせて使うことで、よりきめこまかな検索を行うことができます。
+たとえば、Groongaをよく使っている人をリストアップしたいといった場合考えてみましょう。よく使っている度合いを示す重みつきベクターカラムに格納しているとします。
+
+サンプルとして使うスキーマ定義は次の通りです。
+
+<pre>
+table_create User TABLE_HASH_KEY ShortText
+column_create User weight COLUMN_VECTOR|WITH_WEIGHT ShortText
+column_create User tags COLUMN_VECTOR ShortText
+
+table_create Weight TABLE_HASH_KEY ShortText
+column_create Weight weight_index COLUMN_INDEX|WITH_WEIGHT User weight
+
+table_create Tag TABLE_PAT_KEY ShortText
+column_create Tag tags_index COLUMN_INDEX User tags
+</pre>
+
+サンプルデータを次のようにしてロードします。
+
+<pre>
+load --table User
+[
+  {
+    "_key":"alice",
+    "weight":{"Groonga":30, "Mroonga":20},
+    "tags": ["Groonga", "Mroonga"]
+  },
+  {
+    "_key":"bob",
+    "weight":{"Groonga":50},
+    "tags": ["Groonga"]
+  },
+  {
+    "_key":"carol",
+    "weight":{"Groonga":40,"Mroonga":30},
+    "tags": ["Groonga", "Mroonga"]
+  }
+]
+</pre>
+  
+単に、"Groonga"を使っているというだけなら次のようにして"tags"カラムに"Groonga"を含むレコードを検索すればよさそうです。
+
+<pre>
+select User --output_columns _key,_score,* --sortby -_score --filter 'tags @ "Groonga"'
+</pre>
+
+しかし、欲しいのは使っている度合いに応じた結果です。そのためにadjusterオプションを次のようにして使います。
+
+<pre>
+select User --output_columns _key,_score,* --sortby -_score --filter 'tags @ "Groonga"' --adjuster 'weight @ "Groonga" * 10'
+</pre>
+
+adjusterに渡しているパラメータは次のようになっています。
+
+<pre>
+'weight @ "Groonga" * 10'
+</pre>
+
+これは、'weight'カラムに"Groonga"というキーワードがあるものの重みを10倍にする、ということを意味します。そのため、重みを考慮したスコアの順に並びかえて結果を取得することができます。
+
+Groongaの重みが大きい"bob"が一番上になりました。
+
+<pre>
+["bob",511,["Groonga"],{"Groonga":50}],
+["carol",411,["Groonga","Mroonga"],{"Groonga":40,"Mroonga":30}],
+["alice",311,["Groonga","Mroonga"],{"Groonga":30,"Mroonga":20}]
+</pre>
+
+Groongaだけじゃなくて、Mroongaも使っている人を重視したいなら、adjusterに"Mroonga"を指定すれば目的の結果が得られます。
+
+<pre>
+select User --output_columns _key,_score,* --sortby -_score --filter 'tags @ "Groonga"' --adjuster 'weight @ "Mroonga" * 10'
+</pre>
+
+Mroongaの重みが大きい"carol"が一番上になりました。
+
+<pre>
+["carol",311,["Groonga","Mroonga"],{"Groonga":40,"Mroonga":30}],
+["alice",211,["Groonga","Mroonga"],{"Groonga":30,"Mroonga":20}],
+["bob",1,["Groonga"],{"Groonga":50}]
+</pre>
+
+h3. さいごに
+
+4.0.0からの詳細な変更点は "4.0.1リリース 2014/03/29":/ja/docs/news.html#release-4-0-1 を確認してください。
+
+それでは、Groongaでガンガン検索してください！

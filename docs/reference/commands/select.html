@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>8.3.24. select &mdash; Groonga v4.0.0-81-g24a75c1 documentation</title>
+    <title>8.3.24. select &mdash; Groonga v4.0.1 documentation</title>
     
     <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '4.0.0-81-g24a75c1',
+        VERSION:     '4.0.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../../static/underscore.js"></script>
     <script type="text/javascript" src="../../static/doctools.js"></script>
     <link rel="shortcut icon" href="../../static/favicon.ico"/>
-    <link rel="top" title="Groonga v4.0.0-81-g24a75c1 documentation" href="../../index.html" />
+    <link rel="top" title="Groonga v4.0.1 documentation" href="../../index.html" />
     <link rel="up" title="8.3. Command" href="../command.html" />
     <link rel="next" title="8.3.25. shutdown" href="shutdown.html" />
     <link rel="prev" title="8.3.23. ruby_load" href="ruby_load.html" /> 
@@ -73,7 +73,7 @@
         <li class="right" >
           <a href="ruby_load.html" title="8.3.23. ruby_load"
              accesskey="P">previous</a> |</li>
-        <li><a href="../../index.html">Groonga v4.0.0-81-g24a75c1 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">Groonga v4.0.1 documentation</a> &raquo;</li>
           <li><a href="../../reference.html" >8. Reference manual</a> &raquo;</li>
           <li><a href="../command.html" accesskey="U">8.3. Command</a> &raquo;</li> 
       </ul>
@@ -2187,7 +2187,7 @@ that have <tt class="docutils literal"><span class="pre">groonga</span></tt> tag
 </pre></div>
 </div>
 <p>Here is the <tt class="docutils literal"><span class="pre">SCORE_ADJUST_EXPRESSION</span></tt> syntax:</p>
-<div class="highlight-none"><div class="highlight"><pre>COLUMN @ &quot;KEYWORD&quot; * WEIGHT
+<div class="highlight-none"><div class="highlight"><pre>COLUMN @ &quot;KEYWORD&quot; * FACTOR
 </pre></div>
 </div>
 <p>Note the following:</p>
@@ -2195,7 +2195,7 @@ that have <tt class="docutils literal"><span class="pre">groonga</span></tt> tag
 <div><ul class="simple">
 <li><tt class="docutils literal"><span class="pre">COLUMN</span></tt> must be indexed.</li>
 <li><tt class="docutils literal"><span class="pre">&quot;KEYWORD&quot;</span></tt> must be a string.</li>
-<li><tt class="docutils literal"><span class="pre">WEIGHT</span></tt> must be a positive integer.</li>
+<li><tt class="docutils literal"><span class="pre">FACTOR</span></tt> must be a positive integer.</li>
 </ul>
 </div></blockquote>
 <p>Here is a sample <tt class="docutils literal"><span class="pre">adjuster</span></tt> usage example that uses just one
@@ -2265,70 +2265,10 @@ that have <tt class="docutils literal"><span class="pre">groonga</span></tt> tag
 <tt class="docutils literal"><span class="pre">&quot;groonga&quot;</span></tt> in <tt class="docutils literal"><span class="pre">Entries.content</span></tt> column by 5. There is only one
 record that has <tt class="docutils literal"><span class="pre">&quot;groonga&quot;</span></tt> in <tt class="docutils literal"><span class="pre">Entries.content</span></tt> column.  So the
 record that its key is <tt class="docutils literal"><span class="pre">&quot;Groonga&quot;</span></tt> has score 6 (<tt class="docutils literal"><span class="pre">=</span> <span class="pre">1</span> <span class="pre">+</span> <span class="pre">5</span></tt>).</p>
-<p>You can omit <tt class="docutils literal"><span class="pre">WEIGHT</span></tt>. If you omit <tt class="docutils literal"><span class="pre">WEIGHT</span></tt>, it is treated as 1.</p>
-<p>Here is a sample <tt class="docutils literal"><span class="pre">adjuster</span></tt> usage example that omits <tt class="docutils literal"><span class="pre">WEIGHT</span></tt>:</p>
-<p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>select Entries \
-  --filter true \
-  --adjuster &#39;content @ &quot;groonga&quot;&#39; \
-  --output_columns _key,content,_score
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         5
-#       ],
-#       [
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;_score&quot;,
-#           &quot;Int32&quot;
-#         ]
-#       ],
-#       [
-#         &quot;The first post!&quot;,
-#         &quot;Welcome! This is my first post!&quot;,
-#         1
-#       ],
-#       [
-#         &quot;Groonga&quot;,
-#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
-#         2
-#       ],
-#       [
-#         &quot;Mroonga&quot;,
-#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
-#         1
-#       ],
-#       [
-#         &quot;Good-bye Senna&quot;,
-#         &quot;I migrated all Senna system!&quot;,
-#         1
-#       ],
-#       [
-#         &quot;Good-bye Tritonn&quot;,
-#         &quot;I also migrated all Tritonn system!&quot;,
-#         1
-#       ]
-#     ]
-#   ]
-# ]
-</pre></div>
-</div>
-<p>The <tt class="docutils literal"><span class="pre">adjuster</span></tt> in the <tt class="docutils literal"><span class="pre">select</span></tt> command doesn't have <tt class="docutils literal"><span class="pre">WEIGHT</span></tt>. So
-the weight is treated as 1. There is only one record that has
+<p>You can omit <tt class="docutils literal"><span class="pre">FACTOR</span></tt>. If you omit <tt class="docutils literal"><span class="pre">FACTOR</span></tt>, it is treated as 1.</p>
+<p>Here is a sample <tt class="docutils literal"><span class="pre">adjuster</span></tt> usage example that omits <tt class="docutils literal"><span class="pre">FACTOR</span></tt>:</p>
+<p>The <tt class="docutils literal"><span class="pre">adjuster</span></tt> in the <tt class="docutils literal"><span class="pre">select</span></tt> command doesn't have <tt class="docutils literal"><span class="pre">FACTOR</span></tt>. So
+the factor is treated as 1. There is only one record that has
 <tt class="docutils literal"><span class="pre">&quot;groonga&quot;</span></tt> in <tt class="docutils literal"><span class="pre">Entries.content</span></tt> column. So the record that its
 key is <tt class="docutils literal"><span class="pre">&quot;Groonga&quot;</span></tt> has score 2 (<tt class="docutils literal"><span class="pre">=</span> <span class="pre">1</span> <span class="pre">+</span> <span class="pre">1</span></tt>).</p>
 <p>Here is a sample <tt class="docutils literal"><span class="pre">adjuster</span></tt> usage example that uses multiple
@@ -2404,7 +2344,7 @@ It increases score by 5.</p>
 <p>The second <tt class="docutils literal"><span class="pre">SCORE_ADJUST_EXPRESSION</span></tt> is <tt class="docutils literal"><span class="pre">content</span> <span class="pre">&#64;</span> <span class="pre">&quot;started&quot;</span> <span class="pre">*</span> <span class="pre">3</span></tt>.
 It increases score by 3.</p>
 <p>The final increased score is 9 (<tt class="docutils literal"><span class="pre">=</span> <span class="pre">1</span> <span class="pre">+</span> <span class="pre">5</span> <span class="pre">+</span> <span class="pre">3</span></tt>).</p>
-<p>A <tt class="docutils literal"><span class="pre">SCORE_ADJUST_EXPRESSION</span></tt> has a weight for <tt class="docutils literal"><span class="pre">&quot;KEYWORD&quot;</span></tt>. This
+<p>A <tt class="docutils literal"><span class="pre">SCORE_ADJUST_EXPRESSION</span></tt> has a factor for <tt class="docutils literal"><span class="pre">&quot;KEYWORD&quot;</span></tt>. This
 means that increased scores of all records that has <tt class="docutils literal"><span class="pre">&quot;KEYWORD&quot;</span></tt> are
 the same value. You can change increase score for each record that has
 the same <tt class="docutils literal"><span class="pre">&quot;KEYWORD&quot;</span></tt>. It is useful to tune search score. See
@@ -2593,7 +2533,7 @@ the same <tt class="docutils literal"><span class="pre">&quot;KEYWORD&quot;</spa
         <li class="right" >
           <a href="ruby_load.html" title="8.3.23. ruby_load"
              >previous</a> |</li>
-        <li><a href="../../index.html">Groonga v4.0.0-81-g24a75c1 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">Groonga v4.0.1 documentation</a> &raquo;</li>
           <li><a href="../../reference.html" >8. Reference manual</a> &raquo;</li>
           <li><a href="../command.html" >8.3. Command</a> &raquo;</li> 
       </ul>

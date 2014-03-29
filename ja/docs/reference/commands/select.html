@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>8.3.24. select &mdash; Groonga v4.0.0-81-g24a75c1ドキュメント</title>
+    <title>8.3.24. select &mdash; Groonga v4.0.1ドキュメント</title>
     
     <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '4.0.0-81-g24a75c1',
+        VERSION:     '4.0.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../../static/doctools.js"></script>
     <script type="text/javascript" src="../../static/translations.js"></script>
     <link rel="shortcut icon" href="../../static/favicon.ico"/>
-    <link rel="top" title="Groonga v4.0.0-81-g24a75c1ドキュメント" href="../../index.html" />
+    <link rel="top" title="Groonga v4.0.1ドキュメント" href="../../index.html" />
     <link rel="up" title="8.3. コマンド" href="../command.html" />
     <link rel="next" title="8.3.25. shutdown" href="shutdown.html" />
     <link rel="prev" title="8.3.23. ruby_load" href="ruby_load.html" /> 
@@ -74,7 +74,7 @@
         <li class="right" >
           <a href="ruby_load.html" title="8.3.23. ruby_load"
              accesskey="P">前へ</a> |</li>
-        <li><a href="../../index.html">Groonga v4.0.0-81-g24a75c1ドキュメント</a> &raquo;</li>
+        <li><a href="../../index.html">Groonga v4.0.1ドキュメント</a> &raquo;</li>
           <li><a href="../../reference.html" >8. リファレンスマニュアル</a> &raquo;</li>
           <li><a href="../command.html" accesskey="U">8.3. コマンド</a> &raquo;</li> 
       </ul>
@@ -1980,7 +1980,7 @@ select Entries --match_columns content --query &quot;popular&quot; --query_expan
 </pre></div>
 </div>
 <p>以下が <tt class="docutils literal"><span class="pre">SCORE_ADJUST_EXPRESSION</span></tt> の構文です:</p>
-<div class="highlight-none"><div class="highlight"><pre>COLUMN @ &quot;KEYWORD&quot; * WEIGHT
+<div class="highlight-none"><div class="highlight"><pre>COLUMN @ &quot;KEYWORD&quot; * FACTOR
 </pre></div>
 </div>
 <p>以下のことに注意してください:</p>
@@ -1990,7 +1990,7 @@ select Entries --match_columns content --query &quot;popular&quot; --query_expan
 </li>
 <li><p class="first"><tt class="docutils literal"><span class="pre">&quot;KEYWORD&quot;</span></tt> は文字列でないといけません。</p>
 </li>
-<li><p class="first"><tt class="docutils literal"><span class="pre">WEIGHT</span></tt> は正の整数でないといけません。</p>
+<li><p class="first"><tt class="docutils literal"><span class="pre">FACTOR</span></tt> は正の整数でないといけません。</p>
 </li>
 </ul>
 </div></blockquote>
@@ -2056,69 +2056,9 @@ select Entries --match_columns content --query &quot;popular&quot; --query_expan
 </pre></div>
 </div>
 <p>この <tt class="docutils literal"><span class="pre">select</span></tt> コマンドはすべてのレコードにマッチします。それから、 <tt class="docutils literal"><span class="pre">adjuster</span></tt> を適用します。このアジャスターは <tt class="docutils literal"><span class="pre">Entries.content</span></tt> カラムの中に <tt class="docutils literal"><span class="pre">&quot;groonga&quot;</span></tt> を含むレコードのスコアーを5増やします。 <tt class="docutils literal"><span class="pre">Entries.content</span></tt> カラムに <tt class="docutils literal"><span class="pre">&quot;groonga&quot;</span></tt> が含まれているレコードは1つだけです。 <tt class="docutils literal"><span class="pre">&quot;Groonga&quot;</span></tt> というキーのレコードです。このレコードのスコアーは6（ <tt class="docutils literal"><span class="pre">=</span> <span class="pre">1</span> <span class="pre">+</span> <span class="pre">5</span></tt> ）になります。</p>
-<p><tt class="docutils literal"><span class="pre">WEIGHT</span></tt> は省略できます。 <tt class="docutils literal"><span class="pre">WEIGHT</span></tt> を省略すると、1を指定したとみなします。</p>
-<p><tt class="docutils literal"><span class="pre">WEIGHT</span></tt> を省略した <tt class="docutils literal"><span class="pre">adjuster</span></tt> の使用例です。</p>
-<p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre>select Entries \
-  --filter true \
-  --adjuster &#39;content @ &quot;groonga&quot;&#39; \
-  --output_columns _key,content,_score
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         5
-#       ],
-#       [
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;_score&quot;,
-#           &quot;Int32&quot;
-#         ]
-#       ],
-#       [
-#         &quot;The first post!&quot;,
-#         &quot;Welcome! This is my first post!&quot;,
-#         1
-#       ],
-#       [
-#         &quot;Groonga&quot;,
-#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
-#         2
-#       ],
-#       [
-#         &quot;Mroonga&quot;,
-#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
-#         1
-#       ],
-#       [
-#         &quot;Good-bye Senna&quot;,
-#         &quot;I migrated all Senna system!&quot;,
-#         1
-#       ],
-#       [
-#         &quot;Good-bye Tritonn&quot;,
-#         &quot;I also migrated all Tritonn system!&quot;,
-#         1
-#       ]
-#     ]
-#   ]
-# ]
-</pre></div>
-</div>
-<p>この <tt class="docutils literal"><span class="pre">select</span></tt> コマンドの <tt class="docutils literal"><span class="pre">adjuster</span></tt> は <tt class="docutils literal"><span class="pre">WEIGHT</span></tt> がありません。そのため、重みは1になります。 <tt class="docutils literal"><span class="pre">Entries.content</span></tt> カラムに <tt class="docutils literal"><span class="pre">&quot;groonga&quot;</span></tt> を含むレコードは1つだけです。キーが <tt class="docutils literal"><span class="pre">&quot;Groonga&quot;</span></tt> のレコードです。このレコードのスコアーは2（ <tt class="docutils literal"><span class="pre">=</span> <span class="pre">1</span> <span class="pre">+</span> <span class="pre">1</span></tt> ）になります。</p>
+<p><tt class="docutils literal"><span class="pre">FACTOR</span></tt> は省略できます。 <tt class="docutils literal"><span class="pre">FACTOR</span></tt> を省略すると、1を指定したとみなします。</p>
+<p><tt class="docutils literal"><span class="pre">FACTOR</span></tt> を省略した <tt class="docutils literal"><span class="pre">adjuster</span></tt> の使用例です。</p>
+<p>この <tt class="docutils literal"><span class="pre">select</span></tt> コマンドの <tt class="docutils literal"><span class="pre">adjuster</span></tt> は <tt class="docutils literal"><span class="pre">FACTOR</span></tt> がありません。そのため、係数は1になります。 <tt class="docutils literal"><span class="pre">Entries.content</span></tt> カラムに <tt class="docutils literal"><span class="pre">&quot;groonga&quot;</span></tt> を含むレコードは1つだけです。キーが <tt class="docutils literal"><span class="pre">&quot;Groonga&quot;</span></tt> のレコードです。このレコードのスコアーは2（ <tt class="docutils literal"><span class="pre">=</span> <span class="pre">1</span> <span class="pre">+</span> <span class="pre">1</span></tt> ）になります。</p>
 <p>複数の <tt class="docutils literal"><span class="pre">SCORE_ADJUST_EXPRESSION</span></tt> を使った <tt class="docutils literal"><span class="pre">adjuster</span></tt> の使用例です。</p>
 <p>実行例:</p>
 <div class="highlight-none"><div class="highlight"><pre>select Entries \
@@ -2184,7 +2124,7 @@ select Entries --match_columns content --query &quot;popular&quot; --query_expan
 <p>最初の <tt class="docutils literal"><span class="pre">SCORE_ADJUST_EXPRESSION</span></tt> は <tt class="docutils literal"><span class="pre">content</span> <span class="pre">&#64;</span> <span class="pre">&quot;groonga&quot;</span> <span class="pre">*</span> <span class="pre">5</span></tt> です。これは、スコアーを5増やします。</p>
 <p>2番目の <tt class="docutils literal"><span class="pre">SCORE_ADJUST_EXPRESSION</span></tt> は <tt class="docutils literal"><span class="pre">content</span> <span class="pre">&#64;</span> <span class="pre">&quot;started&quot;</span> <span class="pre">*</span> <span class="pre">3</span></tt> です。これはスコアーを3増やします。</p>
 <p>最終的なスコアーの増分は9（ <tt class="docutils literal"><span class="pre">=</span> <span class="pre">1</span> <span class="pre">+</span> <span class="pre">5</span> <span class="pre">+</span> <span class="pre">3</span></tt> ）です。</p>
-<p>A <tt class="docutils literal"><span class="pre">SCORE_ADJUST_EXPRESSION</span></tt> has a weight for <tt class="docutils literal"><span class="pre">&quot;KEYWORD&quot;</span></tt>. This
+<p>A <tt class="docutils literal"><span class="pre">SCORE_ADJUST_EXPRESSION</span></tt> has a factor for <tt class="docutils literal"><span class="pre">&quot;KEYWORD&quot;</span></tt>. This
 means that increased scores of all records that has <tt class="docutils literal"><span class="pre">&quot;KEYWORD&quot;</span></tt> are
 the same value. You can change increase score for each record that has
 the same <tt class="docutils literal"><span class="pre">&quot;KEYWORD&quot;</span></tt>. It is useful to tune search score. See
@@ -2373,7 +2313,7 @@ the same <tt class="docutils literal"><span class="pre">&quot;KEYWORD&quot;</spa
         <li class="right" >
           <a href="ruby_load.html" title="8.3.23. ruby_load"
              >前へ</a> |</li>
-        <li><a href="../../index.html">Groonga v4.0.0-81-g24a75c1ドキュメント</a> &raquo;</li>
+        <li><a href="../../index.html">Groonga v4.0.1ドキュメント</a> &raquo;</li>
           <li><a href="../../reference.html" >8. リファレンスマニュアル</a> &raquo;</li>
           <li><a href="../command.html" >8.3. コマンド</a> &raquo;</li> 
       </ul>

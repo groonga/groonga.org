@@ -1522,7 +1522,7 @@ select Entries --match_columns content --query &quot;popular&quot; --query_expan
 </div>
 <p>この <tt class="docutils literal"><span class="pre">select</span></tt> コマンドは <tt class="docutils literal"><span class="pre">_id</span></tt> と <tt class="docutils literal"><span class="pre">_key</span></tt> カラムの値だけを出力します。</p>
 <p><tt class="docutils literal"><span class="pre">*</span></tt> is a special value. It means that all columns that are not
-<a class="reference internal" href="../pseudo_column.html"><em>疑似カラム (pseudo_column)</em></a>.</p>
+<a class="reference internal" href="../columns/pseudo.html"><em>疑似カラム (pseudo_column)</em></a>.</p>
 <p>以下は <tt class="docutils literal"><span class="pre">*</span></tt> の使用例です。</p>
 <p>実行例:</p>
 <div class="highlight-none"><div class="highlight"><pre>select Entries --output_columns &#39;_key, *&#39; --limit 1
@@ -2058,6 +2058,66 @@ select Entries --match_columns content --query &quot;popular&quot; --query_expan
 <p>この <tt class="docutils literal"><span class="pre">select</span></tt> コマンドはすべてのレコードにマッチします。それから、 <tt class="docutils literal"><span class="pre">adjuster</span></tt> を適用します。このアジャスターは <tt class="docutils literal"><span class="pre">Entries.content</span></tt> カラムの中に <tt class="docutils literal"><span class="pre">&quot;groonga&quot;</span></tt> を含むレコードのスコアーを5増やします。 <tt class="docutils literal"><span class="pre">Entries.content</span></tt> カラムに <tt class="docutils literal"><span class="pre">&quot;groonga&quot;</span></tt> が含まれているレコードは1つだけです。 <tt class="docutils literal"><span class="pre">&quot;Groonga&quot;</span></tt> というキーのレコードです。このレコードのスコアーは6（ <tt class="docutils literal"><span class="pre">=</span> <span class="pre">1</span> <span class="pre">+</span> <span class="pre">5</span></tt> ）になります。</p>
 <p><tt class="docutils literal"><span class="pre">FACTOR</span></tt> は省略できます。 <tt class="docutils literal"><span class="pre">FACTOR</span></tt> を省略すると、1を指定したとみなします。</p>
 <p><tt class="docutils literal"><span class="pre">FACTOR</span></tt> を省略した <tt class="docutils literal"><span class="pre">adjuster</span></tt> の使用例です。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries \
+  --filter true \
+  --adjuster &#39;content @ &quot;groonga&quot;&#39; \
+  --output_columns _key,content,_score
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;_score&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;The first post!&quot;,
+#         &quot;Welcome! This is my first post!&quot;,
+#         1
+#       ],
+#       [
+#         &quot;Groonga&quot;,
+#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
+#         2
+#       ],
+#       [
+#         &quot;Mroonga&quot;,
+#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         1
+#       ],
+#       [
+#         &quot;Good-bye Senna&quot;,
+#         &quot;I migrated all Senna system!&quot;,
+#         1
+#       ],
+#       [
+#         &quot;Good-bye Tritonn&quot;,
+#         &quot;I also migrated all Tritonn system!&quot;,
+#         1
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
 <p>この <tt class="docutils literal"><span class="pre">select</span></tt> コマンドの <tt class="docutils literal"><span class="pre">adjuster</span></tt> は <tt class="docutils literal"><span class="pre">FACTOR</span></tt> がありません。そのため、係数は1になります。 <tt class="docutils literal"><span class="pre">Entries.content</span></tt> カラムに <tt class="docutils literal"><span class="pre">&quot;groonga&quot;</span></tt> を含むレコードは1つだけです。キーが <tt class="docutils literal"><span class="pre">&quot;Groonga&quot;</span></tt> のレコードです。このレコードのスコアーは2（ <tt class="docutils literal"><span class="pre">=</span> <span class="pre">1</span> <span class="pre">+</span> <span class="pre">1</span></tt> ）になります。</p>
 <p>複数の <tt class="docutils literal"><span class="pre">SCORE_ADJUST_EXPRESSION</span></tt> を使った <tt class="docutils literal"><span class="pre">adjuster</span></tt> の使用例です。</p>
 <p>実行例:</p>

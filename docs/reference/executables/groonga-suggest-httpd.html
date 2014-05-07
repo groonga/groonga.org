@@ -115,10 +115,25 @@ groonga-suggest-httpd behaves similar in point of view of suggestion functionali
 </pre></div>
 </div>
 <p>After executing above command, groonga-suggest-httpd accepts HTTP request on 8080 port.</p>
+<p>If you just want to save requests into log file, use <tt class="docutils literal"><span class="pre">-l</span></tt> option.</p>
+<p>Here is the example to save log files under <tt class="docutils literal"><span class="pre">logs</span></tt> directory with <tt class="docutils literal"><span class="pre">log</span></tt> prefix for each file.:</p>
+<div class="highlight-none"><div class="highlight"><pre>% groonga-suggest-httpd -l logs/log /tmp/groonga-databases/groonga-suggest-httpd
+</pre></div>
+</div>
+<p>Under <tt class="docutils literal"><span class="pre">logs</span></tt> directory, log files such as <tt class="docutils literal"><span class="pre">logYYYYmmddHHMMSS-00</span></tt> are created.</p>
 </div>
 <div class="section" id="request-to-groonga-suggest-httpd">
 <h3>8.1.7.3.3. Request to groonga-suggest-httpd<a class="headerlink" href="#request-to-groonga-suggest-httpd" title="Permalink to this headline">¶</a></h3>
-<p>TODO</p>
+<p>Here is the sample requests to learn <tt class="docutils literal"><span class="pre">groonga</span></tt> for <tt class="docutils literal"><span class="pre">query</span></tt> dataset:</p>
+<div class="highlight-none"><div class="highlight"><pre>% curl &#39;http://localhost:8080/?i=127.0.0.1&amp;l=query&amp;s=92619&amp;t=complete&amp;q=g&#39;
+% curl &#39;http://localhost:8080/?i=127.0.0.1&amp;l=query&amp;s=93850&amp;t=complete&amp;q=gr&#39;
+% curl &#39;http://localhost:8080/?i=127.0.0.1&amp;l=query&amp;s=94293&amp;t=complete&amp;q=gro&#39;
+% curl &#39;http://localhost:8080/?i=127.0.0.1&amp;l=query&amp;s=94734&amp;t=complete&amp;q=groo&#39;
+% curl &#39;http://localhost:8080/?i=127.0.0.1&amp;l=query&amp;s=95147&amp;t=complete&amp;q=grooon&#39;
+% curl &#39;http://localhost:8080/?i=127.0.0.1&amp;l=query&amp;s=95553&amp;t=complete&amp;q=groonga&#39;
+% curl &#39;http://localhost:8080/?i=127.0.0.1&amp;l=query&amp;s=95959&amp;t=submit&amp;q=groonga
+</pre></div>
+</div>
 </div>
 </div>
 <div class="section" id="options">
@@ -132,7 +147,9 @@ groonga-suggest-httpd behaves similar in point of view of suggestion functionali
 <dl class="cmdoption">
 <dt id="cmdoption-t">
 <span id="cmdoption--n-threads"></span><tt class="descname">-t</tt><tt class="descclassname"></tt><tt class="descclassname">, </tt><tt class="descname">--n-threads</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-t" title="Permalink to this definition">¶</a></dt>
-<dd><p>Specify number of threads. The default value is 8.</p>
+<dd><p>Specify number of threads. The default value is 8.
+This option accepts 128 as the max value, but use the number of CPU cores for
+performance.</p>
 </dd></dl>
 
 <dl class="cmdoption">
@@ -173,7 +190,7 @@ groonga-suggest-httpd behaves similar in point of view of suggestion functionali
 
 </div>
 <div class="section" id="command-line-parameters">
-<h2>8.1.7.5. Command line Parameters<a class="headerlink" href="#command-line-parameters" title="Permalink to this headline">¶</a></h2>
+<h2>8.1.7.5. Command line parameters<a class="headerlink" href="#command-line-parameters" title="Permalink to this headline">¶</a></h2>
 <p>There is one required parameter - <tt class="docutils literal"><span class="pre">database_path</span></tt>.</p>
 <div class="section" id="database-path">
 <h3>8.1.7.5.1. <tt class="docutils literal"><span class="pre">database_path</span></tt><a class="headerlink" href="#database-path" title="Permalink to this headline">¶</a></h3>
@@ -181,7 +198,7 @@ groonga-suggest-httpd behaves similar in point of view of suggestion functionali
 </div>
 </div>
 <div class="section" id="get-parameters">
-<h2>8.1.7.6. GET Parameters<a class="headerlink" href="#get-parameters" title="Permalink to this headline">¶</a></h2>
+<h2>8.1.7.6. GET parameters<a class="headerlink" href="#get-parameters" title="Permalink to this headline">¶</a></h2>
 <p>groonga-suggest-httpd accepts following GET parameters.</p>
 <p>There are required parameters which depends on type of query.</p>
 <div class="section" id="required-parameters">
@@ -204,7 +221,7 @@ groonga-suggest-httpd behaves similar in point of view of suggestion functionali
 <td>&nbsp;</td>
 </tr>
 <tr class="row-odd"><td>t</td>
-<td>The type of query. The value of type must be complete, correct, suggest or submit. It also accepts multiple type of query which is concatinated by '|'. Note that 'submit' is invalid value when you specify multiple type of query.</td>
+<td>The type of query. The value of type must be complete, correct, suggest or submit. It also accepts multiple type of query which is concatinated by <tt class="docutils literal"><span class="pre">|</span></tt>. Note that <tt class="docutils literal"><span class="pre">submit</span></tt> is invalid value when you specify multiple type of query.</td>
 <td>&nbsp;</td>
 </tr>
 </tbody>
@@ -227,15 +244,15 @@ groonga-suggest-httpd behaves similar in point of view of suggestion functionali
 <tbody valign="top">
 <tr class="row-even"><td>s</td>
 <td>Elapsed time from 0:00 January 1, 1970</td>
-<td>Note that you need specify the value of 's' in milliseconds</td>
+<td>Note that you need specify the value of <tt class="docutils literal"><span class="pre">s</span></tt> in milliseconds</td>
 </tr>
 <tr class="row-odd"><td>i</td>
 <td>Unique ID to distinct user</td>
 <td>Use session ID or IP address for example</td>
 </tr>
 <tr class="row-even"><td>l</td>
-<td>Specify the name of dataset for learning. It also accepts multiple dataset name which is concatinated by '|'</td>
-<td>Note that dataset name must be matched to following regular expression '[A-Za-z ][A-Za-z0-9 ]{0,15}'</td>
+<td>Specify the name of dataset for learning. It also accepts multiple dataset name which is concatinated by <tt class="docutils literal"><span class="pre">|</span></tt></td>
+<td>Note that dataset name must be matched to following regular expression <tt class="docutils literal"><span class="pre">[A-Za-z</span> <span class="pre">][A-Za-z0-9</span> <span class="pre">]{0,15}</span></tt></td>
 </tr>
 </tbody>
 </table>
@@ -279,7 +296,7 @@ groonga-suggest-httpd behaves similar in point of view of suggestion functionali
 <tbody valign="top">
 <tr class="row-even"><td>callback</td>
 <td>Specify the name of function if you prefer JSONP as response format</td>
-<td>The name of function must be matched to reqular expression '[A-Za-z ][A-Za-z0-9 ]{0,15}'</td>
+<td>The name of function must be matched to reqular expression <tt class="docutils literal"><span class="pre">[A-Za-z</span> <span class="pre">][A-Za-z0-9</span> <span class="pre">]{0,15}</span></tt></td>
 </tr>
 </tbody>
 </table>
@@ -298,13 +315,13 @@ groonga-suggest-httpd behaves similar in point of view of suggestion functionali
 </div>
 <p><tt class="docutils literal"><span class="pre">TYPE</span></tt></p>
 <blockquote>
-<div>'complete', 'correct' or 'suggest'.</div></blockquote>
+<div>One of <tt class="docutils literal"><span class="pre">complete</span></tt>, <tt class="docutils literal"><span class="pre">correct</span></tt> and <tt class="docutils literal"><span class="pre">suggest</span></tt>.</div></blockquote>
 <p><tt class="docutils literal"><span class="pre">CANDIDATE_N</span></tt></p>
 <blockquote>
 <div>The string of candidate (UTF-8).</div></blockquote>
 <p><tt class="docutils literal"><span class="pre">SCORE_N</span></tt></p>
 <blockquote>
-<div>The number of score.</div></blockquote>
+<div>The score.</div></blockquote>
 </div>
 </div>
 
@@ -326,11 +343,11 @@ groonga-suggest-httpd behaves similar in point of view of suggestion functionali
 </ul>
 </li>
 <li><a class="reference internal" href="#options">8.1.7.4. Options</a></li>
-<li><a class="reference internal" href="#command-line-parameters">8.1.7.5. Command line Parameters</a><ul>
+<li><a class="reference internal" href="#command-line-parameters">8.1.7.5. Command line parameters</a><ul>
 <li><a class="reference internal" href="#database-path">8.1.7.5.1. <tt class="docutils literal"><span class="pre">database_path</span></tt></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#get-parameters">8.1.7.6. GET Parameters</a><ul>
+<li><a class="reference internal" href="#get-parameters">8.1.7.6. GET parameters</a><ul>
 <li><a class="reference internal" href="#required-parameters">8.1.7.6.1. Required parameters</a></li>
 <li><a class="reference internal" href="#required-parameters-for-learning">8.1.7.6.2. Required parameters for learning</a></li>
 <li><a class="reference internal" href="#required-parameters-for-suggestion">8.1.7.6.3. Required parameters for suggestion</a></li>

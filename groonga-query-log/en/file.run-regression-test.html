@@ -1,0 +1,271 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>
+  File: run-regression-test
+  
+    &mdash; groonga-query-log
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  hasFrames = window.top.frames.main ? true : false;
+  relpath = '';
+  framesUrl = "frames.html#!file.run-regression-test.html";
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="header">
+      <div id="menu">
+  
+    <a href="_index.html">Index</a> &raquo; 
+    <span class="title">File: run-regression-test</span>
+  
+
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+      Class List
+    </a>
+  
+    <a class="full_list_link" id="method_list_link"
+        href="method_list.html">
+      Method List
+    </a>
+  
+    <a class="full_list_link" id="file_list_link"
+        href="file_list.html">
+      File List
+    </a>
+  
+</div>
+      <div class="clear"></div>
+    </div>
+
+    <iframe id="search_frame"></iframe>
+
+    <div id="content"><div id='filecontents'><h1 id="groonga-query-log-run-regression-test"><code>groonga-query-log-run-regression-test</code></h1>
+
+<p><code>groonga-query-log-run-regression-test</code> is a regression test tool for
+Groonga. It is useful when you upgrade Groonga. You can compare search
+results by old Groonga and new Groonga by
+<code>groonga-query-log-run-regression-test</code>. Test queries are read from
+query logs. You can use query logs on production environment as is.</p>
+
+<h2 id="flow">Flow</h2>
+
+<p>Here is a work flow to run regression test with
+<code>groonga-query-log-run-regression-test</code>:</p>
+
+<ol>
+  <li>Prepare schema.</li>
+  <li>Prepare data.</li>
+  <li>Prepare query logs.</li>
+  <li>Load schema into both old Groonga and new Groonga.</li>
+  <li>Load data into both old Groonga and new Groonga.</li>
+  <li>Send a request extracted from a query log to both old Groonga and
+new Groonga.</li>
+  <li>Compare responses from old Groonga and new Groonga.</li>
+  <li>Repeat 6. and 7. for all request in query logs.</li>
+</ol>
+
+<p>If there is any regression, you can find it by the 7. step.</p>
+
+<h2 id="usage">Usage</h2>
+
+<p>This section describe how to use
+<code>groonga-query-log-run-regression-test</code>.</p>
+
+<p>First, you need to prepare input data. Then you can run regression
+test.</p>
+
+<h3 id="prepare">Prepare</h3>
+
+<p>This section describes how to prepare to run regression test.</p>
+
+<p>Create a directory that has the following structure:</p>
+
+<pre class="code ruby"><code class="ruby">.
+|-- schema/
+|-- indexes/
+|-- data/
+`-- query-logs/
+</code></pre>
+
+<p>The following sections describe how to prepare the directories.</p>
+
+<h4 id="schema"><code>schema/</code></h4>
+
+<p>Put database schema definitions to <code>schema/</code> directory. Each file must
+have <code>.grn</code> extension such as <code>ddl.grn</code>.</p>
+
+<p>You can generate a file to be placed into <code>schema/</code> from an existing
+Groonga database by <code>grndump</code> command:</p>
+
+<pre class="code ruby"><code class="ruby">% grndump --no-dump-indexes --no-dump-tables /groonga/db &gt; schema/ddl.grn
+</code></pre>
+
+<p>Note that <code>grndump</code> command is provided by Rroonga. You can install
+Rroonga by the following command:</p>
+
+<pre class="code ruby"><code class="ruby">% gem install rroonga
+</code></pre>
+
+<h4 id="indexes"><code>indexes/</code></h4>
+
+<p>Put index definitions to <code>indexes/</code> directory. Each file must have
+<code>.grn</code> extension such as <code>indexes.grn</code>.</p>
+
+<p>You can put index definitions to <code>schema/</code> directory. But it is better
+that put index definitions to <code>indexes/</code> directory rather than
+<code>schema/</code> directory. Because it is faster.</p>
+
+<p>If you use <code>indexes/</code> directory, you can use
+<a href="http://groonga.org/docs/reference/indexing.html#offline-index-construction">offline index construction</a>. Offline index construction is 10 times
+faster than <a href="http://groonga.org/docs/reference/indexing.html#online-index-construction">online index construction</a>.</p>
+
+<p>You can generate a file to be placed into <code>indexes/</code> from an existing
+Groonga database by <code>grndump</code> command:</p>
+
+<pre class="code ruby"><code class="ruby">% grndump --no-dump-schema --no-dump-tables /groonga/db &gt; indexes/indexes.grn
+</code></pre>
+
+<h4 id="data"><code>data/</code></h4>
+
+<p>Put data to <code>data/</code> directory. Each file must have <code>.grn</code> extension
+such as <code>data.grn</code>.</p>
+
+<p>You can generate a file to be placed into <code>data/</code> from an existing
+Groonga database by <code>grndump</code> command:</p>
+
+<pre class="code ruby"><code class="ruby">% grndump --no-dump-schema --no-dump-indexes /groonga/db &gt; data/data.grn
+</code></pre>
+
+<h4 id="query-logs"><code>query-logs/</code></h4>
+
+<p>Put query logs to <code>query-logs/</code> directory. Each file must have <code>.log</code>
+extension such as <code>query.log</code>.</p>
+
+<p>You can put multiple log files like the following:</p>
+
+<pre class="code ruby"><code class="ruby">query-logs/
+|-- query-20140506.log
+|-- query-20140507.log
+`-- query-20140508.log
+</code></pre>
+
+<p>Here are links to documents that describe how to create a query log:</p>
+
+<ul>
+  <li>Groonga server users: You can create a query log file by using
+<code>--query-log-path</code> option. See <a href="http://groonga.org/docs/reference/executables/groonga.html">groonga command</a> documentation
+for details.</li>
+  <li>Groonga HTTPD users: You can create a query log file by using
+<code>groonga_query_log_path</code> directive. See <a href="http://groonga.org/docs/reference/executables/groonga-httpd.html#groonga-query-log-path">groonga_query_log_path</a> documentation
+for details.</li>
+</ul>
+
+<h3 id="run">Run</h3>
+
+<p>Now, you can run regression test.</p>
+
+<p>Let the followings:</p>
+
+<ul>
+  <li>Use <code>~/groonga/test</code> as the working directory to run
+regression test.</li>
+  <li>There is the current Groonga database at <code>/var/lib/groonga/db</code>.</li>
+  <li>There are the current query logs at <code>/var/log/groonga/query-*.log</code>.</li>
+  <li>The current Groonga is installed at <code>/opt/groonga-current/bin/groonga</code>.</li>
+  <li>The new Groonga is installed at <code>/opt/groonga-new/bin/groonga</code>.</li>
+</ul>
+
+<p>Install required packages:</p>
+
+<pre class="code ruby"><code class="ruby">% gem install rroonga groonga-query-log
+</code></pre>
+
+<p>Prepare the working directory:</p>
+
+<pre class="code ruby"><code class="ruby">% mkdir -p ~/groonga/test/{schema,indexes,data,query-logs}
+% cd ~/groonga/test/
+</code></pre>
+
+<p>Extract needed data from the current database:</p>
+
+<pre class="code ruby"><code class="ruby">% grndump --no-dump-indexes --no-dump-tables /var/lib/groonga/db &gt; schema/ddl.grn
+% grndump --no-dump-schema --no-dump-tables /var/lib/groonga/db &gt; indexes/indexes.grn
+% grndump --no-dump-schema --no-dump-indexes /var/lib/groonga/db &gt; data/data.grn
+% cp /var/log/groonga/query-*.log query-logs/
+</code></pre>
+
+<p>Run regression test:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='tstring'><span class='tstring_beg'>% </span><span class='tstring_content'>groonga-query-log-run-regression-test</span><span class='tstring_end'> </span></span>\
+    <span class='op'>-</span><span class='op'>-</span><span class='id identifier rubyid_old'>old</span><span class='op'>-</span><span class='id identifier rubyid_groonga'>groonga</span><span class='op'>=</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>opt</span><span class='regexp_end'>/groonga</span></span><span class='op'>-</span><span class='id identifier rubyid_current'>current</span><span class='op'>/</span><span class='id identifier rubyid_bin'>bin</span><span class='op'>/</span><span class='id identifier rubyid_groonga'>groonga</span> \
+    <span class='op'>-</span><span class='op'>-</span><span class='id identifier rubyid_new'>new</span><span class='op'>-</span><span class='id identifier rubyid_groonga'>groonga</span><span class='op'>=</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>opt</span><span class='regexp_end'>/groonga</span></span><span class='op'>-</span><span class='id identifier rubyid_new'>new</span><span class='op'>/</span><span class='id identifier rubyid_bin'>bin</span><span class='op'>/</span><span class='id identifier rubyid_groonga'>groonga</span>
+</code></pre>
+
+<p>It creates new two databases from input data. One is created by the
+current Groonga. Another is created by the new Groonga.</p>
+
+<p>It starts to send requests in a query log to both Groonga servers
+after databases are created. If responses don’t have difference, the
+request isn’t a problem. If responses have any difference, the request
+may be a problem.</p>
+
+<p>You can find details about requests that generate different response in test
+result logs. You can find test result logs under <code>results/</code>
+directory. Test result log file name is the same as input query log
+file name. If query log file is <code>query-logs/query-20140508.log</code>, test
+result log file is <code>results/query-20140508.log</code>.</p>
+
+<h2 id="advanced-usage">Advanced usage</h2>
+
+<p>There are some advanced usages. This section describes about them.</p>
+
+<h3 id="n-clients"><code>--n-clients</code></h3>
+
+<p>If your machine has free resource, you can speed up a regression test.</p>
+
+<p>Use <code>--n-clients</code> option to send multiple requests concurrently. It
+will reduce execution time.</p>
+
+<p>Here is a sample command line to use <code>--n-clients</code>:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='tstring'><span class='tstring_beg'>% </span><span class='tstring_content'>groonga-query-log-run-regression-test</span><span class='tstring_end'> </span></span>\
+    <span class='op'>-</span><span class='op'>-</span><span class='id identifier rubyid_n'>n</span><span class='op'>-</span><span class='id identifier rubyid_clients'>clients</span><span class='op'>=</span><span class='int'>4</span> \
+    <span class='op'>-</span><span class='op'>-</span><span class='id identifier rubyid_old'>old</span><span class='op'>-</span><span class='id identifier rubyid_groonga'>groonga</span><span class='op'>=</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>opt</span><span class='regexp_end'>/groonga</span></span><span class='op'>-</span><span class='id identifier rubyid_current'>current</span><span class='op'>/</span><span class='id identifier rubyid_bin'>bin</span><span class='op'>/</span><span class='id identifier rubyid_groonga'>groonga</span> \
+    <span class='op'>-</span><span class='op'>-</span><span class='id identifier rubyid_new'>new</span><span class='op'>-</span><span class='id identifier rubyid_groonga'>groonga</span><span class='op'>=</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>opt</span><span class='regexp_end'>/groonga</span></span><span class='op'>-</span><span class='id identifier rubyid_new'>new</span><span class='op'>/</span><span class='id identifier rubyid_bin'>bin</span><span class='op'>/</span><span class='id identifier rubyid_groonga'>groonga</span>
+</code></pre>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>You can run regression test with
+<code>groonga-query-log-run-regression-test</code>. It helps you to upgrade
+Groonga safely by confirming a new Groonga doesn’t have problem with
+your data.</p>
+
+</div></div>
+
+    <div id="footer"></div>
+
+  </body>
+</html>

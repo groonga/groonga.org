@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>4.6. タグ検索・参照関係の逆引き &mdash; Groonga v4.0.3 documentation</title>
+    <title>4.6. Tag search and reverse resolution of reference relationships &mdash; Groonga v4.0.4 documentation</title>
     
     <link rel="stylesheet" href="../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '4.0.3',
+        VERSION:     '4.0.4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,9 +24,9 @@
     <script type="text/javascript" src="../static/underscore.js"></script>
     <script type="text/javascript" src="../static/doctools.js"></script>
     <link rel="shortcut icon" href="../static/favicon.ico"/>
-    <link rel="top" title="Groonga v4.0.3 documentation" href="../index.html" />
+    <link rel="top" title="Groonga v4.0.4 documentation" href="../index.html" />
     <link rel="up" title="4. Tutorial" href="../tutorial.html" />
-    <link rel="next" title="4.7. match_columnsパラメータ" href="match_columns.html" />
+    <link rel="next" title="4.7. match_columns parameter" href="match_columns.html" />
     <link rel="prev" title="4.5. Drilldown" href="drilldown.html" /> 
       <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
     <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
@@ -70,12 +70,12 @@
           <a href="../genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="match_columns.html" title="4.7. match_columnsパラメータ"
+          <a href="match_columns.html" title="4.7. match_columns parameter"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="drilldown.html" title="4.5. Drilldown"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Groonga v4.0.3 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Groonga v4.0.4 documentation</a> &raquo;</li>
           <li><a href="../tutorial.html" accesskey="U">4. Tutorial</a> &raquo;</li> 
       </ul>
     </div>  
@@ -85,16 +85,17 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="id1">
-<h1>4.6. タグ検索・参照関係の逆引き<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
-<p>本チュートリアルで、Groongaはカラム値として他のテーブルへの参照の配列を持つことができることを紹介いたしました。実は、テーブルへの参照の配列データを用いることによって、いわゆるタグ検索を行うことが可能となります。</p>
-<p>タグ検索はGroongaの転置インデックスというデータ構造を用いて高速に行われます。</p>
-<div class="section" id="id2">
-<h2>4.6.1. タグ検索<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
-<p>動画共有サイトの検索エンジンを作ることを想定します。1つの動画には、その動画の特徴を表す、複数の語句が付与されています。「ある語句が付与されている動画の一覧を取得する」検索を行いたいとします。</p>
-<p>実際に、動画情報のテーブルを作成し、検索をしてみましょう。</p>
-<p>動画の情報を保存する、Videoテーブルを作成します。Videoテーブルでは、動画のタイトルをtitleカラムに、動画のタグ情報をtagsカラムにTagテーブル型で複数格納しています。
-タグの情報を保存する、Tagテーブルを作成します。Tagテーブルでは、タグ文字列を主キーに格納し、Videoテーブルのtagsカラムに対するインデックスをindex_tagsカラムに格納しています。</p>
+  <div class="section" id="tag-search-and-reverse-resolution-of-reference-relationships">
+<h1>4.6. Tag search and reverse resolution of reference relationships<a class="headerlink" href="#tag-search-and-reverse-resolution-of-reference-relationships" title="Permalink to this headline">¶</a></h1>
+<p>As you know, Groonga supports to store array in column which refers other table.
+In fact, you can do tag search by using array data which refers other table.</p>
+<p>Tag search is very fast because Groonga use inverted index as data structure.</p>
+<div class="section" id="tag-search">
+<h2>4.6.1. Tag search<a class="headerlink" href="#tag-search" title="Permalink to this headline">¶</a></h2>
+<p>Let's consider to create a search engine for an web site to share movies. Each movie may be associated with multiple keywords which represents the content of movie.</p>
+<p>Let's create tables for movie information, then search the movies.</p>
+<p>First, create the <tt class="docutils literal"><span class="pre">Video</span></tt> table which stores movie information. the <tt class="docutils literal"><span class="pre">Video</span></tt> table has two columns. the <tt class="docutils literal"><span class="pre">title</span></tt> column stores title of the movie. the <tt class="docutils literal"><span class="pre">tags</span></tt> column stores multiple tag information in reference Tag table.</p>
+<p>Next, create the <tt class="docutils literal"><span class="pre">Tag</span></tt> table which stores tag information. the <tt class="docutils literal"><span class="pre">Tag</span></tt> table has one column. The tag string is stored as primary key, then <tt class="docutils literal"><span class="pre">index_tags</span></tt> stores indexes for tags column of Video table.</p>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre>table_create --name Video --flags TABLE_HASH_KEY --key_type UInt32
 # [[0, 1337566253.89858, 0.000355720520019531], true]
@@ -120,8 +121,8 @@ load --table Video
 # [[0, 1337566253.89858, 0.000355720520019531], 8]
 </pre></div>
 </div>
-<p>インデックスカラムを作成すると、全文検索が高速に行えるようになります。インデックスカラムは、対象のカラムに保存されたデータに更新があったとき、自動的に更新されます。</p>
-<p>「ある語句が付与されている動画の一覧を取得する」検索を行いましょう。</p>
+<p>After creating indexed column, you can do full-text search very fast. The indexed column is also automatically updated when stored data is refreshed.</p>
+<p>List up the movies that specific keywords are given.</p>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre>select --table Video --query tags:@Variety --output_columns _key,title
 # [
@@ -228,13 +229,13 @@ select --table Video --query tags:@Animation --output_columns _key,title
 # ]
 </pre></div>
 </div>
-<p>このように、「Variety」、「Sports」、「Animation」のようなタグで検索を行うことができました。</p>
+<p>You can search by tags such as &quot;Variety&quot;, &quot;Sports&quot; and &quot;Animation&quot;.</p>
 </div>
-<div class="section" id="id3">
-<h2>4.6.2. 参照関係の逆引き<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
-<p>Groongaはテーブル間の参照関係の逆引きを高速に行うためのインデックスを付与することができます。タグ検索は、その1例にすぎません。</p>
-<p>例えば、ソーシャルネットワーキングサイトにおける友人関係を逆引き検索することができます。</p>
-<p>以下の例では、ユーザー情報を格納するUserテーブルを作成し、ユーザー名を格納するusernameカラム、ユーザーの友人一覧を配列で格納するfriendsカラムとそのインデックスのindex_friendsカラムを追加しています。</p>
+<div class="section" id="reverse-resolution-of-reference-relationships">
+<h2>4.6.2. Reverse resolution of reference relationships<a class="headerlink" href="#reverse-resolution-of-reference-relationships" title="Permalink to this headline">¶</a></h2>
+<p>Groonga supports indexes for reverse resolution among tables. Tag search is one of concrete examples.</p>
+<p>For example, you can search friendships by reverse resolution in social networking site.</p>
+<p>Following example shows how to create <tt class="docutils literal"><span class="pre">User</span></tt> table which stores user information, <tt class="docutils literal"><span class="pre">username</span></tt> column which stores user name, <tt class="docutils literal"><span class="pre">friends</span></tt> column which stores list of user's friends in array, <tt class="docutils literal"><span class="pre">index_friends</span></tt> column as indexed column.</p>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre>table_create --name User --flags TABLE_HASH_KEY --key_type ShortText
 # [[0, 1337566253.89858, 0.000355720520019531], true]
@@ -256,7 +257,7 @@ load --table User
 # [[0, 1337566253.89858, 0.000355720520019531], 6]
 </pre></div>
 </div>
-<p>指定したユーザーを友人リストに入れているユーザーの一覧を表示してみましょう。</p>
+<p>Let's show list of users who contains specified user in friend list.</p>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre>select --table User --query friends:@tomo --output_columns _key,username
 # [
@@ -342,7 +343,7 @@ select --table User --query friends:@jiro --output_columns _key,username
 # ]
 </pre></div>
 </div>
-<p>さらに、ドリルダウンを使って、友人リストに入っている数の一覧を表示してみましょう。</p>
+<p>Then drilldown the count which shows user is listed as friend.</p>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre>select --table User --limit 0 --drilldown friends
 # [
@@ -422,11 +423,12 @@ select --table User --query friends:@jiro --output_columns _key,username
 # ]
 </pre></div>
 </div>
-<p>このように、テーブルの参照関係を逆にたどる検索ができました。</p>
+<p>As you can see, it shows the results which follows reverse resolution of reference relationship.</p>
 </div>
-<div class="section" id="id4">
-<h2>4.6.3. インデックス付きジオサーチ<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
-<p>位置情報のカラムに対して、インデックスを付与することが出来ます。大量の位置情報レコードを検索する場合に、検索速度が速くなります。</p>
+<div class="section" id="geo-location-search-with-index">
+<h2>4.6.3. Geo location search with index<a class="headerlink" href="#geo-location-search-with-index" title="Permalink to this headline">¶</a></h2>
+<p>Groonga supports to add indexes to the column which stores geo location information.
+Groonga is very fast because it use such indexes against the column which contains geo location information to search enormous number of records.</p>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre>table_create --name GeoIndex --flags TABLE_PAT_KEY --key_type WGS84GeoPoint
 # [[0, 1337566253.89858, 0.000355720520019531], true]
@@ -469,7 +471,7 @@ select --table Site --filter &#39;geo_in_circle(location, &quot;128515259x503187
 # ]
 </pre></div>
 </div>
-<p>同様に、位置情報レコードを用いてソートする場合に、ソート速度が速くなります。</p>
+<p>These indexes are also used when sorting the records with geo location search.</p>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre>select --table Site --filter &#39;geo_in_circle(location, &quot;128515259x503187188&quot;, 50000)&#39; --output_columns _key,location,_score --sortby &#39;-geo_distance(location, &quot;128515259x503187188&quot;)&#39; --scorer &#39;_score = geo_distance(location, &quot;128515259x503187188&quot;)&#39;
 # [
@@ -523,10 +525,10 @@ select --table Site --filter &#39;geo_in_circle(location, &quot;128515259x503187
         <div class="sphinxsidebarwrapper">
   <h3><a href="../index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">4.6. タグ検索・参照関係の逆引き</a><ul>
-<li><a class="reference internal" href="#id2">4.6.1. タグ検索</a></li>
-<li><a class="reference internal" href="#id3">4.6.2. 参照関係の逆引き</a></li>
-<li><a class="reference internal" href="#id4">4.6.3. インデックス付きジオサーチ</a></li>
+<li><a class="reference internal" href="#">4.6. Tag search and reverse resolution of reference relationships</a><ul>
+<li><a class="reference internal" href="#tag-search">4.6.1. Tag search</a></li>
+<li><a class="reference internal" href="#reverse-resolution-of-reference-relationships">4.6.2. Reverse resolution of reference relationships</a></li>
+<li><a class="reference internal" href="#geo-location-search-with-index">4.6.3. Geo location search with index</a></li>
 </ul>
 </li>
 </ul>
@@ -536,7 +538,7 @@ select --table Site --filter &#39;geo_in_circle(location, &quot;128515259x503187
                         title="previous chapter">4.5. Drilldown</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="match_columns.html"
-                        title="next chapter">4.7. match_columnsパラメータ</a></p>
+                        title="next chapter">4.7. match_columns parameter</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="../sources/tutorial/index.txt"
@@ -566,12 +568,12 @@ select --table Site --filter &#39;geo_in_circle(location, &quot;128515259x503187
           <a href="../genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="match_columns.html" title="4.7. match_columnsパラメータ"
+          <a href="match_columns.html" title="4.7. match_columns parameter"
              >next</a> |</li>
         <li class="right" >
           <a href="drilldown.html" title="4.5. Drilldown"
              >previous</a> |</li>
-        <li><a href="../index.html">Groonga v4.0.3 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Groonga v4.0.4 documentation</a> &raquo;</li>
           <li><a href="../tutorial.html" >4. Tutorial</a> &raquo;</li> 
       </ul>
     </div>

@@ -7,22 +7,24 @@
 .. groonga-command
 .. database: tutorial
 
-タグ検索・参照関係の逆引き
-==========================
+Tag search and reverse resolution of reference relationships
+============================================================
 
-本チュートリアルで、Groongaはカラム値として他のテーブルへの参照の配列を持つことができることを紹介いたしました。実は、テーブルへの参照の配列データを用いることによって、いわゆるタグ検索を行うことが可能となります。
+As you know, Groonga supports to store array in column which refers other table.
+In fact, you can do tag search by using array data which refers other table.
 
-タグ検索はGroongaの転置インデックスというデータ構造を用いて高速に行われます。
+Tag search is very fast because Groonga use inverted index as data structure.
 
-タグ検索
---------
+Tag search
+----------
 
-動画共有サイトの検索エンジンを作ることを想定します。1つの動画には、その動画の特徴を表す、複数の語句が付与されています。「ある語句が付与されている動画の一覧を取得する」検索を行いたいとします。
+Let's consider to create a search engine for an web site to share movies. Each movie may be associated with multiple keywords which represents the content of movie.
 
-実際に、動画情報のテーブルを作成し、検索をしてみましょう。
+Let's create tables for movie information, then search the movies.
 
-動画の情報を保存する、Videoテーブルを作成します。Videoテーブルでは、動画のタイトルをtitleカラムに、動画のタグ情報をtagsカラムにTagテーブル型で複数格納しています。
-タグの情報を保存する、Tagテーブルを作成します。Tagテーブルでは、タグ文字列を主キーに格納し、Videoテーブルのtagsカラムに対するインデックスをindex_tagsカラムに格納しています。
+First, create the ``Video`` table which stores movie information. the ``Video`` table has two columns. the ``title`` column stores title of the movie. the ``tags`` column stores multiple tag information in reference Tag table.
+
+Next, create the ``Tag`` table which stores tag information. the ``Tag`` table has one column. The tag string is stored as primary key, then ``index_tags`` stores indexes for tags column of Video table.
 
 .. groonga-command
 .. include:: ../example/tutorial/index-1.log
@@ -43,9 +45,9 @@
 .. {"_key":8,"title":"K.O.","tags":["Animation","Music"]}
 .. ]
 
-インデックスカラムを作成すると、全文検索が高速に行えるようになります。インデックスカラムは、対象のカラムに保存されたデータに更新があったとき、自動的に更新されます。
+After creating indexed column, you can do full-text search very fast. The indexed column is also automatically updated when stored data is refreshed.
 
-「ある語句が付与されている動画の一覧を取得する」検索を行いましょう。
+List up the movies that specific keywords are given.
 
 .. groonga-command
 .. include:: ../example/tutorial/index-2.log
@@ -53,16 +55,16 @@
 .. select --table Video --query tags:@Sports --output_columns _key,title
 .. select --table Video --query tags:@Animation --output_columns _key,title
 
-このように、「Variety」、「Sports」、「Animation」のようなタグで検索を行うことができました。
+You can search by tags such as "Variety", "Sports" and "Animation".
 
-参照関係の逆引き
-----------------
+Reverse resolution of reference relationships
+---------------------------------------------
 
-Groongaはテーブル間の参照関係の逆引きを高速に行うためのインデックスを付与することができます。タグ検索は、その1例にすぎません。
+Groonga supports indexes for reverse resolution among tables. Tag search is one of concrete examples.
 
-例えば、ソーシャルネットワーキングサイトにおける友人関係を逆引き検索することができます。
+For example, you can search friendships by reverse resolution in social networking site.
 
-以下の例では、ユーザー情報を格納するUserテーブルを作成し、ユーザー名を格納するusernameカラム、ユーザーの友人一覧を配列で格納するfriendsカラムとそのインデックスのindex_friendsカラムを追加しています。
+Following example shows how to create ``User`` table which stores user information, ``username`` column which stores user name, ``friends`` column which stores list of user's friends in array, ``index_friends`` column as indexed column.
 
 .. groonga-command
 .. include:: ../example/tutorial/index-3.log
@@ -80,25 +82,26 @@ Groongaはテーブル間の参照関係の逆引きを高速に行うための�
 .. {"_key":"hana","username":"花子","friends":["ken","taro","jiro","moritapo","tomo"]}
 .. ]
 
-指定したユーザーを友人リストに入れているユーザーの一覧を表示してみましょう。
+Let's show list of users who contains specified user in friend list.
 
 .. groonga-command
 .. include:: ../example/tutorial/index-4.log
 .. select --table User --query friends:@tomo --output_columns _key,username
 .. select --table User --query friends:@jiro --output_columns _key,username
 
-さらに、ドリルダウンを使って、友人リストに入っている数の一覧を表示してみましょう。
+Then drilldown the count which shows user is listed as friend.
 
 .. groonga-command
 .. include:: ../example/tutorial/index-5.log
 .. select --table User --limit 0 --drilldown friends
 
-このように、テーブルの参照関係を逆にたどる検索ができました。
+As you can see, it shows the results which follows reverse resolution of reference relationship.
 
-インデックス付きジオサーチ
---------------------------
+Geo location search with index
+------------------------------
 
-位置情報のカラムに対して、インデックスを付与することが出来ます。大量の位置情報レコードを検索する場合に、検索速度が速くなります。
+Groonga supports to add indexes to the column which stores geo location information.
+Groonga is very fast because it use such indexes against the column which contains geo location information to search enormous number of records.
 
 .. groonga-command
 .. include:: ../example/tutorial/index-6.log
@@ -111,7 +114,7 @@ Groongaはテーブル間の参照関係の逆引きを高速に行うための�
 .. ]
 .. select --table Site --filter 'geo_in_circle(location, "128515259x503187188", 5000)' --output_columns _key,location
 
-同様に、位置情報レコードを用いてソートする場合に、ソート速度が速くなります。
+These indexes are also used when sorting the records with geo location search.
 
 .. groonga-command
 .. include:: ../example/tutorial/index-7.log

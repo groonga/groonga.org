@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>4.7. match_columnsパラメータ &mdash; Groonga v4.0.3 documentation</title>
+    <title>4.7. match_columns parameter &mdash; Groonga v4.0.4 documentation</title>
     
     <link rel="stylesheet" href="../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '4.0.3',
+        VERSION:     '4.0.4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,10 +24,10 @@
     <script type="text/javascript" src="../static/underscore.js"></script>
     <script type="text/javascript" src="../static/doctools.js"></script>
     <link rel="shortcut icon" href="../static/favicon.ico"/>
-    <link rel="top" title="Groonga v4.0.3 documentation" href="../index.html" />
+    <link rel="top" title="Groonga v4.0.4 documentation" href="../index.html" />
     <link rel="up" title="4. Tutorial" href="../tutorial.html" />
     <link rel="next" title="4.8. パトリシア木による前方一致検索" href="patricia_trie.html" />
-    <link rel="prev" title="4.6. タグ検索・参照関係の逆引き" href="index.html" /> 
+    <link rel="prev" title="4.6. Tag search and reverse resolution of reference relationships" href="index.html" /> 
       <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
     <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
     <meta property="og:type" content="product" />
@@ -73,9 +73,9 @@
           <a href="patricia_trie.html" title="4.8. パトリシア木による前方一致検索"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="index.html" title="4.6. タグ検索・参照関係の逆引き"
+          <a href="index.html" title="4.6. Tag search and reverse resolution of reference relationships"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Groonga v4.0.3 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Groonga v4.0.4 documentation</a> &raquo;</li>
           <li><a href="../tutorial.html" accesskey="U">4. Tutorial</a> &raquo;</li> 
       </ul>
     </div>  
@@ -85,16 +85,17 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="match-columns">
-<h1>4.7. match_columnsパラメータ<a class="headerlink" href="#match-columns" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="id1">
-<h2>4.7.1. 複数のカラムを対象とした全文検索<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
-<p>Groongaでは、複数のカラムを対象とした全文検索を行うことができます。例えば、ブログのテーブルで、タイトルと内容とがそれぞれ別のカラムに入ったものがあるとしましょう。「タイトルもしくは内容に特定の単語を含む」検索を行いたいとします。</p>
-<p>この場合、2つのインデックス作成方式があります。1つは、それぞれのカラムに1つずつインデックスを付与する方式です。もう1つは、複数のカラムに対して1つのインデックスを付与する方式です。Groongaでは、どちらの形式のインデックスが存在している場合でも、同一の記法で全文検索を行うことができます。</p>
-<div class="section" id="id2">
-<h3>4.7.1.1. カラムごとにインデックスを付与する場合<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
-<p>Blog1テーブルを作り、タイトル文字列のtitleカラム、本文のmessageカラムを追加しています。
-インデックス用のIndexBlog1テーブルも作り、titleカラムのインデックス用にindex_titleカラム、messageカラムのインデック用にindex_messageカラムと、それぞれ1カラムごとに1つずつ追加しています。</p>
+  <div class="section" id="match-columns-parameter">
+<h1>4.7. match_columns parameter<a class="headerlink" href="#match-columns-parameter" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="full-text-search-against-multiple-columns">
+<h2>4.7.1. Full-text search against multiple columns<a class="headerlink" href="#full-text-search-against-multiple-columns" title="Permalink to this headline">¶</a></h2>
+<p>Groonga supports full-text search against multiple columns. Let's consider blog site. Usually, blog site has a table which contains title column and content column. How do you search the blog entry which contains specified keywords in title or content?</p>
+<p>In such a case, there are two ways to create indexes. One way is creating column index against each column. The other way is creating one column index against multiple columns. Either way, Groonga supports similar full-text search syntax.</p>
+<div class="section" id="creating-column-index-against-each-column">
+<h3>4.7.1.1. Creating column index against each column<a class="headerlink" href="#creating-column-index-against-each-column" title="Permalink to this headline">¶</a></h3>
+<p>Here is the example which create column index against each column.</p>
+<p>First, create <tt class="docutils literal"><span class="pre">Blog1</span></tt> table, add <tt class="docutils literal"><span class="pre">title</span></tt> column which stores title string, <tt class="docutils literal"><span class="pre">message</span></tt> column which stores content of blog entry.</p>
+<p>Then create <tt class="docutils literal"><span class="pre">IndexBlog1</span></tt> table for column indexes, add <tt class="docutils literal"><span class="pre">index_title</span></tt> column for <tt class="docutils literal"><span class="pre">title</span></tt> column, <tt class="docutils literal"><span class="pre">index_message</span></tt> column for <tt class="docutils literal"><span class="pre">message</span></tt> column.</p>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre>table_create --name Blog1 --flags TABLE_HASH_KEY --key_type ShortText
 # [[0, 1337566253.89858, 0.000355720520019531], true]
@@ -117,8 +118,9 @@ load --table Blog1
 # [[0, 1337566253.89858, 0.000355720520019531], 3]
 </pre></div>
 </div>
-<p>match_columnsオプションで、検索対象のカラムを複数指定することが出来ます。検索する文字列はqueryオプションで指定します。これを使うことで、タイトルと本文を全文検索することができます。</p>
-<p>実際に検索してみましょう。</p>
+<p><tt class="docutils literal"><span class="pre">match_columns</span></tt> option of <tt class="docutils literal"><span class="pre">select</span></tt> command accepts multiple columns as search target.
+Specify query string to <tt class="docutils literal"><span class="pre">query</span></tt> option. Then you can do full-text search title and content of blog entries.</p>
+<p>Let's try to search blog entries.</p>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre>select --table Blog1 --match_columns title||message --query groonga
 # [
@@ -258,10 +260,11 @@ select --table Blog1 --match_columns title --query message
 </pre></div>
 </div>
 </div>
-<div class="section" id="id3">
-<h3>4.7.1.2. 複数のカラムにまたがったインデックスを付与する場合<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
-<p>内容は上の例とほぼ同じですが、titleとmessageの2つのカラムに対するインデックスが共通になっており、インデックスカラムが1つしかありません。</p>
-<p>共通のインデックスを用いても、titleカラムのみでの検索、messageカラムのみでの検索、titleもしくはmessageカラムでの検索、全ての検索を行うことができます。</p>
+<div class="section" id="creating-one-column-index-against-multiple-columns">
+<h3>4.7.1.2. Creating one column index against multiple columns<a class="headerlink" href="#creating-one-column-index-against-multiple-columns" title="Permalink to this headline">¶</a></h3>
+<p>Groonga also supports one column index against multiple columns.</p>
+<p>The difference for previous example is only one column index exists. Thus, There is one common column index against title and message column.</p>
+<p>Even though same column index is used, Groonga supports to search against title column only, message column only and title or message column.</p>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre>table_create --name Blog2 --flags TABLE_HASH_KEY --key_type ShortText
 # [[0, 1337566253.89858, 0.000355720520019531], true]
@@ -282,7 +285,7 @@ load --table Blog2
 # [[0, 1337566253.89858, 0.000355720520019531], 3]
 </pre></div>
 </div>
-<p>実際に検索してみましょう。結果は上の例と同じになります。</p>
+<p>Let's search same query in previous section. You can get same search results.</p>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre>select --table Blog2 --match_columns title||message --query groonga
 # [
@@ -432,8 +435,8 @@ It depends on the case.</p>
 </div>
 </div>
 </div>
-<div class="section" id="id4">
-<h2>4.7.2. インデックス名を指定した全文検索<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h2>4.7.2. インデックス名を指定した全文検索<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <p>執筆中です。</p>
 </div>
 <div class="section" id="nested-index-search-among-related-table-by-column-index">
@@ -693,8 +696,8 @@ select Articles2 --match_columns comment.comment.content --query mroonga --outpu
 <p>As a result, the first query matches two article because of Comments2 table has two records which contains 'mroonga' as keyword.</p>
 <p>On the other hand, the second one matches one article only because of Replies2 table has only one record which contains 'mroonga' as keyword, and there is one record which contains same keyword and refers to the record in Comments2 table.</p>
 </div>
-<div class="section" id="id5">
-<h2>4.7.4. インデックスの重み<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id2">
+<h2>4.7.4. インデックスの重み<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p>執筆中です。</p>
 </div>
 </div>
@@ -707,22 +710,22 @@ select Articles2 --match_columns comment.comment.content --query mroonga --outpu
         <div class="sphinxsidebarwrapper">
   <h3><a href="../index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">4.7. match_columnsパラメータ</a><ul>
-<li><a class="reference internal" href="#id1">4.7.1. 複数のカラムを対象とした全文検索</a><ul>
-<li><a class="reference internal" href="#id2">4.7.1.1. カラムごとにインデックスを付与する場合</a></li>
-<li><a class="reference internal" href="#id3">4.7.1.2. 複数のカラムにまたがったインデックスを付与する場合</a></li>
+<li><a class="reference internal" href="#">4.7. match_columns parameter</a><ul>
+<li><a class="reference internal" href="#full-text-search-against-multiple-columns">4.7.1. Full-text search against multiple columns</a><ul>
+<li><a class="reference internal" href="#creating-column-index-against-each-column">4.7.1.1. Creating column index against each column</a></li>
+<li><a class="reference internal" href="#creating-one-column-index-against-multiple-columns">4.7.1.2. Creating one column index against multiple columns</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id4">4.7.2. インデックス名を指定した全文検索</a></li>
+<li><a class="reference internal" href="#id1">4.7.2. インデックス名を指定した全文検索</a></li>
 <li><a class="reference internal" href="#nested-index-search-among-related-table-by-column-index">4.7.3. Nested index search among related table by column index</a></li>
-<li><a class="reference internal" href="#id5">4.7.4. インデックスの重み</a></li>
+<li><a class="reference internal" href="#id2">4.7.4. インデックスの重み</a></li>
 </ul>
 </li>
 </ul>
 
   <h4>Previous topic</h4>
   <p class="topless"><a href="index.html"
-                        title="previous chapter">4.6. タグ検索・参照関係の逆引き</a></p>
+                        title="previous chapter">4.6. Tag search and reverse resolution of reference relationships</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="patricia_trie.html"
                         title="next chapter">4.8. パトリシア木による前方一致検索</a></p>
@@ -758,9 +761,9 @@ select Articles2 --match_columns comment.comment.content --query mroonga --outpu
           <a href="patricia_trie.html" title="4.8. パトリシア木による前方一致検索"
              >next</a> |</li>
         <li class="right" >
-          <a href="index.html" title="4.6. タグ検索・参照関係の逆引き"
+          <a href="index.html" title="4.6. Tag search and reverse resolution of reference relationships"
              >previous</a> |</li>
-        <li><a href="../index.html">Groonga v4.0.3 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Groonga v4.0.4 documentation</a> &raquo;</li>
           <li><a href="../tutorial.html" >4. Tutorial</a> &raquo;</li> 
       </ul>
     </div>

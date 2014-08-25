@@ -100,6 +100,7 @@
          string
          [normalizer=null]
          [flags=NONE]
+         [mode=ADD]
 </pre></div>
 </div>
 </div>
@@ -452,7 +453,7 @@
 <p>いくつか省略可能な引数があります。</p>
 <div class="section" id="normalizer">
 <h4>8.3.32.4.2.1. <tt class="docutils literal"><span class="pre">normalizer</span></tt><a class="headerlink" href="#normalizer" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p>ノーマライザー名を指定します。 <tt class="docutils literal"><span class="pre">tokenize</span></tt> コマンドは <tt class="docutils literal"><span class="pre">normalizer</span></tt> という名前のノーまライザーを使います。ノーまライザーは <tt class="docutils literal"><span class="pre">TokenBigrma</span></tt> など、N-gram関連のトークナイザーにとってとても重要です。</p>
+<p>ノーマライザー名を指定します。 <tt class="docutils literal"><span class="pre">tokenize</span></tt> コマンドは <tt class="docutils literal"><span class="pre">normalizer</span></tt> という名前のノーマライザーを使います。ノーマライザーは <tt class="docutils literal"><span class="pre">TokenBigrma</span></tt> など、N-gram関連のトークナイザーにとってとても重要です。</p>
 <p>ノーマライザーはノーマライズ中にそれぞれの文字の種類を検出します。N-gram系のトークナイザーはトークナイズ中に文字の種類を利用します。</p>
 <p>以下はノーマライザーを使わない例です。</p>
 <p>実行例:</p>
@@ -679,6 +680,157 @@
 </div>
 <p><tt class="docutils literal"><span class="pre">TokenDelimit</span></tt> トークナイザーはトークナイズ済み区切り文字をサポートしているトークナイザーの1つです。 <tt class="docutils literal"><span class="pre">ENABLE_TOKENIZED_DELIMITER</span></tt> でトークナイズ済み区切り文字を有効に出来ます。トークナイズ済み区切り文字はトークンの区切りを表す特別な文字です。この文字は <tt class="docutils literal"><span class="pre">U+FFFE</span></tt> です。この文字コードはどの文字にも割り当てられていません。つまり、通常の文字列にはこの文字は現れません。よって、トークンの区切りを表すという目的には適切な文字です。 <tt class="docutils literal"><span class="pre">ENABLE_TOKENIZED_DELIMITER</span></tt> が有効のときは、対象文字列はすでにトークナイズ済みであると扱われます。トークナイザーは単にトークナイズ済み区切り文字で区切ってトークナイズします。</p>
 </div>
+<div class="section" id="mode">
+<h4>8.3.32.4.2.3. <tt class="docutils literal"><span class="pre">mode</span></tt><a class="headerlink" href="#mode" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>トークナイズモードを指定します。 <tt class="docutils literal"><span class="pre">ADD</span></tt> を指定すると、ドキュメント追加時と同じルールでトークナイズされます。 <tt class="docutils literal"><span class="pre">GET</span></tt> を指定すると、ドキュメント検索時と同じルールでトークナイズされます。省略された場合、 <tt class="docutils literal"><span class="pre">ADD</span></tt> モードでトークナイズされます。</p>
+<p>デフォルトのモードは <tt class="docutils literal"><span class="pre">ADD</span></tt> です。</p>
+<p>以下は <tt class="docutils literal"><span class="pre">ADD</span></tt> モードの例です。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>tokenize TokenBigram &quot;Fulltext Search&quot; --mode ADD
+# [
+#   [
+#     0,
+#     1408017697.66886,
+#     0.00126171112060547
+#   ],
+#   [
+#     {
+#       &quot;value&quot;: &quot;Fu&quot;,
+#       &quot;position&quot;: 0
+#     },
+#     {
+#       &quot;value&quot;: &quot;ul&quot;,
+#       &quot;position&quot;: 1
+#     },
+#     {
+#       &quot;value&quot;: &quot;ll&quot;,
+#       &quot;position&quot;: 2
+#     },
+#     {
+#       &quot;value&quot;: &quot;lt&quot;,
+#       &quot;position&quot;: 3
+#     },
+#     {
+#       &quot;value&quot;: &quot;te&quot;,
+#       &quot;position&quot;: 4
+#     },
+#     {
+#       &quot;value&quot;: &quot;ex&quot;,
+#       &quot;position&quot;: 5
+#     },
+#     {
+#       &quot;value&quot;: &quot;xt&quot;,
+#       &quot;position&quot;: 6
+#     },
+#     {
+#       &quot;value&quot;: &quot;t &quot;,
+#       &quot;position&quot;: 7
+#     },
+#     {
+#       &quot;value&quot;: &quot; S&quot;,
+#       &quot;position&quot;: 8
+#     },
+#     {
+#       &quot;value&quot;: &quot;Se&quot;,
+#       &quot;position&quot;: 9
+#     },
+#     {
+#       &quot;value&quot;: &quot;ea&quot;,
+#       &quot;position&quot;: 10
+#     },
+#     {
+#       &quot;value&quot;: &quot;ar&quot;,
+#       &quot;position&quot;: 11
+#     },
+#     {
+#       &quot;value&quot;: &quot;rc&quot;,
+#       &quot;position&quot;: 12
+#     },
+#     {
+#       &quot;value&quot;: &quot;ch&quot;,
+#       &quot;position&quot;: 13
+#     },
+#     {
+#       &quot;value&quot;: &quot;h&quot;,
+#       &quot;position&quot;: 14
+#     }
+#   ]
+# ]
+</pre></div>
+</div>
+<p>最後のアルファベットは1文字でトークナイズされています。</p>
+<p>以下は <tt class="docutils literal"><span class="pre">GET</span></tt> モードの例です。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>tokenize TokenBigram &quot;Fulltext Search&quot; --mode GET
+# [
+#   [
+#     0,
+#     1408017732.62883,
+#     0.000665903091430664
+#   ],
+#   [
+#     {
+#       &quot;value&quot;: &quot;Fu&quot;,
+#       &quot;position&quot;: 0
+#     },
+#     {
+#       &quot;value&quot;: &quot;ul&quot;,
+#       &quot;position&quot;: 1
+#     },
+#     {
+#       &quot;value&quot;: &quot;ll&quot;,
+#       &quot;position&quot;: 2
+#     },
+#     {
+#       &quot;value&quot;: &quot;lt&quot;,
+#       &quot;position&quot;: 3
+#     },
+#     {
+#       &quot;value&quot;: &quot;te&quot;,
+#       &quot;position&quot;: 4
+#     },
+#     {
+#       &quot;value&quot;: &quot;ex&quot;,
+#       &quot;position&quot;: 5
+#     },
+#     {
+#       &quot;value&quot;: &quot;xt&quot;,
+#       &quot;position&quot;: 6
+#     },
+#     {
+#       &quot;value&quot;: &quot;t &quot;,
+#       &quot;position&quot;: 7
+#     },
+#     {
+#       &quot;value&quot;: &quot; S&quot;,
+#       &quot;position&quot;: 8
+#     },
+#     {
+#       &quot;value&quot;: &quot;Se&quot;,
+#       &quot;position&quot;: 9
+#     },
+#     {
+#       &quot;value&quot;: &quot;ea&quot;,
+#       &quot;position&quot;: 10
+#     },
+#     {
+#       &quot;value&quot;: &quot;ar&quot;,
+#       &quot;position&quot;: 11
+#     },
+#     {
+#       &quot;value&quot;: &quot;rc&quot;,
+#       &quot;position&quot;: 12
+#     },
+#     {
+#       &quot;value&quot;: &quot;ch&quot;,
+#       &quot;position&quot;: 13
+#     }
+#   ]
+# ]
+</pre></div>
+</div>
+<p>最後のアルファベットは2文字でトークナイズされています。</p>
+</div>
 </div>
 </div>
 <div class="section" id="return-value">
@@ -748,6 +900,7 @@
 <li><a class="reference internal" href="#optional-parameters">8.3.32.4.2. 省略可能引数</a><ul>
 <li><a class="reference internal" href="#normalizer">8.3.32.4.2.1. <tt class="docutils literal"><span class="pre">normalizer</span></tt></a></li>
 <li><a class="reference internal" href="#flags">8.3.32.4.2.2. <tt class="docutils literal"><span class="pre">flags</span></tt></a></li>
+<li><a class="reference internal" href="#mode">8.3.32.4.2.3. <tt class="docutils literal"><span class="pre">mode</span></tt></a></li>
 </ul>
 </li>
 </ul>
@@ -760,7 +913,7 @@
 
   <h4>前のトピックへ</h4>
   <p class="topless"><a href="table_remove.html"
-                        title="前の章へ">8.3.31. table_remove</a></p>
+                        title="前の章へ">8.3.31. <tt class="docutils literal"><span class="pre">table_remove</span></tt></a></p>
   <h4>次のトピックへ</h4>
   <p class="topless"><a href="tokenizer_list.html"
                         title="次の章へ">8.3.33. <tt class="docutils literal"><span class="pre">tokenizer_list</span></tt></a></p>

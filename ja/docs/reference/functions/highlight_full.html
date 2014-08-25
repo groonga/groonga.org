@@ -1,0 +1,320 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>8.11.6. highlight_full &mdash; Groonga v4.0.4ドキュメント</title>
+    
+    <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
+    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '4.0.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../static/doctools.js"></script>
+    <script type="text/javascript" src="../../static/translations.js"></script>
+    <link rel="shortcut icon" href="../../static/favicon.ico"/>
+    <link rel="top" title="Groonga v4.0.4ドキュメント" href="../../index.html" />
+    <link rel="up" title="8.11. 関数" href="../function.html" />
+    <link rel="next" title="8.11.7. highlight_html" href="highlight_html.html" />
+    <link rel="prev" title="8.11.5. geo_in_rectangle" href="geo_in_rectangle.html" /> 
+      <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
+    <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
+    <meta property="og:type" content="product" />
+    <meta property="og:image" content="http://groonga.org/images/logos/groonga-icon-full-size.png" />
+    <meta property="og:site_name" content="groonga" />
+
+    <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
+  </head>
+
+    <body>
+    <div id="fb-root"></div>
+
+<div class="header">
+  <h1 class="title">
+    <a id="top-link" href="../../../">
+      <span class="project">groonga</span>
+      <span class="separator">-</span>
+      <span class="description">オープンソースのカラムストア機能付き全文検索エンジン</span>
+    </a>
+  </h1>
+
+      <div class="facebook-buttons">
+      <fb:like href="http://www.facebook.com/pages/groonga/201193596592346"
+               layout="standard"
+               width="290"></fb:like>
+    </div>
+    <div class="other-language-links">
+
+    <ul>
+      <li><a href="../../../../docs/reference/functions/highlight_full.html"><img src="../../static/us.png" alt="English">English page</a></li>
+    </ul>
+  </div>
+</div>
+  
+
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="highlight_html.html" title="8.11.7. highlight_html"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="geo_in_rectangle.html" title="8.11.5. geo_in_rectangle"
+             accesskey="P">前へ</a> |</li>
+        <li><a href="../../index.html">Groonga v4.0.4ドキュメント</a> &raquo;</li>
+          <li><a href="../../reference.html" >8. リファレンスマニュアル</a> &raquo;</li>
+          <li><a href="../function.html" accesskey="U">8.11. 関数</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="highlight-full">
+<h1>8.11.6. highlight_full<a class="headerlink" href="#highlight-full" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<div class="admonition caution">
+<p class="first admonition-title">ご用心</p>
+<p class="last">この機能は実験的です。APIが変わる可能性があります。</p>
+</div>
+<div class="section" id="summary">
+<h2>8.11.6.1. 概要<a class="headerlink" href="#summary" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">highlight_full</span></tt> は対象テキストをタグ付けします。検索文字列をハイライトさせるために利用することができます。HTMLエスケープの有無、ノーマライザー名を指定することができ、キーワードごとにタグを変更することができます。</p>
+</div>
+<div class="section" id="syntax">
+<h2>8.11.6.2. 構文<a class="headerlink" href="#syntax" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">highlight_full</span></tt> には必須引数と省略可能引数とがあります:</p>
+<div class="highlight-none"><div class="highlight"><pre>highlight_full(column, normalizer_name, use_html_escape,
+               keyword1, open_tag1, close_tag1,
+               ...
+               [keywordN, open_tagN, close_tagN])
+</pre></div>
+</div>
+</div>
+<div class="section" id="usage">
+<h2>8.11.6.3. 使い方<a class="headerlink" href="#usage" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>使い方を示すために使うスキーマ定義とサンプルデータは以下の通りです。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Entries TABLE_NO_KEY
+# [[0,1407692435.35498,0.0364797115325928],true]
+column_create Entries body COLUMN_SCALAR ShortText
+# [[0,1407692435.39156,0.0256640911102295],true]
+table_create Terms TABLE_PAT_KEY ShortText --default_tokenizer TokenBigram --normalizer NormalizerAuto
+# [[0,1407692435.423,0.0274741649627686],true]
+column_create Terms document_index COLUMN_INDEX|WITH_POSITION Entries body
+# [[0,1407692435.45051,0.0534985065460205],true]
+load --table Entries
+[
+{&quot;body&quot;: &quot;Mroonga is a ＭｙＳＱＬ storage engine based on Groonga. &lt;b&gt;Rroonga&lt;/b&gt; is a Ruby binding of Groonga.&quot;}
+]
+# [[0,1407692435.50406,0.378907442092896],1]
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">highlight_full</span></tt> は <a class="reference internal" href="../commands/select.html"><em>select</em></a> コマンドの <tt class="docutils literal"><span class="pre">--output_columns</span></tt> 内でのみ指定できます。</p>
+<p><tt class="docutils literal"><span class="pre">highlight_full</span></tt> を使うにはGroonga 4.0.5以降が必要です。</p>
+<p><tt class="docutils literal"><span class="pre">highlight_full</span></tt> を使うには コマンドバージョン 2以降を使う必要があります。</p>
+<p>以下の例はHTMLエスケープを使用し、ノーマライザーに <tt class="docutils literal"><span class="pre">NormalizerAuto</span></tt> を指定しています。この例では キーワード <tt class="docutils literal"><span class="pre">groonga</span></tt> に <tt class="docutils literal"><span class="pre">&lt;span</span> <span class="pre">class=&quot;keyword1&quot;&gt;</span></tt>  と <tt class="docutils literal"><span class="pre">&lt;/span&gt;</span></tt> のタグを指定し、キーワード <tt class="docutils literal"><span class="pre">mysql</span></tt> に <tt class="docutils literal"><span class="pre">&lt;span</span> <span class="pre">class=&quot;keyword2&quot;&gt;</span></tt> と <tt class="docutils literal"><span class="pre">&lt;/span&gt;</span></tt> のタグを指定しています。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --output_columns &#39;highlight_full(body, &quot;NormalizerAuto&quot;, true, &quot;Groonga&quot;, &quot;&lt;span class=\\&quot;keyword1\\&quot;&gt;&quot;, &quot;&lt;/span&gt;&quot;, &quot;mysql&quot;, &quot;&lt;span class=\\&quot;keyword2\\&quot;&gt;&quot;, &quot;&lt;/span&gt;&quot;)&#39; --command_version 2
+# [
+#   [
+#     0,
+#     1407695996.52987,
+#     0.00151872634887695
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;highlight_full&quot;,
+#           &quot;null&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Mroonga is a &lt;span class=\&quot;keyword2\&quot;&gt;ＭｙＳＱＬ&lt;/span&gt; storage engine based on &lt;span class=\&quot;keyword1\&quot;&gt;Groonga&lt;/span&gt;. &amp;lt;b&amp;gt;Rroonga&amp;lt;/b&amp;gt; is a Ruby binding of &lt;span class=\&quot;keyword1\&quot;&gt;Groonga&lt;/span&gt;.&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>キーワードとテキストは <tt class="docutils literal"><span class="pre">NormalizerAuto</span></tt> ノーマライザーで正規化されてタグ付けのためにスキャンされます。</p>
+<p><tt class="docutils literal"><span class="pre">--query</span> <span class="pre">&quot;groonga</span> <span class="pre">mysql&quot;</span></tt> は最初のレコードにマッチします。 <tt class="docutils literal"><span class="pre">highlight_full</span></tt> は、テキスト中に含まれるキーワード <tt class="docutils literal"><span class="pre">groonga</span></tt> を <tt class="docutils literal"><span class="pre">&lt;span</span> <span class="pre">class=&quot;keyword1&quot;&gt;</span></tt> と <tt class="docutils literal"><span class="pre">&lt;/span&gt;</span></tt> で囲み、 キーワード <tt class="docutils literal"><span class="pre">mysql</span></tt> を <tt class="docutils literal"><span class="pre">&lt;span</span> <span class="pre">class=&quot;keyword2&quot;&gt;</span></tt> と <tt class="docutils literal"><span class="pre">&lt;/span&gt;</span></tt> で囲みます。</p>
+<p><tt class="docutils literal"><span class="pre">&lt;</span></tt> や <tt class="docutils literal"><span class="pre">&gt;</span></tt> などの特殊文字は &amp;lt; や &amp;gt; にエスケープされています。</p>
+<p>カラムの代わりに文字列リテラルを指定することもできます。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --output_columns &#39;highlight_full(&quot;Groonga is very fast fulltext search engine.&quot;, &quot;NormalizerAuto&quot;, true, &quot;Groonga&quot;, &quot;&lt;span class=\\&quot;keyword1\\&quot;&gt;&quot;, &quot;&lt;/span&gt;&quot;, &quot;mysql&quot;, &quot;&lt;span class=\\&quot;keyword2\\&quot;&gt;&quot;, &quot;&lt;/span&gt;&quot;)&#39; --command_version 2 --match_columns body --query &quot;groonga&quot;
+# [
+#   [
+#     0,
+#     1407696157.1849,
+#     0.00164437294006348
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;highlight_full&quot;,
+#           &quot;null&quot;
+#         ]
+#       ],
+#       [
+#         &quot;&lt;span class=\&quot;keyword1\&quot;&gt;Groonga&lt;/span&gt; is very fast fulltext search engine.&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
+<div class="section" id="parameters">
+<h2>8.11.6.4. 引数<a class="headerlink" href="#parameters" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>必須引数は3つあります。 <tt class="docutils literal"><span class="pre">column</span></tt> と <tt class="docutils literal"><span class="pre">normalizer_name</span></tt> と <tt class="docutils literal"><span class="pre">use_html_escape</span></tt> です。省略可能引数は3つ以上あります。 <tt class="docutils literal"><span class="pre">keywordN</span></tt> と <tt class="docutils literal"><span class="pre">open_tagN</span></tt> と <tt class="docutils literal"><span class="pre">end_tagN</span></tt> です。</p>
+<div class="section" id="column">
+<h3>8.11.6.4.1. <tt class="docutils literal"><span class="pre">column</span></tt><a class="headerlink" href="#column" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>テーブルのカラムを指定します。</p>
+</div>
+<div class="section" id="normalizer-name">
+<h3>8.11.6.4.2. <tt class="docutils literal"><span class="pre">normalizer_name</span></tt><a class="headerlink" href="#normalizer-name" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>ノーマライザー名を指定します。</p>
+</div>
+<div class="section" id="use-html-escape">
+<h3>8.11.6.4.3. <tt class="docutils literal"><span class="pre">use_html_escape</span></tt><a class="headerlink" href="#use-html-escape" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>HTMLエスケープの有無を指定します。 <tt class="docutils literal"><span class="pre">true</span></tt> を指定すればHTMLエスケープされます。 <tt class="docutils literal"><span class="pre">false</span></tt> を指定すればHTMLエスケープされません。</p>
+</div>
+<div class="section" id="keywordn">
+<h3>8.11.6.4.4. <tt class="docutils literal"><span class="pre">keywordN</span></tt><a class="headerlink" href="#keywordn" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>タグ付けするキーワードを指定します。3つの引数ごとに複数のキーワードを指定することができます。</p>
+</div>
+<div class="section" id="open-tagn">
+<h3>8.11.6.4.5. <tt class="docutils literal"><span class="pre">open_tagN</span></tt><a class="headerlink" href="#open-tagn" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>開始タグを指定します。3つの引数ごとに複数の開始タグを指定することができます。</p>
+</div>
+<div class="section" id="close-tagn">
+<h3>8.11.6.4.6. <tt class="docutils literal"><span class="pre">close_tagN</span></tt><a class="headerlink" href="#close-tagn" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>終了タグを指定します。3つの引数ごとに複数の終了タグを指定することができます。</p>
+</div>
+</div>
+<div class="section" id="return-value">
+<h2>8.11.6.5. 戻り値<a class="headerlink" href="#return-value" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">highlight_full</span></tt> はタグ付の文字列もしくは null を返します。<tt class="docutils literal"><span class="pre">highlight_full</span></tt> は該当するキーワードがない場合に null を返します。</p>
+</div>
+<div class="section" id="see-also">
+<h2>8.11.6.6. 参考<a class="headerlink" href="#see-also" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<ul class="simple">
+<li><a class="reference internal" href="../commands/select.html"><em>select</em></a></li>
+<li><a class="reference internal" href="highlight_html.html"><em>highlight_html</em></a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">8.11.6. highlight_full</a><ul>
+<li><a class="reference internal" href="#summary">8.11.6.1. 概要</a></li>
+<li><a class="reference internal" href="#syntax">8.11.6.2. 構文</a></li>
+<li><a class="reference internal" href="#usage">8.11.6.3. 使い方</a></li>
+<li><a class="reference internal" href="#parameters">8.11.6.4. 引数</a><ul>
+<li><a class="reference internal" href="#column">8.11.6.4.1. <tt class="docutils literal"><span class="pre">column</span></tt></a></li>
+<li><a class="reference internal" href="#normalizer-name">8.11.6.4.2. <tt class="docutils literal"><span class="pre">normalizer_name</span></tt></a></li>
+<li><a class="reference internal" href="#use-html-escape">8.11.6.4.3. <tt class="docutils literal"><span class="pre">use_html_escape</span></tt></a></li>
+<li><a class="reference internal" href="#keywordn">8.11.6.4.4. <tt class="docutils literal"><span class="pre">keywordN</span></tt></a></li>
+<li><a class="reference internal" href="#open-tagn">8.11.6.4.5. <tt class="docutils literal"><span class="pre">open_tagN</span></tt></a></li>
+<li><a class="reference internal" href="#close-tagn">8.11.6.4.6. <tt class="docutils literal"><span class="pre">close_tagN</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#return-value">8.11.6.5. 戻り値</a></li>
+<li><a class="reference internal" href="#see-also">8.11.6.6. 参考</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="geo_in_rectangle.html"
+                        title="前の章へ">8.11.5. geo_in_rectangle</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="highlight_html.html"
+                        title="次の章へ">8.11.7. highlight_html</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../sources/reference/functions/highlight_full.txt"
+           rel="nofollow">ソースコードを表示（英語）</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="highlight_html.html" title="8.11.7. highlight_html"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="geo_in_rectangle.html" title="8.11.5. geo_in_rectangle"
+             >前へ</a> |</li>
+        <li><a href="../../index.html">Groonga v4.0.4ドキュメント</a> &raquo;</li>
+          <li><a href="../../reference.html" >8. リファレンスマニュアル</a> &raquo;</li>
+          <li><a href="../function.html" >8.11. 関数</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009-2014, Brazil, Inc.
+    </div>
+      <script src="http://connect.facebook.net/ja_JP/all.js"></script>
+
+    <script>
+      FB.init({
+         appId  : null,
+         status : true, // check login status
+         cookie : true, // enable cookies to allow the server to access the session
+         xfbml  : true  // parse XFBML
+      });
+    </script>
+  </body>
+
+</html>

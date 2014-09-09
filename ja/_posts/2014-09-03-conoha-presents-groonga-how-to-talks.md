@@ -19,7 +19,11 @@ description: 2014/09/03にConoHa presents - Groonga "How-To" Talksを開催し�
 
 当日の様子は[ConoHa presents - Groonga "How-To" Talks #groonga タグまとめ - Togetterまとめ](http://togetter.com/li/715054)も参考になりますよ。ツイートをみると、お役立ち勉強会だったことがよくわかりますね。
 
-また、このは通信室でも[ConoHa presents - Groonga "How-To" Talks　イベントレポート](https://www.conoha.jp/blog/conoha/3349.html)が公開されているのでこちらもあわせてどうぞ！
+また、このは通信室でも[ConoHa presents - Groonga "How-To" Talks　イベントレポート](https://www.conoha.jp/blog/conoha/3349.html)が公開されています。写真もあって、どんな雰囲気だったかもわかりやすいです。
+
+参加者の方もレポートを書いてくれています。こちらもあわせてどうぞ！
+
+  * [Elasticsearchで動いてる全文検索機能をまるっとGroongaに置き換えてみる遊び | GMOメディア エンジニアブログ](http://tech.gmo-media.jp/post/96654610919/groonga-bosukete)
 
 勉強会ではいろいろおしらせがありました。
 

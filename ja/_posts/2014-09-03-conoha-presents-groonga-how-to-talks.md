@@ -24,6 +24,7 @@ description: 2014/09/03にConoHa presents - Groonga "How-To" Talksを開催し�
 参加者の方もレポートを書いてくれています。こちらもあわせてどうぞ！
 
   * [Elasticsearchで動いてる全文検索機能をまるっとGroongaに置き換えてみる遊び | GMOメディア エンジニアブログ](http://tech.gmo-media.jp/post/96654610919/groonga-bosukete)
+  * [ConoHa presents - Groonga “How-To” Talksでバックアップについてしゃべった | GMOメディア エンジニアブログ](http://tech.gmo-media.jp/post/97046711949/conoha-presents-groonga-how-to-talks)
 
 勉強会ではいろいろおしらせがありました。
 

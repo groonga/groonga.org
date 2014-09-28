@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>4.10. マイクロブログ検索システムの作成 &mdash; Groonga v4.0.5 documentation</title>
+    <title>4.10. Let&#39;s create micro-blog &mdash; Groonga v4.0.6 documentation</title>
     
     <link rel="stylesheet" href="../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '4.0.5',
+        VERSION:     '4.0.6',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,10 +24,10 @@
     <script type="text/javascript" src="../static/underscore.js"></script>
     <script type="text/javascript" src="../static/doctools.js"></script>
     <link rel="shortcut icon" href="../static/favicon.ico"/>
-    <link rel="top" title="Groonga v4.0.5 documentation" href="../index.html" />
+    <link rel="top" title="Groonga v4.0.6 documentation" href="../index.html" />
     <link rel="up" title="4. Tutorial" href="../tutorial.html" />
-    <link rel="next" title="4.11. クエリ拡張" href="query_expansion.html" />
-    <link rel="prev" title="4.9. 全文検索の語彙表に対する追加情報" href="lexicon.html" /> 
+    <link rel="next" title="4.11. Query expansion" href="query_expansion.html" />
+    <link rel="prev" title="4.9. Additional information about lexicon for full text search" href="lexicon.html" /> 
       <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
     <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
     <meta property="og:type" content="product" />
@@ -70,12 +70,12 @@
           <a href="../genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="query_expansion.html" title="4.11. クエリ拡張"
+          <a href="query_expansion.html" title="4.11. Query expansion"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="lexicon.html" title="4.9. 全文検索の語彙表に対する追加情報"
+          <a href="lexicon.html" title="4.9. Additional information about lexicon for full text search"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Groonga v4.0.5 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Groonga v4.0.6 documentation</a> &raquo;</li>
           <li><a href="../tutorial.html" accesskey="U">4. Tutorial</a> &raquo;</li> 
       </ul>
     </div>  
@@ -85,12 +85,13 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="id1">
-<h1>4.10. マイクロブログ検索システムの作成<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
-<p>これまで学んだGroongaの機能を用いて、マイクロブログの検索システムを作成してみましょう。マイクロブログとは、Twitterのような短いメッセージを投稿するブログです。</p>
-<div class="section" id="id2">
-<h2>4.10.1. テーブルの作成<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
-<p>まずは、テーブルを作成します。</p>
+  <div class="section" id="let-s-create-micro-blog">
+<h1>4.10. Let's create micro-blog<a class="headerlink" href="#let-s-create-micro-blog" title="Permalink to this headline">¶</a></h1>
+<p>Let's create micro-blog with full text search by Groonga.
+Micro-blog is one of the broadcast medium in the forms of blog. It is mainly used to post small messages like a Twitter.</p>
+<div class="section" id="create-a-table">
+<h2>4.10.1. Create a table<a class="headerlink" href="#create-a-table" title="Permalink to this headline">¶</a></h2>
+<p>Let's create table.</p>
 <div class="highlight-none"><div class="highlight"><pre>table_create --name Users --flags TABLE_HASH_KEY --key_type ShortText
 table_create --name Comments --flags TABLE_HASH_KEY --key_type ShortText
 table_create --name HashTags --flags TABLE_HASH_KEY --key_type ShortText
@@ -123,76 +124,78 @@ column_create --table GeoIndex --name users_location --type Users --flags COLUMN
 column_create --table GeoIndex --name comments_location --type Comments --flags COLUMN_INDEX --source location
 </pre></div>
 </div>
-<div class="section" id="users">
-<h3>4.10.1.1. Usersテーブル<a class="headerlink" href="#users" title="Permalink to this headline">¶</a></h3>
-<p>ユーザーの名前や自己紹介文、フォローしているユーザー一覧など、ユーザー情報を格納するためのテーブルです。</p>
+<div class="section" id="users-table">
+<h3>4.10.1.1. Users table<a class="headerlink" href="#users-table" title="Permalink to this headline">¶</a></h3>
+<p>This is the table which stores user information.
+It stores name of user, profile, list of follower and so on.</p>
 <dl class="docutils">
 <dt><tt class="docutils literal"><span class="pre">_key</span></tt></dt>
-<dd>ユーザーID</dd>
+<dd>User ID</dd>
 <dt><tt class="docutils literal"><span class="pre">name</span></tt></dt>
-<dd>ユーザー名</dd>
+<dd>User name</dd>
 <dt><tt class="docutils literal"><span class="pre">follower</span></tt></dt>
-<dd>フォローしているユーザーの一覧</dd>
+<dd>List of following users</dd>
 <dt><tt class="docutils literal"><span class="pre">favorites</span></tt></dt>
-<dd>お気に入りのコメント一覧</dd>
+<dd>List of favorite comments</dd>
 <dt><tt class="docutils literal"><span class="pre">location</span></tt></dt>
-<dd>ユーザーの現在地（緯度経度座標）</dd>
+<dd>Current location of user (geolocation)</dd>
 <dt><tt class="docutils literal"><span class="pre">location_str</span></tt></dt>
-<dd>ユーザーの現在地（文字列）</dd>
+<dd>Current location of user (string)</dd>
 <dt><tt class="docutils literal"><span class="pre">description</span></tt></dt>
-<dd>ユーザーの自己紹介</dd>
+<dd>User profile</dd>
 <dt><tt class="docutils literal"><span class="pre">followee</span></tt></dt>
-<dd>Usersテーブルのfollowerカラムに対するインデックス。
-このインデックスを作ることで、あるユーザーをフォローしているユーザーを検索できるようになります。</dd>
+<dd>Indexes for <tt class="docutils literal"><span class="pre">follower</span></tt> column in <tt class="docutils literal"><span class="pre">Users</span></tt> table.
+With this indexes, you can search users who follows the person.</dd>
 </dl>
 </div>
-<div class="section" id="comments">
-<h3>4.10.1.2. Commentsテーブル<a class="headerlink" href="#comments" title="Permalink to this headline">¶</a></h3>
-<p>コメント内容や投稿日時、返信先情報など、コメントに関する内容を格納するテーブルです。</p>
+<div class="section" id="comments-table">
+<h3>4.10.1.2. Comments table<a class="headerlink" href="#comments-table" title="Permalink to this headline">¶</a></h3>
+<p>This is the table which stores comments and its metadata.
+It stores content of comment, posted date, comment which reply to, and so on.</p>
 <dl class="docutils">
 <dt><tt class="docutils literal"><span class="pre">_key</span></tt></dt>
-<dd>コメントID</dd>
+<dd>Comment ID</dd>
 <dt><tt class="docutils literal"><span class="pre">comment</span></tt></dt>
-<dd>コメント内容</dd>
+<dd>Content of comment</dd>
 <dt><tt class="docutils literal"><span class="pre">last_modified</span></tt></dt>
-<dd>投稿日時</dd>
+<dd>Posted date</dd>
 <dt><tt class="docutils literal"><span class="pre">replied_to</span></tt></dt>
-<dd>返信元のコメント内容</dd>
+<dd>Comment which you reply to someone</dd>
 <dt><tt class="docutils literal"><span class="pre">replied_users</span></tt></dt>
-<dd>返信先のユーザーの一覧</dd>
+<dd>List of users who you reply to</dd>
 <dt><tt class="docutils literal"><span class="pre">hash_tags</span></tt></dt>
-<dd>コメントのハッシュタグの一覧</dd>
+<dd>List of hash tags about comment</dd>
 <dt><tt class="docutils literal"><span class="pre">location</span></tt></dt>
-<dd>投稿場所(緯度経度座標のため)</dd>
+<dd>Posted place (for geolocation)</dd>
 <dt><tt class="docutils literal"><span class="pre">posted_by</span></tt></dt>
-<dd>コメントを書いたユーザー</dd>
+<dd>Person who write comment</dd>
 <dt><tt class="docutils literal"><span class="pre">favorited_by</span></tt></dt>
-<dd>Usersテーブルのfavoritesカラムに対するインデックス。
-このインデックスを作ることで、指定したコメントを誰がお気に入りに入れているのかを検索できるようになります。</dd>
+<dd>Indexes for <tt class="docutils literal"><span class="pre">favorites</span></tt> column in <tt class="docutils literal"><span class="pre">Users</span></tt> table.
+With this indexes, you can search the person who mark comment as favorite one.</dd>
 </dl>
 </div>
-<div class="section" id="hashtags">
-<h3>4.10.1.3. HashTagsテーブル<a class="headerlink" href="#hashtags" title="Permalink to this headline">¶</a></h3>
-<p>コメントのハッシュタグを一覧で保存するためのテーブルです。</p>
+<div class="section" id="hashtags-table">
+<h3>4.10.1.3. HashTags table<a class="headerlink" href="#hashtags-table" title="Permalink to this headline">¶</a></h3>
+<p>This is the table which stores hash tags for comments.</p>
 <dl class="docutils">
 <dt><tt class="docutils literal"><span class="pre">_key</span></tt></dt>
-<dd>ハッシュタグ</dd>
+<dd>Hash tag</dd>
 <dt><tt class="docutils literal"><span class="pre">hash_index</span></tt></dt>
-<dd>「Comments.hash_tags」のインデックス。
-このインデックスを作ることで、指定したハッシュタグのついているコメントの一覧を出すことが出来るようになります。</dd>
+<dd>Indexes for <tt class="docutils literal"><span class="pre">Comments.hash_tags</span></tt>.
+With this indexes, you can search list of comments with specified hash tags.</dd>
 </dl>
 </div>
-<div class="section" id="bigram">
-<h3>4.10.1.4. Bigramテーブル<a class="headerlink" href="#bigram" title="Permalink to this headline">¶</a></h3>
-<p>ユーザー情報・コメントで全文検索が出来るようにするためのインデックスを格納するテーブルです。</p>
+<div class="section" id="bigram-table">
+<h3>4.10.1.4. Bigram table<a class="headerlink" href="#bigram-table" title="Permalink to this headline">¶</a></h3>
+<p>This is the table which stores indexes for full text search by user information or comments.</p>
 <dl class="docutils">
 <dt><tt class="docutils literal"><span class="pre">_key</span></tt></dt>
-<dd>単語</dd>
+<dd>Word</dd>
 <dt><tt class="docutils literal"><span class="pre">users_index</span></tt></dt>
-<dd>ユーザー情報のインデックス。
-このカラムは、ユーザー名「Users.name」、現在地「Users.location_str」、自己紹介文「Users.description」のインデックスになっています。</dd>
+<dd>Indexes of user information.
+This column contains indexes of user name (<tt class="docutils literal"><span class="pre">Users.name</span></tt>), current location (<tt class="docutils literal"><span class="pre">Users.location_str</span></tt>), profile (<tt class="docutils literal"><span class="pre">Users.description</span></tt>).</dd>
 <dt><tt class="docutils literal"><span class="pre">comment_index</span></tt></dt>
-<dd>コメント内容「Comments.comment」のインデックス</dd>
+<dd>Indexes about content of comments (<tt class="docutils literal"><span class="pre">Comments.comment</span></tt>).</dd>
 </dl>
 </div>
 <div class="section" id="geoindex-table">
@@ -206,119 +209,123 @@ column_create --table GeoIndex --name comments_location --type Comments --flags 
 </dl>
 </div>
 </div>
-<div class="section" id="id3">
-<h2>4.10.2. データのロード<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
-<p>つづいて、テスト用データをロードします。</p>
+<div class="section" id="loading-data">
+<h2>4.10.2. Loading data<a class="headerlink" href="#loading-data" title="Permalink to this headline">¶</a></h2>
+<p>Then, load example data.</p>
 <div class="highlight-none"><div class="highlight"><pre>load --table Users
 [
   {
-    &quot;_key&quot;: &quot;daijiro&quot;,
-    &quot;name&quot;: &quot;hsiomaneki&quot;,
-    &quot;follower&quot;: [&quot;tasukuchan&quot;],
+    &quot;_key&quot;: &quot;alice&quot;,
+    &quot;name&quot;: &quot;Alice&quot;,
+    &quot;follower&quot;: [&quot;bob&quot;],
     &quot;favorites&quot;: [],
-    &quot;location&quot;: &quot;127678039x502643091&quot;,
-    &quot;location_str&quot;: &quot;神奈川県&quot;,
-    &quot;description&quot;: &quot;groonga developer&quot;
+    &quot;location&quot;: &quot;152489000x-255829000&quot;,
+    &quot;location_str&quot;: &quot;Boston, Massachusetts&quot;,
+    &quot;description&quot;: &quot;Groonga developer&quot;
   },
   {
-    &quot;_key&quot;: &quot;tasukuchan&quot;,
-    &quot;name&quot;: &quot;グニャラくん&quot;,
-    &quot;follower&quot;: [&quot;daijiro&quot;,&quot;OffGao&quot;],
-    &quot;favorites&quot;: [&quot;daijiro:1&quot;,&quot;OffGao:1&quot;],
-    &quot;location&quot;: &quot;128423343x502929252&quot;,
-    &quot;location_str&quot;: &quot;東京都渋谷区&quot;,
-    &quot;description&quot;: &quot;エロいおっさん&quot;
+    &quot;_key&quot;: &quot;bob&quot;,
+    &quot;name&quot;: &quot;Bob&quot;,
+    &quot;follower&quot;: [&quot;alice&quot;,&quot;charlie&quot;],
+    &quot;favorites&quot;: [&quot;alice:1&quot;,&quot;charlie:1&quot;],
+    &quot;location&quot;: &quot;146249000x-266228000&quot;,
+    &quot;location_str&quot;: &quot;Brooklyn, New York City&quot;,
+    &quot;description&quot;: &quot;&quot;
   },
   {
-    &quot;_key&quot;: &quot;OffGao&quot;,
-    &quot;name&quot;: &quot;OffGao&quot;,
-    &quot;follower&quot;: [&quot;tasukuchan&quot;,&quot;daijiro&quot;],
-    &quot;favorites&quot;: [&quot;tasukuchan:1&quot;,&quot;daijiro:1&quot;],
-    &quot;location&quot;: &quot;128544408x502801502&quot;,
-    &quot;location_str&quot;: &quot;東京都中野区&quot;,
-    &quot;description&quot;: &quot;がおがお&quot;
+    &quot;_key&quot;: &quot;charlie&quot;,
+    &quot;name&quot;: &quot;Charlie&quot;,
+    &quot;follower&quot;: [&quot;alice&quot;,&quot;bob&quot;],
+    &quot;favorites&quot;: [&quot;alice:1&quot;,&quot;bob:1&quot;],
+    &quot;location&quot;: &quot;146607190x-267021260&quot;,
+    &quot;location_str&quot;: &quot;Newark, New Jersey&quot;,
+    &quot;description&quot;: &quot;Hmm,Hmm&quot;
   }
 ]
 
 load --table Comments
 [
   {
-    &quot;_key&quot;: &quot;daijiro:1&quot;,
-    &quot;comment&quot;: &quot;マイクロブログ作ってみました（甘栗むいちゃいました的な感じで）。&quot;,
+    &quot;_key&quot;: &quot;alice:1&quot;,
+    &quot;comment&quot;: &quot;I&#39;ve created micro-blog!&quot;,
     &quot;last_modified&quot;: &quot;2010/03/17 12:05:00&quot;,
-    &quot;posted_by&quot;: &quot;daijiro&quot;,
+    &quot;posted_by&quot;: &quot;alice&quot;,
   },
   {
-    &quot;_key&quot;: &quot;tasukuchan:1&quot;,
-    &quot;comment&quot;: &quot;初の書き込み。テストテスト。&quot;,
+    &quot;_key&quot;: &quot;bob:1&quot;,
+    &quot;comment&quot;: &quot;First post. test,test...&quot;,
     &quot;last_modified&quot;: &quot;2010/03/17 12:00:00&quot;,
-    &quot;posted_by&quot;: &quot;tasukuchan&quot;,
+    &quot;posted_by&quot;: &quot;bob&quot;,
   },
   {
-    &quot;_key&quot;: &quot;daijiro:2&quot;,
-    &quot;comment&quot;: &quot;@tasukuchan ようこそ!!!&quot;,
+    &quot;_key&quot;: &quot;alice:2&quot;,
+    &quot;comment&quot;: &quot;@bob Welcome!!!&quot;,
     &quot;last_modified&quot;: &quot;2010/03/17 12:05:00&quot;,
-    &quot;replied_to&quot;: &quot;tasukuchan:1&quot;,
-    &quot;replied_users&quot;: [&quot;tasukuchan&quot;],
-    &quot;posted_by&quot;: &quot;daijiro&quot;,
+    &quot;replied_to&quot;: &quot;bob:1&quot;,
+    &quot;replied_users&quot;: [&quot;bob&quot;],
+    &quot;posted_by&quot;: &quot;alice&quot;,
   },
   {
-    &quot;_key&quot;: &quot;tasukuchan:2&quot;,
-    &quot;comment&quot;: &quot;@daijiro ありがとう！&quot;,
+    &quot;_key&quot;: &quot;bob:2&quot;,
+    &quot;comment&quot;: &quot;@alice Thanks!&quot;,
     &quot;last_modified&quot;: &quot;2010/03/17 13:00:00&quot;,
-    &quot;replied_to&quot;: &quot;daijiro:2&quot;,
-    &quot;replied_users&quot;: [&quot;daijiro&quot;],
-    &quot;posted_by&quot;: &quot;tasukuchan&quot;,
+    &quot;replied_to&quot;: &quot;alice:2&quot;,
+    &quot;replied_users&quot;: [&quot;alice&quot;],
+    &quot;posted_by&quot;: &quot;bob&quot;,
   },
   {
-    &quot;_key&quot;: &quot;tasukuchan:3&quot;,
-    &quot;comment&quot;: &quot;groongaなう #groonga&quot;,
+    &quot;_key&quot;: &quot;bob:3&quot;,
+    &quot;comment&quot;: &quot;I&#39;ve just used &#39;Try-Groonga&#39; now! #groonga&quot;,
     &quot;last_modified&quot;: &quot;2010/03/17 14:00:00&quot;,
     &quot;hash_tags&quot;: [&quot;groonga&quot;],
-    &quot;location&quot;: &quot;127972422x503117107&quot;,
-    &quot;posted_by&quot;: &quot;tasukuchan&quot;,
+    &quot;location&quot;: &quot;146566000x-266422000&quot;,
+    &quot;posted_by&quot;: &quot;bob&quot;,
   },
   {
-    &quot;_key&quot;: &quot;tasukuchan:4&quot;,
-    &quot;comment&quot;: &quot;groonga開発合宿のため羽田空港に来ました！ #groonga #travel&quot;,
+    &quot;_key&quot;: &quot;bob:4&quot;,
+    &quot;comment&quot;: &quot;I&#39;m come at city of New York for development camp! #groonga #travel&quot;,
     &quot;last_modified&quot;: &quot;2010/03/17 14:05:00&quot;,
     &quot;hash_tags&quot;: [&quot;groonga&quot;, &quot;travel&quot;],
-    &quot;location&quot;: &quot;127975798x502919856&quot;,
-    &quot;posted_by&quot;: &quot;tasukuchan&quot;,
+    &quot;location&quot;: &quot;146566000x-266422000&quot;,
+    &quot;posted_by&quot;: &quot;bob&quot;,
   },
   {
-    &quot;_key&quot;: &quot;OffGao:1&quot;,
-    &quot;comment&quot;: &quot;@daijiro @tasukuchan 登録してみましたよー！&quot;,
+    &quot;_key&quot;: &quot;charlie:1&quot;,
+    &quot;comment&quot;: &quot;@alice @bob I&#39;ve tried to register!&quot;,
     &quot;last_modified&quot;: &quot;2010/03/17 15:00:00&quot;,
-    &quot;replied_users&quot;: [&quot;daijiro&quot;, &quot;tasukuchan&quot;],
-    &quot;location&quot;: &quot;128551935x502796433&quot;,
-    &quot;posted_by&quot;: &quot;OffGao&quot;,
+    &quot;replied_users&quot;: [&quot;alice&quot;, &quot;bob&quot;],
+    &quot;location&quot;: &quot;146607190x-267021260&quot;,
+    &quot;posted_by&quot;: &quot;charlie&quot;,
   }
   {
-    &quot;_key&quot;: &quot;OffGao:2&quot;,
-    &quot;comment&quot;: &quot;中野ブロードウェイなうなう&quot;,
+    &quot;_key&quot;: &quot;charlie:2&quot;,
+    &quot;comment&quot;: &quot;I&#39;m at the Museum of Modern Art in NY now!&quot;,
     &quot;last_modified&quot;: &quot;2010/03/17 15:05:00&quot;,
-    &quot;location&quot;: &quot;128551935x502796434&quot;,
-    &quot;posted_by&quot;: &quot;OffGao&quot;,
+    &quot;location&quot;: &quot;146741340x-266319590&quot;,
+    &quot;posted_by&quot;: &quot;charlie&quot;,
   }
 ]
 </pre></div>
 </div>
-<p>Usersテーブルのfollowerカラムとfavoritesカラム、そしてCommentsテーブルのreplied_usersカラムは、ベクターカラムです。そのため、これらのカラムは配列で値を指定します。</p>
-<p>Usersテーブルのlocationカラムと、Commentsテーブルのlocationカラムは、GeoPoint型です。この型での値の指定は、&quot;[緯度]x[経度]&quot;と記述して指定します。</p>
-<p>Commentsテーブルのlast_modifiedカラムは、Time型です。この型での値を指定する方法は2つあります。
-1つ目の方法は、1970年1月1日0時0分0秒からの経過秒数の値を直接指定する方法です。このとき、小数部分を指定することでマイクロ秒数での指定が可能です。指定した値は、データのロードの際にマイクロ秒を単位とする整数値に変換後、格納されます。
-2つ目の方法は、文字列で日時と時刻を指定する方法です。&quot;年/月/日 時:分:秒&quot;というフォーマットで記述することで、データロードの際に文字列からキャストされ、マイクロ秒数の値が格納されます。</p>
+<p><tt class="docutils literal"><span class="pre">follower</span></tt> column and <tt class="docutils literal"><span class="pre">favorites</span></tt> column in <tt class="docutils literal"><span class="pre">Users</span></tt> table and <tt class="docutils literal"><span class="pre">replied_users</span></tt> column in <tt class="docutils literal"><span class="pre">Comments</span></tt> table are vector column, so specify the value as an array.</p>
+<p><tt class="docutils literal"><span class="pre">location</span></tt> column in <tt class="docutils literal"><span class="pre">Users</span></tt> table, <tt class="docutils literal"><span class="pre">location</span></tt> column in <tt class="docutils literal"><span class="pre">Comments</span></tt> table use GeoPoint type. This type accepts &quot;[latitude]x[longitude]&quot;.</p>
+<p><tt class="docutils literal"><span class="pre">last_modified</span></tt> column in <tt class="docutils literal"><span class="pre">Comments</span></tt> table use Time type.</p>
+<p>There are two way to specify the value.
+First, specify epoch (seconds since Jan, 1, 1970 AM 00:00:00) directly. In this case, you can specify micro seconds as fractional part.
+The value is converted from factional part to the time which is micro seconds based one when data is loaded.
+The second, specify the timestamp as string in following format: &quot;(YEAR)/(MONTH)/(DAY) (HOUR):(MINUTE):(SECOND)&quot;. In this way, the string is casted to proper micro seconds
+when data is loaded.</p>
 </div>
-<div class="section" id="id4">
-<h2>4.10.3. 検索<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
-<p>それでは、実際に検索をしてみましょう。</p>
-<div class="section" id="id5">
-<h3>4.10.3.1. キーワードでユーザー検索<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
-<p>ここでは、 <a class="reference internal" href="match_columns.html"><em>match_columns parameter</em></a> で扱った、複数カラムを対象とした検索を行います。
-指定された文字列で、ユーザー名・現在地・自己紹介文を対象に検索をします。</p>
+<div class="section" id="search">
+<h2>4.10.3. Search<a class="headerlink" href="#search" title="Permalink to this headline">¶</a></h2>
+<p>Let's search micro-blog.</p>
+<div class="section" id="search-users-by-keyword">
+<h3>4.10.3.1. Search users by keyword<a class="headerlink" href="#search-users-by-keyword" title="Permalink to this headline">¶</a></h3>
+<p>In this section, we search micro-blog against multiple column by keyword.
+See <a class="reference internal" href="match_columns.html"><em>match_columns parameter</em></a> to search multiple column at once.</p>
+<p>Let's search user from micro-blog's user name, location, description entries.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>select --table Users --match_columns name,location_str,description --query 東京 --output_columns _key,name
+<div class="highlight-none"><div class="highlight"><pre>select --table Users --match_columns name,location_str,description --query &quot;New York&quot; --output_columns _key,name
 # [[0, 1337566253.89858, 0.000355720520019531], true]
 # [[0, 1337566253.89858, 0.000355720520019531], true]
 # [[0, 1337566253.89858, 0.000355720520019531], true]
@@ -355,7 +362,7 @@ load --table Comments
 #   [
 #     [
 #       [
-#         2
+#         1
 #       ],
 #       [
 #         [
@@ -368,26 +375,23 @@ load --table Comments
 #         ]
 #       ],
 #       [
-#         &quot;tasukuchan&quot;,
-#         &quot;グニャラくん&quot;
-#       ],
-#       [
-#         &quot;OffGao&quot;,
-#         &quot;OffGao&quot;
+#         &quot;bob&quot;,
+#         &quot;Bob&quot;
 #       ]
 #     ]
 #   ]
 # ]
 </pre></div>
 </div>
-<p>「東京」をキーワードにユーザー検索した結果、東京都に住んでいる「グニャラくん」と「OffGao」がヒットしました。</p>
+<p>By using &quot;New York&quot; as searching keyword for user, &quot;Bob&quot; who lives in &quot;New York&quot; is listed in search result.</p>
 </div>
-<div class="section" id="geopoint">
-<h3>4.10.3.2. GeoPointでユーザー検索<a class="headerlink" href="#geopoint" title="Permalink to this headline">¶</a></h3>
-<p>ここでは、 <a class="reference internal" href="search.html"><em>Various search conditions</em></a> で扱った、GeoPoint型のカラムで検索をします。
-以下の例では、指定された位置から5000m以内にいるユーザーを検索しています。</p>
+<div class="section" id="search-users-by-geolocation-data-geopoint">
+<h3>4.10.3.2. Search users by geolocation data (GeoPoint)<a class="headerlink" href="#search-users-by-geolocation-data-geopoint" title="Permalink to this headline">¶</a></h3>
+<p>In this section, we search users by column data which use type of GeoPoint.
+See <a class="reference internal" href="search.html"><em>Various search conditions</em></a> about GeoPoint column.</p>
+<p>Following example searches users who live in within 20km from specified location.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>select --table Users --filter &#39;geo_in_circle(location,&quot;128484216x502919856&quot;,5000)&#39; --output_columns _key,name
+<div class="highlight-none"><div class="highlight"><pre>select --table Users --filter &#39;geo_in_circle(location,&quot;146710080x-266315480&quot;,20000)&#39; --output_columns _key,name
 # [
 #   [
 #     0,
@@ -410,26 +414,26 @@ load --table Comments
 #         ]
 #       ],
 #       [
-#         &quot;tasukuchan&quot;,
-#         &quot;グニャラくん&quot;
+#         &quot;charlie&quot;,
+#         &quot;Charlie&quot;
 #       ],
 #       [
-#         &quot;OffGao&quot;,
-#         &quot;OffGao&quot;
+#         &quot;bob&quot;,
+#         &quot;Bob&quot;
 #       ]
 #     ]
 #   ]
 # ]
 </pre></div>
 </div>
-<p>新宿駅から5km以内にすんでいるユーザーを検索したところ、「グニャラくん」と「OffGao」がヒットしました。</p>
+<p>It shows that &quot;Bob&quot; and &quot;Charlie&quot; lives in within 20 km from station of &quot;Grand Central Terminal&quot;.</p>
 </div>
-<div class="section" id="id6">
-<h3>4.10.3.3. あるユーザーをフォローしているユーザーの検索<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
-<p>ここでは、 <a class="reference internal" href="index.html"><em>Tag search and reverse resolution of reference relationships</em></a> で扱った、参照関係の逆引きをします。
-以下の例では、Usersテーブルのfollowerカラムにあるフォローリストを逆引きします。</p>
+<div class="section" id="search-users-who-follows-specific-user">
+<h3>4.10.3.3. Search users who follows specific user<a class="headerlink" href="#search-users-who-follows-specific-user" title="Permalink to this headline">¶</a></h3>
+<p>In this section, we do reverse resolution of reference relationships which is described at <a class="reference internal" href="index.html"><em>Tag search and reverse resolution of reference relationships</em></a>.</p>
+<p>Following examples shows reverse resolution about <tt class="docutils literal"><span class="pre">follower</span></tt> column of <tt class="docutils literal"><span class="pre">Users</span></tt> table.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>select --table Users --query follower:@tasukuchan --output_columns _key,name
+<div class="highlight-none"><div class="highlight"><pre>select --table Users --query follower:@bob --output_columns _key,name
 # [
 #   [
 #     0,
@@ -452,26 +456,28 @@ load --table Comments
 #         ]
 #       ],
 #       [
-#         &quot;daijiro&quot;,
-#         &quot;hsiomaneki&quot;
+#         &quot;alice&quot;,
+#         &quot;Alice&quot;
 #       ],
 #       [
-#         &quot;OffGao&quot;,
-#         &quot;OffGao&quot;
+#         &quot;charlie&quot;,
+#         &quot;Charlie&quot;
 #       ]
 #     ]
 #   ]
 # ]
 </pre></div>
 </div>
-<p>「グニャラくん」をフォローしている「hsiomaneki」と「OffGao」がヒットしました。</p>
+<p>It shows that &quot;Alice&quot; and &quot;Charlie&quot; follows &quot;Bob&quot;.</p>
 </div>
-<div class="section" id="id7">
-<h3>4.10.3.4. GeoPointでコメント検索<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
-<p>ある範囲内で書かれたコメントを検索します。
-また、 <a class="reference internal" href="drilldown.html"><em>Drilldown</em></a> で扱ったドリルダウンも行います。検索結果をハッシュタグとユーザーでドリルダウンし、ユーザー別・ハッシュタグ別のカウントを出します。</p>
+<div class="section" id="search-comments-by-using-the-value-of-geopoint-type">
+<h3>4.10.3.4. Search comments by using the value of GeoPoint type<a class="headerlink" href="#search-comments-by-using-the-value-of-geopoint-type" title="Permalink to this headline">¶</a></h3>
+<p>In this section, we search comments which are written within specific location.</p>
+<p>Then, we also use drill down which is described at <a class="reference internal" href="drilldown.html"><em>Drilldown</em></a>.
+Following example shows how to drill down against search results.
+As a result, we get the value of count which is grouped by user, and hash tags respectively.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>select --table Comments --filter &#39;geo_in_circle(location,&quot;127975798x502919856&quot;,20000)&#39; --output_columns posted_by.name,comment --drilldown hash_tags,posted_by
+<div class="highlight-none"><div class="highlight"><pre>select --table Comments --filter &#39;geo_in_circle(location,&quot;146867000x-266280000&quot;,20000)&#39; --output_columns posted_by.name,comment --drilldown hash_tags,posted_by
 # [
 #   [
 #     0,
@@ -494,20 +500,20 @@ load --table Comments
 #         ]
 #       ],
 #       [
-#         &quot;グニャラくん&quot;,
-#         &quot;groonga開発合宿のため羽田空港に来ました！ #groonga #travel&quot;
+#         &quot;Charlie&quot;,
+#         &quot;I&#39;m at the Museum of Modern Art in NY now!&quot;
 #       ],
 #       [
-#         &quot;グニャラくん&quot;,
-#         &quot;groongaなう #groonga&quot;
+#         &quot;Bob&quot;,
+#         &quot;I&#39;ve just used &#39;Try-Groonga&#39; now! #groonga&quot;
 #       ],
 #       [
-#         &quot;OffGao&quot;,
-#         &quot;@daijiro @tasukuchan 登録してみましたよー！&quot;
+#         &quot;Bob&quot;,
+#         &quot;I&#39;m come at city of New York for development camp! #groonga #travel&quot;
 #       ],
 #       [
-#         &quot;OffGao&quot;,
-#         &quot;中野ブロードウェイなうなう&quot;
+#         &quot;Charlie&quot;,
+#         &quot;@alice @bob I&#39;ve tried to register!&quot;
 #       ]
 #     ],
 #     [
@@ -548,11 +554,11 @@ load --table Comments
 #         ]
 #       ],
 #       [
-#         &quot;tasukuchan&quot;,
+#         &quot;charlie&quot;,
 #         2
 #       ],
 #       [
-#         &quot;OffGao&quot;,
+#         &quot;bob&quot;,
 #         2
 #       ]
 #     ]
@@ -560,14 +566,16 @@ load --table Comments
 # ]
 </pre></div>
 </div>
-<p>範囲を広く指定したため、位置情報のあるすべてのコメントがヒットしました。そして、ヒットしたコメントからドリルダウンされた結果も返ってきており、ハッシュタグは「#groonga」が2つに「#travel」が1つ、投稿者は「グニャラくん」「OffGao」がそれぞれ2件ずつであることがわかります。</p>
+<p>Above query searches comments which are posted within 20 km from Central Park in city of New York.</p>
+<p>As specified range is 20 km, all comments with location are collected.
+You know that search results contain 2 #groonga hash tags and one #travel hash tag, and bob and charlie posted 2 comments.</p>
 </div>
-<div class="section" id="id8">
-<h3>4.10.3.5. キーワードでコメント検索<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
-<p>あるキーワードを含むコメントを検索します。
-さらに、 <a class="reference internal" href="search.html"><em>Various search conditions</em></a> で扱った、スコア値_scoreも出してみましょう。</p>
+<div class="section" id="search-comments-by-keyword">
+<h3>4.10.3.5. Search comments by keyword<a class="headerlink" href="#search-comments-by-keyword" title="Permalink to this headline">¶</a></h3>
+<p>In this section, we search comments which contains specific keyword.
+And more, Let's calculate the value of <cite>_score</cite> which is described at <a class="reference internal" href="search.html"><em>Various search conditions</em></a>.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>select --table Comments --query comment:@なう --output_columns comment,_score
+<div class="highlight-none"><div class="highlight"><pre>select --table Comments --query comment:@Now --output_columns comment,_score
 # [
 #   [
 #     0,
@@ -590,25 +598,26 @@ load --table Comments
 #         ]
 #       ],
 #       [
-#         &quot;groongaなう #groonga&quot;,
+#         &quot;I&#39;ve just used &#39;Try-Groonga&#39; now! #groonga&quot;,
 #         1
 #       ],
 #       [
-#         &quot;中野ブロードウェイなうなう&quot;,
-#         2
+#         &quot;I&#39;m at the Museum of Modern Art in NY now!&quot;,
+#         1
 #       ]
 #     ]
 #   ]
 # ]
 </pre></div>
 </div>
-<p>「なう」をキーワードにコメント検索した結果、2件のコメントがヒットしました。また、_scoreの値も返ってきており、「なう」の数が出力されていることが確認できます。</p>
+<p>By using 'Now' as a keyword, above query returns 2 comments. It also contains count of 'Now' as the value of <cite>_score</cite>.</p>
 </div>
-<div class="section" id="id9">
-<h3>4.10.3.6. GeoPointとキーワードでコメント検索<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
-<p>今度は、キーワードとGeoPointの両方を条件に検索をしてみます。--queryと--filterの両方を使用した場合、両方の条件に一致するレコードがヒットします。</p>
+<div class="section" id="search-comments-by-keyword-and-geolocation">
+<h3>4.10.3.6. Search comments by keyword and geolocation<a class="headerlink" href="#search-comments-by-keyword-and-geolocation" title="Permalink to this headline">¶</a></h3>
+<p>In this section, we search comments by specific keyword and geolocation.
+By using <cite>--query</cite> and <cite>--filter</cite> option, following query returns records which are matched to both conditions.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>select --table Comments --query comment:@羽田 --filter &#39;geo_in_circle(location,&quot;127975798x502919856&quot;,20000)&#39; --output_columns posted_by.name,comment --drilldown hash_tags,posted_by
+<div class="highlight-none"><div class="highlight"><pre>select --table Comments --query comment:@New --filter &#39;geo_in_circle(location,&quot;146867000x-266280000&quot;,20000)&#39; --output_columns posted_by.name,comment --drilldown hash_tags,posted_by
 # [
 #   [
 #     0,
@@ -631,8 +640,8 @@ load --table Comments
 #         ]
 #       ],
 #       [
-#         &quot;グニャラくん&quot;,
-#         &quot;groonga開発合宿のため羽田空港に来ました！ #groonga #travel&quot;
+#         &quot;Bob&quot;,
+#         &quot;I&#39;m come at city of New York for development camp! #groonga #travel&quot;
 #       ]
 #     ],
 #     [
@@ -673,7 +682,7 @@ load --table Comments
 #         ]
 #       ],
 #       [
-#         &quot;tasukuchan&quot;,
+#         &quot;bob&quot;,
 #         1
 #       ]
 #     ]
@@ -681,12 +690,13 @@ load --table Comments
 # ]
 </pre></div>
 </div>
-<p>両方の条件を満たすコメントが1件ヒットしました。また、ドリルダウンの結果も返ってきており、「グニャラくん」のコメント1件であることがわかります。</p>
+<p>It returns 1 comment which meets both condition.
+It also returns result of drilldown. There is 1 comment which is commented by Bob.</p>
 </div>
-<div class="section" id="id10">
-<h3>4.10.3.7. ハッシュタグでコメント検索<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
-<p>あるハッシュタグのついているコメントを検索します。
-これも、 <a class="reference internal" href="index.html"><em>Tag search and reverse resolution of reference relationships</em></a> で扱った、参照関係の逆引きを使います。</p>
+<div class="section" id="search-comments-by-hash-tags">
+<h3>4.10.3.7. Search comments by hash tags<a class="headerlink" href="#search-comments-by-hash-tags" title="Permalink to this headline">¶</a></h3>
+<p>In this section, we search comments which contains specific hash tags.
+Let's use reverse resolution of reference relationships.</p>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre>select --table Comments --query hash_tags:@groonga --output_columns posted_by.name,comment --drilldown posted_by
 # [
@@ -711,12 +721,12 @@ load --table Comments
 #         ]
 #       ],
 #       [
-#         &quot;グニャラくん&quot;,
-#         &quot;groongaなう #groonga&quot;
+#         &quot;Bob&quot;,
+#         &quot;I&#39;ve just used &#39;Try-Groonga&#39; now! #groonga&quot;
 #       ],
 #       [
-#         &quot;グニャラくん&quot;,
-#         &quot;groonga開発合宿のため羽田空港に来ました！ #groonga #travel&quot;
+#         &quot;Bob&quot;,
+#         &quot;I&#39;m come at city of New York for development camp! #groonga #travel&quot;
 #       ]
 #     ],
 #     [
@@ -734,7 +744,7 @@ load --table Comments
 #         ]
 #       ],
 #       [
-#         &quot;tasukuchan&quot;,
+#         &quot;bob&quot;,
 #         2
 #       ]
 #     ]
@@ -742,13 +752,14 @@ load --table Comments
 # ]
 </pre></div>
 </div>
-<p>#groongaタグの付いている2件のコメントがヒットしました。また、投稿者のドリルダウンも返ってきており、2件とも「グニャラくん」のものであることがわかります。</p>
+<p>Above query returns 2 comments which contains #groonga hash tag.
+It also returns result of drilldown grouped by person who posted it. It shows that there are 2 comments. Bob commented it.</p>
 </div>
-<div class="section" id="id">
-<h3>4.10.3.8. ユーザーIDでコメント検索<a class="headerlink" href="#id" title="Permalink to this headline">¶</a></h3>
-<p>あるユーザーが投稿したコメントを検索します。</p>
+<div class="section" id="search-comments-by-user-id">
+<h3>4.10.3.8. Search comments by user id<a class="headerlink" href="#search-comments-by-user-id" title="Permalink to this headline">¶</a></h3>
+<p>In this section, we search comments which are posted by specific user.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>select --table Comments --query posted_by:tasukuchan --output_columns comment --drilldown hash_tags
+<div class="highlight-none"><div class="highlight"><pre>select --table Comments --query posted_by:bob --output_columns comment --drilldown hash_tags
 # [
 #   [
 #     0,
@@ -767,16 +778,16 @@ load --table Comments
 #         ]
 #       ],
 #       [
-#         &quot;初の書き込み。テストテスト。&quot;
+#         &quot;First post. test,test...&quot;
 #       ],
 #       [
-#         &quot;@daijiro ありがとう！&quot;
+#         &quot;@alice Thanks!&quot;
 #       ],
 #       [
-#         &quot;groongaなう #groonga&quot;
+#         &quot;I&#39;ve just used &#39;Try-Groonga&#39; now! #groonga&quot;
 #       ],
 #       [
-#         &quot;groonga開発合宿のため羽田空港に来ました！ #groonga #travel&quot;
+#         &quot;I&#39;m come at city of New York for development camp! #groonga #travel&quot;
 #       ]
 #     ],
 #     [
@@ -806,13 +817,14 @@ load --table Comments
 # ]
 </pre></div>
 </div>
-<p>「グニャラくん」が書き込んだ4件のコメントがヒットしました。また、ハッシュタグでドリルダウンした結果も返ってきており、ハッシュタグは「#groonga」が2つに「#travel」が1つあることがわかります。</p>
+<p>Above query returns 4 comments which are posted by Bob.
+It also returns result of drilldown by hash tags. There are 2 comments which contains #groonga, and 1 comment which contains #travel as hash tag.</p>
 </div>
-<div class="section" id="id11">
-<h3>4.10.3.9. ユーザーのお気に入りコメントを検索<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
-<p>あるユーザーがお気に入りに入れているコメントを検索します。</p>
+<div class="section" id="search-user-s-favorite-comments">
+<h3>4.10.3.9. Search user's favorite comments<a class="headerlink" href="#search-user-s-favorite-comments" title="Permalink to this headline">¶</a></h3>
+<p>In this section, we search user's favorite comments.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>select --table Users --query _key:tasukuchan --output_columns favorites.posted_by,favorites.comment
+<div class="highlight-none"><div class="highlight"><pre>select --table Users --query _key:bob --output_columns favorites.posted_by,favorites.comment
 # [
 #   [
 #     0,
@@ -836,12 +848,12 @@ load --table Comments
 #       ],
 #       [
 #         [
-#           &quot;daijiro&quot;,
-#           &quot;OffGao&quot;
+#           &quot;alice&quot;,
+#           &quot;charlie&quot;
 #         ],
 #         [
-#           &quot;マイクロブログ作ってみました（甘栗むいちゃいました的な感じで）。&quot;,
-#           &quot;@daijiro @tasukuchan 登録してみましたよー！&quot;
+#           &quot;I&#39;ve created micro-blog!&quot;,
+#           &quot;@alice @bob I&#39;ve tried to register!&quot;
 #         ]
 #       ]
 #     ]
@@ -849,12 +861,13 @@ load --table Comments
 # ]
 </pre></div>
 </div>
-<p>「グニャラくん」がお気に入りに入れている2件のコメントがヒットしました。</p>
+<p>Above query returns Bob's favorite comments.</p>
 </div>
-<div class="section" id="id12">
-<h3>4.10.3.10. 投稿時間でコメント検索<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
-<p>コメントの投稿時間で検索をします。Time型については <a class="reference internal" href="data.html"><em>Various data types</em></a> で扱っています。
-この例では、指定した時間よりも前に投稿されているコメントを検索します。</p>
+<div class="section" id="search-comments-by-posted-time">
+<h3>4.10.3.10. Search comments by posted time<a class="headerlink" href="#search-comments-by-posted-time" title="Permalink to this headline">¶</a></h3>
+<p>In this section, we search comments by posted time.
+See type of <cite>Time</cite> in <a class="reference internal" href="data.html"><em>Various data types</em></a>.</p>
+<p>Let's search comments that posted time are older than specified time.</p>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre>select Comments --filter &#39;last_modified&lt;=1268802000&#39; --output_columns posted_by.name,comment,last_modified --drilldown hash_tags,posted_by
 # [
@@ -883,28 +896,28 @@ load --table Comments
 #         ]
 #       ],
 #       [
-#         &quot;hsiomaneki&quot;,
-#         &quot;マイクロブログ作ってみました（甘栗むいちゃいました的な感じで）。&quot;,
+#         &quot;Alice&quot;,
+#         &quot;I&#39;ve created micro-blog!&quot;,
 #         1268795100.0
 #       ],
 #       [
-#         &quot;グニャラくん&quot;,
-#         &quot;初の書き込み。テストテスト。&quot;,
+#         &quot;Bob&quot;,
+#         &quot;First post. test,test...&quot;,
 #         1268794800.0
 #       ],
 #       [
-#         &quot;hsiomaneki&quot;,
-#         &quot;@tasukuchan ようこそ!!!&quot;,
+#         &quot;Alice&quot;,
+#         &quot;@bob Welcome!!!&quot;,
 #         1268795100.0
 #       ],
 #       [
-#         &quot;グニャラくん&quot;,
-#         &quot;@daijiro ありがとう！&quot;,
+#         &quot;Bob&quot;,
+#         &quot;@alice Thanks!&quot;,
 #         1268798400.0
 #       ],
 #       [
-#         &quot;グニャラくん&quot;,
-#         &quot;groongaなう #groonga&quot;,
+#         &quot;Bob&quot;,
+#         &quot;I&#39;ve just used &#39;Try-Groonga&#39; now! #groonga&quot;,
 #         1268802000.0
 #       ]
 #     ],
@@ -942,11 +955,11 @@ load --table Comments
 #         ]
 #       ],
 #       [
-#         &quot;daijiro&quot;,
+#         &quot;alice&quot;,
 #         2
 #       ],
 #       [
-#         &quot;tasukuchan&quot;,
+#         &quot;bob&quot;,
 #         3
 #       ]
 #     ]
@@ -954,7 +967,8 @@ load --table Comments
 # ]
 </pre></div>
 </div>
-<p>2010/03/17 14:00:00以前に書かれたコメント5件がヒットしました。また、ドリルダウンの結果も返ってきており、「hsiomaneki」が2件、「グニャラくん」が3件ヒットしていることがわかります。</p>
+<p>Above query returns 5 comments which are older than 2010/03/17 14:00:00.
+It also returns result of drilldown by posted person. There are 2 comments by Alice, 3 comments by Bob.</p>
 </div>
 </div>
 </div>
@@ -967,27 +981,27 @@ load --table Comments
         <div class="sphinxsidebarwrapper">
   <h3><a href="../index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">4.10. マイクロブログ検索システムの作成</a><ul>
-<li><a class="reference internal" href="#id2">4.10.1. テーブルの作成</a><ul>
-<li><a class="reference internal" href="#users">4.10.1.1. Usersテーブル</a></li>
-<li><a class="reference internal" href="#comments">4.10.1.2. Commentsテーブル</a></li>
-<li><a class="reference internal" href="#hashtags">4.10.1.3. HashTagsテーブル</a></li>
-<li><a class="reference internal" href="#bigram">4.10.1.4. Bigramテーブル</a></li>
+<li><a class="reference internal" href="#">4.10. Let's create micro-blog</a><ul>
+<li><a class="reference internal" href="#create-a-table">4.10.1. Create a table</a><ul>
+<li><a class="reference internal" href="#users-table">4.10.1.1. Users table</a></li>
+<li><a class="reference internal" href="#comments-table">4.10.1.2. Comments table</a></li>
+<li><a class="reference internal" href="#hashtags-table">4.10.1.3. HashTags table</a></li>
+<li><a class="reference internal" href="#bigram-table">4.10.1.4. Bigram table</a></li>
 <li><a class="reference internal" href="#geoindex-table">4.10.1.5. GeoIndex table</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id3">4.10.2. データのロード</a></li>
-<li><a class="reference internal" href="#id4">4.10.3. 検索</a><ul>
-<li><a class="reference internal" href="#id5">4.10.3.1. キーワードでユーザー検索</a></li>
-<li><a class="reference internal" href="#geopoint">4.10.3.2. GeoPointでユーザー検索</a></li>
-<li><a class="reference internal" href="#id6">4.10.3.3. あるユーザーをフォローしているユーザーの検索</a></li>
-<li><a class="reference internal" href="#id7">4.10.3.4. GeoPointでコメント検索</a></li>
-<li><a class="reference internal" href="#id8">4.10.3.5. キーワードでコメント検索</a></li>
-<li><a class="reference internal" href="#id9">4.10.3.6. GeoPointとキーワードでコメント検索</a></li>
-<li><a class="reference internal" href="#id10">4.10.3.7. ハッシュタグでコメント検索</a></li>
-<li><a class="reference internal" href="#id">4.10.3.8. ユーザーIDでコメント検索</a></li>
-<li><a class="reference internal" href="#id11">4.10.3.9. ユーザーのお気に入りコメントを検索</a></li>
-<li><a class="reference internal" href="#id12">4.10.3.10. 投稿時間でコメント検索</a></li>
+<li><a class="reference internal" href="#loading-data">4.10.2. Loading data</a></li>
+<li><a class="reference internal" href="#search">4.10.3. Search</a><ul>
+<li><a class="reference internal" href="#search-users-by-keyword">4.10.3.1. Search users by keyword</a></li>
+<li><a class="reference internal" href="#search-users-by-geolocation-data-geopoint">4.10.3.2. Search users by geolocation data (GeoPoint)</a></li>
+<li><a class="reference internal" href="#search-users-who-follows-specific-user">4.10.3.3. Search users who follows specific user</a></li>
+<li><a class="reference internal" href="#search-comments-by-using-the-value-of-geopoint-type">4.10.3.4. Search comments by using the value of GeoPoint type</a></li>
+<li><a class="reference internal" href="#search-comments-by-keyword">4.10.3.5. Search comments by keyword</a></li>
+<li><a class="reference internal" href="#search-comments-by-keyword-and-geolocation">4.10.3.6. Search comments by keyword and geolocation</a></li>
+<li><a class="reference internal" href="#search-comments-by-hash-tags">4.10.3.7. Search comments by hash tags</a></li>
+<li><a class="reference internal" href="#search-comments-by-user-id">4.10.3.8. Search comments by user id</a></li>
+<li><a class="reference internal" href="#search-user-s-favorite-comments">4.10.3.9. Search user's favorite comments</a></li>
+<li><a class="reference internal" href="#search-comments-by-posted-time">4.10.3.10. Search comments by posted time</a></li>
 </ul>
 </li>
 </ul>
@@ -996,10 +1010,10 @@ load --table Comments
 
   <h4>Previous topic</h4>
   <p class="topless"><a href="lexicon.html"
-                        title="previous chapter">4.9. 全文検索の語彙表に対する追加情報</a></p>
+                        title="previous chapter">4.9. Additional information about lexicon for full text search</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="query_expansion.html"
-                        title="next chapter">4.11. クエリ拡張</a></p>
+                        title="next chapter">4.11. Query expansion</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="../sources/tutorial/micro_blog.txt"
@@ -1029,12 +1043,12 @@ load --table Comments
           <a href="../genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="query_expansion.html" title="4.11. クエリ拡張"
+          <a href="query_expansion.html" title="4.11. Query expansion"
              >next</a> |</li>
         <li class="right" >
-          <a href="lexicon.html" title="4.9. 全文検索の語彙表に対する追加情報"
+          <a href="lexicon.html" title="4.9. Additional information about lexicon for full text search"
              >previous</a> |</li>
-        <li><a href="../index.html">Groonga v4.0.5 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Groonga v4.0.6 documentation</a> &raquo;</li>
           <li><a href="../tutorial.html" >4. Tutorial</a> &raquo;</li> 
       </ul>
     </div>

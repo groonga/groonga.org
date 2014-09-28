@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>4.11. クエリ拡張 &mdash; Groonga v4.0.5 documentation</title>
+    <title>4.11. Query expansion &mdash; Groonga v4.0.6 documentation</title>
     
     <link rel="stylesheet" href="../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '4.0.5',
+        VERSION:     '4.0.6',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,10 +24,10 @@
     <script type="text/javascript" src="../static/underscore.js"></script>
     <script type="text/javascript" src="../static/doctools.js"></script>
     <link rel="shortcut icon" href="../static/favicon.ico"/>
-    <link rel="top" title="Groonga v4.0.5 documentation" href="../index.html" />
+    <link rel="top" title="Groonga v4.0.6 documentation" href="../index.html" />
     <link rel="up" title="4. Tutorial" href="../tutorial.html" />
     <link rel="next" title="5. Suggest" href="../suggest.html" />
-    <link rel="prev" title="4.10. マイクロブログ検索システムの作成" href="micro_blog.html" /> 
+    <link rel="prev" title="4.10. Let&#39;s create micro-blog" href="micro_blog.html" /> 
       <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
     <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
     <meta property="og:type" content="product" />
@@ -73,9 +73,9 @@
           <a href="../suggest.html" title="5. Suggest"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="micro_blog.html" title="4.10. マイクロブログ検索システムの作成"
+          <a href="micro_blog.html" title="4.10. Let&#39;s create micro-blog"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Groonga v4.0.5 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Groonga v4.0.6 documentation</a> &raquo;</li>
           <li><a href="../tutorial.html" accesskey="U">4. Tutorial</a> &raquo;</li> 
       </ul>
     </div>  
@@ -85,15 +85,18 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="id1">
-<h1>4.11. クエリ拡張<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
-<p>Groongaでは、 <a class="reference internal" href="../reference/commands/select.html"><em>select</em></a> コマンドにquery_expanderパラメータを指定することによって、ユーザが指定した検索文字列を適宜拡張することが可能です。</p>
-<p>たとえば、ユーザが'シークヮーサー'という文字列で検索した場合に、'シークヮーサー OR シークァーサー'で検索した場合と同一の結果を返すことによって、本来ユーザが必要とする結果をよりもれなく検索できるようになります。</p>
-<div class="section" id="id2">
-<h2>4.11.1. 準備<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
-<p>クエリ拡張機能を使用するためには、検索対象となる文書を格納するテーブル(ここでは文書テーブルと呼びます)以外に、ユーザの指定した検索文字列を置換するためのテーブル(ここでは置換テーブルと呼びます)を準備します。置換テーブルでは、その主キーが置換前の文字列となり、文字列型(ShortText)のカラムの値が置換後の文字列となります。</p>
-<p>TODO: 文字列型のベクターカラムでも可能であり、その場合は各要素をORでつなげたものに置換されるということを記述する。</p>
-<p>実際に文書テーブルと置換テーブルを作成してみましょう。</p>
+  <div class="section" id="query-expansion">
+<h1>4.11. Query expansion<a class="headerlink" href="#query-expansion" title="Permalink to this headline">¶</a></h1>
+<p>Groonga accepts <tt class="docutils literal"><span class="pre">query_expander</span></tt> parameter for <a class="reference internal" href="../reference/commands/select.html"><em>select</em></a> command.
+It enables you to extend your query string.</p>
+<p>For example, if user searches &quot;theatre&quot; instead of &quot;theater&quot;,
+query expansion enables to return search results of &quot;theatre OR theater&quot;.
+This kind of way reduces search leakages. This is what really user wants.</p>
+<div class="section" id="preparation">
+<h2>4.11.1. Preparation<a class="headerlink" href="#preparation" title="Permalink to this headline">¶</a></h2>
+<p>To use query expansion, you need to create table which stores documents, synonym table which stores query string and replacement string.
+In synonym table, primary key represents original string, the column of ShortText represents modified string.</p>
+<p>Let's create document table and synonym table.</p>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre>table_create Doc TABLE_PAT_KEY ShortText
 # [[0, 1337566253.89858, 0.000355720520019531], true]
@@ -109,25 +112,26 @@ column_create Synonym body COLUMN_SCALAR ShortText
 # [[0, 1337566253.89858, 0.000355720520019531], true]
 load --table Doc
 [
-{&quot;_key&quot;: &quot;001&quot;, &quot;body&quot;: &quot;すっぱいブドウと甘いシークァーサー&quot;},
-{&quot;_key&quot;: &quot;002&quot;, &quot;body&quot;: &quot;シークヮーサージュースとゴーヤチャンプル&quot;},
+{&quot;_key&quot;: &quot;001&quot;, &quot;body&quot;: &quot;Play all night in this theater.&quot;},
+{&quot;_key&quot;: &quot;002&quot;, &quot;body&quot;: &quot;theatre is British spelling.&quot;},
 ]
 # [[0, 1337566253.89858, 0.000355720520019531], 2]
 load --table Synonym
 [
-{&quot;_key&quot;: &quot;シークァーサー&quot;, &quot;body&quot;: &quot;(シークァーサー OR シークヮーサー)&quot;},
-{&quot;_key&quot;: &quot;シークヮーサー&quot;, &quot;body&quot;: &quot;(シークァーサー OR シークヮーサー)&quot;},
+{&quot;_key&quot;: &quot;theater&quot;, &quot;body&quot;: &quot;(theater OR theatre)&quot;},
+{&quot;_key&quot;: &quot;theatre&quot;, &quot;body&quot;: &quot;(theater OR theatre)&quot;},
 ]
 # [[0, 1337566253.89858, 0.000355720520019531], 2]
 </pre></div>
 </div>
-<p>この例では、ユーザが&quot;シークァーサー&quot;と入力しても、&quot;シークヮーサー&quot;と入力しても、それぞれの異なる表記の文書をもれなく検索するための置換テーブルを作成しています。</p>
+<p>In this case, it doesn't occur search leakage because it creates synonym table which accepts &quot;theatre&quot; and &quot;theater&quot; as query string.</p>
 </div>
-<div class="section" id="id3">
-<h2>4.11.2. 検索<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
-<p>それでは実際に、準備した置換テーブルを使ってみましょう。まずは、query_expanderパラメータを指定せずにselectコマンドを使って検索してみます。</p>
+<div class="section" id="search">
+<h2>4.11.2. Search<a class="headerlink" href="#search" title="Permalink to this headline">¶</a></h2>
+<p>Then, let's use prepared synonym table.
+First, use select command without <tt class="docutils literal"><span class="pre">query_expander</span></tt> parameter.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>select Doc --match_columns body --query &quot;シークァーサー&quot;
+<div class="highlight-none"><div class="highlight"><pre>select Doc --match_columns body --query &quot;theater&quot;
 # [
 #   [
 #     0,
@@ -156,12 +160,12 @@ load --table Synonym
 #       [
 #         1,
 #         &quot;001&quot;,
-#         &quot;すっぱいブドウと甘いシークァーサー&quot;
+#         &quot;Play all night in this theater.&quot;
 #       ]
 #     ]
 #   ]
 # ]
-select Doc --match_columns body --query &quot;シークヮーサー&quot;
+select Doc --match_columns body --query &quot;theatre&quot;
 # [
 #   [
 #     0,
@@ -190,16 +194,17 @@ select Doc --match_columns body --query &quot;シークヮーサー&quot;
 #       [
 #         2,
 #         &quot;002&quot;,
-#         &quot;シークヮーサージュースとゴーヤチャンプル&quot;
+#         &quot;theatre is British spelling.&quot;
 #       ]
 #     ]
 #   ]
 # ]
 </pre></div>
 </div>
-<p>指定された文字列に完全に一致するレコードのみがそれぞれヒットします。次に、query_expanderパラメータに、準備したSynonymテーブルのbodyカラムを指定してみましょう。</p>
+<p>Above query returns the record which completely equal to query string.</p>
+<p>Then, use <tt class="docutils literal"><span class="pre">query_expander</span></tt> parameter against <tt class="docutils literal"><span class="pre">body</span></tt> column of <tt class="docutils literal"><span class="pre">Synonym</span></tt> table.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>select Doc --match_columns body --query &quot;シークァーサー&quot; --query_expander Synonym.body
+<div class="highlight-none"><div class="highlight"><pre>select Doc --match_columns body --query &quot;theater&quot; --query_expander Synonym.body
 # [
 #   [
 #     0,
@@ -228,17 +233,17 @@ select Doc --match_columns body --query &quot;シークヮーサー&quot;
 #       [
 #         1,
 #         &quot;001&quot;,
-#         &quot;すっぱいブドウと甘いシークァーサー&quot;
+#         &quot;Play all night in this theater.&quot;
 #       ],
 #       [
 #         2,
 #         &quot;002&quot;,
-#         &quot;シークヮーサージュースとゴーヤチャンプル&quot;
+#         &quot;theatre is British spelling.&quot;
 #       ]
 #     ]
 #   ]
 # ]
-select Doc --match_columns body --query &quot;シークヮーサー&quot; --query_expander Synonym.body
+select Doc --match_columns body --query &quot;theatre&quot; --query_expander Synonym.body
 # [
 #   [
 #     0,
@@ -267,19 +272,19 @@ select Doc --match_columns body --query &quot;シークヮーサー&quot; --quer
 #       [
 #         1,
 #         &quot;001&quot;,
-#         &quot;すっぱいブドウと甘いシークァーサー&quot;
+#         &quot;Play all night in this theater.&quot;
 #       ],
 #       [
 #         2,
 #         &quot;002&quot;,
-#         &quot;シークヮーサージュースとゴーヤチャンプル&quot;
+#         &quot;theatre is British spelling.&quot;
 #       ]
 #     ]
 #   ]
 # ]
 </pre></div>
 </div>
-<p>どちらのクエリ文字列も、&quot;(シークァーサー OR シークヮーサー)&quot;という文字列に置換されてから検索されるため、表記の揺れを吸収して検索できるようになりました。</p>
+<p>In which cases, query string is replaced to &quot;(theater OR theatre)&quot;, thus synonym is considered for full text search.</p>
 </div>
 </div>
 
@@ -291,16 +296,16 @@ select Doc --match_columns body --query &quot;シークヮーサー&quot; --quer
         <div class="sphinxsidebarwrapper">
   <h3><a href="../index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">4.11. クエリ拡張</a><ul>
-<li><a class="reference internal" href="#id2">4.11.1. 準備</a></li>
-<li><a class="reference internal" href="#id3">4.11.2. 検索</a></li>
+<li><a class="reference internal" href="#">4.11. Query expansion</a><ul>
+<li><a class="reference internal" href="#preparation">4.11.1. Preparation</a></li>
+<li><a class="reference internal" href="#search">4.11.2. Search</a></li>
 </ul>
 </li>
 </ul>
 
   <h4>Previous topic</h4>
   <p class="topless"><a href="micro_blog.html"
-                        title="previous chapter">4.10. マイクロブログ検索システムの作成</a></p>
+                        title="previous chapter">4.10. Let's create micro-blog</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="../suggest.html"
                         title="next chapter">5. Suggest</a></p>
@@ -336,9 +341,9 @@ select Doc --match_columns body --query &quot;シークヮーサー&quot; --quer
           <a href="../suggest.html" title="5. Suggest"
              >next</a> |</li>
         <li class="right" >
-          <a href="micro_blog.html" title="4.10. マイクロブログ検索システムの作成"
+          <a href="micro_blog.html" title="4.10. Let&#39;s create micro-blog"
              >previous</a> |</li>
-        <li><a href="../index.html">Groonga v4.0.5 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Groonga v4.0.6 documentation</a> &raquo;</li>
           <li><a href="../tutorial.html" >4. Tutorial</a> &raquo;</li> 
       </ul>
     </div>

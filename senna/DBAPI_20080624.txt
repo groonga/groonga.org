@@ -1,73 +1,73 @@
-* Senna DB API�� (2008/06/24.0��) (��!:�ŐV�łł͂���܂���)
+* Senna DB API案 (2008/06/24.0版) (注!:最新版ではありませｎ)
 
-** �T�v
+** 概要
 
-- DB API��DBMS�̂悤�Ȕėp�I�ȃf�[�^�x�[�X�Ǘ��@�\��񋟂��܂��B
-- table, column, space ��3����ȍ\���v�f�ƂȂ�܂��B
+- DB APIはDBMSのような汎用的なデータベース管理機能を提供します。
+- table, column, space の3つが主な構成要素となります。
 
 ** table
 
-- table�͕s�ς�ID������record�̏W�܂�ł��B
+- tableは不変のIDを持つrecordの集まりです。
 
-- hash table�ƁApat table�ƁAkey�Ȃ�table�Ƃ�����܂��B
+- hash tableと、pat tableと、keyなしtableとがあります。
 
-- hash table�y��pat table��record�́Aunique��key�ƑΉ��t���ĊǗ�����܂��B
+- hash table及びpat tableのrecordは、uniqueなkeyと対応付けて管理されます。
 
-- key�Ȃ�table�̓V�X�e���ɂ���ĕt�^�����ID�ɂ���Ă̂݃��R�[�h�����ł��܂��B
+- keyなしtableはシステムによって付与されるIDによってのみレコードを特定できます。
 
-- ���O�t��table�Ɩ���table�Ƃ�����܂��B
+- 名前付きtableと無名tableとがあります。
 
 ** column
 
-- ���table�ɑ΂��Ė��O�ɂ���Ď��ʂ����column�𕡐���`�ł��܂��B
+- 一つのtableに対して名前によって識別されるcolumnを複数定義できます。
 
-- ���ꂼ���column�ɂ͓���̌^�̒l���i�[���邱�Ƃ��ł��܂��B
+- それぞれのcolumnには特定の型の値を格納することができます。
 
-- ���table�Ɋi�[�����record�́A���ׂċ��ʂ�column�̑g�������܂��B
+- 一つのtableに格納されるrecordは、すべて共通のcolumnの組を持ちます。
 
-- �]�u�C���f�b�N�X(inv index) column�Ƃ��̑���column�Ƃ�����܂��B
+- 転置インデックス(inv index) columnとその他のcolumnとがあります。
 
-- inv index column��p���č����ȑS�����������s�ł��܂��B
+- inv index columnを用いて高速な全文検索が実行できます。
 
 ** space
 
-- space��table��column�̖��O��֌W���Ǘ����܂��B
+- spaceはtableやcolumnの名前や関係を管理します。
 
-- space�͍�Ɨ̈�̃������Ǘ����s���܂��B
+- spaceは作業領域のメモリ管理も行います。
 
-- ���space�̊Ԃɐe�q�֌W���������邱�Ƃ��ł��܂��B
+- 二つのspaceの間に親子関係を持たせることができます。
 
-- �qspace����͐espace�̖��O��Ԃ��Q�Ƃ��邱�Ƃ��ł��܂��B
+- 子spaceからは親spaceの名前空間を参照することができます。
 
-** ��������
+** 存続期間
 
-- space, table, column�́A��������i��(persistent)�ƈꎞ(temporary)�̂ǂ��炩�̑������Ԃ������܂��B
+- space, table, columnは、いずれも永続(persistent)と一時(temporary)のどちらかの存続期間を持ちます。
 
-- �i��(perisistent)�����������Ă����ꍇ�A���̓��e�̓t�@�C���ɕۑ�����܂��B
+- 永続(perisistent)属性を持っていた場合、その内容はファイルに保存されます。
 
-- �i���I�u�W�F�N�g�͕����̃v���Z�X�ŋ��L���A�����ɃA�N�Z�X���邱�Ƃ��ł��܂��B
+- 永続オブジェクトは複数のプロセスで共有し、同時にアクセスすることができます。
 
-- �ꎞ�I�u�W�F�N�g�͓���̃v���Z�X�ɑ����܂��B
+- 一時オブジェクトは特定のプロセスに属します。
 
-- �ꎞ�I�u�W�F�N�g�͓���v���Z�X�̕����̃X���b�h���瓯���ɃA�N�Z�X���邱�Ƃ��ł��܂���B
+- 一時オブジェクトは同一プロセスの複数のスレッドから同時にアクセスすることができません。
 
-** �^
+** 型
 
-- �X��column��table��key�́A�����ꂩ�̌^�ɑ����܂��B
+- 個々のcolumnやtableのkeyは、いずれかの型に属します。
 
-- ��`�ς݂�type�܂���table���^�Ƃ��Ďw�肷�邱�Ƃ��ł��܂��B
+- 定義済みのtypeまたはtableを型として指定することができます。
 
-- type�͊i�[�����l�̃T�C�Y�⑀����߂܂��B
+- typeは格納される値のサイズや操作を定めます。
 
-** �葱��
+** 手続き
 
-- space�̒��Ŗ��O�ƑΉ��t���Ď葱����o�^���邱�Ƃ��ł��܂��B
+- spaceの中で名前と対応付けて手続きを登録することができます。
 
-- ����table��column����A����table��column�𓱏o���邽�߂̎葱�����`���邱�Ƃ��ł��܂��B
+- あるtableやcolumnから、他のtableやcolumnを導出するための手続きを定義することができます。
 
-- table��column���Q�Ƃ��邢�͍X�V����^�C�~���O�ŌĂяo���葱��(hook)���`���邱�Ƃ��ł��܂��B
+- tableやcolumnを参照あるいは更新するタイミングで呼び出す手続き(hook)を定義することができます。
 
-** API�֐�
+** API関数
 
 {{code
 
@@ -75,30 +75,30 @@ typedef struct _sen_obj sen_obj;
 
 /**
  * sen_space_create:
- * @space: �e�Ƃ���space�BNULL�Ȃ�sen_global_space���e�ɂȂ�B
- * @path: �쐬����space���i�[����t�@�C���p�X�BNULL�Ȃ�temporary space�ƂȂ�B
- * @encoding: �쐬����space�Ńf�t�H���g�ƂȂ�encoding�B
+ * @space: 親とするspace。NULLならsen_global_spaceが親になる。
+ * @path: 作成するspaceを格納するファイルパス。NULLならtemporary spaceとなる。
+ * @encoding: 作成するspaceでデフォルトとなるencoding。
  *
- * �V����space���쐬����B
+ * 新たなspaceを作成する。
  **/
 sen_obj *sen_space_create(sen_obj *space, const char *path, sen_encoding encoding);
 
 /**
  * sen_space_open:
- * @space: �e�Ƃ���space�BNULL�Ȃ�sen_global_space���e�ɂȂ�B
- * @path: �J�����Ƃ���space���i�[����t�@�C���p�X�B
+ * @space: 親とするspace。NULLならsen_global_spaceが親になる。
+ * @path: 開こうとするspaceを格納するファイルパス。
  *
- * ������space���J���B
+ * 既存のspaceを開く。
  **/
 sen_obj *sen_space_open(sen_obj *space, const char *path);
 
 /**
  * sen_space_lookup:
- * @space: �ΏۂƂȂ�space�B
- * @name: �������悤�Ƃ���I�u�W�F�N�g�̖��O�B
+ * @space: 対象となるspace。
+ * @name: 検索しようとするオブジェクトの名前。
  *
- * space����name�ɑΉ�����I�u�W�F�N�g���������ĕԂ��B
- * name�Ɉ�v����I�u�W�F�N�g�����݂��Ȃ����NULL��Ԃ��B
+ * spaceからnameに対応するオブジェクトを検索して返す。
+ * nameに一致するオブジェクトが存在しなければNULLを返す。
  **/
 sen_obj *sen_space_lookup(sen_obj *space, const char *name, unsigned name_size);
 
@@ -107,18 +107,18 @@ typedef enum {
   SEN_TYPE_VARIABLE_SIZE
 } sen_type_type;
 
-extern sen_obj *sen_type_any; /* �C�ӂ�table��record���i�[�ł���^ */
+extern sen_obj *sen_type_any; /* 任意のtableのrecordを格納できる型 */
 
 /**
  * sen_type_create:
- * @space: �ΏۂƂȂ�space�B
- * @name: �쐬����type�̖��O�B
+ * @space: 対象となるspace。
+ * @name: 作成するtypeの名前。
  * @type: SEN_TYPE_FIXED_SIZE, SEN_TYPE_VARIABLE_SIZE
- * @size: SEN_TYPE_VARIABLE_SIZE�̏ꍇ�͍ő咷�A
- *        SEN_TYPE_FIXED_SIZE�̏ꍇ�͒������w��(�P��:byte)
+ * @size: SEN_TYPE_VARIABLE_SIZEの場合は最大長、
+ *        SEN_TYPE_FIXED_SIZEの場合は長さを指定(単位:byte)
  *
- * name�ɑΉ�����V����type(�^)��space�ɒ�`����B
- * (todo: ����key���`���邽�߂̍\��)
+ * nameに対応する新たなtype(型)をspaceに定義する。
+ * (todo: 複合keyを定義するための構造)
  **/
 sen_obj *sen_type_create(sen_obj *space, const char *name, unsigned name_size,
                          sen_type_type flags, unsigned int size);
@@ -138,18 +138,18 @@ typedef enum {
 
 /**
  * sen_proc_create:
- * @space: �ΏۂƂȂ�space�B
- * @name: �쐬����proc�̖��O�B
- * @type: proc�̎�ށB
- * @func: proc�֐��̃|�C���^
+ * @space: 対象となるspace。
+ * @name: 作成するprocの名前。
+ * @type: procの種類。
+ * @func: proc関数のポインタ
  *
- * name�ɑΉ�����V����proc(�葱��)��space�ɒ�`����B
+ * nameに対応する新たなproc(手続き)をspaceに定義する。
  **/
 sen_obj *sen_proc_create(sen_obj *space, const char *name, unsigned name_size,
                          sen_proc_type type, sen_proc_func func);
 
 /*-------------------------------------------------------------
- * table����̂��߂̊֐�
+ * table操作のための関数
  */
 
 #define SEN_TABLE_TOKENIZER_MASK    (0x0f<<4)
@@ -175,40 +175,40 @@ typedef enum {
 
 /**
  * sen_table_create:
- * @space: table��ǉ����悤�Ƃ���space�B
- * @name: �쐬����table�̖��O�BNULL�Ȃ疳��table�ƂȂ�B
- * @path: �쐬����table�̃t�@�C���p�X�B
- *        flags��SEN_OBJ_PERSISTENT���w�肳��Ă���ꍇ�̂ݗL���B
- *        NULL�Ȃ玩���I�Ƀt�@�C���p�X���t�^�����B
- * @flags: SEN_OBJ_PERSISTENT���w�肷��Ɖi��table�ƂȂ�B
- *         SEN_TABLE_PAT_KEY,SEN_TABLE_HASH_KEY,SEN_TABLE_NO_KEY�̂����ꂩ���w�肷��B
- *         SEN_TABLE_KEY_NORMALIZE���w�肷��Ɛ��K�����ꂽ������key�ƂȂ�B
- *         SEN_TABLE_KEY_WITH_SIS���w�肷���key������̑Ssuffix�������I�ɓo�^�����B
- *         SEN_TABLE_KEY_MORPH_ANALYSE,SEN_TABLE_KEY_NGRAM,SEN_TABLE_KEY_DELIMITED�́A
- *         �쐬����table����b�\�Ƃ��ėp����ꍇ��tokenize�̕��@���w�肷��B
- *         SEN_TABLE_KEY_NGRAM���w�肵���ꍇ�Ɍ���A
+ * @space: tableを追加しようとするspace。
+ * @name: 作成するtableの名前。NULLなら無名tableとなる。
+ * @path: 作成するtableのファイルパス。
+ *        flagsにSEN_OBJ_PERSISTENTが指定されている場合のみ有効。
+ *        NULLなら自動的にファイルパスが付与される。
+ * @flags: SEN_OBJ_PERSISTENTを指定すると永続tableとなる。
+ *         SEN_TABLE_PAT_KEY,SEN_TABLE_HASH_KEY,SEN_TABLE_NO_KEYのいずれかを指定する。
+ *         SEN_TABLE_KEY_NORMALIZEを指定すると正規化された文字列がkeyとなる。
+ *         SEN_TABLE_KEY_WITH_SISを指定するとkey文字列の全suffixが自動的に登録される。
+ *         SEN_TABLE_KEY_MORPH_ANALYSE,SEN_TABLE_KEY_NGRAM,SEN_TABLE_KEY_DELIMITEDは、
+ *         作成するtableを語彙表として用いる場合のtokenizeの方法を指定する。
+ *         SEN_TABLE_KEY_NGRAMを指定した場合に限り、
  *         SEN_TABLE_KEY_SPLIT_ALPHA,SEN_TABLE_KEY_SPLIT_DIGIT,SEN_TABLE_KEY_SPLIT_SYMBOL
- *         ���w�肵�āA�������N-GRAM�ɋ�؂�ۂ̕��j���w��ł���B
- * @key_type: key�̌^���w�肷��BSEN_TABLE_NO_KEY���w�肳�ꂽ�ꍇ�͖����B
- *            ������type���邢��table���w��ł���B
- *            key_type��table A���w�肵��table B���쐬�����ꍇ�AB�͕K��A�̃T�u�Z�b�g�ƂȂ�B
- * @value_size: key�ɑΉ�����l���i�[����̈�̃T�C�Y(byte��)�Btable��column�Ƃ͕ʂɁA
- *              key�ɑΉ�����l���i�[����̈������������Ƃ��ł���B
- *              value_size�̎w���SEN_TABLE_HASH_KEY,SEN_TABLE_NO_KEY�̂ݗL���B
- *              SEN_TABLE_PAT_KEY�̏ꍇ�Avalue_size��14bit�ŌŒ�B
+ *         を指定して、文字列をN-GRAMに区切る際の方針を指定できる。
+ * @key_type: keyの型を指定する。SEN_TABLE_NO_KEYが指定された場合は無効。
+ *            既存のtypeあるいはtableを指定できる。
+ *            key_typeにtable Aを指定してtable Bを作成した場合、Bは必ずAのサブセットとなる。
+ * @value_size: keyに対応する値を格納する領域のサイズ(byte長)。tableはcolumnとは別に、
+ *              keyに対応する値を格納する領域を一つだけ持つことができる。
+ *              value_sizeの指定はSEN_TABLE_HASH_KEY,SEN_TABLE_NO_KEYのみ有効。
+ *              SEN_TABLE_PAT_KEYの場合、value_sizeは14bitで固定。
  *
- * name�ɑΉ�����V����table��space�ɒ�`����B
+ * nameに対応する新たなtableをspaceに定義する。
  **/
 sen_obj *sen_table_create(sen_obj *space, const char *name, unsigned name_size,
                           const char *path, sen_obj_flags flags,
                           sen_obj *key_type, unsigned value_size);
 /**
  * sen_table_open:
- * @space: table��ǉ����悤�Ƃ���space�B
- * @name: �J�����Ƃ���table�̖��O�BNULL�Ȃ疳��table�ƂȂ�B
- * @path: �J�����Ƃ���table�̃t�@�C���p�X�B
+ * @space: tableを追加しようとするspace。
+ * @name: 開こうとするtableの名前。NULLなら無名tableとなる。
+ * @path: 開こうとするtableのファイルパス。
  *
- * space�̒���name�ɑΉ��t���Ċ�����table���J���B
+ * spaceの中でnameに対応付けて既存のtableを開く。
  **/
 sen_obj *sen_table_open(sen_obj *space, const char *name, unsigned name_size,
                         const char *path);
@@ -224,55 +224,55 @@ typedef enum {
 
 /**
  * sen_table_lookup:
- * @table: �Ώ�table
- * @key: ����key
- * @flags: SEN_TABLE_EXACT���w�肳�ꂽ�ꍇ��key�Ɋ��S��v����record����������B
- *         SEN_TABLE_LCPS���w�肳�ꂽ�ꍇ��longest common prefix search���s���B
- *         �Y������key�����݂����A����SEN_TABLE_ADD���w�肳�ꂽ�ꍇ�́A
- *         table�ɊY�����R�[�h��ǉ�����B(�ǉ����Ȃ��ꍇ��SEN_SYM_NIL��Ԃ�)
- *         SEN_TABLE_ADD���w�肳��A�����ۂɃ��R�[�h���ǉ����ꂽ�ꍇ�́A
- *         flags��SEN_TABLE_ADDED bit�����Ă���B
- *         flags��NULL���w�肳�ꂽ�ꍇ�́ASEN_TABLE_EXACT�݂̂��w�肳�ꂽ���̂ƌ��Ȃ����B
+ * @table: 対象table
+ * @key: 検索key
+ * @flags: SEN_TABLE_EXACTが指定された場合はkeyに完全一致するrecordを検索する。
+ *         SEN_TABLE_LCPSが指定された場合はlongest common prefix searchを行う。
+ *         該当するkeyが存在せず、かつSEN_TABLE_ADDが指定された場合は、
+ *         tableに該当レコードを追加する。(追加しない場合はSEN_SYM_NILを返す)
+ *         SEN_TABLE_ADDが指定され、かつ実際にレコードが追加された場合は、
+ *         flagsのSEN_TABLE_ADDED bitが立てられる。
+ *         flagsにNULLが指定された場合は、SEN_TABLE_EXACTのみが指定されたものと見なされる。
  *
- * table����key�ɑΉ�����record���������A�Ή�����ID��Ԃ��B
+ * tableからkeyに対応するrecordを検索し、対応するIDを返す。
  **/
 sen_id sen_table_lookup(sen_obj *table, const void *key, unsigned key_size,
                         sen_table_search_flags *flags);
 
 /**
  * sen_table_add:
- * @table: �Ώ�table
+ * @table: 対象table
  *
- * �V�������R�[�h��ǉ����A����ID��Ԃ��B
- * SEN_TABLE_NO_KEY���w�肳�ꂽtable�ł̂ݗL���B
+ * 新しいレコードを追加し、そのIDを返す。
+ * SEN_TABLE_NO_KEYが指定されたtableでのみ有効。
  **/
 sen_id sen_table_add(sen_obj *table);
 
 /**
  * sen_table_get_key:
- * @table: �Ώ�table
- * @id: �Ώۃ��R�[�h��ID
- * @keybuf: key���i�[����o�b�t�@(�ďo���ŏ�������)
- * @buf_size: keybuf�̃T�C�Y(byte��)
+ * @table: 対象table
+ * @id: 対象レコードのID
+ * @keybuf: keyを格納するバッファ(呼出側で準備する)
+ * @buf_size: keybufのサイズ(byte長)
  *
- * table��ID�ɑΉ����郌�R�[�h��key���擾����B�Ή����郌�R�[�h�����݂���ꍇ��key����Ԃ��B
- * ������Ȃ��ꍇ��0��Ԃ��B
- * �Ή�����L�[�̌����ɐ������A�܂�buf_size�̒�����key���ȏ�ł������ꍇ�́A
- * keybuf�ɊY������key���R�s�[����B
+ * tableのIDに対応するレコードのkeyを取得する。対応するレコードが存在する場合はkey長を返す。
+ * 見つからない場合は0を返す。
+ * 対応するキーの検索に成功し、またbuf_sizeの長さがkey長以上であった場合は、
+ * keybufに該当するkeyをコピーする。
  *
  **/
 int sen_table_get_key(sen_obj *table, sen_id id, void *keybuf, int buf_size);
 
 /**
  * sen_table_get_value:
- * @table: �Ώ�table
- * @id: �Ώۃ��R�[�h��ID
- * @valuebuf: value���i�[����o�b�t�@(�ďo���ŏ�������)
+ * @table: 対象table
+ * @id: 対象レコードのID
+ * @valuebuf: valueを格納するバッファ(呼出側で準備する)
  *
- * table��ID�ɑΉ����郌�R�[�h��value���擾����B
- * �Ή����郌�R�[�h�����݂���ꍇ��value����Ԃ��B������Ȃ��ꍇ��0��Ԃ��B
- * value���́Asen_table_create��value_size�����Ɏw�肵���l�ɂȂ�B
- * �ďo���͏\���ȃT�C�Y�̃o�b�t�@��valuebuf�Ɏw�肵�Ȃ���΂Ȃ�Ȃ��B
+ * tableのIDに対応するレコードのvalueを取得する。
+ * 対応するレコードが存在する場合はvalue長を返す。見つからない場合は0を返す。
+ * value長は、sen_table_createでvalue_size引数に指定した値になる。
+ * 呼出側は十分なサイズのバッファをvaluebufに指定しなければならない。
  **/
 int sen_table_get_value(sen_obj *table, sen_id id, void *valuebuf);
 
@@ -286,31 +286,31 @@ typedef enum {
 
 /**
  * sen_table_set_value:
- * @table: �Ώ�table
- * @id: �Ώۃ��R�[�h��ID
- * @value: �i�[����l
- * @type: SEN_UPD_SET, SEN_UPD_ADD�̂����ꂩ���w��ł���B
+ * @table: 対象table
+ * @id: 対象レコードのID
+ * @value: 格納する値
+ * @type: SEN_UPD_SET, SEN_UPD_ADDのいずれかを指定できる。
  *
- * table��ID�ɑΉ����郌�R�[�h��value���X�V����B
- * �Ή����郌�R�[�h�����݂��Ȃ��ꍇ��sen_invalid_argument��Ԃ��B
+ * tableのIDに対応するレコードのvalueを更新する。
+ * 対応するレコードが存在しない場合はsen_invalid_argumentを返す。
  **/
 sen_rc sen_table_set_value(sen_obj *table, sen_id id, void *value, sen_update_type type);
 
 /**
  * sen_table_delete:
- * @table: �Ώ�table
- * @key: ����key
+ * @table: 対象table
+ * @key: 検索key
  *
- * table��key�ɑΉ����郌�R�[�h���폜����B
- * �Ή����郌�R�[�h�����݂��Ȃ��ꍇ��sen_invalid_argument��Ԃ��B
+ * tableのkeyに対応するレコードを削除する。
+ * 対応するレコードが存在しない場合はsen_invalid_argumentを返す。
  **/
 sen_rc sen_table_delete(sen_obj *table, const void *key unsigned key_size);
 
 /**
  * sen_table_truncate:
- * @table: �Ώ�table
+ * @table: 対象table
  *
- * table�̑S���R�[�h���ꊇ���č폜����B
+ * tableの全レコードを一括して削除する。
  **/
 sen_rc sen_table_truncate(sen_obj *table);
 
@@ -324,16 +324,16 @@ typedef enum {
 
 /**
  * sen_table_cursor_open:
- * @space: sen_table_cursor�I�u�W�F�N�g�𕥂��o��space
- * @table: �Ώ�table
- * @min: key�̉��� (NULL�͉����Ȃ��ƌ��Ȃ�)
- * @max: key�̏�� (NULL�͏���Ȃ��ƌ��Ȃ�)
- * @flags: SEN_SYM_ASCENDING���w�肷��Ə�����key�����o���B(�w�肵�Ȃ���΍~��)
- *         SEN_SYM_GT���w�肷���min�Ɉ�v����key��cursor�͈̔͂Ɋ܂܂Ȃ��B
- *         SEN_SYM_LT���w�肷���max�Ɉ�v����key��cursor�͈̔͂Ɋ܂܂Ȃ��B
+ * @space: sen_table_cursorオブジェクトを払い出すspace
+ * @table: 対象table
+ * @min: keyの下限 (NULLは下限なしと見なす)
+ * @max: keyの上限 (NULLは上限なしと見なす)
+ * @flags: SEN_SYM_ASCENDINGを指定すると昇順にkeyを取り出す。(指定しなければ降順)
+ *         SEN_SYM_GTを指定するとminに一致したkeyをcursorの範囲に含まない。
+ *         SEN_SYM_LTを指定するとmaxに一致したkeyをcursorの範囲に含まない。
  *
- * table�ɓo�^����Ă��郌�R�[�h�����ԂɎ��o�����߂̃J�[�\���𐶐����ĕԂ��B
- * min, max, flags�� SEN_TABLE_PAT_KEY���w�肵��table�ł̂ݗL���B
+ * tableに登録されているレコードを順番に取り出すためのカーソルを生成して返す。
+ * min, max, flagsは SEN_TABLE_PAT_KEYを指定したtableでのみ有効。
  **/
 sen_table_cursor *sen_table_cursor_open(sen_obj *space, sen_obj *table,
                                         const void *min, unsigned min_size,
@@ -342,70 +342,70 @@ sen_table_cursor *sen_table_cursor_open(sen_obj *space, sen_obj *table,
 
 /**
  * sen_table_cursor_close:
- * @tc: �Ώ�cursor
+ * @tc: 対象cursor
  *
- * sen_table_cursor_open�Ő�������cursor���������B
+ * sen_table_cursor_openで生成したcursorを解放する。
  **/
 sen_rc sen_table_cursor_close(sen_table_cursor *tc);
 
 /**
  * sen_table_cursor_next:
- * @tc: �Ώ�cursor
+ * @tc: 対象cursor
  *
- * cursor�̃J�����g���R�[�h���ꌏ�i�߂Ă���ID��Ԃ��B
- * cursor�̑Ώ۔͈̖͂����ɒB�����SEN_SYM_NIL��Ԃ��B
+ * cursorのカレントレコードを一件進めてそのIDを返す。
+ * cursorの対象範囲の末尾に達するとSEN_SYM_NILを返す。
  **/
 sen_id sen_table_cursor_next(sen_table_cursor *tc);
 
 /**
  * sen_table_cursor_get_key:
- * @tc: �Ώ�cursor
- * @key: �J�����g���R�[�h��key�ւ̃|�C���^���Z�b�g�����B
- * cursor�̃J�����g���R�[�h��key��@key�ɃZ�b�g���A���̒�����Ԃ��B
+ * @tc: 対象cursor
+ * @key: カレントレコードのkeyへのポインタがセットされる。
+ * cursorのカレントレコードのkeyを@keyにセットし、その長さを返す。
  **/
 int sen_table_cursor_get_key(sen_table_cursor *tc, void **key);
 
 /**
  * sen_table_cursor_get_value:
- * @tc: �Ώ�cursor
- * @value: �J�����g���R�[�h��value�ւ̃|�C���^���Z�b�g�����B
- * cursor�̃J�����g���R�[�h��value��@value�ɃZ�b�g���A���̒�����Ԃ��B
+ * @tc: 対象cursor
+ * @value: カレントレコードのvalueへのポインタがセットされる。
+ * cursorのカレントレコードのvalueを@valueにセットし、その長さを返す。
  **/
 int sen_table_cursor_get_value(sen_table_cursor *tc, void **value);
 
 /**
  * sen_table_cursor_set_value:
- * @tc: �Ώ�cursor
- * @value: �V����value�̒l�B
- * @type: SEN_UPD_SET, SEN_UPD_ADD�̂����ꂩ���w��ł���B
+ * @tc: 対象cursor
+ * @value: 新しいvalueの値。
+ * @type: SEN_UPD_SET, SEN_UPD_ADDのいずれかを指定できる。
  *
- * cursor�̃J�����g���R�[�h��value�������̓��e�ɒu��������B
- * cursor�̃J�����g���R�[�h�����݂��Ȃ��ꍇ��sen_invalid_argument��Ԃ��B
+ * cursorのカレントレコードのvalueを引数の内容に置き換える。
+ * cursorのカレントレコードが存在しない場合はsen_invalid_argumentを返す。
  **/
 sen_rc sen_table_cursor_set_value(sen_table_cursor *tc, void *value, unsigned value_size,
                                   sen_update_type type);
 
 /**
  * sen_table_cursor_delete:
- * @tc: �Ώ�cursor
+ * @tc: 対象cursor
  *
- * cursor�̃J�����g���R�[�h���폜����B
- * cursor�̃J�����g���R�[�h�����݂��Ȃ��ꍇ��sen_invalid_argument��Ԃ��B
+ * cursorのカレントレコードを削除する。
+ * cursorのカレントレコードが存在しない場合はsen_invalid_argumentを返す。
  **/
 sen_rc sen_table_cursor_delete(sen_table_cursor *tc);
 
 /**
  * sen_table_search:
- * @table: �Ώ�table
- * @key: �����L�[
- * @flags: SEN_TABLE_SUFFIX���w�肷���key�Ɍ����v���郌�R�[�h����������
-           SEN_TABLE_PREFIX���w�肷���key�ɑO����v���郌�R�[�h����������
- * @res: �������ʂ��i�[����table
- * @op: sen_sel_or, sen_sel_and, sen_sel_but�̂����ꂩ���w�肷��
+ * @table: 対象table
+ * @key: 検索キー
+ * @flags: SEN_TABLE_SUFFIXを指定するとkeyに後方一致するレコードを検索する
+           SEN_TABLE_PREFIXを指定するとkeyに前方一致するレコードを検索する
+ * @res: 検索結果を格納するtable
+ * @op: sen_sel_or, sen_sel_and, sen_sel_butのいずれかを指定する
  *
- * flags�Ɏw�肷�������table����key�Ƀ}�b�`���郌�R�[�h���������A
- * op�̎w��ɏ]����res�Ƀ��R�[�h��ǉ����邢�͍폜����B
- * SEN_TABLE_PAT_KEY���w�肵��table�ł̂ݗL���B
+ * flagsに指定する条件でtableからkeyにマッチするレコードを検索し、
+ * opの指定に従ってresにレコードを追加あるいは削除する。
+ * SEN_TABLE_PAT_KEYを指定したtableでのみ有効。
  **/
 sen_rc sen_table_search(sen_obj *table, const void *key, unsigned key_size,
                         sen_table_search_flags flags,
@@ -413,76 +413,76 @@ sen_rc sen_table_search(sen_obj *table, const void *key, unsigned key_size,
 
 /**
  * sen_table_sort:
- * @table: �Ώ�table
- * @limit: res�Ɋi�[���郌�R�[�h�̏��
- * @res: ���ʂ��i�[����table
- * @optarg: �\�[�g�ڍ׏���
+ * @table: 対象table
+ * @limit: resに格納するレコードの上限
+ * @res: 結果を格納するtable
+ * @optarg: ソート詳細条件
  *
- * table���̃��R�[�h���\�[�g���A���limit�̗v�f��res�Ɋi�[����B
+ * table内のレコードをソートし、上位limit個の要素をresに格納する。
  **/
 sen_rc sen_table_sort(sen_obj *table, int limit, sen_obj *res, sen_sort_optarg *optarg);
 
 /**
  * sen_table_group:
- * @table: �Ώ�table
- * @limit: res�Ɋi�[����V���ȃ��R�[�h���̃T�u���R�[�h�̍ő�l
- * @res: ���ʂ��i�[����table
- * @optarg: �O���[�v���̏ڍ׏���
+ * @table: 対象table
+ * @limit: resに格納する新たなレコード毎のサブレコードの最大値
+ * @res: 結果を格納するtable
+ * @optarg: グループ化の詳細条件
  *
- * table�̃��R�[�h�����̏����ŃO���[�v�����A���ʂ�res�Ɋi�[����B
- * (todo: n�����W�v)
+ * tableのレコードを特定の条件でグループ化し、結果をresに格納する。
+ * (todo: n次元集計)
  **/
 sen_rc sen_table_group(sen_obj *table, int limit, sen_obj *res, sen_group_optarg *optarg);
 
 /**
  * sen_table_setoperation:
- * @table1: �Ώ�table1
- * @table2: �Ώ�table2
- * @res: ���ʂ��i�[����table
+ * @table1: 対象table1
+ * @table2: 対象table2
+ * @res: 結果を格納するtable
  *
- * table1��table2��op�̎w��ɏ]���ďW�����Z�������ʂ�res�Ɋi�[����B
- * res��table1���邢��table2���̂��̂��w�肵���ꍇ�������΁Atable1, table2�͔j�󂳂�Ȃ��B
+ * table1とtable2をopの指定に従って集合演算した結果をresに格納する。
+ * resにtable1あるいはtable2そのものを指定した場合を除けば、table1, table2は破壊されない。
  **/
 sen_rc sen_table_setoperation(sen_obj *table1, sen_obj *table2, sen_obj *res, op);
 
 /**
  * sen_table_difference:
- * @table1: �Ώ�table1
- * @table2: �Ώ�table2
- * @res1: ���ʂ��i�[����table
- * @res2: ���ʂ��i�[����table
+ * @table1: 対象table1
+ * @table2: 対象table2
+ * @res1: 結果を格納するtable
+ * @res2: 結果を格納するtable
  *
- * table1��table2����d�����郌�R�[�h����菜�������ʂ����ꂼ��res1, res2�Ɋi�[����B
+ * table1とtable2から重複するレコードを取り除いた結果をそれぞれres1, res2に格納する。
  **/
 sen_rc sen_table_difference(sen_obj *table1, sen_obj *table2, sen_obj *res1, sen_obj *res2);
 
 /**
  * sen_table_column:
- * @table: �Ώ�table
- * @name: �J������
+ * @table: 対象table
+ * @name: カラム名
  *
- * name�ɑΉ�����table�̃J������Ԃ��B�Ή�����J���������݂��Ȃ����NULL��Ԃ��B
+ * nameに対応するtableのカラムを返す。対応するカラムが存在しなければNULLを返す。
  **/
 sen_obj *sen_table_column(sen_obj *table, const char *name, unsigned name_size);
 
 /*-------------------------------------------------------------
- * column����̂��߂̊֐�
+ * column操作のための関数
  */
 
 /**
  * sen_column_create:
- * @space: sen_table_cursor�I�u�W�F�N�g�𕥂��o��space
- * @table: �Ώ�table
- * @name: �J������
- * @path: �J�������i�[����t�@�C���p�X�B
- *        flags��SEN_OBJ_PERSISTENT���w�肳��Ă���ꍇ�̂ݗL���B
- *        NULL�Ȃ玩���I�Ƀt�@�C���p�X���t�^�����B
- * @flags: SEN_OBJ_PERSISTENT���w�肷��Ɖi��column�ƂȂ�B
- *         SEN_COLUMN_INV���w�肷��Ɠ]�u�C���f�b�N�X�ƂȂ�B
- * @type: �J�����l�̌^�B��`�ς݂�type���邢��table���w��ł���B
+ * @space: sen_table_cursorオブジェクトを払い出すspace
+ * @table: 対象table
+ * @name: カラム名
+ * @path: カラムを格納するファイルパス。
+ *        flagsにSEN_OBJ_PERSISTENTが指定されている場合のみ有効。
+ *        NULLなら自動的にファイルパスが付与される。
+ * @flags: SEN_OBJ_PERSISTENTを指定すると永続columnとなる。
+ *         SEN_COLUMN_INVを指定すると転置インデックスとなる。
+ * @type: カラム値の型。定義済みのtypeあるいはtableを指定できる。
  *
- * table�ɐV���ȃJ�������`����Bname�͏ȗ��ł��Ȃ��B
- * ���table�ɓ����name��column�𕡐���`���邱�Ƃ͂ł��Ȃ��B
+ * tableに新たなカラムを定義する。nameは省略できない。
+ * 一つのtableに同一のnameのcolumnを複数定義することはできない。
  **/
 sen_obj *sen_column_create(sen_obj *space, sen_obj *table,
                            const char *name, unsigned name_size,
@@ -490,13 +490,13 @@ sen_obj *sen_column_create(sen_obj *space, sen_obj *table,
 
 /**
  * sen_column_open:
- * @space: sen_table_cursor�I�u�W�F�N�g�𕥂��o��space
- * @table: �Ώ�table
- * @name: �J������
- * @path: �J�������i�[����t�@�C���p�X�B
- * @type: �J�����l�̌^�B
+ * @space: sen_table_cursorオブジェクトを払い出すspace
+ * @table: 対象table
+ * @name: カラム名
+ * @path: カラムを格納するファイルパス。
+ * @type: カラム値の型。
  *
- * �����̉i���I��column���Atable��name�ɑΉ�����column�Ƃ��ĊJ��
+ * 既存の永続的なcolumnを、tableのnameに対応するcolumnとして開く
  **/
 sen_obj *sen_column_open(sen_obj *space, sen_obj *table,
                          const char *name, unsigned name_size,
@@ -504,70 +504,70 @@ sen_obj *sen_column_open(sen_obj *space, sen_obj *table,
 
 /**
  * sen_column_set_value:
- * @column: �Ώ�column
- * @id: �Ώۃ��R�[�h��ID
- * @value: �V�����l
- * @value_size: value�̃T�C�Y(�o�C�g��)
- * @type: SEN_UPD_SET, SEN_UPD_ADD, SEN_UPD_APPEND, SEN_UPD_PREPEND�̂����ꂩ���w��ł���B
- *        SEN_UPD_APPEND, SEN_UPD_PREPEND�͉ϒ��̏ꍇ�̂ݗL���B
- *        SEN_UPD_ADD�͌Œ蒷�̏ꍇ�̂ݗL���B
+ * @column: 対象column
+ * @id: 対象レコードのID
+ * @value: 新しい値
+ * @value_size: valueのサイズ(バイト長)
+ * @type: SEN_UPD_SET, SEN_UPD_ADD, SEN_UPD_APPEND, SEN_UPD_PREPENDのいずれかを指定できる。
+ *        SEN_UPD_APPEND, SEN_UPD_PREPENDは可変長の場合のみ有効。
+ *        SEN_UPD_ADDは固定長の場合のみ有効。
  *
- * ID�ɑΉ����郌�R�[�h��column�̒l���X�V����B
+ * IDに対応するレコードのcolumnの値を更新する。
  **/
 sen_rc sen_column_set_value(sen_obj *column, sen_id id,
                             void *value, int value_size, sen_update_type type);
 
 /**
  * sen_column_get_value:
- * @column: �Ώ�column
- * @id: �Ώۃ��R�[�h��ID
- * @valuebuf: value���i�[����o�b�t�@(�ďo���ŏ�������)
- * @buf_size: valuebuf�̃T�C�Y(byte��)
+ * @column: 対象column
+ * @id: 対象レコードのID
+ * @valuebuf: valueを格納するバッファ(呼出側で準備する)
+ * @buf_size: valuebufのサイズ(byte長)
  *
- * ID�ɑΉ����郌�R�[�h��column�̒l�̃T�C�Y(byte��)��Ԃ��B
- * buf_zie���l�̃T�C�Y�ȏ�ł������ꍇ�́Avaluebuf�ɒl���R�s�[����B
+ * IDに対応するレコードのcolumnの値のサイズ(byte長)を返す。
+ * buf_zieが値のサイズ以上であった場合は、valuebufに値をコピーする。
  **/
 int sen_column_get_value(sen_obj *column, sen_id id, void *valuebuf, int buf_size);
 
 /**
  * sen_column_table:
- * @column: �Ώ�column
+ * @column: 対象column
  *
- * column��������table��Ԃ��B
+ * columnが属するtableを返す。
  **/
 sen_obj *sen_column_table(sen_obj *column);
 
 /*-------------------------------------------------------------
- * �]�u�C���f�b�N�Xcolumn�����Ɏg�p�ł���֐�
+ * 転置インデックスcolumnだけに使用できる関数
  */
 
 /**
  * sen_string_search:
- * @inv: �]�u�C���f�b�N�X�^�̃J����
- * @string: ����������
- * @string_size: string�̃T�C�Y(�o�C�g��)
- * @res: �������ʂ��i�[����e�[�u��
- * @op: sen_sel_or, sen_sel_and, sen_sel_but, sen_sel_adjust�̂����ꂩ���w�肷��
- * @optargs: �ڍ׌�������
+ * @inv: 転置インデックス型のカラム
+ * @string: 検索文字列
+ * @string_size: stringのサイズ(バイト長)
+ * @res: 検索結果を格納するテーブル
+ * @op: sen_sel_or, sen_sel_and, sen_sel_but, sen_sel_adjustのいずれかを指定する
+ * @optargs: 詳細検索条件
  *
- * string�Ƀ}�b�`���郌�R�[�h��]�u�C���f�b�N�Xinv��p���Č������A���ʂ�res�Ɋi�[����B
+ * stringにマッチするレコードを転置インデックスinvを用いて検索し、結果をresに格納する。
  **/
 sen_rc sen_string_search(sen_obj *inv, const char *string, unsigned int string_size,
                          sen_obj *res, sen_sel_operator op, sen_select_optarg *optarg);
 
 /**
  * sen_query_search:
- * @inv: �]�u�C���f�b�N�X�^�̃J����
- * @q: �����N�G��
- * @res: �������ʂ��i�[����e�[�u��
- * @op: sen_sel_or, sen_sel_and, sen_sel_but, sen_sel_adjust�̂����ꂩ���w�肷��
+ * @inv: 転置インデックス型のカラム
+ * @q: 検索クエリ
+ * @res: 検索結果を格納するテーブル
+ * @op: sen_sel_or, sen_sel_and, sen_sel_but, sen_sel_adjustのいずれかを指定する
  *
- * query�Ƀ}�b�`���郌�R�[�h��]�u�C���f�b�N�Xinv��p���Č������A���ʂ�res�Ɋi�[����B
+ * queryにマッチするレコードを転置インデックスinvを用いて検索し、結果をresに格納する。
  **/
 sen_rc sen_query_search(sen_obj *inv, sen_query *q, sen_obj *res, sen_sel_operator op);
 
 /*-------------------------------------------------------------
- * space, table, column�̑S�Ă܂��͊���ŋ��ʂɎg�p�ł���֐�
+ * space, table, columnの全てまたは幾つかで共通に使用できる関数
  */
 
 typedef sturct {
@@ -601,205 +601,205 @@ typedef enum {
 
 /**
  * sen_obj_get_info:
- * @obj: �Ώ�obj
- * @type: �擾������̎��
- * @valuebuf: �l���i�[����o�b�t�@(�ďo���ŏ���)
+ * @obj: 対象obj
+ * @type: 取得する情報の種類
+ * @valuebuf: 値を格納するバッファ(呼出側で準備)
  *
- * obj��type�ɑΉ��������valuebuf�Ɋi�[����B
- * �ďo���ł�type�ɉ����ď\���ȃT�C�Y�̃o�b�t�@���m�ۂ��Ȃ���΂Ȃ�Ȃ��B
- * SEN_INFO_SOURCE_INFO���w�肵���ꍇ��valuebuf��sen_proc_spec�\���̂��w�肷��B
- * (obj�̒l�𓱏o���邽�߂̎葱�����擾����)
+ * objのtypeに対応する情報をvaluebufに格納する。
+ * 呼出側ではtypeに応じて十分なサイズのバッファを確保しなければならない。
+ * SEN_INFO_SOURCE_INFOを指定した場合はvaluebufにsen_proc_spec構造体を指定する。
+ * (objの値を導出するための手続きを取得する)
  **/
 sen_rc sen_obj_get_info(sen_obj *obj, sen_info_type type, void *valuebuf);
 
 /**
  * sen_obj_set_info:
- * @obj: �Ώ�obj
- * @type: �ݒ肷����̎��
- * @value: �ݒ肵�悤�Ƃ���l
+ * @obj: 対象obj
+ * @type: 設定する情報の種類
+ * @value: 設定しようとする値
  *
- * obj��type�ɑΉ��������value�̓��e�ɍX�V����B
- * SEN_INFO_SOURCE_INFO���w�肵���ꍇ��value��sen_proc_spec�\���̂��w�肷��B
- * (obj�̒l�𓱏o���邽�߂̎葱����ݒ肷��)
+ * objのtypeに対応する情報をvalueの内容に更新する。
+ * SEN_INFO_SOURCE_INFOを指定した場合はvalueにsen_proc_spec構造体を指定する。
+ * (objの値を導出するための手続きを設定する)
  **/
 sen_rc sen_obj_set_info(sen_obj *obj, sen_info_type type, const void *value);
 
 /**
  * sen_obj_get_element_info:
- * @obj: �Ώ�obj
- * @id: �Ώ�ID
- * @type: �擾������̎��
- * @valuebuf: �l���i�[����o�b�t�@(�ďo���ŏ���)
+ * @obj: 対象obj
+ * @id: 対象ID
+ * @type: 取得する情報の種類
+ * @valuebuf: 値を格納するバッファ(呼出側で準備)
  *
- * obj��id�ɑΉ����郌�R�[�h�́Atype�ɑΉ��������valuebuf�Ɋi�[����B
- * �ďo���ł�type�ɉ����ď\���ȃT�C�Y�̃o�b�t�@���m�ۂ��Ȃ���΂Ȃ�Ȃ��B
+ * objのidに対応するレコードの、typeに対応する情報をvaluebufに格納する。
+ * 呼出側ではtypeに応じて十分なサイズのバッファを確保しなければならない。
  **/
 sen_rc sen_obj_get_element_info(sen_obj *obj, sen_id id,
                                 sen_info_type type, void *valuebuf);
 
 /**
  * sen_obj_set_element_info:
- * @obj: �Ώ�object
- * @id: �Ώ�ID
- * @type: �ݒ肷����̎��
- * @value: �ݒ肵�悤�Ƃ���l
+ * @obj: 対象object
+ * @id: 対象ID
+ * @type: 設定する情報の種類
+ * @value: 設定しようとする値
  *
- * obj��id�ɑΉ����郌�R�[�h��type�ɑΉ��������value�̓��e�ɍX�V����B
+ * objのidに対応するレコードのtypeに対応する情報をvalueの内容に更新する。
  **/
 sen_rc sen_obj_set_element_info(sen_obj *obj, sen_id id,
                                 sen_info_type type, const void *value);
 
 /**
  * sen_obj_add_hook:
- * @obj: �Ώ�object
- * @type: SEN_HOOK_READ�́Aobject�̎Q�Ǝ��ɌĂяo�����hook���`����B
-          SEN_HOOK_WRITE�́Aobject�̍X�V���ɌĂяo�����hook���`����B
- * @offset: hook�̎��s���ʁBoffset�ɑΉ�����hook�̒��O�ɐV����hook��}������B
-            0���w�肵���ꍇ�͐擪�ɑ}�������B-1���w�肵���ꍇ�͖����ɑ}�������B
-            object�ɕ�����hook����`����Ă���ꍇ�͏��ʂ̏��ɌĂяo�����B
- * @spec: �ڍ׏���
+ * @obj: 対象object
+ * @type: SEN_HOOK_READは、objectの参照時に呼び出されるhookを定義する。
+          SEN_HOOK_WRITEは、objectの更新時に呼び出されるhookを定義する。
+ * @offset: hookの実行順位。offsetに対応するhookの直前に新たなhookを挿入する。
+            0を指定した場合は先頭に挿入される。-1を指定した場合は末尾に挿入される。
+            objectに複数のhookが定義されている場合は順位の順に呼び出される。
+ * @spec: 詳細条件
  *
- * obj�ɑ΂���hook��ǉ�����B
+ * objに対してhookを追加する。
  **/
 sen_rc sen_obj_add_hook(sen_obj *obj, sen_proc_type type,
                         int offset, const sen_proc_spec *spec);
 
 /**
  * sen_obj_get_hook_info:
- * @obj: �Ώ�object
- * @type: hook�^�C�v
- * @offset: ���s����
+ * @obj: 対象object
+ * @type: hookタイプ
+ * @offset: 実行順位
  *
- * obj�ɒ�`����Ă���hook�̏����擾����B
+ * objに定義されているhookの情報を取得する。
  **/
 sen_rc sen_obj_get_hook_info(sen_obj *obj, sen_proc_type type,
                              int offset, sen_proc_spec *spec);
 
 /**
  * sen_obj_delete_hook:
- * @obj: �Ώ�object
- * @type: hook�^�C�v
- * @offset: ���s����
+ * @obj: 対象object
+ * @type: hookタイプ
+ * @offset: 実行順位
  *
- * obj�ɒ�`����Ă���hook���폜����B
+ * objに定義されているhookを削除する。
  **/
 sen_rc sen_obj_delete_hook(sen_obj *obj, sen_proc_type type, int offset);
 
 /**
  * sen_obj_remove:
- * @path: object�ɊY������t�@�C���p�X
+ * @path: objectに該当するファイルパス
  *
- * path�ɊY������I�u�W�F�N�g�̃t�@�C���ꎮ���폜����B
+ * pathに該当するオブジェクトのファイル一式を削除する。
  **/
 sen_rc sen_obj_remove(const char *path);
 
 /**
  * sen_obj_rename:
- * @old_path: ���t�@�C���p�X
- * @new_path: �V�t�@�C���p�X
+ * @old_path: 旧ファイルパス
+ * @new_path: 新ファイルパス
  *
- * old_path�ɊY������I�u�W�F�N�g�̃t�@�C������new_path�ɕύX����B
+ * old_pathに該当するオブジェクトのファイル名をnew_pathに変更する。
  **/
 sen_rc sen_obj_rename(const char *old_path, const char *new_path);
 
 /**
  * sen_obj_close:
- * @obj: �Ώ�object
+ * @obj: 対象object
  *
- * obj������������������Bobj�ɑ�����object���ċA�I�Ƀ����������������B
+ * objをメモリから解放する。objに属するobjectも再帰的にメモリから解放される。
  **/
 sen_rc sen_obj_close(sen_obj *obj);
 
 /**
  * sen_obj_path:
- * @obj: �Ώ�object
+ * @obj: 対象object
  *
- * obj�ɑΉ�����t�@�C���p�X��Ԃ��B�ꎞobject�Ȃ�NULL��Ԃ��B
+ * objに対応するファイルパスを返す。一時objectならNULLを返す。
  **/
 const char *sen_obj_path(sen_obj *obj);
 
 /**
  * sen_obj_name:
- * @obj: �Ώ�object
+ * @obj: 対象object
  *
- * obj�̖��O��Ԃ��B����object�Ȃ�NULL��Ԃ��B
+ * objの名前を返す。無名objectならNULLを返す。
  **/
 const char *sen_obj_name(sen_obj *obj);
 
 /**
  * sen_obj_defrag:
- * @obj: �Ώ�object
+ * @obj: 対象object
  *
- * obj�ɑΉ�����t�@�C���̃t���O�����e�[�V��������������B
+ * objに対応するファイルのフラグメンテーションを解消する。
  **/
 int sen_obj_defrag(sen_obj *obj, int threshold);
 
 /**
  * sen_obj_expire:
- * @obj: �Ώ�object
+ * @obj: 対象object
  *
- * obj�̐�L���郁�����̂����A�\�ȗ̈��threshold���w�W�Ƃ��ĉ������B
+ * objの占有するメモリのうち、可能な領域をthresholdを指標として解放する。
  **/
 int sen_obj_expire(sen_obj *obj, int threshold);
 
 /**
  * sen_obj_check:
- * @obj: �Ώ�object
+ * @obj: 対象object
  *
- * obj�ɑΉ�����t�@�C���̐���������������B
+ * objに対応するファイルの整合性を検査する。
  **/
 int sen_obj_check(sen_obj *obj);
 
 /**
  * sen_obj_lock:
- * @obj: �Ώ�object
+ * @obj: 対象object
  *
- * obj��lock����Btimeout(�b)�o�߂��Ă�lock���擾�ł��Ȃ��ꍇ��sen_other_error��Ԃ��B
+ * objをlockする。timeout(秒)経過してもlockを取得できない場合はsen_other_errorを返す。
  **/
 sen_rc sen_obj_lock(sen_obj *obj, int timeout);
 
 /**
  * sen_obj_unlock:
- * @obj: �Ώ�object
+ * @obj: 対象object
  *
- * obj��unlock����B
+ * objをunlockする。
  **/
 sen_rc sen_obj_unlock(sen_obj *obj);
 
 /**
  * sen_obj_clear_lock:
- * @obj: �Ώ�object
+ * @obj: 対象object
  *
- * �����I�Ƀ��b�N���N���A����B
+ * 強制的にロックをクリアする。
  **/
 sen_rc sen_obj_clear_lock(sen_obj *obj);
 
 /*-------------------------------------------------------------
- * space�̐e�q�֌W�𒲂ׂ邽�߂̊֐�
+ * spaceの親子関係を調べるための関数
  */
 
 /**
  * sen_obj_space:
- * @obj: �Ώ�object
+ * @obj: 対象object
  *
- * obj�̑�����space��Ԃ��B
+ * objの属するspaceを返す。
  **/
 sen_rc sen_obj_space(sen_obj *obj);
 
 /**
  * sen_space_sibling:
- * @space: �Ώ�space
+ * @space: 対象space
  *
- * space�̌Z��space(�̈��)��Ԃ��B
- * (sibling�͏z���X�g�ɂȂ��Ă���B)
+ * spaceの兄弟space(の一つ)を返す。
+ * (siblingは循環リストになっている。)
  **/
 sen_rc sen_space_sibling(sen_obj *space);
 
 /**
  * sen_space_child:
- * @space: �Ώ�space
+ * @space: 対象space
  *
- * space�̎qspace(�̈��)��Ԃ��B
+ * spaceの子space(の一つ)を返す。
  **/
 sen_rc sen_space_child(sen_obj *space);
 

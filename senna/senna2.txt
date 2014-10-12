@@ -1,66 +1,66 @@
-* Senna2 API���
+* Senna2 API解説
 
-Senna1.1�ȍ~�Œǉ������Senna Query Language API(QL API)�ɂ��Đ������܂��B
+Senna1.1以降で追加されるSenna Query Language API(QL API)について説明します。
 
-QL API��2�̃f�[�^�^�Ƃ��̑���֐��ō\������Ă��܂��B
+QL APIは2つのデータ型とその操作関数で構成されています。
 
-** sen_db �^
+** sen_db 型
 
-�i���I�ȕ����̃e�[�u������Ȃ�f�[�^�x�[�X�ɑΉ�����f�[�^�^�ł��B
-�X�^���h�A�������[�h�Ńf�[�^�x�[�X���g�p����ꍇ�ɂ́A
-sen_db�̃C���X�^���X���K�v�ɂȂ�܂��B
+永続的な複数のテーブルからなるデータベースに対応するデータ型です。
+スタンドアロンモードでデータベースを使用する場合には、
+sen_dbのインスタンスが必要になります。
 
  sen_db *sen_db_create(const char *path, int flags, sen_encoding encoding);
 
-path�ŗ^����ꂽ�V�����f�[�^�x�[�X���쐬���A�Ή�����sen_db�C���X�^���X��Ԃ��܂��B
-���s�����ꍇ�ɂ�NULL��Ԃ��܂��Bflags�ɂ̓e�[�u�������Ǘ�����sym�ɑ΂���flag�����w�肵�܂��B�ʏ��0���w�肵�Ă��������Bencoding�́A�쐬����f�[�^�x�[�X�Ńf�t�H���g�Ŏg�p����镶���G���R�[�f�B���O���w�肵�܂��B(����ł́A�⍇������Ƀ��e�����Ƃ��ēn������������S�Ă����Ɏw�肵���G���R�[�f�B���O�ɏ]���ĉ��߂���܂�)
+pathで与えられた新しいデータベースを作成し、対応するsen_dbインスタンスを返します。
+失敗した場合にはNULLを返します。flagsにはテーブル名を管理するsymに対するflag情報を指定します。通常は0を指定してください。encodingは、作成するデータベースでデフォルトで使用される文字エンコーディングを指定します。(現状では、問合せ言語にリテラルとして渡した文字列も全てここに指定したエンコーディングに従って解釈されます)
 
  sen_db *sen_db_open(const char *path);
 
-path�ŗ^����ꂽ���ɍ쐬�ς̃f�[�^�x�[�X���J���A
-�Ή�����sen_db�C���X�^���X��Ԃ��܂��B
-���s�����ꍇ��NULL��Ԃ��܂��B
+pathで与えられた既に作成済のデータベースを開き、
+対応するsen_dbインスタンスを返します。
+失敗した場合はNULLを返します。
 
  sen_rc sen_db_close(sen_db *db);
 
-db�ɑΉ�����f�[�^�x�[�X����Asen_db�C���X�^���X��������܂��B
-��������� sen_success ���A���s����΃G���[�R�[�h���Ԃ�܂��B
+dbに対応するデータベースを閉じ、sen_dbインスタンスを解放します。
+成功すれば sen_success が、失敗すればエラーコードが返ります。
 
-** sen_ctx �^
+** sen_ctx 型
 
-�f�[�^�x�[�X�ւ̐ڑ��ɑΉ�����f�[�^�^�ł��B�f�[�^�x�[�X�𑀍삷��ۂɕK�v�ɂȂ�܂��B
-����̃f�[�^�x�[�X�ɑ΂��ĕ�����sen_ctx�𒣂��Ă��\���܂���B
+データベースへの接続に対応するデータ型です。データベースを操作する際に必要になります。
+同一のデータベースに対して複数のsen_ctxを張っても構いません。
 
  sen_ctx *sen_ctx_open(sen_db *db, int flags);
 
-����v���Z�X���Ƀ��[�h���ꂽsen_db�C���X�^���X�ɑ΂��Đڑ����s���A�Ή�����sen_ctx�C���X�^���X��Ԃ��܂��Bflags�ɂ́A�ȉ����w��ł��܂��B���s�����ꍇ�ɂ�NULL��Ԃ��܂��B
+同一プロセス内にロードされたsen_dbインスタンスに対して接続を行い、対応するsen_ctxインスタンスを返します。flagsには、以下が指定できます。失敗した場合にはNULLを返します。
 
-:SEN_CTX_USEQL :�⍇������̎g�p�̗L��(����ł͕K�{)
-:SEN_CTX_BATCHMODE :���͂������̕]�����ʂ̕\��/��\��
+:SEN_CTX_USEQL :問合せ言語の使用の有無(現状では必須)
+:SEN_CTX_BATCHMODE :入力した式の評価結果の表示/非表示
 
  sen_ctx *sen_ctx_connect(const char *host, int port, int flags);
 
-host�ɑΉ�����z�X�g�́Aport�ɑΉ�����|�[�g�ԍ��ɑ΂��Đڑ����s���A�Ή�����sen_ctx�C���X�^���X��Ԃ��܂��Bflags�ɂ́Asen_ctx_open�Ɠ������̂��w��ł��܂��B���s�����ꍇ�ɂ�NULL��Ԃ��܂��B
+hostに対応するホストの、portに対応するポート番号に対して接続を行い、対応するsen_ctxインスタンスを返します。flagsには、sen_ctx_openと同じものが指定できます。失敗した場合にはNULLを返します。
 
  sen_rc sen_ctx_load(sen_ctx *ctx, const char *path);
 
-path�ŗ^������t�@�C���̓��e��ctx�̃C���^�[�v���^�Ƀ��[�h���܂��B
+pathで与えられるファイルの内容をctxのインタープリタにロードします。
 
  sen_rc sen_ctx_send(sen_ctx *ctx, char *str, unsigned int str_len, int flags);
 
-����str_len�o�C�g�̕�����str��ctx�̃C���^�[�v���^�ɕ]�������܂��Bflag�ɂ͈ȉ����w��ł��܂��B
+長さstr_lenバイトの文字列strをctxのインタープリタに評価させます。flagには以下が指定できます。
 
-:SEN_CTX_MORE :�����I�[���Ă��Ȃ�(�܂�����������)���Ƃ������܂��B
+:SEN_CTX_MORE :式が終端していない(まだ続きがある)ことを示します。
 
  sen_rc sen_ctx_recv(sen_ctx *ctx, char **str, unsigned int *str_len, int *flags);
 
-sen_ctx_send�ŗ^�����������ctx�̃C���^�[�v���^���]���������ʂƂ��ē���ꂽ�o�͂��󂯎��܂��Bstr, str_len, flags�͏o�̓p�����[�^�ŁA�ďo�����ŏ����������̂ɑ΂���|�C���^��n���܂��Bstr�ɕԂ���镶������������K�v�͂���܂���Bctx���N���C�A���g���[�h�ō쐬����Ă���ꍇ�A�󂯎��ׂ��o�͂���������܂ő҂��܂��Bflags�ɕԂ����l��SEN_CTX_MORE bit�������Ă���ꍇ�́A�܂����������邱�Ƃ������܂��B
+sen_ctx_sendで与えた文字列をctxのインタープリタが評価した結果として得られた出力を受け取ります。str, str_len, flagsは出力パラメータで、呼出し元で準備した実体に対するポインタを渡します。strに返される文字列を解放する必要はありません。ctxがクライアントモードで作成されている場合、受け取るべき出力が到着するまで待ちます。flagsに返される値のSEN_CTX_MORE bitが立っている場合は、まだ続きがあることを示します。
 
  sen_rc sen_ctx_close(sen_ctx *ctx);
 
-ctx�ɑΉ�����sen_ctx�̐ڑ����������A�֘A���鎑����������܂��B
+ctxに対応するsen_ctxの接続を解除し、関連する資源を解放します。
 
  sen_rc sen_ctx_info_get(sen_ctx *ctx, sen_ctx_info *info);
 
-ctx�Ɋւ�������擾���܂��Binfo�͏o�̓p�����[�^�ŁA�ďo�����ŏ����������̂ɑ΂���|�C���^��n���܂��Bctx���N���C�A���g���[�h�ō쐬����Ă���ꍇ�́A�Ή�����TCP�\�P�b�g�̃t�@�C�����ʎq��info.fd�ɕԂ���܂��̂ŁAselect��poll�R�[�����g���Ď��̃f�[�^�����͂����𔻒f�ł��܂��B
+ctxに関する情報を取得します。infoは出力パラメータで、呼出し元で準備した実体に対するポインタを渡します。ctxがクライアントモードで作成されている場合は、対応するTCPソケットのファイル識別子がinfo.fdに返されますので、selectやpollコールを使って次のデータがいつ届くかを判断できます。
 

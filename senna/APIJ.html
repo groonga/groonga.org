@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html xmlns:v="urn:schemas-microsoft-com:vml"
 ><head
 ><title
->Senna API��� - Senna �g�ݍ��݌^�S�������G���W��</title
+>Senna API解説 - Senna 組み込み型全文検索エンジン</title
 ><link href="theme/css/base.css" media="screen,tv" rel="stylesheet" type="text/css"
 /><link href="theme/css/base.css" media="screen,tv,print" rel="stylesheet" type="text/css"
 /><link href="css/theme.css" media="screen,tv,print" rel="stylesheet" type="text/css"
@@ -17,19 +17,19 @@
 ><div class="container"
 ><div class="main"
 ><!--adminmenu--><!--toc--><h1
->Senna API���</h1
+>Senna API解説</h1
 ><!--body_enter--><div class="body_main"
 ><div class="day"
 ><div class="body"
 ><div class="section"
 ><p
->Senna�̑S�Ă̋@�\��API�֐���ʂ��Ē񋟂���܂��B</p
+>Sennaの全ての機能はAPI関数を通して提供されます。</p
 >
 <p
->API�́Abasic API, advanced API, low-level API��3��ނ���\������܂��B
-basic API���g���ăC���f�b�N�X�̍쐬�E�X�V�E�����̈�ʂ�̋@�\���g�p�ł��܂��B
-advanced API��p���邱�Ƃɂ���āA�������x�ׂ̍��ȃ`���[�j���O�𐧌䂷�邱�Ƃ��\�ɂȂ�܂��B
-low-level API��p���邱�Ƃɂ����Senna�̓����̃f�[�^�\���ɃA�N�Z�X���A����ɕ��G�ȃf�[�^�̑���⌟���������s���܂��B</p
+>APIは、basic API, advanced API, low-level APIの3種類から構成されます。
+basic APIを使ってインデックスの作成・更新・検索の一通りの機能を使用できます。
+advanced APIを用いることによって、検索精度の細かなチューニングを制御することが可能になります。
+low-level APIを用いることによってSennaの内部のデータ構造にアクセスし、さらに複雑なデータの操作や検索処理が行えます。</p
 >
 </div
 ><!--section--></div
@@ -41,70 +41,70 @@ low-level API��p���邱�Ƃɂ����Senna�̓����̃f�[�^�\���ɃA�N�Z�X���A����ɕ��G
 ><div class="section"
 >
 <p
->������API�́Asen_rc�Ƃ����Ԃ�l��Ԃ��܂��B
-����́AAPI�̐��ۂƁAAPI�����s�����ꍇ�ǂ̂悤�ȗ��R�Ŏ��s��������ێ�����l�ł��B
-���\�ɁA�l�Ƃ���Ɍ��ѕt����ꂽAPI�̎��s���R�������܂��B</p
+>多くのAPIは、sen_rcという返り値を返します。
+これは、APIの成否と、APIが失敗した場合どのような理由で失敗したかを保持する値です。
+下表に、値とそれに結び付けられたAPIの失敗理由を示します。</p
 >
 <table
 ><tr
 ><td
 >sen_success = 0</td
 ><td
->API�̐���</td
+>APIの成功</td
 ><td
->API�̐��ۂ́Asen_rc��0��0�łȂ����Ŕ��肷�邱�Ƃ��ł��܂��B</td
+>APIの成否は、sen_rcが0か0でないかで判定することができます。</td
 ></tr
 ><tr
 ><td
 >sen_memory_exhausted</td
 ><td
->�������m�یn�̊֐�(malloc,calloc,realloc,mmap�Ȃ�)�̎��s</td
+>メモリ確保系の関数(malloc,calloc,realloc,mmapなど)の失敗</td
 ></tr
 ><tr
 ><td
 >sen_invalid_format</td
 ><td
->�f�[�^�t�@�C�����̃t�H�[�}�b�g���s��</td
+>データファイル内のフォーマットが不正</td
 ><td
->�o�O�񍐂���������ƍK���ł��B</td
+>バグ報告いただけると幸いです。</td
 ></tr
 ><tr
 ><td
 >sen_file_operation_error</td
 ><td
->�t�@�C���n�̊֐��̎��s</td
+>ファイル系の関数の失敗</td
 ></tr
 ><tr
 ><td
 >sen_invalid_argument</td
 ><td
->�s���Ȉ���(�͈͊O�̒l�ANULL�|�C���^��)</td
+>不正な引数(範囲外の値、NULLポインタ等)</td
 ></tr
 ><tr
 ><td
 >sen_external_error</td
 ><td
->�������E�t�@�C���nAPI��������libc��AMeCab�ȂǊO�����C�u����API�Ăяo���̎��s</td
+>メモリ・ファイル系APIを除いたlibcや、MeCabなど外部ライブラリAPI呼び出しの失敗</td
 ></tr
 ><tr
 ><td
 >sen_internal_error</td
 ><td
->Senna����API�̌Ăяo�������s</td
+>Senna内部APIの呼び出しが失敗</td
 ></tr
 ><tr
 ><td
 >sen_abnormal_error</td
 ><td
->�ʏ킠�肦�Ȃ���ԂɂȂ������Ƃɂ��API�̎��s�B</td
+>通常ありえない状態になったことによるAPIの失敗。</td
 ><td
->�o�O�񍐂���������ƍK���ł��B</td
+>バグ報告いただけると幸いです。</td
 ></tr
 ><tr
 ><td
 >sen_other_error</td
 ><td
->��L�ȊO�̌����ɂ��API�̎��s</td
+>上記以外の原因によるAPIの失敗</td
 ></tr
 ></table
 >
@@ -118,161 +118,161 @@ low-level API��p���邱�Ƃɂ����Senna�̓����̃f�[�^�\���ɃA�N�Z�X���A����ɕ��G
 ><div class="section"
 >
 <p
->basic API�́A2�̃f�[�^�^�Ƃ��̑���֐��A�����senna���C�u����������������֐��Ƃō\������܂��B2�̃f�[�^�^�Ƃ́A�C���f�b�N�X�t�@�C���ɑΉ�����sen_index�^�ƁA
-�������ʂɑΉ�����sen_records�^�ł��B</p
+>basic APIは、2つのデータ型とその操作関数、およびsennaライブラリを初期化する関数とで構成されます。2つのデータ型とは、インデックスファイルに対応するsen_index型と、
+検索結果に対応するsen_records型です。</p
 >
 <h3
->Senna�������֐�</h3
+>Senna初期化関数</h3
 >
 <pre
 >sen_rc sen_init(void);</pre
 >
 <p
->Senna�̋@�\���g�p����O�ɏ������֐�sen_init()���v���Z�X���Ɉ�x�����Ăяo���K�v������܂��B
-(�}���`�X���b�h�A�v���P�[�V�����̏ꍇ�A�����ꂩ�̃X���b�h�ň�x�������s����Ώ\���ł��B)</p
+>Sennaの機能を使用する前に初期化関数sen_init()をプロセス毎に一度だけ呼び出す必要があります。
+(マルチスレッドアプリケーションの場合、いずれかのスレッドで一度だけ実行すれば十分です。)</p
 >
 <pre
 >sen_rc sen_fin(void);</pre
 >
 <p
->Senna�̗��p����߂�ꍇ�ɌĂяo���܂��B</p
+>Sennaの利用をやめる場合に呼び出します。</p
 >
 <h3
->sen_index �^</h3
+>sen_index 型</h3
 >
 <p
->�����񂩂當���������Ɍ������邽�߂̓]�u�C���f�b�N�X(����)�t�@�C���ɑΉ�����f�[�^�^�ł��B
-����ID�ƕ������e(������)�̃y�A����Ȃ镶����o�^����ƁA
-��������L�[�Ƃ��āA������܂ޕ���ID�̏W���������Ɏ��o�����Ƃ��ł��܂��B
-sen_index�̃C���X�^���X�̓t�@�C���V�X�e����̓���̃t�@�C���ɑΉ����Ă���A�i�[���ꂽ�����͉i���I�ɕۑ�����܂��B
-�������Asen_index��p���āA����ID�ɑΉ����镶�����e�����o�����Ƃ͂ł��܂���B</p
+>文字列から文書を高速に検索するための転置インデックス(索引)ファイルに対応するデータ型です。
+文書IDと文書内容(文字列)のペアからなる文書を登録すると、
+文字列をキーとして、これを含む文書IDの集合を高速に取り出すことができます。
+sen_indexのインスタンスはファイルシステム上の特定のファイルに対応しており、格納された文書は永続的に保存されます。
+ただし、sen_indexを用いて、文書IDに対応する文書内容を取り出すことはできません。</p
 >
 <p
->����ID�ɂ͌Œ蒷�̃o�C�i���f�[�^���Anul�ŏI�[����ϒ��̕����񂪎g�p�ł��܂��B</p
+>文書IDには固定長のバイナリデータか、nulで終端する可変長の文字列が使用できます。</p
 >
 <p
->�����̕����ŕ���ID���d�����Ă͂����܂���B</p
+>複数の文書で文書IDが重複してはいけません。</p
 >
 <p
->�ő啶��ID����8191�o�C�g�ł��B</p
+>最大文書ID長は8191バイトです。</p
 >
 <p
->�l�ɂ�nul�ŏI�[����ϒ��̕�������w�肵�܂��B</p
+>値にはnulで終端する可変長の文字列を指定します。</p
 >
 <p
->�l�ɂ͍ő咷�̐����͂���܂���B</p
+>値には最大長の制限はありません。</p
 >
 <p
->�l�Ɏw�肷�镶����̃G���R�[�f�B���O�́ASHIFT-JIS, EUC-japan, utf-8�̂���
-�ꂩ��I���ł��܂��B</p
+>値に指定する文字列のエンコーディングは、SHIFT-JIS, EUC-japan, utf-8のいず
+れかを選択できます。</p
 >
 <p
->�l�Ɏw�肷�镶����̕��������������́A�`�ԑf���, N-gram�̂ǂ��炩��I���ł��܂��B</p
+>値に指定する文字列の分かち書き方式は、形態素解析, N-gramのどちらかを選択できます。</p
 >
 <p
->N-gram��I�������ꍇ�A�p�������񂨂�ыL��������𕶎��v�f�ɕ������邩/���Ȃ�����
-�I���ł��܂��B</p
+>N-gramを選択した場合、英数文字列および記号文字列を文字要素に分割するか/しないかを
+選択できます。</p
 >
 <p
->�l�Ɏw�肷�镶����ɑ΂��āA�p�����̑啶��/�������A�S�p����/���p�����̐��K��������
-�s����/�s��Ȃ�����I���ł��܂��B</p
+>値に指定する文字列に対して、英文字の大文字/小文字、全角文字/半角文字の正規化処理を
+行うか/行わないかを選択できます。</p
 >
 <p
->���sen_index�C���X�^���X�𕡐��̃X���b�h�ŋ��L���邱�Ƃ��ł��܂��B</p
+>一つのsen_indexインスタンスを複数のスレッドで共有することができます。</p
 >
 <p
->��̓]�u�C���f�b�N�X�t�@�C���𕡐��̃v���Z�X�œ�����open���邱�Ƃ��ł��܂��B</p
+>一つの転置インデックスファイルを複数のプロセスで同時にopenすることができます。</p
 >
 <p
->�r������Ȃ��ɍX�V����̎��s�Ɠ����ɎQ�Ƒ�������S�Ɏ��s���邱�Ƃ��ł��܂��B
-(�������g�����U�N�V�����u�����������Ă���킯�ł͂Ȃ��A���R�~�b�g�̃f�[�^
-���Q�Ƃ����ꍇ������܂��B)</p
+>排他制御なしに更新操作の実行と同時に参照操作を安全に実行することができます。
+(ただしトランザクション隔離を実現しているわけではなく、未コミットのデータ
+が参照される場合があります。)</p
 >
 <p
->�����̃v���Z�X�Ȃ����X���b�h����̃C���f�b�N�X�ɑ΂��ē����ɍX�V�������
-�s���邱�Ƃ͂ł��܂���B(�ʓr�r�����䂪�K�v�ɂȂ�܂�)</p
+>複数のプロセスないしスレッドが一つのインデックスに対して同時に更新操作を実
+行することはできません。(別途排他制御が必要になります)</p
 >
 <pre
 >sen_index *sen_index_create(const char *path, int key_size, int flags, int initial_n_segments, sen_encoding encoding);</pre
 >
 <p
->path�ŗ^����ꂽ�V�����]�u�C���f�b�N�X�t�@�C�����쐬���A
-�Ή�����sen_index�C���X�^���X��Ԃ��܂��B
-���s�����ꍇ��NULL��Ԃ��܂��B</p
+>pathで与えられた新しい転置インデックスファイルを作成し、
+対応するsen_indexインスタンスを返します。
+失敗した場合はNULLを返します。</p
 >
 <p
->key_size�ɕ���ID��(�o�C�g��)��^���܂��B
-key_size��0���w�肳�ꂽ�ꍇ�͉ϒ�(nul�I�[���镶����)���w�肳�ꂽ�Ƃ݂Ȃ���܂��B</p
+>key_sizeに文書ID長(バイト長)を与えます。
+key_sizeに0が指定された場合は可変長(nul終端する文字列)が指定されたとみなされます。</p
 >
 <p
->flags�ɂ́A�ȉ���flag��g�ݍ��킹�Ďw�肵�܂��B</p
+>flagsには、以下のflagを組み合わせて指定します。</p
 >
 <dl
 ><dt
 >SEN_INDEX_NORMALIZE</dt
 ><dd
->�p�����̑啶��/�������A�S�p����/���p�����𐳋K�����ăC���f�b�N�X�ɓo�^����</dd
+>英文字の大文字/小文字、全角文字/半角文字を正規化してインデックスに登録する</dd
 ><dt
 >SEN_INDEX_SPLIT_ALPHA</dt
 ><dd
->�p������𕶎��v�f�ɕ�������</dd
+>英文字列を文字要素に分割する</dd
 ><dt
 >SEN_INDEX_SPLIT_DIGIT</dt
 ><dd
->����������𕶎��v�f�ɕ�������</dd
+>数字文字列を文字要素に分割する</dd
 ><dt
 >SEN_INDEX_SPLIT_SYMBOL</dt
 ><dd
->�L��������𕶎��v�f�ɕ�������</dd
+>記号文字列を文字要素に分割する</dd
 ><dt
 >SEN_INDEX_NGRAM</dt
 ><dd
->(�`�ԑf��͂ł͂Ȃ�)n-gram��p����</dd
+>(形態素解析ではなく)n-gramを用いる</dd
 ><dt
 >SEN_INDEX_DELIMITED</dt
 ><dd
->(�`�ԑf��͂ł͂Ȃ�)�󔒋�؂�ŒP�����؂�</dd
+>(形態素解析ではなく)空白区切りで単語を区切る</dd
 ></dl
 >
 <p
->initial_n_segments�́A�����o�b�t�@�T�C�Y��^���܂��B
-initial_n_segments * 256Kbytes���̗e�ʂ������C���f�b�N�X�Ƃ��Ċm�ۂ���܂��B
-���̐��l��(���������T�C�Y���z���Ȃ��͈͂�)�傫���قǍX�V�����������ɂȂ�܂��B</p
+>initial_n_segmentsは、初期バッファサイズを与えます。
+initial_n_segments * 256Kbytes分の容量が初期インデックスとして確保されます。
+この数値が(実メモリサイズを越えない範囲で)大きいほど更新処理が高速になります。</p
 >
 <p
->encoding�ɂ́Asen_enc_default, sen_enc_none, sen_enc_euc_jp,
-sen_enc_utf8, sen_enc_sjis �̂����ꂩ���w�肵�܂��B</p
+>encodingには、sen_enc_default, sen_enc_none, sen_enc_euc_jp,
+sen_enc_utf8, sen_enc_sjis のいずれかを指定します。</p
 >
 <pre
 >sen_index *sen_index_open(const char *path);</pre
 >
 <p
->path�ŗ^����ꂽ���ɍ쐬�ς̓]�u�C���f�b�N�X�t�@�C�����J���A
-�Ή�����sen_index�C���X�^���X��Ԃ��܂��B
-���s�����ꍇ��NULL��Ԃ��܂��B</p
+>pathで与えられた既に作成済の転置インデックスファイルを開き、
+対応するsen_indexインスタンスを返します。
+失敗した場合はNULLを返します。</p
 >
 <pre
 >sen_rc sen_index_close(sen_index *index);</pre
 >
 <p
->index�ɑΉ�����]�u�C���f�b�N�X�t�@�C������A
-sen_index�C���X�^���X��������܂��B
-��������� sen_success ���A���s����΃G���[�R�[�h���Ԃ�܂��B</p
+>indexに対応する転置インデックスファイルを閉じ、
+sen_indexインスタンスを解放します。
+成功すれば sen_success が、失敗すればエラーコードが返ります。</p
 >
 <pre
 >sen_rc sen_index_remove(const char *path);</pre
 >
 <p
->path�ŗ^����ꂽ�]�u�C���f�b�N�X�t�@�C�����폜���܂��B
-��������� sen_success ���A���s����΃G���[�R�[�h���Ԃ�܂��B</p
+>pathで与えられた転置インデックスファイルを削除します。
+成功すれば sen_success が、失敗すればエラーコードが返ります。</p
 >
 <pre
 >sen_rc sen_index_rename(const char *old_name, const char *new_name);</pre
 >
 <p
->old_name�ŗ^����ꂽ�]�u�C���f�b�N�X�t�@�C���̃t�@�C�������A
-new_name�ɕύX���܂��B
-��������� sen_success ���A���s����΃G���[�R�[�h���Ԃ�܂��B</p
+>old_nameで与えられた転置インデックスファイルのファイル名を、
+new_nameに変更します。
+成功すれば sen_success が、失敗すればエラーコードが返ります。</p
 >
 <pre
 >sen_rc sen_index_upd(sen_index *index, const void *key,
@@ -280,96 +280,96 @@ new_name�ɕύX���܂��B
                      const char *newvalue, unsigned int newvalue_len);</pre
 >
 <p
->index����key�ɑΉ����镶���̒l�𒷂���oldvalue_len�ł���oldvalue����A����newvalue_len�ł���newvalue�ɍX�V���܂��B</p
+>index内のkeyに対応する文書の値を長さがoldvalue_lenであるoldvalueから、長さnewvalue_lenであるnewvalueに更新します。</p
 >
 <p
->�V�K�����ł���ꍇ��oldvalue��NULL���w�肵�Aoldvalue_len��0���w�肵�܂��B</p
+>新規文書である場合はoldvalueにNULLを指定し、oldvalue_lenに0を指定します。</p
 >
 <p
->�������폜����ꍇ��newvalue��NULL���w�肵�Anewvalue_len��0���w�肵�܂��B</p
+>文書を削除する場合はnewvalueにNULLを指定し、newvalue_lenに0を指定します。</p
 >
 <p
->oldvalue�ɂ͑O��index�ɓo�^�������̒l�𐳂����w�肷��K�v������܂��B</p
+>oldvalueには前回indexに登録した時の値を正しく指定する必要があります。</p
 >
 <pre
 >sen_records *sen_index_sel(sen_index *index,
                            const char *string, unsigned int string_len);</pre
 >
 <p
->index����A������string_len�ł���string���܂ޕ��������o���Asen_records�C���X�^���X�Ƃ�
-�ĕԂ��܂��B</p
+>indexから、長さがstring_lenであるstringを含む文書を取り出し、sen_recordsインスタンスとし
+て返します。</p
 >
 <h3
->sen_records �^</h3
+>sen_records 型</h3
 >
 <p
->�������ʂƂ��ĕԂ���郌�R�[�h�̏W������������Ɉꎞ�I�Ɋi�[���邽�߂̃f�[�^�^�ł��B</p
+>検索結果として返されるレコードの集合をメモリ上に一時的に格納するためのデータ型です。</p
 >
 <p
->���R�[�h�W���̓��̈�̃��R�[�h���J�����g���R�[�h�Ƃ��ĎQ�Ƃ��Ă��܂��B</p
+>レコード集合の内の一つのレコードをカレントレコードとして参照しています。</p
 >
 <pre
 >int sen_records_next(sen_records *r, void *keybuf, int bufsize, int *score);</pre
 >
 <p
->�\�ł���΃J�����g���R�[�h����i�߂܂��B
-���������ꍇ�̓J�����g���R�[�h��key�����A���s�����ꍇ��0��Ԃ��܂��B
-���������ꍇ�́A
-keybuf���w�肳��Abufsize��key���ȏ�ł���΁A
-�J�����g���R�[�h��key����keybuf�ɃR�s�[���A
-score��NULL�ȊO�̒l���w�肳�ꂽ�ꍇ�̓J�����g���R�[�h�̃X�R�A��*score�ɃZ�b�g���܂��B</p
+>可能であればカレントレコードを一つ進めます。
+成功した場合はカレントレコードのkey長を、失敗した場合は0を返します。
+成功した場合は、
+keybufが指定され、bufsizeがkey長以上であれば、
+カレントレコードのkeyををkeybufにコピーし、
+scoreにNULL以外の値が指定された場合はカレントレコードのスコアを*scoreにセットします。</p
 >
 <pre
 >sen_rc sen_records_rewind(sen_records *records);</pre
 >
 <p
->�J�����g���R�[�h���N���A���܂��Bsen_records_rewind()���s���
-sen_records_next()�����s����΁A
-�ŏ��̃��R�[�h���珇�ԂɃ��R�[�h��ǂݏo�����Ƃ��ł��܂��B</p
+>カレントレコードをクリアします。sen_records_rewind()実行後に
+sen_records_next()を実行すれば、
+最初のレコードから順番にレコードを読み出すことができます。</p
 >
 <pre
 >int sen_records_curr_score(sen_records *records);</pre
 >
 <p
->�J�����g���R�[�h�̃X�R�A(�����N�G���[�ɑ΂���K���x)��Ԃ��܂��B</p
+>カレントレコードのスコア(検索クエリーに対する適合度)を返します。</p
 >
 <pre
 >int sen_records_curr_key(sen_records *records, void *keybuf, int bufsize);</pre
 >
 <p
->�J�����g���R�[�h��key����Ԃ��܂��B
-�J�����g���R�[�h�����݂��Ȃ��ꍇ��0��Ԃ��܂��B</p
+>カレントレコードのkey長を返します。
+カレントレコードが存在しない場合は0を返します。</p
 >
 <p
->sen_index_sel(), sen_index_select(), sen_records_rewind()���s�����
-�J�����g���R�[�h�͑��݂��܂���Bsen_records_next�����s����K�v������܂��B</p
+>sen_index_sel(), sen_index_select(), sen_records_rewind()実行直後は
+カレントレコードは存在しません。sen_records_nextを実行する必要があります。</p
 >
 <p
->records�I�u�W�F�N�g�ɊY������index��key_size��0�ȊO�ł���΁A
-�J�����g���R�[�h�����݂���ꍇ�̖߂�l�͏��key_size�ƈ�v���܂��B</p
+>recordsオブジェクトに該当するindexのkey_sizeが0以外であれば、
+カレントレコードが存在する場合の戻り値は常にkey_sizeと一致します。</p
 >
 <p
->keybuf��NULL�ȊO�̒l���n����Abufsize���J�����g���R�[�h��key���ȏ�ł���΁A
-keybuf�ɃJ�����g���R�[�h��key���R�s�[����܂��B</p
+>keybufにNULL以外の値が渡され、bufsizeがカレントレコードのkey長以上であれば、
+keybufにカレントレコードのkeyがコピーされます。</p
 >
 <pre
 >int sen_records_nhits(sen_records *records);</pre
 >
 <p
->records�Ɋ܂܂�郌�R�[�h�̐���Ԃ��܂��B</p
+>recordsに含まれるレコードの数を返します。</p
 >
 <pre
 >int sen_records_find(sen_records *records, const void *key);</pre
 >
 <p
->records��key�ɑΉ����郌�R�[�h���܂܂�Ă��邩�ǂ����𒲂ׂ܂��B
-�Y�����郌�R�[�h�����݂���΁A���̃��R�[�h�̃X�R�A��Ԃ��܂��B</p
+>recordsにkeyに対応するレコードが含まれているかどうかを調べます。
+該当するレコードが存在すれば、そのレコードのスコアを返します。</p
 >
 <pre
 >sen_rc sen_records_close(sen_records *records);</pre
 >
 <p
->records�C���X�^���X��������܂��B</p
+>recordsインスタンスを解放します。</p
 >
 </div
 ><!--section--></div
@@ -381,113 +381,113 @@ keybuf�ɃJ�����g���R�[�h��key���R�s�[����܂��B</p
 ><div class="section"
 >
 <p
->�������x�̐��x�ׂ̍���������s�����߂� advanced API ���g�p���܂��B
-advanced API�ł�sen_index�^��sen_records�^�ɉ����āA�C���f�b�N�X��
-�o�^���镶�������i�[����sen_values�^���g�p���܂��B</p
+>検索精度の精度の細かい制御を行うために advanced API を使用します。
+advanced APIではsen_index型とsen_records型に加えて、インデックスに
+登録する文書情報を格納するsen_values型を使用します。</p
 >
 <h3
->sen_values �^</h3
+>sen_values 型</h3
 >
 <p
->sen_values�^�́A�C���f�b�N�X�ɓo�^���镶���̓��e����������Ɉꎞ�I�Ɋi�[���邽�߂̃f�[�^�^�ł��B
-basic API�ł́A�����̒l�̓t���b�g�ȒP��̕�����Ƃ��Ĉ����܂����Aadvanced API�ł́A��̕����𕡐��̒i���̏W���Ƃ��Ĉ������Ƃ��ł��܂��B�܂��A���ꂼ��̒i���́A�قȂ�d�݂���������̃��X�g�Ƃ��ĊǗ��ł��܂��B�d�݂Ƃ́A�������ł��̕����񂪋�������Ă���x�������������l�ŁA���錟�����[�h�ɑ΂��āA�d�݂̑傫���ݒ肳�ꂽ�����̕�����Ƀ}�b�`���������̕������K���x���������̂Ƃ݂Ȃ��ď��ʕt�����s�����Ƃ��ł��܂��B</p
+>sen_values型は、インデックスに登録する文書の内容をメモリ上に一時的に格納するためのデータ型です。
+basic APIでは、文書の値はフラットな単一の文字列として扱いますが、advanced APIでは、一つの文書を複数の段落の集合として扱うことができます。また、それぞれの段落は、異なる重みを持つ文字列のリストとして管理できます。重みとは、文書内でその文字列が強調されている度合を示す整数値で、ある検索ワードに対して、重みの大きく設定された部分の文字列にマッチした文書の方がより適合度が高いものとみなして順位付けを行うことができます。</p
 >
 <pre
 >sen_values *sen_values_open(void);</pre
 >
 <p
->�V����sen_values�C���X�^���X�𐶐����܂��B</p
+>新たなsen_valuesインスタンスを生成します。</p
 >
 <pre
 >sen_rc sen_values_close(sen_values *values);</pre
 >
 <p
->sen_values�C���X�^���X��������܂��B</p
+>sen_valuesインスタンスを解放します。</p
 >
 <pre
 >sen_rc sen_values_add(sen_values *values, const char *str, unsigned int str_len,
                       unsigned int weight);</pre
 >
 <p
->values�ɏd�ݒlweight�����A������str_len�̕�����str��ǉ����܂��B</p
+>valuesに重み値weightを持つ、長さがstr_lenの文字列strを追加します。</p
 >
 <h3
->sen_records �^</h3
+>sen_records 型</h3
 >
 <p
->advance API�ł́Asen_records �ɑ΂����蕡�G�ȑ���֐����񋟂���܂��B</p
+>advance APIでは、sen_records に対するより複雑な操作関数が提供されます。</p
 >
 <pre
 >sen_records *sen_records_open(sen_rec_unit record_unit, sen_rec_unit subrec_unit, unsigned int max_n_subrecs);</pre
 >
 <p
->�V�������records�C���X�^���X�𐶐����܂��Bbasic API�ł͌������ʂ͕������ł������Aadvanced API�ł�record_unit���w�肷�邱�Ƃɂ���ă��R�[�h�̒P�ʂ��w��ł��܂��B�܂��A���R�[�h���ɁA���̉��ʂ̒P�ʂŗL���̃T�u���R�[�h���i�[���邱�Ƃ��ł��܂��B�T�u���R�[�h�̒P�ʂ́Asubrec_unit�Ŏw�肵�܂��B
-record_unit, subrec_unit�͈ȉ��̂����ꂩ���w�肵�܂��B</p
+>新しい空のrecordsインスタンスを生成します。basic APIでは検索結果は文書毎でしたが、advanced APIではrecord_unitを指定することによってレコードの単位を指定できます。また、レコード毎に、その下位の単位で有限個のサブレコードを格納することができます。サブレコードの単位は、subrec_unitで指定します。
+record_unit, subrec_unitは以下のいずれかを指定します。</p
 >
 <dl
 ><dt
 >sen_rec_document</dt
 ><dd
->�����P��</dd
+>文書単位</dd
 ><dt
 >sen_rec_section</dt
 ><dd
->�i���P��</dd
+>段落単位</dd
 ><dt
 >sen_rec_position</dt
 ><dd
->�o���ʒu�P��</dd
+>出現位置単位</dd
 ><dt
 >sen_rec_userdef</dt
 ><dd
->���[�U��`�l�P��(group������Ƃ��̂ݗL���ł�)</dd
+>ユーザ定義値単位(group化するときのみ有効です)</dd
 ><dt
 >sen_rec_none</dt
 ><dd
->�T�u���R�[�h���i�[���Ȃ����Ƃ��w�����܂�</dd
+>サブレコードを格納しないことを指示します</dd
 ></dl
 >
 <p
->max_n_subrecs�́A���R�[�h���Ɋi�[����T�u���R�[�h�̍ő吔���w�肵�܂��B</p
+>max_n_subrecsは、レコード毎に格納するサブレコードの最大数を指定します。</p
 >
 <pre
 >sen_records *sen_records_union(sen_records *a, sen_records *b);</pre
 >
 <p
->records a��records b�̘a�W���ł���records��Ԃ��܂��Ba��b�͔j�󂳂�܂��B
-a��b�͓���̃V���{���\�𕶏�ID�Ƃ���C���f�b�N�X�̌������ʂł���A
-record_unit������łȂ���΂Ȃ�܂���B</p
+>records aとrecords bの和集合であるrecordsを返します。aとbは破壊されます。
+aとbは同一のシンボル表を文書IDとするインデックスの検索結果であり、
+record_unitが同一でなければなりません。</p
 >
 <pre
 >sen_records *sen_records_subtract(sen_records *a, sen_records *b);</pre
 >
 <p
->records a��records b�̍��W���ł���records��Ԃ��܂��Ba��b�͔j�󂳂�܂��B
-a��b�͓���̃V���{���\�𕶏�ID�Ƃ���C���f�b�N�X�̌������ʂł���A
-record_unit������łȂ���΂Ȃ�܂���B</p
+>records aとrecords bの差集合であるrecordsを返します。aとbは破壊されます。
+aとbは同一のシンボル表を文書IDとするインデックスの検索結果であり、
+record_unitが同一でなければなりません。</p
 >
 <pre
 >sen_records *sen_records_intersect(sen_records *a, sen_records *b);</pre
 >
 <p
->records a��records b�̋��ʏW���ł���records��Ԃ��܂��Ba��b�͔j�󂳂�܂��B
-a��b�͓���̃V���{���\�𕶏�ID�Ƃ���C���f�b�N�X�̌������ʂł���A
-record_unit������łȂ���΂Ȃ�܂���B</p
+>records aとrecords bの共通集合であるrecordsを返します。aとbは破壊されます。
+aとbは同一のシンボル表を文書IDとするインデックスの検索結果であり、
+record_unitが同一でなければなりません。</p
 >
 <pre
 >int sen_records_difference(sen_records *a, sen_records *b);</pre
 >
 <p
->records a��records b���狤�ʂɊ܂܂�郌�R�[�h����菜���܂��B���ʂɊ܂܂�Ă������R�[�h�̐���Ԃ��܂��B
-a��b�͓���̃V���{���\�𕶏�ID�Ƃ���C���f�b�N�X�̌������ʂł���A
-record_unit������łȂ���΂Ȃ�܂���B</p
+>records aとrecords bから共通に含まれるレコードを取り除きます。共通に含まれていたレコードの数を返します。
+aとbは同一のシンボル表を文書IDとするインデックスの検索結果であり、
+record_unitが同一でなければなりません。</p
 >
 <pre
 >sen_rc sen_records_sort(sen_records *records, int limit, sen_sort_optarg *optarg);</pre
 >
 <p
->records���̃��R�[�h���\�[�g���A���limit�̗v�f��sen_records_next()�ŏ������o����悤�ɂ��܂��B
-optarg���w�肷�邱�Ƃɂ��A�\�[�g�̕��@�𑀍�ł��܂��Bsen_sort_optarg�̍\�����ȉ��Ɏ����܂��B</p
+>records内のレコードをソートし、上位limit個の要素をsen_records_next()で順次取り出せるようにします。
+optargを指定することにより、ソートの方法を操作できます。sen_sort_optargの構造を以下に示します。</p
 >
 <pre
 >struct _sen_sort_optarg {
@@ -497,36 +497,36 @@ optarg���w�肷�邱�Ƃɂ��A�\�[�g�̕��@�𑀍�ł��܂��Bsen_sort_optarg�̍\�����
 };</pre
 >
 <p
->mode�ɂ͈ȉ��̂����ꂩ���w�肵�܂��B</p
+>modeには以下のいずれかを指定します。</p
 >
 <dl
 ><dt
 >sen_sort_descending</dt
 ><dd
->�~��</dd
+>降順</dd
 ><dt
 >sen_sort_ascending</dt
 ><dd
->����</dd
+>昇順</dd
 ></dl
 >
 <p
->�R�[���o�b�N�֐�compar�́A���A��O������sen_records_sort()�Ɏw�肳�ꂽrecords���A
-���A��l�����ɔ�r�ΏۂƂȂ��̃��R�[�h�n���h�����A
-��܈�����compar_arg���n����܂��B��r�֐��́A���̈�������l�̈����ɑ΂��āA 1)�������A2)�������A3)�傫���Ȃ�΁A 1)�[�������A2)�[���A3)�[�����傫�������̂����ꂩ��Ԃ��Ȃ���� �Ȃ�܂���B��̗v�f���������Ƃ��A���בւ���records�ɂ�����A��̏����͖���`�ł��B</p
+>コールバック関数comparは、第一、第三引数にsen_records_sort()に指定されたrecordsが、
+第二、第四引数に比較対象となる二つのレコードハンドルが、
+第五引数にcompar_argが渡されます。比較関数は、第二の引数が第四の引数に対して、 1)小さい、2)等しい、3)大きいならば、 1)ゼロ未満、2)ゼロ、3)ゼロより大きい整数のいずれかを返さなければ なりません。二つの要素が等しいとき、並べ替えたrecordsにおける、二つの順序は未定義です。</p
 >
 <p
->compar��compar_arg�ɋ���NULL���w�肳�ꂽ�ꍇ�́A�L�[�l�ɂ���ă\�[�g����܂��B</p
+>comparとcompar_argに共にNULLが指定された場合は、キー値によってソートされます。</p
 >
 <p
->optarg��NULL���w�肳�ꂽ�ꍇ�́A�e���R�[�h�̃X�R�A�l�ɂ���č~���Ƀ\�[�g���܂��B</p
+>optargにNULLが指定された場合は、各レコードのスコア値によって降順にソートします。</p
 >
 <pre
 >sen_rc sen_records_group(sen_records *records, int limit, sen_group_optarg *optarg);</pre
 >
 <p
->records��record_unit�����傫�ȗ��x�̑傫�ȒP�ʂɕύX���܂��B�V����record_unit�̒l������ł��镡���̃��R�[�h�͈�ɂ܂Ƃ߂��A�T�u���R�[�h�Ƃ��Ċi�[����܂��Blimit�ɂ͐V���ȃ��R�[�h���̃T�u���R�[�h�̍ő�l���w�肵�܂��B
-optarg���w�肷�邱�Ƃɂ��A�O���[�v���̕��@�𑀍�ł��܂��Bsen_group_optarg�̍\�����ȉ��Ɏ����܂��B</p
+>recordsのrecord_unitをより大きな粒度の大きな単位に変更します。新たなrecord_unitの値が同一である複数のレコードは一つにまとめられ、サブレコードとして格納されます。limitには新たなレコード毎のサブレコードの最大値を指定します。
+optargを指定することにより、グループ化の方法を操作できます。sen_group_optargの構造を以下に示します。</p
 >
 <pre
 >struct _sen_group_optarg {
@@ -537,22 +537,22 @@ optarg���w�肷�邱�Ƃɂ��A�O���[�v���̕��@�𑀍�ł��܂��Bsen_group_optarg�̍\
 };</pre
 >
 <p
->mode�́Alimit�ȏ�̂̃T�u���R�[�h�����݂���ꍇ�ɁA�ۑ��ΏۂƂ���T�u���R�[�h��I�яo���������w�肵�܂��B</p
+>modeは、limit個以上ののサブレコードが存在する場合に、保存対象とするサブレコードを選び出す順序を指定します。</p
 >
 <p
->�R�[���o�b�N�֐�func���w�肷�邱�Ƃɂ���āA�����P�ʁE�i���P�ʁE�o���ʒu�P�ʂ̂�����ł��Ȃ��A���[�U�̒�`����O���[�v���L�[�P�ʂŃ��R�[�h���܂Ƃ߂邱�Ƃ��ł��܂��Bfunc�́A��������sen_records_group()�Ɏw�肳�ꂽrecords���A�������Ƀ��R�[�h�n���h�����A��O�����ɃO���[�v���̃L�[���i�[����o�b�t�@���A��l������func_arg���n����܂��Bfunc�̖߂�l��0�ȊO�ł���΁A���Y���R�[�h�͎̂Ă��܂��Bfunc�̓��R�[�h�̓��e�Ɋ�Â���key_size�o�C�g�̃O���[�v���L�[���Z�o���A�o�b�t�@�Ɋi�[���Ȃ���΂Ȃ�܂���B</p
+>コールバック関数funcを指定することによって、文書単位・段落単位・出現位置単位のいずれでもなく、ユーザの定義するグループ化キー単位でレコードをまとめることができます。funcは、第一引数にsen_records_group()に指定されたrecordsが、第二引数にレコードハンドルが、第三引数にグループ化のキーを格納するバッファが、第四引数にfunc_argが渡されます。funcの戻り値が0以外であれば、当該レコードは捨てられます。funcはレコードの内容に基づいてkey_sizeバイトのグループ化キーを算出し、バッファに格納しなければなりません。</p
 >
 <pre
 >const sen_recordh * sen_records_curr_rec(sen_records *r);</pre
 >
 <p
->�J�����g���R�[�h�̃��R�[�h�n���h����Ԃ��܂��B</p
+>カレントレコードのレコードハンドルを返します。</p
 >
 <pre
 >const sen_recordh *sen_records_at(sen_records *records, const void *key, unsigned section, unsigned pos, int *score, int *n_subrecs);</pre
 >
 <p
->records�̒�����A����ID��key�Œi���ԍ���section�ŏo���ʒu��pos�ł��郌�R�[�h���������A���̃��R�[�h�n���h����Ԃ��܂��Bscore, n_subrecs���w�肳�ꂽ�ꍇ�́A�Y�����郌�R�[�h�̃X�R�A�A�T�u���R�[�h����Ԃ��܂��B</p
+>recordsの中から、文書IDがkeyで段落番号がsectionで出現位置がposであるレコードを検索し、そのレコードハンドルを返します。score, n_subrecsが指定された場合は、該当するレコードのスコア、サブレコード数を返します。</p
 >
 <pre
 >sen_rc sen_record_info(sen_records *r, const sen_recordh *rh,
@@ -560,10 +560,10 @@ optarg���w�肷�邱�Ƃɂ��A�O���[�v���̕��@�𑀍�ł��܂��Bsen_group_optarg�̍\
                        int *section, int *pos, int *score, int *n_subrecs);</pre
 >
 <p
->records���̃��R�[�hrh�ɊY�����鑮���������o���A
-keybuf���w�肳��Abufsize��key���ȏ�ł����keybuf��key���R�s�[���A
-section, pos, score, n_subrecs���w�肳��Ă���΁A
-�Z�N�V�����ԍ��A�ʒu�A�X�R�A�A�T�u���R�[�h�������ꂼ��Z�b�g���܂��B</p
+>records中のレコードrhに該当する属性情報を取り出し、
+keybufが指定され、bufsizeがkey長以上であればkeybufにkeyをコピーし、
+section, pos, score, n_subrecsが指定されていれば、
+セクション番号、位置、スコア、サブレコード数をそれぞれセットします。</p
 >
 <pre
 >sen_rc sen_record_subrec_info(sen_records *r, const sen_recordh *rh, int index,
@@ -571,16 +571,16 @@ section, pos, score, n_subrecs���w�肳��Ă���΁A
                               int *section, int *pos, int *score);</pre
 >
 <p
->records���̃��R�[�hrh�́Aindex�Ԗڂ̃T�u���R�[�h�̑����������o���A
-keybuf���w�肳��Abufsize��key���ȏ�ł����keybuf��key���R�s�[���A
-section, pos, score���w�肳��Ă���΁A
-�Z�N�V�����ԍ��A�ʒu�A�X�R�A�����ꂼ��Z�b�g���܂��B</p
+>records中のレコードrhの、index番目のサブレコードの属性情報を取り出し、
+keybufが指定され、bufsizeがkey長以上であればkeybufにkeyをコピーし、
+section, pos, scoreが指定されていれば、
+セクション番号、位置、スコアをそれぞれセットします。</p
 >
 <h3
->sen_index �^</h3
+>sen_index 型</h3
 >
 <p
->advance API�ł́Asen_index �ɑ΂����蕡�G�ȑ���֐����񋟂���܂��B</p
+>advance APIでは、sen_index に対するより複雑な操作関数が提供されます。</p
 >
 <pre
 >sen_index *sen_index_create_with_keys(const char *path, sen_sym *keys,
@@ -588,13 +588,13 @@ section, pos, score���w�肳��Ă���΁A
                                       sen_encoding encoding);</pre
 >
 <p
->sen_index_create�Ɠ��l��path�ŗ^����ꂽ�V�����]�u�C���f�b�N�X�t�@�C�����쐬���A�Ή�����sen_index�C���X�^���X��Ԃ��܂����A����ID���Ǘ�����V���{���\keys�Ɋ�����sen_sym�C���X�^���X���w�肷�邱�Ƃ��ł��܂��B</p
+>sen_index_createと同様にpathで与えられた新しい転置インデックスファイルを作成し、対応するsen_indexインスタンスを返しますが、文書IDを管理するシンボル表keysに既存のsen_symインスタンスを指定することができます。</p
 >
 <pre
 >sen_index *sen_index_open_with_keys(const char *path, sen_sym *keys);</pre
 >
 <p
->sen_index_open�Ɠ��l��path�ŗ^����ꂽ���ɍ쐬�ς̓]�u�C���f�b�N�X�t�@�C�����J���A�Ή�����sen_index�C���X�^���X��Ԃ��܂����A����ID���Ǘ�����V���{���\keys�Ɋ�����sen_sym�C���X�^���X���w�肷�邱�Ƃ��ł��܂��B</p
+>sen_index_openと同様にpathで与えられた既に作成済の転置インデックスファイルを開き、対応するsen_indexインスタンスを返しますが、文書IDを管理するシンボル表keysに既存のsen_symインスタンスを指定することができます。</p
 >
 <pre
 >sen_index *sen_index_create_with_keys_lexicon(const char *path,
@@ -603,7 +603,7 @@ section, pos, score���w�肳��Ă���΁A
                                               int initial_n_segments);</pre
 >
 <p
->sen_index_create�Ɠ��l��path�ŗ^����ꂽ�V�����]�u�C���f�b�N�X�t�@�C�����쐬���A�Ή�����sen_index�C���X�^���X��Ԃ��܂����A����ID���Ǘ�����V���{���\keys�ƌ�bID���Ǘ�����V���{���\lexicon�Ɋ�����sen_sym�C���X�^���X���w�肷�邱�Ƃ��ł��܂��B</p
+>sen_index_createと同様にpathで与えられた新しい転置インデックスファイルを作成し、対応するsen_indexインスタンスを返しますが、文書IDを管理するシンボル表keysと語彙IDを管理するシンボル表lexiconに既存のsen_symインスタンスを指定することができます。</p
 >
 <pre
 >sen_index *sen_index_open_with_keys_lexicon(const char *path,
@@ -611,43 +611,43 @@ section, pos, score���w�肳��Ă���΁A
                                             sen_sym *lexicon);</pre
 >
 <p
->sen_index_open�Ɠ��l��path�ŗ^����ꂽ���ɍ쐬�ς̓]�u�C���f�b�N�X�t�@�C�����J���A�Ή�����sen_index�C���X�^���X��Ԃ��܂����A����ID���Ǘ�����V���{���\keys�ƌ�bID���Ǘ�����V���{���\lexicon�Ɋ�����sen_sym�C���X�^���X���w�肷�邱�Ƃ��ł��܂��B</p
+>sen_index_openと同様にpathで与えられた既に作成済の転置インデックスファイルを開き、対応するsen_indexインスタンスを返しますが、文書IDを管理するシンボル表keysと語彙IDを管理するシンボル表lexiconに既存のsen_symインスタンスを指定することができます。</p
 >
 <pre
 >sen_rc sen_index_update(sen_index *index, const void *key, unsigned int section, sen_values *oldvalue, sen_values *newvalue);</pre
 >
 <p
->key�ɊY�����镶����section�Ԗڂ̒i���̓��e��oldvalue����newvalue�ɍX�V���܂��B</p
+>keyに該当する文書のsection番目の段落の内容をoldvalueからnewvalueに更新します。</p
 >
 <pre
 >sen_rc sen_index_select(sen_index *index, const char *string, unsigned int string_len,
                         sen_records *records, sen_sel_operator op, sen_select_optarg *optarg);</pre
 >
 <p
->index���璷��string_len�ł���string�Ƀ}�b�`���镶�����������A���Z�qop�ɏ]����records�Ɍ��ʂ𔽉f���܂��B
-���Z�qop�͈ȉ��̂����ꂩ���w�肵�܂��B</p
+>indexから長さstring_lenであるstringにマッチする文書を検索し、演算子opに従ってrecordsに結果を反映します。
+演算子opは以下のいずれかを指定します。</p
 >
 <dl
 ><dt
 >sen_sel_or</dt
 ><dd
->string�Ƀ}�b�`���郌�R�[�h��records�ɒǉ����܂��B</dd
+>stringにマッチするレコードをrecordsに追加します。</dd
 ><dt
 >sen_sel_and</dt
 ><dd
->string�Ƀ}�b�`���Ȃ����R�[�h��records����폜���܂��B</dd
+>stringにマッチしないレコードをrecordsから削除します。</dd
 ><dt
 >sen_sel_but</dt
 ><dd
->string�Ƀ}�b�`���郌�R�[�h��records����폜���܂��B</dd
+>stringにマッチするレコードをrecordsから削除します。</dd
 ><dt
 >sen_sel_adjust</dt
 ><dd
->string�Ƀ}�b�`���郌�R�[�h��records�Ɍ��X�܂܂�Ă����ꍇ�ɂ��̃X�R�A�l�����Z���܂��B</dd
+>stringにマッチするレコードがrecordsに元々含まれていた場合にそのスコア値を加算します。</dd
 ></dl
 >
 <p
->�܂��Aoptarg���w�肷�邱�Ƃɂ��Aindex����string�Ƀ}�b�`���郌�R�[�h���������铮��𐧌�ł��܂��Bsen_select_optarg�̍\�����ȉ��Ɏ����܂��B</p
+>また、optargを指定することにより、indexからstringにマッチするレコードを検索する動作を制御できます。sen_select_optargの構造を以下に示します。</p
 >
 <pre
 >struct _sen_select_optarg {
@@ -661,70 +661,70 @@ section, pos, score���w�肳��Ă���΁A
 };</pre
 >
 <p
->mode�ɂ͈ȉ��̂����ꂩ���w�肵�܂��B</p
+>modeには以下のいずれかを指定します。</p
 >
 <dl
 ><dt
 >sen_sel_exact</dt
 ><dd
->string���ꋫ�E�ƈ�v���Č���郌�R�[�h�݂̂��������܂�</dd
+>stringが語境界と一致して現れるレコードのみを検索します</dd
 ><dt
 >sen_sel_partial</dt
 ><dd
->string����̗�̈ꕔ�ƕ�����v���郌�R�[�h���������܂�</dd
+>stringが語の列の一部と部分一致するレコードを検索します</dd
 ><dt
 >sen_sel_unsplit</dt
 ><dd
->string���킩�����������Ɍ�̈ꕔ�Ɉ�v���郌�R�[�h���������܂�</dd
+>stringをわかち書きせずに語の一部に一致するレコードを検索します</dd
 ><dt
 >sen_sel_near</dt
 ><dd
->string���킩�����������e�ꂪmax_interval�͈͓̔��Ɍ���郌�R�[�h���������܂�</dd
+>stringをわかち書きした各語がmax_intervalの範囲内に現れるレコードを検索します</dd
 ><dt
 >sen_sel_similar</dt
 ><dd
->string���킩������������̂����Aidf�l���傫��similarity_threshold�̌�̂����ꂩ���܂ރ��R�[�h���������܂��B</dd
+>stringをわかち書きした語のうち、idf値が大きなsimilarity_threshold個の語のいずれかを含むレコードを検索します。</dd
 ><dt
 >sen_sel_prefix</dt
 ><dd
->string���킩�����������e��ƑO����v����ꂪ����郌�R�[�h���������܂�</dd
+>stringをわかち書きした各語と前方一致する語が現れるレコードを検索します</dd
 ><dt
 >sen_sel_suffix</dt
 ><dd
->string���킩�����������e��ƌ����v����ꂪ����郌�R�[�h���������܂�</dd
+>stringをわかち書きした各語と後方一致する語が現れるレコードを検索します</dd
 ></dl
 >
 <p
->optarg��NULL���w�肳�ꂽ�ꍇ�́Asen_sel_exact���w�肳�ꂽ�Ƃ݂Ȃ���܂��B</p
+>optargにNULLが指定された場合は、sen_sel_exactが指定されたとみなされます。</p
 >
 <p
->�����������̒i������\�������ꍇ�A����̒i�������������ΏۂƂ�����A�X�R�A�������グ���肷�邽�߂ɁAweight_vector��p���܂��Bweight_vector��int�̔z����w�肵�A�z��̑傫����vector_size�Ɏw�肷��ƁAstring�����ꂽ�i��(1�x�[�X)�ɑΉ�����z��̗v�f�̒l���X�R�A�l�ɏ�Z���܂��B�l��0�ł������ꍇ�́A�Ή�����i���͌����Ώۂ��珜�O����܂��B
-weight_vector��NULL���w�肵�Avector_size��0�ȊO�̒l���w�肷��ƁA���ׂĂ̒i���ɑ΂��āA�X�R�A��vector_size�{����܂��B</p
+>文書が複数の段落から構成される場合、特定の段落だけを検索対象としたり、スコアを持ち上げたりするために、weight_vectorを用います。weight_vectorにintの配列を指定し、配列の大きさをvector_sizeに指定すると、stringが現れた段落(1ベース)に対応する配列の要素の値をスコア値に乗算します。値が0であった場合は、対応する段落は検索対象から除外されます。
+weight_vectorにNULLを指定し、vector_sizeに0以外の値を指定すると、すべての段落に対して、スコアがvector_size倍されます。</p
 >
 <p
->�����ɂ���Ēi������weight���قȂ�ꍇ�ɂ́A�R�[���o�b�N�֐�func���w�肵�܂��B
-string�Ƀ}�b�`���郌�R�[�h��������x�ɁArecords, ����ID, �i���ԍ�, func_arg��
-�����Ƃ��ăR�[���o�b�N�֐�func���Ăяo����A���̖߂�l��weight�Ƃ��ăX�R�A�l���Z�o���܂��B</p
+>文書によって段落毎のweightが異なる場合には、コールバック関数funcを指定します。
+stringにマッチするレコードが見つかる度に、records, 文書ID, 段落番号, func_argを
+引数としてコールバック関数funcが呼び出され、その戻り値をweightとしてスコア値を算出します。</p
 >
 <pre
 >sen_rc sen_index_info(sen_index *index, int *key_size, int *flags, int *initial_n_segments, sen_encoding *encoding);</pre
 >
 <p
->index��create���ꂽ���Ɏw�肳�ꂽkey_size, flags, initial_n_segments,
-encoding�̒l���擾���A���ꂼ��̈����̎Q�Ƃ���A�h���X�Ɋi�[���܂��B
-���A��O�A��l�A��܈�����NULL���w�肳�ꂽ�ꍇ�́A���̈����͖������A�l���i�[���܂���B</p
+>indexがcreateされた時に指定されたkey_size, flags, initial_n_segments,
+encodingの値を取得し、それぞれの引数の参照するアドレスに格納します。
+第二、第三、第四、第五引数にNULLが指定された場合は、その引数は無視し、値を格納しません。</p
 >
 <pre
 >sen_set * sen_index_related_terms(sen_index *index, const char *string, const char *(*fetcher)(void *, void *), void *fetcher_arg);</pre
 >
 <p
->string�Ɏw�肳�ꂽ������Ɗ֘A����P��𒊏o���Aindex-&gt;lexicon��id���L�[�Ƃ���sen_set�I�u�W�F�N�g�Ɋi�[���ĕԂ��܂��Bfetcher�́A��������index�̃L�[�A��������fetcher_arg���w�肵�ČĂ΂��ƁA�����̓��e�𕶎���Ƃ��ĕԂ��֐����w�肵�Ȃ���΂Ȃ�܂���B</p
+>stringに指定された文字列と関連する単語を抽出し、index-&gt;lexiconのidをキーとするsen_setオブジェクトに格納して返します。fetcherは、第一引数にindexのキー、第二引数にfetcher_argを指定して呼ばれると、文書の内容を文字列として返す関数を指定しなければなりません。</p
 >
 <h3
 >sen_query</h3
 >
 <p
->sen_query�́A���܂��܂ȏ����Ŏw�肳�ꂽ�����N�G�����i�[����f�[�^�^�ł��B</p
+>sen_queryは、さまざまな書式で指定された検索クエリを格納するデータ型です。</p
 >
 <pre
 >sen_query *sen_query_open(const char *str, unsigned int str_len,
@@ -732,82 +732,82 @@ encoding�̒l���擾���A���ꂼ��̈����̎Q�Ƃ���A�h���X�Ɋi�[���܂��B
                           int max_exprs, sen_encoding encoding);</pre
 >
 <p
->�V����sen_query�C���X�^���X�𐶐����܂��B
-str�ɏ����t���N�G����������w�肵�܂��B
-str_len��str�̃o�C�g�����w�肵�܂��B</p
+>新たなsen_queryインスタンスを生成します。
+strに書式付きクエリ文字列を指定します。
+str_lenにstrのバイト長を指定します。</p
 >
 <p
->default_op�ɁA
-���Z�q�̊���l(���Z�q���ȗ������ꍇ�ɂǂ̉��Z���s����)���w�肵�܂��B
-�ȉ��̂����ꂩ�̒l���w�肵�܂��B</p
+>default_opに、
+演算子の既定値(演算子を省略した場合にどの演算を行うか)を指定します。
+以下のいずれかの値を指定します。</p
 >
 <dl
 ><dt
 >sen_sel_or</dt
 ><dd
->���Z�q�̋K��l��'or'�Ƃ��܂��i�f�t�H���g�j</dd
+>演算子の規定値を'or'とします（デフォルト）</dd
 ><dt
 >sen_sel_and</dt
 ><dd
->���Z�q�̋K��l��'and'�Ƃ��܂��i�ʏ�̌����G���W���ł̌����N�G���Ɠ����g�p���ł��j</dd
+>演算子の規定値を'and'とします（通常の検索エンジンでの検索クエリと同じ使用感です）</dd
 ><dt
 >sen_sel_but</dt
 ><dd
->���Z�q�̋K��l��'-'�Ƃ��܂�</dd
+>演算子の規定値を'-'とします</dd
 ><dt
 >sen_sel_adjust</dt
 ><dd
->���Z�q�̋K��l��'&gt;'�Ƃ��܂�</dd
+>演算子の規定値を'&gt;'とします</dd
 ></dl
 >
 <p
->max_exprs�ɁA�����N�G���Ɏw�肷�鎮�̍ő�l���w�肵�܂��B</p
+>max_exprsに、検索クエリに指定する式の最大値を指定します。</p
 >
 <p
->encoding�ɁA�����N�G���̕����R�[�h���A
+>encodingに、検索クエリの文字コードを、
 sen_enc_default, sen_enc_none, sen_enc_euc_jp,
-sen_enc_utf8, sen_enc_sjis �̂����ꂩ�Ŏw�肵�܂��B</p
+sen_enc_utf8, sen_enc_sjis のいずれかで指定します。</p
 >
 <pre
 >unsigned int sen_query_rest(sen_query *q, const char ** const rest);</pre
 >
 <p
->sen_query_open�Ăяo����ɁA�������Ď󂯕t�����Ȃ������̌����N�G����*rest�ɑ�����A���̃o�C�g����Ԃ��܂��B</p
+>sen_query_open呼び出し後に、長すぎて受け付けられない部分の検索クエリを*restに代入し、そのバイト長を返します。</p
 >
 <pre
 >sen_rc sen_query_exec(sen_index *i, sen_query *q, sen_records *r, sen_sel_operator op);</pre
 >
 <p
->�w�肵��sen_index�ɑ΂��āAsen_query�̏����Ō������s���A���ʂ��w���sen_records�ɔ��f���܂��B</p
+>指定したsen_indexに対して、sen_queryの条件で検索を行い、結果を指定のsen_recordsに反映します。</p
 >
 <p
->���Z�qop�͈ȉ��̂����ꂩ���w�肵�܂��B</p
+>演算子opは以下のいずれかを指定します。</p
 >
 <dl
 ><dt
 >sen_sel_or</dt
 ><dd
->�����Ƀ}�b�`���郌�R�[�h��r�ɒǉ����܂��B</dd
+>条件にマッチするレコードをrに追加します。</dd
 ><dt
 >sen_sel_and</dt
 ><dd
->�����Ƀ}�b�`���Ȃ����R�[�h��r����폜���܂��B</dd
+>条件にマッチしないレコードをrから削除します。</dd
 ><dt
 >sen_sel_but</dt
 ><dd
->�����Ƀ}�b�`���郌�R�[�h��r����폜���܂��B</dd
+>条件にマッチするレコードをrから削除します。</dd
 ><dt
 >sen_sel_adjust</dt
 ><dd
->�����Ƀ}�b�`���郌�R�[�h��r�Ɍ��X�܂܂�Ă����ꍇ�ɂ��̃X�R�A�l�����Z���܂��B</dd
+>条件にマッチするレコードがrに元々含まれていた場合にそのスコア値を加算します。</dd
 ></dl
 >
 <pre
 >void sen_query_term(sen_query *q, query_term_callback func, void *func_arg);</pre
 >
 <p
->sen_query_open�ďo����ɁAquery���̌X�̒P��E���̒����Efunc_arg�������Ƃ���func���Ăяo���܂��B
-func�͈ȉ��̂悤�Ȋ֐��|�C���^���w�肵�܂��B</p
+>sen_query_open呼出し後に、query中の個々の単語・その長さ・func_argを引数としてfuncを呼び出します。
+funcは以下のような関数ポインタを指定します。</p
 >
 <pre
 >typedef int (*query_term_callback)(const char *, unsigned int, void *);</pre
@@ -818,8 +818,8 @@ func�͈ȉ��̂悤�Ȋ֐��|�C���^���w�肵�܂��B</p
 >sen_rc sen_index_del(sen_index *i, const void *key);</pre
 >
 <p
->�w�肵��sen_index��key�ɑΉ����镶���ɍ폜�t���O�𗧂āA�����Ώۂ���O���܂��B
-�ʏ��sen_index_upd��p���č폜���s���Ă��������B</p
+>指定したsen_indexのkeyに対応する文書に削除フラグを立て、検索対象から外します。
+通常はsen_index_updを用いて削除を行ってください。</p
 >
 </div
 ><!--section--></div
@@ -831,121 +831,121 @@ func�͈ȉ��̂悤�Ȋ֐��|�C���^���w�肵�܂��B</p
 ><div class="section"
 >
 <p
->low-level API��p���邱�Ƃɂ����Senna�̓����̃f�[�^�\���ɃA�N�Z�X���A����ɕ��G�ȃf�[�^�̑���⌟�������������ł��܂��B
-low-level API�ł́A�i���I�ȃV���{���\��</p
+>low-level APIを用いることによってSennaの内部のデータ構造にアクセスし、さらに複雑なデータの操作や検索処理が実現できます。
+low-level APIでは、永続的なシンボル表を</p
 >
 <h3
 >sen_set</h3
 >
 <p
->�L�[�ƒl�̃y�A����Ȃ郌�R�[�h�̏W������������ō����ɑ��삷�邽�߂̃f�[�^�^�ł��B
-�������ʂ̏W����A��b�̏W���𑀍삷��̂Ɏg�p���܂��B(sen_records�^��sen_set����h�������f�[�^�^�ł�)
-sen_set�̓L�[���d�����������̃��R�[�h���i�[���邱�Ƃ͂ł��܂���B</p
+>キーと値のペアからなるレコードの集合をメモリ上で高速に操作するためのデータ型です。
+検索結果の集合や、語彙の集合を操作するのに使用します。(sen_records型はsen_setから派生したデータ型です)
+sen_setはキーが重複した複数のレコードを格納することはできません。</p
 >
 <pre
 >sen_set *sen_set_open(unsigned key_size, unsigned value_size, unsigned index_size);</pre
 >
 <p
->�V����sen_set�C���X�^���X�𐶐����܂��B
-key_size�ɃL�[���Avalue_size�ɒl�̒������w�肵�܂��B
-index_size�ɂ͏�����Ԃł̃o�b�t�@�̃T�C�Y���w�肵�܂��B
-key_size��0���w�肳�ꂽ�ꍇ�͉ϒ�(nul�I�[���镶����)���w�肳�ꂽ�Ƃ݂Ȃ���܂��B
-value_size��0���w�肳�ꂽ�ꍇ�́A�l���i�[����̈���m�ۂ��܂���B</p
+>新たなsen_setインスタンスを生成します。
+key_sizeにキー長、value_sizeに値の長さを指定します。
+index_sizeには初期状態でのバッファのサイズを指定します。
+key_sizeに0が指定された場合は可変長(nul終端する文字列)が指定されたとみなされます。
+value_sizeに0が指定された場合は、値を格納する領域を確保しません。</p
 >
 <pre
 >sen_rc sen_set_close(sen_set *set);</pre
 >
 <p
->sen_set�C���X�^���X��������܂��B</p
+>sen_setインスタンスを解放します。</p
 >
 <pre
 >sen_rc sen_set_info(sen_set *set, unsigned *key_size, unsigned *value_size, unsigned *n_entries);</pre
 >
 <p
->set�C���X�^���X�𐶐��������Ɏw�肵��key_size, value_size�A����ъi�[����Ă��郌�R�[�h�̐����擾���܂��B���A��O�A��l������NULL���w�肳�ꂽ�ꍇ�́A���̈����͖������A�l���i�[���܂���B</p
+>setインスタンスを生成した時に指定したkey_size, value_size、および格納されているレコードの数を取得します。第二、第三、第四引数にNULLが指定された場合は、その引数は無視し、値を格納しません。</p
 >
 <pre
 >sen_set_eh *sen_set_get(sen_set *set, const void *key, void **value);</pre
 >
 <p
->set�ɁAkey�ɊY�����郌�R�[�h��o�^���A���R�[�h�ւ̃n���h����Ԃ��܂��B
-value�ɂ̓��R�[�h�̒l�����ɊY������|�C���^��Ԃ���܂��̂ŁA
-�������Ēl���Q��/�X�V�ł��܂��B</p
+>setに、keyに該当するレコードを登録し、レコードへのハンドルを返します。
+valueにはレコードの値部分に該当するポインタを返されますので、
+これを介して値を参照/更新できます。</p
 >
 <pre
 >sen_set_eh *sen_set_at(sen_set *set, const void *key, void **value);</pre
 >
 <p
->set����Akey�ɊY�����郌�R�[�h���������A���R�[�h�ւ̃n���h����Ԃ��܂��B
-�Y������L�[�����݂��Ȃ��ꍇ��NULL��Ԃ��܂��B
-value�ɂ̓��R�[�h�̒l�����ɊY������|�C���^��Ԃ���܂��̂ŁA
-�������Ēl���Q��/�X�V�ł��܂��B</p
+>setから、keyに該当するレコードを検索し、レコードへのハンドルを返します。
+該当するキーが存在しない場合はNULLを返します。
+valueにはレコードの値部分に該当するポインタを返されますので、
+これを介して値を参照/更新できます。</p
 >
 <pre
 >sen_rc sen_set_del(sen_set *set, sen_set_eh *eh);</pre
 >
 <p
->eh�Ɏw�肵�����R�[�h�n���h���ɊY�����郌�R�[�h��set����폜���܂��B</p
+>ehに指定したレコードハンドルに該当するレコードをsetから削除します。</p
 >
 <pre
 >sen_set_cursor *sen_set_cursor_open(sen_set *set);</pre
 >
 <p
->set�ɓo�^����Ă��郌�R�[�h�����ԂɎ��o�����߂̃J�[�\���𐶐����܂��B</p
+>setに登録されているレコードを順番に取り出すためのカーソルを生成します。</p
 >
 <pre
 >sen_set_eh *sen_set_cursor_next(sen_set_cursor *cursor, void **key, void **value);</pre
 >
 <p
->cursor�ɏ]����set���玟�̃��R�[�h�����o���A���R�[�h�ւ̃n���h����Ԃ��܂��B
-���A��O������NULL�ȊO�̃|�C���^��n���ƁAkey�ɂ̓��R�[�h�̃L�[�����ɊY������|�C���^��value�ɂ̓��R�[�h�̒l�����ɊY������|�C���^���Ԃ���܂��B</p
+>cursorに従ってsetから次のレコードを取り出し、レコードへのハンドルを返します。
+第二、第三引数にNULL以外のポインタを渡すと、keyにはレコードのキー部分に該当するポインタがvalueにはレコードの値部分に該当するポインタが返されます。</p
 >
 <pre
 >sen_rc sen_set_cursor_close(sen_set_cursor *cursor);</pre
 >
 <p
->cursor�C���X�^���X��������܂��B</p
+>cursorインスタンスを解放します。</p
 >
 <pre
 >sen_rc sen_set_element_info(sen_set *set, const sen_set_eh *eh, void **key, void **value);</pre
 >
 <p
->set�Ɋ܂܂�郌�R�[�h�n���h��eh�ɑΉ����郌�R�[�h�́A�L�[�ւ̃|�C���^��key�ɁA�l�ւ̃|�C���^��value�ɃZ�b�g���܂��B��O�A��l������NULL���w�肳�ꂽ�ꍇ�́A���̈����͖������A�l���i�[���܂���B</p
+>setに含まれるレコードハンドルehに対応するレコードの、キーへのポインタをkeyに、値へのポインタをvalueにセットします。第三、第四引数にNULLが指定された場合は、その引数は無視し、値を格納しません。</p
 >
 <pre
 >sen_set *sen_set_union(sen_set *a, sen_set *b);</pre
 >
 <p
->2��set�̘a�W���ƂȂ�set��Ԃ��܂��B���̊֐��ďo�ɂ����a, b�͉������܂��B
-�L�[������̃��R�[�h��a, b�̗����Ɋ܂܂�Ă����ꍇ�́Aa�Ɋ܂܂�Ă������R�[�h��
-�l�������p����܂��B</p
+>2つのsetの和集合となるsetを返します。この関数呼出によってa, bは解放されます。
+キーが同一のレコードがa, bの両方に含まれていた場合は、aに含まれていたレコードの
+値が引き継がれます。</p
 >
 <pre
 >sen_set *sen_set_subtract(sen_set *a, sen_set *b);</pre
 >
 <p
->2��set�̍��W���ƂȂ�set��Ԃ��܂��B���̊֐��ďo�ɂ����a, b�͉������܂��B</p
+>2つのsetの差集合となるsetを返します。この関数呼出によってa, bは解放されます。</p
 >
 <pre
 >sen_set *sen_set_intersect(sen_set *a, sen_set *b);</pre
 >
 <p
->2��set�̗����ɓ���̃L�[�����݂��郌�R�[�h����Ȃ�set��Ԃ��܂��B
-���̊֐��ďo�ɂ����a, b�͉������܂��B
-�Ԃ�l��set�̃��R�[�h�̒l�ɂ́Aa�Ɋ܂܂�Ă������R�[�h�̒l�������p����܂��B</p
+>2つのsetの両方に同一のキーが存在するレコードからなるsetを返します。
+この関数呼出によってa, bは解放されます。
+返り値のsetのレコードの値には、aに含まれていたレコードの値が引き継がれます。</p
 >
 <pre
 >int sen_set_difference(sen_set *a, sen_set *b);</pre
 >
 <p
->set a��set b���狤�ʂɊ܂܂�郌�R�[�h����菜���܂��B���ʂɊ܂܂�Ă������R�[�h�̐���Ԃ��܂��B</p
+>set aとset bから共通に含まれるレコードを取り除きます。共通に含まれていたレコードの数を返します。</p
 >
 <pre
 >sen_set_eh *sen_set_sort(sen_set *set, int limit, sen_set_sort_optarg *optarg);</pre
 >
 <p
->set���̃��R�[�h���\�[�g���A���limit�̃��R�[�h�n���h���̔z���Ԃ��܂��B
-optarg���w�肷�邱�Ƃɂ��A�\�[�g�̕��@�𑀍�ł��܂��Bsen_sort_optarg�̍\�����ȉ��Ɏ����܂��B�߂�l�̔z��͌Ăяo������free�ɂ���ĉ�����Ȃ���΂Ȃ�܂���B</p
+>set内のレコードをソートし、上位limit個のレコードハンドルの配列を返します。
+optargを指定することにより、ソートの方法を操作できます。sen_sort_optargの構造を以下に示します。戻り値の配列は呼び出し側でfreeによって解放しなければなりません。</p
 >
 <pre
 >struct _sen_set_sort_optarg {
@@ -956,152 +956,152 @@ optarg���w�肷�邱�Ƃɂ��A�\�[�g�̕��@�𑀍�ł��܂��Bsen_sort_optarg�̍\�����
 };</pre
 >
 <p
->�R�[���o�b�N�֐�compar�́A��������compar_arg0���A
-���A��O�����ɔ�r�ΏۂƂȂ��̃��R�[�h�n���h�����A
-��l������compar_arg���n����܂��B��r�֐��́A���̈�������O�̈����ɑ΂��āA 1)�������A2)�������A3)�傫���Ȃ�΁A 1)�[�������A2)�[���A3)�[�����傫�������̂����ꂩ��Ԃ��Ȃ���� �Ȃ�܂���B��̗v�f���������Ƃ��A���בւ������ʂɂ�����A��̏����͖���`�ł��B</p
+>コールバック関数comparは、第一引数にcompar_arg0が、
+第二、第三引数に比較対象となる二つのレコードハンドルが、
+第四引数にcompar_argが渡されます。比較関数は、第二の引数が第三の引数に対して、 1)小さい、2)等しい、3)大きいならば、 1)ゼロ未満、2)ゼロ、3)ゼロより大きい整数のいずれかを返さなければ なりません。二つの要素が等しいとき、並べ替えた結果における、二つの順序は未定義です。</p
 >
 <p
->compar��NULL���w�肳�ꂽ�ꍇ�ɂ́A���R�[�h�̒l�̐擪4byte��uint32�Ƃ݂Ȃ��A�~���Ƀ\�[�g���܂��B</p
+>comparにNULLが指定された場合には、レコードの値の先頭4byteをuint32とみなし、降順にソートします。</p
 >
 <p
->compar_arg0��NULL���w�肳�ꂽ�ꍇ�ɂ́Asen_set_sort()�̑������Ɏw�肳�ꂽset�������compar�ɓn����܂��B</p
+>compar_arg0にNULLが指定された場合には、sen_set_sort()の第一引数に指定されたsetが代わりにcomparに渡されます。</p
 >
 <p
->optarg��NULL���w�肳�ꂽ�ꍇ�ɂ́Amode��sen_sort_descending���Acompar��NULL���w�肳�ꂽ���̂Ƃ݂Ȃ��܂��B</p
+>optargにNULLが指定された場合には、modeにsen_sort_descendingが、comparにNULLが指定されたものとみなします。</p
 >
 <h3
 >sen_sym</h3
 >
 <p
->�Œ蒷�̃o�C�i���f�[�^��nul�ŏI�[����ϒ��̕�����Ɉ�ӂȔԍ������蓖�Ă�V���{���\�t�@�C���ɑΉ�����f�[�^�^�ł��B
-sen_sym�̃C���X�^���X�̓t�@�C���V�X�e����̓���̃t�@�C���ɑΉ����Ă���A�i�[���ꂽ�����͉i���I�ɕۑ�����܂��B</p
+>固定長のバイナリデータかnulで終端する可変長の文字列に一意な番号を割り当てるシンボル表ファイルに対応するデータ型です。
+sen_symのインスタンスはファイルシステム上の特定のファイルに対応しており、格納された文書は永続的に保存されます。</p
 >
 <p
->�Ȃ�sen_index�C���X�^���X��2��sym_sym�C���X�^���X���܂�ł��܂��B</p
+>なおsen_indexインスタンスは2つのsym_symインスタンスを含んでいます。</p
 >
 <dl
 ><dt
 >keys</dt
 ><dd
->����ID�ƃ��R�[�hID�Ƃ�Ή��t����</dd
+>文書IDとレコードIDとを対応付ける</dd
 ><dt
 >lexicon</dt
 ><dd
->�����̓��e�𕪂�������������b�ƌ�bID�Ƃ�Ή��t����</dd
+>文書の内容を分かち書きした語彙と語彙IDとを対応付ける</dd
 ></dl
 >
 <pre
 >sen_sym * sen_sym_create(const char *path, unsigned key_size, unsigned flags, sen_encoding encoding);</pre
 >
 <p
->path�ŗ^����ꂽ�V�����V���{���\�t�@�C�����쐬���A�Ή�����sen_sym�C���X�^���X��Ԃ��܂��B���s�����ꍇ��NULL��Ԃ��܂��B</p
+>pathで与えられた新しいシンボル表ファイルを作成し、対応するsen_symインスタンスを返します。失敗した場合はNULLを返します。</p
 >
 <p
->key_size�ɃL�[��(�o�C�g��)��^���܂��Bkey_size��0���w�肳�ꂽ�ꍇ�͉ϒ�(nul�I�[���镶����)���w�肳�ꂽ�Ƃ݂Ȃ���܂��B</p
+>key_sizeにキー長(バイト長)を与えます。key_sizeに0が指定された場合は可変長(nul終端する文字列)が指定されたとみなされます。</p
 >
 <p
->flags�� SEN_SYM_WITH_SIS ���w�肵���ꍇ�́A�o�^���ꂽ�L�[�ɑ΂�������v������
-�\�ɂȂ�܂��B</p
+>flagsに SEN_SYM_WITH_SIS を指定した場合は、登録されたキーに対する後方一致検索が
+可能になります。</p
 >
 <p
->encoding�ɂ́Asen_enc_default, sen_enc_none, sen_enc_euc_jp,
-sen_enc_utf8, sen_enc_sjis �̂����ꂩ���w�肵�܂��B</p
+>encodingには、sen_enc_default, sen_enc_none, sen_enc_euc_jp,
+sen_enc_utf8, sen_enc_sjis のいずれかを指定します。</p
 >
 <pre
 >sen_sym * sen_sym_open(const char *path);</pre
 >
 <p
->path�ŗ^����ꂽ���ɍ쐬�ς̃V���{���\�t�@�C�����J���A�Ή�����sen_sym�C���X�^���X��Ԃ��܂��B���s�����ꍇ��NULL��Ԃ��܂��B</p
+>pathで与えられた既に作成済のシンボル表ファイルを開き、対応するsen_symインスタンスを返します。失敗した場合はNULLを返します。</p
 >
 <pre
 >sen_rc sen_sym_info(sen_sym *sym, int *key_size, unsigned *flags, sen_encoding *encoding, unsigned *nrecords);</pre
 >
 <p
->sym�C���X�^���X�𐶐��������Ɏw�肵��key_size, flags, encoding�A����ъi�[����Ă��郌�R�[�h�̐����擾���܂��B���A��O�A��l�A��܈�����NULL���w�肳�ꂽ�ꍇ�́A���̈����͖������A�l���i�[���܂���B</p
+>symインスタンスを生成した時に指定したkey_size, flags, encoding、および格納されているレコードの数を取得します。第二、第三、第四、第五引数にNULLが指定された場合は、その引数は無視し、値を格納しません。</p
 >
 <pre
 >sen_rc sen_sym_close(sen_sym *sym);</pre
 >
 <p
->sym�ɑΉ�����V���{���\�t�@�C������Asen_sym�C���X�^���X��������܂��B
-��������� sen_success ���A���s����΃G���[�R�[�h���Ԃ�܂��B</p
+>symに対応するシンボル表ファイルを閉じ、sen_symインスタンスを解放します。
+成功すれば sen_success が、失敗すればエラーコードが返ります。</p
 >
 <pre
 >sen_rc sen_sym_remove(const char *path);</pre
 >
 <p
->path�ŗ^����ꂽ�V���{���\�t�@�C�����폜���܂��B��������� sen_success ���A���s����΃G���[�R�[�h���Ԃ�܂��B</p
+>pathで与えられたシンボル表ファイルを削除します。成功すれば sen_success が、失敗すればエラーコードが返ります。</p
 >
 <pre
 >sen_id sen_sym_get(sen_sym *sym, const unsigned char *key);</pre
 >
 <p
->�V���{���\sym��key��o�^���A�Ή�����ID��Ԃ��܂��B</p
+>シンボル表symにkeyを登録し、対応するIDを返します。</p
 >
 <pre
 >sen_id sen_sym_at(sen_sym *sym, const unsigned char *key);</pre
 >
 <p
->�V���{���\sym����key�ɑΉ�����ID��Ԃ��܂��B���o�^�ł������ꍇ�� SEN_SYM_NIL ��Ԃ��܂��B</p
+>シンボル表symからkeyに対応するIDを返します。未登録であった場合は SEN_SYM_NIL を返します。</p
 >
 <pre
 >sen_rc sen_sym_del(sen_sym *sym, const unsigned char *key);</pre
 >
 <p
->�V���{���\sym����key���폜���܂��B</p
+>シンボル表symからkeyを削除します。</p
 >
 <pre
 >unsigned int sen_sym_size(sen_sym *sym);</pre
 >
 <p
->�V���{���\sym�Ɋ܂܂��L�[�̐���Ԃ��܂��B</p
+>シンボル表symに含まれるキーの数を返します。</p
 >
 <pre
 >int sen_sym_key(sen_sym *sym, sen_id id, unsigned char *keybuf, int bufsize);</pre
 >
 <p
->�V���{���\sym����ID�ɑΉ�����L�[��Ԃ��܂��B
-�Ή�����L�[�����������ꍇ��key����Ԃ��܂��B
-������Ȃ��ꍇ��0��Ԃ��܂��B
-�Ή�����L�[�̌����ɐ������A
-�܂�keybuf���w�肳��Abufsize�̒���key���ȏ�ł������ꍇ�́A
-keybuf�ɊY������key���R�s�[���ĕԂ��܂��B</p
+>シンボル表symからIDに対応するキーを返します。
+対応するキーが見つかった場合はkey長を返します。
+見つからない場合は0を返します。
+対応するキーの検索に成功し、
+またkeybufが指定され、bufsizeの長さkey長以上であった場合は、
+keybufに該当するkeyをコピーして返します。</p
 >
 <pre
 >sen_set * sen_sym_prefix_search(sen_sym *sym, const unsigned char *key);</pre
 >
 <p
->key�ɑO����v����S�ẴG���g���𒊏o���A������ID���L�[�Ƃ���sen_set�C���X�^���X��Ԃ��܂��B</p
+>keyに前方一致する全てのエントリを抽出し、それらのIDをキーとするsen_setインスタンスを返します。</p
 >
 <pre
 >sen_set * sen_sym_suffix_search(sen_sym *sym, const unsigned char *key);</pre
 >
 <p
->key�Ɍ����v����S�ẴG���g���𒊏o���A������ID���L�[�Ƃ���sen_set�C���X�^���X��Ԃ��܂��B(sym�쐬����SEN_SYM_WITH_SIS���w�肵���ꍇ�̂ݗL���ł�)</p
+>keyに後方一致する全てのエントリを抽出し、それらのIDをキーとするsen_setインスタンスを返します。(sym作成時にSEN_SYM_WITH_SISを指定した場合のみ有効です)</p
 >
 <pre
 >sen_id sen_sym_common_prefix_search(sen_sym *sym, const unsigned char *key);</pre
 >
 <p
->key�ƃL�[�����񂪍ł������O����v����G���g�����������A����ID��Ԃ��܂��B</p
+>keyとキー文字列が最も長く前方一致するエントリを検索し、そのIDを返します。</p
 >
 <pre
 >int sen_sym_pocket_get(sen_sym *sym, sen_id id);</pre
 >
 <p
->sen_sym�̎w��ID�̃G���g���Ɋi�[���ꂽ�������o���܂��B</p
+>sen_symの指定IDのエントリに格納された情報を取り出します。</p
 >
 <pre
 >sen_rc sen_sym_pocket_set(sen_sym *sym, sen_id id, unsigned int value);</pre
 >
 <p
->sen_sym�̎w��ID�̃G���g����value���i�[���܂��B</p
+>sen_symの指定IDのエントリにvalueを格納します。</p
 >
 <pre
 >sen_id sen_sym_next(sen_sym *sym, sen_id id);</pre
 >
 <p
->sen_sym�̎w��ID�̎��̃G���g����ID��Ԃ��܂��B</p
+>sen_symの指定IDの次のエントリのIDを返します。</p
 >
 </div
 ><!--section--></div
@@ -1113,7 +1113,7 @@ keybuf�ɊY������key���R�s�[���ĕԂ��܂��B</p
 ><div class="section"
 >
 <p
->snippet(KWIC)���쐬���邽�߂�API�B</p
+>snippet(KWIC)を作成するためのAPI。</p
 >
 <pre
 >sen_snip *sen_snip_open(sen_encoding encoding, int flags, unsigned int width,
@@ -1123,45 +1123,45 @@ keybuf�ɊY������key���R�s�[���ĕԂ��܂��B</p
                         sen_snip_mapping *mapping);</pre
 >
 <p
->�V����sen_snip�C���X�^���X�𐶐����܂��B</p
+>新たなsen_snipインスタンスを生成します。</p
 >
 <p
->encoding�ɂ́Asen_enc_default, sen_enc_none, sen_enc_euc_jp, sen_enc_utf8, sen_enc_sjis �̂����ꂩ���w�肵�܂��B</p
+>encodingには、sen_enc_default, sen_enc_none, sen_enc_euc_jp, sen_enc_utf8, sen_enc_sjis のいずれかを指定します。</p
 >
 <p
->flags�ɂ́ASEN_SNIP_NORMALIZE(���K�����Č������s��)���w��ł��܂��B</p
+>flagsには、SEN_SNIP_NORMALIZE(正規化して検索を行う)が指定できます。</p
 >
 <p
->width�́Asnippet�̕����o�C�g���Ŏw�肵�܂��Beuc��sjis�̏ꍇ�ɂ͂��̔����Autf-8�̏ꍇ�ɂ͂���1/3�̒����̓��{�ꂪ�i�[�ł���ł��傤�B</p
+>widthは、snippetの幅をバイト長で指定します。eucやsjisの場合にはその半分、utf-8の場合にはその1/3の長さの日本語が格納できるでしょう。</p
 >
 <p
->max_results�́Asnippet�̌����w�肵�܂��B</p
+>max_resultsは、snippetの個数を指定します。</p
 >
 <p
->defaultopentag�́Asnippet���̌����P��̑O�ɂ��镶������w�肵�܂��B</p
+>defaultopentagは、snippet中の検索単語の前につける文字列を指定します。</p
 >
 <p
->defaultopentag_len�́Adefaultopentag�̃o�C�g�����w�肵�܂��B</p
+>defaultopentag_lenは、defaultopentagのバイト長を指定します。</p
 >
 <p
->defaultclosetag�́Asnippet���̌����P��̌�ɂ��镶������w�肵�܂��B</p
+>defaultclosetagは、snippet中の検索単語の後につける文字列を指定します。</p
 >
 <p
->defaultclosetag_len�́Adefaultclosetag�̃o�C�g�����w�肵�܂��B</p
+>defaultclosetag_lenは、defaultclosetagのバイト長を指定します。</p
 >
 <p
->mapping�́A(���݂�)NULL��-1���w�肵�Ă��������B-1���w�肷��ƁAHTML�̃��^��������G���R�[�h����snippet���o�͂��܂��B</p
+>mappingは、(現在は)NULLか-1を指定してください。-1を指定すると、HTMLのメタ文字列をエンコードしたsnippetを出力します。</p
 >
 <p
 ><em
->defaultopentag,defaultclosetag�̎w�����e�́Asen_snip_close���ĂԂ܂ŕύX���Ȃ��ł��������B</em
+>defaultopentag,defaultclosetagの指す内容は、sen_snip_closeを呼ぶまで変更しないでください。</em
 ></p
 >
 <pre
 >sen_rc sen_snip_close(sen_snip *snip);</pre
 >
 <p
->sen_snip�C���X�^���X��j�����܂��B</p
+>sen_snipインスタンスを破棄します。</p
 >
 <pre
 >sen_rc sen_snip_add_cond(sen_snip *snip,
@@ -1170,34 +1170,34 @@ keybuf�ɊY������key���R�s�[���ĕԂ��܂��B</p
                          const char *closetag, unsigned int closetag_len);</pre
 >
 <p
->�����Ώۂ̒P��ƁA���̒P��̑O��ɕt�^���镶������w�肵�܂��B</p
+>検索対象の単語と、その単語の前後に付与する文字列を指定します。</p
 >
 <p
->snip�ɂ́Asen_snip_open�Ő�������sen_snip�C���X�^���X���w�肵�܂��B</p
+>snipには、sen_snip_openで生成したsen_snipインスタンスを指定します。</p
 >
 <p
->keyword�́A�����Ώۂ̒P����w�肵�܂��B</p
+>keywordは、検索対象の単語を指定します。</p
 >
 <p
->keyword_len�́Akeyword�̃o�C�g�����w�肵�܂��B</p
+>keyword_lenは、keywordのバイト長を指定します。</p
 >
 <p
->opentag�́Asnippet���̌����P��̑O�ɂ��镶������w�肵�܂��B
-NULL���w�肵���ꍇ�ɂ́Asen_snip_open�Ŏw�肵��defaultopentag���g�p����܂��B</p
+>opentagは、snippet中の検索単語の前につける文字列を指定します。
+NULLを指定した場合には、sen_snip_openで指定したdefaultopentagが使用されます。</p
 >
 <p
->opentag_len�́Aopentag�̃o�C�g�����w�肵�܂��B</p
+>opentag_lenは、opentagのバイト長を指定します。</p
 >
 <p
->closetag�́Asnippet���̌����P��̌�ɂ��镶������w�肵�܂��B
-NULL���w�肵���ꍇ�ɂ́Asen_snip_open�Ŏw�肵��defaultclosetag���g�p����܂��B</p
+>closetagは、snippet中の検索単語の後につける文字列を指定します。
+NULLを指定した場合には、sen_snip_openで指定したdefaultclosetagが使用されます。</p
 >
 <p
->closetag_len�́Aclosetag�̃o�C�g�����w�肵�܂��B</p
+>closetag_lenは、closetagのバイト長を指定します。</p
 >
 <p
 ><em
->opentag,closetag�̎w�����e�́Asen_snip_close���ĂԂ܂ŕύX���Ȃ��ł��������B</em
+>opentag,closetagの指す内容は、sen_snip_closeを呼ぶまで変更しないでください。</em
 ></p
 >
 <pre
@@ -1205,38 +1205,38 @@ NULL���w�肵���ꍇ�ɂ́Asen_snip_open�Ŏw�肵��defaultclosetag���g�p����܂��B</
                      unsigned int *nresults, unsigned int *max_tagged_len);</pre
 >
 <p
->�����Ώۂ̒P����������Asnippet�𐶐����܂��B</p
+>検索対象の単語を検索し、snippetを生成します。</p
 >
 <p
->snip�ɂ́Asen_snip_open�Ő�������sen_snip�C���X�^���X���w�肵�܂��B</p
+>snipには、sen_snip_openで生成したsen_snipインスタンスを指定します。</p
 >
 <p
->string�ɂ́Asnippet�𐶐�����Ώۂ̕�������w�肵�܂��B</p
+>stringには、snippetを生成する対象の文字列を指定します。</p
 >
 <p
->string_len�ɂ́Astring�̃o�C�g�����w�肵�܂��B</p
+>string_lenには、stringのバイト長を指定します。</p
 >
 <p
->nresults�ɂ́Asnippet�����ۂɐ����ł��������i�[����܂��B</p
+>nresultsには、snippetを実際に生成できた個数が格納されます。</p
 >
 <p
->max_tagged_len�ɂ́A�������ꂽsnippet�̂����A��Ԓ���snippet�̃i���������܂߂��������i�[����܂��B</p
+>max_tagged_lenには、生成されたsnippetのうち、一番長いsnippetのナル文字を含めた長さが格納されます。</p
 >
 <pre
 >sen_rc sen_snip_get_result(sen_snip *snip, const unsigned int index,
                            char *result, unsigned int *result_len);</pre
 >
 <p
->sen_snip_exec�Ő�������snippet�����o���܂��B</p
+>sen_snip_execで生成したsnippetを取り出します。</p
 >
 <p
->index�́Asnippet��0����͂��܂�C���f�b�N�X���w�肵�܂��B</p
+>indexは、snippetの0からはじまるインデックスを指定します。</p
 >
 <p
->result�ɂ́Asnippet�̕����񂪊i�[����܂��B</p
+>resultには、snippetの文字列が格納されます。</p
 >
 <p
->result_len�ɂ́Aresult�̃o�C�g�����i�[����܂��B</p
+>result_lenには、resultのバイト長が格納されます。</p
 >
 <h3
 >log API</h3
@@ -1244,13 +1244,13 @@ NULL���w�肵���ꍇ�ɂ́Asen_snip_open�Ŏw�肵��defaultclosetag���g�p����܂��B</
 >sen_rc sen_logger_info_set(const sen_logger_info *info);</pre
 >
 <p
->Senna�̃��O�o�͋@�\�̏o�͌`�����̃p�����[�^��ݒ肵�܂��B</p
+>Sennaのログ出力機構の出力形式等のパラメータを設定します。</p
 >
 <p
->info�ɂ�sen_logger_info�\���̂̃|�C���^���w�肵�܂��B</p
+>infoにはsen_logger_info構造体のポインタを指定します。</p
 >
 <p
->sen_logger_info�\���̂��ȉ��Ɏ����܂��B</p
+>sen_logger_info構造体を以下に示します。</p
 >
 <pre
 >struct _sen_logger_info {
@@ -1261,97 +1261,97 @@ NULL���w�肵���ꍇ�ɂ́Asen_snip_open�Ŏw�肵��defaultclosetag���g�p����܂��B</
 };</pre
 >
 <p
->max_level�ɂ́A���O�̏o�͑ΏۂƂȂ�ő�̃��O���x�����w�肵�܂��B
-���O���x���ɂ��Ă�<a href="log_level.html"
->���O���x���̉��</a
->���Q�Ƃ��������B</p
+>max_levelには、ログの出力対象となる最大のログレベルを指定します。
+ログレベルについては<a href="log_level.html"
+>ログレベルの解説</a
+>を参照ください。</p
 >
 <p
->flags�ɂ́A���O�ɏo�͂�����e���w�肷��t���O��_���a�������̂��w�肵�܂��B
-�ȉ��̃t���O���w��ł��܂��B</p
+>flagsには、ログに出力する内容を指定するフラグを論理和したものを指定します。
+以下のフラグが指定できます。</p
 >
 <table
 ><tr
 ><td
 >SEN_LOG_TIME</td
 ><td
->���O�o�͎������o�͂��܂��B</td
+>ログ出力時刻を出力します。</td
 ></tr
 ><tr
 ><td
 >SEN_LOG_TITLE</td
 ><td
->���O���b�Z�[�W�̃^�C�g�����w�肵�܂�(���݃^�C�g���͖��g�p)</td
+>ログメッセージのタイトルを指定します(現在タイトルは未使用)</td
 ></tr
 ><tr
 ><td
 >SEN_LOG_MESSAGE</td
 ><td
->���O���b�Z�[�W�{�̂��o�͂��܂��B</td
+>ログメッセージ本体を出力します。</td
 ></tr
 ><tr
 ><td
 >SEN_LOG_LOCATION</td
 ><td
->���O���o�͂����\�[�X�t�@�C���Ƃ��̍s�ʒu���o�͂��܂��B</td
+>ログを出力したソースファイルとその行位置を出力します。</td
 ></tr
 ></table
 >
 <p
->func�ɂ́A���O�̏o�͂��s���R�[���o�b�N�֐��|�C���^���w�肵�܂��B
-NULL���w�肳�ꂽ�ꍇ�A�f�t�H���g�̃��O�o�͊֐����p�����܂��B
-�f�t�H���g�̃��O�o�͊֐��́A�u/var/senna/log/senna.log�v�Ƀ��O���o�͂��܂��B</p
+>funcには、ログの出力を行うコールバック関数ポインタを指定します。
+NULLが指定された場合、デフォルトのログ出力関数が用いられます。
+デフォルトのログ出力関数は、「/var/senna/log/senna.log」にログを出力します。</p
 >
 <p
->func_arg�ɂ́A���O�̏o�͂��s���R�[���o�b�N�֐��ɓn��void *�̈������w�肵�܂��B
-�f�t�H���g�̃��O�o�͊֐��𗘗p����ꍇ�ɂ́A��������܂��B</p
+>func_argには、ログの出力を行うコールバック関数に渡すvoid *の引数を指定します。
+デフォルトのログ出力関数を利用する場合には、無視されます。</p
 >
 <pre
 >void sen_logger_put(sen_log_level level,
                     const char *file, int line, const char *func, char *fmt, ...);</pre
 >
 <p
->Senna�̃��O�o�͋@�\�Ƀ��O���o�͂��܂��B</p
+>Sennaのログ出力機構にログを出力します。</p
 >
 <p
->level�ɂ͏o�͓��ɕ\������郍�O���x�����w�肵�܂��B</p
+>levelには出力内に表示されるログレベルを指定します。</p
 >
 <p
->file�ɂ́A���O�ɏo�͂����w���O���o�͂����֐��̃t�@�C�����x���w�肵�܂��B
-__FILE__�}�N���̗��p��E�߂܂��B</p
+>fileには、ログに出力される『ログを出力した関数のファイル名』を指定します。
+__FILE__マクロの利用を薦めます。</p
 >
 <p
->line�ɂ́A���O�ɏo�͂����w���O���o�͂����֐��̃t�@�C�����̍s�ʒu�x���w�肵�܂��B
-__LINE__�}�N���̗��p��E�߂܂��B</p
+>lineには、ログに出力される『ログを出力した関数のファイル内の行位置』を指定します。
+__LINE__マクロの利用を薦めます。</p
 >
 <p
->func�ɂ́A���O�ɏo�͂����w���O���o�͂����֐����x���w�肵�܂��B
-__FUNCTION__�}�N���̗��p��E�߂܂��B</p
+>funcには、ログに出力される『ログを出力した関数名』を指定します。
+__FUNCTION__マクロの利用を薦めます。</p
 >
 <p
->fmt�Ƃ���ȍ~�̈����ɂ́Aprintf���Ɠ�������������ƃp�����[�^���w�肵�܂��B</p
+>fmtとそれ以降の引数には、printf等と同じ書式文字列とパラメータを指定します。</p
 >
 <pre
 >int sen_logger_pass(sen_log_level level);</pre
 >
 <p
->Senna�����ɂ����āA
-�w�肳�ꂽ���O���x���Ń��O���o�͂���悤�ɂȂ��Ă��邩�ǂ�����Ԃ��܂��B</p
+>Senna内部において、
+指定されたログレベルでログを出力するようになっているかどうかを返します。</p
 >
 <p
->level�ɂ́A���O���o�͂���悤�ɂȂ��Ă��邩�ǂ����𒲂ׂ������O���x�����w�肵�܂��B
-�w�肳�ꂽ���O���x���Ń��O���o�͂���悤�ɂȂ��Ă���ꍇ�ɂ�0�A
-�����łȂ��ꍇ�ɂ�0�łȂ��l��Ԃ��܂��B</p
+>levelには、ログを出力するようになっているかどうかを調べたいログレベルを指定します。
+指定されたログレベルでログを出力するようになっている場合には0、
+そうでない場合には0でない値を返します。</p
 >
 <pre
 >SEN_LOG(sen_log_level level, char *fmt, ...)</pre
 >
 <p
->sen_logger_pass�Ŏw�肳�ꂽ���O���x���ɂ����ă��O���o�͂��邩����𒲂ׁA
-sen_logger_put�Ń��O�̏o�͂��s���}�N���ł��B</p
+>sen_logger_passで指定されたログレベルにおいてログを出力するか動画を調べ、
+sen_logger_putでログの出力を行うマクロです。</p
 >
 <p
->Senna�����ł͂��̃}�N����p���ă��O�o�͂��s���Ă��܂��B</p
+>Senna内部ではこのマクロを用いてログ出力を行っています。</p
 ></div
 ><!--section--></div
 ><!--body--></div
@@ -1363,8 +1363,8 @@ sen_logger_put�Ń��O�̏o�͂��s���}�N���ł��B</p
 ><div class="page_attribute"
 >
 <span class="attribute"
->��������: <em
->__qwik_page_generate_time__�b</em
+>生成時間: <em
+>__qwik_page_generate_time__秒</em
 ></span
 >
 <div align="right"
@@ -1377,7 +1377,7 @@ sen_logger_put�Ń��O�̏o�͂��s���}�N���ł��B</p
 <span style="font-size:9px"
 ><img src="http://img.shinobi.jp/tadaima/fj.gif" style="margin:0;vertical-align:text-bottom;"
 /> <a href="http://randoseru.rentalurl.net"
->�����h�Z��</a
+>ランドセル</a
 ></span
 >
 </div
@@ -1392,11 +1392,11 @@ sen_logger_put�Ń��O�̏o�͂��s���}�N���ł��B</p
 ><!--body_leave--></div
 ><!--main--><div class="sidebar"
 ><h2
->���j���[/Menu</h2
+>メニュー/Menu</h2
 ><ul
 ><li
 ><a href="FrontPageJ.html"
->�z�[��</a
+>ホーム</a
 > / <a href="FrontPage.html"
 >Home</a
 ></li
@@ -1404,19 +1404,19 @@ sen_logger_put�Ń��O�̏o�͂��s���}�N���ł��B</p
 >
 <ul
 ><li
->Senna�̏Љ�</li
+>Sennaの紹介</li
 ><ul
 ><li
 ><a href="senna_takahashi.html"
->Senna�Ƃ�</a
+>Sennaとは</a
 ></li
 ><li
 ><a href="publication.html"
->�G���L���E���\������</a
+>雑誌記事・発表資料等</a
 ></li
 ><li
 ><a href="example.html"
->����ȂƂ���ł��g���Ă܂��I</a
+>こんなところでも使われてます！</a
 ></li
 ><li
 ><a href="FAQ.html"
@@ -1426,93 +1426,93 @@ sen_logger_put�Ń��O�̏o�͂��s���}�N���ł��B</p
 ></li
 ><li
 ><a href="ML.html"
->���[�����O���X�g</a
+>メーリングリスト</a
 > / <a href="ML_en.html"
 >MailingLists</a
 ></li
 ></ul
 ><li
->Senna�̗��p</li
+>Sennaの利用</li
 ><ul
 ><li
 ><a href="Download.html"
->�_�E�����[�h</a
+>ダウンロード</a
 > / <a href="Download_en.html"
 >Download</a
 ></li
 ><li
 ><a href="install.html"
->�C���X�g�[��</a
+>インストール</a
 > / <a href="install_en.html"
 >Install</a
 ></li
 ><li
 ><a href="check_install.html"
->����m�F���@</a
+>動作確認方法</a
 > / <a href="check_install_en.html"
 >Check install</a
 ></li
 ><li
 ><a href="bindings.html"
->�o�C���f�B���O�ꗗ</a
+>バインディング一覧</a
 ></li
 ><li
 ><a href="mysql_binding.html"
->MySQL �o�C���f�B���O</a
+>MySQL バインディング</a
 > / <a href="mysql_binding_en.html"
 >MySQL binding</a
 ></li
 ><li
 ><a href="install_specific.html"
->������ł̃C���X�g�[������</a
+>特定環境でのインストールメモ</a
 > / <a href="install_specific_en.html"
 >installing note for specific environment</a
 ></li
 ></ul
 ><li
->���p�Ҍ���</li
+>利用者向け</li
 ><ul
 ><li
 ><a href="query.html"
->�N�G���[�̏���</a
+>クエリーの書式</a
 > / <a href="query_en.html"
 >query syntax</a
 ></li
 ><li
 ><a href="Customize.html"
->�J�X�^�}�C�Y</a
+>カスタマイズ</a
 > / <a href="Customize_en.html"
 >Customize</a
 ></li
 ><li
 ><a href="sennaql_reference.html"
->SennaQL ���t�@�����X</a
+>SennaQL リファレンス</a
 ></li
 ><li
 ><a href="store_tutorial.html"
->SennaStore���g���Ă݂悤</a
+>SennaStoreを使ってみよう</a
 ></li
 ><li
 ><a href="log_level.html"
->���O���x���̉��</a
+>ログレベルの解説</a
 ></li
 ><li
 ><a href="report_bugs.html"
->�s��񍐌f����</a
+>不具合報告掲示板</a
 ></li
 ><li
 ><a href="contribute.html"
->Senna�ւ̃p�b�`�E���</a
+>Sennaへのパッチ・情報等</a
 ></li
 ><li
 ><a href="knownproblems.html"
->�s���</a
+>不具合等</a
 > / <a href="knownproblems_en.html"
 >Known problems</a
 ></li
 ></ul
 ><li
->���x�ȗ��p�@</li
+>高度な利用法</li
 ><ul
 ><li
 ><a href="APIJ.html"
@@ -1522,33 +1522,33 @@ sen_logger_put�Ń��O�̏o�͂��s���}�N���ł��B</p
 ></li
 ><li
 ><a href="IndexFile.html"
->�C���f�b�N�X�t�@�C��</a
+>インデックスファイル</a
 > / <a href="IndexFile_en.html"
 >Index File</a
 ></li
 ></ul
 ><li
->Senna�J��</li
+>Senna開発</li
 ><ul
 ><li
 ><a href="design_policy.html"
->Senna�݌v���j</a
+>Senna設計方針</a
 ></li
 ><li
 ><a href="Roadmap.html"
->�J�����[�h�}�b�v</a
+>開発ロードマップ</a
 ></li
 ><li
 ><a href="cstyle.html"
->�R�[�f�B���O�K��</a
+>コーディング規約</a
 ></li
 ><li
 ><a href="WorkingStatus.html"
->��Ə�</a
+>作業状況</a
 ></li
 ><li
 ><a href="futureworks.html"
->��]</a
+>野望</a
 > / <a href="futureworks_en.html"
 >Future works</a
 ></li
@@ -1559,7 +1559,7 @@ sen_logger_put�Ń��O�̏o�͂��s���}�N���ł��B</p
 >Search</h2
 ><form action=".search"
 ><input name="q"
-/><input type="submit" value="����"
+/><input type="submit" value="検索"
 /></form
 >
 
@@ -1569,69 +1569,69 @@ sen_logger_put�Ń��O�̏o�͂��s���}�N���ł��B</p
 ><ul
 ><li
 ><a href="example.html" title="2010-10-28 14:04:51"
->����ȂƂ���ł��g���Ă܂��I</a
+>こんなところでも使われてます！</a
 > <span class="ago"
->3�N�O</span
+>3年前</span
 ></li
 ><li
 ><a href="frontpage.html" title="2010-09-14 12:54:06"
 >frontpage</a
 > <span class="ago"
->4�N�O</span
+>4年前</span
 ></li
 ><li
 ><a href="Download_en.html" title="2010-07-22 14:26:20"
 >Download</a
 > <span class="ago"
->4�N�O</span
+>4年前</span
 ></li
 ><li
 ><a href="Download.html" title="2010-07-22 14:26:01"
->�_�E�����[�h</a
+>ダウンロード</a
 > <span class="ago"
->4�N�O</span
+>4年前</span
 ></li
 ><li
 ><a href="FrontPageJ.html" title="2009-11-25 16:14:43"
->Senna �g�ݍ��݌^�S�������G���W��</a
+>Senna 組み込み型全文検索エンジン</a
 > <span class="ago"
->4�N�O</span
+>4年前</span
 ></li
 ><li
 ><a href="FrontPage.html" title="2009-11-25 16:14:20"
 >Senna: An Embeddable Fulltext Search Engine</a
 > <span class="ago"
->4�N�O</span
+>4年前</span
 ></li
 ><li
 ><a href="Ruby_binding.html" title="2009-09-03 18:42:32"
->Ruby�o�C���f�B���O</a
+>Rubyバインディング</a
 > <span class="ago"
->5�N�O</span
+>5年前</span
 ></li
 ><li
 ><a href="PHP_binding.html" title="2009-08-24 04:09:56"
->PHP�o�C���f�B���O</a
+>PHPバインディング</a
 > <span class="ago"
->5�N�O</span
+>5年前</span
 ></li
 ><li
 ><a href="store.html" title="2009-03-23 03:34:52"
->SennaStore�T�v</a
+>SennaStore概要</a
 > <span class="ago"
->5�N�O</span
+>5年前</span
 ></li
 ><li
 ><a href="bindings.html" title="2008-10-05 11:33:12"
->�o�C���f�B���O�ꗗ</a
+>バインディング一覧</a
 > <span class="ago"
->6�N�O</span
+>6年前</span
 ></li
 ></ul
 ><p class="recent"
 ><a href="RecentList.html"
 ><em
->�����ƑO�̏��</em
+>もっと前の情報</em
 ></a
 ></p
 ></div

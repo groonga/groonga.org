@@ -1,31 +1,31 @@
-* ���u���W����MySQL�o�C���f�B���O�̃h�L�������g�u����
+* 旧ブラジル版MySQLバインディングのドキュメント置き場
 
-''���̓��e�́A�Â��o�[�W������MySQL�o�C���f�B���O�̕����ł�''
+''この内容は、古いバージョンのMySQLバインディングの文書です''
 
-** 3) MySQL�̃C���X�g�[��
+** 3) MySQLのインストール
 
-MySQL�o�C���f�B���O�𗘗p����ꍇ�̂݁AMySQL���C���X�g�[������K�v������܂��B
-�ڂ����́A[[mysql_binding]]���������������B
+MySQLバインディングを利用する場合のみ、MySQLをインストールする必要があります。
+詳しくは、[[mysql_binding]]をご覧ください。
 
-MySQL��4.0�n, 4.1�n, 5.0�n�ɑΉ����Ă��܂��B
-senna��g�ݍ��ނ��߂�patch�����Ă�K�v������܂��̂ŁA
-source����r���h���Ȃ���΂Ȃ�܂���B
+MySQLは4.0系, 4.1系, 5.0系に対応しています。
+sennaを組み込むためにpatchをあてる必要がありますので、
+sourceからビルドしなければなりません。
 
 http://dev.mysql.com/downloads/
-����K�v��source�R�[�h���_�E�����[�h���A
-�茳�ɓW�J������őΉ�����senna�̃p�b�`�����Ă܂��B
+から必要なsourceコードをダウンロードし、
+手元に展開した上で対応するsennaのパッチをあてます。
 
-(patch version��MySQL��version���傫���Ⴄ�ꍇ�́Apatch -F�ő傫�߂̐��l��^����Ƃ��܂��ʂ邩���m��܂���)
+(patch versionとMySQLのversionが大きく違う場合は、patch -Fで大きめの数値を与えるとうまく通るかも知れません)
 
  > cd mysql-4.0.27
  > patch -p1 < ../senna/bindings/mysql/mysql-4.0.27.senna.diff
 
-2ind-patch�𕹗p����ꍇ�ɂ́A��L�R�}���h�̎��s��A
+2ind-patchを併用する場合には、上記コマンドの実行後、
  > patch -p1 < ../senna/bindings/mysql/mysql-4.0.27.senna.2ind.diff
-�Ǝ��s���������B
+と実行ください。
 
-autotools��p���āAconfigure���č쐬���܂��B
-''bison 1.75, autoconf 2.59, automake 1.8(aclocal 1.8), libtool 1.4�ȏオ�K�v�ł�''
+autotoolsを用いて、configureを再作成します。
+''bison 1.75, autoconf 2.59, automake 1.8(aclocal 1.8), libtool 1.4以上が必要です''
 
  > libtoolize -c -f
  > aclocal-1.9
@@ -33,136 +33,136 @@ autotools��p���āAconfigure���č쐬���܂��B
  > automake-1.9 -c -a -i
  > autoconf
 
-sql/sql_yacc.yy��touch���܂��B
+sql/sql_yacc.yyをtouchします。
  > touch sql/sql_yacc.yy
 
-configure�Ŋ��ݒ���s���A
-make�����s���Ă��������B
-configure�ɂ́A�u--with-senna�v�I�v�V�������w�肵�Ă��������B
+configureで環境設定を行い、
+makeを実行してください。
+configureには、「--with-senna」オプションを指定してください。
 
  > ./configure --with-charset=utf8 --with-extra-charsets=ujis,sjis --with-named-curses-libs=/lib/libncurses.so.5 --with-senna
  > make
  > sudo make install
 
-���ɂ���Ắu--with-named-curses-libs=/lib/libncurses.so.5�v�͕K�v�Ȃ������肵�܂��B
-make�̓r����libncurses.so.x.x�֌W�̃G���[���o���ꍇ�ɂ́A
+環境によっては「--with-named-curses-libs=/lib/libncurses.so.5」は必要なかったりします。
+makeの途中でlibncurses.so.x.x関係のエラーが出た場合には、
 
  # ldconfig -p | grep libncurses
 
-�Ƃ���libncurses��T���Ă��������B
+としてlibncursesを探してください。
 
-LinuxThreads�ɑΉ����Ă��Ȃ����ł́A�u--with-named-thread-libs="-lpthread"�v���K�v�ƂȂ邱�Ƃ�����܂��B
+LinuxThreadsに対応していない環境では、「--with-named-thread-libs="-lpthread"」が必要となることがあります。
 
---with-charset��--with-extra-charsets�̂����ꂩ�ɁA
-MeCab�Ŏw�肵�������R�[�h�ɑΉ�����
-utf8,sjis,ujis(����:euc�ł͂���܂���!)�̂����ꂩ�̒l��
-�����Ă��Ȃ���΂Ȃ�܂���B
+--with-charsetと--with-extra-charsetsのいずれかに、
+MeCabで指定した文字コードに対応する
+utf8,sjis,ujis(注意:eucではありません!)のいずれかの値が
+入っていなければなりません。
 
-MySQL��configure�I�v�V�����ɂ��Ă̐���
+MySQLのconfigureオプションについての説明
 ( http://dev.mysql.com/doc/refman/4.1/ja/configure-options.html )
-���Q�l�ɂ��āA
-�Ȃ�ׂ����\������MySQL��make���Ă��������B
+も参考にして、
+なるべく性能が高いMySQLをmakeしてください。
 
-configure�I�v�V�����̎����[[mysql_configure]]�ɂ���܂��B
+configureオプションの実例は[[mysql_configure]]にあります。
 
 ----
-�R���t�B�O�t�@�C����z�u���܂��B
-�����ł�my-medium.cnf���R�s�[���Ă��܂����A
-�f�[�^�x�[�X�̋K�͂ɍ��킹�āA
-my-huge.cnf�Ȃǂ̑��̃R���t�B�O�t�@�C�����R�s�[���Ă��������B
+コンフィグファイルを配置します。
+ここではmy-medium.cnfをコピーしていますが、
+データベースの規模に合わせて、
+my-huge.cnfなどの他のコンフィグファイルをコピーしてください。
 
  > sudo cp -p ./support-files/my-medium.cnf /etc/my.cnf
 
-�f�[�^�x�[�X�����������܂��B
+データベースを初期化します。
 
  > sudo ./scripts/mysql_install_db
 
-�f�[�^�x�[�X�̊i�[�p�X�ȉ��ɂ��āA���L�҂ƃO���[�v��ύX���܂��B
+データベースの格納パス以下について、所有者とグループを変更します。
 
  > sudo chown -R mysql:mysql /usr/local/var
 
-mysql�N���X�N���v�g��p���āAmysql���N�����܂��B
+mysql起動スクリプトを用いて、mysqlを起動します。
 
  > chmod +x ./support-files/mysql.server
  > sudo ./support-files/mysql.server start
 
-mysqladmin���g���āAmysql server���N�����Ă��邱�Ƃ��m�F���܂��B
+mysqladminを使って、mysql serverが起動していることを確認します。
 
  > mysqladmin version
 
-mysql�N���X�N���v�g�������N�������悤�ɔz�u���܂��B
+mysql起動スクリプトが自動起動されるように配置します。
 
  > sudo cp ./support-files/mysql.server /etc/init.d/mysql
 
 ====
 
-* MySQL�o�C���f�B���O
+* MySQLバインディング
 
-* Senna MySQL�o�C���f�B���O�Ƃ�?
+* Senna MySQLバインディングとは?
 
-MySQL�́A�o�[�W����3.23.23�ȍ~�AFULLTEXT�C���f�b�N�X���T�|�[�g���Ă���A
-VARCHAR, TEXT�^�̃t�B�[���h�ɑ΂��đS�����������s���邱�Ƃ��ł��܂����A
-1) ���{��̃T�|�[�g���s���S�A2) �t���[�Y�������x���A3) �X�V���x���A
-�Ƃ��������_������܂��B
+MySQLは、バージョン3.23.23以降、FULLTEXTインデックスをサポートしており、
+VARCHAR, TEXT型のフィールドに対して全文検索を実行することができますが、
+1) 日本語のサポートが不完全、2) フレーズ検索が遅い、3) 更新が遅い、
+といった問題点があります。
 
-Senna MySQL�o�C���f�B���O�́AMySQL��FULLTEXT�C���f�b�N�X��u��������`��
-Senna���C�u������g�ݍ��ނ��̂ŁA��L�̖��_��S�ĉ������A
-�����E�����x��Senna�̓�����MySQL����t���Ɏg�p�\�ɂ��܂��B
+Senna MySQLバインディングは、MySQLのFULLTEXTインデックスを置き換える形で
+Sennaライブラリを組み込むもので、上記の問題点を全て解消し、
+高速・高精度なSennaの特徴をMySQLからフルに使用可能にします。
 
-�܂��S�������Ɋւ���\���́AMySQL�̃I���W�i����FULLTEXT�C���f�b�N�X������
-�\�������̂܂܎g�p�\�Ȃ��߁A�X���[�Y�ɓK�p���邱�Ƃ��ł��܂��B
+また全文検索に関する構文は、MySQLのオリジナルのFULLTEXTインデックス向けの
+構文がそのまま使用可能なため、スムーズに適用することができます。
 
-* �g����
+* 使い方
 
-Senna MySQL�o�C���f�B���O���g�p���邽�߂ɂ́ASenna�g�ݍ��ݔł�MySQL���C���X�g�[�����܂��B
-Senna�g�ݍ��ݔł�MySQL���C���X�g�[������ɂ͓�̕��@������܂��B
+Senna MySQLバインディングを使用するためには、Senna組み込み版のMySQLをインストールします。
+Senna組み込み版のMySQLをインストールするには二つの方法があります。
 
-+ Senna MySQL�o�C���f�B���O��g�ݍ��ݍς݂̃o�C�i���p�b�P�[�W���C���X�g�[������
-+ MySQL�̃\�[�X��Senna MySQL�o�C���f�B���O�p�b�`�𓖂ĂăR���p�C���E�C���X�g�[������
++ Senna MySQLバインディングを組み込み済みのバイナリパッケージをインストールする
++ MySQLのソースにSenna MySQLバインディングパッチを当ててコンパイル・インストールする
 
-�C���X�g�[����AMySQL�T�[�o���N������΁A
+インストール後、MySQLサーバを起動すれば、
 http://dev.mysql.com/doc/refman/4.1/ja/fulltext-search.html
-�ɏ�����Ă�����@��Senna��fulltext index���\�z���A
-�S�������@�\���g�p���邱�Ƃ��ł���悤�ɂȂ�܂��B
+に書かれている方法でSennaのfulltext indexを構築し、
+全文検索機能を使用することができるようになります。
 
-* �@�\�Ɛ�������
+* 機能と制限事項
 
-- 4.0�n, 4.1�n, 5.0�n, 5.1�n�̊e�ŐV�o�[�W������MySQL�Ŏg�p�ł��܂��B
-- IN BOOLEAN MODE�ƃf�t�H���g(NLQ MODE)�̑S������(MATCH AGAINST)�N�G�����T�|�[�g���܂��B
-- IN BOOLEAN MODE�ł́A+, -, <, >, (, ), ~, *, " �̑S���Z�q���g�p�ł��܂��B
-- EUC, SJIS, UTF8��3��ނ̃G���R�[�f�B���O���g�p�ł��܂��B
-- �������K���@�\���g�p�ł��܂��BUTF8�̏ꍇ��NFKC���K�����T�|�[�g���܂��B
-- �֘A���������@�\���g�p�ł��܂��B
-- �ߖT(�ߐ�)�����@�\���g�p�ł��܂��B
-- MyISAM �� MERGE��2��ނ̃X�g���[�W�G���W�����T�|�[�g���܂��B(MERGE��4.0.27�̂�)
-- �X�j�y�b�g�@�\���g�p�ł��܂��B
-- �P��C���f�b�N�X(mecab�g�p), NGRAM�C���f�b�N�X, �󔒋�؂�C���f�b�N�X��3��ނ��I���ł��܂��B
-- fulltext�C���f�b�N�X�Ƒ��̃C���f�b�N�X��g�ݍ��킹�Č�������������������@�\������܂�(2ind patch)
-- �q�b�g�����擾��LIMIT�w�茟��������������@�\������܂�(skipmode patch) (4.0.27�̂�)
+- 4.0系, 4.1系, 5.0系, 5.1系の各最新バージョンのMySQLで使用できます。
+- IN BOOLEAN MODEとデフォルト(NLQ MODE)の全文検索(MATCH AGAINST)クエリをサポートします。
+- IN BOOLEAN MODEでは、+, -, <, >, (, ), ~, *, " の全演算子が使用できます。
+- EUC, SJIS, UTF8の3種類のエンコーディングを使用できます。
+- 文字正規化機能を使用できます。UTF8の場合はNFKC正規化をサポートします。
+- 関連文書検索機能が使用できます。
+- 近傍(近接)検索機能が使用できます。
+- MyISAM と MERGEの2種類のストレージエンジンをサポートします。(MERGEは4.0.27のみ)
+- スニペット機能が使用できます。
+- 単語インデックス(mecab使用), NGRAMインデックス, 空白区切りインデックスの3種類が選択できます。
+- fulltextインデックスと他のインデックスを組み合わせて検索処理を高速化する機能があります(2ind patch)
+- ヒット件数取得とLIMIT指定検索を高速化する機能があります(skipmode patch) (4.0.27のみ)
 
-* �C���X�g�[���菇�ڍ�
+* インストール手順詳細
 
-[[install]]���Q�Ɖ������B
+[[install]]を参照下さい。
 
-* �Ǝ��g���@�\
+* 独自拡張機能
 
-Senna MySQL�o�C���f�B���O�ł́A�����p�I�ȑS�������A�v���P�[�V������
-MySQL���g�p�ł���悤�ɂ������̊g���@�\�������Ă��܂��B
-(�g���@�\��񋟂��Ă���������GREE�̏��򂳂�AiYappo�̑�򂳂�ɐ[�����ӂ��܂�)
+Senna MySQLバインディングでは、より実用的な全文検索アプリケーションで
+MySQLを使用できるようにいくつかの拡張機能を加えています。
+(拡張機能を提供してくださったGREEの小泉さん、iYappoの大沢さんに深く感謝します)
 
-** CREATE TABLE / CREATE INDEX ��̊g��
+** CREATE TABLE / CREATE INDEX 句の拡張
 
-�������� Senna �̊e��p�����[�^���w��ł��܂��B
+生成する Senna の各種パラメータを指定できます。
 
-*** �C���f�b�N�X�^�C�v�̎w��
+*** インデックスタイプの指定
 
-�P��C���f�b�N�X, NGRAM�C���f�b�N�X, DELIMITED�C���f�b�N�X��3��̂����ꂩ��I���ł��܂��B
+単語インデックス, NGRAMインデックス, DELIMITEDインデックスの3種のいずれかを選択できます。
 
-**** �P��(mecab)�C���f�b�N�X���쐬����ꍇ
+**** 単語(mecab)インデックスを作成する場合
 
-�C���f�b�N�X�^�C�v���w�肵�Ȃ���ΒP��C���f�b�N�X���g�p����܂��B
+インデックスタイプを指定しなければ単語インデックスが使用されます。
 
-(��)
+(例)
 
    CREATE TABLE test (
      id INTEGER AUTO_INCREMENT,
@@ -171,11 +171,11 @@ MySQL���g�p�ł���悤�ɂ������̊g���@�\�������Ă��܂��B
      FULLTEXT INDEX (text)
    );
 
-**** NGRAM�C���f�b�N�X���쐬����ꍇ
+**** NGRAMインデックスを作成する場合
 
-USING NGRAM���w�肵�܂��B
+USING NGRAMを指定します。
 
-(��)
+(例)
 
    CREATE TABLE test (
      id INTEGER AUTO_INCREMENT,
@@ -184,11 +184,11 @@ USING NGRAM���w�肵�܂��B
      FULLTEXT INDEX USING NGRAM (text)
    );
 
-**** DELIMITED�C���f�b�N�X���쐬����ꍇ
+**** DELIMITEDインデックスを作成する場合
 
-USING DELIMITED���w�肷��ƁA�󔒂ŋ�؂�ꂽ������P�ʂŃC���f�b�N�X���쐬���܂��B
+USING DELIMITEDを指定すると、空白で区切られた文字列単位でインデックスを作成します。
 
-(��)
+(例)
 
    CREATE TABLE test (
      id INTEGER AUTO_INCREMENT,
@@ -197,11 +197,11 @@ USING DELIMITED���w�肷��ƁA�󔒂ŋ�؂�ꂽ������P�ʂŃC���f�b�N�X���쐬���܂
      FULLTEXT INDEX USING DELIMITED (text)
    );
 
-**** MySQL�̑f��fulltext index���쐬����(senna�C���f�b�N�X���g�p���Ȃ�)�ꍇ
+**** MySQLの素のfulltext indexを作成する(sennaインデックスを使用しない)場合
 
-USING NO SENNA���w�肵�܂��B
+USING NO SENNAを指定します。
 
-(��)
+(例)
 
    CREATE TABLE test (
      id INTEGER AUTO_INCREMENT,
@@ -210,12 +210,12 @@ USING NO SENNA���w�肵�܂��B
      FULLTEXT INDEX USING NO SENNA (text)
    );
 
-**** ���K���@�\�̎g�p/�s�g�p
+**** 正規化機能の使用/不使用
 
-�f�t�H���g�ł͐��K���@�\���L���ɂȂ�܂��B
-���������邽�߂ɂ́AUSING NO NORMALIZE���w�肵�܂��B
+デフォルトでは正規化機能が有効になります。
+無効化するためには、USING NO NORMALIZEを指定します。
 
-(��) ���K���Ȃ���NGRAM�C���f�b�N�X���쐬����ꍇ
+(例) 正規化なしでNGRAMインデックスを作成する場合
 
    CREATE TABLE test (
      id INTEGER AUTO_INCREMENT,
@@ -224,12 +224,12 @@ USING NO SENNA���w�肵�܂��B
      FULLTEXT INDEX USING SENNA, NO NORMALIZE, NGRAM (text)
    );
 
-**** INITIAL_N_SEGMENTS�w��
+**** INITIAL_N_SEGMENTS指定
 
-USING ���l���w�肷�邱�Ƃɂ���āAINITIAL_N_SEGMENTS
-(�C���f�b�N�X�o�b�t�@�̈�̏����l)���C���f�b�N�X�쐬���ɐݒ�ł��܂��B
+USING 数値を指定することによって、INITIAL_N_SEGMENTS
+(インデックスバッファ領域の初期値)をインデックス作成時に設定できます。
 
-(��) INITIAL_N_SEGMENTS=2048�ŃC���f�b�N�X���쐬����ꍇ
+(例) INITIAL_N_SEGMENTS=2048でインデックスを作成する場合
 
    CREATE TABLE test (
      id INTEGER AUTO_INCREMENT,
@@ -238,9 +238,9 @@ USING ���l���w�肷�邱�Ƃɂ���āAINITIAL_N_SEGMENTS
      FULLTEXT INDEX USING SENNA, 2048 (text)
    );
 
-** SHOW INDEX ��̊g��
+** SHOW INDEX 句の拡張
 
-CREATE TABLE / CREATE INDEX �̊g���ɔ��� SHOW INDEX ����g�����āA�g�p���Ă���C���f�b�N�X�̎�ނ𒲂ׂ邱�Ƃ��ł���悤�ɂȂ�܂����B
+CREATE TABLE / CREATE INDEX の拡張に伴い SHOW INDEX 句も拡張して、使用しているインデックスの種類を調べることができるようになりました。
 
   mysql> SHOW INDEX FROM test;
   +-------+------------+----------+- ... -+--------+------+--------------------------------+---------+
@@ -251,9 +251,9 @@ CREATE TABLE / CREATE INDEX �̊g���ɔ��� SHOW INDEX ����g�����āA�g�p���Ă���C
   +-------+------------+----------+--... -+--------+------+--------------------------------+---------+ 
   2 rows in set (0.04 sec)
 
-** SHOW TABLE STATUS ��̊g��
+** SHOW TABLE STATUS 句の拡張
 
-SHOW TABLE STATUS �� �ɂ���āA����e�[�u���Ŏg���Ă��� Senna �̓]�u�e�[�u�����b�e�[�u���̃��R�[�h���̍��v��A�C���f�b�N�X�t�@�C���̃T�C�Y��m�邱�Ƃ��ł���悤�ɂȂ�܂��B�����̑S�������C���f�b�N�X���������Ƃ��ɂ͂��܂�Ӗ�������܂���...�B
+SHOW TABLE STATUS 句 によって、あるテーブルで使われている Senna の転置テーブルや語彙テーブルのレコード数の合計や、インデックスファイルのサイズを知ることができるようになります。複数の全文検索インデックスがあったときにはあまり意味がありませんが...。
 
   +-------+--------+ ... -------+----------------+----------------+--------------------+---------+
   | Name  | Type   | ... k_time | Create_options | Senna_key_size | Senna_lexicon_size | Comment | 
@@ -265,158 +265,158 @@ SHOW TABLE STATUS �� �ɂ���āA����e�[�u���Ŏg���Ă��� Senna �̓]�u�e�[�u����
   | test5 | MyISAM | ...        |                |              0 |                  0 |         |
   +-------+--------+ ... -------+----------------+----------------+--------------------+---------+
 
-���̃J�������ǉ�����Ă��܂��B
+次のカラムが追加されています。
 
 - Senna_keys_size
 
-�V���{���\ (.SEN) �̃��R�[�h���̍��v�������܂��B
+シンボル表 (.SEN) のレコード数の合計を示します。
 
 - Senna_keys_file_size
 
-�V���{���\ (.SEN) �̃t�@�C���T�C�Y�̍��v�������܂��B
+シンボル表 (.SEN) のファイルサイズの合計を示します。
 
 - Senna_lexicon_size
 
-��b�e�[�u�� (.SEN.I) �̃��R�[�h���̍��v�������܂��B
+語彙テーブル (.SEN.I) のレコード数の合計を示します。
 
 - Senna_lexicon_file_size
 
-��b�e�[�u�� (.SEN.I) �̃t�@�C���T�C�Y�̍��v�������܂��B
+語彙テーブル (.SEN.I) のファイルサイズの合計を示します。
 
 - Senna_inv_seg_size
 
-�]�u�e�[�u���̃o�b�t�@ (.SEN.i) �̃t�@�C���T�C�Y�������܂��B
+転置テーブルのバッファ (.SEN.i) のファイルサイズを示します。
 
 - Senna_inv_chunk_size
 
-�]�u�e�[�u�� (.SEN.i.c) �̃t�@�C���T�C�Y�������܂��B
+転置テーブル (.SEN.i.c) のファイルサイズを示します。
 
-** 2ind patch(2�C���f�b�N�X�����g�p�@�\)
+** 2ind patch(2インデックス同時使用機能)
 
-*** 2ind patch�Ƃ�
+*** 2ind patchとは
 
-MySQL�ŃN�G�������s����ۂɂ́A
-�P�̃e�[�u���ɑ΂��ĂP�̃C���f�b�N�X�������p�ł��܂���B
+MySQLでクエリを実行する際には、
+１つのテーブルに対して１つのインデックスしか利用できません。
 
-�ʏ�̃N�G���̏ꍇ�́A
-�����̃J�����ɂ܂��������C���f�b�N�X��p�ӂ��邱�Ƃɂ���āA
-�����I�ɂ��̐�����������邱�Ƃ��ł��܂��B
+通常のクエリの場合は、
+複数のカラムにまたがったインデックスを用意することによって、
+現実的にこの制限を回避することができます。
 
-�������A�S�������p�̃C���f�b�N�X��p�����ꍇ�A
-���̃C���f�b�N�X�����p�ł��Ȃ����߁A
-�ȉ��̂悤�Ȗ�肪�����܂��B
+しかし、全文検索用のインデックスを用いた場合、
+他のインデックスが利用できないため、
+以下のような問題が生じます。
 
-1. limit�w��ŏo�͂𐧌����Ă��������x�����
+1. limit指定で出力を制限しても応答が遅い問題
 
    select columns from table where match(a) against(b) limit 1000, 10
 
-�̂悤�ɁA�I�t�Z�b�g�ɑ傫�Ȓl���w�肷��ƃe�[�u���X�L�������������A
-�������x���Ȃ�܂��B
+のように、オフセットに大きな値を指定するとテーブルスキャンが発生し、
+応答が遅くなります。
 
-2. count(*)���Ō������擾���邾���ł��������x�����
+2. count(*)等で件数を取得するだけでも応答が遅い問題
 
    select count(*) from table where match(a) against(b);
 
-�̂悤�Ɍ������擾���邾���ł��e�[�u���X�L�������������A
-�������x���Ȃ�܂��B
+のように件数を取得するだけでもテーブルスキャンが発生し、
+応答が遅くなります。
 
-3. �S�������ȊO�̏����ōi�荞�ޏ������x�����
+3. 全文検索以外の条件で絞り込む処理が遅い問題
 
    select columns from table where match(a) against(b) and c like 'hoge%';
 
-�̂悤�ɁA�S�������ȊO�ɑ��̃J�����Ɋւ���������w�肵���ꍇ�A
-���̃J�����ɃC���f�b�N�X�������Ă��Ă��e�[�u���X�L�������������A
-�������x���Ȃ�܂��B
+のように、全文検索以外に他のカラムに関する条件を指定した場合、
+そのカラムにインデックスが張られていてもテーブルスキャンが発生し、
+応答が遅くなります。
 
-4. �S�������ȊO�̏����Ń\�[�g���鏈�����x�����
+4. 全文検索以外の条件でソートする処理が遅い問題
 
    select columns from table where match(a) against(b) order by c;
 
-�̂悤�ɁA�\�[�g�������w�肵���ꍇ�A���̃J�����ɃC���f�b�N�X��
-�����Ă��Ă��e�[�u���X�L�������������A�������x���Ȃ�܂��B�B
+のように、ソート条件を指定した場合、そのカラムにインデックスが
+張られていてもテーブルスキャンが発生し、応答が遅くなります。。
 
-���̂悤�Ȗ����������邽�߂ɁA
-MySQL���S�������p�̃C���f�b�N�X�ƒʏ�̃C���f�b�N�X�̗����𕹗p�ł���悤�ɂ���2ind-patch�p�b�`���g�p�ł��܂��B
+このような問題を解決するために、
+MySQLが全文検索用のインデックスと通常のインデックスの両方を併用できるようにする2ind-patchパッチが使用できます。
 
-*** 2ind patch�̃C���X�g�[��(�\�[�X����C���X�g�[������ꍇ)
+*** 2ind patchのインストール(ソースからインストールする場合)
 
-MySQL�\�[�X�ɁAmysql-x.x.x.senna.diff �𓖂Ă����ƁA
+MySQLソースに、mysql-x.x.x.senna.diff を当てたあと、
 
  patch -p1 < {senna-package}/bindings/mysql/mysql-x.x.x.senna.2ind.diff
 
-�̂悤�Ɏ��s���āA2ind patch�𓖂Ă܂��B���̑��̎菇��[[install]]�̒ʂ�ł��B
+のように実行して、2ind patchを当てます。その他の手順は[[install]]の通りです。
 
-*** 2ind-patch�̎g����
-- 1. 2.�̃p�^���ɂ��ẮA���Ɉӎ����邱�ƂȂ��A�ʏ�ʂ��SQL�𔭍s���邾����2ind-patch�̌��ʂ������܂��B
-- 3. 4.�̃p�^���ɂ��ẮA�i�荞�݂�\�[�g���Ɏg�p�������C���f�b�N�X���ȉ��̂悤�ɖ����I�Ɏw�肷��K�v������܂��B
+*** 2ind-patchの使い方
+- 1. 2.のパタンについては、特に意識することなく、通常通りにSQLを発行するだけで2ind-patchの効果が得られます。
+- 3. 4.のパタンについては、絞り込みやソート時に使用したいインデックスを以下のように明示的に指定する必要があります。
    select columns from table force index(c) where match(a) against(b) and c like 'hoge%';
 
    select columns from table force index(c) where match(a) against(b) order by c;
 
-(��L�[�ł���� force index(PRIMARY) �̂悤�Ɏw�肵�܂�)
+(主キーであれば force index(PRIMARY) のように指定します)
 
-*** 2ind-patch�̒��ӓ_
+*** 2ind-patchの注意点
 
--�O�q��4�̃N�G���p�^���ȊO�ł͌��ʂ�������Ƃ͌���܂���B�S�����������ő�ʂ̃��R�[�h���q�b�g���邱�Ƃɂ���Ĕ�������f�B�X�NI/O�����\�j�Q�v���ł���ꍇ�ɂ̂݌��ʂ����҂ł��܂��B
--2ind-patch��MySQL�����Ƃ��Ɣ����Ă���C���f�b�N�X�𗘗p���܂��B���������p�t�H�[�}���X���o�����߂ɂ́Akey_buffer_size�ȂǁA���Ƃ��Ƃ�MySQL�̃C���f�b�N�X�ɑ΂���p�����[�^�𒲐�����K�v������܂��B
+-前述の4つのクエリパタン以外では効果が得られるとは限りません。全文検索条件で大量のレコードがヒットすることによって発生するディスクI/Oが性能阻害要因である場合にのみ効果が期待できます。
+-2ind-patchはMySQLがもともと備えているインデックスを利用します。高い検索パフォーマンスを出すためには、key_buffer_sizeなど、もともとのMySQLのインデックスに対するパラメータを調整する必要があります。
 
 ** snippet UDF
 
-�������ʂ�\������ۂɁA�������̃L�[���[�h�̎��ӂ݂̂�\���������ꍇ������܂��B
-���̃L�[���[�h�̎��ӂ̃e�L�X�g���Asnippet�܂���KWIC(KeyWord In Context)�ƌĂт܂��B
-���̋@�\����������̂��Asnippet UDF�ł��B
+検索結果を表示する際に、文書中のキーワードの周辺のみを表示したい場合があります。
+このキーワードの周辺のテキストを、snippetまたはKWIC(KeyWord In Context)と呼びます。
+この機能を実現するのが、snippet UDFです。
 
-***snippet UDF�̃C���X�g�[��
+***snippet UDFのインストール
 
-UDF�̃f�B���N�g���Ɉړ�
+UDFのディレクトリに移動
  > cd {senna-package}/bindings/mysql/udf/
-''Subversion����\�[�X���擾�����ꍇ�̂݁A''autogen.sh�̎��s
+''Subversionからソースを取得した場合のみ、''autogen.shの実行
  > ./autogen.sh
 configure
  > ./configure --prefix=/usr
-make���܂��B
+makeします。
  > make
-install���܂��B
+installします。
  > sudo make install
-MySQL��UDF��g�ݍ��݂܂��B
-���Ȃ݂ɁAmake load�ł́umysql -u root -p�v�R�}���h���Ăяo����UDF��o�^���Ă��܂��B
-MySQL��root���[�U�̃p�X���[�h����͂��������B
+MySQLにUDFを組み込みます。
+ちなみに、make loadでは「mysql -u root -p」コマンドを呼び出してUDFを登録しています。
+MySQLのrootユーザのパスワードを入力ください。
  > make load
 
-*** snippet UDF�̎g����
-snippet UDF�͑�ψ����̑���MySQL�̊֐��ł��B
+*** snippet UDFの使い方
+snippet UDFは大変引数の多いMySQLの関数です。
 
- SELECT snippet(����, snippet�̒����̍ő�o�C�g��, snippet�̍ő��, �����̕����R�[�h, 
-   html�G���R�[�f�B���O�̗L��, snippet�̊J�n�^�O, snippet�̏I���^�O, 
-   �P��1, �P��1�̑O�ɂ�����^�O, �P��1�̌�ɂ�����^�O, 
-   �P��2, �P��2�̑O�ɂ�����^�O, �P��2�̌�ɂ�����^�O, ...);
+ SELECT snippet(文書, snippetの長さの最大バイト数, snippetの最大個数, 文書の文字コード, 
+   htmlエンコーディングの有無, snippetの開始タグ, snippetの終了タグ, 
+   単語1, 単語1の前につけられるタグ, 単語1の後につけられるタグ, 
+   単語2, 単語2の前につけられるタグ, 単語2の後につけられるタグ, ...);
 
-�����R�[�h�́Asjis, ujis, utf8, default�̂����ꂩ���w�肭�������B
-html�G���R�[�f�B���O�̗L���́A0��1���w�肭�������B
-1�̏ꍇ�͕�������<,>,&,"�����ꂼ��&lt;,&gt;,&amp;,&quot;�ɕϊ����ďo�͂��܂��B
+文字コードは、sjis, ujis, utf8, defaultのいずれかを指定ください。
+htmlエンコーディングの有無は、0か1を指定ください。
+1の場合は文書中の<,>,&,"をそれぞれ&lt;,&gt;,&amp;,&quot;に変換して出力します。
 
-��͈ȉ��̂Ƃ���ł��B
+例は以下のとおりです。
 
  SELECT snippet(body, 120, 3, 'ujis', 
    1, '...', '...<br>\n', 
-   '����', '<span class="word1">', '</span>', 
-   '����', '<span class="word2">', '</span>'
+   '検索', '<span class="word1">', '</span>', 
+   '実験', '<span class="word2">', '</span>'
  )
  FROM contents
- WHERE MATCH(body) AGAINST('*D+ ���� ����' IN BOOLEAN MODE)
+ WHERE MATCH(body) AGAINST('*D+ 検索 実験' IN BOOLEAN MODE)
  LIMIT 0,10;
 
 ** skipmode-patch
 
-skipmode-patch�́A�����N�G���[�ɂ����ăq�b�g�����擾��LIMIT�w�茟��������������@�\�ł��B
-MySQL-4.0.27�ł̂ݎg�p���邱�Ƃ��ł��܂��B
+skipmode-patchは、検索クエリーにおいてヒット件数取得とLIMIT指定検索を高速化する機能です。
+MySQL-4.0.27でのみ使用することができます。
 
-*** skipmode patch�̃C���X�g�[��
+*** skipmode patchのインストール
 
-MySQL�\�[�X�ɁAmysql-x.x.x.senna.diff �𓖂Ă����ƁA
+MySQLソースに、mysql-x.x.x.senna.diff を当てたあと、
 
  patch -p1 < {senna-package}/bindings/mysql/mysql-x.x.x.senna.2ind.diff
  patch -p1 < {senna-package}/bindings/mysql/mysql-x.x.x.senna.2ind.skipmode.diff
 
-�̂悤�Ɏ��s���āA2ind patch��skipmode patch�̗����𓖂Ă܂��B
-���̑��̎菇��[[install]]�̒ʂ�ł��B
+のように実行して、2ind patchとskipmode patchの両方を当てます。
+その他の手順は[[install]]の通りです。

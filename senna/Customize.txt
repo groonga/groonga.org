@@ -1,75 +1,75 @@
-* �J�X�^�}�C�Y
+* カスタマイズ
 
-* �ݒ�t�@�C��(senna.conf)�ɂ���
-�ʏ�A/var/senna/senna.conf(Windows�ł�c:\senna\senna.conf)��Senna�̐ݒ�t�@�C���ƂȂ�܂��B
-�ݒ�t�@�C���́A��{�I��
- �ݒ肵�����p�����[�^�� ���p�X�y�[�X �ݒ�l ���s
-�Ƃ����`�����A�Ȃ����t�@�C���ł��B
+* 設定ファイル(senna.conf)について
+通常、/var/senna/senna.conf(Windowsではc:\senna\senna.conf)がSennaの設定ファイルとなります。
+設定ファイルは、基本的に
+ 設定したいパラメータ名 半角スペース 設定値 改行
+という形式が連なったファイルです。
 
-�K�v�̂��鍀�ڂ����C�����������B
-��ʓI�ȗ��p�ł́AINITIAL_N_SEGMENTS��ύX����K�v�͂���܂���B
+必要のある項目だけ修正ください。
+一般的な利用では、INITIAL_N_SEGMENTSを変更する必要はありません。
 
 **DEFAULT_ENCODING
- DEFAULT_ENCODING �����R�[�h
-Senna�������ΏۂƂ��镶����̕����R�[�h���w�肵�܂��B
-euc, sjis, utf8�̂����ꂩ�̒l���w�肵�Ă��������B
-�f�t�H���g��euc�ł��B
+ DEFAULT_ENCODING 文字コード
+Sennaが処理対象とする文字列の文字コードを指定します。
+euc, sjis, utf8のいずれかの値を指定してください。
+デフォルトはeucです。
 
-MeCab�̎����t�@�C���̕����R�[�h
-�iMySQL�o�C���f�B���O�𗘗p����ꍇ�ɂ́A�C���f�b�N�X�Ώۂ̃J�����̕����R�[�h���j����L�Ŏw�肵���R�[�h�ɍ��킹�Ă��������B
+MeCabの辞書ファイルの文字コード
+（MySQLバインディングを利用する場合には、インデックス対象のカラムの文字コードも）を上記で指定したコードに合わせてください。
 
-** N-gram�݂̗̂��p�ł����MeCab�̃C���X�g�[���͕s�v
+** N-gramのみの利用であればMeCabのインストールは不要
 
-N-gram�݂̂�p����\��ł���΁AMeCab�͕K�v����܂���B
-�ȉ��̂悤��configure�����s����΁AMeCab�Ɉˑ����Ȃ�Senna��make�ł��܂��B
+N-gramのみを用いる予定であれば、MeCabは必要ありません。
+以下のようにconfigureを実行すれば、MeCabに依存しないSennaをmakeできます。
 
  > ./confiure --without-mecab
 
-* NFKC��p���������񐳋K���̗}��
-nfkc.c�́AICU���s�����K�������̐��K�����s���\�[�X�ł��B
-���i�K�ł́AUTF-8�̐��K���̏ꍇ�̂ݗp���܂��B
+* NFKCを用いた文字列正規化の抑制
+nfkc.cは、ICUが行う正規化相当の正規化を行うソースです。
+現段階では、UTF-8の正規化の場合のみ用います。
 
-���̃\�[�X��Ruby�Ŏ�����������Ă���A
-��σR���p�C�����ׂ�������܂��B
+このソースはRubyで自動生成されており、
+大変コンパイル負荷がかかります。
 
-����āA�ꕔ���ł̓R���p�C�����������Ȃ��Ƃ��������ۂ��N����܂��B
+よって、一部環境ではコンパイルが完了しないといった現象が起こります。
 
-NFKC�ɂ�鐳�K�����K�v�Ȃ��ꍇ�ɂ́A
-�ȉ��̂悤��configure���s����NFKC�𖳌��ɂ��Ă��������B
+NFKCによる正規化が必要ない場合には、
+以下のようにconfigureを行ってNFKCを無効にしてください。
 
  > ./confiure --disable-nfkc
 
-* Linux AIO/DIO��p�������[�U���x���L���b�V���̗��p
-Linux 2.6�ȍ~�ł́A
-�J�[�l���̃o�b�t�@�L���b�V�����o�R�����Ƀt�@�C���ɔ񓯊��A�N�Z�X���s����
-AIO/DIO�Ƃ����@�\��������Ă��܂��B
+* Linux AIO/DIOを用いたユーザレベルキャッシュの利用
+Linux 2.6以降では、
+カーネルのバッファキャッシュを経由せずにファイルに非同期アクセスを行える
+AIO/DIOという機構が備わっています。
 
-���̋@�\��p���āA
-VA Linux Systems Japan �̖k�ڂ���Senna�̃��[�U���x���L���b�V���@�\���������܂����B
+この機構を用いて、
+VA Linux Systems Japan の北目さんがSennaのユーザレベルキャッシュ機能を実装しました。
 
-�Ⴡ��������ō������ȃL���b�V���Ȃ̂ŁA
-�����������̐��񂪃V�r�A�Ȋ���
-�������\���v�������ǖʂŌ��ʂ����҂ł��܂��B
+低メモリ消費で高効率なキャッシュなので、
+メモリ資源の制約がシビアな環境で
+高い性能が要求される局面で効果が期待できます。
 
-** ���[�U���x���L���b�V���̒��ӓ_
--Linux 2.6�ȍ~��p�ł��B
--����̈��萫�ɂ��Ă͖��m�F�ł��B
--rev.130���݂ł́Aglib 2.8�ȏオ�K�v�ł��B
+** ユーザレベルキャッシュの注意点
+-Linux 2.6以降専用です。
+-動作の安定性については未確認です。
+-rev.130現在では、glib 2.8以上が必要です。
 
-** ���[�U���x���L���b�V���̓������@
--configure����aio�̎g�p���w��
+** ユーザレベルキャッシュの導入方法
+-configure時にaioの使用を指定
  > ./configure --enable-aio
--�N������''���ϐ� SEN_AIO_ENABLED �� 1 ���w��''
-�ȏ�̐ݒ���s�������Ƃ�Senna�𗘗p���������B
+-起動時に''環境変数 SEN_AIO_ENABLED に 1 を指定''
+以上の設定を行ったあとにSennaを利用ください。
 
-* �\�[�X�R�[�h���Œ����ł���p�����[�^
+* ソースコード内で調整できるパラメータ
 
-�\�[�X�R�[�h�ɒ��ڎ�����邱�Ƃɂ���Ă̂ݐݒ�\�ȃp�����[�^�����݂��܂��B
+ソースコードに直接手を入れることによってのみ設定可能なパラメータが存在します。
 
-** Senna �{��
-|�p�����[�^��|�\�[�X�R�[�h|�f�t�H���g�l|�ڍ�|
-|SEN_LEX_NGRAM_UNIT_SIZE|senna.h|2|N-gram��N�̐�|
+** Senna 本体
+|パラメータ名|ソースコード|デフォルト値|詳細|
+|SEN_LEX_NGRAM_UNIT_SIZE|senna.h|2|N-gramのNの数|
 
-** MySQL �o�C���f�B���O
-|�p�����[�^��|�\�[�X�R�[�h|�f�t�H���g�l|�ڍ�|
-|SENNA_MAX_N_EXPR|myisam/ft_boolean_search.c|32|boolean mode�Ŏw��ł��鎮�̍ő吔|
+** MySQL バインディング
+|パラメータ名|ソースコード|デフォルト値|詳細|
+|SENNA_MAX_N_EXPR|myisam/ft_boolean_search.c|32|boolean modeで指定できる式の最大数|

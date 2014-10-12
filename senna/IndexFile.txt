@@ -1,44 +1,44 @@
-* �C���f�b�N�X�t�@�C��
+* インデックスファイル
 
-senna�ł͓]�u�C���f�b�N�X�t�@�C�����쐬���č����Ȍ������������Ă��܂��B
+sennaでは転置インデックスファイルを作成して高速な検索を実現しています。
 
-* �\��
+* 構成
 
-senna�ł�1�C���f�b�N�X�C���X�^���X�ɑ΂��āA4�̃t�@�C�����쐬���܂��B
-sen_create_index�Ŏw�肵���C���f�b�N�X�t�@�C������'hoge'�Ƃ���ƁA�ȉ��̂悤�ȃt�@�C�����쐬����܂��B
+sennaでは1インデックスインスタンスに対して、4つのファイルを作成します。
+sen_create_indexで指定したインデックスファイル名を'hoge'とすると、以下のようなファイルが作成されます。
 
  hoge.SEN
  hoge.SEN.i
  hoge.SEN.i.c
  hoge.SEN.l
 
-:hoge.SEN:�O������ID(������␔�l��)�ƁAsenna�̓�������ID�Ƃ̕ϊ����s���V���{���\�ł��B
+:hoge.SEN:外部文書ID(文字列や数値等)と、sennaの内部文書IDとの変換を行うシンボル表です。
 
-:hoge.SEN.i:�]�u�t�@�C���̃o�b�t�@�̈�ł��B�C���f�b�N�X���������ɌŒ�T�C�Y���\�ߊm�ۂ���܂��B(�f�t�H���g�ł�130MB���x�m�ۂ��܂��B)
+:hoge.SEN.i:転置ファイルのバッファ領域です。インデックス初期化時に固定サイズが予め確保されます。(デフォルトでは130MB程度確保します。)
 
-:hoge.SEN.i.c:�]�u�t�@�C��(�P��ID���當��ID�Əo���ʒu�̃��X�g���Q�Ƃ���t�@�C��)�̎��̂ł��B
+:hoge.SEN.i.c:転置ファイル(単語IDから文書IDと出現位置のリストを参照するファイル)の実体です。
 
-:hoge.SEN.l:�������Ɍ����P��(�����v�f)�̕������ID�Ƃ̕ϊ����s���V���{���\�ł��B
+:hoge.SEN.l:文書内に現れる単語(文字要素)の文字列とIDとの変換を行うシンボル表です。
 
-*�C���f�b�N�X�̃T�C�Y
+*インデックスのサイズ
 
-hoge.SEN.i�t�@�C���̓C���f�b�N�X�쐬���ɌŒ�T�C�Y���m�ۂ��܂����A
-���̌㕶�����ʂɓo�^����ƃC���f�b�N�X�t�@�C���̑��T�C�Y�́A
-�P��C���f�b�N�X�Ȃ當���̏ܖ��T�C�Y��1.3�{���x�A
-n-gram�C���f�b�N�X�Ȃ當���̏ܖ��T�C�Y��2.5�{���x�ɂȂ�܂��B
+hoge.SEN.iファイルはインデックス作成時に固定サイズを確保しますが、
+その後文書を大量に登録するとインデックスファイルの総サイズは、
+単語インデックスなら文書の賞味サイズの1.3倍程度、
+n-gramインデックスなら文書の賞味サイズの2.5倍程度になります。
 
-*.sen.i�t�@�C���̏����T�C�Y
+*.sen.iファイルの初期サイズ
 
-�f�t�H���g�ł�130MB���m�ۂ��܂����A�ݒ�t�@�C��(/var/senna/senna.conf)�ɁA
+デフォルトでは130MBを確保しますが、設定ファイル(/var/senna/senna.conf)に、
 
- INITIAL_N_SEGMENTS ���l
+ INITIAL_N_SEGMENTS 数値
 
-�̂悤�ɐ��l���w�肷��ƁA
+のように数値を指定すると、
 
- ���l * 256KB
+ 数値 * 256KB
 
-�̃T�C�Y���m�ۂ����悤�ɂȂ�܂��B
+のサイズが確保されるようになります。
 
-�������AINITIAL_N_SEGMENTS�̒l���������ݒ肷��قǁA�X�V�����̑��x���ቺ���܂��̂ŁA
-�f�t�H���g�l�����ɒ[�ɏ������l��ݒ肵�Ȃ���������ł��B(�f�t�H���g�l��512�ł�)
+ただし、INITIAL_N_SEGMENTSの値を小さく設定するほど、更新処理の速度が低下しますので、
+デフォルト値よりも極端に小さい値を設定しない方が無難です。(デフォルト値は512です)
 

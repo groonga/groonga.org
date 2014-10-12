@@ -1,25 +1,25 @@
-* SennaStore���g���Ă݂悤
+* SennaStoreを使ってみよう
 
-SennaStore�͌��ݔz�z����SVN���|�W�g���ɂ��łɊ܂܂�Ă��܂��B
-�e��A�v���P�[�V�����C���^�t�F�[�X����A��{�I�ȃN�G���Z�b�g���������Ƃ��ł��܂��B
+SennaStoreは現在配布中のSVNリポジトリにすでに含まれています。
+各種アプリケーションインタフェースから、基本的なクエリセットを試すことができます。
 
-���̃y�[�W�ł͊ȒP�ȃA�v���P�[�V�����̍쐬��ʂ��ĐV����Senna�̑�����@���Љ�܂��B
+このページでは簡単なアプリケーションの作成を通して新しいSennaの操作方法を紹介します。
 
-* �C���X�g�[��
+* インストール
 
-[[install]]�̎菇�ɉ����čŐV��svn���|�W�g������senna���C���X�g�[�����܂��B
-make install����ƁAsenna�R�}���h���C���X�g�[������܂��B
+[[install]]の手順に沿って最新のsvnリポジトリからsennaをインストールします。
+make installすると、sennaコマンドもインストールされます。
 
-* �f�[�^�x�[�X�̍쐬
+* データベースの作成
 
-�ȒP�ȃu�b�N�}�[�N�A�v���P�[�V�����p�̃f�[�^�x�[�X������Ă݂܂��B
-�ȉ��̂悤�ɍ쐬�������f�[�^�x�[�X�t�@�C���̃p�X���w�肵��senna�R�}���h���N�����܂��B
+簡単なブックマークアプリケーション用のデータベースを作ってみます。
+以下のように作成したいデータベースファイルのパスを指定してsennaコマンドを起動します。
 
 {{{
 % senna /tmp/bookmark.db
 }}}
 
-senna�R�}���h���N������ƃv�����v�g���\������A�Θb�I�ɃR�}���h�����s�ł��܂��B
+sennaコマンドを起動するとプロンプトが表示され、対話的にコマンドを実行できます。
 
 {{{
 > (+ 1 1)
@@ -28,37 +28,37 @@ senna�R�}���h���N������ƃv�����v�g���\������A�Θb�I�ɃR�}���h�����s�ł��܂��B
 a
 }}}
 
-���ʂ�lisp�̃C���^�[�v���^�Ƃ��ē����Ă��܂��B
+普通にlispのインタープリタとして動いています。
 
-* �e�[�u���̒�`
+* テーブルの定義
 
-''ptable''�Ƃ����֐����g�����Ƃɂ���āA�쐬����bookmark.db�Ƀe�[�u�����`���邱�Ƃ��ł��܂��B
+''ptable''という関数を使うことによって、作成したbookmark.dbにテーブルを定義することができます。
 
 {{{
 > (ptable '<items>)
 <items>
 }}}
 
-�����''<items>''�Ƃ������O�̃e�[�u�����쐬�ł��܂����B
+これで''<items>''という名前のテーブルが作成できました。
 
-�e�[�u���Ɍ���܂��񂪁Adb�n�̑�������č��ꂽ�I�u�W�F�N�g�́A
-�֐��Ƃ��Čďo���\�ɂȂ�A������keyword��n�����Ƃɂ���ăI�u�W�F�N�g�𑀍삷�邱�Ƃ��ł���悤�ɂȂ�܂��B
+テーブルに限りませんが、db系の操作をして作られたオブジェクトは、
+関数として呼出し可能になり、引数にkeywordを渡すことによってオブジェクトを操作することができるようになります。
 
-�Ⴆ�Έȉ��̂悤��''::nrecords''�Ƃ���keyword���w�肷��ƁA�e�[�u���ɓo�^����Ă��郌�R�[�h�̌������Ԃ�܂��B(CLOS�n�̃I�u�W�F�N�g�V�X�e���Ɋ��ꂽ�l�͈�a���������邩���m��܂���d)
+例えば以下のように''::nrecords''というkeywordを指定すると、テーブルに登録されているレコードの件数が返ります。(CLOS系のオブジェクトシステムに慣れた人は違和感を感じるかも知れません‥)
 
 {{{
 > (<items> ::nrecords)
 0
 }}}
 
-�e�[�u�����쐬�������_��'':key''�Ƃ������O�̃J�����������I�ɒǉ�����Ă��܂��B
-'':key''�͎�L�[�ƂȂ�J�����ł��B
-Senna�ō쐬����e�[�u����(�����_�ł�)�K����L�[�������Ȃ���΂Ȃ�܂���B
-�܂�'':key''�J�����̌^�͕�����^�Ɍ��肳��Ă��܂��B
+テーブルを作成した時点で'':key''という名前のカラムが自動的に追加されています。
+'':key''は主キーとなるカラムです。
+Sennaで作成するテーブルは(現時点では)必ず主キーを持たなければなりません。
+また'':key''カラムの型は文字列型に限定されています。
 
-* ���R�[�h��ǉ�����
+* レコードを追加する
 
-''<items>''�e�[�u���Ƀ��R�[�h��ǉ����܂��B
+''<items>''テーブルにレコードを追加します。
 
 {{{
 > (<items> ::new "http://ja.wikipedia.org/wiki/LISP")
@@ -67,73 +67,73 @@ Senna�ō쐬����e�[�u����(�����_�ł�)�K����L�[�������Ȃ���΂Ȃ�܂���B
  #p<0000800002>
 }}}
 
-�������m�F����Ɗm����2�������Ă��܂��B
+件数を確認すると確かに2件増えています。
 
 {{{
 > (<items> ::nrecords)
 2
 }}}
 
-��L�[���w�肵�ă��R�[�h�����o�����ɂ͈ȉ��̂悤�ɂ��܂��B
+主キーを指定してレコードを取り出す時には以下のようにします。
 
 {{{
 > (<items> : "http://ja.wikipedia.org/wiki/LISP")
  #p<0000800001>
 }}}
 
-* �S���������s��
+* 全文検索を行う
 
-�eitem�̃^�C�g���������o�^���āA�S�������ł���悤�ɂ��Ă݂܂��傤�B
+各itemのタイトル文字列を登録して、全文検索できるようにしてみましょう。
 
-�܂�''<items>''�e�[�u����''title''�Ƃ������O�̃J������ǉ����܂��B
+まず''<items>''テーブルに''title''という名前のカラムを追加します。
 
 {{{
 > (<items> ::def :title <text>)
 <items>.title
 }}}
 
-3�Ԗڂ̈����́A�ǉ�����J�����̃f�[�^�^�������Ă��܂��B
-''<int>'', ''<text>'', ''<longtext>''���̌^����{�^�Ƃ��ėp�ӂ���Ă��܂��B
+3番目の引数は、追加するカラムのデータ型を示しています。
+''<int>'', ''<text>'', ''<longtext>''等の型が基本型として用意されています。
 
-�S���������邽�߂ɂ́A������𕪉����ē�����e�P����i�[���邽�߂̃e�[�u����ʓr���Ȃ���΂Ȃ�܂���B�����ł�''<terms>''�Ƃ������O�Ńe�[�u�����`���܂��B
-���̒i�K�ŒP��C���f�b�N�X�ɂ��邩ngram�C���f�b�N�X�ɂ��邩�����߂܂��B
+全文検索するためには、文字列を分解して得られる各単語を格納するためのテーブルを別途しなければなりません。ここでは''<terms>''という名前でテーブルを定義します。
+この段階で単語インデックスにするかngramインデックスにするかも決めます。
 
 {{{
 > (ptable '<terms> :ngram)
 <terms>
 }}}
 
-''<item>''�e�[�u����''title''�J�����ɑ΂���C���f�b�N�X���`���܂��B
+''<item>''テーブルの''title''カラムに対するインデックスを定義します。
 
 {{{
 > (<terms> ::def :item_title :as '(<items>.title ::match ()))
 <terms>.item_title
 }}}
 
-������a���������邩���m��܂��񂪁A
-''<item>''�e�[�u���̃J�����ɑ΂���C���f�b�N�X�́A
-''<terms>''�e�[�u���̃J�����Ƃ��Ē�`���܂��B
+少し違和感を感じるかも知れませんが、
+''<item>''テーブルのカラムに対するインデックスは、
+''<terms>''テーブルのカラムとして定義します。
 
-''<item>''�Ƀ��R�[�h���o�^�����ƁA���̒��Ɋ܂܂��P��ɊY�����郌�R�[�h��
-''<terms>''�Ɏ����I�ɒǉ������悤�ɂȂ�܂��B
+''<item>''にレコードが登録されると、その中に含まれる単語に該当するレコードが
+''<terms>''に自動的に追加されるようになります。
 
-''<terms>''�́A�����Ɋ܂܂���b�ɑ�������A������ȃe�[�u�����ƌ����܂��B
-�������A���̃e�[�u���Ɠ��l�Ɍ�b�e�[�u���ɂ͎��R�ɃJ������ǉ����A
-�P�ꖈ�̗l�X�ȑ������Ǘ����邱�Ƃ��ł��܂��B
-����͂����̌����������s���ۂɂ͔��ɕ֗��ɋ@�\���܂��B
+''<terms>''は、文書に含まれる語彙に相当する、やや特殊なテーブルだと言えます。
+しかし、他のテーブルと同様に語彙テーブルには自由にカラムを追加し、
+単語毎の様々な属性を管理することができます。
+これはある種の検索処理を行う際には非常に便利に機能します。
 
-����Ńe�[�u���̒�`�͊����ł��B
+これでテーブルの定義は完了です。
 
-��قǓo�^�����e���R�[�h��''title''�J�����ɒl���Z�b�g���܂��B
+先ほど登録した各レコードの''title''カラムに値をセットします。
 
 {{{
 > ((<items> : "http://ja.wikipedia.org/wiki/LISP") :title "LISP")
 "LISP"
-> ((<items> : "http://www.unfindable.net/~yabuki/article/why_lisp.html") :title "�Ȃ�Lisp�Ȃ̂�")
-"�Ȃ�Lisp�Ȃ̂�"
+> ((<items> : "http://www.unfindable.net/~yabuki/article/why_lisp.html") :title "なぜLispなのか")
+"なぜLispなのか"
 }}}
 
-�ȉ��̂悤�ɂ��Č������邱�Ƃ��ł��܂��B
+以下のようにして検索することができます。
 
 {{{
 > (disp (<terms>.item_title : "lisp") :json)
@@ -141,9 +141,9 @@ Senna�ō쐬����e�[�u����(�����_�ł�)�K����L�[�������Ȃ���΂Ȃ�܂���B
 #t
 }}}
 
-''disp''�́A�������ʓ��̃I�u�W�F�N�g���o�͂���g���݊֐��ł��B''disp''�֐��̑�2�����ɂ͏o�͌`�����w�肵�܂��B��L�̗��json�`���ŏo�͂��Ă��܂��B
+''disp''は、検索結果等のオブジェクトを出力する組込み関数です。''disp''関数の第2引数には出力形式を指定します。上記の例はjson形式で出力しています。
 
-�ȒP�̂��߁A�������ʂ�tsv�`���ŏo�͂���֐�''sen-output''���ȉ��̂悤�ɒ�`���Ă����܂��B
+簡単のため、検索結果をtsv形式で出力する関数''sen-output''を以下のように定義しておきます。
 
 {{{
 (define (sen-output . x)
@@ -151,21 +151,21 @@ Senna�ō쐬����e�[�u����(�����_�ł�)�K����L�[�������Ȃ���΂Ȃ�܂���B
  (disp (cons : x) :tsv))
 }}}
 
-''sen-output''�́A�I�u�W�F�N�g��TSV�`���ŏo�͂��܂��B
-�������ɏo�͑Ώۂ̃I�u�W�F�N�g���A
-�������ɏo�͂���J�������X�g���w�肵�܂��B
+''sen-output''は、オブジェクトをTSV形式で出力します。
+第一引数に出力対象のオブジェクトを、
+第二引数に出力するカラムリストを指定します。
 
-* �}���`���[�U�����̃u�b�N�}�[�N�A�v���P�[�V����
+* マルチユーザ向けのブックマークアプリケーション
 
-�����܂łō�����P�@�\�̃A�v���P�[�V���������������g�����āA
-�����̃��[�U���A���ꂼ��ɃR�����g���L���ł���u�b�N�}�[�N�A�v���P�[�V�����ɂ��Ă݂܂��傤�B
+ここまでで作った単機能のアプリケーションをもう少し拡張して、
+複数のユーザが、それぞれにコメントを記入できるブックマークアプリケーションにしてみましょう。
 
-�܂��A���[�U���ƃR�����g�����i�[����e�[�u����ǉ����āA
-���}�̂悤�ȃe�[�u���\���ɂ��܂��B
+まず、ユーザ情報とコメント情報を格納するテーブルを追加して、
+下図のようなテーブル構成にします。
 
 {{img("senna2.files/rect4605.png")}}
 
-''<users>''�e�[�u����''<comments>''�e�[�u����ǉ����܂��B
+''<users>''テーブルと''<comments>''テーブルを追加します。
 
 {{{
 > (ptable '<users>)
@@ -184,52 +184,52 @@ Senna�ō쐬����e�[�u����(�����_�ł�)�K����L�[�������Ȃ���΂Ȃ�܂���B
 <comments>.issued
 }}}
 
-''<comments>''�e�[�u����''content''�J������S�������ł���悤�ɃC���f�b�N�X���`���܂��B
+''<comments>''テーブルの''content''カラムを全文検索できるようにインデックスを定義します。
 
 {{{
 > (<terms> ::def :comment_content :as '(<comments>.content ::match ()))
 <terms>.comment_content
 }}}
 
-����Ńe�[�u������`�ł��܂����B
+これでテーブルが定義できました。
 
-�����ă��[�U�����l���ǉ����܂��B
+続いてユーザを何人か追加します。
 
 {{{
-> (<users> ::new "moritan" :name "�����^��")
+> (<users> ::new "moritan" :name "モリタン")
  #p<0000400001>
-> (<users> ::new "taporobo" :name "�^�|���{")
+> (<users> ::new "taporobo" :name "タポロボ")
  #p<0000400002>
 }}}
 
-���ɁA���ۂɃ��[�U���u�b�N�}�[�N��\�鎞�̏��������s���Ă݂܂��傤�B
+次に、実際にユーザがブックマークを貼る時の処理を実行してみましょう。
 
-���[�U''moritan''���A�͂Ăȃ_�C�A���[�̂Ƃ���y�[�W���u�b�N�}�[�N�����Ƒz�肵�܂��B
+ユーザ''moritan''が、はてなダイアリーのとあるページをブックマークしたと想定します。
 
-�܂��Ώۂ̃y�[�W��''<items>''�e�[�u���ɓo�^�ς��ǂ������ׂ܂��B
+まず対象のページが''<items>''テーブルに登録済かどうか調べます。
 
 {{{
 > (<items> : "http://d.hatena.ne.jp/brazil/20050829/1125321936")
 ()
 }}}
 
-���o�^�Ȃ̂ł܂����Y�y�[�W��''<items>''�ɓo�^���܂��B
+未登録なのでまず当該ページを''<items>''に登録します。
 
 {{{
-> (<items> ::new "http://d.hatena.ne.jp/brazil/20050829/1125321936" :title "[�|��]JavaScript: ���E�ōł�������ꂽ�v���O���~���O����")
+> (<items> ::new "http://d.hatena.ne.jp/brazil/20050829/1125321936" :title "[翻訳]JavaScript: 世界で最も誤解されたプログラミング言語")
  #p<0000800003>
 }}}
 
-���ɁA�o�^����item��'':item''�J�����̒l�Ɏw�肵��''<comments>''�Ƀ��R�[�h��o�^���܂��B
+次に、登録したitemを'':item''カラムの値に指定して''<comments>''にレコードを登録します。
 
 {{{
 > (<comments> ::new "1" :item "http://d.hatena.ne.jp/brazil/20050829/1125321936" :author "moritan" :content "JavaScript LISP" :issued 1187430026)
  #p<0000600001>
 }}}
 
-* �֐���
+* 関数化
 
-��L�̈�A�̎葱�����֐��ɂ܂Ƃ߂Ă݂܂��B
+上記の一連の手続きを関数にまとめてみます。
 
 {{{
 > (define (add_bookmark item_url item_title comment_author comment_content comment_issued)
@@ -243,104 +243,104 @@ Senna�ō쐬����e�[�u����(�����_�ł�)�K����L�[�������Ȃ���΂Ȃ�܂���B
 add_bookmark
 }}}
 
-''add_bookmark''�Ƃ����֐������܂����B
-�ȉ��̂悤�Ȏ菇�����s���Ă��܂��B
+''add_bookmark''という関数を作りました。
+以下のような手順を実行しています。
 
-- ''<items>''�e�[�u���ɊY���y�[�W�̃��R�[�h�����邩�ǂ������ׂ�B
-- ���R�[�h���Ȃ���Βǉ�����B
-- ''<comments>''�e�[�u���ɓo�^����id�𕥂��o���B(������Ƒe��)
-- ''<comments>''�e�[�u���Ƀ��R�[�h��o�^����B
+- ''<items>''テーブルに該当ページのレコードがあるかどうか調べる。
+- レコードがなければ追加する。
+- ''<comments>''テーブルに登録するidを払い出す。(ちょっと粗い)
+- ''<comments>''テーブルにレコードを登録する。
 
-�쐬�����֐����Ăяo���Ă������u�b�N�}�[�N��o�^���Ă݂܂��傤�B
+作成した関数を呼び出していくつかブックマークを登録してみましょう。
 
 {{{
-> (add_bookmark "http://practical-scheme.net/docs/cont-j.html" "�Ȃ�ł��p��" "moritan" "�p�� LISP Scheme" 1187568692)
+> (add_bookmark "http://practical-scheme.net/docs/cont-j.html" "なんでも継続" "moritan" "継続 LISP Scheme" 1187568692)
  #p<0000600002>
-> (add_bookmark "http://d.hatena.ne.jp/higepon/20070815/1187192864" "�����ċA" "taporobo" "�����ċA Scheme LISP" 1187568793)
+> (add_bookmark "http://d.hatena.ne.jp/higepon/20070815/1187192864" "末尾再帰" "taporobo" "末尾再帰 Scheme LISP" 1187568793)
  #p<0000600003>
-> (add_bookmark "http://practical-scheme.net/docs/cont-j.html" "�Ȃ�ł��p��" "taporobo" "�g�����|���� LISP continuation" 1187568692)
+> (add_bookmark "http://practical-scheme.net/docs/cont-j.html" "なんでも継続" "taporobo" "トランポリン LISP continuation" 1187568692)
  #p<000060000w>
 }}}
 
-���̂悤�Ɋ֐��ďo���ɂ���ƁA�N���C�A���g���̏������Ȍ��ɂȂ�Ɠ����ɁA
-�N���C�A���g/�T�[�o�Ԃł̒ʐM���팸�ł���Ƃ��������b�g������܂��B
+このように関数呼出しにすると、クライアント側の処理が簡潔になると同時に、
+クライアント/サーバ間での通信を削減できるというメリットがあります。
 
-* �S����������2
+* 全文検索その2
 
-�o�^�������R�[�h�ɑ΂��đS�����������s���Ă݂܂��B
+登録したレコードに対して全文検索を実行してみます。
 
 {{{
 > (sen-output
 >  (<terms>.comment_content : "LISP")
 >  '(.:key .issued .item.title .author.name .content))
 4
-1	1187430026	[�|��]JavaScript: ���E�ōł�������ꂽ�v���O���~���O����	�����^��	JavaScript LISP
-2	1187568692	�Ȃ�ł��p��	�����^��	�p�� LISP Scheme
-3	1187568793	�����ċA	�^�|���{	�����ċA Scheme LISP
-4	1187568692	�Ȃ�ł��p��	�^�|���{	�g�����|���� LISP continuation
+1	1187430026	[翻訳]JavaScript: 世界で最も誤解されたプログラミング言語	モリタン	JavaScript LISP
+2	1187568692	なんでも継続	モリタン	継続 LISP Scheme
+3	1187568793	末尾再帰	タポロボ	末尾再帰 Scheme LISP
+4	1187568692	なんでも継続	タポロボ	トランポリン LISP continuation
 #t
 }}}
 
-�o�̓J�������X�g�ł́A�J��������''.''�Ōq���ŕ����f�[�^�^�̗v�f���ċA�I�ɒH�邱�Ƃ��ł��܂��B(���l�̏o�͂𕁒ʂ�RDB�Ŏ������邽�߂ɂ́A''<items>''�e�[�u��, ''<comments>''�e�[�u��, ''<users>''�e�[�u����JOIN���삪�K�v�ɂȂ�܂��B)
+出力カラムリストでは、カラム名を''.''で繋いで複合データ型の要素を再帰的に辿ることができます。(同様の出力を普通のRDBで実現するためには、''<items>''テーブル, ''<comments>''テーブル, ''<users>''テーブルのJOIN操作が必要になります。)
 
 
-��̎��̒��ŁA�̐S�̌��������́A�������̎���]�����鎞�_�Ŋ������Ă��āA
-���R�[�h�Z�b�g�I�u�W�F�N�g�Ƃ��ă������ɒ~�ς���Ă��܂��B
+上の式の中で、肝心の検索処理は、第一引数の式を評価する時点で完了していて、
+レコードセットオブジェクトとしてメモリに蓄積されています。
 
 {{{
 > (<terms>.comment_content : "LISP")
  #<RECORDS>
 }}}
 
-���R�[�h�Z�b�g�́A�o�͊֐��ɂ�����O�ɗl�X�ɉ��H���邱�Ƃ��ł��܂��B
+レコードセットは、出力関数にかける前に様々に加工することができます。
 
-�ȉ��́A���t�ō~���Ƀ\�[�g���Ă���o�͂�����ł��B
+以下は、日付で降順にソートしてから出力した例です。
 
 {{{
 > (sen-output
 >  ((<terms>.comment_content : "LISP") ::sort :issued :desc)
 >  '(.:key .issued .item.title .author.name .content))
 4
-3	1187568793	�����ċA	�^�|���{	�����ċA Scheme LISP
-2	1187568692	�Ȃ�ł��p��	�����^��	�p�� LISP Scheme
-4	1187568692	�Ȃ�ł��p��	�^�|���{	�g�����|���� LISP continuation
-1	1187430026	[�|��]JavaScript: ���E�ōł�������ꂽ�v���O���~���O����	�����^��	JavaScript LISP
+3	1187568793	末尾再帰	タポロボ	末尾再帰 Scheme LISP
+2	1187568692	なんでも継続	モリタン	継続 LISP Scheme
+4	1187568692	なんでも継続	タポロボ	トランポリン LISP continuation
+1	1187430026	[翻訳]JavaScript: 世界で最も誤解されたプログラミング言語	モリタン	JavaScript LISP
 #t
 }}}
 
-����item�����x���o�Ă���ƌ������ʂ����ɂ����̂ŁAitem���ɃO���[�v�����Ă݂܂��B
+同じitemが何度も出てくると検索結果が見にくいので、item毎にグループ化してみます。
 
 {{{
 > (sen-output
 >  ((<terms>.comment_content : "LISP") ::group :item)
 >  '(.:nsubrecs .:key .title))
 3
-1	http://d.hatena.ne.jp/brazil/20050829/1125321936	[�|��]JavaScript: ���E�ōł�������ꂽ�v���O���~���O����
-2	http://practical-scheme.net/docs/cont-j.html	�Ȃ�ł��p��
-1	http://d.hatena.ne.jp/higepon/20070815/1187192864	�����ċA
+1	http://d.hatena.ne.jp/brazil/20050829/1125321936	[翻訳]JavaScript: 世界で最も誤解されたプログラミング言語
+2	http://practical-scheme.net/docs/cont-j.html	なんでも継続
+1	http://d.hatena.ne.jp/higepon/20070815/1187192864	末尾再帰
 #t
 }}}
 
-''::nsubrecs''�Ƃ����̂̓O���[�v�������P�ʂɊ܂܂�郌�R�[�h�̌����������܂��B
-SQL�Ō����΁AGROUP BY ����܂ރN�G����count�֐��̂悤�ȓ����ł��B
+''::nsubrecs''というのはグループ化した単位に含まれるレコードの件数を示します。
+SQLで言えば、GROUP BY 句を含むクエリのcount関数のような働きです。
 
-* �������G�Ȍ���
+* 少し複雑な検索
 
-����Ɏ��p�I�Ȍ����ɂ��čl���Ă݂܂��傤�B
+さらに実用的な検索について考えてみましょう。
 
-�u�b�N�}�[�N����ʂɒ~�ς����ɏ]���āA���I�m�ɓK���x���Z�o����K�v���ɔ����܂��B
+ブックマークが大量に蓄積されるに従って、より的確に適合度を算出する必要性に迫られます。
 
-���̂Ƃ��댟���ΏۂƂ��ė��p�ł���̂�''<items>.title''��''<comments>.content''�ł����A
-''<items>.title''�͌��y�[�W���瓾������M���ł�����Ȃ̂ɑ΂��āA
-''<comments>.content''�̓u�b�N�}�[�N���[�U���C�ӂɐݒ�ł�����ŁA���M�ߐ��ɖR�����ƌ����܂��B�������A�Č������m�ۂ��邽�߂ɂ̓��[�U�̃R�����g������ΏۂɊ܂߂����Ƃ���ł��B
+今のところ検索対象として利用できるのは''<items>.title''と''<comments>.content''ですが、
+''<items>.title''は元ページから得られるやや信頼できる情報なのに対して、
+''<comments>.content''はブックマークユーザが任意に設定できる情報で、やや信憑性に乏しいと言えます。しかし、再現率を確保するためにはユーザのコメントも是非対象に含めたいところです。
 
-�����ŁA�ȉ��̂悤�ȃ|���V�[�Ō������s�����Ƃɂ��܂��B
+そこで、以下のようなポリシーで検索を行うことにします。
 
-- ''<items>.title''��''<comments>.content''�̂����ꂩ�Ƀ}�b�`����item����������B
-- �������A''<items>.title''�Ƀ}�b�`�������R�[�h�̓X�R�A��10�{�d�ݕt������B
-- �����item�ɑ΂��āA�L�[���[�h�Ƀ}�b�`����comment���������݂����ꍇ�́A���ꂼ���comment�̃X�R�A�̘a���A�Y������item�̃X�R�A�Ƃ���B
+- ''<items>.title''か''<comments>.content''のいずれかにマッチするitemを検索する。
+- ただし、''<items>.title''にマッチしたレコードはスコアを10倍重み付けする。
+- 同一のitemに対して、キーワードにマッチするcommentが複数存在した場合は、それぞれのcommentのスコアの和を、該当するitemのスコアとする。
 
-�ȉ��̂悤�ɂ��āAcomment��item�Ƃ��ꂼ��ɑ΂��錟�����ʂ����߂܂��B
+以下のようにして、commentとitemとそれぞれに対する検索結果を求めます。
 
 {{{
 > (define r1 (<terms>.comment_content : "LISP"))
@@ -349,18 +349,18 @@ r1
 r2
 }}}
 
-r1�̌��ʂ�''item''���ɃO���[�v�����Ar2��union���ďo�͂��܂��B
+r1の結果を''item''毎にグループ化し、r2とunionして出力します。
 
 {{{
 > (sen-output (((r1 ::group :item) ::union r2) ::sort ::score) '(.:score .title))
 5
 50	LISP
-50	�Ȃ�Lisp�Ȃ̂�
-10	�Ȃ�ł��p��
-5	[�|��]JavaScript: ���E�ōł�������ꂽ�v���O���~���O����
-5	�����ċA
+50	なぜLispなのか
+10	なんでも継続
+5	[翻訳]JavaScript: 世界で最も誤解されたプログラミング言語
+5	末尾再帰
 #t
 }}}
 
-����ŖړI�̌��ʂ������܂����B
+これで目的の結果が得られました。
 

@@ -1,58 +1,58 @@
-* ���m�̐��������E�s�
+* 既知の制限事項・不具合
 
-* ��������
+* 制限事項
 
-** �C���f�b�N�X����l
+** インデックス上限値
 
-1�̃C���f�b�N�X�ɂ�����_����̏���l�͈ȉ��̂Ƃ���ł��B
+1つのインデックスにおける論理上の上限値は以下のとおりです。
 
--�ő僌�R�[�h��: 268,435,455 (��2��6�疜)
--�ő��b��:     268,435,455 (��2��6�疜)
--�ő�C���f�b�N�X�T�C�Y: 256GByte
-(���ۂɂ͑��̏������̐���ɂ���L�̒l�܂œ��B���Ȃ��ꍇ������܂�)
+-最大レコード数: 268,435,455 (約2億6千万)
+-最大語彙数:     268,435,455 (約2億6千万)
+-最大インデックスサイズ: 256GByte
+(実際には他の諸条件の制約により上記の値まで到達しない場合もあります)
 
-** �}���`�v���Z�X�E�}���`�X���b�h�ł̗��p�ɂ���
+** マルチプロセス・マルチスレッドでの利用について
 
-�����̃v���Z�X�Ȃ����X���b�h����̃C���f�b�N�X�ɑ΂��ē����ɍX�V��������s���邱�Ƃ͂ł��܂���B
-�ʓr�r�����䂪�K�v�ɂȂ�܂��B
+複数のプロセスないしスレッドが一つのインデックスに対して同時に更新操作を実行することはできません。
+別途排他制御が必要になります。
 
-** SEN_SPLIT_ALPHA,DIGIT,SYMBOL�ɂ���
+** SEN_SPLIT_ALPHA,DIGIT,SYMBOLについて
 
-SEN_INDEX_NORMALIZE���w�肳��Ă��Ȃ��ꍇ�͗��p�ł��܂���B
+SEN_INDEX_NORMALIZEが指定されていない場合は利用できません。
 
-** sen_records_find, sen_records_at�ɂ���
+** sen_records_find, sen_records_atについて
 
-sen_records_find, sen_records_at�����s�����ȍ~�ɁA
-sen_records_next�����s�����ꍇ���������ʂ��Ԃ���邱�Ƃ͕ۏ؂���܂���B
-sen_records_rewind�����s���ăJ�[�\��������������K�v������܂��B
+sen_records_find, sen_records_atを実行した以降に、
+sen_records_nextを実行した場合正しい結果が返されることは保証されません。
+sen_records_rewindを実行してカーソルを初期化する必要があります。
 
-** snippet�֐���opentag, closetag�ɂ���
+** snippet関数のopentag, closetagについて
 
-snippet�֐����ĂяI���܂ŁAopentag��closetag�̃o�b�t�@���e�͕ύX�ł��܂���B
-�ύX�����ꍇ�A���삪�s��ƂȂ�܂��B
+snippet関数を呼び終わるまで、opentagとclosetagのバッファ内容は変更できません。
+変更した場合、動作が不定となります。
 
-** sen_sel_partial�I�v�V����, sen_sym_suffix_search�ɂ���
+** sen_sel_partialオプション, sen_sym_suffix_searchについて
 
-�ȉ��̏ꍇ�A
-sen_sel_partial�I�v�V�����Ō����v����p�^�[���̌�����A
-sen_sym_suffix_search�ɂČ����v�������s�����Ƃ��ł��܂���B
+以下の場合、
+sen_sel_partialオプションで後方一致するパターンの検索や、
+sen_sym_suffix_searchにて後方一致検索を行うことができません。
 
--�p������L��������
--SEN_INDEX_DELIMTED���w�肵�ăC���f�b�N�X���쐬�����ꍇ
+-英数字や記号文字列
+-SEN_INDEX_DELIMTEDを指定してインデックスを作成した場合
 
-��ʓI�ɉp��Ō���̕ω��͂�����̂́A�ꊲ�̕ω��͏��Ȃ��ƍl�����܂��B
-�����v���s�����߂ɂ́A��b�\�Ɍ�b��ǉ����Ȃ���΂Ȃ炸�A
-���p�p�x�ƌ�b�\�̃T�C�Y�Ƃ����Ă������ʂ��̂悤�Ȑ������������݂��܂��B
+一般的に英語で語尾の変化はあるものの、語幹の変化は少ないと考えられます。
+後方一致を行うためには、語彙表に語彙を追加しなければならず、
+利用頻度と語彙表のサイズとを勘案した結果このような制限事項が存在します。
 
-** Windows�ł�Linux�łŃC���f�b�N�X�̌`�����قȂ�܂�
+** Windows版とLinux版でインデックスの形式が異なります
 
-Windows�ł�Linux�łŁA�C���f�b�N�X�̌`�����قȂ�܂��B
+Windows版とLinux版で、インデックスの形式が異なります。
 
-* �s�
+* 不具合
 
-** AIO/DIO���g���Ȃ�
+** AIO/DIOが使えない
 
-Linux 2.6�ȍ~��AIO/DIO�@�\��p�������[�U���x���L���b�V�����������Ă���܂��B
-�������A�܂����̋@�\�͕s����ŁAsegmentation fault���N�����܂��B
+Linux 2.6以降のAIO/DIO機能を用いたユーザレベルキャッシュを実装しております。
+しかし、まだこの機能は不安定で、segmentation faultを起こします。
 
-���̖��́AYappo����ɂ��񍐂���܂����B
+この問題は、Yappoさんにより報告されました。

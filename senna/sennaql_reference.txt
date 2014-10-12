@@ -1,296 +1,296 @@
-* SennaQL ���t�@�����X
+* SennaQL リファレンス
 
-�����ł�R^4RS scheme�ɑ΂���SennaQL�������Ă���ǉ��@�\�ɂ��Đ������܂��B
+ここではR^4RS schemeに対してSennaQLが加えている追加機能について説明します。
 
-** �\��
+** 構文
 
 Reader Syntax: '':name''
 
-���O��name�ł���L�[���[�h�Ƃ��ēǂݍ��܂�܂��B�擪��':'�ł͂��܂�V���{�����L�[���[�h�ƌĂт܂��B�L�[���[�h�͕]������Ə�Ɏ��g��Ԃ��܂��B
+名前がnameであるキーワードとして読み込まれます。先頭が':'ではじまるシンボルをキーワードと呼びます。キーワードは評価すると常に自身を返します。
 
 
 
 Reader Syntax: ''datum.name''
 
-(datum :name)�Ƃ��ēǂݍ��܂�܂��Bdatum��'.'��name�̊Ԃɋ󔒂��󂯂Ă͂����܂���B
+(datum :name)として読み込まれます。datumと'.'とnameの間に空白を空けてはいけません。
 
 
 
 Reader Syntax: ''?''
 
-�t�H�[������'?'���܂܂�Ă����ꍇ�́A�t�H�[���̒���̓��͂𕶎���Ƃ��ēǂݍ��݁A'?'�ƒu�������܂��B�t�H�[�����ɕ�����'?'���܂܂�Ă����ꍇ�́A'?'�̏o�����ɑΉ����邾�����͂�ǂݍ��݁A�o�������ɉ����Ēu�������܂��B(���͂�sen_ctx_send()�̌ďo���ƑΉ����܂�)
+フォーム中に'?'が含まれていた場合は、フォームの直後の入力を文字列として読み込み、'?'と置き換えます。フォーム中に複数の'?'が含まれていた場合は、'?'の出現数に対応するだけ入力を読み込み、出現順序に沿って置き換えます。(入力はsen_ctx_send()の呼出しと対応します)
 
 
 
-** Scheme�葱��
+** Scheme手続き
 
 Function: ''ptable'' name &optional args
 
-���O��name�ł���i���I�ȃe�[�u�����`���܂��Bargs�̎w��`���ɂ͈ȉ���5��ނ�����܂��B
+名前がnameである永続的なテーブルを定義します。argsの指定形式には以下の5種類があります。
 
-�`��1 ''ptable'' name &optional type option1 option2 ...
+形式1 ''ptable'' name &optional type option1 option2 ...
 
-��L�[�̌^��type�ł����{�e�[�u�����`���܂��Btype���ȗ������ꍇ�́A������^(''<shorttext>'')���w�肳�ꂽ���̂Ƃ݂Ȃ��܂��Btype��������^(''<shorttext>'')�ł������ꍇ�ɂ́A�ȉ���option���w��ł��܂��B
+主キーの型がtypeである基本テーブルを定義します。typeを省略した場合は、文字列型(''<shorttext>'')が指定されたものとみなします。typeが文字列型(''<shorttext>'')であった場合には、以下のoptionが指定できます。
 
- :delimited  ��`����e�[�u����]�u�����̌�b�e�[�u���Ƃ��ė��p����ꍇ�A�󔒂ŋ�؂���������P�ʂŌ�b���Ǘ����܂��B
+ :delimited  定義するテーブルを転置索引の語彙テーブルとして利用する場合、空白で区切った文字列単位で語彙を管理します。
 
- :euc-jp     ��L�[�l��EUC-JP�ŃG���R�[�f�B���O���ꂽ������Ƃ݂Ȃ��܂��B
+ :euc-jp     主キー値をEUC-JPでエンコーディングされた文字列とみなします。
 
- :koi8r      ��L�[�l��koi8r�ŃG���R�[�f�B���O���ꂽ������Ƃ݂Ȃ��܂��B
+ :koi8r      主キー値をkoi8rでエンコーディングされた文字列とみなします。
 
- :latin1     ��L�[�l��latin1�ŃG���R�[�f�B���O���ꂽ������Ƃ݂Ȃ��܂��B
+ :latin1     主キー値をlatin1でエンコーディングされた文字列とみなします。
 
- :ngram      ��`����e�[�u����]�u�����̌�b�e�[�u���Ƃ��ė��p����ꍇ�Angram������P�ʂŌ�b���Ǘ����܂��B
+ :ngram      定義するテーブルを転置索引の語彙テーブルとして利用する場合、ngram文字列単位で語彙を管理します。
 
- :normalize  ��L�[�l���p�����̑啶��/�������A�S�p����/���p�����𐳋K�����܂��B
+ :normalize  主キー値を英文字の大文字/小文字、全角文字/半角文字を正規化します。
 
- :sjis       ��L�[�l��shift-jis�ŃG���R�[�f�B���O���ꂽ������Ƃ݂Ȃ��܂��B
+ :sjis       主キー値をshift-jisでエンコーディングされた文字列とみなします。
 
- :sis        ��`����e�[�u����]�u�����̌�b�e�[�u���Ƃ��ė��p����ꍇ�A�����v�������\�ɂ��܂��B
+ :sis        定義するテーブルを転置索引の語彙テーブルとして利用する場合、後方一致検索を可能にします。
 
- :utf8       ��L�[�l��utf-8�ŃG���R�[�f�B���O���ꂽ������Ƃ݂Ȃ��܂��B
+ :utf8       主キー値をutf-8でエンコーディングされた文字列とみなします。
 
-�`��2 ''ptable'' name :surrogate-key
+形式2 ''ptable'' name :surrogate-key
 
-�����^�̎�L�[�l�������I�ɕt�^�����{�e�[�u�����`���܂��B(������)
+整数型の主キー値を自動的に付与する基本テーブルを定義します。(未実装)
 
-�`��3 ''ptable'' name table
+形式3 ''ptable'' name table
 
-table����`�ς݂̃e�[�u���ł������ꍇ�́Atable��base�Ƃ���r���[�e�[�u�����`���܂��B
+tableが定義済みのテーブルであった場合は、tableをbaseとするビューテーブルを定義します。
 
-�`��4 ''ptable'' name :as query
+形式4 ''ptable'' name :as query
 
-query�̎��s���ʂ�l�Ƃ���r���[�e�[�u�����`���܂��B(������)
+queryの実行結果を値とするビューテーブルを定義します。(未実装)
 
-�`��5 ''ptable'' name :key pkeyspec-list
+形式5 ''ptable'' name :key pkeyspec-list
 
-�����L�[����L�[�Ƃ���e�[�u�����`���܂��Bpkeyspec-list�ɂ͈ȉ��̂悤�ȃt�H�[���̃��X�g���w�肵�܂��B(������)
+複合キーを主キーとするテーブルを定義します。pkeyspec-listには以下のようなフォームのリストを指定します。(未実装)
 
  (type option1 option2 ...)
 
-option�ɂ͌`��1�̏ꍇ�Ɠ������̂��w��ł��܂��B
+optionには形式1の場合と同じものが指定できます。
 
 Function: ''disp'' obj format
 
-format�Ɏw�肷��`����obj���o�͂��܂��Bformat�ɂ͈ȉ��̂����ꂩ���w�肵�܂��B
+formatに指定する形式でobjを出力します。formatには以下のいずれかを指定します。
 
- :json JSON�`��
+ :json JSON形式
 
- :sexp S��(������)
+ :sexp S式(未実装)
 
- :tsv  TSV�`��
+ :tsv  TSV形式
 
- :xml  XML�`��(������)
+ :xml  XML形式(未実装)
 
-obj���Ɉȉ��̃t�H�[�����܂܂�Ă����ꍇ�͓��ʂȏ������������܂��B
+obj中に以下のフォームが含まれていた場合は特別な処理が加えられます。
 
  (: table slot-spec &optional offset limit)
 
-table��offset�Ԗڂ���limit���̃��R�[�h��slot-spec�ɏ]���đ��������o���ďo�͂��܂��Boffset��limit�̊���l�́A���ꂼ��0��10�ł��B
+tableのoffset番目からlimit件のレコードをslot-specに従って属性を取り出して出力します。offsetとlimitの既定値は、それぞれ0と10です。
 
-slot-spec�ɂ�slot-expr�̃��X�g���w�肵�܂��Bslot-expr�͈ȉ��̂悤�ȃt�H�[���ł��B
+slot-specにはslot-exprのリストを指定します。slot-exprは以下のようなフォームです。
 
  (() :slotname)
 
-slotname�ɑΉ����鑮���̒l���o�͂���܂��B����͈ȉ��̂悤�ɕ\�L���邱�Ƃ��ł��܂��B
+slotnameに対応する属性の値が出力されます。これは以下のように表記することもできます。
 
  .slotname
 
-�w�肵���������A�O���L�[�Ƃ��đ��̃e�[�u�����Q�Ƃ��Ă���ꍇ�A�ȉ��̂悤�ɎQ�Ɛ�̃e�[�u���̃��R�[�h�̑������ċA�I�Ɏ擾���ďo�͂��邱�Ƃ��ł��܂��B
+指定した属性が、外部キーとして他のテーブルを参照している場合、以下のように参照先のテーブルのレコードの属性を再帰的に取得して出力することができます。
 
  (((() :slotname1) :slotname2) :slotname3)
 
-����͈ȉ��̂悤�ɕ\�L���邱�Ƃ��ł��܂��B
+これは以下のように表記することもできます。
 
  .slotname1.slotname2.slotname3
 
-slot-spec�̐擪�v�f���V���{��'@'�ł������ꍇ�́A�ȉ��̂悤��label��slot-expr�����݂ɗ^��������̂Ƃ݂Ȃ���܂��B
+slot-specの先頭要素がシンボル'@'であった場合は、以下のようにlabelとslot-exprが交互に与えられるものとみなされます。
 
  (@ label1 slot-expr1 label2 slot-expr2 label3 slot-expr3 ...)
 
 Function: ''snippet'' cond width max_results opentag1 closetag1 opentag2 closetag2 ...
 
-snippet�֐��𐶐����܂��B
+snippet関数を生成します。
 
 Function: ''x->query'' string
 
-query�I�u�W�F�N�g�𐶐����܂��B
+queryオブジェクトを生成します。
 
 
 
-** �g���݌^
+** 組込み型
 
-�e�[�u���̎�L�[(*)�⑮���Ɏw��ł���f�[�^�^�Ƃ��Ĉȉ�����������Ă��܂��B
+テーブルの主キー(*)や属性に指定できるデータ型として以下が準備されています。
 
-Builtin Type: ''<shorttext>'' 8KByte�ȉ��̕�����
+Builtin Type: ''<shorttext>'' 8KByte以下の文字列
 
-Builtin Type: ''<text>''  64KByte�ȉ��̕�����
+Builtin Type: ''<text>''  64KByte以下の文字列
 
-Builtin Type: ''<longtext>'' 4MByte�ȉ��̕�����
+Builtin Type: ''<longtext>'' 4MByte以下の文字列
 
-Builtin Type: ''<int>'' -2147483648 ~ 2147483647�͈͓̔��̐���
+Builtin Type: ''<int>'' -2147483648 ~ 2147483647の範囲内の整数
 
-Builtin Type: ''<uint>'' 0 ~ 4294967295�͈͓̔��̐���
+Builtin Type: ''<uint>'' 0 ~ 4294967295の範囲内の整数
 
-Builtin Type: ''<int64>'' -9223372036854775808 ~ 9223372036854775807�͈͓̔��̐���
+Builtin Type: ''<int64>'' -9223372036854775808 ~ 9223372036854775807の範囲内の整数
 
-Builtin Type: ''<float>'' IEEE 64 �r�b�g�̕����t�����������_��
+Builtin Type: ''<float>'' IEEE 64 ビットの符号付き浮動小数点数
 
-Builtin Type: ''<time>'' 1901�N12��14��5��45��52.000000�b ~ 2038�N1��19��12��14��7.999999�b�͈͓̔��̎���
+Builtin Type: ''<time>'' 1901年12月14日5時45分52.000000秒 ~ 2038年1月19日12時14分7.999999秒の範囲内の時刻
 
-(*) ��L�[�l�ɂ�<text>, <longtext>�͎w��ł��܂���B
+(*) 主キー値には<text>, <longtext>は指定できません。
 
 
-** �e�[�u��
+** テーブル
 
-ptable���Œ�`�����e�[�u���́A�ȉ��̂悤�Ɋ֐��Ƃ��ĕ]�����邱�Ƃɂ���đ��삷�邱�Ƃ��ł��܂��B
+ptable等で定義したテーブルは、以下のように関数として評価することによって操作することができます。
 
  (table_obj selector args ...)
 
-table_obj�ɂ�ptable�Œ�`�����e�[�u����A�֌W���Z�̌��ʂƂ��ĕԂ����e�[�u�����w�肷�邱�Ƃ��ł��܂��Bselector�Ɏw��\�ȃL�[���[�h�Ƃ��Ĉȉ�����������Ă��܂��B
+table_objにはptableで定義したテーブルや、関係演算の結果として返されるテーブルを指定することができます。selectorに指定可能なキーワードとして以下が準備されています。
 
 
 
-Builtin Selector: ''�F'' value
+Builtin Selector: ''：'' value
 
-table_obj�����L�[�̒l��value�ł��郌�R�[�h��Ԃ��܂��B�Ή����郌�R�[�h�����݂��Ȃ��ꍇ��()��Ԃ��܂��B
+table_objから主キーの値がvalueであるレコードを返します。対応するレコードが存在しない場合は()を返します。
 
 
 
 Builtin Selector: ''::def'' slotname &optional args
 
-���O��slotname�ł���V����������table_obj�ɒ�`���܂��B
-slotname�ɂ̓L�[���[�h���w�肵�܂��B�������A'::'�Ŏn�܂�L�[���[�h�͑g���ݑ����Ƃ��ė\�񂳂�Ă��܂��̂Ŏg�p���邱�Ƃ��ł��܂���B
+名前がslotnameである新しい属性をtable_objに定義します。
+slotnameにはキーワードを指定します。ただし、'::'で始まるキーワードは組込み属性として予約されていますので使用することができません。
 
-�ȉ���3��ނ̎w��`��������܂��B(�i���e�[�u���̂ݗL��)
+以下の3種類の指定形式があります。(永続テーブルのみ有効)
 
-�`��1 ''::def'' slotname type
+形式1 ''::def'' slotname type
 
-���O��slotname�Ō^��type�ł��鑮�����`���܂��Btype�ɂ͐������f�[�^�^���w�肵�܂��B
+名前がslotnameで型がtypeである属性を定義します。typeには正しいデータ型を指定します。
 
-�`��2 ''::def'' slotname table
+形式2 ''::def'' slotname table
 
-table����`�ς݂̃e�[�u���ł������ꍇ�́Atable�̎�L�[�^�Ɠ������^�̑������`���܂��Btable�͊O���L�[�ƂȂ�A���̑����̒l����L�[�l�Ƃ��郌�R�[�h��table�ɕK�����݂��邱�Ƃ��ۏ؂����悤�ɂȂ�܂��B
+tableが定義済みのテーブルであった場合は、tableの主キー型と等しい型の属性を定義します。tableは外部キーとなり、この属性の値を主キー値とするレコードがtableに必ず存在することが保証されるようになります。
 
-�`��3 ''::def'' slotname :as query
+形式3 ''::def'' slotname :as query
 
-query�̎��s���ʂ�l�Ƃ���r���[�������`���܂��B
+queryの実行結果を値とするビュー属性を定義します。
 
 
 
 Builtin Selector: ''::new'' args
 
-table_obj�ɐV�K���R�[�h��ǉ����܂��B�Ώۂ̃e�[�u���̎�L�[��surrogate-key�ȊO�ł���ꍇ�͈ȉ��̌`���ƂȂ�܂��B(�i���e�[�u���̂ݗL��)
+table_objに新規レコードを追加します。対象のテーブルの主キーがsurrogate-key以外である場合は以下の形式となります。(永続テーブルのみ有効)
 
-�`��1 ''::new'' pkey-value &optional slot-name1 slot-value1 ...
+形式1 ''::new'' pkey-value &optional slot-name1 slot-value1 ...
 
-pkey-value����L�[�l�Ƃ��郌�R�[�h��ǉ����܂��B���R�[�h�����ɑ��݂��Ă����ꍇ�͂��̃��R�[�h��Ԃ��܂��B���Y���R�[�h�̖��O��slot-name�ł��鑮���̒l�ɂ�slot-value���Z�b�g����܂��B
+pkey-valueを主キー値とするレコードを追加します。レコードが既に存在していた場合はそのレコードを返します。当該レコードの名前がslot-nameである属性の値にはslot-valueがセットされます。
 
-table_obj�̎�L�[��surrogate-key�ł���ꍇ�͈ȉ��̌`���ƂȂ�܂��B
+table_objの主キーがsurrogate-keyである場合は以下の形式となります。
 
-�`��2 ''::new'' &optional slot-name1 slot-value1 ...
+形式2 ''::new'' &optional slot-name1 slot-value1 ...
 
-��L�[�l�͎����I�ɕt�^����܂��B
+主キー値は自動的に付与されます。
 
 
 
 Builtin Selector: ''::nrecords''
 
-table_obj�Ɋ܂܂�郌�R�[�h�̌�����Ԃ��܂��B
+table_objに含まれるレコードの件数を返します。
 
 
 
 Builtin Selector: ''::''
 
-table_obj�Ɋ܂܂�郌�R�[�h�����ɑS�Ď��o�����߂̃C�e���[�^���쐬���ĕԂ��܂��B
+table_objに含まれるレコードを順に全て取り出すためのイテレータを作成して返します。
 
 
 
 Builtin Selector: ''::+'' iterator
 
-iterator�Ɏw�肳�ꂽ�C�e���[�^�Ɋ�Â��Ď��̃��R�[�h��Ԃ��܂��B
+iteratorに指定されたイテレータに基づいて次のレコードを返します。
 
 
 
 Builtin Selector: ''::del'' value
 
-table_obj�����L�[�̒l��value�ł��郌�R�[�h���폜���܂��B�Ή����郌�R�[�h�����݂����ꍇ��#t���A���Ȃ������ꍇ��#f��Ԃ��܂��B
+table_objから主キーの値がvalueであるレコードを削除します。対応するレコードが存在した場合は#tを、しなかった場合は#fを返します。
 
 
 
 Builtin Selector: ''::difference!'' table
 
-table_obj��table�Ƃ̋��ʕ��������ꂼ�ꏜ�����܂��Btable_obj��table�͎�L�[�̌^������ł��邱�Ƃ��K�v�ł��B(�ꎞ�e�[�u���̂ݗL��)
+table_objとtableとの共通部分をそれぞれ除去します。table_objとtableは主キーの型が同一であることが必要です。(一時テーブルのみ有効)
 
 
 
 Builtin Selector: ''::group!'' slot-expr &optional limit dir
 
-table_obj�Ɋ܂܂��S�Ẵ��R�[�h�ɂ��āAslot-expr��K�p�������ʂ���L�[�Ƃ���e�[�u����table_obj��ϊ����܂��B
-(�ꎞ�e�[�u���̂ݗL���Bslot-expr�ɂ͊O���L�[�ł��鑮�����������w��ł���)
-limit�ɂ̓O���[�v����̃e�[�u���ɕۑ�����A�O���[�v���O�̎�L�[�̔z��̍ő�T�C�Y���w�肵�܂��B(����l��0) dir�ɂ�:asc(����)��:desc(�~��)�̂����ꂩ���w�肵�܂��B(����l��:desc) �O���[�v���O�̎�L�[�z��̕��я��������܂��B
+table_objに含まれる全てのレコードについて、slot-exprを適用した結果を主キーとするテーブルにtable_objを変換します。
+(一時テーブルのみ有効。slot-exprには外部キーである属性名だけが指定できる)
+limitにはグループ化後のテーブルに保存する、グループ化前の主キーの配列の最大サイズを指定します。(既定値は0) dirには:asc(昇順)と:desc(降順)のいずれかを指定します。(既定値は:desc) グループ化前の主キー配列の並び順を示します。
 
 
 
 Builtin Selector: ''::intersect!'' table
 
-table_obj��table�Ƃ̋��ʗv�f�݂̂��c���āA����ȊO�̗v�f��table_obj����폜���܂��Btable_obj��table�͎�L�[�̌^������ł��邱�Ƃ��K�v�ł��B(�ꎞ�e�[�u���̂ݗL��)
+table_objとtableとの共通要素のみを残して、それ以外の要素をtable_objから削除します。table_objとtableは主キーの型が同一であることが必要です。(一時テーブルのみ有効)
 
 
 
 Builtin Selector: ''::sort!'' slot-expr &optional limit dir
 
-table_obj�Ɋ܂܂��S���R�[�h��slot-expr��K�p�������ʂɂ���ĕ��בւ��A�ŏ���limit���݂̂��c���āA����ȊO��table_obj����폜���܂��Blimit�̊���l��10�ł��B dir�ɂ�:asc(����)��:desc(�~��)�̂����ꂩ���w�肵�܂��B����l��:desc�ł��B(�ꎞ�e�[�u���̂ݗL��)
+table_objに含まれる全レコードをslot-exprを適用した結果によって並べ替え、最初のlimit件のみを残して、それ以外をtable_objから削除します。limitの既定値は10です。 dirには:asc(昇順)と:desc(降順)のいずれかを指定します。既定値は:descです。(一時テーブルのみ有効)
 
 
 
 Builtin Selector: ''::subtract!'' table
 
-table_obj����table�Ƃ̋��ʗv�f���폜���܂��Btable_obj��table�͎�L�[�̌^������ł��邱�Ƃ��K�v�ł��B(�ꎞ�e�[�u���̂ݗL��)
+table_objからtableとの共通要素を削除します。table_objとtableは主キーの型が同一であることが必要です。(一時テーブルのみ有効)
 
 
 
 Builtin Selector: ''::union!'' table
 
-table_obj��table�Ƃ̘a�W����\���e�[�u����Ԃ��܂��B(����table_obj��table�͂�������j�󂳂�܂�)(�ꎞ�e�[�u���̂ݗL��)
+table_objとtableとの和集合を表すテーブルを返します。(元のtable_objとtableはいずれも破壊されます)(一時テーブルのみ有効)
 
 
 
 Builtin Selector: ''::common-prefix-search'' string
 
-table_obj�̎�L�[�ł��镶����̂����Astring�ƑO����v����ł��������������L�[�Ƃ��郌�R�[�h��Ԃ��܂��B(�i���e�[�u���̂ݗL��)
+table_objの主キーである文字列のうち、stringと前方一致する最も長い文字列を主キーとするレコードを返します。(永続テーブルのみ有効)
 
 
 
 Builtin Selector: ''::load'' &optional slotname1 slotname2 ...
 
-��L�[�l(*)��slotname�ɑΉ����鑮���̒l��TSV�`���Ŏ󂯎���ă��R�[�h��}�����܂��B
-��s���󂯂�ƏI�����܂��B(�i���e�[�u���̂ݗL��)
+主キー値(*)とslotnameに対応する属性の値をTSV形式で受け取ってレコードを挿入します。
+空行を受けると終了します。(永続テーブルのみ有効)
 
-(*) surrogate-key�̏ꍇ�͕s�v
+(*) surrogate-keyの場合は不要
 
 
 
 Builtin Selector: ''::prefix-search'' string
 
-table_obj�̒��Ŏ�L�[�l��string�ɑO����v���郌�R�[�h��v�f�Ƃ���e�[�u����Ԃ��܂��B(�i���e�[�u���̂ݗL��)
+table_objの中で主キー値がstringに前方一致するレコードを要素とするテーブルを返します。(永続テーブルのみ有効)
 
 
 
 Builtin Selector: ''::undef'' slotname
 
-table_obj����slotname�ɑΉ����鑮�����폜���܂��B
+table_objからslotnameに対応する属性を削除します。
 
 
 Builtin Selector: ''::scan'' match-expr
 
-table_obj�̒���match-expr�Ɏw�肷������𖞂������R�[�h��v�f�Ƃ���e�[�u����Ԃ��܂��B(�i���e�[�u���̂ݗL��)
+table_objの中でmatch-exprに指定する条件を満たすレコードを要素とするテーブルを返します。(永続テーブルのみ有効)
 
-match-expr�͈ȉ��̌`���̃t�H�[����n���܂��B
+match-exprは以下の形式のフォームを渡します。
 
  (func expr1 expr2 ...)
 
-expr��slot-expr���w�肷��ƁAtable_obj�̊e���R�[�h�ɂ���slot-expr��K�p�������ʂɒu������A�t�H�[�����]������܂��Bslot-expr�`���ȊO��expr�͒萔�Ɖ��߂���܂��Bfunc�͐^�U�l��Ԃ�C�g���݊֐��łȂ���΂Ȃ�܂���B����ł͈ȉ��̂����ꂩ���w��ł��܂��B
+exprにslot-exprを指定すると、table_objの各レコードについてslot-exprを適用した結果に置換され、フォームが評価されます。slot-expr形式以外のexprは定数と解釈されます。funcは真偽値を返すC組込み関数でなければなりません。現状では以下のいずれかが指定できます。
 
  not
  eqv?
@@ -307,102 +307,102 @@ expr��slot-expr���w�肷��ƁAtable_obj�̊e���R�[�h�ɂ���slot-expr��K�p�������
 
 Builtin Selector: ''::schema''
 
-�e�[�u���̒�`���o�͂��܂��B
+テーブルの定義を出力します。
 
 Builtin Selector: ''::suffix-search'' string
 
-table_obj�̒��Ŏ�L�[�l��string�Ɍ����v���郌�R�[�h��v�f�Ƃ���e�[�u����Ԃ��܂��B(��`���Ɏ�L�[������:sis�������w�肵�Ă����i���e�[�u���̂ݗL��)
+table_objの中で主キー値がstringに後方一致するレコードを要素とするテーブルを返します。(定義時に主キー属性に:sis属性を指定していた永続テーブルのみ有効)
 
 
 
 Builtin Selector: ''::slots'' string
 
-table_obj�̑����̂����A���O��string���O����v������̂�v�f�Ƃ���e�[�u����Ԃ��܂��B(�i���e�[�u���̂ݗL��)
+table_objの属性のうち、名前にstringが前方一致するものを要素とするテーブルを返します。(永続テーブルのみ有効)
 
 
 
-�f�[�^�x�[�X�쐬���Ɏ����I�ɍ쐬�����e�[�u��������܂��B
+データベース作成時に自動的に作成されるテーブルがあります。
 
 Builtin Table: ''<db>''
 
-<db>�̓f�[�^�x�[�X���ɒ�`���ꂽ�i���e�[�u����v�f�Ƃ���e�[�u���ł��B
-<db>�ɂ�selector�Ɏw��\�ȃL�[���[�h�Ƃ��Ĉȉ�����������Ă��܂��B
+<db>はデータベース内に定義された永続テーブルを要素とするテーブルです。
+<db>にはselectorに指定可能なキーワードとして以下が準備されています。
 
 Builtin Selector: ''::drop'' tablename
 
-�f�[�^�x�[�X����tablename�ɑΉ�����i���e�[�u�����폜���܂��B
+データベースからtablenameに対応する永続テーブルを削除します。
 
-** ���R�[�h
+** レコード
 
-�e�[�u���Ɋi�[����Ă��郌�R�[�h�́A�ȉ��̂悤�Ɋ֐��Ƃ��ĕ]�����邱�Ƃɂ���đ��삷�邱�Ƃ��ł��܂��B
+テーブルに格納されているレコードは、以下のように関数として評価することによって操作することができます。
 
  (record_obj selector args ...)
 
-record_obj�̓e�[�u��������o�������R�[�h��A���R�[�hID�𒼐ڗ^���邱�Ƃɂ���Ďw�肷�邱�Ƃ��ł��܂��B
+record_objはテーブルから取り出したレコードや、レコードIDを直接与えることによって指定することができます。
 
-ptable�Œ�`�����e�[�u����A�֌W���Z�̌��ʂƂ��ĕԂ����e�[�u�����w�肷�邱�Ƃ��ł��܂��Brecord_obj�������Ă���e�[�u���̊e������selector�Ƃ��Ďg�p���邱�Ƃ��ł��܂��B
+ptableで定義したテーブルや、関係演算の結果として返されるテーブルを指定することができます。record_objが属しているテーブルの各属性はselectorとして使用することができます。
 
 Selector: slot-name &optional value
 
-value���w�肳��Ȃ������ꍇ�́A���O��slot-name�ł��鑮���̒l��Ԃ��܂��B
-value���w�肳�ꂽ�ꍇ�́A���O��slot-name�ł��鑮���̒l��value�ɍX�V���܂��B
+valueが指定されなかった場合は、名前がslot-nameである属性の値を返します。
+valueが指定された場合は、名前がslot-nameである属性の値をvalueに更新します。
 
 
-selector�Ɏw��\�ȃL�[���[�h�Ƃ��Ĉȉ�����������Ă��܂��B
+selectorに指定可能なキーワードとして以下が準備されています。
 
 Builtin Selector: ''::id''
 
-record_obj��ID�𕶎���Ƃ��ĕԂ��܂��B���R�[�hID�́A���̃��R�[�h���폜����Ȃ�����s�ςł���A���R�[�h�̃��e�����\���Ƃ��Ďg�p���邱�Ƃ��ł��܂��B
+record_objのIDを文字列として返します。レコードIDは、そのレコードが削除されない限り不変であり、レコードのリテラル表現として使用することができます。
 
 
 
 Builtin Selector: ''::key''
 
-record_obj�̎�L�[�l��Ԃ��܂��B
+record_objの主キー値を返します。
 
 
 
 Builtin Selector: ''::score''
 
-record_obj���S����������ɂ���Đ������ꂽ�e�[�u���̗v�f�ł������ꍇ�A�S�������X�R�A�̒l��Ԃ��܂��B
+record_objが全文検索操作によって生成されたテーブルの要素であった場合、全文検索スコアの値を返します。
 
 
 
 Builtin Selector: ''::nsubrec''
 
-record_obj��group����ɂ���Đ������ꂽ�e�[�u���̗v�f�ł������ꍇ�Agroup���O�̃e�[�u���ɁA���Y���R�[�h�ɑΉ����郌�R�[�h�������܂܂�Ă�������Ԃ��܂��B
+record_objがgroup操作によって生成されたテーブルの要素であった場合、group化前のテーブルに、当該レコードに対応するレコードが何件含まれていたかを返します。
 
 
 
 
-** �e�[�u������
+** テーブル属性
 
-�e�[�u���̑����́A�ȉ��̂悤�Ɋ֐��Ƃ��ĕ]�����邱�Ƃɂ���đ��삷�邱�Ƃ��ł��܂��B
+テーブルの属性は、以下のように関数として評価することによって操作することができます。
 
  (slot_obj selector args ...)
 
-slot_obj�́A
+slot_objは、
 
  (table_obj slotname)
 
-�Ƃ����t�H�[����]�����邱�Ƃɂ���Ď��o�����Ƃ��ł��܂��B
-slotname�� :slotname �Ƃ����L�[���[�h�ł������ꍇ�A���̃t�H�[���́A
+というフォームを評価することによって取り出すことができます。
+slotnameが :slotname というキーワードであった場合、このフォームは、
 
  table_obj.slotname
 
-�Ƃ����\�L�ɂ���Ă��\�����邱�Ƃ��ł��܂��B
+という表記によっても表現することができます。
 
-�e�[�u�������ɂ͈ȉ��̑g����selector����������Ă��܂��B
+テーブル属性には以下の組込みselectorが準備されています。
 
-Builtin Selector: ''�F'' value
+Builtin Selector: ''：'' value
 
-slot_obj�������Ă���e�[�u�������L�[�̒l��value�ł��郌�R�[�h�����o���A���̃��R�[�h��slot_obj�̒l��Ԃ��܂��B�Ή����郌�R�[�h�����݂��Ȃ��ꍇ��()��Ԃ��܂��B
+slot_objが属しているテーブルから主キーの値がvalueであるレコードを取り出し、そのレコードのslot_objの値を返します。対応するレコードが存在しない場合は()を返します。
 
 Builtin Selector: ''::defrag''
 
-�ϒ��̃e�[�u�������̏ꍇ�A�t���O�����e�[�V�������蓮�ŉ������܂��B
+可変長のテーブル属性の場合、フラグメンテーションを手動で解消します。
 
 Builtin Selector: ''::schema''
 
-�e�[�u�������̒�`���o�͂��܂��B
+テーブル属性の定義を出力します。
 

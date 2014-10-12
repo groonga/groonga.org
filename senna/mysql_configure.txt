@@ -1,0 +1,91 @@
+* MySQLのconfigureオプション
+
+Sennaを導入する上でつまづきそうな、
+MySQLのconfigureオプションを調べる。
+
+既存のパッケージシステムでmysqlサーバを入れている場合、
+それに上書きする形だと、
+他の依存パッケージが使えて嬉しいだろう。
+
+他のノウハウ
+- configureに忘れずに--with-sennaをつける
+- -mtune=pentium4 などを用いて最適化(gccのバージョンによっては、-marchとか-mcpuとか)
+- /usr/local/以下にmecabとsennaが入っている場合は、-I/usr/local/includeと-L/usr/local/libをつける
+- Debianでは--with-named-curses-libs=/lib/libncurses.so.5が必要
+- --enable-thread-safe-clientをつける
+- --enable-assemblerをつける
+- CXXFLAGSに-felide-constructors -fno-exceptions -fno-rttiをつける
+- --with-unix-socket-path(ソケットのパス)と--prefix(インストールパス)と--localstatedir(データのパス)はパッケージシステムのMySQLが使っているものにあわせる
+- デバッグ時は--with-debugをつける
+- mysqlクライアントで日本語入力ができるように、--with-readlineをつける
+- --with-charsetでデフォルトのcharacter setを、--with-extra-charsetsでそれ以外に使えるcharacter setを選ぶ。allだと全てを静的に使えるようにし、complexだと全てを動的に使えるようにする。
+- staticリンクされたmysqldを得たい場合は、--with-mysqld-ldflags=-all-staticと--disable-sharedをつける。
+- 現在MySQLに添付されているreadlineは日本語が通らないので、--with-readlineをつける。
+
+
+mtuneの引数はこんな感じ。
+,i386,i386
+,i486,i486
+,i586もしくはpentium,MMXなしのpentium
+,pentium-mmx,MMXありのpentium
+,i686もしくはpentiumpro,PentiumPro
+,pentium2,Pentium2
+,pentium3もしくはpentium3m,Pentium3
+,pentiumm,PentiumM
+,pentium4もしくはpentium4m,Pentium4でSSE3をサポートしてないやつ
+,prescott,Pentium4でSSE3をサポートして、EM64Tをサポートしてないやつ
+,nocona,Pentium4でEM64Tをサポートしているやつ
+,k6,K6
+,k6-2もしくはk6-3,3dNOW!をサポートしたK6
+,athlonもしくはathlon-tbird enhanced,3dNOW!とSSEの一部命令をサポートしてるやつ
+,athlon-4もしくはathlon-xpもしくはathlon-mp,AthlonでSSE命令を全部サポートしてるやつ
+,k8もしくはopteronもしくはathlon64もしくはathlon-fx,Athlonでx86-64をサポートしてるやつやOpteron
+
+** MySQL 4.0.26 一般的なLinuxでの例
+
+-/usr/local/以下に入れる。
+-データは/var/lib/mysql以下に入れる。
+
+ CFLAGS="-O3 -mtune=nocona -I/usr/local/include" \
+ CXX=gcc CXXFLAGS="-O3 -mtune=nocona \
+ -felide-constructors -fno-exceptions -fno-rtti -I/usr/local/include" \
+ LDFLAGS="-L/usr/local/lib" \
+ ./configure \
+ --with-senna \
+ --prefix=/usr/local \
+ --enable-assembler \
+ --with-charset=ujis --with-extra-charsets=complex \
+ --enable-thread-safe-client \
+ --with-readline \
+ --localstatedir=/var/lib/mysql
+
+** MySQL 5.0.21 on Debian sargeでの例
+- --with-big-tablesをつけてみる。
+-socketのパスを合わせてみる。
+-/usr/以下に入れる。
+-データは/var/lib/mysql以下に入れる。
+
+ CFLAGS="-O3 -mtune=nocona -I/usr/local/include" \
+ CXX=gcc CXXFLAGS="-O3 -mtune=nocona \
+ -felide-constructors -fno-exceptions -fno-rtti -I/usr/local/include" \
+ LDFLAGS="-L/usr/local/lib" \
+ ./configure \
+ --with-senna \
+ --prefix=/usr \
+ --enable-assembler \
+ --with-charset=ujis --with-extra-charsets=complex \
+ --enable-thread-safe-client \
+ --with-big-tables \
+ --with-named-curses-libs=/lib/libncurses.so.5 \
+ --localstatedir=/var/lib/mysql \
+ --with-readline \
+ --with-unix-socket-path=/var/run/mysqld/mysqld.sock
+
+** デバッグのやり方
+
+以下のようにデバッグ
+
+ sudo gdb /usr/local/libexec/mysqld
+ break sql_select.cc:4798
+ run --gdb --basedir=/usr/local --datadir=/usr/local/var --user=mysql --pid-file=/usr/local/var/debichan.pid --skip-locking --port=3306 --socket=/tmp/mysql.sock
+

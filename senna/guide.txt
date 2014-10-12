@@ -1,0 +1,304 @@
+* 検索エンジンの構成とSennaの適用
+
+** 検索エンジンシステムの構成
+
+{{img("guide.files/2007_09_18_004335.png")}}
+
+- クロールorロードによって文書を一旦システム内部にコピーする
+- filterは文書から本文やメタデータを抽出する
+- 非管理下文書(運営者の管理下にない文書)では本文の抽出は自明ではない(エンコーディング識別・本文範囲特定等)
+- メタデータ: 著者・表題・出版日等の書誌情報、リンク情報・関連キーワード・ユーザ参照履歴等
+- 非管理化文書を対象に不特定ユーザ向けにサービスする場合、メタデータの活用が検索精度を決する
+- searcherは本文やメタデータを組み合わせて的確な結果を算出する
+- indexとcache(クエリキャッシュ)は、検索速度を補うために使われる副次的なデータ
+- frontendはユーザとエンジンとの界面。入出力の契機と方法を規定
+- crawler, filter, searcher, frontendは応用毎に特化したロジックが必要(その他は汎用化可能)
+
+** Sennaの適用範囲
+
+{{img("guide.files/2007_09_18_030003.png")}}
+
+- DBMSとSennaを組み合わせた場合 or 単体のSennaを使用した場合、点線で囲んだ範囲に適用可能
+- ただし、filter部には外部モジュールが必要(エンコーディング識別・パーザ・テキスト抽出フィルタ)
+- データストア・インデックス付与等の汎用機能を提供する。
+- filter, searcherのビジネスロジックを柔軟に記述可能な問い合わせ言語を提供する(SQL or SennaQL)
+
+** Sennaの特徴
+
+- 高速な更新(参照ロック不要・バキューム不要)
+- 高精度(適合率と再現率のバランス・両立)
+- 柔軟な問い合わせ(SQL, SennaQL)
+
+** SennaQL
+
+*** なぜ今、独自問い合わせ言語?
+
+- SQLは十分に柔軟で強力
+- しかし現状の実装(MySQL, PostgreSQL)では回避できない性能阻害要因がある
+- 目標: Sennaの性能を最大限に発揮しつつ、柔軟な問い合わせを記述可能にすること
+
+-- 将来はMySQLもPGも改善すると思われるが、現時点でSennaの能力を検証したい
+
+** SennaQLのデータモデル
+
+- データベースは任意数のテーブルで構成される
+- 主キーは必須
+- 外部キー定義可能
+- viewテーブル(他のテーブルから演算によって導出できるテーブル)
+- viewカラム(他のテーブル・カラムから演算によって導出できるカラム)
+- viewテーブル/viewカラムは任意の時点で実体化可能(常に最新に保つ/検索時に算出/キャッシュ有無等)
+
+- 転置インデックスはviewテーブルとviewカラムによって表現する
+
+** インストール
+
+*** 1) MeCabのインストール
+
+http://mecab.sourceforge.jp/#download
+
+{{{
+% tar zxfv mecab-X.X.tar.gz
+% cd mecab-X.X
+% ./configure --prefix=/usr
+% make
+% make check
+% sudo make install
+}}}
+
+辞書のインストール
+
+{{{
+% tar zxfv mecab-ipadic-2.7.0-XXXX.tar.gz
+% mecab-ipadic-2.7.0-XXXX
+% ./configure --prefix=/usr
+% make
+% sudo make install
+}}}
+
+*** 2) sennaのインストール
+
+{{{
+% svn co http://svn.razil.jp/senna/trunk senna
+% cd senna
+% ./configure --prefix=/usr
+% make
+% sudo make install
+}}}
+
+** 操作
+
+*** 起動
+
+{{{
+% senna /tmp/bookmark.db
+}}}
+
+{{{
+> (+ 1 1)
+2
+> (car '(a b c))
+a
+}}}
+
+*** テーブル作成
+
+{{{
+> (ptable '<items>)
+<items>
+> (<items> ::nrecords)
+0
+}}}
+
+*** レコード追加
+
+{{{
+> (<items> ::new "http://ja.wikipedia.org/wiki/LISP")
+ #p<0000800001>
+> (<items> ::new "http://www.unfindable.net/~yabuki/article/why_lisp.html")
+ #p<0000800002>
+> (<items> ::nrecords)
+2
+}}}
+
+*** レコード取得
+
+{{{
+> (<items> : "http://ja.wikipedia.org/wiki/LISP")
+ #p<0000800001>
+}}}
+
+*** 全文検索
+
+{{{
+> (<items> ::def :title <text>)
+<items>.title
+> (ptable '<terms> :ngram)
+<terms>
+> (<terms> ::def :item_title :as '(<items>.title ::match ()))
+<terms>.item_title
+> ((<items> : "http://ja.wikipedia.org/wiki/LISP") :title "LISP")
+"LISP"
+> ((<items> : "http://www.unfindable.net/~yabuki/article/why_lisp.html") :title "なぜLispなのか")
+"なぜLispなのか"
+> (js-output (<terms>.item_title : "lisp"))
+["http://ja.wikipedia.org/wiki/LISP", "http://www.unfindable.net/~yabuki/article/why_lisp.html"]
+#t
+}}}
+
+** マルチユーザ向けブックマークアプリケーション
+
+{{img("senna2.files/rect4605.png")}}
+
+*** テーブル作成
+
+{{{
+> (ptable '<users>)
+<users>
+> (<users> ::def :name <text>)
+<users>.name
+> (ptable '<comments>)
+<comments>
+> (<comments> ::def :item <items>)
+<comments>.item
+> (<comments> ::def :author <users>)
+<comments>.author
+> (<comments> ::def :content <text>)
+<comments>.content
+> (<comments> ::def :issued <int>)
+<comments>.issued
+> (<terms> ::def :comment_content :as '(<comments>.content ::match ()))
+<terms>.comment_content
+}}}
+
+*** ユーザ追加
+
+{{{
+> (<users> ::new "moritan" :name "モリタン")
+ #p<0000400001>
+> (<users> ::new "taporobo" :name "タポロボ")
+ #p<0000400002>
+}}}
+
+*** ブックマーク作成
+
+{{{
+> (<items> : "http://d.hatena.ne.jp/brazil/20050829/1125321936")
+()
+}}}
+
+未登録なのでまず当該ページを''<items>''に登録
+
+{{{
+> (<items> ::new "http://d.hatena.ne.jp/brazil/20050829/1125321936" :title "[翻訳]JavaScript: 世界で最も誤解されたプログラミング言語")
+ #p<0000800003>
+}}}
+
+登録したitemを'':item''カラムの値に指定して''<comments>''にレコードを登録
+
+{{{
+> (<comments> ::new "1" :item "http://d.hatena.ne.jp/brazil/20050829/1125321936" :author "moritan" :content "JavaScript LISP" :issued 1187430026)
+ #p<0000600001>
+}}}
+
+*** 関数化
+
+{{{
+> (define (add_bookmark item_url item_title comment_author comment_content comment_issued)
+>  (let ((item (or (<items> : item_url) (<items> ::new item_url :title item_title)))
+>        (id (+ (<comments> ::nrecords) 1)))
+>   (<comments> ::new id
+>    :item item
+>    :author comment_author
+>    :content comment_content
+>    :issued comment_issued)))
+add_bookmark
+}}}
+
+{{{
+> (add_bookmark "http://practical-scheme.net/docs/cont-j.html" "なんでも継続" "moritan" "継続 LISP Scheme" 1187568692)
+ #p<0000600002>
+> (add_bookmark "http://d.hatena.ne.jp/higepon/20070815/1187192864" "末尾再帰" "taporobo" "末尾再帰 Scheme LISP" 1187568793)
+ #p<0000600003>
+> (add_bookmark "http://practical-scheme.net/docs/cont-j.html" "なんでも継続" "taporobo" "トランポリン LISP continuation" 1187568692)
+ #p<000060000w>
+}}}
+
+** 全文検索(2)
+
+{{{
+> (sen-output
+>  (<terms>.comment_content : "LISP")
+>  '(.:key .issued .item.title .author.name .content))
+4
+1	1187430026	[翻訳]JavaScript: 世界で最も誤解されたプログラミング言語	モリタン	JavaScript LISP
+2	1187568692	なんでも継続	モリタン	継続 LISP Scheme
+3	1187568793	末尾再帰	タポロボ	末尾再帰 Scheme LISP
+4	1187568692	なんでも継続	タポロボ	トランポリン LISP continuation
+#t
+}}}
+
+{{{
+> (<terms>.comment_content : "LISP")
+ #<RECORDS>
+}}}
+
+レコードセットは、出力関数にかける前に様々に加工可能。
+
+日付で降順にソート
+
+{{{
+> (sen-output
+>  ((<terms>.comment_content : "LISP") ::sort :issued :desc)
+>  '(.:key .issued .item.title .author.name .content))
+4
+3	1187568793	末尾再帰	タポロボ	末尾再帰 Scheme LISP
+2	1187568692	なんでも継続	モリタン	継続 LISP Scheme
+4	1187568692	なんでも継続	タポロボ	トランポリン LISP continuation
+1	1187430026	[翻訳]JavaScript: 世界で最も誤解されたプログラミング言語	モリタン	JavaScript LISP
+#t
+}}}
+
+item毎にグループ化
+
+{{{
+> (sen-output
+>  ((<terms>.comment_content : "LISP") ::group :item)
+>  '(.:nsubrecs .:key .title))
+3
+1	http://d.hatena.ne.jp/brazil/20050829/1125321936	[翻訳]JavaScript: 世界で最も誤解されたプログラミング言語
+2	http://practical-scheme.net/docs/cont-j.html	なんでも継続
+1	http://d.hatena.ne.jp/higepon/20070815/1187192864	末尾再帰
+#t
+}}}
+
+** 少し複雑な検索
+
+- ''<items>.title''か''<comments>.content''のいずれかにマッチするitemを検索する。
+- ただし、''<items>.title''にマッチしたレコードはスコアを10倍重み付けする。
+- 同一のitemに対して、キーワードにマッチするcommentが複数存在した場合は、それぞれのcommentのスコアの和を、該当するitemのスコアとする。
+
+{{{
+> (define r1 (<terms>.comment_content : "LISP"))
+r1
+> (define r2 (<terms>.item_title : "*W1:50 LISP"))
+r2
+}}}
+
+r1の結果を''item''毎にグループ化し、r2とunionして出力
+
+{{{
+> (sen-output (((r1 ::group :item) ::union r2) ::sort ::score) '(.:score .title))
+5
+50	LISP
+50	なぜLispなのか
+10	なんでも継続
+5	[翻訳]JavaScript: 世界で最も誤解されたプログラミング言語
+5	末尾再帰
+#t
+}}}
+
+** 今後の予定
+
+- SennaQLの完成
+- エラーハンドリングを抜本的に修正
+- トランザクション対応

@@ -1,0 +1,673 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html xmlns:v="urn:schemas-microsoft-com:vml"
+><head
+><title
+>全文検索エンジンSennaの設計 - Senna 組み込み型全文検索エンジン</title
+><link href="theme/css/base.css" media="screen,tv" rel="stylesheet" type="text/css"
+/><link href="theme/css/base.css" media="screen,tv,print" rel="stylesheet" type="text/css"
+/><link href="css/theme.css" media="screen,tv,print" rel="stylesheet" type="text/css"
+/><link href="rss.xml" rel="alternate" title="RSS 0.91" type="application/rss+xml"
+/><script src=".theme/js/base.js" type="text/javascript"
+></script
+><script src=".theme/js/niftypp.js" type="text/javascript"
+></script
+><script src=".theme/js/se_hilite_jp.js" type="text/javascript"
+></script
+></head
+><body onload="qwik_onload();"
+><div class="container"
+><div class="main"
+><!--adminmenu--><!--toc--><h1
+>全文検索エンジンSennaの設計</h1
+><!--body_enter--><div class="body_main"
+><div class="day"
+><div class="body"
+><div class="section"
+><p
+>検索システム勉強会資料</p
+>
+<dl
+><dt
+>日時</dt
+><dd
+>2005年3月26日</dd
+><dt
+>場所</dt
+><dd
+>文京グリーンコート産総研オフィス</dd
+></dl
+>
+</div
+><!--section--></div
+><!--body--></div
+><!--day--><div class="day"
+><h2 id="3c097073a286cb79411af89980ddc155"
+>開発の目的</h2
+><div class="body"
+><div class="section"
+>
+<ul
+><li
+>OSSパーツでGoogleを構成可能とすること</li
+><ul
+><li
+>LAMPを補完するパーツを作りたい</li
+></ul
+><li
+>ストレージエンジンに全文検索機能を追加する</li
+><ul
+><li
+>DBMS, ファイルシステムに組み込んで使用することを想定</li
+></ul
+></ul
+>
+</div
+><!--section--></div
+><!--body--></div
+><!--day--><div class="day"
+><h2 id="5e9d6b98ebefda93b8e63ab99c233174"
+>転置インデックス</h2
+><div class="body"
+><div class="section"
+>
+<ul
+><li
+>なぜ転置インデックス?</li
+><ul
+><li
+>大規模な文書に対して高い検索性能を実現</li
+></ul
+><li
+>転置インデックス型全文検索システムの構成</li
+><ul
+><li
+>文書ファイル (文書毎の情報を局所化して格納)</li
+><li
+>転置ファイル (単語毎の情報を局所化して格納)</li
+></ul
+><li
+>Sennaは転置ファイルのみ提供</li
+><ul
+><li
+>文書ファイルは流用可能な部品が一杯ある</li
+><li
+>転置ファイルは全文検索に特化した特殊な構造</li
+></ul
+></ul
+>
+</div
+><!--section--></div
+><!--body--></div
+><!--day--><div class="day"
+><h2 id="62bca1a442e2442c06aa6d2207164da5"
+>設計方針(1/2)</h2
+><div class="body"
+><div class="section"
+>
+<ul
+><li
+>本質的なトレードオフ</li
+><ul
+><li
+>万能なエンジンは存在しない。どこでバランスするか</li
+></ul
+><li
+>更新速度←→検索速度</li
+><ul
+><li
+>転置インデックスは検索速度重視。可能な範囲で更新も頑張る</li
+></ul
+><li
+>適合率←→再現率</li
+><ul
+><li
+>‥どっちも大事</li
+></ul
+></ul
+>
+</div
+><!--section--></div
+><!--body--></div
+><!--day--><div class="day"
+><h2 id="53d5ea6ecc2032ea60b7af5079ac8d3e"
+>設計方針(2/2)</h2
+><div class="body"
+><div class="section"
+>
+<ul
+><li
+>リソース消費</li
+><ul
+><li
+>実メモリより大きな文書セットもカバー。disk I/O 考慮</li
+></ul
+><li
+>同時実行制御</li
+><ul
+><li
+>リーダとライタ間のロックは性能阻害要因→回避したい</li
+><li
+>ACID特性の実現は高コスト→未コミット読み取りは許容</li
+></ul
+><li
+>汎用性</li
+><ul
+><li
+>様々なストレージエンジンと組み合わせて動作可能</li
+></ul
+></ul
+>
+</div
+><!--section--></div
+><!--body--></div
+><!--day--><div class="day"
+><h2 id="01362269ec6564344744e9518f90da2a"
+>n-gramインデックス vs 単語インデックス</h2
+><div class="body"
+><div class="section"
+>
+<pre
+>               n-gramインデックス   単語インデックス
+   適合率             ×                 ○
+   再現率             ○                 ×
+ インデックスサイズ   大                 小
+ 検索速度(小規模)     ○                 △
+ 検索速度(大規模)     △                 ○
+ 更新速度(小規模)     ○                 △
+ 更新速度(大規模)     △                 ○</pre
+>
+<ul
+><li
+>小中規模文書セットならn-gramインデックス</li
+><li
+>大規模文書セットなら単語インデックス</li
+></ul
+>
+</div
+><!--section--></div
+><!--body--></div
+><!--day--><div class="day"
+><h2 id="a63f231a517edf1af39556d89c95cf57"
+>適合率←→再現率: おさらい</h2
+><div class="body"
+><div class="section"
+>
+<ul
+><li
+>京都 → 東京都</li
+><li
+>民主党 → 自由民主党</li
+><li
+>あびる優 → 今注目をあびる優れたOSは?</li
+></ul
+>
+</div
+><!--section--></div
+><!--body--></div
+><!--day--><div class="day"
+><h2 id="b4372e8a2966cee63d6faed2ddf1a25e"
+>適合率←→再現率: どーする?</h2
+><div class="body"
+><div class="section"
+>
+<ul
+><li
+>n-gramインデックスと単語インデックス選択可能に</li
+><ul
+><li
+>インデックス作成時に指定</li
+><li
+>検索時に適合率/再現率の優先順位を変えられない</li
+></ul
+><li
+>両方のインデックス作る</li
+><ul
+><li
+>さすがにデカすぎ</li
+></ul
+></ul
+>
+</div
+><!--section--></div
+><!--body--></div
+><!--day--><div class="day"
+><h2 id="98f055cc589891dcba4bd2521d4db286"
+>sennaのアプローチ</h2
+><div class="body"
+><div class="section"
+>
+<ul
+><li
+>インデックスは単語単位で作成。シンボル表を部分一致可能に</li
+><ul
+><li
+>任意の文字列で洩れなく検索可能</li
+><li
+>どこまで再現率を求めるかソフトに調節可能</li
+><ul
+><li
+>部分一致する文字列の中で取捨選択</li
+><li
+>字種境界等のヒューリスティックで</li
+><li
+>「ソフト分かち書き」技術で</li
+></ul
+><li
+>クエリーによっては検索時の転置ファイルI/Oが局所化できない</li
+><ul
+><li
+>大規模文書ではI/Oネックで検索性能低下</li
+><li
+>大規模文書なら大体適合率重視だからいいか‥</li
+></ul
+></ul
+></ul
+>
+</div
+><!--section--></div
+><!--body--></div
+><!--day--><div class="day"
+><h2 id="c909fd320ad0f93a86c338b4a61cf62f"
+>実装</h2
+><div class="body"
+><div class="section"
+>
+<ul
+><li
+>インデックスを構成する部品は二種類</li
+><ul
+><li
+>シンボル表: 文字列とIDとを対応づけて管理</li
+><li
+>可変長レコード表: 文書IDと位置情報のリストを単語毎に格納</li
+></ul
+></ul
+>
+</div
+><!--section--></div
+><!--body--></div
+><!--day--><div class="day"
+><h2 id="7d4fc498be1cd6bb3048ad5856730c3f"
+>シンボル表</h2
+><div class="body"
+><div class="section"
+>
+<ul
+><li
+>PATRICIAで実装</li
+><li
+>空間効率はhash表と同程度</li
+><li
+>前方一致可能</li
+><li
+>検索/更新速度はhash表よりやや遅</li
+><li
+>単語毎の半無限文字列を登録</li
+><ul
+><li
+>部分一致検索が可能になる</li
+><li
+>日本語の単語のみならシンボル表の増大は1.5倍程度</li
+></ul
+></ul
+>
+</div
+><!--section--></div
+><!--body--></div
+><!--day--><div class="day"
+><h2 id="e8be3bab819f66d31386bf8eb68f132e"
+>可変長レコード表</h2
+><div class="body"
+><div class="section"
+>
+<ul
+><li
+>転置ファイルの実体</li
+><li
+>キーと値のペアを管理</li
+><li
+>キー:単語ID</li
+><li
+>値:文書IDと位置情報のリスト</li
+><li
+>1文書の更新に対して複数のレコードを更新する必要がある</li
+><li
+>バッファはメモリ上に確保(mmapしてる)</li
+><li
+>バッファ上では非圧縮。連結リストで高速に更新</li
+><li
+>ディスクフラッシュ時に圧縮</li
+></ul
+>
+</div
+><!--section--></div
+><!--body--></div
+><!--day--><div class="day"
+><h2 id="2e38a3c298c93bc3ae33b199ab269bd4"
+>インデックスの構成</h2
+><div class="body"
+><div class="section"
+>
+<ul
+><li
+>外部文書IDと内部文書IDを対応づけるためのシンボル表</li
+><ul
+><li
+>外部文書IDは文字列だったり数値だったりいろいろ</li
+><li
+>外部IDが数値でも一旦内部IDに変換→圧縮率担保</li
+></ul
+><li
+>単語文字列と単語IDを対応づけるためのシンボル表</li
+><ul
+><li
+>正規化してから登録</li
+></ul
+><li
+>単語IDと内部文書IDのリストを管理する可変長レコード表</li
+></ul
+>
+</div
+><!--section--></div
+><!--body--></div
+><!--day--></div
+><!--body_main--><div class="body_leave" id="body_leave"
+><div class="day"
+><div class="comment"
+><div class="caption"
+><div class="page_attribute"
+>
+<span class="attribute"
+>生成時間: <em
+>__qwik_page_generate_time__秒</em
+></span
+>
+<div align="right"
+>
+<a href="http://x6.at-ninja.jp/bin/gg?067333300"
+>
+<img border="0" src="http://x6.at-ninja.jp/bin/ll?067333300"
+/></a
+>
+<span style="font-size:9px"
+><img src="http://img.shinobi.jp/tadaima/fj.gif" style="margin:0;vertical-align:text-bottom;"
+/> <a href="http://randoseru.rentalurl.net"
+>ランドセル</a
+></span
+>
+</div
+>
+
+
+</div
+></div
+></div
+></div
+></div
+><!--body_leave--></div
+><!--main--><div class="sidebar"
+><h2
+>メニュー/Menu</h2
+><ul
+><li
+><a href="FrontPageJ.html"
+>ホーム</a
+> / <a href="FrontPage.html"
+>Home</a
+></li
+></ul
+>
+<ul
+><li
+>Sennaの紹介</li
+><ul
+><li
+><a href="senna_takahashi.html"
+>Sennaとは</a
+></li
+><li
+><a href="publication.html"
+>雑誌記事・発表資料等</a
+></li
+><li
+><a href="example.html"
+>こんなところでも使われてます！</a
+></li
+><li
+><a href="FAQ.html"
+>FAQ</a
+> / <a href="FAQ_en.html"
+>FAQ (English)</a
+></li
+><li
+><a href="ML.html"
+>メーリングリスト</a
+> / <a href="ML_en.html"
+>MailingLists</a
+></li
+></ul
+><li
+>Sennaの利用</li
+><ul
+><li
+><a href="Download.html"
+>ダウンロード</a
+> / <a href="Download_en.html"
+>Download</a
+></li
+><li
+><a href="install.html"
+>インストール</a
+> / <a href="install_en.html"
+>Install</a
+></li
+><li
+><a href="check_install.html"
+>動作確認方法</a
+> / <a href="check_install_en.html"
+>Check install</a
+></li
+><li
+><a href="bindings.html"
+>バインディング一覧</a
+></li
+><li
+><a href="mysql_binding.html"
+>MySQL バインディング</a
+> / <a href="mysql_binding_en.html"
+>MySQL binding</a
+></li
+><li
+><a href="install_specific.html"
+>特定環境でのインストールメモ</a
+> / <a href="install_specific_en.html"
+>installing note for specific environment</a
+></li
+></ul
+><li
+>利用者向け</li
+><ul
+><li
+><a href="query.html"
+>クエリーの書式</a
+> / <a href="query_en.html"
+>query syntax</a
+></li
+><li
+><a href="Customize.html"
+>カスタマイズ</a
+> / <a href="Customize_en.html"
+>Customize</a
+></li
+><li
+><a href="sennaql_reference.html"
+>SennaQL リファレンス</a
+></li
+><li
+><a href="store_tutorial.html"
+>SennaStoreを使ってみよう</a
+></li
+><li
+><a href="log_level.html"
+>ログレベルの解説</a
+></li
+><li
+><a href="report_bugs.html"
+>不具合報告掲示板</a
+></li
+><li
+><a href="contribute.html"
+>Sennaへのパッチ・情報等</a
+></li
+><li
+><a href="knownproblems.html"
+>不具合等</a
+> / <a href="knownproblems_en.html"
+>Known problems</a
+></li
+></ul
+><li
+>高度な利用法</li
+><ul
+><li
+><a href="APIJ.html"
+>API</a
+> / <a href="API.html"
+>C API(English)</a
+></li
+><li
+><a href="IndexFile.html"
+>インデックスファイル</a
+> / <a href="IndexFile_en.html"
+>Index File</a
+></li
+></ul
+><li
+>Senna開発</li
+><ul
+><li
+><a href="design_policy.html"
+>Senna設計方針</a
+></li
+><li
+><a href="Roadmap.html"
+>開発ロードマップ</a
+></li
+><li
+><a href="cstyle.html"
+>コーディング規約</a
+></li
+><li
+><a href="WorkingStatus.html"
+>作業状況</a
+></li
+><li
+><a href="futureworks.html"
+>野望</a
+> / <a href="futureworks_en.html"
+>Future works</a
+></li
+></ul
+></ul
+>
+<h2
+>Search</h2
+><form action=".search"
+><input name="q"
+/><input type="submit" value="検索"
+/></form
+>
+
+<h2
+>Recent Change</h2
+><div class="recent"
+><ul
+><li
+><a href="example.html" title="2010-10-28 14:04:51"
+>こんなところでも使われてます！</a
+> <span class="ago"
+>3年前</span
+></li
+><li
+><a href="frontpage.html" title="2010-09-14 12:54:06"
+>frontpage</a
+> <span class="ago"
+>4年前</span
+></li
+><li
+><a href="Download_en.html" title="2010-07-22 14:26:20"
+>Download</a
+> <span class="ago"
+>4年前</span
+></li
+><li
+><a href="Download.html" title="2010-07-22 14:26:01"
+>ダウンロード</a
+> <span class="ago"
+>4年前</span
+></li
+><li
+><a href="FrontPageJ.html" title="2009-11-25 16:14:43"
+>Senna 組み込み型全文検索エンジン</a
+> <span class="ago"
+>4年前</span
+></li
+><li
+><a href="FrontPage.html" title="2009-11-25 16:14:20"
+>Senna: An Embeddable Fulltext Search Engine</a
+> <span class="ago"
+>4年前</span
+></li
+><li
+><a href="Ruby_binding.html" title="2009-09-03 18:42:32"
+>Rubyバインディング</a
+> <span class="ago"
+>5年前</span
+></li
+><li
+><a href="PHP_binding.html" title="2009-08-24 04:09:56"
+>PHPバインディング</a
+> <span class="ago"
+>5年前</span
+></li
+><li
+><a href="store.html" title="2009-03-23 03:34:52"
+>SennaStore概要</a
+> <span class="ago"
+>5年前</span
+></li
+><li
+><a href="bindings.html" title="2008-10-05 11:33:12"
+>バインディング一覧</a
+> <span class="ago"
+>6年前</span
+></li
+></ul
+><p class="recent"
+><a href="RecentList.html"
+><em
+>もっと前の情報</em
+></a
+></p
+></div
+>
+<a class="rss-button" href="rss.xml"
+><span
+>RSS</span
+></a
+><a class="rss-button" href="atom.xml"
+><span
+>ATOM</span
+></a
+>
+
+</div
+><!--sidebar--><div class="footer"
+><span title="__qwik_page_generate_time__"
+>powered by <a href="http://qwik.jp/"
+>qwikWeb</a
+></span
+></div
+><!--footer--></div
+><!--container--></body
+></html
+>

@@ -1,0 +1,77 @@
+* Customize
+
+* About setup file (senna.conf)
+
+Generally, /var/senna/senna.conf(in Windows, c:\senna\senna.conf) is the setup file for Senna. It has the basic syntax
+{{{
+Parameter Name blank-space Value Line break
+}}}
+
+You should only modify necessary item. There is no need to change INITIAL_N_SEGMENTS for general usage.
+
+** DEFAULT_ENCODING
+
+{{{
+DEFAULT_ENCODING character code
+}}}
+
+It sets a character set which is used by Senna. Usable character sets are euc, sjis, or utf8. Default value is euc.
+
+The MeCab's dictionary needs to be set to same character set. (If Senna is bounded to MySQL, the Senna indexed column also needs to be same encoding too.)
+
+** MeCab doesn't need if only N-gram is used
+
+If you only use N-gram, you don't need to install MeCab. The following option enables to make MeCab independent Senna.
+
+{{{
+> ./configure --without-mecab
+}}}
+
+* Holding of string normalization with NFKC
+
+nfkc.c is a source for doing the normalization of ICU. Currently, it can normalize only for UTF-8.
+
+It makes compiler stressed much, since this source is automatically built by Ruby.
+
+Therefore some environment cannot finish Senna compiling.
+
+If there is no need for normalization of NFKC, you can make NFKC disabled by adding following option:
+
+{{{
+> ./configure --disable-nfkc
+}}}
+
+* Using user level cache with Linux AIO/DIO
+Linux 2.6 or above have a system called AIO/DIO. It enables asynchronous access without using kernel's buffer cache.
+
+By using the system, Kitame (beloged to VA Linux Systems Japan) implemented user level cache for Senna.
+
+Since it use low memory and high-efficiency, it is expected to be a solution for a stage required high performance and severe to use memory resources.
+
+** Note to use user level cache
+
+- It is exclusive use for Linux 2.6 or above.
+- It is unstable
+- In rev. 130, glib 2.8 or above is required.
+
+** How to install user level cache
+
+- Add aio option to configure
+{{{
+> ./configure --enable-aio
+}}}
+- Modify environmental variable SEN_AIO_ENABLED as 1 on start up.
+
+Run Senna after set above things.
+
+* Parameters can be modified in the source code.
+Some parameters are able to set by modifying directly Senna source code.
+
+** Senna itself
+|Parameter Name|Source Code|Default Value|Detail|
+|SEN_LEX_NGRAM_UNIT_SIZE|senna.h|2|Number of N-gram|
+
+** MySQL Binding
+
+|Parameter Name|Source Code|Default Value|Detail|
+|SENNA_MAX_N_EXPR|myisam/ft_boolean_search.c|32|Max expression set by boolean mode|

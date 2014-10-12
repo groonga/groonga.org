@@ -1,0 +1,88 @@
+* wikipedia日本語版を使ったテスト
+
+** xml2sqlをゲット( http://meta.wikimedia.org/wiki/Xml2sql )
+ wget ftp://ftp.tietew.jp/pub/wikipedia/xml2sql-0.5.tar.gz
+ tar xvfz xml2sql-0.5.tar.gz
+ cd xml2sql-0.5
+ ./configure
+ make
+ sudo make install
+
+Debianだったら、libexpat1-devが必要です。
+
+** Wikipediaのデータをダウンロード
+ wget http://download.wikimedia.org/jawiki/20070224/jawiki-20070224-pages-articles.xml.bz2
+
+** コンバート
+ bunzip2 -c jawiki-20060803-pages-articles.xml.bz2 | /usr/local/bin/xml2sql -v
+
+** import
+
+以下の手順では、Wikipediaのタグなどが除去されません。
+wpxmltodb.pyの利用をオススメします。
+http://svn.razil.jp/django-wikipedia/trunk/wpxmltodb/wpxmltodb.py
+
+ echo "create database wikipedia_ja" | mysql -u root
+ mysql -u root wikipedia_ja
+
+ CREATE TABLE page (
+  page_id int(8) unsigned NOT NULL auto_increment,
+  page_namespace int NOT NULL,
+  page_title varchar(255) binary NOT NULL,
+  page_restrictions tinyblob NOT NULL default '',
+  page_counter bigint(20) unsigned NOT NULL default '0',
+  page_is_redirect tinyint(1) unsigned NOT NULL default '0',
+  page_is_new tinyint(1) unsigned NOT NULL default '0',
+  page_random real unsigned NOT NULL,
+  page_touched char(14) binary NOT NULL default '',
+  page_latest int(8) unsigned NOT NULL,
+  page_len int(8) unsigned NOT NULL,
+  PRIMARY KEY page_id (page_id)
+ ) TYPE=MyISAM DEFAULT CHARACTER SET=utf8;
+
+ CREATE TABLE text (
+  old_id int(8) unsigned NOT NULL auto_increment,
+  old_text mediumtext NOT NULL default '',
+  old_flags tinyblob NOT NULL default '',
+  PRIMARY KEY old_id (old_id)
+ ) TYPE=MyISAM DEFAULT CHARACTER SET=utf8;
+
+ CREATE TABLE revision (
+  rev_id int(8) unsigned NOT NULL auto_increment,
+  rev_page int(8) unsigned NOT NULL,
+  rev_text_id int(8) unsigned NOT NULL,
+  rev_comment tinyblob NOT NULL default '',
+  rev_user int(5) unsigned NOT NULL default '0',
+  rev_user_text varchar(255) binary NOT NULL default '',
+  rev_timestamp char(14) binary NOT NULL default '',
+  rev_minor_edit tinyint(1) unsigned NOT NULL default '0',
+  rev_deleted tinyint(1) unsigned NOT NULL default '0',
+  PRIMARY KEY rev_page_id (rev_page, rev_id),
+  KEY rev_page (rev_page),
+  KEY rev_text_id (rev_text_id)
+ ) TYPE=MyISAM;
+
+ CREATE TABLE articles (
+  id int(8) unsigned NOT NULL,
+  title varchar(255) NOT NULL,
+  text  mediumtext NOT NULL,
+  redirect tinyint(1) unsigned NOT NULL,
+  last_update char(14) binary NOT NULL,
+  PRIMARY KEY id (id),
+  FULLTEXT ft_title_text (title,text)
+ ) TYPE=MyISAM DEFAULT CHARACTER SET=utf8;
+
+ mysqlimport -u root --default-character-set=utf8 wikipedia_ja `pwd`/{page,text,revision}.txt
+ mysql -u root wikipedia_ja
+
+ insert into articles
+  select a.page_id,a.page_title,c.old_text,a.page_is_redirect,a.page_touched
+  from page as a
+   left join revision as b
+    left join text as c on b.rev_text_id = c.old_id
+   on a.page_id = b.rev_page
+  where a.page_namespace = 0;
+
+ drop table page;
+ drop table revision;
+ drop table text;

@@ -1,0 +1,52 @@
+* FAQ
+** 一般的な質問
+:商用利用は可能ですか？:可能です。LGPL 2.1のライセンスに従ってお使いください。ご利用の際には、[[Powered by Sennaバナー|http://dev.razil.jp/img/senna_logo/senna_banner.gif]]を使っていただけると嬉しいです。また、Sennaのコンサルティングサービスやサポートサービスを有償にて行う企業がございます。詳細については、各社のWebページをごらんください。
+- MySQLと共に利用する場合 : 住商情報システム(株) http://www.scs.co.jp/mysql/support.html#+senna
+- PostgreSQLと共に利用する場合 : (株)NTTデータ http://www.nttdata.co.jp/services/ludia/index.html
+- Senna単体で利用する場合 : (有)未来検索ブラジル http://b.razil.jp/company/mail.html
+:Senna用のアプリケーションを作ってみました:Senna本体のパッチにとどまらず、周辺アプリケーションなどの開発、大歓迎です。連絡いただければ紹介させていただきます。
+
+** Sennaの使い方に関する質問
+:MySQLがないと使えないのですか？:MySQLと組み合わせなくても使えます。C言語から直接利用してもいいですし、各種言語バインディングも利用できます。PostgreSQLと組み合わせた[[Ludia|http://www.nttdata.co.jp/services/ludia/index.html]]もあります。
+:検索がうまくいきません:以下のようなケースが考えられます。
+-MeCabの辞書のエンコーディングと、インデックス対象の文書の文字コードが異なる
+-間違ったエンコーディングの文字列で作成した辞書に追記している
+-インデックスの互換性が失われたバージョンアップの際に、旧フォーマットのインデックスを読んでいる
+このような現象が生じた場合には、
+各種エンコーディングが合致していることを確認の上、
+以下のいずれかの操作を行ってください。
+-Senna単体での利用の場合
+--インデックスファイルを削除し、再構築してください。
+-MySQL binding利用の場合
+--一旦fulltext indexをdropし、再度 create indexを行う
+--MySQLサーバを終了させ、myisamchk -rでインデックスの再構築を行う
+:Windows版で文字コードを変更するにはどのようにすればよいですか？
+-MeCabの辞書を文字コードを変えて構築しなおす
+:Namazuみたいにサーバ内のコンテンツを検索できるシステムはついているの？:まだ作っていないです。Perlであれば、[[File-Extractモジュール|http://search.cpan.org/dist/File-Extract/]]と[[Tie-Sennaモジュール|http://search.cpan.org/dist/Tie-Senna/]]を使って実装できるかもしれません。この場合はMySQLは不要です。
+:かなり大きな文書セットを扱うのですが、速度面では大丈夫ですか？:Sennaでは大規模な文書セットも扱えるように設計されています。以下の設定を行うことを推奨します。
++MySQLバインディング利用で、スコア順以外のソートを用いたり、条件での絞り込みを行ったり、COUNT(*)を件数を取得する場合には、2ind-patchをあてる。その場合、適切なkey_buffer_sizeを設定する。key_buffer_sizeの設置は、MySQLによると、搭載メモリの1/4程度が推奨されている。詳しくは、MySQLのチューニングを扱った記事等をごらんください。
++senna.confで、INITIAL_N_SEGMENTSをデフォルトの512から増やす。
++Linux 2.6以降のサーバで動かし、ユーザレベルキャッシュ(現状安定化しておりません)を有効にする。
++コンテンツを複数に分割する
+
+** 各種バインディングについて
+:各種バインディングのコンパイル時にエラーが出てしまうのですが？:以下のようなエラーが出る場合があります。
+ myisamchk.o: In function `main':
+ myisamchk.c:(.text+0x72): undefined reference to `sen_init'
+ libmyisam.a(mi_open.o): In function `mi_open':
+ mi_open.c:(.text+0x14e7): undefined reference to `sen_log'
+ ...
+
+リンカがライブラリを発見できないことが原因だと考えられます。
+以下の対策を行うことによって回避できる場合が多いです。
+
+- バインディングのconfigureでヘッダ/ライブラリの正しいパスを指定する
+- root権限で、/etc/ld.so.confに「/usr/local/lib」行を追加。ファイルがない場合は新規作成し追加。
+- root権限で、ldconfig -m /usr/local/libを実行
+
+** インストールに関する質問
+
+:nfkc.cのコンパイルで固まります。:一部のコンパイラでコンパイル時間が恐ろしくかかるようです。１５分ほど待ってもコンパイルが終わらない場合には、Ctrl-Cで強制終了してください。
+そして、以下のいずれかの方法で再度configureを実行してください。
+- --disable-nfkcオプションを指定してconfiugreを実行
+- 環境変数CFLAGSに-O0を指定してconfigureを実行

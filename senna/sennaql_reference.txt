@@ -1,0 +1,408 @@
+* SennaQL リファレンス
+
+ここではR^4RS schemeに対してSennaQLが加えている追加機能について説明します。
+
+** 構文
+
+Reader Syntax: '':name''
+
+名前がnameであるキーワードとして読み込まれます。先頭が':'ではじまるシンボルをキーワードと呼びます。キーワードは評価すると常に自身を返します。
+
+
+
+Reader Syntax: ''datum.name''
+
+(datum :name)として読み込まれます。datumと'.'とnameの間に空白を空けてはいけません。
+
+
+
+Reader Syntax: ''?''
+
+フォーム中に'?'が含まれていた場合は、フォームの直後の入力を文字列として読み込み、'?'と置き換えます。フォーム中に複数の'?'が含まれていた場合は、'?'の出現数に対応するだけ入力を読み込み、出現順序に沿って置き換えます。(入力はsen_ctx_send()の呼出しと対応します)
+
+
+
+** Scheme手続き
+
+Function: ''ptable'' name &optional args
+
+名前がnameである永続的なテーブルを定義します。argsの指定形式には以下の5種類があります。
+
+形式1 ''ptable'' name &optional type option1 option2 ...
+
+主キーの型がtypeである基本テーブルを定義します。typeを省略した場合は、文字列型(''<shorttext>'')が指定されたものとみなします。typeが文字列型(''<shorttext>'')であった場合には、以下のoptionが指定できます。
+
+ :delimited  定義するテーブルを転置索引の語彙テーブルとして利用する場合、空白で区切った文字列単位で語彙を管理します。
+
+ :euc-jp     主キー値をEUC-JPでエンコーディングされた文字列とみなします。
+
+ :koi8r      主キー値をkoi8rでエンコーディングされた文字列とみなします。
+
+ :latin1     主キー値をlatin1でエンコーディングされた文字列とみなします。
+
+ :ngram      定義するテーブルを転置索引の語彙テーブルとして利用する場合、ngram文字列単位で語彙を管理します。
+
+ :normalize  主キー値を英文字の大文字/小文字、全角文字/半角文字を正規化します。
+
+ :sjis       主キー値をshift-jisでエンコーディングされた文字列とみなします。
+
+ :sis        定義するテーブルを転置索引の語彙テーブルとして利用する場合、後方一致検索を可能にします。
+
+ :utf8       主キー値をutf-8でエンコーディングされた文字列とみなします。
+
+形式2 ''ptable'' name :surrogate-key
+
+整数型の主キー値を自動的に付与する基本テーブルを定義します。(未実装)
+
+形式3 ''ptable'' name table
+
+tableが定義済みのテーブルであった場合は、tableをbaseとするビューテーブルを定義します。
+
+形式4 ''ptable'' name :as query
+
+queryの実行結果を値とするビューテーブルを定義します。(未実装)
+
+形式5 ''ptable'' name :key pkeyspec-list
+
+複合キーを主キーとするテーブルを定義します。pkeyspec-listには以下のようなフォームのリストを指定します。(未実装)
+
+ (type option1 option2 ...)
+
+optionには形式1の場合と同じものが指定できます。
+
+Function: ''disp'' obj format
+
+formatに指定する形式でobjを出力します。formatには以下のいずれかを指定します。
+
+ :json JSON形式
+
+ :sexp S式(未実装)
+
+ :tsv  TSV形式
+
+ :xml  XML形式(未実装)
+
+obj中に以下のフォームが含まれていた場合は特別な処理が加えられます。
+
+ (: table slot-spec &optional offset limit)
+
+tableのoffset番目からlimit件のレコードをslot-specに従って属性を取り出して出力します。offsetとlimitの既定値は、それぞれ0と10です。
+
+slot-specにはslot-exprのリストを指定します。slot-exprは以下のようなフォームです。
+
+ (() :slotname)
+
+slotnameに対応する属性の値が出力されます。これは以下のように表記することもできます。
+
+ .slotname
+
+指定した属性が、外部キーとして他のテーブルを参照している場合、以下のように参照先のテーブルのレコードの属性を再帰的に取得して出力することができます。
+
+ (((() :slotname1) :slotname2) :slotname3)
+
+これは以下のように表記することもできます。
+
+ .slotname1.slotname2.slotname3
+
+slot-specの先頭要素がシンボル'@'であった場合は、以下のようにlabelとslot-exprが交互に与えられるものとみなされます。
+
+ (@ label1 slot-expr1 label2 slot-expr2 label3 slot-expr3 ...)
+
+Function: ''snippet'' cond width max_results opentag1 closetag1 opentag2 closetag2 ...
+
+snippet関数を生成します。
+
+Function: ''x->query'' string
+
+queryオブジェクトを生成します。
+
+
+
+** 組込み型
+
+テーブルの主キー(*)や属性に指定できるデータ型として以下が準備されています。
+
+Builtin Type: ''<shorttext>'' 8KByte以下の文字列
+
+Builtin Type: ''<text>''  64KByte以下の文字列
+
+Builtin Type: ''<longtext>'' 4MByte以下の文字列
+
+Builtin Type: ''<int>'' -2147483648 ~ 2147483647の範囲内の整数
+
+Builtin Type: ''<uint>'' 0 ~ 4294967295の範囲内の整数
+
+Builtin Type: ''<int64>'' -9223372036854775808 ~ 9223372036854775807の範囲内の整数
+
+Builtin Type: ''<float>'' IEEE 64 ビットの符号付き浮動小数点数
+
+Builtin Type: ''<time>'' 1901年12月14日5時45分52.000000秒 ~ 2038年1月19日12時14分7.999999秒の範囲内の時刻
+
+(*) 主キー値には<text>, <longtext>は指定できません。
+
+
+** テーブル
+
+ptable等で定義したテーブルは、以下のように関数として評価することによって操作することができます。
+
+ (table_obj selector args ...)
+
+table_objにはptableで定義したテーブルや、関係演算の結果として返されるテーブルを指定することができます。selectorに指定可能なキーワードとして以下が準備されています。
+
+
+
+Builtin Selector: ''：'' value
+
+table_objから主キーの値がvalueであるレコードを返します。対応するレコードが存在しない場合は()を返します。
+
+
+
+Builtin Selector: ''::def'' slotname &optional args
+
+名前がslotnameである新しい属性をtable_objに定義します。
+slotnameにはキーワードを指定します。ただし、'::'で始まるキーワードは組込み属性として予約されていますので使用することができません。
+
+以下の3種類の指定形式があります。(永続テーブルのみ有効)
+
+形式1 ''::def'' slotname type
+
+名前がslotnameで型がtypeである属性を定義します。typeには正しいデータ型を指定します。
+
+形式2 ''::def'' slotname table
+
+tableが定義済みのテーブルであった場合は、tableの主キー型と等しい型の属性を定義します。tableは外部キーとなり、この属性の値を主キー値とするレコードがtableに必ず存在することが保証されるようになります。
+
+形式3 ''::def'' slotname :as query
+
+queryの実行結果を値とするビュー属性を定義します。
+
+
+
+Builtin Selector: ''::new'' args
+
+table_objに新規レコードを追加します。対象のテーブルの主キーがsurrogate-key以外である場合は以下の形式となります。(永続テーブルのみ有効)
+
+形式1 ''::new'' pkey-value &optional slot-name1 slot-value1 ...
+
+pkey-valueを主キー値とするレコードを追加します。レコードが既に存在していた場合はそのレコードを返します。当該レコードの名前がslot-nameである属性の値にはslot-valueがセットされます。
+
+table_objの主キーがsurrogate-keyである場合は以下の形式となります。
+
+形式2 ''::new'' &optional slot-name1 slot-value1 ...
+
+主キー値は自動的に付与されます。
+
+
+
+Builtin Selector: ''::nrecords''
+
+table_objに含まれるレコードの件数を返します。
+
+
+
+Builtin Selector: ''::''
+
+table_objに含まれるレコードを順に全て取り出すためのイテレータを作成して返します。
+
+
+
+Builtin Selector: ''::+'' iterator
+
+iteratorに指定されたイテレータに基づいて次のレコードを返します。
+
+
+
+Builtin Selector: ''::del'' value
+
+table_objから主キーの値がvalueであるレコードを削除します。対応するレコードが存在した場合は#tを、しなかった場合は#fを返します。
+
+
+
+Builtin Selector: ''::difference!'' table
+
+table_objとtableとの共通部分をそれぞれ除去します。table_objとtableは主キーの型が同一であることが必要です。(一時テーブルのみ有効)
+
+
+
+Builtin Selector: ''::group!'' slot-expr &optional limit dir
+
+table_objに含まれる全てのレコードについて、slot-exprを適用した結果を主キーとするテーブルにtable_objを変換します。
+(一時テーブルのみ有効。slot-exprには外部キーである属性名だけが指定できる)
+limitにはグループ化後のテーブルに保存する、グループ化前の主キーの配列の最大サイズを指定します。(既定値は0) dirには:asc(昇順)と:desc(降順)のいずれかを指定します。(既定値は:desc) グループ化前の主キー配列の並び順を示します。
+
+
+
+Builtin Selector: ''::intersect!'' table
+
+table_objとtableとの共通要素のみを残して、それ以外の要素をtable_objから削除します。table_objとtableは主キーの型が同一であることが必要です。(一時テーブルのみ有効)
+
+
+
+Builtin Selector: ''::sort!'' slot-expr &optional limit dir
+
+table_objに含まれる全レコードをslot-exprを適用した結果によって並べ替え、最初のlimit件のみを残して、それ以外をtable_objから削除します。limitの既定値は10です。 dirには:asc(昇順)と:desc(降順)のいずれかを指定します。既定値は:descです。(一時テーブルのみ有効)
+
+
+
+Builtin Selector: ''::subtract!'' table
+
+table_objからtableとの共通要素を削除します。table_objとtableは主キーの型が同一であることが必要です。(一時テーブルのみ有効)
+
+
+
+Builtin Selector: ''::union!'' table
+
+table_objとtableとの和集合を表すテーブルを返します。(元のtable_objとtableはいずれも破壊されます)(一時テーブルのみ有効)
+
+
+
+Builtin Selector: ''::common-prefix-search'' string
+
+table_objの主キーである文字列のうち、stringと前方一致する最も長い文字列を主キーとするレコードを返します。(永続テーブルのみ有効)
+
+
+
+Builtin Selector: ''::load'' &optional slotname1 slotname2 ...
+
+主キー値(*)とslotnameに対応する属性の値をTSV形式で受け取ってレコードを挿入します。
+空行を受けると終了します。(永続テーブルのみ有効)
+
+(*) surrogate-keyの場合は不要
+
+
+
+Builtin Selector: ''::prefix-search'' string
+
+table_objの中で主キー値がstringに前方一致するレコードを要素とするテーブルを返します。(永続テーブルのみ有効)
+
+
+
+Builtin Selector: ''::undef'' slotname
+
+table_objからslotnameに対応する属性を削除します。
+
+
+Builtin Selector: ''::scan'' match-expr
+
+table_objの中でmatch-exprに指定する条件を満たすレコードを要素とするテーブルを返します。(永続テーブルのみ有効)
+
+match-exprは以下の形式のフォームを渡します。
+
+ (func expr1 expr2 ...)
+
+exprにslot-exprを指定すると、table_objの各レコードについてslot-exprを適用した結果に置換され、フォームが評価されます。slot-expr形式以外のexprは定数と解釈されます。funcは真偽値を返すC組込み関数でなければなりません。現状では以下のいずれかが指定できます。
+
+ not
+ eqv?
+ eq?
+ null?
+ zero?
+ positive?
+ negative?
+ =
+ <
+ >
+ <=
+ >=
+
+Builtin Selector: ''::schema''
+
+テーブルの定義を出力します。
+
+Builtin Selector: ''::suffix-search'' string
+
+table_objの中で主キー値がstringに後方一致するレコードを要素とするテーブルを返します。(定義時に主キー属性に:sis属性を指定していた永続テーブルのみ有効)
+
+
+
+Builtin Selector: ''::slots'' string
+
+table_objの属性のうち、名前にstringが前方一致するものを要素とするテーブルを返します。(永続テーブルのみ有効)
+
+
+
+データベース作成時に自動的に作成されるテーブルがあります。
+
+Builtin Table: ''<db>''
+
+<db>はデータベース内に定義された永続テーブルを要素とするテーブルです。
+<db>にはselectorに指定可能なキーワードとして以下が準備されています。
+
+Builtin Selector: ''::drop'' tablename
+
+データベースからtablenameに対応する永続テーブルを削除します。
+
+** レコード
+
+テーブルに格納されているレコードは、以下のように関数として評価することによって操作することができます。
+
+ (record_obj selector args ...)
+
+record_objはテーブルから取り出したレコードや、レコードIDを直接与えることによって指定することができます。
+
+ptableで定義したテーブルや、関係演算の結果として返されるテーブルを指定することができます。record_objが属しているテーブルの各属性はselectorとして使用することができます。
+
+Selector: slot-name &optional value
+
+valueが指定されなかった場合は、名前がslot-nameである属性の値を返します。
+valueが指定された場合は、名前がslot-nameである属性の値をvalueに更新します。
+
+
+selectorに指定可能なキーワードとして以下が準備されています。
+
+Builtin Selector: ''::id''
+
+record_objのIDを文字列として返します。レコードIDは、そのレコードが削除されない限り不変であり、レコードのリテラル表現として使用することができます。
+
+
+
+Builtin Selector: ''::key''
+
+record_objの主キー値を返します。
+
+
+
+Builtin Selector: ''::score''
+
+record_objが全文検索操作によって生成されたテーブルの要素であった場合、全文検索スコアの値を返します。
+
+
+
+Builtin Selector: ''::nsubrec''
+
+record_objがgroup操作によって生成されたテーブルの要素であった場合、group化前のテーブルに、当該レコードに対応するレコードが何件含まれていたかを返します。
+
+
+
+
+** テーブル属性
+
+テーブルの属性は、以下のように関数として評価することによって操作することができます。
+
+ (slot_obj selector args ...)
+
+slot_objは、
+
+ (table_obj slotname)
+
+というフォームを評価することによって取り出すことができます。
+slotnameが :slotname というキーワードであった場合、このフォームは、
+
+ table_obj.slotname
+
+という表記によっても表現することができます。
+
+テーブル属性には以下の組込みselectorが準備されています。
+
+Builtin Selector: ''：'' value
+
+slot_objが属しているテーブルから主キーの値がvalueであるレコードを取り出し、そのレコードのslot_objの値を返します。対応するレコードが存在しない場合は()を返します。
+
+Builtin Selector: ''::defrag''
+
+可変長のテーブル属性の場合、フラグメンテーションを手動で解消します。
+
+Builtin Selector: ''::schema''
+
+テーブル属性の定義を出力します。
+

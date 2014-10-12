@@ -1,0 +1,100 @@
+* Query Syntax
+
+To search Senna indexes, query syntax like BOOLEAN MODE of MySQL is provisioned. You can use them not only for Senna + MySQL binding and other bindings.
+
+* Pragma
+
+Pragma for setting query handling can be added on top of query string:
+
+- Pragma have to be located on top of query string.
+- To use multiple pragma, don't put blank space between each of them (don't put blank space on top of the query either).
+
+** *EN1[,N2] (N1 and N2 are numeric number)
+
+When the search result is lesser then N1, Senna automatically change handling way as ordering by perfect matching -> unsplit word matching -> partial matching.
+In that case, scores for items that isn't perfect matching decrease N2 point.
+If N2 is omitted, N2 is set default value (=2). In case negative number set on N1, Senna handles as below.
+
+ -1: only search by perfect matching.
+ -2: only search by unsplit word matching.
+ -3: only search by perfect matching and unsplit word matching.
+ -4: only search by pertial matcing.
+ -5: only search by perfect matching and pertial matching.
+ -6: only search by unsplit matching and pertial matching.
+ -7: search by perfect matcing, unsplit word matching, and pertial matching.
+
+example:
+
+ *E10,3
+
+Search results are less than 10, Senna changes search way and decrements scores 3 points sequencially.
+
+** *DOperator
+
+Specify which operator uses when operator is omitted.
+
+Specifyable operators are OR, +, and -. OR works as BOOLEAN MODE of MySQL. + works as most web search engine.
+
+example 1:
+
+ *D+ abc def
+
+Search documents that have both "abc" and "def".
+
+example 2:
+
+ *DOR abc def
+
+Search documents that have whether "abc" or "def".
+
+** *W[N[:W]][,N[:W]]...
+Search documents that has word in the section specified by N. Score are multiplied by W per a section.If W is not specified, W is 1.W is able to be specified to negative value.
+
+* Operators
+** +word
+
+A plus operator indicates that this word must be present in matching document.
+(What is called AND)
+
+** -word
+
+A minus operator indicates that this word must not be present in any matching document.
+(What is called NOT)
+
+** ORword
+
+A OR operator indicates the word is optional, but the document that contains the specified word is rated higher.
+
+(What is called OR)
+note: OR have to be written by capital.
+
+** ~word
+
+A ~ operator indicates that this word can be presented, but the document that contains the specified word is rated lower.
+
+** <word or >word
+
+Decrease the word's contribution (<). Increase the word's contribution (>).
+
+
+** (word operators)
+
+This operator grouplize the word and operators.
+
+For example: -(+Foo +Bar)
+
+** word*
+
+This operator indicates that a word which beginning with the specified word in matching document.
+
+** "word"
+
+If the operator is used, only matches documents contains the specified phrase.
+
+** *S[N]"String"
+
+Search documents that is related to the specfied string. [Number] sets the number of selected characters.
+
+** *N[N]"String"
+
+Search documents that has words in "Search" with located adjacent each other. The [N] sets the maximum number of neighborhood words. For N-gram, it sets the number of characters.

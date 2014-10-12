@@ -1,0 +1,1657 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html xmlns:v="urn:schemas-microsoft-com:vml"
+><head
+><title
+>不具合報告掲示板 - Senna 組み込み型全文検索エンジン</title
+><link href="theme/css/base.css" media="screen,tv" rel="stylesheet" type="text/css"
+/><link href="theme/css/base.css" media="screen,tv,print" rel="stylesheet" type="text/css"
+/><link href="css/theme.css" media="screen,tv,print" rel="stylesheet" type="text/css"
+/><link href="rss.xml" rel="alternate" title="RSS 0.91" type="application/rss+xml"
+/><script src=".theme/js/base.js" type="text/javascript"
+></script
+><script src=".theme/js/niftypp.js" type="text/javascript"
+></script
+><script src=".theme/js/se_hilite_jp.js" type="text/javascript"
+></script
+></head
+><body onload="qwik_onload();"
+><div class="container"
+><div class="main"
+><!--adminmenu--><!--toc--><h1
+>不具合報告掲示板</h1
+><!--body_enter--><div class="body_main"
+><div class="day"
+><div class="body"
+><div class="section"
+><p
+>不具合を発見したら、<a href="ML.html"
+>メーリングリスト</a
+>に報告をお願いいたします。</p
+>
+</div
+><!--section--></div
+><!--body--></div
+><!--day--><div class="day"
+><h2 id="b8eefd97cd04412209b52c1b6c56d0af"
+>過去ログ</h2
+><div class="body"
+><div class="section"
+>
+<table
+><tr
+><td
+>1157609184</td
+><td
+>グニャラくん</td
+><td
+>&gt;&gt;Utaさん\nこちらの環境でも切れています。\n不具合として認識しております。</td
+></tr
+><tr
+><td
+>1157605104</td
+><td
+>Uta</td
+><td
+>はじめまして。\n下記のようにshow indexしたときにIndex_typeが途中で切れてしまうのですが、私だけでしょうか\nmysql&gt; show index from bsm;\n+-------+------------+------------+--------------+-------------+-----------+-------------+----------+--------+------+------------------+---------+\n</td
+><td
+> Table </td
+><td
+> Non_unique </td
+><td
+> Key_name   </td
+><td
+> Seq_in_index </td
+><td
+> Column_name </td
+><td
+> Collation </td
+><td
+> Cardinality </td
+><td
+> Sub_part </td
+><td
+> Packed </td
+><td
+> Null </td
+><td
+>       </td
+><td
+> Comment </td
+><td
+>\n+-------+------------+------------+--------------+-------------+-----------+-------------+----------+--------+------+------------------+---------+\n</td
+><td
+> bsm   </td
+><td
+>          1 </td
+><td
+> pk         </td
+><td
+>            1 </td
+><td
+> id   </td
+><td
+> A         </td
+><td
+>        NULL </td
+><td
+>     NULL </td
+><td
+> NULL   </td
+><td
+>      </td
+><td
+> BTREE            </td
+><td
+>         </td
+><td
+> \n</td
+><td
+> bsm   </td
+><td
+>          1 </td
+><td
+> body </td
+><td
+>            1 </td
+><td
+> body  </td
+><td
+> NULL      </td
+><td
+>        NULL </td
+><td
+>     NULL </td
+><td
+> NULL   </td
+><td
+> YES  </td
+><td
+> FULLTEXT,SENNA,N </td
+><td
+>         </td
+><td
+> \n+-------+------------+------------+--------------+-------------+-----------+-------------+----------+--------+------+------------------+---------+\nNGRAM,mecab両タイプで試してみましたが同様でした。\nRev235+MySQL5.0.24a+mecab0.93\n(CentOS4.3)で使用しております。</td
+></tr
+><tr
+><td
+>1154709399</td
+><td
+>グニャラくん</td
+><td
+>おおお、本当ですね！ &gt; -all-static\n嘘の情報で混乱させて申し訳なかったです。\nそして指摘ありがとうございます。\n\nGREEによるパッチによって、\nテーブルのインデックス情報を見るためのクエリが拡張されています。\nその影響で、MySQL adminやphpMyAdminではエラーが出ることがあると思います。\n（Shimamuraさんのケースがこれにあたるかどうかは確実ではないのですが）\n対処法については検討中です。\n\nsnippet関数のstatic化についても\n検討してみますね。\n\nSEGVについては、他にも報告があるようです。</td
+></tr
+><tr
+><td
+>1154694932</td
+><td
+>Y.Shimamura</td
+><td
+>原因わかりました(snippet)\nldには\n&gt; mv libmysql_udf_snippet.so libmysql_udf_snippet.so.2\n&gt; ln -s libmysql_udf_snippet.so.2 libmysql_udf_snippet.so\n&gt; ldconfig -R\nでライブラリを通し、(これで通りました。)\n\nMySQLは\nhttp://dev.mysql.com/doc/refman/4.1/ja/adding-udf.html\nということで、\n--with-mysqld-ldflags=-all-static\nではなく\n--with-mysqld-ldflags=-rdynamic\nでコンパイルすると、CREATE FUNCTIONが通りました。\n\n/* 関数自体が便利なので、\nsnippet関数のパッチ for MySQLソースコード\nとかあったら便利だな。爆 */\n\nSIGSEGVについては未だ原因わかってませんが、一応報告+わがままをお伝えします。</td
+></tr
+><tr
+><td
+>1154685825</td
+><td
+>Y.Shimamura</td
+><td
+>ldconfig -m /usr/lib \nだめでした。。\n他のライブラリみたいに通し番号みたいなのをつけて\nlibmysql_udf_snippet.so.2&lt;-こんなの\nsymlinkでやってみようかなって思います。\n\n8/3時点のlatestです。しかしながら、負荷をかけても落ちないときがあります。負荷をかける作業として、インデックスの張り直し等を行っていました。\n何かおかしいこと、といえば、\nmysqlユーザーの管理はphpMyAdminで行っているのですが、(楽なので)\n特権をいじるページに行くと、Got error 12 from table handlerとなってしまう時がありました。\nこれはどういうときに発生するのかがいまいちつかめてませんが‥</td
+></tr
+><tr
+><td
+>1154684905</td
+><td
+>グニャラくん</td
+><td
+>Y.Shimamuraさん＞\n/usrでもダメですか。。\nldconfig -m /usr/lib\nも試してみてください。\n\n負荷が高くなると落ちる現象についてですが、\nどの日のパッケージを使っていますか？\nおそらくMLでのアドバイス後\nバージョンをあげられたと思うのですが。</td
+></tr
+><tr
+><td
+>1154681583</td
+><td
+>Y.Shimamura</td
+><td
+>ldconfig -Rでリスキャンしましたが、どうもldにマージされていないです。。/usrで作り直してみてもだめでした。\nそれと、負荷が高くなるとごく希にSegmentation Faultで落ちる現象を確認しました。\n@FreeBSD 6.0 MySQL 4.0.27 Senna(8/3) FULLTEXT INDEX USING SENNA, NO NORMALIZE, NGRAM\n\nデバッグしたログです。\nhttp://dj.2-d.jp/senna-segv.060804.log</td
+></tr
+><tr
+><td
+>1154661112</td
+><td
+>グニャラくん</td
+><td
+>--disable-sharedは問題ないと思います。\n\nrootで\n ldconfig -r </td
+><td
+> grep snippet\nと実行してみてください。\nもし何も表示されないようであれば、\n ldconfig -R\nしてみて、表示されるようになれば利用できると思います。\n\nsnippet udfを\n./configure --prefix=/usr\nとして作り直す、という方法もあります。\n</td
+></tr
+><tr
+><td
+>1154605981</td
+><td
+>Y.Shimamura</td
+><td
+>ありがとうございます。\n/usr/libに移してみましたが、結果変わらず\nERROR 1126 at line 1: Can't open shared library 'libmysql_udf_snippet.so' (errno: 0 Service unavailable) \nでした。。\n\nもしかして、MySQLをコンパイルするときの--disable-sharedがいけなかったりしますか？</td
+></tr
+><tr
+><td
+>1154597081</td
+><td
+>グニャラくん</td
+><td
+>Y.Shimamuraさん&gt;\n/usr/local/libにlibmysql_udf_snippet.soがあると思います。\nmv /usr/local/lib/libmysql_udf_snippet.so /usr/lib\nで使えるようになると思います。</td
+></tr
+><tr
+><td
+>1154574440</td
+><td
+>Y.Shimamura</td
+><td
+>現状ではsnippet UDFは使用できないのでしょうか？。。\nFreeBSD 6.0 MySQL 4.0.27 Senna(8/3)\nbindings/mysql/udf/内でconfigure,make,installを行い、make loadをしましたが、\nERROR 1126 at line 1: Can't open shared library 'libmysql_udf_snippet.so' (errno: 0 Service unavailable)\nとなってしましました。\n\nMySQL側ではSennaがきちんと動いています。</td
+></tr
+><tr
+><td
+>1152779386</td
+><td
+>グニャラくん</td
+><td
+>ここ数週間で\nwindowsでの不具合\nMacOSXでの不具合\nなどさまざまな不具合が修正されております。</td
+></tr
+><tr
+><td
+>1149591995</td
+><td
+>グニャラくん</td
+><td
+>enuiさん＞\nご利用ありがとうございます。\nrpmパッケージは欲しがっている人が多いと思うので、\nspecファイルやパッケージ本体等\n公開いただければありがたいです。\nその際はリンクさせていただきます。\n\nWikipedia検索は内部的に作ってみたのですが、\n公開に至っていません。</td
+></tr
+><tr
+><td
+>1149583169</td
+><td
+>enui</td
+><td
+>CentOS 4.3 mysql-4.1.12.srcから、mysql.senna.2ind.mecab.rpmを作ってインストールして、\nWikipedia dump, \nOpen directory project RDF, \nなどを入れてみました。\nかなり軽快に検索できますね。\nGood job!</td
+></tr
+><tr
+><td
+>1149578580</td
+><td
+>グニャラくん</td
+><td
+>テオファビさん＞\nぜひぜひご利用を。\n\nMURAさん＞\nよかったです。\nまた何かあった場合は、\n報告していただければ幸いです。\n\nぴろさん＞\n出ちゃいました。\n</td
+></tr
+><tr
+><td
+>1149553457</td
+><td
+>ぴろ</td
+><td
+>うおおお、2indパッチ4.1用でましたか～～\n待ち望んでおりました！ありがとうございます。</td
+></tr
+><tr
+><td
+>1149520230</td
+><td
+>MURA</td
+><td
+>グニャラくんさん\n\nすいません、時間が空いてしまったのですが、、\n以前に問い合わせさせていただいた, 3文字以下でのIN BOOLEAN MODEの動作ですが、MySQL 4.1.19のパッチで期待通りhitしていることを確認しました。\n\n環境は、Fedora Core 2 + MySQL4.1.19 + mecab0.91、\n試したパッチは\nhttp://tasuku.suenaga.name/pub/senna/mysql-4.1.19.senna.diff.alpha.tar.gz\nです。\n\n対応どうもありがとうございました。\n</td
+></tr
+><tr
+><td
+>1149500148</td
+><td
+>テオファビ</td
+><td
+>グニャラくん さん (笑)、お返事ありがとうございます。\nですか！早速インストールします！</td
+></tr
+><tr
+><td
+>1149498188</td
+><td
+>グニャラくん</td
+><td
+>テオファビさん＞\nレスありがとうございます！\n今日リリースした4.1用の新しいパッチでは\nft_min_wordの設定は不要になっております。\nまた、2indパッチを利用することができるようになりました。\n\nぜひお試しください。</td
+></tr
+><tr
+><td
+>1149475132</td
+><td
+>テオファビ</td
+><td
+>みのごんた さん、はじめまして\nsennaをありがたく使わさせていただいている１ユーザです。\n私も同じ現象が起こり解決しました。（関係なければご容赦ください。）\n１文字から 検索対象にしたい場合は my.cnfに以下のおまじないが必要かと思いますが、これは入っていますか？\nもしなければ設定後 テーブルをrepairすればヒットするようになるはずです。\n-----------------------\n[mysqld]\nft_min_word_len=1\n-----------------------\n</td
+></tr
+><tr
+><td
+>1149359719</td
+><td
+>グニャラくん</td
+><td
+>みのごんたさん＞\nはじめまして。\n\nMySQL 4.1用のパッチのみ現在古くなっていて、\n特にboolean modeにおいては動作が他のバージョン向けのパッチと異なっております。\n\nお手数ですが、\n以下のＵＲＬのパッチでお試しください。\nhttp://tasuku.suenaga.name/pub/senna/mysql-4.1.19.senna.diff.alpha.tar.gz\n(追記）すでにこのパッチは本家パッケージ取り込まれました。</td
+></tr
+><tr
+><td
+>1149333137</td
+><td
+>みのごんた</td
+><td
+>sennaによる全文検索を利用するために、今回システム\nリニューアル中ですが、全角２文字のでの検索条件が\nヒットしません。ログにも記録されません。今のところ\n全角３文字以上はヒットしています。仕様上の問題でしょうか。\nお知恵をお貸し下さい。\n\n■環境\nOS:Solaris8 x96\nDB:MySQL 4.1.15\nsenna:senna-20060603\n\nヒットする時\nWHERE MATCH (idx) AGAINST ('+アクション +ドラマ'  in boolean mode)\n-&gt; ログには アクションとドラマが sen_index_sel\n\nヒットしない時\nWHERE MATCH (idx) AGAINST ('+国内 +ドラマ' in boolean mode)\n-&gt; ログには ドラマのみが sen_index_sel\n\n</td
+></tr
+><tr
+><td
+>1149133166</td
+><td
+>テオファビ</td
+><td
+>早速のお返事感謝します。\n&gt; よってパフォーマンスにそれほど差はないはずです。 \nすみません。 スコアで order by すると多少遅くなるだけで、それをしなければ相変わらずの驚愕速度でした。m(__)m\n\n5.0系にも組み込んで色々とテストしてみます。</td
+></tr
+><tr
+><td
+>1149093105</td
+><td
+>グニャラくん</td
+><td
+>Y.Shimamuraさん＞\nちょっと時間かかると思いますが、\n宜しくお願いいたします。\n\nテオファビさん＞\nご利用ありがとうございます。\n1.複数フィールドの場合は、内部的に連結をしています。\nよってパフォーマンスにそれほど差はないはずです。\n何か他の原因が考えられると思います。\n\n2.ちゃんと調べていないのですが、\nSennaのスコアは基本的にtf-idfだと思います。\n元のMySQLもそうだと思いますが、\n単語の区切り方が異なるので違ったスコアが出ると思います。\n\nhttp://qwik.jp/senna/query.html\nにあるとおり、マッチングの方法が変わるとスコアも変わります。\n\n4.1系のみ現在2indパッチがないです。\nというわけで、高速に使うためには\nいろいろと工夫が必要だと思います。</td
+></tr
+><tr
+><td
+>1149060036</td
+><td
+>テオファビ</td
+><td
+>まずは大変素晴らしいソフトウェエアを公開して頂き感謝・感謝です。\n既存のシステムへ組み込んでみましたが驚愕のパフォーマンスの向上にビックリしております。\n\n２点確認させてください。(mysql 4.1.15 width senna)\n\n1. ～WHERE MATCH('body')～  を ～WHERE MATCH('title, body')～ と対象を複数にするとガクッとパフォーマンスが落ちてしまうようです。\nこれはこういうものなのでしょうか？\nもちろんフィールドの取り方を変更すれば回避できることなのですが。\n\n2. スコア against('hoge') as score の計算方法はオリジナルと同等なのでしょうか？（なんか違うような）\nもし sennaのオリジナルなのでしたら算出方法をご教授いただけると幸いです。\n</td
+></tr
+><tr
+><td
+>1148554302</td
+><td
+>Y.Shimamura</td
+><td
+>ご返事ありがとうございます。\n了解いたしました。しばらく待ってみようと思います。</td
+></tr
+><tr
+><td
+>1148367426</td
+><td
+>グニャラくん</td
+><td
+>Y.Shimamuraさん＞\nお返事が遅くなり申し訳ございません。\n現在、AIOまわりについてソースを見直している最中です。\nその結果コンパイルが通るようになる可能性はあると思います。</td
+></tr
+><tr
+><td
+>1147963757</td
+><td
+>Y.Shimamura</td
+><td
+>毎度毎度お世話になります。。\n\nFreeBSD上でSennaを動かしているとどうしてもメモリ不足に悩まされるので、\nLinuxを導入し、そこでSennaを動かそうということになり、インストールを行いましたが\nどうもうまくいきませんでした。\n\nDebian/Sargeを使用し、\n# uname -a\nLinux linux 2.6.8-3-686-smp #1 SMP Thu Feb 9 07:05:39 UTC 2006 i686 GNU/Linux\n# gcc -v\nReading specs from /usr/lib/gcc-lib/i486-linux/3.3.5/specs\nConfigured with: ../src/configure -v --enable-languages=c,c++,java,f77,pascal,objc,ada,treelang --prefix=/usr --mandir=/usr/share/man --infodir=/usr/share/info --with-gxx-include-dir=/usr/include/c++/3.3 --enable-shared --enable-__cxa_atexit --with-system-zlib --enable-nls --without-included-gettext --enable-clocale=gnu --enable-debug --enable-java-gc=boehm --enable-java-awt=xlib --enable-objc-gc i486-linux\nThread model: posix\ngcc version 3.3.5 (Debian 1:3.3.5-13)\n\nとなっています。\n\n./configure --prefix=/usr --enable-aio --disable-nfkc --without-mecab\n\nでmakeを行ったところ、\n\nIn file included from /usr/include/stdlib.h:33,\n                 from senna_in.h:28,\n                 from io.c:18:\n/usr/lib/gcc-lib/i486-linux/3.3.5/include/stddef.h:213: error: syntax error before &quot;typedef&quot;\nio.c: In function `sen_io_win_mapv':\nio.c:464: warning: implicit declaration of function `posix_memalign'\nmake[2]: *** [io.lo] Error 1\n\nというエラーで終了してしまいました。\n\nMLで似たようなエラーで止まっている報告がありましたが、\nDebianで使用が確認できていると言うことなので、Debianを導入してみたのですが‥\n何分Linuxは初めてなのでよくわからないのですが、\n足りないライブラリ等があるのでしょうか？\n\nよろしくお願いします。</td
+></tr
+><tr
+><td
+>1147871715</td
+><td
+>MURA</td
+><td
+>パッチの提供ありがとうございます。\n週末に試してみます。</td
+></tr
+><tr
+><td
+>1147546719</td
+><td
+>グニャラくん</td
+><td
+>MURAさん&gt;\n最新のMySQL 4.0.26パッチに基づいた、\nMySQL 4.1.19のパッチを試しに作ってみました。\nコンパイルしか通していませんが、\nこれでBOOLEAN MODEでの動作が可能になるかもしれません。\n一度お試しください。\n\nhttp://tasuku.suenaga.name/pub/senna/mysql-4.1.19.senna.diff.alpha.tar.gz</td
+></tr
+><tr
+><td
+>1147447220</td
+><td
+>MURA</td
+><td
+>グニャラさん\n\n調査ありがとうございます。\n\nこちらでも細々調べましたが、\n日本語文字4文字以上でヒットしログ出力あり、\n日本語文字3文字以下でヒットせずログ出力なし、\nのような傾向がありそうです。\n\nご参考まで。\n\n\n[試した検索語]○でヒット、×でヒットせず\n○アメ横で\n×アメ横\n\n○これでも\n×これで\n\n○社員食堂\n×社員食\n\n○そうだった\n○そうだっ\n×そうだ\n\n○握り寿司\n×寿司\n\n\n\n\n</td
+></tr
+><tr
+><td
+>1147323157</td
+><td
+>グニャラくん</td
+><td
+>MURAさん&gt;\nはじめましてー。ご利用ありがとうございます。\n状況から、MySQL本来の全文検索が使われているようです。\nMySQL 4.1用のパッチの問題かもしれません。\n調査いたしますね。</td
+></tr
+><tr
+><td
+>1147280968</td
+><td
+>MURA</td
+><td
+>はじめまして。\n感謝しつつ、利用させていただいてます。\n\nFedora Core 2 + MySQL4.1.15 + mecab0.90\n文字コードはEUCで利用しているのですが、\nIN BOOLEAN MODEで、検索語に漢字を指定したときに検索にヒットしません。\n(多バイト文字が原因かと思ってましたが,一部ひらがなでヒットしています。)\n今までIN BOOLEAN MODEを利用していなかったのですが、この場合は問題なくヒットしております。\nシングルバイト文字で検索した場合は, IN BOOLEAN MODEの指定の有無にかかわらず動作しております。\n\n検索を繰り返しながら、tailでsenna.logログを見ていると、IN BOOLEAN MODEでの検索の場合は\nまったくログが出ていないことに気づきました。\n何か設定ミスがあるような気がして利用者向けの情報を探したのですが、解決の糸口が見つからない状況です。\n\n何か心当たりがあればご指摘いただけますでしょうか？\n\n--------------------------------------------------IN BOOLEAN MODEを指定しない場合\n\n05/11:01:14:16.623005</td
+><td
+>0764</td
+><td
+>sen_index_sel &gt; ( 寿司 )\n05/11:01:14:16.623115</td
+><td
+>0764</td
+><td
+>0:寿司(10526)\n05/11:01:14:16.623132</td
+><td
+>0764</td
+><td
+>n=1 ( 寿司 )\n05/11:01:14:16.623147</td
+><td
+>0764</td
+><td
+>o=0 n=1 s=14 r=201\n05/11:01:14:16.623173</td
+><td
+>0764</td
+><td
+>exit\n05/11:01:14:16.623188</td
+><td
+>0764</td
+><td
+>exact: 12\n05/11:01:14:16.623202</td
+><td
+>0764</td
+><td
+>hits=12\n05/11:01:14:16.623231</td
+><td
+>0764</td
+><td
+>ft_nlq_reinit_search(0x9e7e878)\n05/11:01:14:16.623594</td
+><td
+>0764</td
+><td
+>ft_nlq_close_search(0x9e7e878)\n05/11:01:14:16.623645</td
+><td
+>0764</td
+><td
+>sen_records_close &lt; (999a1d8:13:0)\n\n--------------------------------------------------IN BOOLEAN MODEを指定した場合\n\n(ログには何も表示されず)\n\n--------------------------------------------------\n</td
+></tr
+><tr
+><td
+>1147257001</td
+><td
+>Y.Shimamura</td
+><td
+>速度は落ちるものの、非常に便利ですね-&gt;*E\nsnippet UDFなんてのも気づかないうちにあって、、\nこんな細かい指定までできるようになってるなんてすごい！\n\n話は戻り、\nsenna.hにSEN_LEX_NGRAM_UNIT_SIZEがありました。\nさっそく&quot;1&quot;で再コンパイルし、インデックスを作成してみたところ‥\n求めていたとおりの結果が出るようになりました。\nvarchar(50)*2\ntext *1\nに3つのNGRAM(INITIAL_N_SEGMENTS=96)ですが、全く問題ないです。\n検索速度も全く問題なく(むしろもっとかかってもいいのにと思えるほど)良好です。\nFOUND_ROWS()なんてのを使ってカウントしてますが、こちらもいい感じです。\n\nなんにせよ、すばらしいプログラムだと思います。\nこれから他に新しく出た機能を試してみたいと思います。本当にありがとうございました。</td
+></tr
+><tr
+><td
+>1147248581</td
+><td
+>グニャラくん</td
+><td
+>&gt;Y.Shimamuraさん\nバタバタしていてMLでの返事もなかなか書けずにいます。\n\nまず、(B)について、想定された動作だと思います。\n\nShift-JIS版のmecabで\n「レゲェでいぃ歌手や歌教えてぇ♪♪」\nを分かち書きしてみると、\n「レゲェ で い ぃ 歌手 や 歌 教え てぇ ♪♪」\nとなります。\nよって、（基本的には）\n「歌」や「♪♪」では検索にヒットし、\n「♪」では検索にヒットしません。\n\nhttp://qwik.jp/senna/query.html\nにある書式を用いて\n「*E-7 ♪」とすればヒットするでしょう。\nMySQLの場合は、\nMATCH(x) AGAINST('*E-7 ♪' IN BOOLEAN MODE)と指定してあげるとよいでしょう。\n速度は遅くなってしまいますが。\n\nsennaのソース中、SEN_LEX_NGRAM_UNIT_SIZEでN-gramのNのサイズを決めています。\nデフォルトは2です。\nつまり、内部的には\n「レゲ ゲェ ェで でい いぃ ぃ歌 歌手 手や ・・・」\nという2文字の単語のリストが辞書に登録されます。\n(N-gramの部分はきちんと追っていないので間違っているかもしれません)\nよって、1文字検索の場合は(B)と同じような現象が起こります。\n\nこの動作は適合率（適切なものを検索）と再現率（もらさず検索）を両立させるためのものです。\n適合率重視で検索を行い、\nヒット数が少なければ再現率重視の検索を、\nさらにヒット数が少なければ、より再現率重視の検索を行うようになっています。\nこの動作について設定を行うのが、\n先ほど紹介した\nhttp://qwik.jp/senna/query.html\nの「*E」パラメータなのです。\n</td
+></tr
+><tr
+><td
+>1147184573</td
+><td
+>Y.Shimamura</td
+><td
+>確率的言語みたいなのは全く解らなくて、バグかどうか解らないのですが、\nN-GRAMインデックスについてお聞きしたいことがあります。\n\nmysql-4.0.26.senna.diff内のSEN_INDEX_NORMALIZEを\n(A) SEN_INDEX_NORMALIZE </td
+><td
+> SEN_INDEX_SPLIT_ALPHA...SEN_INDEX_NGRAMにしたり\n(B) SEN_INDEX_NGRAMだけにしたり\nそんな試行錯誤を繰り返していたのですが、\nどうも出力結果が気になりました。\n\n・(A)の場合、前方一致or後方一致しかされない(？)\n例1:(&quot;美&quot;で検索すると、&quot;美人&quot;はﾋｯﾄしても&quot;中島美嘉&quot;はﾋｯﾄしない)\n例2:(&quot;姫&quot;で検索すると、&quot;安藤美姫&quot;はﾋｯﾄしても&quot;姫様&quot;はﾋｯﾄしない)\n// 例1は実際 LIKE %美% で検索すると682件\n\n・(B)の場合、一致するものの、微妙(？)\n例:(&quot;♪&quot;で検索すると5件、&quot;♪♪&quot;で検索すると217件)\n// 実際 LIKE %♪% で検索すると1097件\n\nのような感じです。\nもしかして(特に[B]は)これで正常なのかもしれないのですが、なぜ&quot;♪&quot;と&quot;♪♪&quot;でこの違いが。。という感じです。\n試しに、\nN-gram length min:1 max:∞\nN-gram frequency min:0 max:∞\nでいくつか調べてみました。\n\n&quot;レゲェでいぃ歌手や歌教えてぇ♪♪&quot;という文字列(実例。爆)の場合、\n&quot;♪&quot;と&quot;歌&quot;が同じ共起頻度でした。\nですが&quot;♪&quot;だとﾋｯﾄせず、&quot;歌&quot;だとﾋｯﾄします。\n\nこんな感じです。\nこれは正常なのでしょうか？\n\n現在(B)でﾃｽﾄ運用しています。\n\n// MLで質問させていただきましたインストールに関してはmecabの部分を削ってインストールに成功しました。</td
+></tr
+><tr
+><td
+>1146485051</td
+><td
+>グニャラくん</td
+><td
+>VIVIさん＞\nこちらのメール環境でお手数をかけて申し訳ありませんでした。\nソースコードの入ったメールを受け取りました。\n解析いたしますね。</td
+></tr
+><tr
+><td
+>1146210926</td
+><td
+>グニャラくん</td
+><td
+>VIVIさん＞\nエラーが出てしまいますか。。。\nメールで新しい送付先を連絡しました。\nお手数ですが、宜しくお願いいたします。</td
+></tr
+><tr
+><td
+>1146197684</td
+><td
+>VIVI</td
+><td
+>senna.windows@gmail.com に再送していますが、エラーで送れません。サイズ制限等ありますでしょうか？</td
+></tr
+><tr
+><td
+>1146129462</td
+><td
+>グニャラくん</td
+><td
+>VIVIさん\nありがとうございます。\nしかし、まだソースが届いていないようです。\n\n添付ファイルがMLのプログラムではじかれている可能性もあるので、\nsenna.windows@gmail.com\nに再送いただけると嬉しいです。\nお手数かけて申し訳ないです。</td
+></tr
+><tr
+><td
+>1146110931</td
+><td
+>VIVI</td
+><td
+>またまた遅くなりましたが、ソースを送付いたしましたので、よろしくお願い致します。</td
+></tr
+><tr
+><td
+>1145968390</td
+><td
+>グニャラくん</td
+><td
+>VIVIさん\nこちらこそお返事が遅くなりました。\nsenna at razil.jp\nに送付いただけると幸いです。</td
+></tr
+><tr
+><td
+>1145860383</td
+><td
+>VIVI</td
+><td
+>お返事が遅くなりました。\nお手数をお掛けしておりまして、申し訳ありません。\nソースコードの件、了解致しましたが、どのようにお送りしたらよろしいでしょうか？</td
+></tr
+><tr
+><td
+>1145717819</td
+><td
+>グニャラくん</td
+><td
+>VIVIさん\n調査が遅れていて申し訳ございません。\nよろしければ、VIVIさんが構築した際の\nパッチ済みのMySQLのソースコード一式をいただけませんか？</td
+></tr
+><tr
+><td
+>1145083479</td
+><td
+>VIVI</td
+><td
+>よろしくお願いします。</td
+></tr
+><tr
+><td
+>1145016315</td
+><td
+>グニャラくん</td
+><td
+>VIVIさん\nはじめまして。すばらしい報告ありがとうございます。\nおそらく不具合だと思います。\n追ってみますね。。。</td
+></tr
+><tr
+><td
+>1144977417</td
+><td
+>VIVI</td
+><td
+>はじめまして。\nすばらしいソフトウェアの公開を有難うございます。\n有効に使わせていただきたいと思いますが、現在以下のような問題が発生して悩んでおります。\n\n使用環境\nWindowsXP SP2\nMysql 4.1.16\nSenna rev113\nNGRAMのみの使用でmecab未使用\nUTF-8コード使用\n\nテストとして、空のテーブルにファイルよりLoad data にて一括で登録していますが、\nファイルの件数(25万件ほど)が増えるとMysqlがダウンします。\n\nログにてダウン箇所を追いかけていくと\nsen_ngram_next\n_sen_sym_get\npat_at\nsen_io_seg_bind\nsen_io_seg_map 内にてsegno = -1 のログを残した後Abendします。\n\n上記の_sen_sym_get 内にて\nsym-&gt;header-&gt;garbages[size] （size=7) の値にいきなり 1679392　という\n数値が入ってきます。（ダウン直前以外は、すべて 0）\nこのあたりが問題のような気がしていますが、\nチェック箇所、対処方法などをご教示いただければと思います。よろしくお願い致します。\n</td
+></tr
+><tr
+><td
+>1143697747</td
+><td
+>Shimamura</td
+><td
+>ご返答ありがとうございます。\nメールを送信させていただきました。</td
+></tr
+><tr
+><td
+>1143695377</td
+><td
+>moritapo</td
+><td
+>うーん、、なんか厄介ですね。\nよろしかったら再現条件(sqlの内容も含めた情報)を\nいただけると対応できるかも知れません。\nここだとナンですので、senna at razil.jpの方にメールを\nいただくのはいかがでしょうか？</td
+></tr
+><tr
+><td
+>1143650085</td
+><td
+>Shimamura</td
+><td
+>スペルミス失礼しました。\n無事Sennaのインストールは完了しました。\n\n早速FULLTEXTインデックスを張ってみたところ、Lost connection to MySQL server during queryとなってしまいました。\n\nhttp://ryne.jp/senna.txt\n\nこちらにSennaのログとMySQLのログを置いておきました。\n\nメモリ不足？のようなのですが、実際メモリが足りない状態ではありませんでした。。\n\nSEN_INDEX_NGRAMのみでコンパイルしています。\n\n\nこんなに手こずるとは思わず苦戦状態です。。</td
+></tr
+><tr
+><td
+>1143642438</td
+><td
+>グニャラくん</td
+><td
+>リポビさん＞\nはーい。とはいえ手がしばらく空きそうにないのです。。。\n\nShimamuraさん＞\n--disable-nkfcではなくて、\n--disable-nfkcでお試しください。</td
+></tr
+><tr
+><td
+>1143568786</td
+><td
+>Shimamura</td
+><td
+>FreeBSD 4.11のインストールでこけました。。\nenv CC=gcc CFLAGS=&quot;-O3 -I/usr/local/include/&quot; LDFLAGS=&quot;-L/usr/local/lib -pthread&quot; \\n./configure --disable-nkfc --without-mecab \n\n\n上記の./configureを通しました。\n/* SEN_INDEX_NGRAMのみで使用するため、MeCabもはずしました。*/\n\ngmakeしているうちにメモリは500MB以上消費、LAが40を超えてSWAPに落ちるとき辺りに\n\n gcc -D_REENTRANT -DSENNA_HOME=＼&quot;/var/senna＼&quot; -DNO_MECAB -I. -I. -I.. -I. -I.. -I/usr/local/include/senna -Wall -O3 -fno-strict-aliasing -O3 -I/usr/local/include/ -c nfkc.c -Wp,-MD,.deps/nfkc.TPlo  -fPIC -DPIC -o .libs/nfkc.o\nnfkc.c: In function `sen_nfkc_map2':\nnfkc.c:71730: virtual memory exhausted\n\nとなって、エラーで止まってしまいました。\n\n使用アーカイブ:senna-20060328.tar.gz</td
+></tr
+><tr
+><td
+>1143550095</td
+><td
+>リポビ</td
+><td
+>はい、よろしくお願いします</td
+></tr
+><tr
+><td
+>1143519048</td
+><td
+>グニャラくん</td
+><td
+>リポビさん＞\nなるほどー。\n手が空いたら僕のほうでも試してみますね。</td
+></tr
+><tr
+><td
+>1143512553</td
+><td
+>リポビ</td
+><td
+>senaをインストールしようとしていたサーバを他の用途に取られてしまい\n現在インストールの試みができないのですが\nMeCab 0.90rc11 で\n./configure --with-charset=sjis\nとしてコンパイルしました\n\nまたsena用にマシンを調達出来しだい、ご報告させていただきます</td
+></tr
+><tr
+><td
+>1143468583</td
+><td
+>グニャラくん</td
+><td
+>Shimamuraさん＞\nテーブルごとにバッファを確保し続けているので、\nテーブル数が多いとやはりメモリ不足になってしまうと思います。\n\nデータをコピーして、\n全文検索用のテーブルを設けるというのも\n１つの解決策かと思います。</td
+></tr
+><tr
+><td
+>1143268988</td
+><td
+>Shimamura</td
+><td
+>ありがとうございます。\n早速テストしてみようと思います。\n\nまた、メモリ確保の部分なのですが、\n5.4の環境で2時間に1度メモリ不足でMySQLが再起動しています。\n\ninitial_n_segmentsの数値も、メモリバッファ量も調整してあるのですが、、\n実行時のみメモリを確保するらしいのですが、実行後はどうなるのでしょうか？</td
+></tr
+><tr
+><td
+>1143210408</td
+><td
+>グニャラくん</td
+><td
+>Shimamuraさん&gt;\n遅くなりましたが、\n実際にインストールしてみましたー。\nhttp://qwik.jp/senna/freebsd_4_11.html\n\nリポビさん&gt;\nld.so.confについては\n追記しておいたほうがいいですね。\nご指摘ありがとうございます。\n\njapanese_tokenizer関係のエラーは初見です。\nほ、whiteboxを入れてみますか。。。\n\nmecabはどのようにしてインストールされましたか？</td
+></tr
+><tr
+><td
+>1143117261</td
+><td
+>リポビ</td
+><td
+>autoconfをやっていませんでした\nautoconfしてconfigureしてみたところ\n\nsize of char... configure: error: cannot compute sizeof (char), 77\n\nのメッセージで今度は止まってしまい、いろいろ調べて見ましたところ\n/etc/ld.so.conf\nに\n/usr/local/lib\nが入っていなかった為、/usr/local/libを/etc/ld.so.confに追加後\nconfigure make\n前の段階より進んだのですが\n今度は\n\n/usr/local/lib/libmecab.a(japanese_tokenizer.o)(.gnu.linkonce.t._ZN5MeCab17JapaneseTokenizerD1Ev+0xc4):\nIn function `MeCab::JapaneseTokenizer::~JapaneseTokenizer()':\n\nなるメッセージが出て止まってしまいました</td
+></tr
+><tr
+><td
+>1143075644</td
+><td
+>グニャラくん</td
+><td
+>Shimamuraさん＞\nありがとうございます。\nインストールしますね。</td
+></tr
+><tr
+><td
+>1143069788</td
+><td
+>Shimamura</td
+><td
+>ありがとうございます。\nISOなのですが、\nftp://ftp2.jp.freebsd.org/pub/.d3/FreeBSD/releases/\nこのFTPなら比較的4.11が置いてあるので、よかったらよろしくお願いします。</td
+></tr
+><tr
+><td
+>1143005586</td
+><td
+>グニャラくん</td
+><td
+>Shimamuraさん＞\n4.11のminimun ISO-imageを手に入れて\nインストールしようとするも、\n通常のミラーにはもう4.11関係のファイルがないため、\nFTP installでコケたままになっています。。。\n\nリポビさん＞\n報告ありがとうございます。\nひとつ確認したいことがあります。\nmysqlのディレクトリでconfigureを行う前に、\nautoconfはしましたでしょうか？</td
+></tr
+><tr
+><td
+>1143004800</td
+><td
+>リポビ</td
+><td
+>私の方でも同じようなエラーがmysql 4.0.26 make時に出て止まってしまいます\n\nmyisamchk.o(.text+0x6e): In function `main':\nmyisamchk.c:102: undefined reference to `sen_init'\nlibmyisam.a(mi_open.o)(.text+0x1585): In function `mi_open':\nmi_open.c:332: undefined reference to `sen_log'\nlibmyisam.a(mi_open.o)(.text+0x15a1):mi_open.c:333: undefined reference to `sen_log'\nlibmyisam.a(mi_open.o)(.text+0x15bd):mi_open.c:334: undefined reference to `sen_log'\n....\n\nOSはwhite box(EL3相当)\nsennaのconfigureオプションは\n./configure  --disable-nfkc --prefix=/usr\nその後以下を確認し\nldconfig  -p </td
+><td
+> grep -i senna\nlibsenna.so.0 (libc6) =&gt; /usr/lib/libsenna.so.0\nlibsenna.so (libc6) =&gt; /usr/lib/libsenna.so\nmysqlにpatch を充ててmakeすると上のエラーが出て止まります\n\n./configure  --disable-nfkc\nでも試してみましたが同じでした\n</td
+></tr
+><tr
+><td
+>1142837087</td
+><td
+>グニャラくん</td
+><td
+>ここ数日のパッケージが壊れていた可能性があります。\nSubversion経由のダウンロードでは問題ありません。\n修正したパッケージでの配布を再開しました。</td
+></tr
+><tr
+><td
+>1142815121</td
+><td
+>グニャラくん</td
+><td
+>Shimamuraさん＞お待ちくださーい\nNooさん,wheelさん＞\nサーバ移転でsubversionのプロトコルを、\nsvnからhttpに変えたせいで起こった現象です。\n申し訳ございませんでした。\n指摘ありがとうございます。\nダウンロードページを更新しました。</td
+></tr
+><tr
+><td
+>1142671985</td
+><td
+>Noo</td
+><td
+>wheelさん\n\nチェックアウトできました！\n早速コンパイルしてみます。どうもありがとうございました:-)</td
+></tr
+><tr
+><td
+>1142644928</td
+><td
+>wheel</td
+><td
+>Nooさん\n\nsvn co <a class="external" href="http://svn.razil.jp/senna/trunk"
+>http://svn.razil.jp/senna/trunk</a
+> senna\nとすればよいようです。\n（私も小1時間はまりました。）</td
+></tr
+><tr
+><td
+>1142627248</td
+><td
+>Noo</td
+><td
+>Subversionでソースを取得しようとしたところ、\n\nsvn: /var/svn/misc/senna-it.conf:1: Section header expected\n\nというエラーが出てしまいました…。</td
+></tr
+><tr
+><td
+>1142608601</td
+><td
+>Shimamura</td
+><td
+>よろしくお願いいたします。。</td
+></tr
+><tr
+><td
+>1142482477</td
+><td
+>グニャラくん</td
+><td
+>うーん。4.11のISOイメージをとってきました。\nインストールレポート書いてみましね。</td
+></tr
+><tr
+><td
+>1142477756</td
+><td
+>Shimamura</td
+><td
+>試しに/usr/libにシンボリックリンクを張ってみました。\nsv-2# ldconfig -r </td
+><td
+> grep senna\n        67:-lsenna.0 =&gt; /usr/lib/libsenna.so.0\n        125:-lsenna.0 =&gt; /usr/local/lib/libsenna.so.0\n        159:-lsenna.0 =&gt; /usr/local/lib//libsenna.so.0\n\nsv-2# ls -l /usr/lib/libsenna.so.0\nlrwxr-xr-x  1 root  wheel  28 Mar 16 11:47 /usr/lib/libsenna.so.0 -&gt; /usr/local/lib/libsenna.so.0\n\nしかし状況相変わらずでした。\n4.11では無理なのでしょうかね。。LinuxThreadsを使用しなくてもこんな感じです。</td
+></tr
+><tr
+><td
+>1142470549</td
+><td
+>グニャラくん</td
+><td
+>ldconfigで/usr/lib/libsenna.so.0が捕捉できていなさそうです。\n--prefix=/usrだと/usr/lib/libsenna.so.0にインストールされるはずなので。。。\n</td
+></tr
+><tr
+><td
+>1142429384</td
+><td
+>Shimamura</td
+><td
+>sv-2# ls -l /usr/local/lib//libsenna.so.0\n-rwxr-xr-x  1 root  wheel  216424 Mar 14 23:42 /usr/local/lib//libsenna.so.0\nこんな感じでした。\n\nSennaのconfigureは\n--prefix=/usr --without-mecab --disable-nfkc \\nCFLAGS=-O3 CXXFLAGS=-O3\nこんな感じです。既に指定してました(*_*)\n\n試しにportsを改変してインストールしてみてこの結果なので、、\n\nPacking list:\n        Comment: PKG_FORMAT_REVISION:1.1\n        Package name: senna-0.20060311_1\n        Package origin: textproc/senna\n        CWD to /usr/local\nDependency: ja-mecab-0.81\n        dependency origin: japanese/mecab\nFile: bin/senna-cfg\n        Comment: MD5:329361a25890ea77a0e0c125deeea576\nFile: include/senna/senna.h\n        Comment: MD5:c9c45e28215d1d03b4eb3de9f192603b\nFile: lib/libsenna.a\n        Comment: MD5:5331e31bda469e9aa3346d78ab6f23f3\nFile: lib/libsenna.la\nFile: lib/libsenna.so\n        Comment: MD5:1bb7d4bf8fae7af27d0e19f42ad03499\nFile: lib/libsenna.so.0\n        Comment: MD5:d20e1b5a76f7420086b272bcbfd6bb43\n        Deinstall directory remove: include/senna\n        EXEC '/sbin/ldconfig -m %D/lib'\n        UNEXEC '/sbin/ldconfig -R'</td
+></tr
+><tr
+><td
+>1142417341</td
+><td
+>グニャラくん</td
+><td
+>158:-lsenna.0 =&gt; /usr/local/lib//libsenna.so.0 \nがちょっと気になったりはします。\n\nsennaのconfigureで--prefix=/usrを指定して、\nSennaのインストールを/usr/libと/usr/include以下にしたら\n解消できるかもしれません。</td
+></tr
+><tr
+><td
+>1142347757</td
+><td
+>Shimamura</td
+><td
+>やはりダメでした。。\n\nldconfigの内容は、\nsv-2# ldconfig -r </td
+><td
+> grep senna\n        124:-lsenna.0 =&gt; /usr/local/lib/libsenna.so.0\n        158:-lsenna.0 =&gt; /usr/local/lib//libsenna.so.0\n\n/usr/local/libの内容は\n		\nsv-2# ls -l /usr/local/lib </td
+><td
+> grep senna\n-rw-r--r--    1 root  wheel   226164 Mar 14 23:42 libsenna.a\nlrwxr-xr-x    1 root  wheel       13 Mar 14 23:42 libsenna.so -&gt; libsenna.so.0\n-rwxr-xr-x    1 root  wheel   216424 Mar 14 23:42 libsenna.so.0\n\nです。\n\n5.4はうまく動くのですが、、</td
+></tr
+><tr
+><td
+>1142343973</td
+><td
+>グニャラくん</td
+><td
+>Shimamuraさん＞\nうーん。。。なんなんでしょう。\n\n昔のライブラリが残っていたり、とか。\nとりあえず、/usr/libとか/usr/local/libとかにある\nlibsenna*をすべて消去して、\nldconfigを実行しlibsennaがないことを確認。\nSennaを作成しなおし、\nさらにmake後にldconfig -p </td
+><td
+> grep sennaでlibsennaがあることを確認して、\nMySQLのmakeをしてみてくださーい。。。\n\nやっぱりバイナリパッケージは必要ですね。</td
+></tr
+><tr
+><td
+>1142285115</td
+><td
+>Shimamura</td
+><td
+>修正をしなくても初めのエラー(../include/myisam.h:33: senna/senna.h: No such file or directory)\nは無くなりました。\nが、依然\nmyisamchk.o: In function `main':\nmyisamchk.o(.text+0x6c): undefined reference to `sen_init'\nlibmyisam.a(mi_open.o): In function `mi_open':\nmi_open.o(.text+0x9d7): undefined reference to `sen_log'\nmi_open.o(.text+0x9f0): undefined reference to `sen_log'\nmi_open.o(.text+0xa0c): undefined reference to `sen_log'\nmi_open.o(.text+0xa25): undefined reference to `sen_log'\nmi_open.o(.text+0xa40): undefined reference to `sen_log'\nlibmyisam.a(mi_open.o)(.text+0xa93): more undefined references to `sen_log' follow\n\nのようなエラーが出てmakeが通らない状況です。\n\n試しにportsのMySQLを使用してもみましたが、上記のエラーは同様です。\n\nうまくライブラリのパスが通ってないのでしょうか？？</td
+></tr
+><tr
+><td
+>1142212250</td
+><td
+>グニャラくん</td
+><td
+>Shimamuraさん&gt;\nMySQLのconfigureを以下のようにした場合はどうでしょうか？\n\nCC=gcc CFLAGS=&quot;-O3 -fno-strength-reduce -march=i686 -I/usr/local/include&quot; \\n CXX=gcc CXXFLAGS=&quot;-O3 -fno-rtti -fno-exceptions -march=i686 \\n -felide-constructors -fno-strength-reduce -I/usr/local/include&quot; \\n LDFLAGS=&quot;-L/usr/local/lib&quot; \\n ./configure --prefix=/usr/local/mysql --enable-assembler \\n --with-charset=utf8 --with-extra-charsets=sjis,ujis\n</td
+></tr
+><tr
+><td
+>1142062257</td
+><td
+>Shimamura</td
+><td
+>初め、if内にint p;でやってもだめだったのですが、外で変数定義ですか。。勉強になります。\nIN BOOLEAN MODEのフルサポートが出るというのは助かります。是非頑張ってください。\n\nFreeBSD4.11のほうではOSの都合もあり、5.4と違うのはLinuxThreadsでコンパイルするぐらいでしょうか。\n\nmysql-4.0.26用のパッチ、2indパッチをあててインストールしています。\n\nが、\n../include/myisam.h:33: senna/senna.h: No such file or directory\nということでうまくincludeされておらず、(/usr/local/include/senna/senna.hは実在する)\nmyisam.hで/usr/local/include/を直接指定してみると、MLで投げられていた\nhttp://lists.sourceforge.jp/mailman/archives/senna-dev/2005-May/000044.html\nのようなエラーでした。\n\n5.4の時はautoconfをすればきちんと通っていたのですが、4.11はどうしても通らないです。。</td
+></tr
+><tr
+><td
+>1142047578</td
+><td
+>moritapo</td
+><td
+>&gt;&gt;Shimamuraさん\nsyntax error失礼いたしました。\nIN BOOLEAN MODEは現状でも+などは使えています(thanks yappoさん)\nもう少しでboolean modeの機能をフルサポートした版が出せると思います。</td
+></tr
+><tr
+><td
+>1142041534</td
+><td
+>グニャラくん</td
+><td
+>Shimamuraさん\nおお、標準Cの仕様を逸脱してる部分があります。\nsen_query_execを\n404:  int p;\n405:  if (!i </td
+><td
+></td
+><td
+> !q </td
+><td
+></td
+><td
+> !r) { return sen_invalid_argument; }\n406:  // dump_query(q, q-&gt;expr, 0);\n407:  p = q-&gt;partial_match_threshold;\nにしてください。\n指摘ありがとうございます！</td
+></tr
+><tr
+><td
+>1142033826</td
+><td
+>Shimamura</td
+><td
+>5.4のほうはかなり順調に動いているようです。\nN-Gramのため莫大なインデックスとなりましたが、そのサイズに見合う効果が出ています。\nもう少しテストしてみた後、アプリケーション側でIN BOOLEAN MODE等のオプションに対応させてみたいと思います。\n\nさて、4.11のほうですが、ﾍｯﾀﾞに\n#ifndef int_least8_t \ntypedef char int_least8_t; \n#endif \nを追記し、ｺﾝﾊﾟｲﾙしたところquery.c辺りでSyntax errorでした。\n\nquery.c: In function `sen_query_exec':\nquery.c:406: syntax error before `int'\nquery.c:407: `p' undeclared (first use in this function)</td
+></tr
+><tr
+><td
+>1142028560</td
+><td
+>gunyarakun</td
+><td
+>Shimamuraさん＞\nおお、稼働できたのですね！\n長い道のりお疲れ様でした。\n\nそして4.11でインストールできないんですね。。\n#ifndef int_least8_t\ntypedef char int_least8_t;\n#endif\nとsenna.hに書き込めば動作する、\nとは思います。\n貴重な情報ありがとうございます。</td
+></tr
+><tr
+><td
+>1142027061</td
+><td
+>Shimamura</td
+><td
+>ありがとうございます。\nFreeBSD5.4 + MySQL4.0.26 + Senna rev.93で今のところ順調に稼働しています。\n\nFreeBSD4.11のサーバーが届いたのでテストしてみると、Sennaインストール時に(./autogen.shを行った後、gmakeを動かすと)\nIn file included from io.c:28:\nstr.h:57: syntax error before `int_least8_t'\n\nとなってインストールができませんでした。。</td
+></tr
+><tr
+><td
+>1141984330</td
+><td
+>gunyarakun</td
+><td
+>googlerさん＞\nぜひぜひご利用くださーい。\n\nShimamuraさん＞\n現在インストールページにあるパッケージは、\nまだrev.93の変更が反映されていません。\nSubversion経由で取得いただくか、\n明日ダウンロードいただけると\nおそらくN-gramでの検索ができるようになると思います。\n宜しくお願いいたします。</td
+></tr
+><tr
+><td
+>1141981266</td
+><td
+>Shimamura</td
+><td
+>MLで質問を投げさせてもらいましたが、こちらで報告させていただきます。\nやはりこちらの環境\nFreeBSD 5.4\ni386\nMySQL4.0.26\n\nshare-&gt;keyinfo[i].senna = sen_index_create(buf, sizeof(my_off_t), SEN_INDEX_NGRAM, 0, sen_enc_sjis);\n\nこのmi_open.cでコンパイルしましたが、状況相変わらずでした。。\n\nもう少ししたらXeonのFreeBSD6(MySQL4.0.26)が届くので、それでもテストしてみたいと思います。</td
+></tr
+><tr
+><td
+>1141977161</td
+><td
+>googler</td
+><td
+>なるほど！これですっきりと導入にふみきれます。\nすばらしいソフトウェアのご提供ありがとうございます。\nデザインもすっきりしましたね(笑)</td
+></tr
+><tr
+><td
+>1141975604</td
+><td
+>gunyarakun</td
+><td
+>naoyaさん、\n情報ありがとうございます！\nSolaris, Windowsでの動作報告は貴重です。\n\n「メール」問題 on Windowsは調べてみます。\nWindows上のMeCabは辞書作成が大変そうですね。。。\n\n既知の不具合・制限事項も更新させていただきました。</td
+></tr
+><tr
+><td
+>1141961054</td
+><td
+>moritapo</td
+><td
+>&gt;&gt;googlerさん\n申し訳ありません。。rev93でn-gramインデックスのバグを修正しました。私の手元(debian sarge)ではn-gramで問題なくインデックスを作成、検索できています。</td
+></tr
+><tr
+><td
+>1141949488</td
+><td
+>naoya</td
+><td
+>はじめまして.\n\n次の環境にても動作することを確認しました．ご参考までに. \n\n　文字コード　UTF-8\n\nプラットホーム（コンパイラ):\n Solaris 10  3/05    (Sun C コンパイラ5.8 32bit)\n Linux RHEL3 update6 (gcc 3.2.3)\n Windows XP  SP2     (VC++ 7.0)\n\n以下の点が不具合(?）といったところでした\n\nAll\n\n どなたかのご指摘のとおり,N-Gramでは動きませんでした\n\nSolaris\n\nPATH_MAX　がシステム側で定義されていませんでした\n\nWindows\n\nPATH_MAX　は同じく.\n\nご提供のパッチでは　vcproj ファイルなどが変更されないため,自身でMySQLソースパッケージで提供される\nものを変更しました\n\n　Windwos/UTF-8でコードマッピングに問題があるのかあるいはSennaのノーマライズの問題なのか,わかりませんが,　－　あるいは　ー　のノーマライズがうまく作動していないのでしょうか？　または　Mecabの問題でしょうか?？　”メール”　という単語でインデクスから引くことができませんでした　(Mecabでは分かち書きしてくれているようでした)\n\n\nまた,　Mecab辞書は　Cygwin　で作った方がうまく作れるようでしたね.(関係ないかもしれませんが)\n \nなんにせよ,すばらしいソフトウェアを公開していただきありがとうございます.</td
+></tr
+><tr
+><td
+>1141884540</td
+><td
+>gunyarakun</td
+><td
+>googlerさん、貴重なご意見ありがとうございます。\nいつかのrevisionより問題が混入したようです。\n現在N-gramの環境を作成しテストを行っている段階です。\nおそらく環境依存ではないのではないか、\nと考えられます。</td
+></tr
+><tr
+><td
+>1141750694</td
+><td
+>googler</td
+><td
+>N-gramでの利用でsegmentation faultが発生する\nという既知の問題があるそうですが、これが利用を思いとどまらせています。結構致命的だと思うのですが、解決はまだされていないのでしょうか、、、\nまた、N-gram利用されている方で、問題ない、というケースもあるのでしょうか。環境依存するのであれば推奨環境で構築したいのですが、、\n</td
+></tr
+><tr
+><td
+>1141110669</td
+><td
+>niraikanaibird</td
+><td
+>gunyarakunさん\n\n解決できました。ありがとうございました。</td
+></tr
+><tr
+><td
+>1141046684</td
+><td
+>gunyarakun</td
+><td
+>niraikanaibirdさん、\npkg-configを入れてみてください。</td
+></tr
+><tr
+><td
+>1141037918</td
+><td
+>niraikanaibird</td
+><td
+>はじめまして。\nインストールでつまづいています。\n\n# ./configure --prefix=/usr\nを実行したときに以下のログが出ていてmakefileが作成されません。\n---------------\n./configure: line 20042: syntax error near unexpected token `GLIB,'\n./configure: line 20042: `              PKG_CHECK_MODULES(GLIB, glib-2.0 &gt;= 2.8)'\n---------------\n\nautogen.shをを実行したときにも最後に同じログが出ています。</td
+></tr
+><tr
+><td
+>1140149534</td
+><td
+>taka</td
+><td
+>ありがとうございます。\n1GB超えに関してなのですが、現在別の検証作業を行っているのでそちらが終わり次第ver.upしたいと思います。\ninitial_n_segmentsに関してはその時16まで減らしていたのですが足りなかったのでしょうか…。</td
+></tr
+><tr
+><td
+>1140072368</td
+><td
+>moritapo</td
+><td
+>&gt;&gt;takaさん\nrev80で1GB超のインデックスが動くようになったと思います。\n(まだ当方でも試験中ですが)\n\nmmap_sizeの問題については、\nメモリ消費量 = テーブル数 * initial_n_segments * 256KB\nが4GBを超過しているものと思われます。32bitマシンでは4GBが限度です。\nテーブル数を減らすか、initial_n_segmentsを減らす必要があります。</td
+></tr
+><tr
+><td
+>1139933166</td
+><td
+>tote</td
+><td
+>あっ、素晴らしいです。これでコンパイルが最適化できますね。</td
+></tr
+><tr
+><td
+>1139910436</td
+><td
+>gunyarakun</td
+><td
+>UTF8の正規化を利用しないのであれば、\nrev-77からnkfc.cのコンパイルを飛ばすことができるようになりました。\nconfigureに、--disable-nfkcを追加して\nmakeをお試しください。\n</td
+></tr
+><tr
+><td
+>1139807875</td
+><td
+>tote</td
+><td
+>\nCFLAGS=-O0でもだめですか？</td
+></tr
+><tr
+><td
+>1139797127</td
+><td
+>aki</td
+><td
+>下の方にもありましたが、\n\nmecab-0.90rc8をインストールした後、\nsenna-20060213-svn.tar.gz をダウンロードして、\nconfigure CFLAGS=-O2 の後 make すると、\n\ngcc -D_REENTRANT -DSENNA_HOME=\&quot;/var/senna\&quot; -I. -I.. -Wall -O3 -fno-strict-aliasing -O2 -Wp,-MD,.deps/nfkc.pp -c nfkc.c  -fPIC -DPIC -o .libs/nfkc.o\n\nで止まってしまいます。下の方では、\n\n&gt; コンパイルオプションを -O3 や -O2 をはずしたらいけましたよ\n\nとありましたが、ダメでした。\nちなみにOSはredhat9で\n\ngcc -v\n/usr/lib/gcc-lib/i386-redhat-linux/3.2.2/specs から spec を読み込み中\nコンフィグオプション: ../configure --prefix=/usr --mandir=/usr/share/man --infodir=/usr/share/info --enable-shared --enable-threads=posix --disable-checking --with-system-zlib --enable-__cxa_atexit --host=i386-redhat-linux\nスレッドモデル: posix\ngcc バージョン 3.2.2 20030222 (Red Hat Linux 3.2.2-5)\n\nです。\nよろしくお願いします。</td
+></tr
+><tr
+><td
+>1139581840</td
+><td
+>taka</td
+><td
+>お待ちしております。\n次から次へと申し訳ないです。。。</td
+></tr
+><tr
+><td
+>1139580179</td
+><td
+>gunyarakun</td
+><td
+>takaさん、お待たせしちゃうかもしれませんが、\n宜しくお願いします。。\n\nERROR 1030: Got error 134 from table handler\nが出てくるという報告は他にもありまして、\n1Gの問題とは直接には関係していないと推定されます。\n検索クエリが短いときに問題が起きるようで、\nそれが、対象件数が多すぎるからか、\nそれともクエリが短いことそのものが原因なのか、\nまだ把握できていない状態です。</td
+></tr
+><tr
+><td
+>1139577039</td
+><td
+>taka</td
+><td
+>ありがとうございます。お待ちしております。\nまた転置ファイルが1Gの状態で検索し、100件程度のヒットなら問題ないのですが数百件以上ヒットするとERROR 1030: Got error 134 from table handlerとなってしまいます。これも容量が増えなくなるのと関連があるのでしょうか？</td
+></tr
+><tr
+><td
+>1139575158</td
+><td
+>gunyarakun</td
+><td
+>takaさん、はじめまして。\nまず、1Gを超えると転置ファイルの容量が増えなくなる件についてですが、バグです。\n修正予定です。\n\ninsertの件については、\nまだ状況が追えていませんが、\nおそらくバグだとは思います。\n調査いたしますのでお待ちください。</td
+></tr
+><tr
+><td
+>1139491111</td
+><td
+>taka</td
+><td
+>はじめまして。150万レコード1.6G程度のデータで***.SEN.i.cが1Gになった所で転置ファイルが増えなくなりました。よって該当テーブルを数十個に分割しました。\nところがinsertを行っているとLost connection to MySQL server during queryとなってしまいます。\nその際logにはmmap(4194304,535,69632)=0x0 &lt;-1&gt;と表示されています。またその際mmap_sizeの値がどんどん増えint型のサイズを超えマイナス値となっていました。\n何か対処方法はありますでしょうか？\n動作環境\nmecab-0.81(patch有)\nipadic-2.6.0\nsenna-20051224-svn\nmysql-4.0.26\nFreeBSD 5.4-RELEASE</td
+></tr
+><tr
+><td
+>1139220646</td
+><td
+>gunyarakun</td
+><td
+>おお、問題解決よかったです。。。\nインデックスまわりのエラー処理をきちんとすべきですね。\n今後ともSennaを宜しくお願いいたしますー。</td
+></tr
+><tr
+><td
+>1139056331</td
+><td
+>tote</td
+><td
+>moritapoさん、gunyarakunさんスイマセン。\n原因がわかりました。\nインデックスをdropせずにver.upしたのが原因でした。\n\nホント申し訳ないです。</td
+></tr
+><tr
+><td
+>1138952380</td
+><td
+>moritapo</td
+><td
+>ありがとうございます。お待ちしてますー</td
+></tr
+><tr
+><td
+>1138944251</td
+><td
+>tote</td
+><td
+>NFSは使ってないです．フツーにRAID．\nsennaのログは採ってたんで，見てみたら780MBありました．．．\n一度からにしてから再度log採ってみます．\nまた，そのlogはメールにて送ります．</td
+></tr
+><tr
+><td
+>1138938763</td
+><td
+>moritapo</td
+><td
+>確認ですが、toteさんの環境では、nfsでマウントしたファイルシステム上にDBファイルを置いて運用されていますか？\nあと、よろしければ、/var/senna/log/というディレクトリを掘って、mysqldに書き込み権限を与えて再起動し、\n事象が再現した時のログファイルをsenna at razil.jp等にメールして頂けると大変助かります。</td
+></tr
+><tr
+><td
+>1138898850</td
+><td
+>gunyarakun</td
+><td
+>中に取り込まれましたー。\nちょっと今バタバタしていてすぐ着手できそうにないんですが、\n修正後にテストお願いすると思います。\nよろしくお願いいたします。</td
+></tr
+><tr
+><td
+>1138809927</td
+><td
+>tote</td
+><td
+>あぅ。gunyarakunさんって中の人だったんですか？\n今は、rev.67とMySQL4.1.16で不満は無いですがなるべく新しいのが使えるのがうれしいかなぁっと・・\n\n「こんなテストをしたらどう？」みたいのがあったらご教示くださいませ。テストぐらいしか出来ませんので。</td
+></tr
+><tr
+><td
+>1138636903</td
+><td
+>gunyarakun</td
+><td
+>toteさんの問題、NFSがらみのところなんですかねえ。\n追ってみないと。。。</td
+></tr
+><tr
+><td
+>1137140313</td
+><td
+>tote</td
+><td
+>しばらくrev.67で動かしていましたが、mysqlのパッチが新しくなった様なのでrev.73をインストールしてみました。\nしかし、以前起きた問題と同じような事が起こってます。はうぅ～～</td
+></tr
+><tr
+><td
+>1135703954</td
+><td
+>tote</td
+><td
+>と、思ったらダメだった・・・\n\nただのSELECTでもrestartするのです。\nやっぱり一個前のrev使います。</td
+></tr
+><tr
+><td
+>1135703366</td
+><td
+>tote</td
+><td
+>MySQLとMecabとSennaを一度削除して、インストールし直しました。\nrev.68でも素のMeCabにパッチが当たってないとMecab_new3がねぇ～よパッチングしたやつ使えって怒られたが・・・\n\nとりあえずちゃんと動いてるっぽいおのでオケ。</td
+></tr
+><tr
+><td
+>1135653091</td
+><td
+>tote</td
+><td
+>発生頻度は高いです。\nというか\nSELECT COUNT(*) AS 'count' FROM `article` WHERE MATCH(`body`) AGAINST('あいうえお')\nみたいな全文検索名クエリを受け取るたびにrestartしてます。\n\nMySQL-4.1.16とrev.67で動いていてsennaのみを\n./configure\nmake; make install\nでインストールしてMySQLを再起動しました。patchは当ててません（前のrevisionのパッチが当たってるので）\n\n今はsenna-20051224-svn.tar.gzで問題なく動いてます。MySQLの再インストールや再パッチなどは行ってません。</td
+></tr
+><tr
+><td
+>1135530278</td
+><td
+>moritapo</td
+><td
+>んんん、、rev68でですか。。\nrev64でファイル操作まわりを結構いじったのですがそれのせいじゃないとすると何だろう。。\n不具合が発生する頻度は高いですか？ 確実に再現する手順とかあると嬉しいです。</td
+></tr
+><tr
+><td
+>1135489196</td
+><td
+>tote</td
+><td
+>rev.68でcannot lstat `.': Stale NFS file handleと出てmysqlが勝手に再起動します。\nrev.67まではOKでした。\nn-gramなmysqlは4.1.16でおます。</td
+></tr
+><tr
+><td
+>1133925441</td
+><td
+>moritapo</td
+><td
+>いずれもn-gramだと起こらないところが関連ありそげですね。。</td
+></tr
+><tr
+><td
+>1133856794</td
+><td
+>Yappo</td
+><td
+><a class="external" href="http://lists.sourceforge.jp/mailman/archives/senna-dev/2005-October/000155.html"
+>http://lists.sourceforge.jp/mailman/archives/senna-dev/2005-October/000155.html</a
+>\n\nこの件と関連性あるんですかね・・・</td
+></tr
+><tr
+><td
+>1133842563</td
+><td
+>axel</td
+><td
+>mysqlからmecabを使わないようにすると\n問題が生じませんでした。\nお騒がせしました。\n</td
+></tr
+><tr
+><td
+>1133772639</td
+><td
+>axel</td
+><td
+>sennaをsenna-20051023にしても同様でした。\nデータの大きさが148769では、問題がおきませんでした。\n</td
+></tr
+><tr
+><td
+>1133767557</td
+><td
+>axel</td
+><td
+>ちなみに\nhttp://dev.razil.jp/archive/deb/\nから、ダウンロードした\nlibmecab0_0.81-0.1_i386.deb\nlibsenna0_0.1-1_i386.deb\nmecab-utils_0.81-0.1_i386.deb\nmecab_0.81-0.1_i386.deb\nと、\nsenna-20051023-svn.tar.gz\nを、apt-get sourceしたmysql-dfsg-4.0.24に\nパッチをあて、ビルドしたパッケージを利用しています。\ndebでinstallしたものが、古いバージョンだからなのですかね？\n</td
+></tr
+><tr
+><td
+>1133765649</td
+><td
+>axel</td
+><td
+>phpで、\necho strlen($str);\nとすると、193884です。\n193884byte=189kbyteなので、256kb以下のようです。\n\n</td
+></tr
+><tr
+><td
+>1133756460</td
+><td
+>axel</td
+><td
+>ログをみてみると、replaceしたときに、\nRLIMIT_STACK is 2093056 (9942)\nexpanded RLIMIT_STACK to 268435456\nとなっていました。</td
+></tr
+><tr
+><td
+>1133744641</td
+><td
+>moritapo</td
+><td
+>axelさんの問題と同じかどうか分かりませんが、\n256kb超の文字列を食わせるとmecabが停止する場合があるようです。\n「かなり長い文章」のサイズはどれぐらいでしょうか？\n</td
+></tr
+><tr
+><td
+>1133702583</td
+><td
+>axel</td
+><td
+>debian sargeで\nmysql4.0.24-10+senna0.1-1+php4.3.10を利用しております。\nfulltext indexをつけたLONGTEXTに、\nかなり長い文章をreplaceすると\nquery failed: Lost connection to MySQL server during query \nと、エラーになります。\n原因を調べていると、fulltext indexをつけたときに\n長い文字列を使うと発生する症状だとわかりました。\nLONGTEXTに、fulltext indexを使った場合、\n文字数の制限等はあるのでしょうか？\nまた、その制限を変更することはできるのでしょうか？\n\n宜しくお願い致します。\n</td
+></tr
+><tr
+><td
+>1133702564</td
+><td
+>axel</td
+><td
+>debian sargeで\nmysql4.0.24-10+senna0.1-1+php4.3.10を利用しております。\nfulltext indexをつけたLONGTEXTに、\nかなり長い文章をreplaceすると\nquery failed: Lost connection to MySQL server during query \nと、エラーになります。\n原因を調べていると、fulltext indexをつけたときに\n長い文字列を使うと発生する症状だとわかりました。\nLONGTEXTに、fulltext indexを使った場合、\n文字数の制限等はあるのでしょうか？\nまた、その制限を変更することはできるのでしょうか？\n\n宜しくお願い致します。\n</td
+></tr
+><tr
+><td
+>1132902794</td
+><td
+>moritapo</td
+><td
+>原因わかって良かったです。これからもsennaをよろしくです。。</td
+></tr
+><tr
+><td
+>1132822071</td
+><td
+>sesaru</td
+><td
+>申し訳ありません。\nやっぱり、/etc/ld.so.conf が原因でした。\n\n/usr/local/mecab-0.81/lib\n/usr/local/senna/lib\n\nと指定してしないといけないところを、\n\n/usr/local/mecab-0.81\n/usr/local/senna\n\nとしておりました・・・。\nお騒がせ致しました。\n\n下記で、問題なくインストールできましたので、\nご報告いたします。\n\nexport CPPFLAGS=&quot; -I/usr/local/mecab-0.81/include -I/usr/local/senna/include &quot;\nexport LDFLAGS=&quot; -L/usr/local/mecab-0.81/lib -L/usr/local/senna/lib &quot;\n/usr/local/autoconf-2.59/bin/autoconf\n./configure --prefix=/usr/local/mysql-4.0.26 --with-charset=ujis --with-extra-charsets=complex\nmake\nmake install\n</td
+></tr
+><tr
+><td
+>1132641459</td
+><td
+>sesaru</td
+><td
+>/etc/ld.so.conf に指定していますがだめです。\nML の方でも以前話題になっていたようですが、原因がうやむやのまま終ったようです。\n\n実は、インストール先が微妙に違うのですが、それが原因でしょうか？\n\n/usr/local/mecab-0.81\n/usr/local/senna\n\nとしていて、\n\nexport CFLAGS=&quot;-O3 -mpentiumpro -I/usr/local/mecab-0.81/include -I/usr/local/senna/include &quot;\nexport LDFLAGS=&quot; -L/usr/local/mecab-0.81/lib -L/usr/local/senna/lib&quot;\n\n上記のオプションを指定しています。\n前のリビジョン(rev50)では問題なかったのですが・・・。\n\nconfig.log を送った方がいいですか？</td
+></tr
+><tr
+><td
+>1132306260</td
+><td
+>moritapo</td
+><td
+>私の環境だとうまく再現しません。\nlibmecab.soやlibsenna.soをインストールしたパスが/etc/ld.so.confに含まれていなかった時に同様の症状を、\n経験したことがあります。\nconfigureスクリプトの内部でtest用のcプログラムのコンパイルに失敗しているのだと思います。\nコンパイルに失敗している理由がわかると嬉しいのですが。。</td
+></tr
+><tr
+><td
+>1132202235</td
+><td
+>senna</td
+><td
+>しばらくぶりですが、\nrev 50 → 57 があがっていたので、\nMySQL 4.0.26 + senna rev57 をインストールしてみましたが、インストール手順のように「普通に」できなくなってきました。\n\nMySQL の ./configure で以下のようなエラーがでます。\nerror: cannot compute sizeof (char), 77\n\nいろいろ調べましたが、autoconf をやらずに、\n自分でMakefile に -lmecab -lsenna 等を追加したらいけました。\n\nML 等に話題になってる64bit 対応等もいいのですが、\nかなりめんどうなのですがどうにかなりませんかー？</td
+></tr
+><tr
+><td
+>1130652698</td
+><td
+>moritapo</td
+><td
+>とりあえずrev56でmyisamchkが動く版を出しましたー。</td
+></tr
+><tr
+><td
+>1129516288</td
+><td
+>moritapo</td
+><td
+>すみません！ 遅くなりました。\n現行バージョンですと、形態素解析インデックスを持つテーブルではmyisamchkに失敗してしまうと思います。\n対応版を近日中に出します。\n1GB超のテーブルが破損する件については、もし詳細情報がいただければ解析したいです。</td
+></tr
+><tr
+><td
+>1128440560</td
+><td
+>taro</td
+><td
+>はじめまして。senna すごいです。さっそくですが、\n200万レコード、1GB程度のテーブルが壊れてしまいました。\n\nmyisamchk: error: sort_buffer_size is to small\nMyISAM-table 'url.MYI' is not fixed because of errors\nTry fixing it by using the --safe-recover (-o), the --force (-f) option or by not using the --quick (-q) flag\n\nいわれるままに　sort_buffer_size　を増やしたのですが、やっぱりだめです。弱りました。\n</td
+></tr
+><tr
+><td
+>1128391179</td
+><td
+>acu</td
+><td
+>メモリが256MBしか無いからかなぁ。。\nコンパイルオプションはずしても止まる。。</td
+></tr
+><tr
+><td
+>1127870630</td
+><td
+>moritapo</td
+><td
+>そういうことですか。3時間かかってたのはswapperが動いていたのかも知れませんね。</td
+></tr
+><tr
+><td
+>1127806396</td
+><td
+>sesaru</td
+><td
+>コンパイルオプションを -O3 や -O2 をはずしたらいけましたよ。メモリも 300MB以上ないとエラーになりました。</td
+></tr
+><tr
+><td
+>1127741733</td
+><td
+>moritapo</td
+><td
+>３時間！ それは申し訳ありません。。orz\n方式を変えるか、configureで外せるようにするか対策考えます。</td
+></tr
+><tr
+><td
+>1127645283</td
+><td
+>acu</td
+><td
+>３時間待ってみたけど終わらない。。\n./configure --helpした限りでは、NFKCをはずしオプション無いですよね？</td
+></tr
+><tr
+><td
+>1127520039</td
+><td
+>moritapo</td
+><td
+>あ、それはコンパイルに時間がかかっているのかも知れません。辛抱強く待ってみて下さい。マシンによっては10分ぐらいかかるかも。。</td
+></tr
+><tr
+><td
+>1127498947</td
+><td
+>acu</td
+><td
+>./configure\nmakeすると\n gcc -D_REENTRANT -DSENNA_HOME=\&quot;/var/senna\&quot; -I. -I.. -Wall -O3 -fno-strict-aliasing -g -O2 -Wp,-MD,.deps/nfkc.pp -c nfkc.c  -fPIC -DPIC -o .libs/nfkc.o\nで止まる。エラーメッセージは特にないです。\n\ngcc -vは、\n/usr/lib/gcc-lib/i386-redhat-linux/3.2.3/specs から spec を読み込み中\nコンフィグオプション: ../configure --prefix=/usr --mandir=/usr/share/man --infodir=/usr/share/info --enable-shared --enable-threads=posix --disable-checking --with-system-zlib --enable-__cxa_atexit --host=i386-redhat-linux\nスレッドモデル: posix\ngcc バージョン 3.2.3 20030502 (Red Hat Linux 3.2.3-34)\nです。</td
+></tr
+><tr
+><td
+>1126916255</td
+><td
+>moritapo</td
+><td
+>sennaのバグや不審な挙動を見つけたらガンガン書いて下さい</td
+></tr
+></table
+></div
+><!--section--></div
+><!--body--></div
+><!--day--></div
+><!--body_main--><div class="body_leave" id="body_leave"
+><div class="day"
+><div class="comment"
+><div class="caption"
+><div class="page_attribute"
+>
+<span class="attribute"
+>生成時間: <em
+>__qwik_page_generate_time__秒</em
+></span
+>
+<div align="right"
+>
+<a href="http://x6.at-ninja.jp/bin/gg?067333300"
+>
+<img border="0" src="http://x6.at-ninja.jp/bin/ll?067333300"
+/></a
+>
+<span style="font-size:9px"
+><img src="http://img.shinobi.jp/tadaima/fj.gif" style="margin:0;vertical-align:text-bottom;"
+/> <a href="http://randoseru.rentalurl.net"
+>ランドセル</a
+></span
+>
+</div
+>
+
+
+</div
+></div
+></div
+></div
+></div
+><!--body_leave--></div
+><!--main--><div class="sidebar"
+><h2
+>メニュー/Menu</h2
+><ul
+><li
+><a href="FrontPageJ.html"
+>ホーム</a
+> / <a href="FrontPage.html"
+>Home</a
+></li
+></ul
+>
+<ul
+><li
+>Sennaの紹介</li
+><ul
+><li
+><a href="senna_takahashi.html"
+>Sennaとは</a
+></li
+><li
+><a href="publication.html"
+>雑誌記事・発表資料等</a
+></li
+><li
+><a href="example.html"
+>こんなところでも使われてます！</a
+></li
+><li
+><a href="FAQ.html"
+>FAQ</a
+> / <a href="FAQ_en.html"
+>FAQ (English)</a
+></li
+><li
+><a href="ML.html"
+>メーリングリスト</a
+> / <a href="ML_en.html"
+>MailingLists</a
+></li
+></ul
+><li
+>Sennaの利用</li
+><ul
+><li
+><a href="Download.html"
+>ダウンロード</a
+> / <a href="Download_en.html"
+>Download</a
+></li
+><li
+><a href="install.html"
+>インストール</a
+> / <a href="install_en.html"
+>Install</a
+></li
+><li
+><a href="check_install.html"
+>動作確認方法</a
+> / <a href="check_install_en.html"
+>Check install</a
+></li
+><li
+><a href="bindings.html"
+>バインディング一覧</a
+></li
+><li
+><a href="mysql_binding.html"
+>MySQL バインディング</a
+> / <a href="mysql_binding_en.html"
+>MySQL binding</a
+></li
+><li
+><a href="install_specific.html"
+>特定環境でのインストールメモ</a
+> / <a href="install_specific_en.html"
+>installing note for specific environment</a
+></li
+></ul
+><li
+>利用者向け</li
+><ul
+><li
+><a href="query.html"
+>クエリーの書式</a
+> / <a href="query_en.html"
+>query syntax</a
+></li
+><li
+><a href="Customize.html"
+>カスタマイズ</a
+> / <a href="Customize_en.html"
+>Customize</a
+></li
+><li
+><a href="sennaql_reference.html"
+>SennaQL リファレンス</a
+></li
+><li
+><a href="store_tutorial.html"
+>SennaStoreを使ってみよう</a
+></li
+><li
+><a href="log_level.html"
+>ログレベルの解説</a
+></li
+><li
+><a href="report_bugs.html"
+>不具合報告掲示板</a
+></li
+><li
+><a href="contribute.html"
+>Sennaへのパッチ・情報等</a
+></li
+><li
+><a href="knownproblems.html"
+>不具合等</a
+> / <a href="knownproblems_en.html"
+>Known problems</a
+></li
+></ul
+><li
+>高度な利用法</li
+><ul
+><li
+><a href="APIJ.html"
+>API</a
+> / <a href="API.html"
+>C API(English)</a
+></li
+><li
+><a href="IndexFile.html"
+>インデックスファイル</a
+> / <a href="IndexFile_en.html"
+>Index File</a
+></li
+></ul
+><li
+>Senna開発</li
+><ul
+><li
+><a href="design_policy.html"
+>Senna設計方針</a
+></li
+><li
+><a href="Roadmap.html"
+>開発ロードマップ</a
+></li
+><li
+><a href="cstyle.html"
+>コーディング規約</a
+></li
+><li
+><a href="WorkingStatus.html"
+>作業状況</a
+></li
+><li
+><a href="futureworks.html"
+>野望</a
+> / <a href="futureworks_en.html"
+>Future works</a
+></li
+></ul
+></ul
+>
+<h2
+>Search</h2
+><form action=".search"
+><input name="q"
+/><input type="submit" value="検索"
+/></form
+>
+
+<h2
+>Recent Change</h2
+><div class="recent"
+><ul
+><li
+><a href="example.html" title="2010-10-28 14:04:51"
+>こんなところでも使われてます！</a
+> <span class="ago"
+>3年前</span
+></li
+><li
+><a href="frontpage.html" title="2010-09-14 12:54:06"
+>frontpage</a
+> <span class="ago"
+>4年前</span
+></li
+><li
+><a href="Download_en.html" title="2010-07-22 14:26:20"
+>Download</a
+> <span class="ago"
+>4年前</span
+></li
+><li
+><a href="Download.html" title="2010-07-22 14:26:01"
+>ダウンロード</a
+> <span class="ago"
+>4年前</span
+></li
+><li
+><a href="FrontPageJ.html" title="2009-11-25 16:14:43"
+>Senna 組み込み型全文検索エンジン</a
+> <span class="ago"
+>4年前</span
+></li
+><li
+><a href="FrontPage.html" title="2009-11-25 16:14:20"
+>Senna: An Embeddable Fulltext Search Engine</a
+> <span class="ago"
+>4年前</span
+></li
+><li
+><a href="Ruby_binding.html" title="2009-09-03 18:42:32"
+>Rubyバインディング</a
+> <span class="ago"
+>5年前</span
+></li
+><li
+><a href="PHP_binding.html" title="2009-08-24 04:09:56"
+>PHPバインディング</a
+> <span class="ago"
+>5年前</span
+></li
+><li
+><a href="store.html" title="2009-03-23 03:34:52"
+>SennaStore概要</a
+> <span class="ago"
+>5年前</span
+></li
+><li
+><a href="bindings.html" title="2008-10-05 11:33:12"
+>バインディング一覧</a
+> <span class="ago"
+>6年前</span
+></li
+></ul
+><p class="recent"
+><a href="RecentList.html"
+><em
+>もっと前の情報</em
+></a
+></p
+></div
+>
+<a class="rss-button" href="rss.xml"
+><span
+>RSS</span
+></a
+><a class="rss-button" href="atom.xml"
+><span
+>ATOM</span
+></a
+>
+
+</div
+><!--sidebar--><div class="footer"
+><span title="__qwik_page_generate_time__"
+>powered by <a href="http://qwik.jp/"
+>qwikWeb</a
+></span
+></div
+><!--footer--></div
+><!--container--></body
+></html
+>

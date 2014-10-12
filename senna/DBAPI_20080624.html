@@ -1,0 +1,2688 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html xmlns:v="urn:schemas-microsoft-com:vml"
+><head
+><title
+>Senna DB API案 (2008/06/24.0版) (注!:最新版ではありませｎ) - Senna 組み込み型全文検索エンジン</title
+><link href="theme/css/base.css" media="screen,tv" rel="stylesheet" type="text/css"
+/><link href="theme/css/base.css" media="screen,tv,print" rel="stylesheet" type="text/css"
+/><link href="css/theme.css" media="screen,tv,print" rel="stylesheet" type="text/css"
+/><link href="rss.xml" rel="alternate" title="RSS 0.91" type="application/rss+xml"
+/><script src=".theme/js/base.js" type="text/javascript"
+></script
+><script src=".theme/js/niftypp.js" type="text/javascript"
+></script
+><script src=".theme/js/se_hilite_jp.js" type="text/javascript"
+></script
+></head
+><body onload="qwik_onload();"
+><div class="container"
+><div class="main"
+><!--adminmenu--><!--toc--><h1
+>Senna DB API案 (2008/06/24.0版) (注!:最新版ではありませｎ)</h1
+><!--body_enter--><div class="body_main"
+><div class="day"
+><div class="body"
+><div class="section"
+><h3
+>概要</h3
+>
+<ul
+><li
+>DB APIはDBMSのような汎用的なデータベース管理機能を提供します。</li
+><li
+>table, column, space の3つが主な構成要素となります。</li
+></ul
+>
+<h3
+>table</h3
+>
+<ul
+><li
+>tableは不変のIDを持つrecordの集まりです。</li
+></ul
+>
+<ul
+><li
+>hash tableと、pat tableと、keyなしtableとがあります。</li
+></ul
+>
+<ul
+><li
+>hash table及びpat tableのrecordは、uniqueなkeyと対応付けて管理されます。</li
+></ul
+>
+<ul
+><li
+>keyなしtableはシステムによって付与されるIDによってのみレコードを特定できます。</li
+></ul
+>
+<ul
+><li
+>名前付きtableと無名tableとがあります。</li
+></ul
+>
+<h3
+>column</h3
+>
+<ul
+><li
+>一つのtableに対して名前によって識別されるcolumnを複数定義できます。</li
+></ul
+>
+<ul
+><li
+>それぞれのcolumnには特定の型の値を格納することができます。</li
+></ul
+>
+<ul
+><li
+>一つのtableに格納されるrecordは、すべて共通のcolumnの組を持ちます。</li
+></ul
+>
+<ul
+><li
+>転置インデックス(inv index) columnとその他のcolumnとがあります。</li
+></ul
+>
+<ul
+><li
+>inv index columnを用いて高速な全文検索が実行できます。</li
+></ul
+>
+<h3
+>space</h3
+>
+<ul
+><li
+>spaceはtableやcolumnの名前や関係を管理します。</li
+></ul
+>
+<ul
+><li
+>spaceは作業領域のメモリ管理も行います。</li
+></ul
+>
+<ul
+><li
+>二つのspaceの間に親子関係を持たせることができます。</li
+></ul
+>
+<ul
+><li
+>子spaceからは親spaceの名前空間を参照することができます。</li
+></ul
+>
+<h3
+>存続期間</h3
+>
+<ul
+><li
+>space, table, columnは、いずれも永続(persistent)と一時(temporary)のどちらかの存続期間を持ちます。</li
+></ul
+>
+<ul
+><li
+>永続(perisistent)属性を持っていた場合、その内容はファイルに保存されます。</li
+></ul
+>
+<ul
+><li
+>永続オブジェクトは複数のプロセスで共有し、同時にアクセスすることができます。</li
+></ul
+>
+<ul
+><li
+>一時オブジェクトは特定のプロセスに属します。</li
+></ul
+>
+<ul
+><li
+>一時オブジェクトは同一プロセスの複数のスレッドから同時にアクセスすることができません。</li
+></ul
+>
+<h3
+>型</h3
+>
+<ul
+><li
+>個々のcolumnやtableのkeyは、いずれかの型に属します。</li
+></ul
+>
+<ul
+><li
+>定義済みのtypeまたはtableを型として指定することができます。</li
+></ul
+>
+<ul
+><li
+>typeは格納される値のサイズや操作を定めます。</li
+></ul
+>
+<h3
+>手続き</h3
+>
+<ul
+><li
+>spaceの中で名前と対応付けて手続きを登録することができます。</li
+></ul
+>
+<ul
+><li
+>あるtableやcolumnから、他のtableやcolumnを導出するための手続きを定義することができます。</li
+></ul
+>
+<ul
+><li
+>tableやcolumnを参照あるいは更新するタイミングで呼び出す手続き(hook)を定義することができます。</li
+></ul
+>
+<h3
+>API関数</h3
+>
+<div class="code"
+><pre
+><span class="line odd" style="background:url(.num/1.png) no-repeat;"
+></span
+>
+<span class="line even" style="background:url(.num/2.png) no-repeat;"
+>typedef struct _sen_obj sen_obj;</span
+>
+<span class="line odd" style="background:url(.num/3.png) no-repeat;"
+></span
+>
+<span class="line even" style="background:url(.num/4.png) no-repeat;"
+>/**</span
+>
+<span class="line odd" style="background:url(.num/5.png) no-repeat;"
+> * sen_space_create:</span
+>
+<span class="line even" style="background:url(.num/6.png) no-repeat;"
+> * @space: 親とするspace。NULLならsen_global_spaceが親になる。</span
+>
+<span class="line odd" style="background:url(.num/7.png) no-repeat;"
+> * @path: 作成するspaceを格納するファイルパス。NULLならtemporary spaceとなる。</span
+>
+<span class="line even" style="background:url(.num/8.png) no-repeat;"
+> * @encoding: 作成するspaceでデフォルトとなるencoding。</span
+>
+<span class="line odd" style="background:url(.num/9.png) no-repeat;"
+> *</span
+>
+<span class="line even" style="background:url(.num/10.png) no-repeat;"
+> * 新たなspaceを作成する。</span
+>
+<span class="line odd" style="background:url(.num/11.png) no-repeat;"
+> **/</span
+>
+<span class="line even" style="background:url(.num/12.png) no-repeat;"
+>sen_obj *sen_space_create(sen_obj *space, const char *path, sen_encoding encoding);</span
+>
+<span class="line odd" style="background:url(.num/13.png) no-repeat;"
+></span
+>
+<span class="line even" style="background:url(.num/14.png) no-repeat;"
+>/**</span
+>
+<span class="line odd" style="background:url(.num/15.png) no-repeat;"
+> * sen_space_open:</span
+>
+<span class="line even" style="background:url(.num/16.png) no-repeat;"
+> * @space: 親とするspace。NULLならsen_global_spaceが親になる。</span
+>
+<span class="line odd" style="background:url(.num/17.png) no-repeat;"
+> * @path: 開こうとするspaceを格納するファイルパス。</span
+>
+<span class="line even" style="background:url(.num/18.png) no-repeat;"
+> *</span
+>
+<span class="line odd" style="background:url(.num/19.png) no-repeat;"
+> * 既存のspaceを開く。</span
+>
+<span class="line even" style="background:url(.num/20.png) no-repeat;"
+> **/</span
+>
+<span class="line odd" style="background:url(.num/21.png) no-repeat;"
+>sen_obj *sen_space_open(sen_obj *space, const char *path);</span
+>
+<span class="line even" style="background:url(.num/22.png) no-repeat;"
+></span
+>
+<span class="line odd" style="background:url(.num/23.png) no-repeat;"
+>/**</span
+>
+<span class="line even" style="background:url(.num/24.png) no-repeat;"
+> * sen_space_lookup:</span
+>
+<span class="line odd" style="background:url(.num/25.png) no-repeat;"
+> * @space: 対象となるspace。</span
+>
+<span class="line even" style="background:url(.num/26.png) no-repeat;"
+> * @name: 検索しようとするオブジェクトの名前。</span
+>
+<span class="line odd" style="background:url(.num/27.png) no-repeat;"
+> *</span
+>
+<span class="line even" style="background:url(.num/28.png) no-repeat;"
+> * spaceからnameに対応するオブジェクトを検索して返す。</span
+>
+<span class="line odd" style="background:url(.num/29.png) no-repeat;"
+> * nameに一致するオブジェクトが存在しなければNULLを返す。</span
+>
+<span class="line even" style="background:url(.num/30.png) no-repeat;"
+> **/</span
+>
+<span class="line odd" style="background:url(.num/31.png) no-repeat;"
+>sen_obj *sen_space_lookup(sen_obj *space, const char *name, unsigned name_size);</span
+>
+<span class="line even" style="background:url(.num/32.png) no-repeat;"
+></span
+>
+<span class="line odd" style="background:url(.num/33.png) no-repeat;"
+>typedef enum {</span
+>
+<span class="line even" style="background:url(.num/34.png) no-repeat;"
+>  SEN_TYPE_FIXED_SIZE = 0,</span
+>
+<span class="line odd" style="background:url(.num/35.png) no-repeat;"
+>  SEN_TYPE_VARIABLE_SIZE</span
+>
+<span class="line even" style="background:url(.num/36.png) no-repeat;"
+>} sen_type_type;</span
+>
+<span class="line odd" style="background:url(.num/37.png) no-repeat;"
+></span
+>
+<span class="line even" style="background:url(.num/38.png) no-repeat;"
+>extern sen_obj *sen_type_any; /* 任意のtableのrecordを格納できる型 */</span
+>
+<span class="line odd" style="background:url(.num/39.png) no-repeat;"
+></span
+>
+<span class="line even" style="background:url(.num/40.png) no-repeat;"
+>/**</span
+>
+<span class="line odd" style="background:url(.num/41.png) no-repeat;"
+> * sen_type_create:</span
+>
+<span class="line even" style="background:url(.num/42.png) no-repeat;"
+> * @space: 対象となるspace。</span
+>
+<span class="line odd" style="background:url(.num/43.png) no-repeat;"
+> * @name: 作成するtypeの名前。</span
+>
+<span class="line even" style="background:url(.num/44.png) no-repeat;"
+> * @type: SEN_TYPE_FIXED_SIZE, SEN_TYPE_VARIABLE_SIZE</span
+>
+<span class="line odd" style="background:url(.num/45.png) no-repeat;"
+> * @size: SEN_TYPE_VARIABLE_SIZEの場合は最大長、</span
+>
+<span class="line even" style="background:url(.num/46.png) no-repeat;"
+> *        SEN_TYPE_FIXED_SIZEの場合は長さを指定(単位:byte)</span
+>
+<span class="line odd" style="background:url(.num/47.png) no-repeat;"
+> *</span
+>
+<span class="line even" style="background:url(.num/48.png) no-repeat;"
+> * nameに対応する新たなtype(型)をspaceに定義する。</span
+>
+<span class="line odd" style="background:url(.num/49.png) no-repeat;"
+> * (todo: 複合keyを定義するための構造)</span
+>
+<span class="line even" style="background:url(.num/50.png) no-repeat;"
+> **/</span
+>
+<span class="line odd" style="background:url(.num/51.png) no-repeat;"
+>sen_obj *sen_type_create(sen_obj *space, const char *name, unsigned name_size,</span
+>
+<span class="line even" style="background:url(.num/52.png) no-repeat;"
+>                         sen_type_type flags, unsigned int size);</span
+>
+<span class="line odd" style="background:url(.num/53.png) no-repeat;"
+></span
+>
+<span class="line even" style="background:url(.num/54.png) no-repeat;"
+>typedef int (*sen_proc_func)(sen_obj *, int, sen_obj **);</span
+>
+<span class="line odd" style="background:url(.num/55.png) no-repeat;"
+></span
+>
+<span class="line even" style="background:url(.num/56.png) no-repeat;"
+>typedef enum {</span
+>
+<span class="line odd" style="background:url(.num/57.png) no-repeat;"
+>  SEN_PROC_READ_HOOK = 0,</span
+>
+<span class="line even" style="background:url(.num/58.png) no-repeat;"
+>  SEN_PROC_WRITE_HOOK,</span
+>
+<span class="line odd" style="background:url(.num/59.png) no-repeat;"
+>  SEN_PROC_ADD_HOOK,</span
+>
+<span class="line even" style="background:url(.num/60.png) no-repeat;"
+>  SEN_PROC_DELETE_HOOK,</span
+>
+<span class="line odd" style="background:url(.num/61.png) no-repeat;"
+>  SEN_PROC_RECALC,</span
+>
+<span class="line even" style="background:url(.num/62.png) no-repeat;"
+>  SEN_PROC_SCORE,</span
+>
+<span class="line odd" style="background:url(.num/63.png) no-repeat;"
+>  SEN_PROC_COMPARE,</span
+>
+<span class="line even" style="background:url(.num/64.png) no-repeat;"
+>  SEN_PROC_GROUP</span
+>
+<span class="line odd" style="background:url(.num/65.png) no-repeat;"
+>} sen_proc_type;</span
+>
+<span class="line even" style="background:url(.num/66.png) no-repeat;"
+></span
+>
+<span class="line odd" style="background:url(.num/67.png) no-repeat;"
+>/**</span
+>
+<span class="line even" style="background:url(.num/68.png) no-repeat;"
+> * sen_proc_create:</span
+>
+<span class="line odd" style="background:url(.num/69.png) no-repeat;"
+> * @space: 対象となるspace。</span
+>
+<span class="line even" style="background:url(.num/70.png) no-repeat;"
+> * @name: 作成するprocの名前。</span
+>
+<span class="line odd" style="background:url(.num/71.png) no-repeat;"
+> * @type: procの種類。</span
+>
+<span class="line even" style="background:url(.num/72.png) no-repeat;"
+> * @func: proc関数のポインタ</span
+>
+<span class="line odd" style="background:url(.num/73.png) no-repeat;"
+> *</span
+>
+<span class="line even" style="background:url(.num/74.png) no-repeat;"
+> * nameに対応する新たなproc(手続き)をspaceに定義する。</span
+>
+<span class="line odd" style="background:url(.num/75.png) no-repeat;"
+> **/</span
+>
+<span class="line even" style="background:url(.num/76.png) no-repeat;"
+>sen_obj *sen_proc_create(sen_obj *space, const char *name, unsigned name_size,</span
+>
+<span class="line odd" style="background:url(.num/77.png) no-repeat;"
+>                         sen_proc_type type, sen_proc_func func);</span
+>
+<span class="line even" style="background:url(.num/78.png) no-repeat;"
+></span
+>
+<span class="line odd" style="background:url(.num/79.png) no-repeat;"
+>/*-------------------------------------------------------------</span
+>
+<span class="line even" style="background:url(.num/80.png) no-repeat;"
+> * table操作のための関数</span
+>
+<span class="line odd" style="background:url(.num/81.png) no-repeat;"
+> */</span
+>
+<span class="line even" style="background:url(.num/82.png) no-repeat;"
+></span
+>
+<span class="line odd" style="background:url(.num/83.png) no-repeat;"
+>#define SEN_TABLE_TOKENIZER_MASK    (0x0f&lt;&lt;4)</span
+>
+<span class="line even" style="background:url(.num/84.png) no-repeat;"
+>#define SEN_TABLE_TYPE_MASK         (0x0f&lt;&lt;8)</span
+>
+<span class="line odd" style="background:url(.num/85.png) no-repeat;"
+>#define SEN_COLUMN_TYPE_MASK        (0x0f&lt;&lt;12)</span
+>
+<span class="line even" style="background:url(.num/86.png) no-repeat;"
+></span
+>
+<span class="line odd" style="background:url(.num/87.png) no-repeat;"
+>typedef enum {</span
+>
+<span class="line even" style="background:url(.num/88.png) no-repeat;"
+>  SEN_TABLE_KEY_NORMALIZE         = (1L&lt;&lt;0),</span
+>
+<span class="line odd" style="background:url(.num/89.png) no-repeat;"
+>  SEN_TABLE_KEY_SPLIT_ALPHA       = (1L&lt;&lt;1),</span
+>
+<span class="line even" style="background:url(.num/90.png) no-repeat;"
+>  SEN_TABLE_KEY_SPLIT_DIGIT       = (1L&lt;&lt;2),</span
+>
+<span class="line odd" style="background:url(.num/91.png) no-repeat;"
+>  SEN_TABLE_KEY_SPLIT_SYMBOL      = (1L&lt;&lt;3),</span
+>
+<span class="line even" style="background:url(.num/92.png) no-repeat;"
+>  SEN_TABLE_KEY_MORPH_ANALYSE     = (0L&lt;&lt;4),</span
+>
+<span class="line odd" style="background:url(.num/93.png) no-repeat;"
+>  SEN_TABLE_KEY_NGRAM             = (1L&lt;&lt;4),</span
+>
+<span class="line even" style="background:url(.num/94.png) no-repeat;"
+>  SEN_TABLE_KEY_DELIMITED         = (2L&lt;&lt;4),</span
+>
+<span class="line odd" style="background:url(.num/95.png) no-repeat;"
+>  SEN_TABLE_KEY_WITH_SIS          = (1L&lt;&lt;31),</span
+>
+<span class="line even" style="background:url(.num/96.png) no-repeat;"
+>  SEN_TABLE_HASH_KEY              = (0L&lt;&lt;8),</span
+>
+<span class="line odd" style="background:url(.num/97.png) no-repeat;"
+>  SEN_TABLE_PAT_KEY               = (1L&lt;&lt;8),</span
+>
+<span class="line even" style="background:url(.num/98.png) no-repeat;"
+>  SEN_TABLE_NO_KEY                = (2L&lt;&lt;8),</span
+>
+<span class="line odd" style="background:url(.num/99.png) no-repeat;"
+>  SEN_TABLE_ALIAS                 = (3L&lt;&lt;8),</span
+>
+<span class="line even" style="background:url(.num/100.png) no-repeat;"
+>  SEN_COLUMN_INV                  = (1L&lt;&lt;12),</span
+>
+<span class="line odd" style="background:url(.num/101.png) no-repeat;"
+>  SEN_OBJ_PERSISTENT              = (1L&lt;&lt;16)</span
+>
+<span class="line even" style="background:url(.num/102.png) no-repeat;"
+>} sen_obj_flags;</span
+>
+<span class="line odd" style="background:url(.num/103.png) no-repeat;"
+></span
+>
+<span class="line even" style="background:url(.num/104.png) no-repeat;"
+>/**</span
+>
+<span class="line odd" style="background:url(.num/105.png) no-repeat;"
+> * sen_table_create:</span
+>
+<span class="line even" style="background:url(.num/106.png) no-repeat;"
+> * @space: tableを追加しようとするspace。</span
+>
+<span class="line odd" style="background:url(.num/107.png) no-repeat;"
+> * @name: 作成するtableの名前。NULLなら無名tableとなる。</span
+>
+<span class="line even" style="background:url(.num/108.png) no-repeat;"
+> * @path: 作成するtableのファイルパス。</span
+>
+<span class="line odd" style="background:url(.num/109.png) no-repeat;"
+> *        flagsにSEN_OBJ_PERSISTENTが指定されている場合のみ有効。</span
+>
+<span class="line even" style="background:url(.num/110.png) no-repeat;"
+> *        NULLなら自動的にファイルパスが付与される。</span
+>
+<span class="line odd" style="background:url(.num/111.png) no-repeat;"
+> * @flags: SEN_OBJ_PERSISTENTを指定すると永続tableとなる。</span
+>
+<span class="line even" style="background:url(.num/112.png) no-repeat;"
+> *         SEN_TABLE_PAT_KEY,SEN_TABLE_HASH_KEY,SEN_TABLE_NO_KEYのいずれかを指定する。</span
+>
+<span class="line odd" style="background:url(.num/113.png) no-repeat;"
+> *         SEN_TABLE_KEY_NORMALIZEを指定すると正規化された文字列がkeyとなる。</span
+>
+<span class="line even" style="background:url(.num/114.png) no-repeat;"
+> *         SEN_TABLE_KEY_WITH_SISを指定するとkey文字列の全suffixが自動的に登録される。</span
+>
+<span class="line odd" style="background:url(.num/115.png) no-repeat;"
+> *         SEN_TABLE_KEY_MORPH_ANALYSE,SEN_TABLE_KEY_NGRAM,SEN_TABLE_KEY_DELIMITEDは、</span
+>
+<span class="line even" style="background:url(.num/116.png) no-repeat;"
+> *         作成するtableを語彙表として用いる場合のtokenizeの方法を指定する。</span
+>
+<span class="line odd" style="background:url(.num/117.png) no-repeat;"
+> *         SEN_TABLE_KEY_NGRAMを指定した場合に限り、</span
+>
+<span class="line even" style="background:url(.num/118.png) no-repeat;"
+> *         SEN_TABLE_KEY_SPLIT_ALPHA,SEN_TABLE_KEY_SPLIT_DIGIT,SEN_TABLE_KEY_SPLIT_SYMBOL</span
+>
+<span class="line odd" style="background:url(.num/119.png) no-repeat;"
+> *         を指定して、文字列をN-GRAMに区切る際の方針を指定できる。</span
+>
+<span class="line even" style="background:url(.num/120.png) no-repeat;"
+> * @key_type: keyの型を指定する。SEN_TABLE_NO_KEYが指定された場合は無効。</span
+>
+<span class="line odd" style="background:url(.num/121.png) no-repeat;"
+> *            既存のtypeあるいはtableを指定できる。</span
+>
+<span class="line even" style="background:url(.num/122.png) no-repeat;"
+> *            key_typeにtable Aを指定してtable Bを作成した場合、Bは必ずAのサブセットとなる。</span
+>
+<span class="line odd" style="background:url(.num/123.png) no-repeat;"
+> * @value_size: keyに対応する値を格納する領域のサイズ(byte長)。tableはcolumnとは別に、</span
+>
+<span class="line even" style="background:url(.num/124.png) no-repeat;"
+> *              keyに対応する値を格納する領域を一つだけ持つことができる。</span
+>
+<span class="line odd" style="background:url(.num/125.png) no-repeat;"
+> *              value_sizeの指定はSEN_TABLE_HASH_KEY,SEN_TABLE_NO_KEYのみ有効。</span
+>
+<span class="line even" style="background:url(.num/126.png) no-repeat;"
+> *              SEN_TABLE_PAT_KEYの場合、value_sizeは14bitで固定。</span
+>
+<span class="line odd" style="background:url(.num/127.png) no-repeat;"
+> *</span
+>
+<span class="line even" style="background:url(.num/128.png) no-repeat;"
+> * nameに対応する新たなtableをspaceに定義する。</span
+>
+<span class="line odd" style="background:url(.num/129.png) no-repeat;"
+> **/</span
+>
+<span class="line even" style="background:url(.num/130.png) no-repeat;"
+>sen_obj *sen_table_create(sen_obj *space, const char *name, unsigned name_size,</span
+>
+<span class="line odd" style="background:url(.num/131.png) no-repeat;"
+>                          const char *path, sen_obj_flags flags,</span
+>
+<span class="line even" style="background:url(.num/132.png) no-repeat;"
+>                          sen_obj *key_type, unsigned value_size);</span
+>
+<span class="line odd" style="background:url(.num/133.png) no-repeat;"
+>/**</span
+>
+<span class="line even" style="background:url(.num/134.png) no-repeat;"
+> * sen_table_open:</span
+>
+<span class="line odd" style="background:url(.num/135.png) no-repeat;"
+> * @space: tableを追加しようとするspace。</span
+>
+<span class="line even" style="background:url(.num/136.png) no-repeat;"
+> * @name: 開こうとするtableの名前。NULLなら無名tableとなる。</span
+>
+<span class="line odd" style="background:url(.num/137.png) no-repeat;"
+> * @path: 開こうとするtableのファイルパス。</span
+>
+<span class="line even" style="background:url(.num/138.png) no-repeat;"
+> *</span
+>
+<span class="line odd" style="background:url(.num/139.png) no-repeat;"
+> * spaceの中でnameに対応付けて既存のtableを開く。</span
+>
+<span class="line even" style="background:url(.num/140.png) no-repeat;"
+> **/</span
+>
+<span class="line odd" style="background:url(.num/141.png) no-repeat;"
+>sen_obj *sen_table_open(sen_obj *space, const char *name, unsigned name_size,</span
+>
+<span class="line even" style="background:url(.num/142.png) no-repeat;"
+>                        const char *path);</span
+>
+<span class="line odd" style="background:url(.num/143.png) no-repeat;"
+></span
+>
+<span class="line even" style="background:url(.num/144.png) no-repeat;"
+>typedef enum {</span
+>
+<span class="line odd" style="background:url(.num/145.png) no-repeat;"
+>  SEN_TABLE_EXACT  =  0,</span
+>
+<span class="line even" style="background:url(.num/146.png) no-repeat;"
+>  SEN_TABLE_LCPS   =  1,</span
+>
+<span class="line odd" style="background:url(.num/147.png) no-repeat;"
+>  SEN_TABLE_SUFFIX =  2,</span
+>
+<span class="line even" style="background:url(.num/148.png) no-repeat;"
+>  SEN_TABLE_PREFIX =  3,</span
+>
+<span class="line odd" style="background:url(.num/149.png) no-repeat;"
+>  SEN_TABLE_ADD    =  (1L&lt;&lt;6),</span
+>
+<span class="line even" style="background:url(.num/150.png) no-repeat;"
+>  SEN_TABLE_ADDED  =  (1L&lt;&lt;7),</span
+>
+<span class="line odd" style="background:url(.num/151.png) no-repeat;"
+>} sen_table_search_flags;</span
+>
+<span class="line even" style="background:url(.num/152.png) no-repeat;"
+></span
+>
+<span class="line odd" style="background:url(.num/153.png) no-repeat;"
+>/**</span
+>
+<span class="line even" style="background:url(.num/154.png) no-repeat;"
+> * sen_table_lookup:</span
+>
+<span class="line odd" style="background:url(.num/155.png) no-repeat;"
+> * @table: 対象table</span
+>
+<span class="line even" style="background:url(.num/156.png) no-repeat;"
+> * @key: 検索key</span
+>
+<span class="line odd" style="background:url(.num/157.png) no-repeat;"
+> * @flags: SEN_TABLE_EXACTが指定された場合はkeyに完全一致するrecordを検索する。</span
+>
+<span class="line even" style="background:url(.num/158.png) no-repeat;"
+> *         SEN_TABLE_LCPSが指定された場合はlongest common prefix searchを行う。</span
+>
+<span class="line odd" style="background:url(.num/159.png) no-repeat;"
+> *         該当するkeyが存在せず、かつSEN_TABLE_ADDが指定された場合は、</span
+>
+<span class="line even" style="background:url(.num/160.png) no-repeat;"
+> *         tableに該当レコードを追加する。(追加しない場合はSEN_SYM_NILを返す)</span
+>
+<span class="line odd" style="background:url(.num/161.png) no-repeat;"
+> *         SEN_TABLE_ADDが指定され、かつ実際にレコードが追加された場合は、</span
+>
+<span class="line even" style="background:url(.num/162.png) no-repeat;"
+> *         flagsのSEN_TABLE_ADDED bitが立てられる。</span
+>
+<span class="line odd" style="background:url(.num/163.png) no-repeat;"
+> *         flagsにNULLが指定された場合は、SEN_TABLE_EXACTのみが指定されたものと見なされる。</span
+>
+<span class="line even" style="background:url(.num/164.png) no-repeat;"
+> *</span
+>
+<span class="line odd" style="background:url(.num/165.png) no-repeat;"
+> * tableからkeyに対応するrecordを検索し、対応するIDを返す。</span
+>
+<span class="line even" style="background:url(.num/166.png) no-repeat;"
+> **/</span
+>
+<span class="line odd" style="background:url(.num/167.png) no-repeat;"
+>sen_id sen_table_lookup(sen_obj *table, const void *key, unsigned key_size,</span
+>
+<span class="line even" style="background:url(.num/168.png) no-repeat;"
+>                        sen_table_search_flags *flags);</span
+>
+<span class="line odd" style="background:url(.num/169.png) no-repeat;"
+></span
+>
+<span class="line even" style="background:url(.num/170.png) no-repeat;"
+>/**</span
+>
+<span class="line odd" style="background:url(.num/171.png) no-repeat;"
+> * sen_table_add:</span
+>
+<span class="line even" style="background:url(.num/172.png) no-repeat;"
+> * @table: 対象table</span
+>
+<span class="line odd" style="background:url(.num/173.png) no-repeat;"
+> *</span
+>
+<span class="line even" style="background:url(.num/174.png) no-repeat;"
+> * 新しいレコードを追加し、そのIDを返す。</span
+>
+<span class="line odd" style="background:url(.num/175.png) no-repeat;"
+> * SEN_TABLE_NO_KEYが指定されたtableでのみ有効。</span
+>
+<span class="line even" style="background:url(.num/176.png) no-repeat;"
+> **/</span
+>
+<span class="line odd" style="background:url(.num/177.png) no-repeat;"
+>sen_id sen_table_add(sen_obj *table);</span
+>
+<span class="line even" style="background:url(.num/178.png) no-repeat;"
+></span
+>
+<span class="line odd" style="background:url(.num/179.png) no-repeat;"
+>/**</span
+>
+<span class="line even" style="background:url(.num/180.png) no-repeat;"
+> * sen_table_get_key:</span
+>
+<span class="line odd" style="background:url(.num/181.png) no-repeat;"
+> * @table: 対象table</span
+>
+<span class="line even" style="background:url(.num/182.png) no-repeat;"
+> * @id: 対象レコードのID</span
+>
+<span class="line odd" style="background:url(.num/183.png) no-repeat;"
+> * @keybuf: keyを格納するバッファ(呼出側で準備する)</span
+>
+<span class="line even" style="background:url(.num/184.png) no-repeat;"
+> * @buf_size: keybufのサイズ(byte長)</span
+>
+<span class="line odd" style="background:url(.num/185.png) no-repeat;"
+> *</span
+>
+<span class="line even" style="background:url(.num/186.png) no-repeat;"
+> * tableのIDに対応するレコードのkeyを取得する。対応するレコードが存在する場合はkey長を返す。</span
+>
+<span class="line odd" style="background:url(.num/187.png) no-repeat;"
+> * 見つからない場合は0を返す。</span
+>
+<span class="line even" style="background:url(.num/188.png) no-repeat;"
+> * 対応するキーの検索に成功し、またbuf_sizeの長さがkey長以上であった場合は、</span
+>
+<span class="line odd" style="background:url(.num/189.png) no-repeat;"
+> * keybufに該当するkeyをコピーする。</span
+>
+<span class="line even" style="background:url(.num/190.png) no-repeat;"
+> *</span
+>
+<span class="line odd" style="background:url(.num/191.png) no-repeat;"
+> **/</span
+>
+<span class="line even" style="background:url(.num/192.png) no-repeat;"
+>int sen_table_get_key(sen_obj *table, sen_id id, void *keybuf, int buf_size);</span
+>
+<span class="line odd" style="background:url(.num/193.png) no-repeat;"
+></span
+>
+<span class="line even" style="background:url(.num/194.png) no-repeat;"
+>/**</span
+>
+<span class="line odd" style="background:url(.num/195.png) no-repeat;"
+> * sen_table_get_value:</span
+>
+<span class="line even" style="background:url(.num/196.png) no-repeat;"
+> * @table: 対象table</span
+>
+<span class="line odd" style="background:url(.num/197.png) no-repeat;"
+> * @id: 対象レコードのID</span
+>
+<span class="line even" style="background:url(.num/198.png) no-repeat;"
+> * @valuebuf: valueを格納するバッファ(呼出側で準備する)</span
+>
+<span class="line odd" style="background:url(.num/199.png) no-repeat;"
+> *</span
+>
+<span class="line even" style="background:url(.num/200.png) no-repeat;"
+> * tableのIDに対応するレコードのvalueを取得する。</span
+>
+<span class="line odd" style="background:url(.num/201.png) no-repeat;"
+> * 対応するレコードが存在する場合はvalue長を返す。見つからない場合は0を返す。</span
+>
+<span class="line even" style="background:url(.num/202.png) no-repeat;"
+> * value長は、sen_table_createでvalue_size引数に指定した値になる。</span
+>
+<span class="line odd" style="background:url(.num/203.png) no-repeat;"
+> * 呼出側は十分なサイズのバッファをvaluebufに指定しなければならない。</span
+>
+<span class="line even" style="background:url(.num/204.png) no-repeat;"
+> **/</span
+>
+<span class="line odd" style="background:url(.num/205.png) no-repeat;"
+>int sen_table_get_value(sen_obj *table, sen_id id, void *valuebuf);</span
+>
+<span class="line even" style="background:url(.num/206.png) no-repeat;"
+></span
+>
+<span class="line odd" style="background:url(.num/207.png) no-repeat;"
+>typedef enum {</span
+>
+<span class="line even" style="background:url(.num/208.png) no-repeat;"
+>  SEN_UPD_SET = 0,</span
+>
+<span class="line odd" style="background:url(.num/209.png) no-repeat;"
+>  SEN_UPD_ADD,</span
+>
+<span class="line even" style="background:url(.num/210.png) no-repeat;"
+>  SEN_UPD_CAS,</span
+>
+<span class="line odd" style="background:url(.num/211.png) no-repeat;"
+>  SEN_UPD_APPEND,</span
+>
+<span class="line even" style="background:url(.num/212.png) no-repeat;"
+>  SEN_UPD_PREPEND</span
+>
+<span class="line odd" style="background:url(.num/213.png) no-repeat;"
+>} sen_update_type;</span
+>
+<span class="line even" style="background:url(.num/214.png) no-repeat;"
+></span
+>
+<span class="line odd" style="background:url(.num/215.png) no-repeat;"
+>/**</span
+>
+<span class="line even" style="background:url(.num/216.png) no-repeat;"
+> * sen_table_set_value:</span
+>
+<span class="line odd" style="background:url(.num/217.png) no-repeat;"
+> * @table: 対象table</span
+>
+<span class="line even" style="background:url(.num/218.png) no-repeat;"
+> * @id: 対象レコードのID</span
+>
+<span class="line odd" style="background:url(.num/219.png) no-repeat;"
+> * @value: 格納する値</span
+>
+<span class="line even" style="background:url(.num/220.png) no-repeat;"
+> * @type: SEN_UPD_SET, SEN_UPD_ADDのいずれかを指定できる。</span
+>
+<span class="line odd" style="background:url(.num/221.png) no-repeat;"
+> *</span
+>
+<span class="line even" style="background:url(.num/222.png) no-repeat;"
+> * tableのIDに対応するレコードのvalueを更新する。</span
+>
+<span class="line odd" style="background:url(.num/223.png) no-repeat;"
+> * 対応するレコードが存在しない場合はsen_invalid_argumentを返す。</span
+>
+<span class="line even" style="background:url(.num/224.png) no-repeat;"
+> **/</span
+>
+<span class="line odd" style="background:url(.num/225.png) no-repeat;"
+>sen_rc sen_table_set_value(sen_obj *table, sen_id id, void *value, sen_update_type type);</span
+>
+<span class="line even" style="background:url(.num/226.png) no-repeat;"
+></span
+>
+<span class="line odd" style="background:url(.num/227.png) no-repeat;"
+>/**</span
+>
+<span class="line even" style="background:url(.num/228.png) no-repeat;"
+> * sen_table_delete:</span
+>
+<span class="line odd" style="background:url(.num/229.png) no-repeat;"
+> * @table: 対象table</span
+>
+<span class="line even" style="background:url(.num/230.png) no-repeat;"
+> * @key: 検索key</span
+>
+<span class="line odd" style="background:url(.num/231.png) no-repeat;"
+> *</span
+>
+<span class="line even" style="background:url(.num/232.png) no-repeat;"
+> * tableのkeyに対応するレコードを削除する。</span
+>
+<span class="line odd" style="background:url(.num/233.png) no-repeat;"
+> * 対応するレコードが存在しない場合はsen_invalid_argumentを返す。</span
+>
+<span class="line even" style="background:url(.num/234.png) no-repeat;"
+> **/</span
+>
+<span class="line odd" style="background:url(.num/235.png) no-repeat;"
+>sen_rc sen_table_delete(sen_obj *table, const void *key unsigned key_size);</span
+>
+<span class="line even" style="background:url(.num/236.png) no-repeat;"
+></span
+>
+<span class="line odd" style="background:url(.num/237.png) no-repeat;"
+>/**</span
+>
+<span class="line even" style="background:url(.num/238.png) no-repeat;"
+> * sen_table_truncate:</span
+>
+<span class="line odd" style="background:url(.num/239.png) no-repeat;"
+> * @table: 対象table</span
+>
+<span class="line even" style="background:url(.num/240.png) no-repeat;"
+> *</span
+>
+<span class="line odd" style="background:url(.num/241.png) no-repeat;"
+> * tableの全レコードを一括して削除する。</span
+>
+<span class="line even" style="background:url(.num/242.png) no-repeat;"
+> **/</span
+>
+<span class="line odd" style="background:url(.num/243.png) no-repeat;"
+>sen_rc sen_table_truncate(sen_obj *table);</span
+>
+<span class="line even" style="background:url(.num/244.png) no-repeat;"
+></span
+>
+<span class="line odd" style="background:url(.num/245.png) no-repeat;"
+>typedef struct _sen_table_cursor sen_table_cursor;</span
+>
+<span class="line even" style="background:url(.num/246.png) no-repeat;"
+></span
+>
+<span class="line odd" style="background:url(.num/247.png) no-repeat;"
+>typedef enum {</span
+>
+<span class="line even" style="background:url(.num/248.png) no-repeat;"
+>  SEN_SYM_ASCENDING = (1L&lt;&lt;0),</span
+>
+<span class="line odd" style="background:url(.num/249.png) no-repeat;"
+>  SEN_SYM_GT        = (1L&lt;&lt;1),</span
+>
+<span class="line even" style="background:url(.num/250.png) no-repeat;"
+>  SEN_SYM_LT        = (1L&lt;&lt;2)</span
+>
+<span class="line odd" style="background:url(.num/251.png) no-repeat;"
+>} sen_table_cursor_flags;</span
+>
+<span class="line even" style="background:url(.num/252.png) no-repeat;"
+></span
+>
+<span class="line odd" style="background:url(.num/253.png) no-repeat;"
+>/**</span
+>
+<span class="line even" style="background:url(.num/254.png) no-repeat;"
+> * sen_table_cursor_open:</span
+>
+<span class="line odd" style="background:url(.num/255.png) no-repeat;"
+> * @space: sen_table_cursorオブジェクトを払い出すspace</span
+>
+<span class="line even" style="background:url(.num/256.png) no-repeat;"
+> * @table: 対象table</span
+>
+<span class="line odd" style="background:url(.num/257.png) no-repeat;"
+> * @min: keyの下限 (NULLは下限なしと見なす)</span
+>
+<span class="line even" style="background:url(.num/258.png) no-repeat;"
+> * @max: keyの上限 (NULLは上限なしと見なす)</span
+>
+<span class="line odd" style="background:url(.num/259.png) no-repeat;"
+> * @flags: SEN_SYM_ASCENDINGを指定すると昇順にkeyを取り出す。(指定しなければ降順)</span
+>
+<span class="line even" style="background:url(.num/260.png) no-repeat;"
+> *         SEN_SYM_GTを指定するとminに一致したkeyをcursorの範囲に含まない。</span
+>
+<span class="line odd" style="background:url(.num/261.png) no-repeat;"
+> *         SEN_SYM_LTを指定するとmaxに一致したkeyをcursorの範囲に含まない。</span
+>
+<span class="line even" style="background:url(.num/262.png) no-repeat;"
+> *</span
+>
+<span class="line odd" style="background:url(.num/263.png) no-repeat;"
+> * tableに登録されているレコードを順番に取り出すためのカーソルを生成して返す。</span
+>
+<span class="line even" style="background:url(.num/264.png) no-repeat;"
+> * min, max, flagsは SEN_TABLE_PAT_KEYを指定したtableでのみ有効。</span
+>
+<span class="line odd" style="background:url(.num/265.png) no-repeat;"
+> **/</span
+>
+<span class="line even" style="background:url(.num/266.png) no-repeat;"
+>sen_table_cursor *sen_table_cursor_open(sen_obj *space, sen_obj *table,</span
+>
+<span class="line odd" style="background:url(.num/267.png) no-repeat;"
+>                                        const void *min, unsigned min_size,</span
+>
+<span class="line even" style="background:url(.num/268.png) no-repeat;"
+>                                        const void *max, unsigned max_size,</span
+>
+<span class="line odd" style="background:url(.num/269.png) no-repeat;"
+>                                        sen_table_cursor_flags flags);</span
+>
+<span class="line even" style="background:url(.num/270.png) no-repeat;"
+></span
+>
+<span class="line odd" style="background:url(.num/271.png) no-repeat;"
+>/**</span
+>
+<span class="line even" style="background:url(.num/272.png) no-repeat;"
+> * sen_table_cursor_close:</span
+>
+<span class="line odd" style="background:url(.num/273.png) no-repeat;"
+> * @tc: 対象cursor</span
+>
+<span class="line even" style="background:url(.num/274.png) no-repeat;"
+> *</span
+>
+<span class="line odd" style="background:url(.num/275.png) no-repeat;"
+> * sen_table_cursor_openで生成したcursorを解放する。</span
+>
+<span class="line even" style="background:url(.num/276.png) no-repeat;"
+> **/</span
+>
+<span class="line odd" style="background:url(.num/277.png) no-repeat;"
+>sen_rc sen_table_cursor_close(sen_table_cursor *tc);</span
+>
+<span class="line even" style="background:url(.num/278.png) no-repeat;"
+></span
+>
+<span class="line odd" style="background:url(.num/279.png) no-repeat;"
+>/**</span
+>
+<span class="line even" style="background:url(.num/280.png) no-repeat;"
+> * sen_table_cursor_next:</span
+>
+<span class="line odd" style="background:url(.num/281.png) no-repeat;"
+> * @tc: 対象cursor</span
+>
+<span class="line even" style="background:url(.num/282.png) no-repeat;"
+> *</span
+>
+<span class="line odd" style="background:url(.num/283.png) no-repeat;"
+> * cursorのカレントレコードを一件進めてそのIDを返す。</span
+>
+<span class="line even" style="background:url(.num/284.png) no-repeat;"
+> * cursorの対象範囲の末尾に達するとSEN_SYM_NILを返す。</span
+>
+<span class="line odd" style="background:url(.num/285.png) no-repeat;"
+> **/</span
+>
+<span class="line even" style="background:url(.num/286.png) no-repeat;"
+>sen_id sen_table_cursor_next(sen_table_cursor *tc);</span
+>
+<span class="line odd" style="background:url(.num/287.png) no-repeat;"
+></span
+>
+<span class="line even" style="background:url(.num/288.png) no-repeat;"
+>/**</span
+>
+<span class="line odd" style="background:url(.num/289.png) no-repeat;"
+> * sen_table_cursor_get_key:</span
+>
+<span class="line even" style="background:url(.num/290.png) no-repeat;"
+> * @tc: 対象cursor</span
+>
+<span class="line odd" style="background:url(.num/291.png) no-repeat;"
+> * @key: カレントレコードのkeyへのポインタがセットされる。</span
+>
+<span class="line even" style="background:url(.num/292.png) no-repeat;"
+> * cursorのカレントレコードのkeyを@keyにセットし、その長さを返す。</span
+>
+<span class="line odd" style="background:url(.num/293.png) no-repeat;"
+> **/</span
+>
+<span class="line even" style="background:url(.num/294.png) no-repeat;"
+>int sen_table_cursor_get_key(sen_table_cursor *tc, void **key);</span
+>
+<span class="line odd" style="background:url(.num/295.png) no-repeat;"
+></span
+>
+<span class="line even" style="background:url(.num/296.png) no-repeat;"
+>/**</span
+>
+<span class="line odd" style="background:url(.num/297.png) no-repeat;"
+> * sen_table_cursor_get_value:</span
+>
+<span class="line even" style="background:url(.num/298.png) no-repeat;"
+> * @tc: 対象cursor</span
+>
+<span class="line odd" style="background:url(.num/299.png) no-repeat;"
+> * @value: カレントレコードのvalueへのポインタがセットされる。</span
+>
+<span class="line even" style="background:url(.num/300.png) no-repeat;"
+> * cursorのカレントレコードのvalueを@valueにセットし、その長さを返す。</span
+>
+<span class="line odd" style="background:url(.num/301.png) no-repeat;"
+> **/</span
+>
+<span class="line even" style="background:url(.num/302.png) no-repeat;"
+>int sen_table_cursor_get_value(sen_table_cursor *tc, void **value);</span
+>
+<span class="line odd" style="background:url(.num/303.png) no-repeat;"
+></span
+>
+<span class="line even" style="background:url(.num/304.png) no-repeat;"
+>/**</span
+>
+<span class="line odd" style="background:url(.num/305.png) no-repeat;"
+> * sen_table_cursor_set_value:</span
+>
+<span class="line even" style="background:url(.num/306.png) no-repeat;"
+> * @tc: 対象cursor</span
+>
+<span class="line odd" style="background:url(.num/307.png) no-repeat;"
+> * @value: 新しいvalueの値。</span
+>
+<span class="line even" style="background:url(.num/308.png) no-repeat;"
+> * @type: SEN_UPD_SET, SEN_UPD_ADDのいずれかを指定できる。</span
+>
+<span class="line odd" style="background:url(.num/309.png) no-repeat;"
+> *</span
+>
+<span class="line even" style="background:url(.num/310.png) no-repeat;"
+> * cursorのカレントレコードのvalueを引数の内容に置き換える。</span
+>
+<span class="line odd" style="background:url(.num/311.png) no-repeat;"
+> * cursorのカレントレコードが存在しない場合はsen_invalid_argumentを返す。</span
+>
+<span class="line even" style="background:url(.num/312.png) no-repeat;"
+> **/</span
+>
+<span class="line odd" style="background:url(.num/313.png) no-repeat;"
+>sen_rc sen_table_cursor_set_value(sen_table_cursor *tc, void *value, unsigned value_size,</span
+>
+<span class="line even" style="background:url(.num/314.png) no-repeat;"
+>                                  sen_update_type type);</span
+>
+<span class="line odd" style="background:url(.num/315.png) no-repeat;"
+></span
+>
+<span class="line even" style="background:url(.num/316.png) no-repeat;"
+>/**</span
+>
+<span class="line odd" style="background:url(.num/317.png) no-repeat;"
+> * sen_table_cursor_delete:</span
+>
+<span class="line even" style="background:url(.num/318.png) no-repeat;"
+> * @tc: 対象cursor</span
+>
+<span class="line odd" style="background:url(.num/319.png) no-repeat;"
+> *</span
+>
+<span class="line even" style="background:url(.num/320.png) no-repeat;"
+> * cursorのカレントレコードを削除する。</span
+>
+<span class="line odd" style="background:url(.num/321.png) no-repeat;"
+> * cursorのカレントレコードが存在しない場合はsen_invalid_argumentを返す。</span
+>
+<span class="line even" style="background:url(.num/322.png) no-repeat;"
+> **/</span
+>
+<span class="line odd" style="background:url(.num/323.png) no-repeat;"
+>sen_rc sen_table_cursor_delete(sen_table_cursor *tc);</span
+>
+<span class="line even" style="background:url(.num/324.png) no-repeat;"
+></span
+>
+<span class="line odd" style="background:url(.num/325.png) no-repeat;"
+>/**</span
+>
+<span class="line even" style="background:url(.num/326.png) no-repeat;"
+> * sen_table_search:</span
+>
+<span class="line odd" style="background:url(.num/327.png) no-repeat;"
+> * @table: 対象table</span
+>
+<span class="line even" style="background:url(.num/328.png) no-repeat;"
+> * @key: 検索キー</span
+>
+<span class="line odd" style="background:url(.num/329.png) no-repeat;"
+> * @flags: SEN_TABLE_SUFFIXを指定するとkeyに後方一致するレコードを検索する</span
+>
+<span class="line even" style="background:url(.num/330.png) no-repeat;"
+>           SEN_TABLE_PREFIXを指定するとkeyに前方一致するレコードを検索する</span
+>
+<span class="line odd" style="background:url(.num/331.png) no-repeat;"
+> * @res: 検索結果を格納するtable</span
+>
+<span class="line even" style="background:url(.num/332.png) no-repeat;"
+> * @op: sen_sel_or, sen_sel_and, sen_sel_butのいずれかを指定する</span
+>
+<span class="line odd" style="background:url(.num/333.png) no-repeat;"
+> *</span
+>
+<span class="line even" style="background:url(.num/334.png) no-repeat;"
+> * flagsに指定する条件でtableからkeyにマッチするレコードを検索し、</span
+>
+<span class="line odd" style="background:url(.num/335.png) no-repeat;"
+> * opの指定に従ってresにレコードを追加あるいは削除する。</span
+>
+<span class="line even" style="background:url(.num/336.png) no-repeat;"
+> * SEN_TABLE_PAT_KEYを指定したtableでのみ有効。</span
+>
+<span class="line odd" style="background:url(.num/337.png) no-repeat;"
+> **/</span
+>
+<span class="line even" style="background:url(.num/338.png) no-repeat;"
+>sen_rc sen_table_search(sen_obj *table, const void *key, unsigned key_size,</span
+>
+<span class="line odd" style="background:url(.num/339.png) no-repeat;"
+>                        sen_table_search_flags flags,</span
+>
+<span class="line even" style="background:url(.num/340.png) no-repeat;"
+>                        sen_obj *res, sen_sel_operator op);</span
+>
+<span class="line odd" style="background:url(.num/341.png) no-repeat;"
+></span
+>
+<span class="line even" style="background:url(.num/342.png) no-repeat;"
+>/**</span
+>
+<span class="line odd" style="background:url(.num/343.png) no-repeat;"
+> * sen_table_sort:</span
+>
+<span class="line even" style="background:url(.num/344.png) no-repeat;"
+> * @table: 対象table</span
+>
+<span class="line odd" style="background:url(.num/345.png) no-repeat;"
+> * @limit: resに格納するレコードの上限</span
+>
+<span class="line even" style="background:url(.num/346.png) no-repeat;"
+> * @res: 結果を格納するtable</span
+>
+<span class="line odd" style="background:url(.num/347.png) no-repeat;"
+> * @optarg: ソート詳細条件</span
+>
+<span class="line even" style="background:url(.num/348.png) no-repeat;"
+> *</span
+>
+<span class="line odd" style="background:url(.num/349.png) no-repeat;"
+> * table内のレコードをソートし、上位limit個の要素をresに格納する。</span
+>
+<span class="line even" style="background:url(.num/350.png) no-repeat;"
+> **/</span
+>
+<span class="line odd" style="background:url(.num/351.png) no-repeat;"
+>sen_rc sen_table_sort(sen_obj *table, int limit, sen_obj *res, sen_sort_optarg *optarg);</span
+>
+<span class="line even" style="background:url(.num/352.png) no-repeat;"
+></span
+>
+<span class="line odd" style="background:url(.num/353.png) no-repeat;"
+>/**</span
+>
+<span class="line even" style="background:url(.num/354.png) no-repeat;"
+> * sen_table_group:</span
+>
+<span class="line odd" style="background:url(.num/355.png) no-repeat;"
+> * @table: 対象table</span
+>
+<span class="line even" style="background:url(.num/356.png) no-repeat;"
+> * @limit: resに格納する新たなレコード毎のサブレコードの最大値</span
+>
+<span class="line odd" style="background:url(.num/357.png) no-repeat;"
+> * @res: 結果を格納するtable</span
+>
+<span class="line even" style="background:url(.num/358.png) no-repeat;"
+> * @optarg: グループ化の詳細条件</span
+>
+<span class="line odd" style="background:url(.num/359.png) no-repeat;"
+> *</span
+>
+<span class="line even" style="background:url(.num/360.png) no-repeat;"
+> * tableのレコードを特定の条件でグループ化し、結果をresに格納する。</span
+>
+<span class="line odd" style="background:url(.num/361.png) no-repeat;"
+> * (todo: n次元集計)</span
+>
+<span class="line even" style="background:url(.num/362.png) no-repeat;"
+> **/</span
+>
+<span class="line odd" style="background:url(.num/363.png) no-repeat;"
+>sen_rc sen_table_group(sen_obj *table, int limit, sen_obj *res, sen_group_optarg *optarg);</span
+>
+<span class="line even" style="background:url(.num/364.png) no-repeat;"
+></span
+>
+<span class="line odd" style="background:url(.num/365.png) no-repeat;"
+>/**</span
+>
+<span class="line even" style="background:url(.num/366.png) no-repeat;"
+> * sen_table_setoperation:</span
+>
+<span class="line odd" style="background:url(.num/367.png) no-repeat;"
+> * @table1: 対象table1</span
+>
+<span class="line even" style="background:url(.num/368.png) no-repeat;"
+> * @table2: 対象table2</span
+>
+<span class="line odd" style="background:url(.num/369.png) no-repeat;"
+> * @res: 結果を格納するtable</span
+>
+<span class="line even" style="background:url(.num/370.png) no-repeat;"
+> *</span
+>
+<span class="line odd" style="background:url(.num/371.png) no-repeat;"
+> * table1とtable2をopの指定に従って集合演算した結果をresに格納する。</span
+>
+<span class="line even" style="background:url(.num/372.png) no-repeat;"
+> * resにtable1あるいはtable2そのものを指定した場合を除けば、table1, table2は破壊されない。</span
+>
+<span class="line odd" style="background:url(.num/373.png) no-repeat;"
+> **/</span
+>
+<span class="line even" style="background:url(.num/374.png) no-repeat;"
+>sen_rc sen_table_setoperation(sen_obj *table1, sen_obj *table2, sen_obj *res, op);</span
+>
+<span class="line odd" style="background:url(.num/375.png) no-repeat;"
+></span
+>
+<span class="line even" style="background:url(.num/376.png) no-repeat;"
+>/**</span
+>
+<span class="line odd" style="background:url(.num/377.png) no-repeat;"
+> * sen_table_difference:</span
+>
+<span class="line even" style="background:url(.num/378.png) no-repeat;"
+> * @table1: 対象table1</span
+>
+<span class="line odd" style="background:url(.num/379.png) no-repeat;"
+> * @table2: 対象table2</span
+>
+<span class="line even" style="background:url(.num/380.png) no-repeat;"
+> * @res1: 結果を格納するtable</span
+>
+<span class="line odd" style="background:url(.num/381.png) no-repeat;"
+> * @res2: 結果を格納するtable</span
+>
+<span class="line even" style="background:url(.num/382.png) no-repeat;"
+> *</span
+>
+<span class="line odd" style="background:url(.num/383.png) no-repeat;"
+> * table1とtable2から重複するレコードを取り除いた結果をそれぞれres1, res2に格納する。</span
+>
+<span class="line even" style="background:url(.num/384.png) no-repeat;"
+> **/</span
+>
+<span class="line odd" style="background:url(.num/385.png) no-repeat;"
+>sen_rc sen_table_difference(sen_obj *table1, sen_obj *table2, sen_obj *res1, sen_obj *res2);</span
+>
+<span class="line even" style="background:url(.num/386.png) no-repeat;"
+></span
+>
+<span class="line odd" style="background:url(.num/387.png) no-repeat;"
+>/**</span
+>
+<span class="line even" style="background:url(.num/388.png) no-repeat;"
+> * sen_table_column:</span
+>
+<span class="line odd" style="background:url(.num/389.png) no-repeat;"
+> * @table: 対象table</span
+>
+<span class="line even" style="background:url(.num/390.png) no-repeat;"
+> * @name: カラム名</span
+>
+<span class="line odd" style="background:url(.num/391.png) no-repeat;"
+> *</span
+>
+<span class="line even" style="background:url(.num/392.png) no-repeat;"
+> * nameに対応するtableのカラムを返す。対応するカラムが存在しなければNULLを返す。</span
+>
+<span class="line odd" style="background:url(.num/393.png) no-repeat;"
+> **/</span
+>
+<span class="line even" style="background:url(.num/394.png) no-repeat;"
+>sen_obj *sen_table_column(sen_obj *table, const char *name, unsigned name_size);</span
+>
+<span class="line odd" style="background:url(.num/395.png) no-repeat;"
+></span
+>
+<span class="line even" style="background:url(.num/396.png) no-repeat;"
+>/*-------------------------------------------------------------</span
+>
+<span class="line odd" style="background:url(.num/397.png) no-repeat;"
+> * column操作のための関数</span
+>
+<span class="line even" style="background:url(.num/398.png) no-repeat;"
+> */</span
+>
+<span class="line odd" style="background:url(.num/399.png) no-repeat;"
+></span
+>
+<span class="line even" style="background:url(.num/400.png) no-repeat;"
+>/**</span
+>
+<span class="line odd" style="background:url(.num/401.png) no-repeat;"
+> * sen_column_create:</span
+>
+<span class="line even" style="background:url(.num/402.png) no-repeat;"
+> * @space: sen_table_cursorオブジェクトを払い出すspace</span
+>
+<span class="line odd" style="background:url(.num/403.png) no-repeat;"
+> * @table: 対象table</span
+>
+<span class="line even" style="background:url(.num/404.png) no-repeat;"
+> * @name: カラム名</span
+>
+<span class="line odd" style="background:url(.num/405.png) no-repeat;"
+> * @path: カラムを格納するファイルパス。</span
+>
+<span class="line even" style="background:url(.num/406.png) no-repeat;"
+> *        flagsにSEN_OBJ_PERSISTENTが指定されている場合のみ有効。</span
+>
+<span class="line odd" style="background:url(.num/407.png) no-repeat;"
+> *        NULLなら自動的にファイルパスが付与される。</span
+>
+<span class="line even" style="background:url(.num/408.png) no-repeat;"
+> * @flags: SEN_OBJ_PERSISTENTを指定すると永続columnとなる。</span
+>
+<span class="line odd" style="background:url(.num/409.png) no-repeat;"
+> *         SEN_COLUMN_INVを指定すると転置インデックスとなる。</span
+>
+<span class="line even" style="background:url(.num/410.png) no-repeat;"
+> * @type: カラム値の型。定義済みのtypeあるいはtableを指定できる。</span
+>
+<span class="line odd" style="background:url(.num/411.png) no-repeat;"
+> *</span
+>
+<span class="line even" style="background:url(.num/412.png) no-repeat;"
+> * tableに新たなカラムを定義する。nameは省略できない。</span
+>
+<span class="line odd" style="background:url(.num/413.png) no-repeat;"
+> * 一つのtableに同一のnameのcolumnを複数定義することはできない。</span
+>
+<span class="line even" style="background:url(.num/414.png) no-repeat;"
+> **/</span
+>
+<span class="line odd" style="background:url(.num/415.png) no-repeat;"
+>sen_obj *sen_column_create(sen_obj *space, sen_obj *table,</span
+>
+<span class="line even" style="background:url(.num/416.png) no-repeat;"
+>                           const char *name, unsigned name_size,</span
+>
+<span class="line odd" style="background:url(.num/417.png) no-repeat;"
+>                           const char *path, sen_obj_flags flags, sen_obj *type);</span
+>
+<span class="line even" style="background:url(.num/418.png) no-repeat;"
+></span
+>
+<span class="line odd" style="background:url(.num/419.png) no-repeat;"
+>/**</span
+>
+<span class="line even" style="background:url(.num/420.png) no-repeat;"
+> * sen_column_open:</span
+>
+<span class="line odd" style="background:url(.num/421.png) no-repeat;"
+> * @space: sen_table_cursorオブジェクトを払い出すspace</span
+>
+<span class="line even" style="background:url(.num/422.png) no-repeat;"
+> * @table: 対象table</span
+>
+<span class="line odd" style="background:url(.num/423.png) no-repeat;"
+> * @name: カラム名</span
+>
+<span class="line even" style="background:url(.num/424.png) no-repeat;"
+> * @path: カラムを格納するファイルパス。</span
+>
+<span class="line odd" style="background:url(.num/425.png) no-repeat;"
+> * @type: カラム値の型。</span
+>
+<span class="line even" style="background:url(.num/426.png) no-repeat;"
+> *</span
+>
+<span class="line odd" style="background:url(.num/427.png) no-repeat;"
+> * 既存の永続的なcolumnを、tableのnameに対応するcolumnとして開く</span
+>
+<span class="line even" style="background:url(.num/428.png) no-repeat;"
+> **/</span
+>
+<span class="line odd" style="background:url(.num/429.png) no-repeat;"
+>sen_obj *sen_column_open(sen_obj *space, sen_obj *table,</span
+>
+<span class="line even" style="background:url(.num/430.png) no-repeat;"
+>                         const char *name, unsigned name_size,</span
+>
+<span class="line odd" style="background:url(.num/431.png) no-repeat;"
+>                         const char *path, sen_obj *type);</span
+>
+<span class="line even" style="background:url(.num/432.png) no-repeat;"
+></span
+>
+<span class="line odd" style="background:url(.num/433.png) no-repeat;"
+>/**</span
+>
+<span class="line even" style="background:url(.num/434.png) no-repeat;"
+> * sen_column_set_value:</span
+>
+<span class="line odd" style="background:url(.num/435.png) no-repeat;"
+> * @column: 対象column</span
+>
+<span class="line even" style="background:url(.num/436.png) no-repeat;"
+> * @id: 対象レコードのID</span
+>
+<span class="line odd" style="background:url(.num/437.png) no-repeat;"
+> * @value: 新しい値</span
+>
+<span class="line even" style="background:url(.num/438.png) no-repeat;"
+> * @value_size: valueのサイズ(バイト長)</span
+>
+<span class="line odd" style="background:url(.num/439.png) no-repeat;"
+> * @type: SEN_UPD_SET, SEN_UPD_ADD, SEN_UPD_APPEND, SEN_UPD_PREPENDのいずれかを指定できる。</span
+>
+<span class="line even" style="background:url(.num/440.png) no-repeat;"
+> *        SEN_UPD_APPEND, SEN_UPD_PREPENDは可変長の場合のみ有効。</span
+>
+<span class="line odd" style="background:url(.num/441.png) no-repeat;"
+> *        SEN_UPD_ADDは固定長の場合のみ有効。</span
+>
+<span class="line even" style="background:url(.num/442.png) no-repeat;"
+> *</span
+>
+<span class="line odd" style="background:url(.num/443.png) no-repeat;"
+> * IDに対応するレコードのcolumnの値を更新する。</span
+>
+<span class="line even" style="background:url(.num/444.png) no-repeat;"
+> **/</span
+>
+<span class="line odd" style="background:url(.num/445.png) no-repeat;"
+>sen_rc sen_column_set_value(sen_obj *column, sen_id id,</span
+>
+<span class="line even" style="background:url(.num/446.png) no-repeat;"
+>                            void *value, int value_size, sen_update_type type);</span
+>
+<span class="line odd" style="background:url(.num/447.png) no-repeat;"
+></span
+>
+<span class="line even" style="background:url(.num/448.png) no-repeat;"
+>/**</span
+>
+<span class="line odd" style="background:url(.num/449.png) no-repeat;"
+> * sen_column_get_value:</span
+>
+<span class="line even" style="background:url(.num/450.png) no-repeat;"
+> * @column: 対象column</span
+>
+<span class="line odd" style="background:url(.num/451.png) no-repeat;"
+> * @id: 対象レコードのID</span
+>
+<span class="line even" style="background:url(.num/452.png) no-repeat;"
+> * @valuebuf: valueを格納するバッファ(呼出側で準備する)</span
+>
+<span class="line odd" style="background:url(.num/453.png) no-repeat;"
+> * @buf_size: valuebufのサイズ(byte長)</span
+>
+<span class="line even" style="background:url(.num/454.png) no-repeat;"
+> *</span
+>
+<span class="line odd" style="background:url(.num/455.png) no-repeat;"
+> * IDに対応するレコードのcolumnの値のサイズ(byte長)を返す。</span
+>
+<span class="line even" style="background:url(.num/456.png) no-repeat;"
+> * buf_zieが値のサイズ以上であった場合は、valuebufに値をコピーする。</span
+>
+<span class="line odd" style="background:url(.num/457.png) no-repeat;"
+> **/</span
+>
+<span class="line even" style="background:url(.num/458.png) no-repeat;"
+>int sen_column_get_value(sen_obj *column, sen_id id, void *valuebuf, int buf_size);</span
+>
+<span class="line odd" style="background:url(.num/459.png) no-repeat;"
+></span
+>
+<span class="line even" style="background:url(.num/460.png) no-repeat;"
+>/**</span
+>
+<span class="line odd" style="background:url(.num/461.png) no-repeat;"
+> * sen_column_table:</span
+>
+<span class="line even" style="background:url(.num/462.png) no-repeat;"
+> * @column: 対象column</span
+>
+<span class="line odd" style="background:url(.num/463.png) no-repeat;"
+> *</span
+>
+<span class="line even" style="background:url(.num/464.png) no-repeat;"
+> * columnが属するtableを返す。</span
+>
+<span class="line odd" style="background:url(.num/465.png) no-repeat;"
+> **/</span
+>
+<span class="line even" style="background:url(.num/466.png) no-repeat;"
+>sen_obj *sen_column_table(sen_obj *column);</span
+>
+<span class="line odd" style="background:url(.num/467.png) no-repeat;"
+></span
+>
+<span class="line even" style="background:url(.num/468.png) no-repeat;"
+>/*-------------------------------------------------------------</span
+>
+<span class="line odd" style="background:url(.num/469.png) no-repeat;"
+> * 転置インデックスcolumnだけに使用できる関数</span
+>
+<span class="line even" style="background:url(.num/470.png) no-repeat;"
+> */</span
+>
+<span class="line odd" style="background:url(.num/471.png) no-repeat;"
+></span
+>
+<span class="line even" style="background:url(.num/472.png) no-repeat;"
+>/**</span
+>
+<span class="line odd" style="background:url(.num/473.png) no-repeat;"
+> * sen_string_search:</span
+>
+<span class="line even" style="background:url(.num/474.png) no-repeat;"
+> * @inv: 転置インデックス型のカラム</span
+>
+<span class="line odd" style="background:url(.num/475.png) no-repeat;"
+> * @string: 検索文字列</span
+>
+<span class="line even" style="background:url(.num/476.png) no-repeat;"
+> * @string_size: stringのサイズ(バイト長)</span
+>
+<span class="line odd" style="background:url(.num/477.png) no-repeat;"
+> * @res: 検索結果を格納するテーブル</span
+>
+<span class="line even" style="background:url(.num/478.png) no-repeat;"
+> * @op: sen_sel_or, sen_sel_and, sen_sel_but, sen_sel_adjustのいずれかを指定する</span
+>
+<span class="line odd" style="background:url(.num/479.png) no-repeat;"
+> * @optargs: 詳細検索条件</span
+>
+<span class="line even" style="background:url(.num/480.png) no-repeat;"
+> *</span
+>
+<span class="line odd" style="background:url(.num/481.png) no-repeat;"
+> * stringにマッチするレコードを転置インデックスinvを用いて検索し、結果をresに格納する。</span
+>
+<span class="line even" style="background:url(.num/482.png) no-repeat;"
+> **/</span
+>
+<span class="line odd" style="background:url(.num/483.png) no-repeat;"
+>sen_rc sen_string_search(sen_obj *inv, const char *string, unsigned int string_size,</span
+>
+<span class="line even" style="background:url(.num/484.png) no-repeat;"
+>                         sen_obj *res, sen_sel_operator op, sen_select_optarg *optarg);</span
+>
+<span class="line odd" style="background:url(.num/485.png) no-repeat;"
+></span
+>
+<span class="line even" style="background:url(.num/486.png) no-repeat;"
+>/**</span
+>
+<span class="line odd" style="background:url(.num/487.png) no-repeat;"
+> * sen_query_search:</span
+>
+<span class="line even" style="background:url(.num/488.png) no-repeat;"
+> * @inv: 転置インデックス型のカラム</span
+>
+<span class="line odd" style="background:url(.num/489.png) no-repeat;"
+> * @q: 検索クエリ</span
+>
+<span class="line even" style="background:url(.num/490.png) no-repeat;"
+> * @res: 検索結果を格納するテーブル</span
+>
+<span class="line odd" style="background:url(.num/491.png) no-repeat;"
+> * @op: sen_sel_or, sen_sel_and, sen_sel_but, sen_sel_adjustのいずれかを指定する</span
+>
+<span class="line even" style="background:url(.num/492.png) no-repeat;"
+> *</span
+>
+<span class="line odd" style="background:url(.num/493.png) no-repeat;"
+> * queryにマッチするレコードを転置インデックスinvを用いて検索し、結果をresに格納する。</span
+>
+<span class="line even" style="background:url(.num/494.png) no-repeat;"
+> **/</span
+>
+<span class="line odd" style="background:url(.num/495.png) no-repeat;"
+>sen_rc sen_query_search(sen_obj *inv, sen_query *q, sen_obj *res, sen_sel_operator op);</span
+>
+<span class="line even" style="background:url(.num/496.png) no-repeat;"
+></span
+>
+<span class="line odd" style="background:url(.num/497.png) no-repeat;"
+>/*-------------------------------------------------------------</span
+>
+<span class="line even" style="background:url(.num/498.png) no-repeat;"
+> * space, table, columnの全てまたは幾つかで共通に使用できる関数</span
+>
+<span class="line odd" style="background:url(.num/499.png) no-repeat;"
+> */</span
+>
+<span class="line even" style="background:url(.num/500.png) no-repeat;"
+></span
+>
+<span class="line odd" style="background:url(.num/501.png) no-repeat;"
+>typedef sturct {</span
+>
+<span class="line even" style="background:url(.num/502.png) no-repeat;"
+>  sen_obj *proc,</span
+>
+<span class="line odd" style="background:url(.num/503.png) no-repeat;"
+>  int argc,</span
+>
+<span class="line even" style="background:url(.num/504.png) no-repeat;"
+>  sen_obj *argv[SEN_PROC_MAX_ARGS]</span
+>
+<span class="line odd" style="background:url(.num/505.png) no-repeat;"
+>} sen_proc_spec;</span
+>
+<span class="line even" style="background:url(.num/506.png) no-repeat;"
+></span
+>
+<span class="line odd" style="background:url(.num/507.png) no-repeat;"
+>typedef enum {</span
+>
+<span class="line even" style="background:url(.num/508.png) no-repeat;"
+>  SEN_INFO_ELEMENT_SIZE = 0,</span
+>
+<span class="line odd" style="background:url(.num/509.png) no-repeat;"
+>  SEN_INFO_CURR_MAX,</span
+>
+<span class="line even" style="background:url(.num/510.png) no-repeat;"
+>  SEN_INFO_MAX_ELEMENT_SIZE,</span
+>
+<span class="line odd" style="background:url(.num/511.png) no-repeat;"
+>  SEN_INFO_SEG_SIZE,</span
+>
+<span class="line even" style="background:url(.num/512.png) no-repeat;"
+>  SEN_INFO_CHUNK_SIZE,</span
+>
+<span class="line odd" style="background:url(.num/513.png) no-repeat;"
+>  SEN_INFO_INITIAL_N_SEGMENTS,</span
+>
+<span class="line even" style="background:url(.num/514.png) no-repeat;"
+>  SEN_INFO_MAX_SECTION,</span
+>
+<span class="line odd" style="background:url(.num/515.png) no-repeat;"
+>  SEN_INFO_SOURCE_INFO,</span
+>
+<span class="line even" style="background:url(.num/516.png) no-repeat;"
+>  SEN_INFO_ENCODING,</span
+>
+<span class="line odd" style="background:url(.num/517.png) no-repeat;"
+>  SEN_ELEMENT_INFO_A,</span
+>
+<span class="line even" style="background:url(.num/518.png) no-repeat;"
+>  SEN_ELEMENT_INFO_CHUNK,</span
+>
+<span class="line odd" style="background:url(.num/519.png) no-repeat;"
+>  SEN_ELEMENT_INFO_CHUNK_SIZE,</span
+>
+<span class="line even" style="background:url(.num/520.png) no-repeat;"
+>  SEN_ELEMENT_INFO_BUFFER_FREE,</span
+>
+<span class="line odd" style="background:url(.num/521.png) no-repeat;"
+>  SEN_ELEMENT_INFO_NTERMS,</span
+>
+<span class="line even" style="background:url(.num/522.png) no-repeat;"
+>  SEN_ELEMENT_INFO_NTERMS_VOID,</span
+>
+<span class="line odd" style="background:url(.num/523.png) no-repeat;"
+>  SEN_ELEMENT_INFO_SIZE_IN_CHUNK,</span
+>
+<span class="line even" style="background:url(.num/524.png) no-repeat;"
+>  SEN_ELEMENT_INFO_POS_IN_CHUNK,</span
+>
+<span class="line odd" style="background:url(.num/525.png) no-repeat;"
+>  SEN_ELEMENT_INFO_SIZE_IN_BUFFER,</span
+>
+<span class="line even" style="background:url(.num/526.png) no-repeat;"
+>  SEN_ELEMENT_INFO_POS_IN_BUFFER,</span
+>
+<span class="line odd" style="background:url(.num/527.png) no-repeat;"
+>  SEN_ELEMENT_INFO_ESTIMATE_SIZE</span
+>
+<span class="line even" style="background:url(.num/528.png) no-repeat;"
+>} sen_info_type;</span
+>
+<span class="line odd" style="background:url(.num/529.png) no-repeat;"
+></span
+>
+<span class="line even" style="background:url(.num/530.png) no-repeat;"
+>/**</span
+>
+<span class="line odd" style="background:url(.num/531.png) no-repeat;"
+> * sen_obj_get_info:</span
+>
+<span class="line even" style="background:url(.num/532.png) no-repeat;"
+> * @obj: 対象obj</span
+>
+<span class="line odd" style="background:url(.num/533.png) no-repeat;"
+> * @type: 取得する情報の種類</span
+>
+<span class="line even" style="background:url(.num/534.png) no-repeat;"
+> * @valuebuf: 値を格納するバッファ(呼出側で準備)</span
+>
+<span class="line odd" style="background:url(.num/535.png) no-repeat;"
+> *</span
+>
+<span class="line even" style="background:url(.num/536.png) no-repeat;"
+> * objのtypeに対応する情報をvaluebufに格納する。</span
+>
+<span class="line odd" style="background:url(.num/537.png) no-repeat;"
+> * 呼出側ではtypeに応じて十分なサイズのバッファを確保しなければならない。</span
+>
+<span class="line even" style="background:url(.num/538.png) no-repeat;"
+> * SEN_INFO_SOURCE_INFOを指定した場合はvaluebufにsen_proc_spec構造体を指定する。</span
+>
+<span class="line odd" style="background:url(.num/539.png) no-repeat;"
+> * (objの値を導出するための手続きを取得する)</span
+>
+<span class="line even" style="background:url(.num/540.png) no-repeat;"
+> **/</span
+>
+<span class="line odd" style="background:url(.num/541.png) no-repeat;"
+>sen_rc sen_obj_get_info(sen_obj *obj, sen_info_type type, void *valuebuf);</span
+>
+<span class="line even" style="background:url(.num/542.png) no-repeat;"
+></span
+>
+<span class="line odd" style="background:url(.num/543.png) no-repeat;"
+>/**</span
+>
+<span class="line even" style="background:url(.num/544.png) no-repeat;"
+> * sen_obj_set_info:</span
+>
+<span class="line odd" style="background:url(.num/545.png) no-repeat;"
+> * @obj: 対象obj</span
+>
+<span class="line even" style="background:url(.num/546.png) no-repeat;"
+> * @type: 設定する情報の種類</span
+>
+<span class="line odd" style="background:url(.num/547.png) no-repeat;"
+> * @value: 設定しようとする値</span
+>
+<span class="line even" style="background:url(.num/548.png) no-repeat;"
+> *</span
+>
+<span class="line odd" style="background:url(.num/549.png) no-repeat;"
+> * objのtypeに対応する情報をvalueの内容に更新する。</span
+>
+<span class="line even" style="background:url(.num/550.png) no-repeat;"
+> * SEN_INFO_SOURCE_INFOを指定した場合はvalueにsen_proc_spec構造体を指定する。</span
+>
+<span class="line odd" style="background:url(.num/551.png) no-repeat;"
+> * (objの値を導出するための手続きを設定する)</span
+>
+<span class="line even" style="background:url(.num/552.png) no-repeat;"
+> **/</span
+>
+<span class="line odd" style="background:url(.num/553.png) no-repeat;"
+>sen_rc sen_obj_set_info(sen_obj *obj, sen_info_type type, const void *value);</span
+>
+<span class="line even" style="background:url(.num/554.png) no-repeat;"
+></span
+>
+<span class="line odd" style="background:url(.num/555.png) no-repeat;"
+>/**</span
+>
+<span class="line even" style="background:url(.num/556.png) no-repeat;"
+> * sen_obj_get_element_info:</span
+>
+<span class="line odd" style="background:url(.num/557.png) no-repeat;"
+> * @obj: 対象obj</span
+>
+<span class="line even" style="background:url(.num/558.png) no-repeat;"
+> * @id: 対象ID</span
+>
+<span class="line odd" style="background:url(.num/559.png) no-repeat;"
+> * @type: 取得する情報の種類</span
+>
+<span class="line even" style="background:url(.num/560.png) no-repeat;"
+> * @valuebuf: 値を格納するバッファ(呼出側で準備)</span
+>
+<span class="line odd" style="background:url(.num/561.png) no-repeat;"
+> *</span
+>
+<span class="line even" style="background:url(.num/562.png) no-repeat;"
+> * objのidに対応するレコードの、typeに対応する情報をvaluebufに格納する。</span
+>
+<span class="line odd" style="background:url(.num/563.png) no-repeat;"
+> * 呼出側ではtypeに応じて十分なサイズのバッファを確保しなければならない。</span
+>
+<span class="line even" style="background:url(.num/564.png) no-repeat;"
+> **/</span
+>
+<span class="line odd" style="background:url(.num/565.png) no-repeat;"
+>sen_rc sen_obj_get_element_info(sen_obj *obj, sen_id id,</span
+>
+<span class="line even" style="background:url(.num/566.png) no-repeat;"
+>                                sen_info_type type, void *valuebuf);</span
+>
+<span class="line odd" style="background:url(.num/567.png) no-repeat;"
+></span
+>
+<span class="line even" style="background:url(.num/568.png) no-repeat;"
+>/**</span
+>
+<span class="line odd" style="background:url(.num/569.png) no-repeat;"
+> * sen_obj_set_element_info:</span
+>
+<span class="line even" style="background:url(.num/570.png) no-repeat;"
+> * @obj: 対象object</span
+>
+<span class="line odd" style="background:url(.num/571.png) no-repeat;"
+> * @id: 対象ID</span
+>
+<span class="line even" style="background:url(.num/572.png) no-repeat;"
+> * @type: 設定する情報の種類</span
+>
+<span class="line odd" style="background:url(.num/573.png) no-repeat;"
+> * @value: 設定しようとする値</span
+>
+<span class="line even" style="background:url(.num/574.png) no-repeat;"
+> *</span
+>
+<span class="line odd" style="background:url(.num/575.png) no-repeat;"
+> * objのidに対応するレコードのtypeに対応する情報をvalueの内容に更新する。</span
+>
+<span class="line even" style="background:url(.num/576.png) no-repeat;"
+> **/</span
+>
+<span class="line odd" style="background:url(.num/577.png) no-repeat;"
+>sen_rc sen_obj_set_element_info(sen_obj *obj, sen_id id,</span
+>
+<span class="line even" style="background:url(.num/578.png) no-repeat;"
+>                                sen_info_type type, const void *value);</span
+>
+<span class="line odd" style="background:url(.num/579.png) no-repeat;"
+></span
+>
+<span class="line even" style="background:url(.num/580.png) no-repeat;"
+>/**</span
+>
+<span class="line odd" style="background:url(.num/581.png) no-repeat;"
+> * sen_obj_add_hook:</span
+>
+<span class="line even" style="background:url(.num/582.png) no-repeat;"
+> * @obj: 対象object</span
+>
+<span class="line odd" style="background:url(.num/583.png) no-repeat;"
+> * @type: SEN_HOOK_READは、objectの参照時に呼び出されるhookを定義する。</span
+>
+<span class="line even" style="background:url(.num/584.png) no-repeat;"
+>          SEN_HOOK_WRITEは、objectの更新時に呼び出されるhookを定義する。</span
+>
+<span class="line odd" style="background:url(.num/585.png) no-repeat;"
+> * @offset: hookの実行順位。offsetに対応するhookの直前に新たなhookを挿入する。</span
+>
+<span class="line even" style="background:url(.num/586.png) no-repeat;"
+>            0を指定した場合は先頭に挿入される。-1を指定した場合は末尾に挿入される。</span
+>
+<span class="line odd" style="background:url(.num/587.png) no-repeat;"
+>            objectに複数のhookが定義されている場合は順位の順に呼び出される。</span
+>
+<span class="line even" style="background:url(.num/588.png) no-repeat;"
+> * @spec: 詳細条件</span
+>
+<span class="line odd" style="background:url(.num/589.png) no-repeat;"
+> *</span
+>
+<span class="line even" style="background:url(.num/590.png) no-repeat;"
+> * objに対してhookを追加する。</span
+>
+<span class="line odd" style="background:url(.num/591.png) no-repeat;"
+> **/</span
+>
+<span class="line even" style="background:url(.num/592.png) no-repeat;"
+>sen_rc sen_obj_add_hook(sen_obj *obj, sen_proc_type type,</span
+>
+<span class="line odd" style="background:url(.num/593.png) no-repeat;"
+>                        int offset, const sen_proc_spec *spec);</span
+>
+<span class="line even" style="background:url(.num/594.png) no-repeat;"
+></span
+>
+<span class="line odd" style="background:url(.num/595.png) no-repeat;"
+>/**</span
+>
+<span class="line even" style="background:url(.num/596.png) no-repeat;"
+> * sen_obj_get_hook_info:</span
+>
+<span class="line odd" style="background:url(.num/597.png) no-repeat;"
+> * @obj: 対象object</span
+>
+<span class="line even" style="background:url(.num/598.png) no-repeat;"
+> * @type: hookタイプ</span
+>
+<span class="line odd" style="background:url(.num/599.png) no-repeat;"
+> * @offset: 実行順位</span
+>
+<span class="line even" style="background:url(.num/600.png) no-repeat;"
+> *</span
+>
+<span class="line odd" style="background:url(.num/601.png) no-repeat;"
+> * objに定義されているhookの情報を取得する。</span
+>
+<span class="line even" style="background:url(.num/602.png) no-repeat;"
+> **/</span
+>
+<span class="line odd" style="background:url(.num/603.png) no-repeat;"
+>sen_rc sen_obj_get_hook_info(sen_obj *obj, sen_proc_type type,</span
+>
+<span class="line even" style="background:url(.num/604.png) no-repeat;"
+>                             int offset, sen_proc_spec *spec);</span
+>
+<span class="line odd" style="background:url(.num/605.png) no-repeat;"
+></span
+>
+<span class="line even" style="background:url(.num/606.png) no-repeat;"
+>/**</span
+>
+<span class="line odd" style="background:url(.num/607.png) no-repeat;"
+> * sen_obj_delete_hook:</span
+>
+<span class="line even" style="background:url(.num/608.png) no-repeat;"
+> * @obj: 対象object</span
+>
+<span class="line odd" style="background:url(.num/609.png) no-repeat;"
+> * @type: hookタイプ</span
+>
+<span class="line even" style="background:url(.num/610.png) no-repeat;"
+> * @offset: 実行順位</span
+>
+<span class="line odd" style="background:url(.num/611.png) no-repeat;"
+> *</span
+>
+<span class="line even" style="background:url(.num/612.png) no-repeat;"
+> * objに定義されているhookを削除する。</span
+>
+<span class="line odd" style="background:url(.num/613.png) no-repeat;"
+> **/</span
+>
+<span class="line even" style="background:url(.num/614.png) no-repeat;"
+>sen_rc sen_obj_delete_hook(sen_obj *obj, sen_proc_type type, int offset);</span
+>
+<span class="line odd" style="background:url(.num/615.png) no-repeat;"
+></span
+>
+<span class="line even" style="background:url(.num/616.png) no-repeat;"
+>/**</span
+>
+<span class="line odd" style="background:url(.num/617.png) no-repeat;"
+> * sen_obj_remove:</span
+>
+<span class="line even" style="background:url(.num/618.png) no-repeat;"
+> * @path: objectに該当するファイルパス</span
+>
+<span class="line odd" style="background:url(.num/619.png) no-repeat;"
+> *</span
+>
+<span class="line even" style="background:url(.num/620.png) no-repeat;"
+> * pathに該当するオブジェクトのファイル一式を削除する。</span
+>
+<span class="line odd" style="background:url(.num/621.png) no-repeat;"
+> **/</span
+>
+<span class="line even" style="background:url(.num/622.png) no-repeat;"
+>sen_rc sen_obj_remove(const char *path);</span
+>
+<span class="line odd" style="background:url(.num/623.png) no-repeat;"
+></span
+>
+<span class="line even" style="background:url(.num/624.png) no-repeat;"
+>/**</span
+>
+<span class="line odd" style="background:url(.num/625.png) no-repeat;"
+> * sen_obj_rename:</span
+>
+<span class="line even" style="background:url(.num/626.png) no-repeat;"
+> * @old_path: 旧ファイルパス</span
+>
+<span class="line odd" style="background:url(.num/627.png) no-repeat;"
+> * @new_path: 新ファイルパス</span
+>
+<span class="line even" style="background:url(.num/628.png) no-repeat;"
+> *</span
+>
+<span class="line odd" style="background:url(.num/629.png) no-repeat;"
+> * old_pathに該当するオブジェクトのファイル名をnew_pathに変更する。</span
+>
+<span class="line even" style="background:url(.num/630.png) no-repeat;"
+> **/</span
+>
+<span class="line odd" style="background:url(.num/631.png) no-repeat;"
+>sen_rc sen_obj_rename(const char *old_path, const char *new_path);</span
+>
+<span class="line even" style="background:url(.num/632.png) no-repeat;"
+></span
+>
+<span class="line odd" style="background:url(.num/633.png) no-repeat;"
+>/**</span
+>
+<span class="line even" style="background:url(.num/634.png) no-repeat;"
+> * sen_obj_close:</span
+>
+<span class="line odd" style="background:url(.num/635.png) no-repeat;"
+> * @obj: 対象object</span
+>
+<span class="line even" style="background:url(.num/636.png) no-repeat;"
+> *</span
+>
+<span class="line odd" style="background:url(.num/637.png) no-repeat;"
+> * objをメモリから解放する。objに属するobjectも再帰的にメモリから解放される。</span
+>
+<span class="line even" style="background:url(.num/638.png) no-repeat;"
+> **/</span
+>
+<span class="line odd" style="background:url(.num/639.png) no-repeat;"
+>sen_rc sen_obj_close(sen_obj *obj);</span
+>
+<span class="line even" style="background:url(.num/640.png) no-repeat;"
+></span
+>
+<span class="line odd" style="background:url(.num/641.png) no-repeat;"
+>/**</span
+>
+<span class="line even" style="background:url(.num/642.png) no-repeat;"
+> * sen_obj_path:</span
+>
+<span class="line odd" style="background:url(.num/643.png) no-repeat;"
+> * @obj: 対象object</span
+>
+<span class="line even" style="background:url(.num/644.png) no-repeat;"
+> *</span
+>
+<span class="line odd" style="background:url(.num/645.png) no-repeat;"
+> * objに対応するファイルパスを返す。一時objectならNULLを返す。</span
+>
+<span class="line even" style="background:url(.num/646.png) no-repeat;"
+> **/</span
+>
+<span class="line odd" style="background:url(.num/647.png) no-repeat;"
+>const char *sen_obj_path(sen_obj *obj);</span
+>
+<span class="line even" style="background:url(.num/648.png) no-repeat;"
+></span
+>
+<span class="line odd" style="background:url(.num/649.png) no-repeat;"
+>/**</span
+>
+<span class="line even" style="background:url(.num/650.png) no-repeat;"
+> * sen_obj_name:</span
+>
+<span class="line odd" style="background:url(.num/651.png) no-repeat;"
+> * @obj: 対象object</span
+>
+<span class="line even" style="background:url(.num/652.png) no-repeat;"
+> *</span
+>
+<span class="line odd" style="background:url(.num/653.png) no-repeat;"
+> * objの名前を返す。無名objectならNULLを返す。</span
+>
+<span class="line even" style="background:url(.num/654.png) no-repeat;"
+> **/</span
+>
+<span class="line odd" style="background:url(.num/655.png) no-repeat;"
+>const char *sen_obj_name(sen_obj *obj);</span
+>
+<span class="line even" style="background:url(.num/656.png) no-repeat;"
+></span
+>
+<span class="line odd" style="background:url(.num/657.png) no-repeat;"
+>/**</span
+>
+<span class="line even" style="background:url(.num/658.png) no-repeat;"
+> * sen_obj_defrag:</span
+>
+<span class="line odd" style="background:url(.num/659.png) no-repeat;"
+> * @obj: 対象object</span
+>
+<span class="line even" style="background:url(.num/660.png) no-repeat;"
+> *</span
+>
+<span class="line odd" style="background:url(.num/661.png) no-repeat;"
+> * objに対応するファイルのフラグメンテーションを解消する。</span
+>
+<span class="line even" style="background:url(.num/662.png) no-repeat;"
+> **/</span
+>
+<span class="line odd" style="background:url(.num/663.png) no-repeat;"
+>int sen_obj_defrag(sen_obj *obj, int threshold);</span
+>
+<span class="line even" style="background:url(.num/664.png) no-repeat;"
+></span
+>
+<span class="line odd" style="background:url(.num/665.png) no-repeat;"
+>/**</span
+>
+<span class="line even" style="background:url(.num/666.png) no-repeat;"
+> * sen_obj_expire:</span
+>
+<span class="line odd" style="background:url(.num/667.png) no-repeat;"
+> * @obj: 対象object</span
+>
+<span class="line even" style="background:url(.num/668.png) no-repeat;"
+> *</span
+>
+<span class="line odd" style="background:url(.num/669.png) no-repeat;"
+> * objの占有するメモリのうち、可能な領域をthresholdを指標として解放する。</span
+>
+<span class="line even" style="background:url(.num/670.png) no-repeat;"
+> **/</span
+>
+<span class="line odd" style="background:url(.num/671.png) no-repeat;"
+>int sen_obj_expire(sen_obj *obj, int threshold);</span
+>
+<span class="line even" style="background:url(.num/672.png) no-repeat;"
+></span
+>
+<span class="line odd" style="background:url(.num/673.png) no-repeat;"
+>/**</span
+>
+<span class="line even" style="background:url(.num/674.png) no-repeat;"
+> * sen_obj_check:</span
+>
+<span class="line odd" style="background:url(.num/675.png) no-repeat;"
+> * @obj: 対象object</span
+>
+<span class="line even" style="background:url(.num/676.png) no-repeat;"
+> *</span
+>
+<span class="line odd" style="background:url(.num/677.png) no-repeat;"
+> * objに対応するファイルの整合性を検査する。</span
+>
+<span class="line even" style="background:url(.num/678.png) no-repeat;"
+> **/</span
+>
+<span class="line odd" style="background:url(.num/679.png) no-repeat;"
+>int sen_obj_check(sen_obj *obj);</span
+>
+<span class="line even" style="background:url(.num/680.png) no-repeat;"
+></span
+>
+<span class="line odd" style="background:url(.num/681.png) no-repeat;"
+>/**</span
+>
+<span class="line even" style="background:url(.num/682.png) no-repeat;"
+> * sen_obj_lock:</span
+>
+<span class="line odd" style="background:url(.num/683.png) no-repeat;"
+> * @obj: 対象object</span
+>
+<span class="line even" style="background:url(.num/684.png) no-repeat;"
+> *</span
+>
+<span class="line odd" style="background:url(.num/685.png) no-repeat;"
+> * objをlockする。timeout(秒)経過してもlockを取得できない場合はsen_other_errorを返す。</span
+>
+<span class="line even" style="background:url(.num/686.png) no-repeat;"
+> **/</span
+>
+<span class="line odd" style="background:url(.num/687.png) no-repeat;"
+>sen_rc sen_obj_lock(sen_obj *obj, int timeout);</span
+>
+<span class="line even" style="background:url(.num/688.png) no-repeat;"
+></span
+>
+<span class="line odd" style="background:url(.num/689.png) no-repeat;"
+>/**</span
+>
+<span class="line even" style="background:url(.num/690.png) no-repeat;"
+> * sen_obj_unlock:</span
+>
+<span class="line odd" style="background:url(.num/691.png) no-repeat;"
+> * @obj: 対象object</span
+>
+<span class="line even" style="background:url(.num/692.png) no-repeat;"
+> *</span
+>
+<span class="line odd" style="background:url(.num/693.png) no-repeat;"
+> * objをunlockする。</span
+>
+<span class="line even" style="background:url(.num/694.png) no-repeat;"
+> **/</span
+>
+<span class="line odd" style="background:url(.num/695.png) no-repeat;"
+>sen_rc sen_obj_unlock(sen_obj *obj);</span
+>
+<span class="line even" style="background:url(.num/696.png) no-repeat;"
+></span
+>
+<span class="line odd" style="background:url(.num/697.png) no-repeat;"
+>/**</span
+>
+<span class="line even" style="background:url(.num/698.png) no-repeat;"
+> * sen_obj_clear_lock:</span
+>
+<span class="line odd" style="background:url(.num/699.png) no-repeat;"
+> * @obj: 対象object</span
+>
+<span class="line even" style="background:url(.num/700.png) no-repeat;"
+> *</span
+>
+<span class="line odd" style="background:url(.num/701.png) no-repeat;"
+> * 強制的にロックをクリアする。</span
+>
+<span class="line even" style="background:url(.num/702.png) no-repeat;"
+> **/</span
+>
+<span class="line odd" style="background:url(.num/703.png) no-repeat;"
+>sen_rc sen_obj_clear_lock(sen_obj *obj);</span
+>
+<span class="line even" style="background:url(.num/704.png) no-repeat;"
+></span
+>
+<span class="line odd" style="background:url(.num/705.png) no-repeat;"
+>/*-------------------------------------------------------------</span
+>
+<span class="line even" style="background:url(.num/706.png) no-repeat;"
+> * spaceの親子関係を調べるための関数</span
+>
+<span class="line odd" style="background:url(.num/707.png) no-repeat;"
+> */</span
+>
+<span class="line even" style="background:url(.num/708.png) no-repeat;"
+></span
+>
+<span class="line odd" style="background:url(.num/709.png) no-repeat;"
+>/**</span
+>
+<span class="line even" style="background:url(.num/710.png) no-repeat;"
+> * sen_obj_space:</span
+>
+<span class="line odd" style="background:url(.num/711.png) no-repeat;"
+> * @obj: 対象object</span
+>
+<span class="line even" style="background:url(.num/712.png) no-repeat;"
+> *</span
+>
+<span class="line odd" style="background:url(.num/713.png) no-repeat;"
+> * objの属するspaceを返す。</span
+>
+<span class="line even" style="background:url(.num/714.png) no-repeat;"
+> **/</span
+>
+<span class="line odd" style="background:url(.num/715.png) no-repeat;"
+>sen_rc sen_obj_space(sen_obj *obj);</span
+>
+<span class="line even" style="background:url(.num/716.png) no-repeat;"
+></span
+>
+<span class="line odd" style="background:url(.num/717.png) no-repeat;"
+>/**</span
+>
+<span class="line even" style="background:url(.num/718.png) no-repeat;"
+> * sen_space_sibling:</span
+>
+<span class="line odd" style="background:url(.num/719.png) no-repeat;"
+> * @space: 対象space</span
+>
+<span class="line even" style="background:url(.num/720.png) no-repeat;"
+> *</span
+>
+<span class="line odd" style="background:url(.num/721.png) no-repeat;"
+> * spaceの兄弟space(の一つ)を返す。</span
+>
+<span class="line even" style="background:url(.num/722.png) no-repeat;"
+> * (siblingは循環リストになっている。)</span
+>
+<span class="line odd" style="background:url(.num/723.png) no-repeat;"
+> **/</span
+>
+<span class="line even" style="background:url(.num/724.png) no-repeat;"
+>sen_rc sen_space_sibling(sen_obj *space);</span
+>
+<span class="line odd" style="background:url(.num/725.png) no-repeat;"
+></span
+>
+<span class="line even" style="background:url(.num/726.png) no-repeat;"
+>/**</span
+>
+<span class="line odd" style="background:url(.num/727.png) no-repeat;"
+> * sen_space_child:</span
+>
+<span class="line even" style="background:url(.num/728.png) no-repeat;"
+> * @space: 対象space</span
+>
+<span class="line odd" style="background:url(.num/729.png) no-repeat;"
+> *</span
+>
+<span class="line even" style="background:url(.num/730.png) no-repeat;"
+> * spaceの子space(の一つ)を返す。</span
+>
+<span class="line odd" style="background:url(.num/731.png) no-repeat;"
+> **/</span
+>
+<span class="line even" style="background:url(.num/732.png) no-repeat;"
+>sen_rc sen_space_child(sen_obj *space);</span
+>
+<span class="line odd" style="background:url(.num/733.png) no-repeat;"
+></span
+>
+</pre
+></div
+></div
+><!--section--></div
+><!--body--></div
+><!--day--></div
+><!--body_main--><div class="body_leave" id="body_leave"
+><div class="day"
+><div class="comment"
+><div class="caption"
+><div class="page_attribute"
+>
+<span class="attribute"
+>生成時間: <em
+>__qwik_page_generate_time__秒</em
+></span
+>
+<div align="right"
+>
+<a href="http://x6.at-ninja.jp/bin/gg?067333300"
+>
+<img border="0" src="http://x6.at-ninja.jp/bin/ll?067333300"
+/></a
+>
+<span style="font-size:9px"
+><img src="http://img.shinobi.jp/tadaima/fj.gif" style="margin:0;vertical-align:text-bottom;"
+/> <a href="http://randoseru.rentalurl.net"
+>ランドセル</a
+></span
+>
+</div
+>
+
+
+</div
+></div
+></div
+></div
+></div
+><!--body_leave--></div
+><!--main--><div class="sidebar"
+><h2
+>メニュー/Menu</h2
+><ul
+><li
+><a href="FrontPageJ.html"
+>ホーム</a
+> / <a href="FrontPage.html"
+>Home</a
+></li
+></ul
+>
+<ul
+><li
+>Sennaの紹介</li
+><ul
+><li
+><a href="senna_takahashi.html"
+>Sennaとは</a
+></li
+><li
+><a href="publication.html"
+>雑誌記事・発表資料等</a
+></li
+><li
+><a href="example.html"
+>こんなところでも使われてます！</a
+></li
+><li
+><a href="FAQ.html"
+>FAQ</a
+> / <a href="FAQ_en.html"
+>FAQ (English)</a
+></li
+><li
+><a href="ML.html"
+>メーリングリスト</a
+> / <a href="ML_en.html"
+>MailingLists</a
+></li
+></ul
+><li
+>Sennaの利用</li
+><ul
+><li
+><a href="Download.html"
+>ダウンロード</a
+> / <a href="Download_en.html"
+>Download</a
+></li
+><li
+><a href="install.html"
+>インストール</a
+> / <a href="install_en.html"
+>Install</a
+></li
+><li
+><a href="check_install.html"
+>動作確認方法</a
+> / <a href="check_install_en.html"
+>Check install</a
+></li
+><li
+><a href="bindings.html"
+>バインディング一覧</a
+></li
+><li
+><a href="mysql_binding.html"
+>MySQL バインディング</a
+> / <a href="mysql_binding_en.html"
+>MySQL binding</a
+></li
+><li
+><a href="install_specific.html"
+>特定環境でのインストールメモ</a
+> / <a href="install_specific_en.html"
+>installing note for specific environment</a
+></li
+></ul
+><li
+>利用者向け</li
+><ul
+><li
+><a href="query.html"
+>クエリーの書式</a
+> / <a href="query_en.html"
+>query syntax</a
+></li
+><li
+><a href="Customize.html"
+>カスタマイズ</a
+> / <a href="Customize_en.html"
+>Customize</a
+></li
+><li
+><a href="sennaql_reference.html"
+>SennaQL リファレンス</a
+></li
+><li
+><a href="store_tutorial.html"
+>SennaStoreを使ってみよう</a
+></li
+><li
+><a href="log_level.html"
+>ログレベルの解説</a
+></li
+><li
+><a href="report_bugs.html"
+>不具合報告掲示板</a
+></li
+><li
+><a href="contribute.html"
+>Sennaへのパッチ・情報等</a
+></li
+><li
+><a href="knownproblems.html"
+>不具合等</a
+> / <a href="knownproblems_en.html"
+>Known problems</a
+></li
+></ul
+><li
+>高度な利用法</li
+><ul
+><li
+><a href="APIJ.html"
+>API</a
+> / <a href="API.html"
+>C API(English)</a
+></li
+><li
+><a href="IndexFile.html"
+>インデックスファイル</a
+> / <a href="IndexFile_en.html"
+>Index File</a
+></li
+></ul
+><li
+>Senna開発</li
+><ul
+><li
+><a href="design_policy.html"
+>Senna設計方針</a
+></li
+><li
+><a href="Roadmap.html"
+>開発ロードマップ</a
+></li
+><li
+><a href="cstyle.html"
+>コーディング規約</a
+></li
+><li
+><a href="WorkingStatus.html"
+>作業状況</a
+></li
+><li
+><a href="futureworks.html"
+>野望</a
+> / <a href="futureworks_en.html"
+>Future works</a
+></li
+></ul
+></ul
+>
+<h2
+>Search</h2
+><form action=".search"
+><input name="q"
+/><input type="submit" value="検索"
+/></form
+>
+
+<h2
+>Recent Change</h2
+><div class="recent"
+><ul
+><li
+><a href="example.html" title="2010-10-28 14:04:51"
+>こんなところでも使われてます！</a
+> <span class="ago"
+>3年前</span
+></li
+><li
+><a href="frontpage.html" title="2010-09-14 12:54:06"
+>frontpage</a
+> <span class="ago"
+>4年前</span
+></li
+><li
+><a href="Download_en.html" title="2010-07-22 14:26:20"
+>Download</a
+> <span class="ago"
+>4年前</span
+></li
+><li
+><a href="Download.html" title="2010-07-22 14:26:01"
+>ダウンロード</a
+> <span class="ago"
+>4年前</span
+></li
+><li
+><a href="FrontPageJ.html" title="2009-11-25 16:14:43"
+>Senna 組み込み型全文検索エンジン</a
+> <span class="ago"
+>4年前</span
+></li
+><li
+><a href="FrontPage.html" title="2009-11-25 16:14:20"
+>Senna: An Embeddable Fulltext Search Engine</a
+> <span class="ago"
+>4年前</span
+></li
+><li
+><a href="Ruby_binding.html" title="2009-09-03 18:42:32"
+>Rubyバインディング</a
+> <span class="ago"
+>5年前</span
+></li
+><li
+><a href="PHP_binding.html" title="2009-08-24 04:09:56"
+>PHPバインディング</a
+> <span class="ago"
+>5年前</span
+></li
+><li
+><a href="store.html" title="2009-03-23 03:34:52"
+>SennaStore概要</a
+> <span class="ago"
+>5年前</span
+></li
+><li
+><a href="bindings.html" title="2008-10-05 11:33:12"
+>バインディング一覧</a
+> <span class="ago"
+>6年前</span
+></li
+></ul
+><p class="recent"
+><a href="RecentList.html"
+><em
+>もっと前の情報</em
+></a
+></p
+></div
+>
+<a class="rss-button" href="rss.xml"
+><span
+>RSS</span
+></a
+><a class="rss-button" href="atom.xml"
+><span
+>ATOM</span
+></a
+>
+
+</div
+><!--sidebar--><div class="footer"
+><span title="__qwik_page_generate_time__"
+>powered by <a href="http://qwik.jp/"
+>qwikWeb</a
+></span
+></div
+><!--footer--></div
+><!--container--></body
+></html
+>

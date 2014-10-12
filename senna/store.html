@@ -1,0 +1,757 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html xmlns:v="urn:schemas-microsoft-com:vml"
+><head
+><title
+>SennaStore概要 - Senna 組み込み型全文検索エンジン</title
+><link href="theme/css/base.css" media="screen,tv" rel="stylesheet" type="text/css"
+/><link href="theme/css/base.css" media="screen,tv,print" rel="stylesheet" type="text/css"
+/><link href="css/theme.css" media="screen,tv,print" rel="stylesheet" type="text/css"
+/><link href="rss.xml" rel="alternate" title="RSS 0.91" type="application/rss+xml"
+/><script src=".theme/js/base.js" type="text/javascript"
+></script
+><script src=".theme/js/niftypp.js" type="text/javascript"
+></script
+><script src=".theme/js/se_hilite_jp.js" type="text/javascript"
+></script
+></head
+><body onload="qwik_onload();"
+><div class="container"
+><div class="main"
+><!--adminmenu--><!--toc--><h1
+>SennaStore概要</h1
+><!--body_enter--><div class="body_main"
+><div class="day"
+><div class="body"
+><div class="section"
+><p
+>Sennaはデータベースと検索エンジンとの距離を埋め、本格的な全文検索機能を持つアプリケーションを効率よくLAMPパーツで作れるようにすることを目的としています。
+この目的のために、Sennaは二つの切り口を用意しています。</p
+>
+<h3
+>組込み向けインタフェース</h3
+>
+<p
+>DBMSへの組込みを想定したライブラリインタフェースです。DBMSの全文検索機能を自然な形で強化します。このインタフェースを利用したプロジェクトとしてTritonn(MySQLバインディング), Ludia(PostgreSQL)などがあり、多くの利用実績があります。</p
+>
+<h3
+>SennaStore</h3
+>
+<p
+>リレーショナルモデルに基づく独自のデータベースです。複数の表を定義してデータを蓄積したり検索したりできます。全文検索の要素技術をより柔軟に組み合わせて、高度な検索アプリケーションを効率よく作れるようにすることを目的としています。Senna1.1以降から使用可能です。</p
+>
+<p
+>このページでは、SennaStoreの概要について説明します。</p
+>
+</div
+><!--section--></div
+><!--body--></div
+><!--day--><div class="day"
+><h2 id="082ba4d07213b04fb01c54c4825a556c"
+>SennaStoreの特徴</h2
+><div class="body"
+><div class="section"
+>
+<p
+>SennaStoreは以下の点を特徴とするように重点を置いて開発しています。</p
+>
+<h3
+>Sennaの性能を最大限に発揮</h3
+>
+<p
+>Sennaは、大量のトラフィックをこなす大規模なwebアプリケーション等での使用を想定し、</p
+><ul
+><li
+>検索精度(適合率・再現率)の高さ</li
+><li
+>検索・更新スループットの大きさ</li
+><li
+>文書許容量の大きさ</li
+></ul
+><p
+>の各要件をそれぞれ高いレベルで満たすことを目指して設計されています。
+SennaStoreはこれらのSennaの特徴を最大限に引き出すことを目標としています。</p
+>
+<h3
+>従来の全文検索エンジンの枠組を越えた柔軟なクエリ</h3
+>
+<p
+>SennaStoreは、リレーショナルモデルに基づいたデータベースですが、
+高速な全文検索処理の実現に必要な部品を、
+実体化タイミングを制御可能なビューおよび関係値属性という切り口で
+データモデルに組み込んでいます。
+Schemeの上に実装したクエリ言語(SennaQL)からこれを操作することによって
+高度な検索アプリケーションを柔軟に作ることができます。</p
+>
+<h3
+>アプリケーションインタフェース</h3
+>
+<p
+>以下の3種類のインタフェースを通してアプリケーションから使用することができます。</p
+>
+<ul
+><li
+>組込みライブラリインタフェース</li
+><li
+>コマンドインタフェース</li
+><li
+>クライアントサーバインタフェース</li
+></ul
+>
+<p
+>組込みライブラリはスレッド安全に設計されています。いずれのインタフェースでも、一つのデータベースを複数のスレッドand/or複数プロセスで共有することが可能です。
+それぞれのインタフェースは可能な限り差異を小さく抑えているため、アプリケーションのプロセス構成の変更にも容易に対応することができます。</p
+>
+</div
+><!--section--></div
+><!--body--></div
+><!--day--><div class="day"
+><h2 id="SennaQL"
+>SennaQL</h2
+><div class="body"
+><div class="section"
+>
+<p
+>SennaStoreでは、いずれのアプリケーションインタフェースでもSennaQLと呼ばれるクエリ言語を使ってデータを定義・操作します。
+SennaQLは、R^4RSベースのScheme処理系に埋め込まれており、クエリはS式で表現します。</p
+>
+<p
+>S式は可読性に乏しいという意見もありますが、SennaQLでは若干の構文拡張を加え、
+簡潔にクエリを記述できることを目指しています。
+以下に同様のクエリをSQLとSennaQLで記述した例を示します。</p
+>
+<h3
+>例1</h3
+>
+<p
+>SQL:</p
+><pre
+> SELECT name FROM users WHERE user_id = 'U00001';
+</pre
+>
+<p
+>SennaQL:</p
+><pre
+> (&lt;users&gt; : &quot;U00001&quot;).name
+</pre
+>
+<h3
+>例2</h3
+>
+<p
+>SQL:</p
+><pre
+> SELECT country.name
+  FROM branch NATURAL JOIN city NATURAL JOIN country
+  WHERE branch_id = 'B00001';
+</pre
+>
+<p
+>SennaQL:</p
+><pre
+> (&lt;branch&gt; : 'B00001').city.country.name
+</pre
+>
+<h3
+>例3</h3
+>
+<p
+>SQL:</p
+><pre
+> CREATE TEMPORARY TABLE T1 AS
+  SELECT DISTINCT url FROM tags WHERE comment like &quot;%LISP%&quot;
+  UNION
+  SELECT url FROM items WHERE body like &quot;%LISP%&quot;;
+</pre
+>
+<p
+>SennaQL:</p
+><pre
+> (define &lt;t1&gt;
+   (((&lt;terms&gt;.tag_comment : &quot;LISP&quot;) ::group :url)
+    ::union
+    (&lt;terms&gt;.item_body : &quot;LISP&quot;)))
+</pre
+>
+<p
+>SennaQLの詳細については、以下のページを御覧下さい。</p
+>
+<ul
+><li
+><a href="store_tutorial.html"
+>SennaStoreを使ってみよう</a
+></li
+><li
+><a href="sennaql_reference.html"
+>SennaQL リファレンス</a
+></li
+></ul
+>
+</div
+><!--section--></div
+><!--body--></div
+><!--day--><div class="day"
+><h2 id="f9a0c1b05dade4c060b2c87c6aeafc44"
+>アーキテクチャ</h2
+><div class="body"
+><div class="section"
+>
+<p
+>図はSennaStoreのアーキテクチャを示しています。</p
+>
+<img alt="senna2.files/2007_08_21_190947.png" src="senna2.files/2007_08_21_190947.png"
+/>
+<ul
+><li
+>図中の上側に示すアプリケーションプロセスは、libsennaライブラリをリンクします。</li
+></ul
+>
+<ul
+><li
+>libsennaライブラリは、従来と同様にbasic APIとadvanced APIに加えて、ql APIという新たなインタフェースを提供しています。</li
+></ul
+>
+<ul
+><li
+>アプリケーションプログラムはこのAPIを、直接的に、または(言語バインディング等を使って)間接的に呼び出すことによってSennaStoreの機能を使用できます。</li
+></ul
+>
+<ul
+><li
+>ql APIは、データベースと接続する手段を2種類用意しています。</li
+></ul
+>
+<ul
+><li
+>一つは、データベースのファイルを直接操作する方法で、スタンドアロンモードと呼んでいます。</li
+></ul
+>
+<ul
+><li
+>スタンドアロンモードでデータベースを使用する場合には、そのデータベースファイルは、ローカルファイルシステム上に存在しなければなりません。</li
+></ul
+>
+<ul
+><li
+>スタンドアロンモードでは、データベースを操作するために必要なファイル識別子、作業メモリ、問合せ言語の実行環境等の資源は、全てライブラリを呼び出すプロセス上に展開されます。</li
+></ul
+>
+<ul
+><li
+>もう一つは、sennaサーバに接続して、ソケット経由で間接的に操作する方法で、クライアントモードと呼んでいます。</li
+></ul
+>
+<ul
+><li
+>クライアントモードは、TCPソケットを使って接続しますのでネットワークを介して異なるホストに存在するデータベースを操作することができます。</li
+></ul
+>
+<ul
+><li
+>クライアントモードでは、データベースを操作するために必要な諸資源はサーバプロセス上に展開されます。</li
+></ul
+>
+<ul
+><li
+>スタンドアロン/クライアントどちらの手段で接続した場合でも、ql APIはsen_ctxというオブジェクトへのハンドルが返し、以降ハンドルを介して全く同様に操作することができます。</li
+></ul
+>
+<ul
+><li
+>クライアントモードの場合、下図のようにクライアントからの総接続数分だけの問合せ言語の実行環境(sen_ctx)がサーバプロセス上に作られます。接続が閉じられれば実行環境は削除されます。</li
+></ul
+>
+<img alt="senna2.files/2007_08_22_002824.png" src="senna2.files/2007_08_22_002824.png"
+/>
+<ul
+><li
+>問合せ言語の実行環境が持つ変数のスコープは、当該sen_ctxに閉じており、複数のctx間で共有することはできません。</li
+></ul
+>
+<ul
+><li
+>データベースに対する更新操作は永続的であり、同じデータベースに接続する全てのctx間で共有されます。</li
+></ul
+>
+<ul
+><li
+>複数のプロセスが同じデータベースを同時に使用しても問題ありません。</li
+></ul
+>
+<ul
+><li
+>ただし、更新操作は同時に一つまでしか動作せず、操作が完了するまで残りのプロセスはブロックすることになります。参照操作については複数のプロセス/スレッドが並列に動作することができます。</li
+></ul
+>
+</div
+><!--section--></div
+><!--body--></div
+><!--day--><div class="day"
+><h2 id="95ddcec032cc04d8de7de92dd0414e4e"
+>ロードマップ</h2
+><div class="body"
+><div class="section"
+>
+<p
+>SennaStoreは現在配布中のSVNリポジトリにすでに含まれています。
+各種アプリケーションインタフェースから、基本的なクエリセットを試すことができます。
+今後以下のステップで開発を進める予定です。</p
+>
+<h3
+>1.0.* ←いまここ</h3
+>
+<ul
+><li
+>基本的なクエリセット</li
+><li
+>各種アプリケーションインタフェース</li
+></ul
+>
+<h3
+>1.1.0</h3
+>
+<ul
+><li
+>クエリセットの拡充</li
+><li
+>永続化可能なデータ型の拡充</li
+><li
+>viewの実体化タイミングの明示的な制御</li
+></ul
+>
+<h3
+>2.0</h3
+>
+<ul
+><li
+>高速化</li
+><li
+>安定化</li
+></ul
+>
+<h3
+>2.*</h3
+>
+<ul
+><li
+>トランザクションサポート</li
+><li
+>ACID特性サポート</li
+></ul
+>
+</div
+><!--section--></div
+><!--body--></div
+><!--day--><div class="day"
+><h2 id="fe2e4bc4fc22dfeecb19b3deb099f208"
+>開発者向け文書</h2
+><div class="body"
+><div class="section"
+>
+<ul
+><li
+><a href="design_policy.html"
+>Senna設計方針</a
+></li
+><li
+><a href="senna2.html"
+>Senna2 API解説</a
+></li
+></ul
+>
+</div
+><!--section--></div
+><!--body--></div
+><!--day--><div class="day"
+><h2 id="FAQ"
+>FAQ</h2
+><div class="body"
+><div class="section"
+>
+<ul
+><li
+>Q:分散できないの?</li
+><li
+>A:有料&amp;非OSSの分散オプションがあります。台数を動的にどんどん追加して、大規模分散検索できます。</li
+></ul
+>
+<ul
+><li
+>Q:RDB(MySQL,PostgreSQL)とのすみわけは?</li
+><li
+>A:更新系が主で信頼性に関する要求条件が高い用途ではRDBの方が優れています。標準的な問合せ言語であるSQLが使用できるのもRDBのメリットです。Sennaは参照系が主で複雑な検索処理が必要な用途に適しています。</li
+></ul
+>
+<ul
+><li
+>Q:どんな言語から使えるの?</li
+><li
+>A:現在、C, PHP, Python, Rubyから使用できます。</li
+></ul
+>
+<ul
+><li
+>Q:組込みのSchemeでCGIとかwebアプリとか何でも書けるの?</li
+><li
+>A:あくまで問合せ言語としての使用を想定しています。webアプリを全て組込みのSchemeで書くのはムリがあります。Schemeが元々得意な方は、Gauche等の汎用向けの処理系にsennaを組み込んで使うのが良いと思います。</li
+></ul
+>
+<ul
+><li
+>Q:いつ正式リリースされるの?</li
+><li
+>A:この夏‥‥。まずSenna1.*としてリリースして、安定化した段階で2.0にします。</li
+></ul
+>
+<ul
+><li
+>Q:今までみたいに組込み用途でも使えるの?</li
+><li
+>A:組込み型エンジンとしての機能はこれからも維持しますし、性能や機能の向上にも取り組んでいきます。TritonnやLudiaもこれまで通りよろしくお願いします。</li
+></ul
+>
+<h3
+>その他質問どーぞ</h3
+><div class="hcomment"
+><form action="senna.hcomment" method="POST"
+>お名前: <input name="name" size="10"
+/> コメント: <input name="msg" size="50"
+/> <input name="comment" type="submit" value="投稿"
+/><input name="comment_no" type="hidden" value="2"
+/><input name="style" type="hidden" value="1"
+/></form
+></div
+><ul
+><li
+>2007-08-24 14:55:55 <strong
+>も</strong
+> : まだないのですが、正式リリースまでには是非入れたいと思います。</li
+><li
+>2007-08-24 13:19:01 <strong
+>baal</strong
+> : Gauche のバインディングはありますか？</li
+><li
+>2007-08-17 22:35:32 <strong
+>も</strong
+> : 同じです。makeすると両方が作られます。</li
+><li
+>2007-08-17 22:32:04 <strong
+>名無しさん</strong
+> : 新しいSennaと組み込み用とは別々のパッケージになるんですか？</li
+></ul
+>
+</div
+><!--section--></div
+><!--body--></div
+><!--day--><div class="day"
+><h2 id="9b20c9d4e67d7c0a2f329946f16a905d"
+>その他</h2
+><div class="body"
+><div class="section"
+>
+
+<p
+>文責: 森(田)</p
+></div
+><!--section--></div
+><!--body--></div
+><!--day--></div
+><!--body_main--><div class="body_leave" id="body_leave"
+><div class="day"
+><div class="comment"
+><div class="caption"
+><div class="page_attribute"
+>
+<span class="attribute"
+>生成時間: <em
+>__qwik_page_generate_time__秒</em
+></span
+>
+<div align="right"
+>
+<a href="http://x6.at-ninja.jp/bin/gg?067333300"
+>
+<img border="0" src="http://x6.at-ninja.jp/bin/ll?067333300"
+/></a
+>
+<span style="font-size:9px"
+><img src="http://img.shinobi.jp/tadaima/fj.gif" style="margin:0;vertical-align:text-bottom;"
+/> <a href="http://randoseru.rentalurl.net"
+>ランドセル</a
+></span
+>
+</div
+>
+
+
+</div
+></div
+></div
+></div
+></div
+><!--body_leave--></div
+><!--main--><div class="sidebar"
+><h2
+>メニュー/Menu</h2
+><ul
+><li
+><a href="FrontPageJ.html"
+>ホーム</a
+> / <a href="FrontPage.html"
+>Home</a
+></li
+></ul
+>
+<ul
+><li
+>Sennaの紹介</li
+><ul
+><li
+><a href="senna_takahashi.html"
+>Sennaとは</a
+></li
+><li
+><a href="publication.html"
+>雑誌記事・発表資料等</a
+></li
+><li
+><a href="example.html"
+>こんなところでも使われてます！</a
+></li
+><li
+><a href="FAQ.html"
+>FAQ</a
+> / <a href="FAQ_en.html"
+>FAQ (English)</a
+></li
+><li
+><a href="ML.html"
+>メーリングリスト</a
+> / <a href="ML_en.html"
+>MailingLists</a
+></li
+></ul
+><li
+>Sennaの利用</li
+><ul
+><li
+><a href="Download.html"
+>ダウンロード</a
+> / <a href="Download_en.html"
+>Download</a
+></li
+><li
+><a href="install.html"
+>インストール</a
+> / <a href="install_en.html"
+>Install</a
+></li
+><li
+><a href="check_install.html"
+>動作確認方法</a
+> / <a href="check_install_en.html"
+>Check install</a
+></li
+><li
+><a href="bindings.html"
+>バインディング一覧</a
+></li
+><li
+><a href="mysql_binding.html"
+>MySQL バインディング</a
+> / <a href="mysql_binding_en.html"
+>MySQL binding</a
+></li
+><li
+><a href="install_specific.html"
+>特定環境でのインストールメモ</a
+> / <a href="install_specific_en.html"
+>installing note for specific environment</a
+></li
+></ul
+><li
+>利用者向け</li
+><ul
+><li
+><a href="query.html"
+>クエリーの書式</a
+> / <a href="query_en.html"
+>query syntax</a
+></li
+><li
+><a href="Customize.html"
+>カスタマイズ</a
+> / <a href="Customize_en.html"
+>Customize</a
+></li
+><li
+><a href="sennaql_reference.html"
+>SennaQL リファレンス</a
+></li
+><li
+><a href="store_tutorial.html"
+>SennaStoreを使ってみよう</a
+></li
+><li
+><a href="log_level.html"
+>ログレベルの解説</a
+></li
+><li
+><a href="report_bugs.html"
+>不具合報告掲示板</a
+></li
+><li
+><a href="contribute.html"
+>Sennaへのパッチ・情報等</a
+></li
+><li
+><a href="knownproblems.html"
+>不具合等</a
+> / <a href="knownproblems_en.html"
+>Known problems</a
+></li
+></ul
+><li
+>高度な利用法</li
+><ul
+><li
+><a href="APIJ.html"
+>API</a
+> / <a href="API.html"
+>C API(English)</a
+></li
+><li
+><a href="IndexFile.html"
+>インデックスファイル</a
+> / <a href="IndexFile_en.html"
+>Index File</a
+></li
+></ul
+><li
+>Senna開発</li
+><ul
+><li
+><a href="design_policy.html"
+>Senna設計方針</a
+></li
+><li
+><a href="Roadmap.html"
+>開発ロードマップ</a
+></li
+><li
+><a href="cstyle.html"
+>コーディング規約</a
+></li
+><li
+><a href="WorkingStatus.html"
+>作業状況</a
+></li
+><li
+><a href="futureworks.html"
+>野望</a
+> / <a href="futureworks_en.html"
+>Future works</a
+></li
+></ul
+></ul
+>
+<h2
+>Search</h2
+><form action=".search"
+><input name="q"
+/><input type="submit" value="検索"
+/></form
+>
+
+<h2
+>Recent Change</h2
+><div class="recent"
+><ul
+><li
+><a href="example.html" title="2010-10-28 14:04:51"
+>こんなところでも使われてます！</a
+> <span class="ago"
+>3年前</span
+></li
+><li
+><a href="frontpage.html" title="2010-09-14 12:54:06"
+>frontpage</a
+> <span class="ago"
+>4年前</span
+></li
+><li
+><a href="Download_en.html" title="2010-07-22 14:26:20"
+>Download</a
+> <span class="ago"
+>4年前</span
+></li
+><li
+><a href="Download.html" title="2010-07-22 14:26:01"
+>ダウンロード</a
+> <span class="ago"
+>4年前</span
+></li
+><li
+><a href="FrontPageJ.html" title="2009-11-25 16:14:43"
+>Senna 組み込み型全文検索エンジン</a
+> <span class="ago"
+>4年前</span
+></li
+><li
+><a href="FrontPage.html" title="2009-11-25 16:14:20"
+>Senna: An Embeddable Fulltext Search Engine</a
+> <span class="ago"
+>4年前</span
+></li
+><li
+><a href="Ruby_binding.html" title="2009-09-03 18:42:32"
+>Rubyバインディング</a
+> <span class="ago"
+>5年前</span
+></li
+><li
+><a href="PHP_binding.html" title="2009-08-24 04:09:56"
+>PHPバインディング</a
+> <span class="ago"
+>5年前</span
+></li
+><li
+><a href="store.html" title="2009-03-23 03:34:52"
+>SennaStore概要</a
+> <span class="ago"
+>5年前</span
+></li
+><li
+><a href="bindings.html" title="2008-10-05 11:33:12"
+>バインディング一覧</a
+> <span class="ago"
+>6年前</span
+></li
+></ul
+><p class="recent"
+><a href="RecentList.html"
+><em
+>もっと前の情報</em
+></a
+></p
+></div
+>
+<a class="rss-button" href="rss.xml"
+><span
+>RSS</span
+></a
+><a class="rss-button" href="atom.xml"
+><span
+>ATOM</span
+></a
+>
+
+</div
+><!--sidebar--><div class="footer"
+><span title="__qwik_page_generate_time__"
+>powered by <a href="http://qwik.jp/"
+>qwikWeb</a
+></span
+></div
+><!--footer--></div
+><!--container--></body
+></html
+>

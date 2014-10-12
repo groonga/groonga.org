@@ -1,0 +1,731 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html xmlns:v="urn:schemas-microsoft-com:vml"
+><head
+><title
+>検索エンジンの構成とSennaの適用 - Senna 組み込み型全文検索エンジン</title
+><link href="theme/css/base.css" media="screen,tv" rel="stylesheet" type="text/css"
+/><link href="theme/css/base.css" media="screen,tv,print" rel="stylesheet" type="text/css"
+/><link href="css/theme.css" media="screen,tv,print" rel="stylesheet" type="text/css"
+/><link href="rss.xml" rel="alternate" title="RSS 0.91" type="application/rss+xml"
+/><script src=".theme/js/base.js" type="text/javascript"
+></script
+><script src=".theme/js/niftypp.js" type="text/javascript"
+></script
+><script src=".theme/js/se_hilite_jp.js" type="text/javascript"
+></script
+></head
+><body onload="qwik_onload();"
+><div class="container"
+><div class="main"
+><!--adminmenu--><!--toc--><h1
+>検索エンジンの構成とSennaの適用</h1
+><!--body_enter--><div class="body_main"
+><div class="day"
+><div class="body"
+><div class="section"
+><h3
+>検索エンジンシステムの構成</h3
+>
+<img alt="guide.files/2007_09_18_004335.png" src="guide.files/2007_09_18_004335.png"
+/>
+<ul
+><li
+>クロールorロードによって文書を一旦システム内部にコピーする</li
+><li
+>filterは文書から本文やメタデータを抽出する</li
+><li
+>非管理下文書(運営者の管理下にない文書)では本文の抽出は自明ではない(エンコーディング識別・本文範囲特定等)</li
+><li
+>メタデータ: 著者・表題・出版日等の書誌情報、リンク情報・関連キーワード・ユーザ参照履歴等</li
+><li
+>非管理化文書を対象に不特定ユーザ向けにサービスする場合、メタデータの活用が検索精度を決する</li
+><li
+>searcherは本文やメタデータを組み合わせて的確な結果を算出する</li
+><li
+>indexとcache(クエリキャッシュ)は、検索速度を補うために使われる副次的なデータ</li
+><li
+>frontendはユーザとエンジンとの界面。入出力の契機と方法を規定</li
+><li
+>crawler, filter, searcher, frontendは応用毎に特化したロジックが必要(その他は汎用化可能)</li
+></ul
+>
+<h3
+>Sennaの適用範囲</h3
+>
+<img alt="guide.files/2007_09_18_030003.png" src="guide.files/2007_09_18_030003.png"
+/>
+<ul
+><li
+>DBMSとSennaを組み合わせた場合 or 単体のSennaを使用した場合、点線で囲んだ範囲に適用可能</li
+><li
+>ただし、filter部には外部モジュールが必要(エンコーディング識別・パーザ・テキスト抽出フィルタ)</li
+><li
+>データストア・インデックス付与等の汎用機能を提供する。</li
+><li
+>filter, searcherのビジネスロジックを柔軟に記述可能な問い合わせ言語を提供する(SQL or SennaQL)</li
+></ul
+>
+<h3
+>Sennaの特徴</h3
+>
+<ul
+><li
+>高速な更新(参照ロック不要・バキューム不要)</li
+><li
+>高精度(適合率と再現率のバランス・両立)</li
+><li
+>柔軟な問い合わせ(SQL, SennaQL)</li
+></ul
+>
+<h3
+>SennaQL</h3
+>
+<h4
+>なぜ今、独自問い合わせ言語?</h4
+>
+<ul
+><li
+>SQLは十分に柔軟で強力</li
+><li
+>しかし現状の実装(MySQL, PostgreSQL)では回避できない性能阻害要因がある</li
+><li
+>目標: Sennaの性能を最大限に発揮しつつ、柔軟な問い合わせを記述可能にすること</li
+></ul
+>
+<ul
+><ul
+><li
+>将来はMySQLもPGも改善すると思われるが、現時点でSennaの能力を検証したい</li
+></ul
+></ul
+>
+<h3
+>SennaQLのデータモデル</h3
+>
+<ul
+><li
+>データベースは任意数のテーブルで構成される</li
+><li
+>主キーは必須</li
+><li
+>外部キー定義可能</li
+><li
+>viewテーブル(他のテーブルから演算によって導出できるテーブル)</li
+><li
+>viewカラム(他のテーブル・カラムから演算によって導出できるカラム)</li
+><li
+>viewテーブル/viewカラムは任意の時点で実体化可能(常に最新に保つ/検索時に算出/キャッシュ有無等)</li
+></ul
+>
+<ul
+><li
+>転置インデックスはviewテーブルとviewカラムによって表現する</li
+></ul
+>
+<h3
+>インストール</h3
+>
+<h4
+>1) MeCabのインストール</h4
+>
+<p
+><a class="external" href="http://mecab.sourceforge.jp/#download"
+>http://mecab.sourceforge.jp/#download</a
+></p
+>
+<pre
+>% tar zxfv mecab-X.X.tar.gz
+% cd mecab-X.X
+% ./configure --prefix=/usr
+% make
+% make check
+% sudo make install
+</pre
+>
+<p
+>辞書のインストール</p
+>
+<pre
+>% tar zxfv mecab-ipadic-2.7.0-XXXX.tar.gz
+% mecab-ipadic-2.7.0-XXXX
+% ./configure --prefix=/usr
+% make
+% sudo make install
+</pre
+>
+<h4
+>2) sennaのインストール</h4
+>
+<pre
+>% svn co http://svn.razil.jp/senna/trunk senna
+% cd senna
+% ./configure --prefix=/usr
+% make
+% sudo make install
+</pre
+>
+<h3
+>操作</h3
+>
+<h4
+>起動</h4
+>
+<pre
+>% senna /tmp/bookmark.db
+</pre
+>
+<pre
+>&gt; (+ 1 1)
+2
+&gt; (car '(a b c))
+a
+</pre
+>
+<h4
+>テーブル作成</h4
+>
+<pre
+>&gt; (ptable '&lt;items&gt;)
+&lt;items&gt;
+&gt; (&lt;items&gt; ::nrecords)
+0
+</pre
+>
+<h4
+>レコード追加</h4
+>
+<pre
+>&gt; (&lt;items&gt; ::new &quot;http://ja.wikipedia.org/wiki/LISP&quot;)
+ #p&lt;0000800001&gt;
+&gt; (&lt;items&gt; ::new &quot;http://www.unfindable.net/~yabuki/article/why_lisp.html&quot;)
+ #p&lt;0000800002&gt;
+&gt; (&lt;items&gt; ::nrecords)
+2
+</pre
+>
+<h4
+>レコード取得</h4
+>
+<pre
+>&gt; (&lt;items&gt; : &quot;http://ja.wikipedia.org/wiki/LISP&quot;)
+ #p&lt;0000800001&gt;
+</pre
+>
+<h4
+>全文検索</h4
+>
+<pre
+>&gt; (&lt;items&gt; ::def :title &lt;text&gt;)
+&lt;items&gt;.title
+&gt; (ptable '&lt;terms&gt; :ngram)
+&lt;terms&gt;
+&gt; (&lt;terms&gt; ::def :item_title :as '(&lt;items&gt;.title ::match ()))
+&lt;terms&gt;.item_title
+&gt; ((&lt;items&gt; : &quot;http://ja.wikipedia.org/wiki/LISP&quot;) :title &quot;LISP&quot;)
+&quot;LISP&quot;
+&gt; ((&lt;items&gt; : &quot;http://www.unfindable.net/~yabuki/article/why_lisp.html&quot;) :title &quot;なぜLispなのか&quot;)
+&quot;なぜLispなのか&quot;
+&gt; (js-output (&lt;terms&gt;.item_title : &quot;lisp&quot;))
+[&quot;http://ja.wikipedia.org/wiki/LISP&quot;, &quot;http://www.unfindable.net/~yabuki/article/why_lisp.html&quot;]
+#t
+</pre
+>
+<h3
+>マルチユーザ向けブックマークアプリケーション</h3
+>
+<img alt="senna2.files/rect4605.png" src="senna2.files/rect4605.png"
+/>
+<h4
+>テーブル作成</h4
+>
+<pre
+>&gt; (ptable '&lt;users&gt;)
+&lt;users&gt;
+&gt; (&lt;users&gt; ::def :name &lt;text&gt;)
+&lt;users&gt;.name
+&gt; (ptable '&lt;comments&gt;)
+&lt;comments&gt;
+&gt; (&lt;comments&gt; ::def :item &lt;items&gt;)
+&lt;comments&gt;.item
+&gt; (&lt;comments&gt; ::def :author &lt;users&gt;)
+&lt;comments&gt;.author
+&gt; (&lt;comments&gt; ::def :content &lt;text&gt;)
+&lt;comments&gt;.content
+&gt; (&lt;comments&gt; ::def :issued &lt;int&gt;)
+&lt;comments&gt;.issued
+&gt; (&lt;terms&gt; ::def :comment_content :as '(&lt;comments&gt;.content ::match ()))
+&lt;terms&gt;.comment_content
+</pre
+>
+<h4
+>ユーザ追加</h4
+>
+<pre
+>&gt; (&lt;users&gt; ::new &quot;moritan&quot; :name &quot;モリタン&quot;)
+ #p&lt;0000400001&gt;
+&gt; (&lt;users&gt; ::new &quot;taporobo&quot; :name &quot;タポロボ&quot;)
+ #p&lt;0000400002&gt;
+</pre
+>
+<h4
+>ブックマーク作成</h4
+>
+<pre
+>&gt; (&lt;items&gt; : &quot;http://d.hatena.ne.jp/brazil/20050829/1125321936&quot;)
+()
+</pre
+>
+<p
+>未登録なのでまず当該ページを<em
+>&lt;items&gt;</em
+>に登録</p
+>
+<pre
+>&gt; (&lt;items&gt; ::new &quot;http://d.hatena.ne.jp/brazil/20050829/1125321936&quot; :title &quot;[翻訳]JavaScript: 世界で最も誤解されたプログラミング言語&quot;)
+ #p&lt;0000800003&gt;
+</pre
+>
+<p
+>登録したitemを<em
+>:item</em
+>カラムの値に指定して<em
+>&lt;comments&gt;</em
+>にレコードを登録</p
+>
+<pre
+>&gt; (&lt;comments&gt; ::new &quot;1&quot; :item &quot;http://d.hatena.ne.jp/brazil/20050829/1125321936&quot; :author &quot;moritan&quot; :content &quot;JavaScript LISP&quot; :issued 1187430026)
+ #p&lt;0000600001&gt;
+</pre
+>
+<h4
+>関数化</h4
+>
+<pre
+>&gt; (define (add_bookmark item_url item_title comment_author comment_content comment_issued)
+&gt;  (let ((item (or (&lt;items&gt; : item_url) (&lt;items&gt; ::new item_url :title item_title)))
+&gt;        (id (+ (&lt;comments&gt; ::nrecords) 1)))
+&gt;   (&lt;comments&gt; ::new id
+&gt;    :item item
+&gt;    :author comment_author
+&gt;    :content comment_content
+&gt;    :issued comment_issued)))
+add_bookmark
+</pre
+>
+<pre
+>&gt; (add_bookmark &quot;http://practical-scheme.net/docs/cont-j.html&quot; &quot;なんでも継続&quot; &quot;moritan&quot; &quot;継続 LISP Scheme&quot; 1187568692)
+ #p&lt;0000600002&gt;
+&gt; (add_bookmark &quot;http://d.hatena.ne.jp/higepon/20070815/1187192864&quot; &quot;末尾再帰&quot; &quot;taporobo&quot; &quot;末尾再帰 Scheme LISP&quot; 1187568793)
+ #p&lt;0000600003&gt;
+&gt; (add_bookmark &quot;http://practical-scheme.net/docs/cont-j.html&quot; &quot;なんでも継続&quot; &quot;taporobo&quot; &quot;トランポリン LISP continuation&quot; 1187568692)
+ #p&lt;000060000w&gt;
+</pre
+>
+<h3
+>全文検索(2)</h3
+>
+<pre
+>&gt; (sen-output
+&gt;  (&lt;terms&gt;.comment_content : &quot;LISP&quot;)
+&gt;  '(.:key .issued .item.title .author.name .content))
+4
+1	1187430026	[翻訳]JavaScript: 世界で最も誤解されたプログラミング言語	モリタン	JavaScript LISP
+2	1187568692	なんでも継続	モリタン	継続 LISP Scheme
+3	1187568793	末尾再帰	タポロボ	末尾再帰 Scheme LISP
+4	1187568692	なんでも継続	タポロボ	トランポリン LISP continuation
+#t
+</pre
+>
+<pre
+>&gt; (&lt;terms&gt;.comment_content : &quot;LISP&quot;)
+ #&lt;RECORDS&gt;
+</pre
+>
+<p
+>レコードセットは、出力関数にかける前に様々に加工可能。</p
+>
+<p
+>日付で降順にソート</p
+>
+<pre
+>&gt; (sen-output
+&gt;  ((&lt;terms&gt;.comment_content : &quot;LISP&quot;) ::sort :issued :desc)
+&gt;  '(.:key .issued .item.title .author.name .content))
+4
+3	1187568793	末尾再帰	タポロボ	末尾再帰 Scheme LISP
+2	1187568692	なんでも継続	モリタン	継続 LISP Scheme
+4	1187568692	なんでも継続	タポロボ	トランポリン LISP continuation
+1	1187430026	[翻訳]JavaScript: 世界で最も誤解されたプログラミング言語	モリタン	JavaScript LISP
+#t
+</pre
+>
+<p
+>item毎にグループ化</p
+>
+<pre
+>&gt; (sen-output
+&gt;  ((&lt;terms&gt;.comment_content : &quot;LISP&quot;) ::group :item)
+&gt;  '(.:nsubrecs .:key .title))
+3
+1	http://d.hatena.ne.jp/brazil/20050829/1125321936	[翻訳]JavaScript: 世界で最も誤解されたプログラミング言語
+2	http://practical-scheme.net/docs/cont-j.html	なんでも継続
+1	http://d.hatena.ne.jp/higepon/20070815/1187192864	末尾再帰
+#t
+</pre
+>
+<h3
+>少し複雑な検索</h3
+>
+<ul
+><li
+><em
+>&lt;items&gt;.title</em
+>か<em
+>&lt;comments&gt;.content</em
+>のいずれかにマッチするitemを検索する。</li
+><li
+>ただし、<em
+>&lt;items&gt;.title</em
+>にマッチしたレコードはスコアを10倍重み付けする。</li
+><li
+>同一のitemに対して、キーワードにマッチするcommentが複数存在した場合は、それぞれのcommentのスコアの和を、該当するitemのスコアとする。</li
+></ul
+>
+<pre
+>&gt; (define r1 (&lt;terms&gt;.comment_content : &quot;LISP&quot;))
+r1
+&gt; (define r2 (&lt;terms&gt;.item_title : &quot;*W1:50 LISP&quot;))
+r2
+</pre
+>
+<p
+>r1の結果を<em
+>item</em
+>毎にグループ化し、r2とunionして出力</p
+>
+<pre
+>&gt; (sen-output (((r1 ::group :item) ::union r2) ::sort ::score) '(.:score .title))
+5
+50	LISP
+50	なぜLispなのか
+10	なんでも継続
+5	[翻訳]JavaScript: 世界で最も誤解されたプログラミング言語
+5	末尾再帰
+#t
+</pre
+>
+<h3
+>今後の予定</h3
+>
+<ul
+><li
+>SennaQLの完成</li
+><li
+>エラーハンドリングを抜本的に修正</li
+><li
+>トランザクション対応</li
+></ul
+></div
+><!--section--></div
+><!--body--></div
+><!--day--></div
+><!--body_main--><div class="body_leave" id="body_leave"
+><div class="day"
+><div class="comment"
+><div class="caption"
+><div class="page_attribute"
+>
+<span class="attribute"
+>生成時間: <em
+>__qwik_page_generate_time__秒</em
+></span
+>
+<div align="right"
+>
+<a href="http://x6.at-ninja.jp/bin/gg?067333300"
+>
+<img border="0" src="http://x6.at-ninja.jp/bin/ll?067333300"
+/></a
+>
+<span style="font-size:9px"
+><img src="http://img.shinobi.jp/tadaima/fj.gif" style="margin:0;vertical-align:text-bottom;"
+/> <a href="http://randoseru.rentalurl.net"
+>ランドセル</a
+></span
+>
+</div
+>
+
+
+</div
+></div
+></div
+></div
+></div
+><!--body_leave--></div
+><!--main--><div class="sidebar"
+><h2
+>メニュー/Menu</h2
+><ul
+><li
+><a href="FrontPageJ.html"
+>ホーム</a
+> / <a href="FrontPage.html"
+>Home</a
+></li
+></ul
+>
+<ul
+><li
+>Sennaの紹介</li
+><ul
+><li
+><a href="senna_takahashi.html"
+>Sennaとは</a
+></li
+><li
+><a href="publication.html"
+>雑誌記事・発表資料等</a
+></li
+><li
+><a href="example.html"
+>こんなところでも使われてます！</a
+></li
+><li
+><a href="FAQ.html"
+>FAQ</a
+> / <a href="FAQ_en.html"
+>FAQ (English)</a
+></li
+><li
+><a href="ML.html"
+>メーリングリスト</a
+> / <a href="ML_en.html"
+>MailingLists</a
+></li
+></ul
+><li
+>Sennaの利用</li
+><ul
+><li
+><a href="Download.html"
+>ダウンロード</a
+> / <a href="Download_en.html"
+>Download</a
+></li
+><li
+><a href="install.html"
+>インストール</a
+> / <a href="install_en.html"
+>Install</a
+></li
+><li
+><a href="check_install.html"
+>動作確認方法</a
+> / <a href="check_install_en.html"
+>Check install</a
+></li
+><li
+><a href="bindings.html"
+>バインディング一覧</a
+></li
+><li
+><a href="mysql_binding.html"
+>MySQL バインディング</a
+> / <a href="mysql_binding_en.html"
+>MySQL binding</a
+></li
+><li
+><a href="install_specific.html"
+>特定環境でのインストールメモ</a
+> / <a href="install_specific_en.html"
+>installing note for specific environment</a
+></li
+></ul
+><li
+>利用者向け</li
+><ul
+><li
+><a href="query.html"
+>クエリーの書式</a
+> / <a href="query_en.html"
+>query syntax</a
+></li
+><li
+><a href="Customize.html"
+>カスタマイズ</a
+> / <a href="Customize_en.html"
+>Customize</a
+></li
+><li
+><a href="sennaql_reference.html"
+>SennaQL リファレンス</a
+></li
+><li
+><a href="store_tutorial.html"
+>SennaStoreを使ってみよう</a
+></li
+><li
+><a href="log_level.html"
+>ログレベルの解説</a
+></li
+><li
+><a href="report_bugs.html"
+>不具合報告掲示板</a
+></li
+><li
+><a href="contribute.html"
+>Sennaへのパッチ・情報等</a
+></li
+><li
+><a href="knownproblems.html"
+>不具合等</a
+> / <a href="knownproblems_en.html"
+>Known problems</a
+></li
+></ul
+><li
+>高度な利用法</li
+><ul
+><li
+><a href="APIJ.html"
+>API</a
+> / <a href="API.html"
+>C API(English)</a
+></li
+><li
+><a href="IndexFile.html"
+>インデックスファイル</a
+> / <a href="IndexFile_en.html"
+>Index File</a
+></li
+></ul
+><li
+>Senna開発</li
+><ul
+><li
+><a href="design_policy.html"
+>Senna設計方針</a
+></li
+><li
+><a href="Roadmap.html"
+>開発ロードマップ</a
+></li
+><li
+><a href="cstyle.html"
+>コーディング規約</a
+></li
+><li
+><a href="WorkingStatus.html"
+>作業状況</a
+></li
+><li
+><a href="futureworks.html"
+>野望</a
+> / <a href="futureworks_en.html"
+>Future works</a
+></li
+></ul
+></ul
+>
+<h2
+>Search</h2
+><form action=".search"
+><input name="q"
+/><input type="submit" value="検索"
+/></form
+>
+
+<h2
+>Recent Change</h2
+><div class="recent"
+><ul
+><li
+><a href="example.html" title="2010-10-28 14:04:51"
+>こんなところでも使われてます！</a
+> <span class="ago"
+>3年前</span
+></li
+><li
+><a href="frontpage.html" title="2010-09-14 12:54:06"
+>frontpage</a
+> <span class="ago"
+>4年前</span
+></li
+><li
+><a href="Download_en.html" title="2010-07-22 14:26:20"
+>Download</a
+> <span class="ago"
+>4年前</span
+></li
+><li
+><a href="Download.html" title="2010-07-22 14:26:01"
+>ダウンロード</a
+> <span class="ago"
+>4年前</span
+></li
+><li
+><a href="FrontPageJ.html" title="2009-11-25 16:14:43"
+>Senna 組み込み型全文検索エンジン</a
+> <span class="ago"
+>4年前</span
+></li
+><li
+><a href="FrontPage.html" title="2009-11-25 16:14:20"
+>Senna: An Embeddable Fulltext Search Engine</a
+> <span class="ago"
+>4年前</span
+></li
+><li
+><a href="Ruby_binding.html" title="2009-09-03 18:42:32"
+>Rubyバインディング</a
+> <span class="ago"
+>5年前</span
+></li
+><li
+><a href="PHP_binding.html" title="2009-08-24 04:09:56"
+>PHPバインディング</a
+> <span class="ago"
+>5年前</span
+></li
+><li
+><a href="store.html" title="2009-03-23 03:34:52"
+>SennaStore概要</a
+> <span class="ago"
+>5年前</span
+></li
+><li
+><a href="bindings.html" title="2008-10-05 11:33:12"
+>バインディング一覧</a
+> <span class="ago"
+>6年前</span
+></li
+></ul
+><p class="recent"
+><a href="RecentList.html"
+><em
+>もっと前の情報</em
+></a
+></p
+></div
+>
+<a class="rss-button" href="rss.xml"
+><span
+>RSS</span
+></a
+><a class="rss-button" href="atom.xml"
+><span
+>ATOM</span
+></a
+>
+
+</div
+><!--sidebar--><div class="footer"
+><span title="__qwik_page_generate_time__"
+>powered by <a href="http://qwik.jp/"
+>qwikWeb</a
+></span
+></div
+><!--footer--></div
+><!--container--></body
+></html
+>

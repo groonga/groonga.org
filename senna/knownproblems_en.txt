@@ -1,0 +1,55 @@
+* known problems
+
+* Limitations
+
+** Limits about index
+
+In one index, logical limits in Senna are below.
+
+-max record count : 268,435,455
+-max lexicon count : 268,435,455
+-max index size : 256GByte
+
+(Actually, other conditions may interfere for Senna to attain these limits.)
+
+** use in multi-process/multi-thread
+
+You cannot 'update' one index at a time in multi-process/multi-thread environments.
+If you do so, you have to update with exclusive access control.
+
+** About SEN_SPLIT_ALPHA,DIGIT,SYMBOL
+
+SEN_SPLIT_ALPHA,DIGIT,SYMBOL options have no effect in absense of SEN_INDEX_NORLALIZE.
+
+** About sen_records_find, sen_records_at
+
+You cannot get valid results with sen_records_next 
+after you use sen_records_find or sen_records_at.
+You have to execute sen_records_rewind and initialize the cursor.
+
+** About opentag and closetag in snippet API
+
+If you use snippet functions,
+you cannot modify data in a buffer which is passed as opentag or closetag 
+before you call sen_snip_close.
+
+** About sen_sel_partial option, sen_sym_suffix_search
+
+In below case, 
+you cannot execute 'suffix' search in searching with sen_sel_search or sen_sym_suffix_search.
+
+-alphabet, number, symbol in euc-jp/sjis/utf-8 text
+-index is created with SEN_INDEX_DELIMTED option.
+
+Because, English words generally vary in it's suffix but prefix.
+
+** Indexes in Windows and Linux are different.
+
+* Bugs
+
+** Now, you cannot use Senna with AIO/DIO.
+
+Senna has a user level cache with AIO/DIO which is implemented in Linux 2.6.
+But, this feature is not stable. Segmentation fault may occur.
+
+This problem is reported by Yappo.

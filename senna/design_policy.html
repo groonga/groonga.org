@@ -1,0 +1,565 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html xmlns:v="urn:schemas-microsoft-com:vml"
+><head
+><title
+>Senna設計方針 - Senna 組み込み型全文検索エンジン</title
+><link href="theme/css/base.css" media="screen,tv" rel="stylesheet" type="text/css"
+/><link href="theme/css/base.css" media="screen,tv,print" rel="stylesheet" type="text/css"
+/><link href="css/theme.css" media="screen,tv,print" rel="stylesheet" type="text/css"
+/><link href="rss.xml" rel="alternate" title="RSS 0.91" type="application/rss+xml"
+/><script src=".theme/js/base.js" type="text/javascript"
+></script
+><script src=".theme/js/niftypp.js" type="text/javascript"
+></script
+><script src=".theme/js/se_hilite_jp.js" type="text/javascript"
+></script
+></head
+><body onload="qwik_onload();"
+><div class="container"
+><div class="main"
+><!--adminmenu--><!--toc--><h1
+>Senna設計方針</h1
+><!--body_enter--><div class="body_main"
+><div class="day"
+><h2 id="387bb286b7a7d732196f112c61515cc0"
+>全文検索エンジンとしての基本方針</h2
+><div class="body"
+><div class="section"
+>
+<h3
+>想定する用途</h3
+>
+<ul
+><li
+>多数の著者が頻繁に更新する大規模な文書セットが対象</li
+><li
+>多数のユーザが頻繁に検索サービスを利用</li
+><li
+>検索精度が重視される</li
+><li
+>スモールスタート &amp; スケールアウト</li
+></ul
+>
+<h3
+>求められる要件</h3
+>
+<ul
+><li
+>検索スループット → 大</li
+><li
+>更新スループット → 大</li
+><li
+>文書許容量 → 大</li
+><li
+>適合率 → 高</li
+><li
+>再現率 → 高</li
+><li
+>メタ情報 → 柔軟に活用</li
+></ul
+>
+<h3
+>本質的なトレードオフ</h3
+>
+<ul
+><li
+>検索スループット ←→ 更新スループット</li
+><li
+>適合率 ←→ 再現率</li
+><li
+>文書許容量 ←→ 検索スループット</li
+><li
+>文書許容量 ←→ 更新スループット</li
+></ul
+>
+<p
+><em
+>方針: 可能な限り高いレベルで両立し、運用時にバランスを調整可能とする。</em
+></p
+>
+<h3
+>メタ情報の重要性</h3
+>
+<p
+>メタ情報:</p
+>
+<ul
+><li
+>書誌情報(著者・表題・著作日時‥)</li
+><li
+>ハイパーリンク</li
+><li
+>タグ・ブックマーク</li
+><li
+>閲覧履歴</li
+><li
+>etc..(アプリケーション毎に様々)</li
+></ul
+>
+<p
+>多数の著者によって書かれた文書セットでは、文書の内容は均質ではなく、
+本文に対する全文検索の結果だけでは十分な精度が得られない場合が多い。</p
+>
+<p
+>精度を向上させるために、有効なメタ情報を検索結果の算出に適切に加味させることが必要。
+有効なメタ情報は、アプリケーションのドメインに大きく依存する。</p
+>
+<p
+>本文情報やメタ情報のデータ構造を自由に表現し、
+これらを柔軟に組み合わせてクエリを記述できることを目指す。</p
+>
+<p
+><em
+>方針: データ構造とクエリの記述力を重視する。</em
+></p
+>
+<p
+>現時点ではリレーショナルモデルがこの方針に合致する最適なモデルだと考えている。
+二つのアプローチでリレーショナルデータベースと全文検索エンジンとの融合を目指す。</p
+>
+<ul
+><li
+>アプローチ1: 既存のDBMSに組み込む</li
+><li
+>アプローチ2: 独自のDBMSを作る</li
+></ul
+>
+<p
+><em
+>方針: それぞれのアプローチに適した異なるレイヤのAPIを、性能を阻害しない形で提供する。</em
+></p
+>
+</div
+><!--section--></div
+><!--body--></div
+><!--day--><div class="day"
+><h2 id="bdfbf9a474a2d25add5be6aadcc5d02c"
+>アプローチ1: 既存のDBMSに組み込む</h2
+><div class="body"
+><div class="section"
+>
+<p
+><em
+>方針: DBMSのクエリ言語に自然な形で全文検索クエリを埋め込めるようにする。</em
+></p
+>
+<p
+>DBMSと検索エンジン間のインピーダンス不整合を抑えることを重視する。
+全文検索条件と他の検索条件は自然に組み合わせて記述できることを目指す。
+また最適なパスでクエリが実行されることを目指す。</p
+>
+<p
+><em
+>方針: DBMS本体の改造は最小限に留める。インタフェースの改善を開発元に要求する。</em
+></p
+>
+<p
+>DBMSの準備する拡張インタフェースの枠組を越えた無理な改造はなるべく加えない。
+機能や性能を阻害している要因をDBMSの開発元に伝えて改善を要求する。</p
+>
+</div
+><!--section--></div
+><!--body--></div
+><!--day--><div class="day"
+><h2 id="92b07d08ab459cb3d3ea24aa4e7532dd"
+>アプローチ2: 独自のDBMSを作る</h2
+><div class="body"
+><div class="section"
+>
+<p
+><em
+>方針: 全文検索エンジンとしてのSennaの基本性能を最大限発揮する。</em
+></p
+>
+<h3
+>データモデルの方針</h3
+>
+<p
+><em
+>方針: 性能を阻害しない範囲で最大限柔軟性に配慮する。</em
+></p
+>
+<p
+>設計者の想定を越えるような用途を期待する。</p
+>
+<p
+>従来の全文検索インデックスを更に部品に分解し、
+それぞれfirst-class objectとして操作可能とする。</p
+>
+<p
+>現時点ではビューとして一般化することを考えている。</p
+>
+<ul
+><li
+>実体化のタイミングを制御可能とする</li
+><li
+>インデックスとキャッシュはビューの範疇と考える</li
+><li
+>全文検索インデックスはビューの組み合わせで表現する</li
+></ul
+>
+<h3
+>アプリケーションインタフェースの方針</h3
+>
+<p
+><em
+>方針: アプリケーションのプロセスモデルを選ばない。</em
+></p
+>
+<p
+>様々なプロセスモデルのアプリケーションとの組合せを想定する。
+ライブラリ, コマンド, クライアント・サーバ 等のインタフェースで使用できる。
+一つのデータベースを複数スレッドand/or複数プロセスで共有可能とする。</p
+>
+<h3
+>クエリ言語の方針</h3
+>
+<p
+><em
+>方針: 拡張性の高い言語を利用する</em
+></p
+>
+<p
+>実は現時点ではクエリ言語の仕様は完全には固まっていない。
+SQLで十分な可能性も不十分な可能性もあると考えている。
+そこで構文やセマンティックスを容易に拡張可能な言語をベースとして用いる。
+現状では、Scheme上の埋め込み言語としてクエリー言語を実装する。</p
+>
+<p
+><em
+>方針: 簡潔な記述を目指す</em
+></p
+>
+<p
+>実用的で簡潔にクエリーを書き下させるように配慮する。</p
+>
+<p
+><em
+>方針: Scheme言語処理系としての完成度を追求しない。</em
+></p
+>
+<p
+>クエリ言語はScheme上に構築されているが、
+Schemeそのものがクエリ言語というわけではない。
+Schemeは専らグルー(糊)として機能する。
+宣言的に記述されたクエリを、Senna API実行シーケンスに翻訳する処理に活用するが、
+検索処理の主要なループの中でSchemeのコードが動くことは想定しない。</p
+>
+<p
+>独自DBMSはScheme言語処理系を内包するが、
+その汎用プログラミング言語としての完成度は追求しない。
+代わりに以下のポイントを重視する。</p
+>
+<ul
+><li
+>起動の速さ</li
+><li
+>footprintの小ささ</li
+><li
+>C関数の呼出しコストの小ささ</li
+></ul
+>
+</div
+><!--section--></div
+><!--body--></div
+><!--day--></div
+><!--body_main--><div class="body_leave" id="body_leave"
+><div class="day"
+><div class="comment"
+><div class="caption"
+><div class="page_attribute"
+>
+<span class="attribute"
+>生成時間: <em
+>__qwik_page_generate_time__秒</em
+></span
+>
+<div align="right"
+>
+<a href="http://x6.at-ninja.jp/bin/gg?067333300"
+>
+<img border="0" src="http://x6.at-ninja.jp/bin/ll?067333300"
+/></a
+>
+<span style="font-size:9px"
+><img src="http://img.shinobi.jp/tadaima/fj.gif" style="margin:0;vertical-align:text-bottom;"
+/> <a href="http://randoseru.rentalurl.net"
+>ランドセル</a
+></span
+>
+</div
+>
+
+
+</div
+></div
+></div
+></div
+></div
+><!--body_leave--></div
+><!--main--><div class="sidebar"
+><h2
+>メニュー/Menu</h2
+><ul
+><li
+><a href="FrontPageJ.html"
+>ホーム</a
+> / <a href="FrontPage.html"
+>Home</a
+></li
+></ul
+>
+<ul
+><li
+>Sennaの紹介</li
+><ul
+><li
+><a href="senna_takahashi.html"
+>Sennaとは</a
+></li
+><li
+><a href="publication.html"
+>雑誌記事・発表資料等</a
+></li
+><li
+><a href="example.html"
+>こんなところでも使われてます！</a
+></li
+><li
+><a href="FAQ.html"
+>FAQ</a
+> / <a href="FAQ_en.html"
+>FAQ (English)</a
+></li
+><li
+><a href="ML.html"
+>メーリングリスト</a
+> / <a href="ML_en.html"
+>MailingLists</a
+></li
+></ul
+><li
+>Sennaの利用</li
+><ul
+><li
+><a href="Download.html"
+>ダウンロード</a
+> / <a href="Download_en.html"
+>Download</a
+></li
+><li
+><a href="install.html"
+>インストール</a
+> / <a href="install_en.html"
+>Install</a
+></li
+><li
+><a href="check_install.html"
+>動作確認方法</a
+> / <a href="check_install_en.html"
+>Check install</a
+></li
+><li
+><a href="bindings.html"
+>バインディング一覧</a
+></li
+><li
+><a href="mysql_binding.html"
+>MySQL バインディング</a
+> / <a href="mysql_binding_en.html"
+>MySQL binding</a
+></li
+><li
+><a href="install_specific.html"
+>特定環境でのインストールメモ</a
+> / <a href="install_specific_en.html"
+>installing note for specific environment</a
+></li
+></ul
+><li
+>利用者向け</li
+><ul
+><li
+><a href="query.html"
+>クエリーの書式</a
+> / <a href="query_en.html"
+>query syntax</a
+></li
+><li
+><a href="Customize.html"
+>カスタマイズ</a
+> / <a href="Customize_en.html"
+>Customize</a
+></li
+><li
+><a href="sennaql_reference.html"
+>SennaQL リファレンス</a
+></li
+><li
+><a href="store_tutorial.html"
+>SennaStoreを使ってみよう</a
+></li
+><li
+><a href="log_level.html"
+>ログレベルの解説</a
+></li
+><li
+><a href="report_bugs.html"
+>不具合報告掲示板</a
+></li
+><li
+><a href="contribute.html"
+>Sennaへのパッチ・情報等</a
+></li
+><li
+><a href="knownproblems.html"
+>不具合等</a
+> / <a href="knownproblems_en.html"
+>Known problems</a
+></li
+></ul
+><li
+>高度な利用法</li
+><ul
+><li
+><a href="APIJ.html"
+>API</a
+> / <a href="API.html"
+>C API(English)</a
+></li
+><li
+><a href="IndexFile.html"
+>インデックスファイル</a
+> / <a href="IndexFile_en.html"
+>Index File</a
+></li
+></ul
+><li
+>Senna開発</li
+><ul
+><li
+><a href="design_policy.html"
+>Senna設計方針</a
+></li
+><li
+><a href="Roadmap.html"
+>開発ロードマップ</a
+></li
+><li
+><a href="cstyle.html"
+>コーディング規約</a
+></li
+><li
+><a href="WorkingStatus.html"
+>作業状況</a
+></li
+><li
+><a href="futureworks.html"
+>野望</a
+> / <a href="futureworks_en.html"
+>Future works</a
+></li
+></ul
+></ul
+>
+<h2
+>Search</h2
+><form action=".search"
+><input name="q"
+/><input type="submit" value="検索"
+/></form
+>
+
+<h2
+>Recent Change</h2
+><div class="recent"
+><ul
+><li
+><a href="example.html" title="2010-10-28 14:04:51"
+>こんなところでも使われてます！</a
+> <span class="ago"
+>3年前</span
+></li
+><li
+><a href="frontpage.html" title="2010-09-14 12:54:06"
+>frontpage</a
+> <span class="ago"
+>4年前</span
+></li
+><li
+><a href="Download_en.html" title="2010-07-22 14:26:20"
+>Download</a
+> <span class="ago"
+>4年前</span
+></li
+><li
+><a href="Download.html" title="2010-07-22 14:26:01"
+>ダウンロード</a
+> <span class="ago"
+>4年前</span
+></li
+><li
+><a href="FrontPageJ.html" title="2009-11-25 16:14:43"
+>Senna 組み込み型全文検索エンジン</a
+> <span class="ago"
+>4年前</span
+></li
+><li
+><a href="FrontPage.html" title="2009-11-25 16:14:20"
+>Senna: An Embeddable Fulltext Search Engine</a
+> <span class="ago"
+>4年前</span
+></li
+><li
+><a href="Ruby_binding.html" title="2009-09-03 18:42:32"
+>Rubyバインディング</a
+> <span class="ago"
+>5年前</span
+></li
+><li
+><a href="PHP_binding.html" title="2009-08-24 04:09:56"
+>PHPバインディング</a
+> <span class="ago"
+>5年前</span
+></li
+><li
+><a href="store.html" title="2009-03-23 03:34:52"
+>SennaStore概要</a
+> <span class="ago"
+>5年前</span
+></li
+><li
+><a href="bindings.html" title="2008-10-05 11:33:12"
+>バインディング一覧</a
+> <span class="ago"
+>6年前</span
+></li
+></ul
+><p class="recent"
+><a href="RecentList.html"
+><em
+>もっと前の情報</em
+></a
+></p
+></div
+>
+<a class="rss-button" href="rss.xml"
+><span
+>RSS</span
+></a
+><a class="rss-button" href="atom.xml"
+><span
+>ATOM</span
+></a
+>
+
+</div
+><!--sidebar--><div class="footer"
+><span title="__qwik_page_generate_time__"
+>powered by <a href="http://qwik.jp/"
+>qwikWeb</a
+></span
+></div
+><!--footer--></div
+><!--container--></body
+></html
+>

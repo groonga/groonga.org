@@ -1,0 +1,829 @@
+* Senna DB API案 (2008/07/10.0版)
+
+** 概要
+
+- DB APIはDBMSのような汎用的なデータベース管理機能を提供します。
+- table, column, space の3つが主な構成要素となります。
+
+** table
+
+- tableは不変のIDを持つrecordの集まりです。
+
+- hash tableと、pat tableと、keyなしtableとがあります。
+
+- hash table及びpat tableのrecordは、uniqueなkeyと対応付けて管理されます。
+
+- keyなしtableはシステムによって付与されるIDによってのみレコードを特定できます。
+
+- 名前付きtableと無名tableとがあります。
+
+** column
+
+- 一つのtableに対して名前によって識別されるcolumnを複数定義できます。
+
+- それぞれのcolumnには特定の型の値を格納することができます。
+
+- 一つのtableに格納されるrecordは、すべて共通のcolumnの組を持ちます。
+
+- 転置インデックス(inv index) columnとその他のcolumnとがあります。
+
+- inv index columnを用いて高速な全文検索が実行できます。
+
+** space
+
+- spaceはtableやcolumnの名前や関係を管理します。
+
+- spaceは作業領域のメモリ管理も行います。
+
+- 二つのspaceの間に親子関係を持たせることができます。
+
+- 子spaceからは親spaceの名前空間を参照することができます。
+
+** ctx
+
+- ctxはerror情報の報告と、一時的なobjectのメモリ管理に使われます。
+
+- DBAPIの全ての関数の第一引数にはctxを指定します。
+
+- APIの実行中にエラーが発生した場合にはctxの内容を参照することでエラーの詳細を知ることができます。
+
+- ctxには直前に実行したAPIのエラー情報が格納されます。複数のスレッドで同一のctxを同時に使用することはできません。
+
+** 存続期間
+
+- space, table, columnは、いずれも永続(persistent)と一時(temporary)のどちらかの存続期間を持ちます。
+
+- 永続(perisistent)属性を持っていた場合、その内容はファイルに保存されます。
+
+- 永続オブジェクトは複数のプロセスで共有し、同時にアクセスすることができます。
+
+- 一時オブジェクトは特定のプロセスに属します。
+
+- 一時オブジェクトは同一プロセスの複数のスレッドから同時にアクセスすることができません。
+
+** 型
+
+- 個々のcolumnやtableのkeyは、いずれかの型に属します。
+
+- 定義済みのtypeまたはtableを型として指定することができます。
+
+- typeは格納される値のサイズや操作を定めます。
+
+** 手続き
+
+- spaceの中で名前と対応付けて手続きを登録することができます。
+
+- あるtableやcolumnから、他のtableやcolumnを導出するための手続きを定義することができます。
+
+- tableやcolumnを参照あるいは更新するタイミングで呼び出す手続き(hook)を定義することができます。
+
+** API関数
+
+{{code
+
+/**
+ * sen_ctx_init:
+ * @ctx: 初期化するctx構造体へのポインタを指定します。
+ * @flags: 初期化するctxのオプションを指定します。(詳細未定)
+ * @encoding: 初期化するctxでデフォルトとなるencoding。
+ *
+ * ctxを初期化します。
+ **/
+sen_rc sen_ctx_init(sen_ctx *ctx, int flags, sen_encoding encoding);
+
+/**
+ * sen_ctx_fin:
+ * @ctx: 終了化するctx構造体へのポインタを指定します。
+ *
+ * ctxの管理するメモリを解放し、使用を終了します。
+ **/
+sen_rc sen_ctx_fin(sen_ctx *ctx);
+
+/**
+ * sen_space_create:
+ * @space: 親とするspace。NULLならsen_global_spaceが親になる。
+ * @path: 作成するspaceを格納するファイルパス。NULLならtemporary spaceとなる。
+ * @encoding: 作成するspaceでデフォルトとなるencoding。
+ *
+ * 新たなspaceを作成する。
+ **/
+sen_obj *sen_space_create(sen_ctx *ctx, sen_obj *space, const char *path, sen_encoding encoding);
+
+/**
+ * sen_space_open:
+ * @space: 親とするspace。NULLならsen_global_spaceが親になる。
+ * @path: 開こうとするspaceを格納するファイルパス。
+ *
+ * 既存のspaceを開く。
+ **/
+sen_obj *sen_space_open(sen_ctx *ctx, sen_obj *space, const char *path);
+
+/**
+ * sen_space_lookup:
+ * @space: 対象となるspace。
+ * @name: 検索しようとするオブジェクトの名前。
+ *
+ * spaceからnameに対応するオブジェクトを検索して返す。
+ * nameに一致するオブジェクトが存在しなければNULLを返す。
+ **/
+sen_obj *sen_space_lookup(sen_ctx *ctx, sen_obj *space, const char *name, unsigned name_size);
+
+#define SEN_TYPE_FIXED_SIZE    0
+#define SEN_TYPE_VARIABLE_SIZE 1
+
+typedef uint8_t sen_type_type;
+
+extern sen_obj *sen_type_any; /* 任意のtableのrecordを格納できる型 */
+
+/**
+ * sen_type_create:
+ * @space: 対象となるspace。
+ * @name: 作成するtypeの名前。
+ * @type: SEN_TYPE_FIXED_SIZE, SEN_TYPE_VARIABLE_SIZE
+ * @size: SEN_TYPE_VARIABLE_SIZEの場合は最大長、
+ *        SEN_TYPE_FIXED_SIZEの場合は長さを指定(単位:byte)
+ *
+ * nameに対応する新たなtype(型)をspaceに定義する。
+ * (todo: 複合keyを定義するための構造)
+ **/
+sen_obj *sen_type_create(sen_ctx *ctx, sen_obj *space, const char *name, unsigned name_size,
+                         sen_type_type flags, unsigned int size);
+
+typedef int (*sen_proc_func)(sen_ctx *ctx, sen_obj *, int, sen_obj **);
+
+typedef enum {
+  SEN_PROC_READ_HOOK = 0,
+  SEN_PROC_WRITE_HOOK,
+  SEN_PROC_ADD_HOOK,
+  SEN_PROC_DELETE_HOOK,
+  SEN_PROC_RECALC,
+  SEN_PROC_SCORE,
+  SEN_PROC_COMPARE,
+  SEN_PROC_GROUP
+} sen_proc_type;
+
+/**
+ * sen_proc_create:
+ * @space: 対象となるspace。
+ * @name: 作成するprocの名前。
+ * @type: procの種類。
+ * @func: proc関数のポインタ
+ *
+ * nameに対応する新たなproc(手続き)をspaceに定義する。
+ **/
+sen_obj *sen_proc_create(sen_ctx *ctx, sen_obj *space, const char *name, unsigned name_size,
+                         sen_proc_type type, sen_proc_func func);
+
+/*-------------------------------------------------------------
+ * table操作のための関数
+ */
+
+#define SEN_TABLE_TOKENIZER_MASK    (0x0f<<4)
+#define SEN_TABLE_TYPE_MASK         (0x0f<<8)
+#define SEN_COLUMN_TYPE_MASK        (0x0f<<12)
+
+typedef enum {
+  SEN_TABLE_KEY_NORMALIZE         = (1L<<0),
+  SEN_TABLE_KEY_SPLIT_ALPHA       = (1L<<1),
+  SEN_TABLE_KEY_SPLIT_DIGIT       = (1L<<2),
+  SEN_TABLE_KEY_SPLIT_SYMBOL      = (1L<<3),
+  SEN_TABLE_KEY_MORPH_ANALYSE     = (0L<<4),
+  SEN_TABLE_KEY_NGRAM             = (1L<<4),
+  SEN_TABLE_KEY_DELIMITED         = (2L<<4),
+  SEN_TABLE_KEY_WITH_SIS          = (1L<<31),
+  SEN_TABLE_HASH_KEY              = (0L<<8),
+  SEN_TABLE_PAT_KEY               = (1L<<8),
+  SEN_TABLE_NO_KEY                = (2L<<8),
+  SEN_TABLE_ALIAS                 = (3L<<8),
+  SEN_COLUMN_INV                  = (1L<<12),
+  SEN_OBJ_PERSISTENT              = (1L<<16)
+} sen_obj_flags;
+
+/**
+ * sen_table_create:
+ * @space: tableを追加しようとするspace。
+ * @name: 作成するtableの名前。NULLなら無名tableとなる。
+ * @path: 作成するtableのファイルパス。
+ *        flagsにSEN_OBJ_PERSISTENTが指定されている場合のみ有効。
+ *        NULLなら自動的にファイルパスが付与される。
+ * @flags: SEN_OBJ_PERSISTENTを指定すると永続tableとなる。
+ *         SEN_TABLE_PAT_KEY,SEN_TABLE_HASH_KEY,SEN_TABLE_NO_KEYのいずれかを指定する。
+ *         SEN_TABLE_KEY_NORMALIZEを指定すると正規化された文字列がkeyとなる。
+ *         SEN_TABLE_KEY_WITH_SISを指定するとkey文字列の全suffixが自動的に登録される。
+ *         SEN_TABLE_KEY_MORPH_ANALYSE,SEN_TABLE_KEY_NGRAM,SEN_TABLE_KEY_DELIMITEDは、
+ *         作成するtableを語彙表として用いる場合のtokenizeの方法を指定する。
+ *         SEN_TABLE_KEY_NGRAMを指定した場合に限り、
+ *         SEN_TABLE_KEY_SPLIT_ALPHA,SEN_TABLE_KEY_SPLIT_DIGIT,SEN_TABLE_KEY_SPLIT_SYMBOL
+ *         を指定して、文字列をN-GRAMに区切る際の方針を指定できる。
+ * @key_type: keyの型を指定する。SEN_TABLE_NO_KEYが指定された場合は無効。
+ *            既存のtypeあるいはtableを指定できる。
+ *            key_typeにtable Aを指定してtable Bを作成した場合、Bは必ずAのサブセットとなる。
+ * @value_size: keyに対応する値を格納する領域のサイズ(byte長)。tableはcolumnとは別に、
+ *              keyに対応する値を格納する領域を一つだけ持つことができる。
+ *              value_sizeの指定はSEN_TABLE_HASH_KEY,SEN_TABLE_NO_KEYのみ有効。
+ *              SEN_TABLE_PAT_KEYの場合、value_sizeは14bitで固定。
+ *
+ * nameに対応する新たなtableをspaceに定義する。
+ **/
+sen_obj *sen_table_create(sen_ctx *ctx, sen_obj *space, const char *name, unsigned name_size,
+                          const char *path, sen_obj_flags flags,
+                          sen_obj *key_type, unsigned value_size);
+/**
+ * sen_table_open:
+ * @space: tableを追加しようとするspace。
+ * @name: 開こうとするtableの名前。NULLなら無名tableとなる。
+ * @path: 開こうとするtableのファイルパス。
+ *
+ * spaceの中でnameに対応付けて既存のtableを開く。
+ **/
+sen_obj *sen_table_open(sen_ctx *ctx, sen_obj *space, const char *name, unsigned name_size,
+                        const char *path);
+
+#define  SEN_TABLE_EXACT    0
+#define  SEN_TABLE_LCPS     1
+#define  SEN_TABLE_SUFFIX   2
+#define  SEN_TABLE_PREFIX   3
+#define  SEN_TABLE_ADD      (1L<<6)
+#define  SEN_TABLE_ADDED    (1L<<7)
+
+typedef uint8_t sen_table_search_flags;
+
+/**
+ * sen_table_lookup:
+ * @table: 対象table
+ * @key: 検索key
+ * @flags: SEN_TABLE_EXACTが指定された場合はkeyに完全一致するrecordを検索する。
+ *         SEN_TABLE_LCPSが指定された場合はlongest common prefix searchを行う。
+ *         該当するkeyが存在せず、かつSEN_TABLE_ADDが指定された場合は、
+ *         tableに該当レコードを追加する。(追加しない場合はSEN_SYM_NILを返す)
+ *         SEN_TABLE_ADDが指定され、かつ実際にレコードが追加された場合は、
+ *         flagsのSEN_TABLE_ADDED bitが立てられる。
+ *         flagsにNULLが指定された場合は、SEN_TABLE_EXACTのみが指定されたものと見なされる。
+ *
+ * tableからkeyに対応するrecordを検索し、対応するIDを返す。
+ **/
+sen_id sen_table_lookup(sen_ctx *ctx, sen_obj *table, const void *key, unsigned key_size,
+                        sen_table_search_flags *flags);
+
+/**
+ * sen_table_add:
+ * @table: 対象table
+ *
+ * 新しいレコードを追加し、そのIDを返す。
+ * SEN_TABLE_NO_KEYが指定されたtableでのみ有効。
+ **/
+sen_id sen_table_add(sen_ctx *ctx, sen_obj *table);
+
+/**
+ * sen_table_get_key:
+ * @table: 対象table
+ * @id: 対象レコードのID
+ * @keybuf: keyを格納するバッファ(呼出側で準備する)
+ * @buf_size: keybufのサイズ(byte長)
+ *
+ * tableのIDに対応するレコードのkeyを取得する。対応するレコードが存在する場合はkey長を返す。
+ * 見つからない場合は0を返す。
+ * 対応するキーの検索に成功し、またbuf_sizeの長さがkey長以上であった場合は、
+ * keybufに該当するkeyをコピーする。
+ *
+ **/
+int sen_table_get_key(sen_ctx *ctx, sen_obj *table, sen_id id, void *keybuf, int buf_size);
+
+/**
+ * sen_table_get_value:
+ * @table: 対象table
+ * @id: 対象レコードのID
+ * @valuebuf: valueを格納するバッファ(呼出側で準備する)
+ *
+ * tableのIDに対応するレコードのvalueを取得する。
+ * 対応するレコードが存在する場合はvalue長を返す。見つからない場合は0を返す。
+ * value長は、sen_table_createでvalue_size引数に指定した値になる。
+ * 呼出側は十分なサイズのバッファをvaluebufに指定しなければならない。
+ **/
+int sen_table_get_value(sen_ctx *ctx, sen_obj *table, sen_id id, void *valuebuf);
+
+typedef enum {
+  SEN_UPD_SET = 0,
+  SEN_UPD_ADD,
+  SEN_UPD_CAS,
+  SEN_UPD_APPEND,
+  SEN_UPD_PREPEND
+} sen_update_type;
+
+/**
+ * sen_table_set_value:
+ * @table: 対象table
+ * @id: 対象レコードのID
+ * @value: 格納する値
+ * @type: SEN_UPD_SET, SEN_UPD_ADDのいずれかを指定できる。
+ *
+ * tableのIDに対応するレコードのvalueを更新する。
+ * 対応するレコードが存在しない場合はsen_invalid_argumentを返す。
+ **/
+sen_rc sen_table_set_value(sen_ctx *ctx, sen_obj *table, sen_id id, void *value, sen_update_type type);
+
+/**
+ * sen_table_delete:
+ * @table: 対象table
+ * @key: 検索key
+ *
+ * tableのkeyに対応するレコードを削除する。
+ * 対応するレコードが存在しない場合はsen_invalid_argumentを返す。
+ **/
+sen_rc sen_table_delete(sen_ctx *ctx, sen_obj *table, const void *key, unsigned key_size);
+
+/**
+ * sen_table_truncate:
+ * @table: 対象table
+ *
+ * tableの全レコードを一括して削除する。
+ **/
+sen_rc sen_table_truncate(sen_ctx *ctx, sen_obj *table);
+
+typedef sen_obj sen_table_cursor;
+
+/**
+ * sen_table_cursor_open:
+ * @space: sen_table_cursorオブジェクトを払い出すspace
+ * @table: 対象table
+ * @min: keyの下限 (NULLは下限なしと見なす)
+ * @max: keyの上限 (NULLは上限なしと見なす)
+ * @flags: SEN_SYM_ASCENDINGを指定すると昇順にkeyを取り出す。(指定しなければ降順)
+ *         SEN_SYM_GTを指定するとminに一致したkeyをcursorの範囲に含まない。
+ *         SEN_SYM_LTを指定するとmaxに一致したkeyをcursorの範囲に含まない。
+ *
+ * tableに登録されているレコードを順番に取り出すためのカーソルを生成して返す。
+ * min, max, flagsは SEN_TABLE_PAT_KEYを指定したtableでのみ有効。
+ **/
+sen_table_cursor *sen_table_cursor_open(sen_ctx *ctx, sen_obj *space, sen_obj *table,
+                                        const void *min, unsigned min_size,
+                                        const void *max, unsigned max_size,
+                                        int flags);
+
+/**
+ * sen_table_cursor_close:
+ * @tc: 対象cursor
+ *
+ * sen_table_cursor_openで生成したcursorを解放する。
+ **/
+sen_rc sen_table_cursor_close(sen_ctx *ctx, sen_table_cursor *tc);
+
+/**
+ * sen_table_cursor_next:
+ * @tc: 対象cursor
+ *
+ * cursorのカレントレコードを一件進めてそのIDを返す。
+ * cursorの対象範囲の末尾に達するとSEN_SYM_NILを返す。
+ **/
+sen_id sen_table_cursor_next(sen_ctx *ctx, sen_table_cursor *tc);
+
+/**
+ * sen_table_cursor_get_key:
+ * @tc: 対象cursor
+ * @key: カレントレコードのkeyへのポインタがセットされる。
+ * cursorのカレントレコードのkeyを@keyにセットし、その長さを返す。
+ **/
+int sen_table_cursor_get_key(sen_ctx *ctx, sen_table_cursor *tc, void **key);
+
+/**
+ * sen_table_cursor_get_value:
+ * @tc: 対象cursor
+ * @value: カレントレコードのvalueへのポインタがセットされる。
+ * cursorのカレントレコードのvalueを@valueにセットし、その長さを返す。
+ **/
+int sen_table_cursor_get_value(sen_ctx *ctx, sen_table_cursor *tc, void **value);
+
+/**
+ * sen_table_cursor_set_value:
+ * @tc: 対象cursor
+ * @value: 新しいvalueの値。
+ * @type: SEN_UPD_SET, SEN_UPD_ADDのいずれかを指定できる。
+ *
+ * cursorのカレントレコードのvalueを引数の内容に置き換える。
+ * cursorのカレントレコードが存在しない場合はsen_invalid_argumentを返す。
+ **/
+sen_rc sen_table_cursor_set_value(sen_ctx *ctx, sen_table_cursor *tc, void *value, unsigned value_size,
+                                  sen_update_type type);
+
+/**
+ * sen_table_cursor_delete:
+ * @tc: 対象cursor
+ *
+ * cursorのカレントレコードを削除する。
+ * cursorのカレントレコードが存在しない場合はsen_invalid_argumentを返す。
+ **/
+sen_rc sen_table_cursor_delete(sen_ctx *ctx, sen_table_cursor *tc);
+
+/**
+ * sen_table_search:
+ * @table: 対象table
+ * @key: 検索キー
+ * @flags: SEN_TABLE_SUFFIXを指定するとkeyに後方一致するレコードを検索する
+           SEN_TABLE_PREFIXを指定するとkeyに前方一致するレコードを検索する
+ * @res: 検索結果を格納するtable
+ * @op: sen_sel_or, sen_sel_and, sen_sel_butのいずれかを指定する
+ *
+ * flagsに指定する条件でtableからkeyにマッチするレコードを検索し、
+ * opの指定に従ってresにレコードを追加あるいは削除する。
+ * SEN_TABLE_PAT_KEYを指定したtableでのみ有効。
+ **/
+sen_rc sen_table_search(sen_ctx *ctx, sen_obj *table, const void *key, unsigned key_size,
+                        sen_table_search_flags flags,
+                        sen_obj *res, sen_sel_operator op);
+
+/**
+ * sen_table_sort:
+ * @table: 対象table
+ * @limit: resに格納するレコードの上限
+ * @res: 結果を格納するtable
+ * @optarg: ソート詳細条件
+ *
+ * table内のレコードをソートし、上位limit個の要素をresに格納する。
+ **/
+sen_rc sen_table_sort(sen_ctx *ctx, sen_obj *table, int limit, sen_obj *res, sen_sort_optarg *optarg);
+
+/**
+ * sen_table_group:
+ * @table: 対象table
+ * @limit: resに格納する新たなレコード毎のサブレコードの最大値
+ * @res: 結果を格納するtable
+ * @optarg: グループ化の詳細条件
+ *
+ * tableのレコードを特定の条件でグループ化し、結果をresに格納する。
+ * (todo: n次元集計)
+ **/
+sen_rc sen_table_group(sen_ctx *ctx, sen_obj *table, int limit, sen_obj *res, sen_group_optarg *optarg);
+
+/**
+ * sen_table_setoperation:
+ * @table1: 対象table1
+ * @table2: 対象table2
+ * @res: 結果を格納するtable
+ *
+ * table1とtable2をopの指定に従って集合演算した結果をresに格納する。
+ * resにtable1あるいはtable2そのものを指定した場合を除けば、table1, table2は破壊されない。
+ **/
+sen_rc sen_table_setoperation(sen_ctx *ctx, sen_obj *table1, sen_obj *table2, sen_obj *res,
+                              sen_sel_operator op);
+
+/**
+ * sen_table_difference:
+ * @table1: 対象table1
+ * @table2: 対象table2
+ * @res1: 結果を格納するtable
+ * @res2: 結果を格納するtable
+ *
+ * table1とtable2から重複するレコードを取り除いた結果をそれぞれres1, res2に格納する。
+ **/
+sen_rc sen_table_difference(sen_ctx *ctx, sen_obj *table1, sen_obj *table2, sen_obj *res1, sen_obj *res2);
+
+/**
+ * sen_table_column:
+ * @table: 対象table
+ * @name: カラム名
+ *
+ * nameに対応するtableのカラムを返す。対応するカラムが存在しなければNULLを返す。
+ **/
+sen_obj *sen_table_column(sen_ctx *ctx, sen_obj *table, const char *name, unsigned name_size);
+
+/*-------------------------------------------------------------
+ * column操作のための関数
+ */
+
+/**
+ * sen_column_create:
+ * @space: sen_table_cursorオブジェクトを払い出すspace
+ * @table: 対象table
+ * @name: カラム名
+ * @path: カラムを格納するファイルパス。
+ *        flagsにSEN_OBJ_PERSISTENTが指定されている場合のみ有効。
+ *        NULLなら自動的にファイルパスが付与される。
+ * @flags: SEN_OBJ_PERSISTENTを指定すると永続columnとなる。
+ *         SEN_COLUMN_INVを指定すると転置インデックスとなる。
+ * @type: カラム値の型。定義済みのtypeあるいはtableを指定できる。
+ *
+ * tableに新たなカラムを定義する。nameは省略できない。
+ * 一つのtableに同一のnameのcolumnを複数定義することはできない。
+ **/
+sen_obj *sen_column_create(sen_ctx *ctx, sen_obj *space, sen_obj *table,
+                           const char *name, unsigned name_size,
+                           const char *path, sen_obj_flags flags, sen_obj *type);
+
+/**
+ * sen_column_open:
+ * @space: sen_table_cursorオブジェクトを払い出すspace
+ * @table: 対象table
+ * @name: カラム名
+ * @path: カラムを格納するファイルパス。
+ * @type: カラム値の型。
+ *
+ * 既存の永続的なcolumnを、tableのnameに対応するcolumnとして開く
+ **/
+sen_obj *sen_column_open(sen_ctx *ctx, sen_obj *space, sen_obj *table,
+                         const char *name, unsigned name_size,
+                         const char *path, sen_obj *type);
+
+/**
+ * sen_column_set_value:
+ * @column: 対象column
+ * @id: 対象レコードのID
+ * @value: 新しい値
+ * @value_size: valueのサイズ(バイト長)
+ * @type: SEN_UPD_SET, SEN_UPD_ADD, SEN_UPD_APPEND, SEN_UPD_PREPENDのいずれかを指定できる。
+ *        SEN_UPD_APPEND, SEN_UPD_PREPENDは可変長の場合のみ有効。
+ *        SEN_UPD_ADDは固定長の場合のみ有効。
+ *
+ * IDに対応するレコードのcolumnの値を更新する。
+ **/
+sen_rc sen_column_set_value(sen_ctx *ctx, sen_obj *column, sen_id id,
+                            void *value, int value_size, sen_update_type type);
+
+/**
+ * sen_column_get_value:
+ * @column: 対象column
+ * @id: 対象レコードのID
+ * @valuebuf: valueを格納するバッファ(呼出側で準備する)
+ * @buf_size: valuebufのサイズ(byte長)
+ *
+ * IDに対応するレコードのcolumnの値のサイズ(byte長)を返す。
+ * buf_zieが値のサイズ以上であった場合は、valuebufに値をコピーする。
+ **/
+int sen_column_get_value(sen_ctx *ctx, sen_obj *column, sen_id id, void *valuebuf, int buf_size);
+
+/**
+ * sen_column_table:
+ * @column: 対象column
+ *
+ * columnが属するtableを返す。
+ **/
+sen_obj *sen_column_table(sen_ctx *ctx, sen_obj *column);
+
+/*-------------------------------------------------------------
+ * 転置インデックスcolumnだけに使用できる関数
+ */
+
+/**
+ * sen_string_search:
+ * @inv: 転置インデックス型のカラム
+ * @string: 検索文字列
+ * @string_size: stringのサイズ(バイト長)
+ * @res: 検索結果を格納するテーブル
+ * @op: sen_sel_or, sen_sel_and, sen_sel_but, sen_sel_adjustのいずれかを指定する
+ * @optargs: 詳細検索条件
+ *
+ * stringにマッチするレコードを転置インデックスinvを用いて検索し、結果をresに格納する。
+ **/
+sen_rc sen_string_search(sen_ctx *ctx, sen_obj *inv, const char *string, unsigned int string_size,
+                         sen_obj *res, sen_sel_operator op, sen_select_optarg *optarg);
+
+/**
+ * sen_query_search:
+ * @inv: 転置インデックス型のカラム
+ * @q: 検索クエリ
+ * @res: 検索結果を格納するテーブル
+ * @op: sen_sel_or, sen_sel_and, sen_sel_but, sen_sel_adjustのいずれかを指定する
+ *
+ * queryにマッチするレコードを転置インデックスinvを用いて検索し、結果をresに格納する。
+ **/
+sen_rc sen_query_search(sen_ctx *ctx, sen_obj *inv, sen_query *q, sen_obj *res, sen_sel_operator op);
+
+/*-------------------------------------------------------------
+ * space, table, columnの全てまたは幾つかで共通に使用できる関数
+ */
+
+#define SEN_PROC_MAX_ARGS 256
+
+typedef struct {
+  sen_obj *proc;
+  int argc;
+  sen_obj *argv[SEN_PROC_MAX_ARGS];
+} sen_proc_spec;
+
+typedef enum {
+  SEN_INFO_ELEMENT_SIZE = 0,
+  SEN_INFO_CURR_MAX,
+  SEN_INFO_MAX_ELEMENT_SIZE,
+  SEN_INFO_SEG_SIZE,
+  SEN_INFO_CHUNK_SIZE,
+  SEN_INFO_INITIAL_N_SEGMENTS,
+  SEN_INFO_MAX_SECTION,
+  SEN_INFO_SOURCE_INFO,
+  SEN_INFO_ENCODING,
+  SEN_ELEMENT_INFO_A,
+  SEN_ELEMENT_INFO_CHUNK,
+  SEN_ELEMENT_INFO_CHUNK_SIZE,
+  SEN_ELEMENT_INFO_BUFFER_FREE,
+  SEN_ELEMENT_INFO_NTERMS,
+  SEN_ELEMENT_INFO_NTERMS_VOID,
+  SEN_ELEMENT_INFO_SIZE_IN_CHUNK,
+  SEN_ELEMENT_INFO_POS_IN_CHUNK,
+  SEN_ELEMENT_INFO_SIZE_IN_BUFFER,
+  SEN_ELEMENT_INFO_POS_IN_BUFFER,
+  SEN_ELEMENT_INFO_ESTIMATE_SIZE
+} sen_info_type;
+
+/**
+ * sen_obj_get_info:
+ * @obj: 対象obj
+ * @type: 取得する情報の種類
+ * @valuebuf: 値を格納するバッファ(呼出側で準備)
+ *
+ * objのtypeに対応する情報をvaluebufに格納する。
+ * 呼出側ではtypeに応じて十分なサイズのバッファを確保しなければならない。
+ * SEN_INFO_SOURCE_INFOを指定した場合はvaluebufにsen_proc_spec構造体を指定する。
+ * (objの値を導出するための手続きを取得する)
+ **/
+sen_rc sen_obj_get_info(sen_ctx *ctx, sen_obj *obj, sen_info_type type, void *valuebuf);
+
+/**
+ * sen_obj_set_info:
+ * @obj: 対象obj
+ * @type: 設定する情報の種類
+ * @value: 設定しようとする値
+ *
+ * objのtypeに対応する情報をvalueの内容に更新する。
+ * SEN_INFO_SOURCE_INFOを指定した場合はvalueにsen_proc_spec構造体を指定する。
+ * (objの値を導出するための手続きを設定する)
+ **/
+sen_rc sen_obj_set_info(sen_ctx *ctx, sen_obj *obj, sen_info_type type, const void *value);
+
+/**
+ * sen_obj_get_element_info:
+ * @obj: 対象obj
+ * @id: 対象ID
+ * @type: 取得する情報の種類
+ * @valuebuf: 値を格納するバッファ(呼出側で準備)
+ *
+ * objのidに対応するレコードの、typeに対応する情報をvaluebufに格納する。
+ * 呼出側ではtypeに応じて十分なサイズのバッファを確保しなければならない。
+ **/
+sen_rc sen_obj_get_element_info(sen_ctx *ctx, sen_obj *obj, sen_id id,
+                                sen_info_type type, void *valuebuf);
+
+/**
+ * sen_obj_set_element_info:
+ * @obj: 対象object
+ * @id: 対象ID
+ * @type: 設定する情報の種類
+ * @value: 設定しようとする値
+ *
+ * objのidに対応するレコードのtypeに対応する情報をvalueの内容に更新する。
+ **/
+sen_rc sen_obj_set_element_info(sen_ctx *ctx, sen_obj *obj, sen_id id,
+                                sen_info_type type, const void *value);
+
+/**
+ * sen_obj_add_hook:
+ * @obj: 対象object
+ * @type: SEN_HOOK_READは、objectの参照時に呼び出されるhookを定義する。
+          SEN_HOOK_WRITEは、objectの更新時に呼び出されるhookを定義する。
+ * @offset: hookの実行順位。offsetに対応するhookの直前に新たなhookを挿入する。
+            0を指定した場合は先頭に挿入される。-1を指定した場合は末尾に挿入される。
+            objectに複数のhookが定義されている場合は順位の順に呼び出される。
+ * @spec: 詳細条件
+ *
+ * objに対してhookを追加する。
+ **/
+sen_rc sen_obj_add_hook(sen_ctx *ctx, sen_obj *obj, sen_proc_type type,
+                        int offset, const sen_proc_spec *spec);
+
+/**
+ * sen_obj_get_hook_info:
+ * @obj: 対象object
+ * @type: hookタイプ
+ * @offset: 実行順位
+ *
+ * objに定義されているhookの情報を取得する。
+ **/
+sen_rc sen_obj_get_hook_info(sen_ctx *ctx, sen_obj *obj, sen_proc_type type,
+                             int offset, sen_proc_spec *spec);
+
+/**
+ * sen_obj_delete_hook:
+ * @obj: 対象object
+ * @type: hookタイプ
+ * @offset: 実行順位
+ *
+ * objに定義されているhookを削除する。
+ **/
+sen_rc sen_obj_delete_hook(sen_ctx *ctx, sen_obj *obj, sen_proc_type type, int offset);
+
+/**
+ * sen_obj_remove:
+ * @path: objectに該当するファイルパス
+ *
+ * pathに該当するオブジェクトのファイル一式を削除する。
+ **/
+sen_rc sen_obj_remove(sen_ctx *ctx, const char *path);
+
+/**
+ * sen_obj_rename:
+ * @old_path: 旧ファイルパス
+ * @new_path: 新ファイルパス
+ *
+ * old_pathに該当するオブジェクトのファイル名をnew_pathに変更する。
+ **/
+sen_rc sen_obj_rename(sen_ctx *ctx, const char *old_path, const char *new_path);
+
+/**
+ * sen_obj_close:
+ * @obj: 対象object
+ *
+ * objをメモリから解放する。objに属するobjectも再帰的にメモリから解放される。
+ **/
+sen_rc sen_obj_close(sen_ctx *ctx, sen_obj *obj);
+
+/**
+ * sen_obj_path:
+ * @obj: 対象object
+ *
+ * objに対応するファイルパスを返す。一時objectならNULLを返す。
+ **/
+const char *sen_obj_path(sen_ctx *ctx, sen_obj *obj);
+
+/**
+ * sen_obj_name:
+ * @obj: 対象object
+ *
+ * objの名前を返す。無名objectならNULLを返す。
+ **/
+const char *sen_obj_name(sen_ctx *ctx, sen_obj *obj);
+
+/**
+ * sen_obj_defrag:
+ * @obj: 対象object
+ *
+ * objに対応するファイルのフラグメンテーションを解消する。
+ **/
+int sen_obj_defrag(sen_ctx *ctx, sen_obj *obj, int threshold);
+
+/**
+ * sen_obj_expire:
+ * @obj: 対象object
+ *
+ * objの占有するメモリのうち、可能な領域をthresholdを指標として解放する。
+ **/
+int sen_obj_expire(sen_ctx *ctx, sen_obj *obj, int threshold);
+
+/**
+ * sen_obj_check:
+ * @obj: 対象object
+ *
+ * objに対応するファイルの整合性を検査する。
+ **/
+int sen_obj_check(sen_ctx *ctx, sen_obj *obj);
+
+/**
+ * sen_obj_lock:
+ * @obj: 対象object
+ *
+ * objをlockする。timeout(秒)経過してもlockを取得できない場合はsen_other_errorを返す。
+ **/
+sen_rc sen_obj_lock(sen_ctx *ctx, sen_obj *obj, int timeout);
+
+/**
+ * sen_obj_unlock:
+ * @obj: 対象object
+ *
+ * objをunlockする。
+ **/
+sen_rc sen_obj_unlock(sen_ctx *ctx, sen_obj *obj);
+
+/**
+ * sen_obj_clear_lock:
+ * @obj: 対象object
+ *
+ * 強制的にロックをクリアする。
+ **/
+sen_rc sen_obj_clear_lock(sen_ctx *ctx, sen_obj *obj);
+
+/*-------------------------------------------------------------
+ * spaceの親子関係を調べるための関数
+ */
+
+/**
+ * sen_obj_space:
+ * @obj: 対象object
+ *
+ * objの属するspaceを返す。
+ **/
+sen_rc sen_obj_space(sen_ctx *ctx, sen_obj *obj);
+
+/**
+ * sen_space_sibling:
+ * @space: 対象space
+ *
+ * spaceの兄弟space(の一つ)を返す。
+ * (siblingは循環リストになっている。)
+ **/
+sen_rc sen_space_sibling(sen_ctx *ctx, sen_obj *space);
+
+/**
+ * sen_space_child:
+ * @space: 対象space
+ *
+ * spaceの子space(の一つ)を返す。
+ **/
+sen_rc sen_space_child(sen_ctx *ctx, sen_obj *space);
+
+}}

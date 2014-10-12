@@ -1,0 +1,1014 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html xmlns:v="urn:schemas-microsoft-com:vml"
+><head
+><title
+>SennaQL リファレンス - Senna 組み込み型全文検索エンジン</title
+><link href="theme/css/base.css" media="screen,tv" rel="stylesheet" type="text/css"
+/><link href="theme/css/base.css" media="screen,tv,print" rel="stylesheet" type="text/css"
+/><link href="css/theme.css" media="screen,tv,print" rel="stylesheet" type="text/css"
+/><link href="rss.xml" rel="alternate" title="RSS 0.91" type="application/rss+xml"
+/><script src=".theme/js/base.js" type="text/javascript"
+></script
+><script src=".theme/js/niftypp.js" type="text/javascript"
+></script
+><script src=".theme/js/se_hilite_jp.js" type="text/javascript"
+></script
+></head
+><body onload="qwik_onload();"
+><div class="container"
+><div class="main"
+><!--adminmenu--><!--toc--><h1
+>SennaQL リファレンス</h1
+><!--body_enter--><div class="body_main"
+><div class="day"
+><div class="body"
+><div class="section"
+><p
+>ここではR^4RS schemeに対してSennaQLが加えている追加機能について説明します。</p
+>
+<h3
+>構文</h3
+>
+<p
+>Reader Syntax: <em
+>:name</em
+></p
+>
+<p
+>名前がnameであるキーワードとして読み込まれます。先頭が':'ではじまるシンボルをキーワードと呼びます。キーワードは評価すると常に自身を返します。</p
+>
+
+
+<p
+>Reader Syntax: <em
+>datum.name</em
+></p
+>
+<p
+>(datum :name)として読み込まれます。datumと'.'とnameの間に空白を空けてはいけません。</p
+>
+
+
+<p
+>Reader Syntax: <em
+>?</em
+></p
+>
+<p
+>フォーム中に'?'が含まれていた場合は、フォームの直後の入力を文字列として読み込み、'?'と置き換えます。フォーム中に複数の'?'が含まれていた場合は、'?'の出現数に対応するだけ入力を読み込み、出現順序に沿って置き換えます。(入力はsen_ctx_send()の呼出しと対応します)</p
+>
+
+
+<h3
+>Scheme手続き</h3
+>
+<p
+>Function: <em
+>ptable</em
+> name &amp;optional args</p
+>
+<p
+>名前がnameである永続的なテーブルを定義します。argsの指定形式には以下の5種類があります。</p
+>
+<p
+>形式1 <em
+>ptable</em
+> name &amp;optional type option1 option2 ...</p
+>
+<p
+>主キーの型がtypeである基本テーブルを定義します。typeを省略した場合は、文字列型(<em
+>&lt;shorttext&gt;</em
+>)が指定されたものとみなします。typeが文字列型(<em
+>&lt;shorttext&gt;</em
+>)であった場合には、以下のoptionが指定できます。</p
+>
+<pre
+>:delimited  定義するテーブルを転置索引の語彙テーブルとして利用する場合、空白で区切った文字列単位で語彙を管理します。</pre
+>
+<pre
+>:euc-jp     主キー値をEUC-JPでエンコーディングされた文字列とみなします。</pre
+>
+<pre
+>:koi8r      主キー値をkoi8rでエンコーディングされた文字列とみなします。</pre
+>
+<pre
+>:latin1     主キー値をlatin1でエンコーディングされた文字列とみなします。</pre
+>
+<pre
+>:ngram      定義するテーブルを転置索引の語彙テーブルとして利用する場合、ngram文字列単位で語彙を管理します。</pre
+>
+<pre
+>:normalize  主キー値を英文字の大文字/小文字、全角文字/半角文字を正規化します。</pre
+>
+<pre
+>:sjis       主キー値をshift-jisでエンコーディングされた文字列とみなします。</pre
+>
+<pre
+>:sis        定義するテーブルを転置索引の語彙テーブルとして利用する場合、後方一致検索を可能にします。</pre
+>
+<pre
+>:utf8       主キー値をutf-8でエンコーディングされた文字列とみなします。</pre
+>
+<p
+>形式2 <em
+>ptable</em
+> name :surrogate-key</p
+>
+<p
+>整数型の主キー値を自動的に付与する基本テーブルを定義します。(未実装)</p
+>
+<p
+>形式3 <em
+>ptable</em
+> name table</p
+>
+<p
+>tableが定義済みのテーブルであった場合は、tableをbaseとするビューテーブルを定義します。</p
+>
+<p
+>形式4 <em
+>ptable</em
+> name :as query</p
+>
+<p
+>queryの実行結果を値とするビューテーブルを定義します。(未実装)</p
+>
+<p
+>形式5 <em
+>ptable</em
+> name :key pkeyspec-list</p
+>
+<p
+>複合キーを主キーとするテーブルを定義します。pkeyspec-listには以下のようなフォームのリストを指定します。(未実装)</p
+>
+<pre
+>(type option1 option2 ...)</pre
+>
+<p
+>optionには形式1の場合と同じものが指定できます。</p
+>
+<p
+>Function: <em
+>disp</em
+> obj format</p
+>
+<p
+>formatに指定する形式でobjを出力します。formatには以下のいずれかを指定します。</p
+>
+<pre
+>:json JSON形式</pre
+>
+<pre
+>:sexp S式(未実装)</pre
+>
+<pre
+>:tsv  TSV形式</pre
+>
+<pre
+>:xml  XML形式(未実装)</pre
+>
+<p
+>obj中に以下のフォームが含まれていた場合は特別な処理が加えられます。</p
+>
+<pre
+>(: table slot-spec &amp;optional offset limit)</pre
+>
+<p
+>tableのoffset番目からlimit件のレコードをslot-specに従って属性を取り出して出力します。offsetとlimitの既定値は、それぞれ0と10です。</p
+>
+<p
+>slot-specにはslot-exprのリストを指定します。slot-exprは以下のようなフォームです。</p
+>
+<pre
+>(() :slotname)</pre
+>
+<p
+>slotnameに対応する属性の値が出力されます。これは以下のように表記することもできます。</p
+>
+<pre
+>.slotname</pre
+>
+<p
+>指定した属性が、外部キーとして他のテーブルを参照している場合、以下のように参照先のテーブルのレコードの属性を再帰的に取得して出力することができます。</p
+>
+<pre
+>(((() :slotname1) :slotname2) :slotname3)</pre
+>
+<p
+>これは以下のように表記することもできます。</p
+>
+<pre
+>.slotname1.slotname2.slotname3</pre
+>
+<p
+>slot-specの先頭要素がシンボル'@'であった場合は、以下のようにlabelとslot-exprが交互に与えられるものとみなされます。</p
+>
+<pre
+>(@ label1 slot-expr1 label2 slot-expr2 label3 slot-expr3 ...)</pre
+>
+<p
+>Function: <em
+>snippet</em
+> cond width max_results opentag1 closetag1 opentag2 closetag2 ...</p
+>
+<p
+>snippet関数を生成します。</p
+>
+<p
+>Function: <em
+>x-&gt;query</em
+> string</p
+>
+<p
+>queryオブジェクトを生成します。</p
+>
+
+
+<h3
+>組込み型</h3
+>
+<p
+>テーブルの主キー(*)や属性に指定できるデータ型として以下が準備されています。</p
+>
+<p
+>Builtin Type: <em
+>&lt;shorttext&gt;</em
+> 8KByte以下の文字列</p
+>
+<p
+>Builtin Type: <em
+>&lt;text&gt;</em
+>  64KByte以下の文字列</p
+>
+<p
+>Builtin Type: <em
+>&lt;longtext&gt;</em
+> 4MByte以下の文字列</p
+>
+<p
+>Builtin Type: <em
+>&lt;int&gt;</em
+> -2147483648 ~ 2147483647の範囲内の整数</p
+>
+<p
+>Builtin Type: <em
+>&lt;uint&gt;</em
+> 0 ~ 4294967295の範囲内の整数</p
+>
+<p
+>Builtin Type: <em
+>&lt;int64&gt;</em
+> -9223372036854775808 ~ 9223372036854775807の範囲内の整数</p
+>
+<p
+>Builtin Type: <em
+>&lt;float&gt;</em
+> IEEE 64 ビットの符号付き浮動小数点数</p
+>
+<p
+>Builtin Type: <em
+>&lt;time&gt;</em
+> 1901年12月14日5時45分52.000000秒 ~ 2038年1月19日12時14分7.999999秒の範囲内の時刻</p
+>
+<p
+>(*) 主キー値には&lt;text&gt;, &lt;longtext&gt;は指定できません。</p
+>
+
+<h3
+>テーブル</h3
+>
+<p
+>ptable等で定義したテーブルは、以下のように関数として評価することによって操作することができます。</p
+>
+<pre
+>(table_obj selector args ...)</pre
+>
+<p
+>table_objにはptableで定義したテーブルや、関係演算の結果として返されるテーブルを指定することができます。selectorに指定可能なキーワードとして以下が準備されています。</p
+>
+
+
+<p
+>Builtin Selector: <em
+>：</em
+> value</p
+>
+<p
+>table_objから主キーの値がvalueであるレコードを返します。対応するレコードが存在しない場合は()を返します。</p
+>
+
+
+<p
+>Builtin Selector: <em
+>::def</em
+> slotname &amp;optional args</p
+>
+<p
+>名前がslotnameである新しい属性をtable_objに定義します。
+slotnameにはキーワードを指定します。ただし、'::'で始まるキーワードは組込み属性として予約されていますので使用することができません。</p
+>
+<p
+>以下の3種類の指定形式があります。(永続テーブルのみ有効)</p
+>
+<p
+>形式1 <em
+>::def</em
+> slotname type</p
+>
+<p
+>名前がslotnameで型がtypeである属性を定義します。typeには正しいデータ型を指定します。</p
+>
+<p
+>形式2 <em
+>::def</em
+> slotname table</p
+>
+<p
+>tableが定義済みのテーブルであった場合は、tableの主キー型と等しい型の属性を定義します。tableは外部キーとなり、この属性の値を主キー値とするレコードがtableに必ず存在することが保証されるようになります。</p
+>
+<p
+>形式3 <em
+>::def</em
+> slotname :as query</p
+>
+<p
+>queryの実行結果を値とするビュー属性を定義します。</p
+>
+
+
+<p
+>Builtin Selector: <em
+>::new</em
+> args</p
+>
+<p
+>table_objに新規レコードを追加します。対象のテーブルの主キーがsurrogate-key以外である場合は以下の形式となります。(永続テーブルのみ有効)</p
+>
+<p
+>形式1 <em
+>::new</em
+> pkey-value &amp;optional slot-name1 slot-value1 ...</p
+>
+<p
+>pkey-valueを主キー値とするレコードを追加します。レコードが既に存在していた場合はそのレコードを返します。当該レコードの名前がslot-nameである属性の値にはslot-valueがセットされます。</p
+>
+<p
+>table_objの主キーがsurrogate-keyである場合は以下の形式となります。</p
+>
+<p
+>形式2 <em
+>::new</em
+> &amp;optional slot-name1 slot-value1 ...</p
+>
+<p
+>主キー値は自動的に付与されます。</p
+>
+
+
+<p
+>Builtin Selector: <em
+>::nrecords</em
+></p
+>
+<p
+>table_objに含まれるレコードの件数を返します。</p
+>
+
+
+<p
+>Builtin Selector: <em
+>::</em
+></p
+>
+<p
+>table_objに含まれるレコードを順に全て取り出すためのイテレータを作成して返します。</p
+>
+
+
+<p
+>Builtin Selector: <em
+>::+</em
+> iterator</p
+>
+<p
+>iteratorに指定されたイテレータに基づいて次のレコードを返します。</p
+>
+
+
+<p
+>Builtin Selector: <em
+>::del</em
+> value</p
+>
+<p
+>table_objから主キーの値がvalueであるレコードを削除します。対応するレコードが存在した場合は#tを、しなかった場合は#fを返します。</p
+>
+
+
+<p
+>Builtin Selector: <em
+>::difference!</em
+> table</p
+>
+<p
+>table_objとtableとの共通部分をそれぞれ除去します。table_objとtableは主キーの型が同一であることが必要です。(一時テーブルのみ有効)</p
+>
+
+
+<p
+>Builtin Selector: <em
+>::group!</em
+> slot-expr &amp;optional limit dir</p
+>
+<p
+>table_objに含まれる全てのレコードについて、slot-exprを適用した結果を主キーとするテーブルにtable_objを変換します。
+(一時テーブルのみ有効。slot-exprには外部キーである属性名だけが指定できる)
+limitにはグループ化後のテーブルに保存する、グループ化前の主キーの配列の最大サイズを指定します。(既定値は0) dirには:asc(昇順)と:desc(降順)のいずれかを指定します。(既定値は:desc) グループ化前の主キー配列の並び順を示します。</p
+>
+
+
+<p
+>Builtin Selector: <em
+>::intersect!</em
+> table</p
+>
+<p
+>table_objとtableとの共通要素のみを残して、それ以外の要素をtable_objから削除します。table_objとtableは主キーの型が同一であることが必要です。(一時テーブルのみ有効)</p
+>
+
+
+<p
+>Builtin Selector: <em
+>::sort!</em
+> slot-expr &amp;optional limit dir</p
+>
+<p
+>table_objに含まれる全レコードをslot-exprを適用した結果によって並べ替え、最初のlimit件のみを残して、それ以外をtable_objから削除します。limitの既定値は10です。 dirには:asc(昇順)と:desc(降順)のいずれかを指定します。既定値は:descです。(一時テーブルのみ有効)</p
+>
+
+
+<p
+>Builtin Selector: <em
+>::subtract!</em
+> table</p
+>
+<p
+>table_objからtableとの共通要素を削除します。table_objとtableは主キーの型が同一であることが必要です。(一時テーブルのみ有効)</p
+>
+
+
+<p
+>Builtin Selector: <em
+>::union!</em
+> table</p
+>
+<p
+>table_objとtableとの和集合を表すテーブルを返します。(元のtable_objとtableはいずれも破壊されます)(一時テーブルのみ有効)</p
+>
+
+
+<p
+>Builtin Selector: <em
+>::common-prefix-search</em
+> string</p
+>
+<p
+>table_objの主キーである文字列のうち、stringと前方一致する最も長い文字列を主キーとするレコードを返します。(永続テーブルのみ有効)</p
+>
+
+
+<p
+>Builtin Selector: <em
+>::load</em
+> &amp;optional slotname1 slotname2 ...</p
+>
+<p
+>主キー値(*)とslotnameに対応する属性の値をTSV形式で受け取ってレコードを挿入します。
+空行を受けると終了します。(永続テーブルのみ有効)</p
+>
+<p
+>(*) surrogate-keyの場合は不要</p
+>
+
+
+<p
+>Builtin Selector: <em
+>::prefix-search</em
+> string</p
+>
+<p
+>table_objの中で主キー値がstringに前方一致するレコードを要素とするテーブルを返します。(永続テーブルのみ有効)</p
+>
+
+
+<p
+>Builtin Selector: <em
+>::undef</em
+> slotname</p
+>
+<p
+>table_objからslotnameに対応する属性を削除します。</p
+>
+
+<p
+>Builtin Selector: <em
+>::scan</em
+> match-expr</p
+>
+<p
+>table_objの中でmatch-exprに指定する条件を満たすレコードを要素とするテーブルを返します。(永続テーブルのみ有効)</p
+>
+<p
+>match-exprは以下の形式のフォームを渡します。</p
+>
+<pre
+>(func expr1 expr2 ...)</pre
+>
+<p
+>exprにslot-exprを指定すると、table_objの各レコードについてslot-exprを適用した結果に置換され、フォームが評価されます。slot-expr形式以外のexprは定数と解釈されます。funcは真偽値を返すC組込み関数でなければなりません。現状では以下のいずれかが指定できます。</p
+>
+<pre
+>not
+eqv?
+eq?
+null?
+zero?
+positive?
+negative?
+=
+&lt;
+&gt;
+&lt;=
+&gt;=</pre
+>
+<p
+>Builtin Selector: <em
+>::schema</em
+></p
+>
+<p
+>テーブルの定義を出力します。</p
+>
+<p
+>Builtin Selector: <em
+>::suffix-search</em
+> string</p
+>
+<p
+>table_objの中で主キー値がstringに後方一致するレコードを要素とするテーブルを返します。(定義時に主キー属性に:sis属性を指定していた永続テーブルのみ有効)</p
+>
+
+
+<p
+>Builtin Selector: <em
+>::slots</em
+> string</p
+>
+<p
+>table_objの属性のうち、名前にstringが前方一致するものを要素とするテーブルを返します。(永続テーブルのみ有効)</p
+>
+
+
+<p
+>データベース作成時に自動的に作成されるテーブルがあります。</p
+>
+<p
+>Builtin Table: <em
+>&lt;db&gt;</em
+></p
+>
+<p
+>&lt;db&gt;はデータベース内に定義された永続テーブルを要素とするテーブルです。
+&lt;db&gt;にはselectorに指定可能なキーワードとして以下が準備されています。</p
+>
+<p
+>Builtin Selector: <em
+>::drop</em
+> tablename</p
+>
+<p
+>データベースからtablenameに対応する永続テーブルを削除します。</p
+>
+<h3
+>レコード</h3
+>
+<p
+>テーブルに格納されているレコードは、以下のように関数として評価することによって操作することができます。</p
+>
+<pre
+>(record_obj selector args ...)</pre
+>
+<p
+>record_objはテーブルから取り出したレコードや、レコードIDを直接与えることによって指定することができます。</p
+>
+<p
+>ptableで定義したテーブルや、関係演算の結果として返されるテーブルを指定することができます。record_objが属しているテーブルの各属性はselectorとして使用することができます。</p
+>
+<p
+>Selector: slot-name &amp;optional value</p
+>
+<p
+>valueが指定されなかった場合は、名前がslot-nameである属性の値を返します。
+valueが指定された場合は、名前がslot-nameである属性の値をvalueに更新します。</p
+>
+
+<p
+>selectorに指定可能なキーワードとして以下が準備されています。</p
+>
+<p
+>Builtin Selector: <em
+>::id</em
+></p
+>
+<p
+>record_objのIDを文字列として返します。レコードIDは、そのレコードが削除されない限り不変であり、レコードのリテラル表現として使用することができます。</p
+>
+
+
+<p
+>Builtin Selector: <em
+>::key</em
+></p
+>
+<p
+>record_objの主キー値を返します。</p
+>
+
+
+<p
+>Builtin Selector: <em
+>::score</em
+></p
+>
+<p
+>record_objが全文検索操作によって生成されたテーブルの要素であった場合、全文検索スコアの値を返します。</p
+>
+
+
+<p
+>Builtin Selector: <em
+>::nsubrec</em
+></p
+>
+<p
+>record_objがgroup操作によって生成されたテーブルの要素であった場合、group化前のテーブルに、当該レコードに対応するレコードが何件含まれていたかを返します。</p
+>
+
+
+
+<h3
+>テーブル属性</h3
+>
+<p
+>テーブルの属性は、以下のように関数として評価することによって操作することができます。</p
+>
+<pre
+>(slot_obj selector args ...)</pre
+>
+<p
+>slot_objは、</p
+>
+<pre
+>(table_obj slotname)</pre
+>
+<p
+>というフォームを評価することによって取り出すことができます。
+slotnameが :slotname というキーワードであった場合、このフォームは、</p
+>
+<pre
+>table_obj.slotname</pre
+>
+<p
+>という表記によっても表現することができます。</p
+>
+<p
+>テーブル属性には以下の組込みselectorが準備されています。</p
+>
+<p
+>Builtin Selector: <em
+>：</em
+> value</p
+>
+<p
+>slot_objが属しているテーブルから主キーの値がvalueであるレコードを取り出し、そのレコードのslot_objの値を返します。対応するレコードが存在しない場合は()を返します。</p
+>
+<p
+>Builtin Selector: <em
+>::defrag</em
+></p
+>
+<p
+>可変長のテーブル属性の場合、フラグメンテーションを手動で解消します。</p
+>
+<p
+>Builtin Selector: <em
+>::schema</em
+></p
+>
+<p
+>テーブル属性の定義を出力します。</p
+>
+</div
+><!--section--></div
+><!--body--></div
+><!--day--></div
+><!--body_main--><div class="body_leave" id="body_leave"
+><div class="day"
+><div class="comment"
+><div class="caption"
+><div class="page_attribute"
+>
+<span class="attribute"
+>生成時間: <em
+>__qwik_page_generate_time__秒</em
+></span
+>
+<div align="right"
+>
+<a href="http://x6.at-ninja.jp/bin/gg?067333300"
+>
+<img border="0" src="http://x6.at-ninja.jp/bin/ll?067333300"
+/></a
+>
+<span style="font-size:9px"
+><img src="http://img.shinobi.jp/tadaima/fj.gif" style="margin:0;vertical-align:text-bottom;"
+/> <a href="http://randoseru.rentalurl.net"
+>ランドセル</a
+></span
+>
+</div
+>
+
+
+</div
+></div
+></div
+></div
+></div
+><!--body_leave--></div
+><!--main--><div class="sidebar"
+><h2
+>メニュー/Menu</h2
+><ul
+><li
+><a href="FrontPageJ.html"
+>ホーム</a
+> / <a href="FrontPage.html"
+>Home</a
+></li
+></ul
+>
+<ul
+><li
+>Sennaの紹介</li
+><ul
+><li
+><a href="senna_takahashi.html"
+>Sennaとは</a
+></li
+><li
+><a href="publication.html"
+>雑誌記事・発表資料等</a
+></li
+><li
+><a href="example.html"
+>こんなところでも使われてます！</a
+></li
+><li
+><a href="FAQ.html"
+>FAQ</a
+> / <a href="FAQ_en.html"
+>FAQ (English)</a
+></li
+><li
+><a href="ML.html"
+>メーリングリスト</a
+> / <a href="ML_en.html"
+>MailingLists</a
+></li
+></ul
+><li
+>Sennaの利用</li
+><ul
+><li
+><a href="Download.html"
+>ダウンロード</a
+> / <a href="Download_en.html"
+>Download</a
+></li
+><li
+><a href="install.html"
+>インストール</a
+> / <a href="install_en.html"
+>Install</a
+></li
+><li
+><a href="check_install.html"
+>動作確認方法</a
+> / <a href="check_install_en.html"
+>Check install</a
+></li
+><li
+><a href="bindings.html"
+>バインディング一覧</a
+></li
+><li
+><a href="mysql_binding.html"
+>MySQL バインディング</a
+> / <a href="mysql_binding_en.html"
+>MySQL binding</a
+></li
+><li
+><a href="install_specific.html"
+>特定環境でのインストールメモ</a
+> / <a href="install_specific_en.html"
+>installing note for specific environment</a
+></li
+></ul
+><li
+>利用者向け</li
+><ul
+><li
+><a href="query.html"
+>クエリーの書式</a
+> / <a href="query_en.html"
+>query syntax</a
+></li
+><li
+><a href="Customize.html"
+>カスタマイズ</a
+> / <a href="Customize_en.html"
+>Customize</a
+></li
+><li
+><a href="sennaql_reference.html"
+>SennaQL リファレンス</a
+></li
+><li
+><a href="store_tutorial.html"
+>SennaStoreを使ってみよう</a
+></li
+><li
+><a href="log_level.html"
+>ログレベルの解説</a
+></li
+><li
+><a href="report_bugs.html"
+>不具合報告掲示板</a
+></li
+><li
+><a href="contribute.html"
+>Sennaへのパッチ・情報等</a
+></li
+><li
+><a href="knownproblems.html"
+>不具合等</a
+> / <a href="knownproblems_en.html"
+>Known problems</a
+></li
+></ul
+><li
+>高度な利用法</li
+><ul
+><li
+><a href="APIJ.html"
+>API</a
+> / <a href="API.html"
+>C API(English)</a
+></li
+><li
+><a href="IndexFile.html"
+>インデックスファイル</a
+> / <a href="IndexFile_en.html"
+>Index File</a
+></li
+></ul
+><li
+>Senna開発</li
+><ul
+><li
+><a href="design_policy.html"
+>Senna設計方針</a
+></li
+><li
+><a href="Roadmap.html"
+>開発ロードマップ</a
+></li
+><li
+><a href="cstyle.html"
+>コーディング規約</a
+></li
+><li
+><a href="WorkingStatus.html"
+>作業状況</a
+></li
+><li
+><a href="futureworks.html"
+>野望</a
+> / <a href="futureworks_en.html"
+>Future works</a
+></li
+></ul
+></ul
+>
+<h2
+>Search</h2
+><form action=".search"
+><input name="q"
+/><input type="submit" value="検索"
+/></form
+>
+
+<h2
+>Recent Change</h2
+><div class="recent"
+><ul
+><li
+><a href="example.html" title="2010-10-28 14:04:51"
+>こんなところでも使われてます！</a
+> <span class="ago"
+>3年前</span
+></li
+><li
+><a href="frontpage.html" title="2010-09-14 12:54:06"
+>frontpage</a
+> <span class="ago"
+>4年前</span
+></li
+><li
+><a href="Download_en.html" title="2010-07-22 14:26:20"
+>Download</a
+> <span class="ago"
+>4年前</span
+></li
+><li
+><a href="Download.html" title="2010-07-22 14:26:01"
+>ダウンロード</a
+> <span class="ago"
+>4年前</span
+></li
+><li
+><a href="FrontPageJ.html" title="2009-11-25 16:14:43"
+>Senna 組み込み型全文検索エンジン</a
+> <span class="ago"
+>4年前</span
+></li
+><li
+><a href="FrontPage.html" title="2009-11-25 16:14:20"
+>Senna: An Embeddable Fulltext Search Engine</a
+> <span class="ago"
+>4年前</span
+></li
+><li
+><a href="Ruby_binding.html" title="2009-09-03 18:42:32"
+>Rubyバインディング</a
+> <span class="ago"
+>5年前</span
+></li
+><li
+><a href="PHP_binding.html" title="2009-08-24 04:09:56"
+>PHPバインディング</a
+> <span class="ago"
+>5年前</span
+></li
+><li
+><a href="store.html" title="2009-03-23 03:34:52"
+>SennaStore概要</a
+> <span class="ago"
+>5年前</span
+></li
+><li
+><a href="bindings.html" title="2008-10-05 11:33:12"
+>バインディング一覧</a
+> <span class="ago"
+>6年前</span
+></li
+></ul
+><p class="recent"
+><a href="RecentList.html"
+><em
+>もっと前の情報</em
+></a
+></p
+></div
+>
+<a class="rss-button" href="rss.xml"
+><span
+>RSS</span
+></a
+><a class="rss-button" href="atom.xml"
+><span
+>ATOM</span
+></a
+>
+
+</div
+><!--sidebar--><div class="footer"
+><span title="__qwik_page_generate_time__"
+>powered by <a href="http://qwik.jp/"
+>qwikWeb</a
+></span
+></div
+><!--footer--></div
+><!--container--></body
+></html
+>

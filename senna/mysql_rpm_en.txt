@@ -1,0 +1,79 @@
+* How to create MySQL + Senna rpm
+
+* Download
+Download Source RPM from MySQL page:
+{{{
+wget http://dev.mysql.com/get/Downloads/MySQL-5.0/MySQL-5.0.22-0.src.rpm/from/http://ftp.iij.ad.jp/pub/db/mysql/
+}}}
+
+Download Senna:
+{{{
+wget http://dev.razil.jp/archive/senna/senna-latest-svn.tar.gz
+}}}
+
+Download MeCab:
+{{{
+wget http://prdownloads.sourceforge.jp/mecab/20917/mecab-0.92.tar.gz
+wget http://prdownloads.sourceforge.jp/mecab/20904/mecab-ipadic-2.7.0-20060707.tar.gz
+}}}
+
+* Make MeCab rpm
+- MeCab package 0.91 or below has mecab.spec and mecab.spec.in. After configure is executed, mecab.spec will be created.
+- Version 0.92 or above don't have mecab.spec.in, so the file needs to be gotten from version 0.91 or below.
+- mecab.spec of version 0.91 or below has a little old style grammar, so it needs to be fixed.
+- Mecab itself can handle all character sets.
+{{{
+tar xvfz mecab-0.91.tar.gz
+tar xvfz mecab-0.93.tar.gz
+cd mecab-0.91
+cp ../mecab-0.91/mecab.spec .
+vi mecab.spec
+ modify version to 0.93
+ modify copyright: LGPL to License: LGPL
+ modify configure option as you like
+cp mecab-0.93.tar.gz /usr/src/redhat/SOURCES/
+rpmbuild -ba --target i686 mecab.spec
+}}}
+
+* Make IPADIC rpm
+
+- Run configure and create mecab-ipadic.spec from mecab-ipadic.spec.in
+- Don't forget to set character sets for dictionary!!!
+{{{
+tar xvfz mecab-ipadic-2.7.0-20060707.tar.gz
+cd mecab-ipadic-2.7.0-20060707
+./configure
+vi mecab.spec
+ modify copyright: LGPL to License: LGPL
+ modify configure option as you like (in this part, you can set character sets for dictionary!!!)
+cp mecab-ipadic-2.7.0-20060707.tar.gz /usr/src/redhat/SOURCES/
+rpmbuild -ba mecab-ipadic.spec
+}}}
+
+* Make Senna rpm
+- Run configure and create senna.spec from senna.spec.in
+{{{
+tar xvfz senna-latest-svn.tar.gz
+cd senna
+./configure
+vi senna.spec
+ modify configure option as you like
+cp senna-latest-svn.tar.gz /usr/src/redhat/SOURCES/libsenna-0.8.0.tar.gz
+rpmbuild -ba --target i686 senna.spec
+}}}
+
+* Make MySQL with Senna rpm
+- Use MySQL source rpm
+- About MySQL binding patch
+-- MySQL tarball in MySQL source rpm doesn't have configure.ac. So remove that point from Senna patches.
+-- Instead of that create a patch that targets configure itself.
+- About spec file
+-- Add MySQL binding patches with above adjustment
+-- Add patches for above configure
+-- Modify Name to MySQl-senna from MySQL
+-- Add Provides arbitrarily
+-- Add libsenna-devel and mecab-devel to BuildRequires
+-- Add Obsoletes arbitrarily
+-- Add --with-senna option to configure
+
+This part is still writing...

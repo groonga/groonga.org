@@ -1,0 +1,366 @@
+* SennaStoreを使ってみよう
+
+SennaStoreは現在配布中のSVNリポジトリにすでに含まれています。
+各種アプリケーションインタフェースから、基本的なクエリセットを試すことができます。
+
+このページでは簡単なアプリケーションの作成を通して新しいSennaの操作方法を紹介します。
+
+* インストール
+
+[[install]]の手順に沿って最新のsvnリポジトリからsennaをインストールします。
+make installすると、sennaコマンドもインストールされます。
+
+* データベースの作成
+
+簡単なブックマークアプリケーション用のデータベースを作ってみます。
+以下のように作成したいデータベースファイルのパスを指定してsennaコマンドを起動します。
+
+{{{
+% senna /tmp/bookmark.db
+}}}
+
+sennaコマンドを起動するとプロンプトが表示され、対話的にコマンドを実行できます。
+
+{{{
+> (+ 1 1)
+2
+> (car '(a b c))
+a
+}}}
+
+普通にlispのインタープリタとして動いています。
+
+* テーブルの定義
+
+''ptable''という関数を使うことによって、作成したbookmark.dbにテーブルを定義することができます。
+
+{{{
+> (ptable '<items>)
+<items>
+}}}
+
+これで''<items>''という名前のテーブルが作成できました。
+
+テーブルに限りませんが、db系の操作をして作られたオブジェクトは、
+関数として呼出し可能になり、引数にkeywordを渡すことによってオブジェクトを操作することができるようになります。
+
+例えば以下のように''::nrecords''というkeywordを指定すると、テーブルに登録されているレコードの件数が返ります。(CLOS系のオブジェクトシステムに慣れた人は違和感を感じるかも知れません‥)
+
+{{{
+> (<items> ::nrecords)
+0
+}}}
+
+テーブルを作成した時点で'':key''という名前のカラムが自動的に追加されています。
+'':key''は主キーとなるカラムです。
+Sennaで作成するテーブルは(現時点では)必ず主キーを持たなければなりません。
+また'':key''カラムの型は文字列型に限定されています。
+
+* レコードを追加する
+
+''<items>''テーブルにレコードを追加します。
+
+{{{
+> (<items> ::new "http://ja.wikipedia.org/wiki/LISP")
+ #p<0000800001>
+> (<items> ::new "http://www.unfindable.net/~yabuki/article/why_lisp.html")
+ #p<0000800002>
+}}}
+
+件数を確認すると確かに2件増えています。
+
+{{{
+> (<items> ::nrecords)
+2
+}}}
+
+主キーを指定してレコードを取り出す時には以下のようにします。
+
+{{{
+> (<items> : "http://ja.wikipedia.org/wiki/LISP")
+ #p<0000800001>
+}}}
+
+* 全文検索を行う
+
+各itemのタイトル文字列を登録して、全文検索できるようにしてみましょう。
+
+まず''<items>''テーブルに''title''という名前のカラムを追加します。
+
+{{{
+> (<items> ::def :title <text>)
+<items>.title
+}}}
+
+3番目の引数は、追加するカラムのデータ型を示しています。
+''<int>'', ''<text>'', ''<longtext>''等の型が基本型として用意されています。
+
+全文検索するためには、文字列を分解して得られる各単語を格納するためのテーブルを別途しなければなりません。ここでは''<terms>''という名前でテーブルを定義します。
+この段階で単語インデックスにするかngramインデックスにするかも決めます。
+
+{{{
+> (ptable '<terms> :ngram)
+<terms>
+}}}
+
+''<item>''テーブルの''title''カラムに対するインデックスを定義します。
+
+{{{
+> (<terms> ::def :item_title :as '(<items>.title ::match ()))
+<terms>.item_title
+}}}
+
+少し違和感を感じるかも知れませんが、
+''<item>''テーブルのカラムに対するインデックスは、
+''<terms>''テーブルのカラムとして定義します。
+
+''<item>''にレコードが登録されると、その中に含まれる単語に該当するレコードが
+''<terms>''に自動的に追加されるようになります。
+
+''<terms>''は、文書に含まれる語彙に相当する、やや特殊なテーブルだと言えます。
+しかし、他のテーブルと同様に語彙テーブルには自由にカラムを追加し、
+単語毎の様々な属性を管理することができます。
+これはある種の検索処理を行う際には非常に便利に機能します。
+
+これでテーブルの定義は完了です。
+
+先ほど登録した各レコードの''title''カラムに値をセットします。
+
+{{{
+> ((<items> : "http://ja.wikipedia.org/wiki/LISP") :title "LISP")
+"LISP"
+> ((<items> : "http://www.unfindable.net/~yabuki/article/why_lisp.html") :title "なぜLispなのか")
+"なぜLispなのか"
+}}}
+
+以下のようにして検索することができます。
+
+{{{
+> (disp (<terms>.item_title : "lisp") :json)
+["http://ja.wikipedia.org/wiki/LISP", "http://www.unfindable.net/~yabuki/article/why_lisp.html"]
+#t
+}}}
+
+''disp''は、検索結果等のオブジェクトを出力する組込み関数です。''disp''関数の第2引数には出力形式を指定します。上記の例はjson形式で出力しています。
+
+簡単のため、検索結果をtsv形式で出力する関数''sen-output''を以下のように定義しておきます。
+
+{{{
+(define (sen-output . x)
+ (disp (car x).:nr :tsv)
+ (disp (cons : x) :tsv))
+}}}
+
+''sen-output''は、オブジェクトをTSV形式で出力します。
+第一引数に出力対象のオブジェクトを、
+第二引数に出力するカラムリストを指定します。
+
+* マルチユーザ向けのブックマークアプリケーション
+
+ここまでで作った単機能のアプリケーションをもう少し拡張して、
+複数のユーザが、それぞれにコメントを記入できるブックマークアプリケーションにしてみましょう。
+
+まず、ユーザ情報とコメント情報を格納するテーブルを追加して、
+下図のようなテーブル構成にします。
+
+{{img("senna2.files/rect4605.png")}}
+
+''<users>''テーブルと''<comments>''テーブルを追加します。
+
+{{{
+> (ptable '<users>)
+<users>
+> (<users> ::def :name <text>)
+<users>.name
+> (ptable '<comments>)
+<comments>
+> (<comments> ::def :item <items>)
+<comments>.item
+> (<comments> ::def :author <users>)
+<comments>.author
+> (<comments> ::def :content <text>)
+<comments>.content
+> (<comments> ::def :issued <int>)
+<comments>.issued
+}}}
+
+''<comments>''テーブルの''content''カラムを全文検索できるようにインデックスを定義します。
+
+{{{
+> (<terms> ::def :comment_content :as '(<comments>.content ::match ()))
+<terms>.comment_content
+}}}
+
+これでテーブルが定義できました。
+
+続いてユーザを何人か追加します。
+
+{{{
+> (<users> ::new "moritan" :name "モリタン")
+ #p<0000400001>
+> (<users> ::new "taporobo" :name "タポロボ")
+ #p<0000400002>
+}}}
+
+次に、実際にユーザがブックマークを貼る時の処理を実行してみましょう。
+
+ユーザ''moritan''が、はてなダイアリーのとあるページをブックマークしたと想定します。
+
+まず対象のページが''<items>''テーブルに登録済かどうか調べます。
+
+{{{
+> (<items> : "http://d.hatena.ne.jp/brazil/20050829/1125321936")
+()
+}}}
+
+未登録なのでまず当該ページを''<items>''に登録します。
+
+{{{
+> (<items> ::new "http://d.hatena.ne.jp/brazil/20050829/1125321936" :title "[翻訳]JavaScript: 世界で最も誤解されたプログラミング言語")
+ #p<0000800003>
+}}}
+
+次に、登録したitemを'':item''カラムの値に指定して''<comments>''にレコードを登録します。
+
+{{{
+> (<comments> ::new "1" :item "http://d.hatena.ne.jp/brazil/20050829/1125321936" :author "moritan" :content "JavaScript LISP" :issued 1187430026)
+ #p<0000600001>
+}}}
+
+* 関数化
+
+上記の一連の手続きを関数にまとめてみます。
+
+{{{
+> (define (add_bookmark item_url item_title comment_author comment_content comment_issued)
+>  (let ((item (or (<items> : item_url) (<items> ::new item_url :title item_title)))
+>        (id (+ (<comments> ::nrecords) 1)))
+>   (<comments> ::new id
+>    :item item
+>    :author comment_author
+>    :content comment_content
+>    :issued comment_issued)))
+add_bookmark
+}}}
+
+''add_bookmark''という関数を作りました。
+以下のような手順を実行しています。
+
+- ''<items>''テーブルに該当ページのレコードがあるかどうか調べる。
+- レコードがなければ追加する。
+- ''<comments>''テーブルに登録するidを払い出す。(ちょっと粗い)
+- ''<comments>''テーブルにレコードを登録する。
+
+作成した関数を呼び出していくつかブックマークを登録してみましょう。
+
+{{{
+> (add_bookmark "http://practical-scheme.net/docs/cont-j.html" "なんでも継続" "moritan" "継続 LISP Scheme" 1187568692)
+ #p<0000600002>
+> (add_bookmark "http://d.hatena.ne.jp/higepon/20070815/1187192864" "末尾再帰" "taporobo" "末尾再帰 Scheme LISP" 1187568793)
+ #p<0000600003>
+> (add_bookmark "http://practical-scheme.net/docs/cont-j.html" "なんでも継続" "taporobo" "トランポリン LISP continuation" 1187568692)
+ #p<000060000w>
+}}}
+
+このように関数呼出しにすると、クライアント側の処理が簡潔になると同時に、
+クライアント/サーバ間での通信を削減できるというメリットがあります。
+
+* 全文検索その2
+
+登録したレコードに対して全文検索を実行してみます。
+
+{{{
+> (sen-output
+>  (<terms>.comment_content : "LISP")
+>  '(.:key .issued .item.title .author.name .content))
+4
+1	1187430026	[翻訳]JavaScript: 世界で最も誤解されたプログラミング言語	モリタン	JavaScript LISP
+2	1187568692	なんでも継続	モリタン	継続 LISP Scheme
+3	1187568793	末尾再帰	タポロボ	末尾再帰 Scheme LISP
+4	1187568692	なんでも継続	タポロボ	トランポリン LISP continuation
+#t
+}}}
+
+出力カラムリストでは、カラム名を''.''で繋いで複合データ型の要素を再帰的に辿ることができます。(同様の出力を普通のRDBで実現するためには、''<items>''テーブル, ''<comments>''テーブル, ''<users>''テーブルのJOIN操作が必要になります。)
+
+
+上の式の中で、肝心の検索処理は、第一引数の式を評価する時点で完了していて、
+レコードセットオブジェクトとしてメモリに蓄積されています。
+
+{{{
+> (<terms>.comment_content : "LISP")
+ #<RECORDS>
+}}}
+
+レコードセットは、出力関数にかける前に様々に加工することができます。
+
+以下は、日付で降順にソートしてから出力した例です。
+
+{{{
+> (sen-output
+>  ((<terms>.comment_content : "LISP") ::sort :issued :desc)
+>  '(.:key .issued .item.title .author.name .content))
+4
+3	1187568793	末尾再帰	タポロボ	末尾再帰 Scheme LISP
+2	1187568692	なんでも継続	モリタン	継続 LISP Scheme
+4	1187568692	なんでも継続	タポロボ	トランポリン LISP continuation
+1	1187430026	[翻訳]JavaScript: 世界で最も誤解されたプログラミング言語	モリタン	JavaScript LISP
+#t
+}}}
+
+同じitemが何度も出てくると検索結果が見にくいので、item毎にグループ化してみます。
+
+{{{
+> (sen-output
+>  ((<terms>.comment_content : "LISP") ::group :item)
+>  '(.:nsubrecs .:key .title))
+3
+1	http://d.hatena.ne.jp/brazil/20050829/1125321936	[翻訳]JavaScript: 世界で最も誤解されたプログラミング言語
+2	http://practical-scheme.net/docs/cont-j.html	なんでも継続
+1	http://d.hatena.ne.jp/higepon/20070815/1187192864	末尾再帰
+#t
+}}}
+
+''::nsubrecs''というのはグループ化した単位に含まれるレコードの件数を示します。
+SQLで言えば、GROUP BY 句を含むクエリのcount関数のような働きです。
+
+* 少し複雑な検索
+
+さらに実用的な検索について考えてみましょう。
+
+ブックマークが大量に蓄積されるに従って、より的確に適合度を算出する必要性に迫られます。
+
+今のところ検索対象として利用できるのは''<items>.title''と''<comments>.content''ですが、
+''<items>.title''は元ページから得られるやや信頼できる情報なのに対して、
+''<comments>.content''はブックマークユーザが任意に設定できる情報で、やや信憑性に乏しいと言えます。しかし、再現率を確保するためにはユーザのコメントも是非対象に含めたいところです。
+
+そこで、以下のようなポリシーで検索を行うことにします。
+
+- ''<items>.title''か''<comments>.content''のいずれかにマッチするitemを検索する。
+- ただし、''<items>.title''にマッチしたレコードはスコアを10倍重み付けする。
+- 同一のitemに対して、キーワードにマッチするcommentが複数存在した場合は、それぞれのcommentのスコアの和を、該当するitemのスコアとする。
+
+以下のようにして、commentとitemとそれぞれに対する検索結果を求めます。
+
+{{{
+> (define r1 (<terms>.comment_content : "LISP"))
+r1
+> (define r2 (<terms>.item_title : "*W1:50 LISP"))
+r2
+}}}
+
+r1の結果を''item''毎にグループ化し、r2とunionして出力します。
+
+{{{
+> (sen-output (((r1 ::group :item) ::union r2) ::sort ::score) '(.:score .title))
+5
+50	LISP
+50	なぜLispなのか
+10	なんでも継続
+5	[翻訳]JavaScript: 世界で最も誤解されたプログラミング言語
+5	末尾再帰
+#t
+}}}
+
+これで目的の結果が得られました。
+

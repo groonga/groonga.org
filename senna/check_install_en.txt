@@ -1,0 +1,62 @@
+* check MySQL with Senna whether proparlly installed or not
+
+** run mysql client
+
+  # mysql -u root
+  mysql>
+
+check connection.
+
+** create database
+
+  mysql> create database senna_test;
+
+check database is created.
+
+  mysql> show databases;
+  +--------------+
+  | Database     |
+  +--------------+
+  | mysql        |
+  | senna_test   |
+  | test         |
+  +--------------+
+  3 rows in set (0.00 sec)
+
+** create table
+
+create table with below sql.
+
+ CREATE TABLE table01 (
+     id INT UNSIGNED AUTO_INCREMENT NOT NULL, PRIMARY KEY(id),
+     title VARCHAR(255),
+     body TEXT,
+     FULLTEXT INDEX USING NGRAM (body)
+ );
+
+USING NGRAM means MySQL with Senna behaves samely an original MySQL.
+If no option exists, MySQL with Senna behaves suitably for Japanese
+(uses Mecab, Japanese tokenizer and support suffix search for Japanese words).
+
+If you specify USING NO SENNA option,
+MySQL uses original fulltext index.
+
+** check INSERT
+
+execute insert query.
+
+ mysql > INSERT INTO table01 VALUES
+          (NULL, "test document", "This is a test document."),
+          (NULL, "test document", "Test is most important.");
+
+** check search
+
+execute select query.
+
+ use senna_test;
+ SELECT * FROM table01 WHERE MATCH(body) AGAINST('this');
+ SELECT * FROM table01 WHERE MATCH(body) AGAINST('test');
+ SELECT * FROM table01 WHERE MATCH(body) AGAINST('document');
+ SELECT * FROM table01 WHERE MATCH(body) AGAINST('nothing');
+
+check properlly searched.

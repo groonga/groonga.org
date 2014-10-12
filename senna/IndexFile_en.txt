@@ -1,0 +1,36 @@
+* Index File
+
+Senna achieves high speed searching by using inverted index file.
+
+* Construction
+Senna makes 4 files for each 1 index instance. If 'hoge' is a index specified by sen_create_index, Senna creates these files:
+{{{
+hoge.SEN
+hoge.SEN.i
+hoge.SEN.i.c
+hoge.SEN.l
+}}}
+
+:hoge.SEN
+It is the symbols' table translates between outside document ID (string or numbers) and internal Senna document file ID.
+:hoge.SEN.i
+This is buffering space for inverted file. It gets fixed size when target's index is initialized. (By default it reserves about 130MB.)
+:hoge.SEN.i.c
+This is the entity of the inverted file. It refers the document ID and the appearing point from word ID.
+:hoge.SEN.l
+It is a symbols' table translates between string of an appearing word (character element) and ID.
+
+* Size of indexes
+The file, hoge.SEN.i, reserves fixed size when target's index is created, however if large documents are registered, its total size is modified: in case word indexes, it becomes about 1.3 times size of the registered document; in case of n-gram index, it gets about 2.5 times size of the registered document.
+
+* Initial size of .sen.i
+By default it reserves 130MB, though, it can change by modifying the configure file (/var/senna/senna.conf):
+{{{
+INITIAL_N_SEGMENTS number
+}}}
+If it is specified as above, initial fixed size changes to
+{{{
+number * 256KB
+}}}
+
+However INITAIL_N_SEGMENTS getting smaller, Senna gets worse performance to update indexes. It is better not to set quite smaller value than default (default value is 512).

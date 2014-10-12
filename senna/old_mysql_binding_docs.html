@@ -1,0 +1,999 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html xmlns:v="urn:schemas-microsoft-com:vml"
+><head
+><title
+>旧ブラジル版MySQLバインディングのドキュメント置き場 - Senna 組み込み型全文検索エンジン</title
+><link href="theme/css/base.css" media="screen,tv" rel="stylesheet" type="text/css"
+/><link href="theme/css/base.css" media="screen,tv,print" rel="stylesheet" type="text/css"
+/><link href="css/theme.css" media="screen,tv,print" rel="stylesheet" type="text/css"
+/><link href="rss.xml" rel="alternate" title="RSS 0.91" type="application/rss+xml"
+/><script src=".theme/js/base.js" type="text/javascript"
+></script
+><script src=".theme/js/niftypp.js" type="text/javascript"
+></script
+><script src=".theme/js/se_hilite_jp.js" type="text/javascript"
+></script
+></head
+><body onload="qwik_onload();"
+><div class="container"
+><div class="main"
+><!--adminmenu--><!--toc--><h1
+>旧ブラジル版MySQLバインディングのドキュメント置き場</h1
+><!--body_enter--><div class="body_main"
+><div class="day"
+><div class="body"
+><div class="section"
+><p
+><em
+>この内容は、古いバージョンのMySQLバインディングの文書です</em
+></p
+>
+<h3
+>3) MySQLのインストール</h3
+>
+<p
+>MySQLバインディングを利用する場合のみ、MySQLをインストールする必要があります。
+詳しくは、<a href="mysql_binding.html"
+>MySQL バインディング</a
+>をご覧ください。</p
+>
+<p
+>MySQLは4.0系, 4.1系, 5.0系に対応しています。
+sennaを組み込むためにpatchをあてる必要がありますので、
+sourceからビルドしなければなりません。</p
+>
+<p
+><a class="external" href="http://dev.mysql.com/downloads/"
+>http://dev.mysql.com/downloads/</a
+>
+から必要なsourceコードをダウンロードし、
+手元に展開した上で対応するsennaのパッチをあてます。</p
+>
+<p
+>(patch versionとMySQLのversionが大きく違う場合は、patch -Fで大きめの数値を与えるとうまく通るかも知れません)</p
+>
+<pre
+>&gt; cd mysql-4.0.27
+&gt; patch -p1 &lt; ../senna/bindings/mysql/mysql-4.0.27.senna.diff</pre
+>
+<p
+>2ind-patchを併用する場合には、上記コマンドの実行後、</p
+><pre
+>&gt; patch -p1 &lt; ../senna/bindings/mysql/mysql-4.0.27.senna.2ind.diff</pre
+><p
+>と実行ください。</p
+>
+<p
+>autotoolsを用いて、configureを再作成します。
+<em
+>bison 1.75, autoconf 2.59, automake 1.8(aclocal 1.8), libtool 1.4以上が必要です</em
+></p
+>
+<pre
+>&gt; libtoolize -c -f
+&gt; aclocal-1.9
+&gt; autoheader
+&gt; automake-1.9 -c -a -i
+&gt; autoconf</pre
+>
+<p
+>sql/sql_yacc.yyをtouchします。</p
+><pre
+>&gt; touch sql/sql_yacc.yy</pre
+>
+<p
+>configureで環境設定を行い、
+makeを実行してください。
+configureには、「--with-senna」オプションを指定してください。</p
+>
+<pre
+>&gt; ./configure --with-charset=utf8 --with-extra-charsets=ujis,sjis --with-named-curses-libs=/lib/libncurses.so.5 --with-senna
+&gt; make
+&gt; sudo make install</pre
+>
+<p
+>環境によっては「--with-named-curses-libs=/lib/libncurses.so.5」は必要なかったりします。
+makeの途中でlibncurses.so.x.x関係のエラーが出た場合には、</p
+>
+<pre
+># ldconfig -p | grep libncurses</pre
+>
+<p
+>としてlibncursesを探してください。</p
+>
+<p
+>LinuxThreadsに対応していない環境では、「--with-named-thread-libs=&quot;-lpthread&quot;」が必要となることがあります。</p
+>
+<ul
+><ul
+><li
+>with-charsetと--with-extra-charsetsのいずれかに、</li
+></ul
+></ul
+><p
+>MeCabで指定した文字コードに対応する
+utf8,sjis,ujis(注意:eucではありません!)のいずれかの値が
+入っていなければなりません。</p
+>
+<p
+>MySQLのconfigureオプションについての説明
+( <a class="external" href="http://dev.mysql.com/doc/refman/4.1/ja/configure-options.html"
+>http://dev.mysql.com/doc/refman/4.1/ja/configure-options.html</a
+> )
+も参考にして、
+なるべく性能が高いMySQLをmakeしてください。</p
+>
+<p
+>configureオプションの実例は<a href="mysql_configure.html"
+>MySQLのconfigureオプション</a
+>にあります。</p
+>
+<hr
+/><p
+>コンフィグファイルを配置します。
+ここではmy-medium.cnfをコピーしていますが、
+データベースの規模に合わせて、
+my-huge.cnfなどの他のコンフィグファイルをコピーしてください。</p
+>
+<pre
+>&gt; sudo cp -p ./support-files/my-medium.cnf /etc/my.cnf</pre
+>
+<p
+>データベースを初期化します。</p
+>
+<pre
+>&gt; sudo ./scripts/mysql_install_db</pre
+>
+<p
+>データベースの格納パス以下について、所有者とグループを変更します。</p
+>
+<pre
+>&gt; sudo chown -R mysql:mysql /usr/local/var</pre
+>
+<p
+>mysql起動スクリプトを用いて、mysqlを起動します。</p
+>
+<pre
+>&gt; chmod +x ./support-files/mysql.server
+&gt; sudo ./support-files/mysql.server start</pre
+>
+<p
+>mysqladminを使って、mysql serverが起動していることを確認します。</p
+>
+<pre
+>&gt; mysqladmin version</pre
+>
+<p
+>mysql起動スクリプトが自動起動されるように配置します。</p
+>
+<pre
+>&gt; sudo cp ./support-files/mysql.server /etc/init.d/mysql</pre
+>
+<hr
+/>
+</div
+><!--section--></div
+><!--body--></div
+><!--day--><div class="day"
+><h2 id="b8b97be16a47f4f3dc921bd9aaf444de"
+>MySQLバインディング</h2
+><div class="body"
+><div class="section"
+>
+</div
+><!--section--></div
+><!--body--></div
+><!--day--><div class="day"
+><h2 id="b86db1f2bc623bc48a2179535c6af95b"
+>Senna MySQLバインディングとは?</h2
+><div class="body"
+><div class="section"
+>
+<p
+>MySQLは、バージョン3.23.23以降、FULLTEXTインデックスをサポートしており、
+VARCHAR, TEXT型のフィールドに対して全文検索を実行することができますが、
+1) 日本語のサポートが不完全、2) フレーズ検索が遅い、3) 更新が遅い、
+といった問題点があります。</p
+>
+<p
+>Senna MySQLバインディングは、MySQLのFULLTEXTインデックスを置き換える形で
+Sennaライブラリを組み込むもので、上記の問題点を全て解消し、
+高速・高精度なSennaの特徴をMySQLからフルに使用可能にします。</p
+>
+<p
+>また全文検索に関する構文は、MySQLのオリジナルのFULLTEXTインデックス向けの
+構文がそのまま使用可能なため、スムーズに適用することができます。</p
+>
+</div
+><!--section--></div
+><!--body--></div
+><!--day--><div class="day"
+><h2 id="8438c4ae8c24c80a465ed130009b673c"
+>使い方</h2
+><div class="body"
+><div class="section"
+>
+<p
+>Senna MySQLバインディングを使用するためには、Senna組み込み版のMySQLをインストールします。
+Senna組み込み版のMySQLをインストールするには二つの方法があります。</p
+>
+<ol
+><li
+>Senna MySQLバインディングを組み込み済みのバイナリパッケージをインストールする</li
+><li
+>MySQLのソースにSenna MySQLバインディングパッチを当ててコンパイル・インストールする</li
+></ol
+>
+<p
+>インストール後、MySQLサーバを起動すれば、
+<a class="external" href="http://dev.mysql.com/doc/refman/4.1/ja/fulltext-search.html"
+>http://dev.mysql.com/doc/refman/4.1/ja/fulltext-search.html</a
+>
+に書かれている方法でSennaのfulltext indexを構築し、
+全文検索機能を使用することができるようになります。</p
+>
+</div
+><!--section--></div
+><!--body--></div
+><!--day--><div class="day"
+><h2 id="d804b90103dbe2f96616935912ecb41f"
+>機能と制限事項</h2
+><div class="body"
+><div class="section"
+>
+<ul
+><li
+>4.0系, 4.1系, 5.0系, 5.1系の各最新バージョンのMySQLで使用できます。</li
+><li
+>IN BOOLEAN MODEとデフォルト(NLQ MODE)の全文検索(MATCH AGAINST)クエリをサポートします。</li
+><li
+>IN BOOLEAN MODEでは、+, -, &lt;, &gt;, (, ), ~, *, &quot; の全演算子が使用できます。</li
+><li
+>EUC, SJIS, UTF8の3種類のエンコーディングを使用できます。</li
+><li
+>文字正規化機能を使用できます。UTF8の場合はNFKC正規化をサポートします。</li
+><li
+>関連文書検索機能が使用できます。</li
+><li
+>近傍(近接)検索機能が使用できます。</li
+><li
+>MyISAM と MERGEの2種類のストレージエンジンをサポートします。(MERGEは4.0.27のみ)</li
+><li
+>スニペット機能が使用できます。</li
+><li
+>単語インデックス(mecab使用), NGRAMインデックス, 空白区切りインデックスの3種類が選択できます。</li
+><li
+>fulltextインデックスと他のインデックスを組み合わせて検索処理を高速化する機能があります(2ind patch)</li
+><li
+>ヒット件数取得とLIMIT指定検索を高速化する機能があります(skipmode patch) (4.0.27のみ)</li
+></ul
+>
+</div
+><!--section--></div
+><!--body--></div
+><!--day--><div class="day"
+><h2 id="f5133cccf834af370ef9c6e6bf6ff097"
+>インストール手順詳細</h2
+><div class="body"
+><div class="section"
+>
+<p
+><a href="install.html"
+>インストール方法</a
+>を参照下さい。</p
+>
+</div
+><!--section--></div
+><!--body--></div
+><!--day--><div class="day"
+><h2 id="418ed1514ab16a435dfff0e09f6d0161"
+>独自拡張機能</h2
+><div class="body"
+><div class="section"
+>
+<p
+>Senna MySQLバインディングでは、より実用的な全文検索アプリケーションで
+MySQLを使用できるようにいくつかの拡張機能を加えています。
+(拡張機能を提供してくださったGREEの小泉さん、iYappoの大沢さんに深く感謝します)</p
+>
+<h3
+>CREATE TABLE / CREATE INDEX 句の拡張</h3
+>
+<p
+>生成する Senna の各種パラメータを指定できます。</p
+>
+<h4
+>インデックスタイプの指定</h4
+>
+<p
+>単語インデックス, NGRAMインデックス, DELIMITEDインデックスの3種のいずれかを選択できます。</p
+>
+<h5
+>単語(mecab)インデックスを作成する場合</h5
+>
+<p
+>インデックスタイプを指定しなければ単語インデックスが使用されます。</p
+>
+<p
+>(例)</p
+>
+<pre
+>  CREATE TABLE test (
+    id INTEGER AUTO_INCREMENT,
+    PRIMARY KEY (id),
+    text TEXT NOT NULL,
+    FULLTEXT INDEX (text)
+  );</pre
+>
+<h5
+>NGRAMインデックスを作成する場合</h5
+>
+<p
+>USING NGRAMを指定します。</p
+>
+<p
+>(例)</p
+>
+<pre
+>  CREATE TABLE test (
+    id INTEGER AUTO_INCREMENT,
+    PRIMARY KEY (id),
+    text TEXT NOT NULL,
+    FULLTEXT INDEX USING NGRAM (text)
+  );</pre
+>
+<h5
+>DELIMITEDインデックスを作成する場合</h5
+>
+<p
+>USING DELIMITEDを指定すると、空白で区切られた文字列単位でインデックスを作成します。</p
+>
+<p
+>(例)</p
+>
+<pre
+>  CREATE TABLE test (
+    id INTEGER AUTO_INCREMENT,
+    PRIMARY KEY (id),
+    text TEXT NOT NULL,
+    FULLTEXT INDEX USING DELIMITED (text)
+  );</pre
+>
+<h5
+>MySQLの素のfulltext indexを作成する(sennaインデックスを使用しない)場合</h5
+>
+<p
+>USING NO SENNAを指定します。</p
+>
+<p
+>(例)</p
+>
+<pre
+>  CREATE TABLE test (
+    id INTEGER AUTO_INCREMENT,
+    PRIMARY KEY (id),
+    text TEXT NOT NULL,
+    FULLTEXT INDEX USING NO SENNA (text)
+  );</pre
+>
+<h5
+>正規化機能の使用/不使用</h5
+>
+<p
+>デフォルトでは正規化機能が有効になります。
+無効化するためには、USING NO NORMALIZEを指定します。</p
+>
+<p
+>(例) 正規化なしでNGRAMインデックスを作成する場合</p
+>
+<pre
+>  CREATE TABLE test (
+    id INTEGER AUTO_INCREMENT,
+    PRIMARY KEY (id),
+    text TEXT NOT NULL,
+    FULLTEXT INDEX USING SENNA, NO NORMALIZE, NGRAM (text)
+  );</pre
+>
+<h5
+>INITIAL_N_SEGMENTS指定</h5
+>
+<p
+>USING 数値を指定することによって、INITIAL_N_SEGMENTS
+(インデックスバッファ領域の初期値)をインデックス作成時に設定できます。</p
+>
+<p
+>(例) INITIAL_N_SEGMENTS=2048でインデックスを作成する場合</p
+>
+<pre
+>  CREATE TABLE test (
+    id INTEGER AUTO_INCREMENT,
+    PRIMARY KEY (id),
+    text TEXT NOT NULL,
+    FULLTEXT INDEX USING SENNA, 2048 (text)
+  );</pre
+>
+<h3
+>SHOW INDEX 句の拡張</h3
+>
+<p
+>CREATE TABLE / CREATE INDEX の拡張に伴い SHOW INDEX 句も拡張して、使用しているインデックスの種類を調べることができるようになりました。</p
+>
+<pre
+> mysql&gt; SHOW INDEX FROM test;
+ +-------+------------+----------+- ... -+--------+------+--------------------------------+---------+
+ | Table | Non_unique | Key_name |       | Packed | Null | Index_type                     | Comment |
+ +-------+------------+----------+- ... -+--------+------+--------------------------------+---------+
+ | test  |          0 | PRIMARY  |       | NULL   |      | BTREE                          |         |
+ | test  |          1 | text     |       | NULL   | YES  | FULLTEXT,SENNA,NORMALIZE,NGRAM |         |
+ +-------+------------+----------+--... -+--------+------+--------------------------------+---------+ 
+ 2 rows in set (0.04 sec)</pre
+>
+<h3
+>SHOW TABLE STATUS 句の拡張</h3
+>
+<p
+>SHOW TABLE STATUS 句 によって、あるテーブルで使われている Senna の転置テーブルや語彙テーブルのレコード数の合計や、インデックスファイルのサイズを知ることができるようになります。複数の全文検索インデックスがあったときにはあまり意味がありませんが...。</p
+>
+<pre
+> +-------+--------+ ... -------+----------------+----------------+--------------------+---------+
+ | Name  | Type   | ... k_time | Create_options | Senna_key_size | Senna_lexicon_size | Comment | 
+ +-------+--------+ ... -------+----------------+----------------+--------------------+---------+
+ | test1 | MyISAM | ...        |                |              0 |                  0 |         |
+ | test2 | MyISAM | ...        |                |              0 |                  0 |         |
+ | test3 | MyISAM | ...        |                |              0 |                  0 |         |
+ | test4 | MyISAM | ...        |                |              0 |                  0 |         |
+ | test5 | MyISAM | ...        |                |              0 |                  0 |         |
+ +-------+--------+ ... -------+----------------+----------------+--------------------+---------+</pre
+>
+<p
+>次のカラムが追加されています。</p
+>
+<ul
+><li
+>Senna_keys_size</li
+></ul
+>
+<p
+>シンボル表 (.SEN) のレコード数の合計を示します。</p
+>
+<ul
+><li
+>Senna_keys_file_size</li
+></ul
+>
+<p
+>シンボル表 (.SEN) のファイルサイズの合計を示します。</p
+>
+<ul
+><li
+>Senna_lexicon_size</li
+></ul
+>
+<p
+>語彙テーブル (.SEN.I) のレコード数の合計を示します。</p
+>
+<ul
+><li
+>Senna_lexicon_file_size</li
+></ul
+>
+<p
+>語彙テーブル (.SEN.I) のファイルサイズの合計を示します。</p
+>
+<ul
+><li
+>Senna_inv_seg_size</li
+></ul
+>
+<p
+>転置テーブルのバッファ (.SEN.i) のファイルサイズを示します。</p
+>
+<ul
+><li
+>Senna_inv_chunk_size</li
+></ul
+>
+<p
+>転置テーブル (.SEN.i.c) のファイルサイズを示します。</p
+>
+<h3
+>2ind patch(2インデックス同時使用機能)</h3
+>
+<h4
+>2ind patchとは</h4
+>
+<p
+>MySQLでクエリを実行する際には、
+１つのテーブルに対して１つのインデックスしか利用できません。</p
+>
+<p
+>通常のクエリの場合は、
+複数のカラムにまたがったインデックスを用意することによって、
+現実的にこの制限を回避することができます。</p
+>
+<p
+>しかし、全文検索用のインデックスを用いた場合、
+他のインデックスが利用できないため、
+以下のような問題が生じます。</p
+>
+<p
+>1. limit指定で出力を制限しても応答が遅い問題</p
+>
+<pre
+>  select columns from table where match(a) against(b) limit 1000, 10</pre
+>
+<p
+>のように、オフセットに大きな値を指定するとテーブルスキャンが発生し、
+応答が遅くなります。</p
+>
+<p
+>2. count(*)等で件数を取得するだけでも応答が遅い問題</p
+>
+<pre
+>  select count(*) from table where match(a) against(b);</pre
+>
+<p
+>のように件数を取得するだけでもテーブルスキャンが発生し、
+応答が遅くなります。</p
+>
+<p
+>3. 全文検索以外の条件で絞り込む処理が遅い問題</p
+>
+<pre
+>  select columns from table where match(a) against(b) and c like 'hoge%';</pre
+>
+<p
+>のように、全文検索以外に他のカラムに関する条件を指定した場合、
+そのカラムにインデックスが張られていてもテーブルスキャンが発生し、
+応答が遅くなります。</p
+>
+<p
+>4. 全文検索以外の条件でソートする処理が遅い問題</p
+>
+<pre
+>  select columns from table where match(a) against(b) order by c;</pre
+>
+<p
+>のように、ソート条件を指定した場合、そのカラムにインデックスが
+張られていてもテーブルスキャンが発生し、応答が遅くなります。。</p
+>
+<p
+>このような問題を解決するために、
+MySQLが全文検索用のインデックスと通常のインデックスの両方を併用できるようにする2ind-patchパッチが使用できます。</p
+>
+<h4
+>2ind patchのインストール(ソースからインストールする場合)</h4
+>
+<p
+>MySQLソースに、mysql-x.x.x.senna.diff を当てたあと、</p
+>
+<pre
+>patch -p1 &lt; {senna-package}/bindings/mysql/mysql-x.x.x.senna.2ind.diff</pre
+>
+<p
+>のように実行して、2ind patchを当てます。その他の手順は<a href="install.html"
+>インストール方法</a
+>の通りです。</p
+>
+<h4
+>2ind-patchの使い方</h4
+><ul
+><li
+>1. 2.のパタンについては、特に意識することなく、通常通りにSQLを発行するだけで2ind-patchの効果が得られます。</li
+><li
+>3. 4.のパタンについては、絞り込みやソート時に使用したいインデックスを以下のように明示的に指定する必要があります。</li
+></ul
+><pre
+>  select columns from table force index(c) where match(a) against(b) and c like 'hoge%';</pre
+>
+<pre
+>  select columns from table force index(c) where match(a) against(b) order by c;</pre
+>
+<p
+>(主キーであれば force index(PRIMARY) のように指定します)</p
+>
+<h4
+>2ind-patchの注意点</h4
+>
+<ul
+><li
+>前述の4つのクエリパタン以外では効果が得られるとは限りません。全文検索条件で大量のレコードがヒットすることによって発生するディスクI/Oが性能阻害要因である場合にのみ効果が期待できます。</li
+><li
+>2ind-patchはMySQLがもともと備えているインデックスを利用します。高い検索パフォーマンスを出すためには、key_buffer_sizeなど、もともとのMySQLのインデックスに対するパラメータを調整する必要があります。</li
+></ul
+>
+<h3
+>snippet UDF</h3
+>
+<p
+>検索結果を表示する際に、文書中のキーワードの周辺のみを表示したい場合があります。
+このキーワードの周辺のテキストを、snippetまたはKWIC(KeyWord In Context)と呼びます。
+この機能を実現するのが、snippet UDFです。</p
+>
+<h4
+>snippet UDFのインストール</h4
+>
+<p
+>UDFのディレクトリに移動</p
+><pre
+>&gt; cd {senna-package}/bindings/mysql/udf/</pre
+><p
+><em
+>Subversionからソースを取得した場合のみ、</em
+>autogen.shの実行</p
+><pre
+>&gt; ./autogen.sh</pre
+><p
+>configure</p
+><pre
+>&gt; ./configure --prefix=/usr</pre
+><p
+>makeします。</p
+><pre
+>&gt; make</pre
+><p
+>installします。</p
+><pre
+>&gt; sudo make install</pre
+><p
+>MySQLにUDFを組み込みます。
+ちなみに、make loadでは「mysql -u root -p」コマンドを呼び出してUDFを登録しています。
+MySQLのrootユーザのパスワードを入力ください。</p
+><pre
+>&gt; make load</pre
+>
+<h4
+>snippet UDFの使い方</h4
+><p
+>snippet UDFは大変引数の多いMySQLの関数です。</p
+>
+<pre
+>SELECT snippet(文書, snippetの長さの最大バイト数, snippetの最大個数, 文書の文字コード, 
+  htmlエンコーディングの有無, snippetの開始タグ, snippetの終了タグ, 
+  単語1, 単語1の前につけられるタグ, 単語1の後につけられるタグ, 
+  単語2, 単語2の前につけられるタグ, 単語2の後につけられるタグ, ...);</pre
+>
+<p
+>文字コードは、sjis, ujis, utf8, defaultのいずれかを指定ください。
+htmlエンコーディングの有無は、0か1を指定ください。
+1の場合は文書中の&lt;,&gt;,&amp;,&quot;をそれぞれ&amp;lt;,&amp;gt;,&amp;amp;,&amp;quot;に変換して出力します。</p
+>
+<p
+>例は以下のとおりです。</p
+>
+<pre
+>SELECT snippet(body, 120, 3, 'ujis', 
+  1, '...', '...&lt;br&gt;\n', 
+  '検索', '&lt;span class=&quot;word1&quot;&gt;', '&lt;/span&gt;', 
+  '実験', '&lt;span class=&quot;word2&quot;&gt;', '&lt;/span&gt;'
+)
+FROM contents
+WHERE MATCH(body) AGAINST('*D+ 検索 実験' IN BOOLEAN MODE)
+LIMIT 0,10;</pre
+>
+<h3
+>skipmode-patch</h3
+>
+<p
+>skipmode-patchは、検索クエリーにおいてヒット件数取得とLIMIT指定検索を高速化する機能です。
+MySQL-4.0.27でのみ使用することができます。</p
+>
+<h4
+>skipmode patchのインストール</h4
+>
+<p
+>MySQLソースに、mysql-x.x.x.senna.diff を当てたあと、</p
+>
+<pre
+>patch -p1 &lt; {senna-package}/bindings/mysql/mysql-x.x.x.senna.2ind.diff
+patch -p1 &lt; {senna-package}/bindings/mysql/mysql-x.x.x.senna.2ind.skipmode.diff</pre
+>
+<p
+>のように実行して、2ind patchとskipmode patchの両方を当てます。
+その他の手順は<a href="install.html"
+>インストール方法</a
+>の通りです。</p
+></div
+><!--section--></div
+><!--body--></div
+><!--day--></div
+><!--body_main--><div class="body_leave" id="body_leave"
+><div class="day"
+><div class="comment"
+><div class="caption"
+><div class="page_attribute"
+>
+<span class="attribute"
+>生成時間: <em
+>__qwik_page_generate_time__秒</em
+></span
+>
+<div align="right"
+>
+<a href="http://x6.at-ninja.jp/bin/gg?067333300"
+>
+<img border="0" src="http://x6.at-ninja.jp/bin/ll?067333300"
+/></a
+>
+<span style="font-size:9px"
+><img src="http://img.shinobi.jp/tadaima/fj.gif" style="margin:0;vertical-align:text-bottom;"
+/> <a href="http://randoseru.rentalurl.net"
+>ランドセル</a
+></span
+>
+</div
+>
+
+
+</div
+></div
+></div
+></div
+></div
+><!--body_leave--></div
+><!--main--><div class="sidebar"
+><h2
+>メニュー/Menu</h2
+><ul
+><li
+><a href="FrontPageJ.html"
+>ホーム</a
+> / <a href="FrontPage.html"
+>Home</a
+></li
+></ul
+>
+<ul
+><li
+>Sennaの紹介</li
+><ul
+><li
+><a href="senna_takahashi.html"
+>Sennaとは</a
+></li
+><li
+><a href="publication.html"
+>雑誌記事・発表資料等</a
+></li
+><li
+><a href="example.html"
+>こんなところでも使われてます！</a
+></li
+><li
+><a href="FAQ.html"
+>FAQ</a
+> / <a href="FAQ_en.html"
+>FAQ (English)</a
+></li
+><li
+><a href="ML.html"
+>メーリングリスト</a
+> / <a href="ML_en.html"
+>MailingLists</a
+></li
+></ul
+><li
+>Sennaの利用</li
+><ul
+><li
+><a href="Download.html"
+>ダウンロード</a
+> / <a href="Download_en.html"
+>Download</a
+></li
+><li
+><a href="install.html"
+>インストール</a
+> / <a href="install_en.html"
+>Install</a
+></li
+><li
+><a href="check_install.html"
+>動作確認方法</a
+> / <a href="check_install_en.html"
+>Check install</a
+></li
+><li
+><a href="bindings.html"
+>バインディング一覧</a
+></li
+><li
+><a href="mysql_binding.html"
+>MySQL バインディング</a
+> / <a href="mysql_binding_en.html"
+>MySQL binding</a
+></li
+><li
+><a href="install_specific.html"
+>特定環境でのインストールメモ</a
+> / <a href="install_specific_en.html"
+>installing note for specific environment</a
+></li
+></ul
+><li
+>利用者向け</li
+><ul
+><li
+><a href="query.html"
+>クエリーの書式</a
+> / <a href="query_en.html"
+>query syntax</a
+></li
+><li
+><a href="Customize.html"
+>カスタマイズ</a
+> / <a href="Customize_en.html"
+>Customize</a
+></li
+><li
+><a href="sennaql_reference.html"
+>SennaQL リファレンス</a
+></li
+><li
+><a href="store_tutorial.html"
+>SennaStoreを使ってみよう</a
+></li
+><li
+><a href="log_level.html"
+>ログレベルの解説</a
+></li
+><li
+><a href="report_bugs.html"
+>不具合報告掲示板</a
+></li
+><li
+><a href="contribute.html"
+>Sennaへのパッチ・情報等</a
+></li
+><li
+><a href="knownproblems.html"
+>不具合等</a
+> / <a href="knownproblems_en.html"
+>Known problems</a
+></li
+></ul
+><li
+>高度な利用法</li
+><ul
+><li
+><a href="APIJ.html"
+>API</a
+> / <a href="API.html"
+>C API(English)</a
+></li
+><li
+><a href="IndexFile.html"
+>インデックスファイル</a
+> / <a href="IndexFile_en.html"
+>Index File</a
+></li
+></ul
+><li
+>Senna開発</li
+><ul
+><li
+><a href="design_policy.html"
+>Senna設計方針</a
+></li
+><li
+><a href="Roadmap.html"
+>開発ロードマップ</a
+></li
+><li
+><a href="cstyle.html"
+>コーディング規約</a
+></li
+><li
+><a href="WorkingStatus.html"
+>作業状況</a
+></li
+><li
+><a href="futureworks.html"
+>野望</a
+> / <a href="futureworks_en.html"
+>Future works</a
+></li
+></ul
+></ul
+>
+<h2
+>Search</h2
+><form action=".search"
+><input name="q"
+/><input type="submit" value="検索"
+/></form
+>
+
+<h2
+>Recent Change</h2
+><div class="recent"
+><ul
+><li
+><a href="example.html" title="2010-10-28 14:04:51"
+>こんなところでも使われてます！</a
+> <span class="ago"
+>3年前</span
+></li
+><li
+><a href="frontpage.html" title="2010-09-14 12:54:06"
+>frontpage</a
+> <span class="ago"
+>4年前</span
+></li
+><li
+><a href="Download_en.html" title="2010-07-22 14:26:20"
+>Download</a
+> <span class="ago"
+>4年前</span
+></li
+><li
+><a href="Download.html" title="2010-07-22 14:26:01"
+>ダウンロード</a
+> <span class="ago"
+>4年前</span
+></li
+><li
+><a href="FrontPageJ.html" title="2009-11-25 16:14:43"
+>Senna 組み込み型全文検索エンジン</a
+> <span class="ago"
+>4年前</span
+></li
+><li
+><a href="FrontPage.html" title="2009-11-25 16:14:20"
+>Senna: An Embeddable Fulltext Search Engine</a
+> <span class="ago"
+>4年前</span
+></li
+><li
+><a href="Ruby_binding.html" title="2009-09-03 18:42:32"
+>Rubyバインディング</a
+> <span class="ago"
+>5年前</span
+></li
+><li
+><a href="PHP_binding.html" title="2009-08-24 04:09:56"
+>PHPバインディング</a
+> <span class="ago"
+>5年前</span
+></li
+><li
+><a href="store.html" title="2009-03-23 03:34:52"
+>SennaStore概要</a
+> <span class="ago"
+>5年前</span
+></li
+><li
+><a href="bindings.html" title="2008-10-05 11:33:12"
+>バインディング一覧</a
+> <span class="ago"
+>6年前</span
+></li
+></ul
+><p class="recent"
+><a href="RecentList.html"
+><em
+>もっと前の情報</em
+></a
+></p
+></div
+>
+<a class="rss-button" href="rss.xml"
+><span
+>RSS</span
+></a
+><a class="rss-button" href="atom.xml"
+><span
+>ATOM</span
+></a
+>
+
+</div
+><!--sidebar--><div class="footer"
+><span title="__qwik_page_generate_time__"
+>powered by <a href="http://qwik.jp/"
+>qwikWeb</a
+></span
+></div
+><!--footer--></div
+><!--container--></body
+></html
+>

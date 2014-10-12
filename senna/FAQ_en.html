@@ -1,0 +1,507 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html xmlns:v="urn:schemas-microsoft-com:vml"
+><head
+><title
+>FAQ (English) - Senna 組み込み型全文検索エンジン</title
+><link href="theme/css/base.css" media="screen,tv" rel="stylesheet" type="text/css"
+/><link href="theme/css/base.css" media="screen,tv,print" rel="stylesheet" type="text/css"
+/><link href="css/theme.css" media="screen,tv,print" rel="stylesheet" type="text/css"
+/><link href="rss.xml" rel="alternate" title="RSS 0.91" type="application/rss+xml"
+/><script src=".theme/js/base.js" type="text/javascript"
+></script
+><script src=".theme/js/niftypp.js" type="text/javascript"
+></script
+><script src=".theme/js/se_hilite_jp.js" type="text/javascript"
+></script
+></head
+><body onload="qwik_onload();"
+><div class="container"
+><div class="main"
+><!--adminmenu--><!--toc--><h1
+>FAQ (English)</h1
+><!--body_enter--><div class="body_main"
+><div class="day"
+><div class="body"
+><div class="section"
+><h3
+>General Question</h3
+>
+<h4
+>Can I use Senna for business?</h4
+><p
+>Yes, you can use it by following the LGPL 2.1 license. We're welcome you to use <img alt="Powerd by Senna banner" src="http://dev.razil.jp/img/senna_logo/senna_banner.gif"
+/>.
+<a class="external" href="http://b.razil.jp"
+>Brazil</a
+> is doing consulting and supports for profit. Please contact us for detail information from <a class="external" href="http://b.razil.jp/company/mail.html"
+>contact form</a
+></p
+>
+<h4
+>I made an application for Senna.</h4
+>
+<p
+>Not only patches for Senna, we also much appliciate developing applications related to Senna. If you correspond with us about your work, we will introduce it.</p
+>
+<h3
+>Question about Senna uses</h3
+>
+<dl
+><dt
+>Can I use Senna without MySQL?</dt
+></dl
+><p
+>You can use Senna without binding to MySQL. Senna can work in C code, and various types of languages are able to use for binding. We also produce binding with PostgresSql named <a class="external" href="http://www.nttdata.co.jp/services/ludia/index.html"
+>ludia</a
+>.</p
+>
+<dl
+><dt
+>Search doesn't work well.</dt
+></dl
+>
+<p
+>It might be occurred by following cases</p
+><ul
+><li
+>Character sets specified in /var/senna/senna.conf or c:\senna\senna.conf, for MeCab's dictionary, and for a target index are different.</li
+><li
+>Using MeCab dictionary which is made with wrong character sets.</li
+><li
+>Senna reads old format index, when Senna loses compatibility of indexes by version up.</li
+></ul
+>
+<p
+>If you encouter these kind of phenomenon, you should check those encodings are matched or not. And operate below.</p
+>
+<ul
+><li
+>If you're using Senna alone</li
+><ul
+><li
+>Delete index files, and restructuring them.</li
+></ul
+><li
+>If you're using MySQL + Senna</li
+><ul
+><li
+>Drop full text index, and then do rcreate it.</li
+><li
+>Stop MySQL server. Restructuring index by myisamchk -r</li
+></ul
+></ul
+>
+<dl
+><dt
+>Is there a system that can search internal contents of a server like Namazu?</dt
+></dl
+><p
+>No, not yet. However Perl might be able to achieve by using <a class="external" href="http://search.cpan.org/dist/File-Extract/"
+>File-Extract module</a
+> and <a class="external" href="http://search.cpan.org/dist/Tie-Senna/"
+>Tie-Senna</a
+>. In this case, MySQL is not required.</p
+>
+<dl
+><dt
+>Can I use huge document sets?</dt
+></dl
+><p
+>Senna is designed to be able to handling huge document sets. We recommend to set below:</p
+><ol
+><li
+>For MySQL binding, patch the 2ind-patch, if you need to do searching refinement, getting numbers of item by count(*), and sorting by any items except score order.If you use mysql with 2ind-patch, you have to check key_buffer_size parameter is properlly chooned.</li
+><li
+>Set INITIAL_N_SEGMENTS suitable size. That can find in senna.conf</li
+><li
+>Use Linux 2.6 or above, to enable user level cache (currently it's not stable).</li
+><li
+>Breakup contents.</li
+></ol
+>
+<h3
+>About MySQL Binding</h3
+>
+<h4
+>I get a error during MySQL compile</h4
+><p
+>MySQL + Senna is possibly shows up error like this</p
+>
+<pre
+>myisamchk.o: In function `main':
+myisamchk.c:(.text+0x72): undefined reference to `sen_init'
+libmyisam.a(mi_open.o): In function `mi_open':
+mi_open.c:(.text+0x14e7): undefined reference to `sen_log'
+...
+</pre
+>
+<p
+>What the reasons are:</p
+>
+<ul
+><li
+>You didn't run autotools (automake or autoconf), before you run configure.</li
+><li
+>Linker cannot find libraries.</li
+></ul
+>
+<p
+>Second one probably avoids by these provision.</p
+>
+<ul
+><li
+>Do &quot;ls /usr/local/lib&quot;, and confirm existence of libsenna.a</li
+><li
+>Add &quot;/usr/local/lib&quot; line in /etc/ld.so.conf as root. If there is no file, create as new file.</li
+><li
+>run &quot;ldconfig -m /usr/local/lib&quot; as root</li
+></ul
+>
+<dl
+><dt
+>How can I use AND Search, OR Search, or NOT Search?</dt
+></dl
+>
+<p
+>There is two ways:</p
+>
+<ol
+><li
+>Expand WHERE clause as WHERE MATCH(a) AGAINST('text') AND NOT MATCH(a) AGAINST('text') OR MATCH ...</li
+><li
+>Use IN BOOLEAN MODE (Refer <a href="query_en.html"
+>query syntax</a
+> for detail grammar)</li
+></ol
+>
+<h3
+>Question About Install</h3
+>
+<dl
+><dt
+>I don't know how to configure MySQL!</dt
+></dl
+>
+<p
+>Please refer <a href="mysql_configure_en.html"
+>MySQL's configure option</a
+></p
+>
+<dl
+><dt
+>Compile stops during nfkc.c</dt
+></dl
+>
+<p
+>Some compiler takes very long time. If the compiling doesn't end even 15 minutes passed, halt it by Ctrl-C.
+Then configure again by either one of</p
+><ul
+><li
+>run configure with --disable-nfkc option</li
+><li
+>run configure with assigned -O0 to environment variable CFLAGS</li
+></ul
+></div
+><!--section--></div
+><!--body--></div
+><!--day--></div
+><!--body_main--><div class="body_leave" id="body_leave"
+><div class="day"
+><div class="comment"
+><div class="caption"
+><div class="page_attribute"
+>
+<span class="attribute"
+>生成時間: <em
+>__qwik_page_generate_time__秒</em
+></span
+>
+<div align="right"
+>
+<a href="http://x6.at-ninja.jp/bin/gg?067333300"
+>
+<img border="0" src="http://x6.at-ninja.jp/bin/ll?067333300"
+/></a
+>
+<span style="font-size:9px"
+><img src="http://img.shinobi.jp/tadaima/fj.gif" style="margin:0;vertical-align:text-bottom;"
+/> <a href="http://randoseru.rentalurl.net"
+>ランドセル</a
+></span
+>
+</div
+>
+
+
+</div
+></div
+></div
+></div
+></div
+><!--body_leave--></div
+><!--main--><div class="sidebar"
+><h2
+>メニュー/Menu</h2
+><ul
+><li
+><a href="FrontPageJ.html"
+>ホーム</a
+> / <a href="FrontPage.html"
+>Home</a
+></li
+></ul
+>
+<ul
+><li
+>Sennaの紹介</li
+><ul
+><li
+><a href="senna_takahashi.html"
+>Sennaとは</a
+></li
+><li
+><a href="publication.html"
+>雑誌記事・発表資料等</a
+></li
+><li
+><a href="example.html"
+>こんなところでも使われてます！</a
+></li
+><li
+><a href="FAQ.html"
+>FAQ</a
+> / <a href="FAQ_en.html"
+>FAQ (English)</a
+></li
+><li
+><a href="ML.html"
+>メーリングリスト</a
+> / <a href="ML_en.html"
+>MailingLists</a
+></li
+></ul
+><li
+>Sennaの利用</li
+><ul
+><li
+><a href="Download.html"
+>ダウンロード</a
+> / <a href="Download_en.html"
+>Download</a
+></li
+><li
+><a href="install.html"
+>インストール</a
+> / <a href="install_en.html"
+>Install</a
+></li
+><li
+><a href="check_install.html"
+>動作確認方法</a
+> / <a href="check_install_en.html"
+>Check install</a
+></li
+><li
+><a href="bindings.html"
+>バインディング一覧</a
+></li
+><li
+><a href="mysql_binding.html"
+>MySQL バインディング</a
+> / <a href="mysql_binding_en.html"
+>MySQL binding</a
+></li
+><li
+><a href="install_specific.html"
+>特定環境でのインストールメモ</a
+> / <a href="install_specific_en.html"
+>installing note for specific environment</a
+></li
+></ul
+><li
+>利用者向け</li
+><ul
+><li
+><a href="query.html"
+>クエリーの書式</a
+> / <a href="query_en.html"
+>query syntax</a
+></li
+><li
+><a href="Customize.html"
+>カスタマイズ</a
+> / <a href="Customize_en.html"
+>Customize</a
+></li
+><li
+><a href="sennaql_reference.html"
+>SennaQL リファレンス</a
+></li
+><li
+><a href="store_tutorial.html"
+>SennaStoreを使ってみよう</a
+></li
+><li
+><a href="log_level.html"
+>ログレベルの解説</a
+></li
+><li
+><a href="report_bugs.html"
+>不具合報告掲示板</a
+></li
+><li
+><a href="contribute.html"
+>Sennaへのパッチ・情報等</a
+></li
+><li
+><a href="knownproblems.html"
+>不具合等</a
+> / <a href="knownproblems_en.html"
+>Known problems</a
+></li
+></ul
+><li
+>高度な利用法</li
+><ul
+><li
+><a href="APIJ.html"
+>API</a
+> / <a href="API.html"
+>C API(English)</a
+></li
+><li
+><a href="IndexFile.html"
+>インデックスファイル</a
+> / <a href="IndexFile_en.html"
+>Index File</a
+></li
+></ul
+><li
+>Senna開発</li
+><ul
+><li
+><a href="design_policy.html"
+>Senna設計方針</a
+></li
+><li
+><a href="Roadmap.html"
+>開発ロードマップ</a
+></li
+><li
+><a href="cstyle.html"
+>コーディング規約</a
+></li
+><li
+><a href="WorkingStatus.html"
+>作業状況</a
+></li
+><li
+><a href="futureworks.html"
+>野望</a
+> / <a href="futureworks_en.html"
+>Future works</a
+></li
+></ul
+></ul
+>
+<h2
+>Search</h2
+><form action=".search"
+><input name="q"
+/><input type="submit" value="検索"
+/></form
+>
+
+<h2
+>Recent Change</h2
+><div class="recent"
+><ul
+><li
+><a href="example.html" title="2010-10-28 14:04:51"
+>こんなところでも使われてます！</a
+> <span class="ago"
+>3年前</span
+></li
+><li
+><a href="frontpage.html" title="2010-09-14 12:54:06"
+>frontpage</a
+> <span class="ago"
+>4年前</span
+></li
+><li
+><a href="Download_en.html" title="2010-07-22 14:26:20"
+>Download</a
+> <span class="ago"
+>4年前</span
+></li
+><li
+><a href="Download.html" title="2010-07-22 14:26:01"
+>ダウンロード</a
+> <span class="ago"
+>4年前</span
+></li
+><li
+><a href="FrontPageJ.html" title="2009-11-25 16:14:43"
+>Senna 組み込み型全文検索エンジン</a
+> <span class="ago"
+>4年前</span
+></li
+><li
+><a href="FrontPage.html" title="2009-11-25 16:14:20"
+>Senna: An Embeddable Fulltext Search Engine</a
+> <span class="ago"
+>4年前</span
+></li
+><li
+><a href="Ruby_binding.html" title="2009-09-03 18:42:32"
+>Rubyバインディング</a
+> <span class="ago"
+>5年前</span
+></li
+><li
+><a href="PHP_binding.html" title="2009-08-24 04:09:56"
+>PHPバインディング</a
+> <span class="ago"
+>5年前</span
+></li
+><li
+><a href="store.html" title="2009-03-23 03:34:52"
+>SennaStore概要</a
+> <span class="ago"
+>5年前</span
+></li
+><li
+><a href="bindings.html" title="2008-10-05 11:33:12"
+>バインディング一覧</a
+> <span class="ago"
+>6年前</span
+></li
+></ul
+><p class="recent"
+><a href="RecentList.html"
+><em
+>もっと前の情報</em
+></a
+></p
+></div
+>
+<a class="rss-button" href="rss.xml"
+><span
+>RSS</span
+></a
+><a class="rss-button" href="atom.xml"
+><span
+>ATOM</span
+></a
+>
+
+</div
+><!--sidebar--><div class="footer"
+><span title="__qwik_page_generate_time__"
+>powered by <a href="http://qwik.jp/"
+>qwikWeb</a
+></span
+></div
+><!--footer--></div
+><!--container--></body
+></html
+>

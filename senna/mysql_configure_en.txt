@@ -1,0 +1,89 @@
+* MySQL Configure Option
+
+Examining MySQL options which can be hurdles during installation of Senna.
+
+If MySQL server has already been installed existing package system, Senna has better to be installed by upgrading it for user to continue using other dependent packages of it.
+
+Other Know-How
+
+- Don't forget to add --with-senna option.
+- Optimize by adding -mtune=pentium4 option (it depends on gcc version, -march, -mcpu, or others are better).
+- If mecab and senna is installed in /usr/local, -I/usr/local/include and -L/usr/local/lib options are required.
+- Debian needs to add --with-named-curses-libs=/lib/libncurses.so.5
+- Add --enable-thread-safe-client option.
+- Add -enable-assembler option.
+- -felide-constructors, -fno-exceptions, and -fnortti options need to be listed for CXXFLAGS.
+- Adapt --with-unix-socket-path (the path for the socket), --prefix (installation path), and --localstatedir (data path) to installed packaged MySQL.
+- For debugging add -with-debug option.
+- Choose character sets by --with-charset (default) and --with-extra-charsets (others). 'all' makes all character sets usable statically. 'complex' makes all character sets usable dynamically.
+- To make mysqld as static linked, add --with-mysqld-ldflags=-all-static and --disable-shared.
+
+Parameters for mtune are like these.
+
+|i386|i386|
+|i486|i486|
+|i586 or pentium|pentium without MMX|
+|pentium-mmx|pentium with MMX|
+|i686 or pentiumpro|PentiumPro|
+|pentium2|Pentium2|
+|pentium3 or pentium3m|Pentium3|
+|pentiumm|PentiumM|
+|pentium4 or entium4m|Pentium4 supports SSE3|
+|prescott|Pentium4 supports SSE3, but it doesn't support EM64T|
+|nocona|Pentium4 supports EM64T|
+|k6|K6|
+|k6-2 or k6-3|K6 supports 3dNOW!|
+|athlon or athlon-tbird enhanced|The things support some part of 3dNOW! and SSE|
+|athlon-4, athlon-xp, or athlon-mp|Athlon that supports every SSE command|
+|k8, opteron, athlon64, or athlon-fx|Athlon that supports x86-64, or Opteron|
+
+** Example for MySQL 4.0.26 on general Linux
+
+- Install into /usr/local/
+- Data is stored into /var/lib/mysql
+
+ CFLAGS="-O3 -mtune=nocona -I/usr/local/include" \
+ CXX=gcc CXXFLAGS="-O3 -mtune=nocona \
+ -felide-constructors -fno-exceptions -fno-rtti -I/usr/local/include" \
+ LDFLAGS="-L/usr/local/lib" \
+ ./configure \
+ --with-senna \
+ --prefix=/usr/local \
+ --enable-assembler \
+ --with-charset=ujis --with-extra-charsets=complex \
+ --enable-thread-safe-client \
+ --with-readline \
+ --localstatedir=/var/lib/mysql
+
+** Example for MySQL 5.0.21 on Debian sarge
+
+- Add --with-big-tables
+- Adjust socket path
+- Install into /usr/
+- Store data in /var/lib/mysql
+
+ CFLAGS="-O3 -mtune=nocona -I/usr/local/include" \
+ CXX=gcc CXXFLAGS="-O3 -mtune=nocona \
+ -felide-constructors -fno-exceptions -fno-rtti -I/usr/local/include" \
+ LDFLAGS="-L/usr/local/lib" \
+ ./configure \
+ --with-senna \
+ --prefix=/usr \
+ --enable-assembler \
+ --with-charset=ujis --with-extra-charsets=complex \
+ --enable-thread-safe-client \
+ --with-big-tables \
+ --with-named-curses-libs=/lib/libncurses.so.5 \
+ --localstatedir=/var/lib/mysql \
+ --with-readline \
+ --with-unix-socket-path=/var/run/mysqld/mysqld.sock
+
+
+** How to debug
+
+Debug like below
+
+ sudo gdb /usr/local/libexec/mysqld
+ break sql_select.cc:4798
+ run --gdb --basedir=/usr/local --datadir=/usr/local/var --user=mysql --pid-file=/usr/local/var/ debichan.pid --skip-locking --port=3306 --socket=/tmp/mysql.sock
+

@@ -1,0 +1,289 @@
+* MySQL binding
+
+* What is Senna MySQL binding?
+
+MySQL version after 3.23.23 supports FULLTEXT index.
+With it, MySQL can execute the full-text search for the field of VARCHAR and TEXT type.
+But, these problems exist.
+1) Insufficient Japanese support
+2) Slow phrase search
+3) Slow update
+
+Senna MySQL binding substitute for MySQL original fulltext index.
+Those problems are fixed.
+And, It enables you to use full features of Senna through MySQL.
+
+* How to use
+
+You can install MySQL with Senna with either one of below two method.
+
++binary package
++patch MySQL source, compile and install.
+
+* Functions
+
+- Supports version 4.0, 4.1, 5.0 and 5.1
+- MATCH AGAINST query support in BOOLEAN MODE and defaulut mode(NLQ MODE)
+- In BOOLEAN MODE, you can use all operators like +, -, <, >, (, ), ~, *, ".
+- Supports Japanese encoding EUC, SJIS
+- Supports Unicode with UTF8
+- Supports normalization. In UTF8, NFKC normalization supported
+- Supports similar document search
+- Supports near words search
+- Supports MyISAM and MERGE(4.0 only) storage engines.
+- Supports snippet(KWIC) function with MySQL user defined functions.
+- Supports Japanese word's index(with MeCab), N-gram(bi-gram) index and space delimited index.
+- 2ind patch enables MySQL to use FULLTEXT index and normal b-tree index bothly at one time.
+- skipmode patch(4.0 only) accelerate queries as select count(*) and select * from table limit x,y.
+
+* Install
+
+Please read [[install_en]].
+
+* Original enhanced features
+
+Senna extends SQL syntax.
+
+Thanks to
+Moriyoshi Koizumi at GREE(http://gree.jp) and
+Kazuhiro Osawa at iYappo(http://i.yappo.jp/).
+
+** enhanced CREATE TABLE / CREATE INDEX
+
+CREATE TABLE / CREATE INDEX query is enhanced to be able to pass Senna parameters.
+
+*** You can specify index type
+
+You can select Japanese word index, NGRAM index or DELIMITED index.
+
+**** Japanese word index (with MeCab)
+
+If no index type specified, Senna makes Japanese word index.
+Notice: For English users, this mode is not befitted. use NGRAM index.
+
+ex.)
+
+   CREATE TABLE test (
+     id INTEGER AUTO_INCREMENT,
+     PRIMARY KEY (id),
+     text TEXT NOT NULL,
+     FULLTEXT INDEX (text)
+   );
+
+**** NGRAM index(bigram index for non-ascii strings and word index for ascii strings)
+
+Specify USING NGRAM.
+
+ex.)
+
+   CREATE TABLE test (
+     id INTEGER AUTO_INCREMENT,
+     PRIMARY KEY (id),
+     text TEXT NOT NULL,
+     FULLTEXT INDEX USING NGRAM (text)
+   );
+
+**** DELIMITED index(space delimited index)
+
+If you specify USING DELIMITED, words delimited by space are indexed.
+
+ex.)
+
+   CREATE TABLE test (
+     id INTEGER AUTO_INCREMENT,
+     PRIMARY KEY (id),
+     text TEXT NOT NULL,
+     FULLTEXT INDEX USING DELIMITED (text)
+   );
+
+**** MySQL original fulltext index(without Senna)
+
+Specify USING NO SENNA.
+
+ex.)
+
+   CREATE TABLE test (
+     id INTEGER AUTO_INCREMENT,
+     PRIMARY KEY (id),
+     text TEXT NOT NULL,
+     FULLTEXT INDEX USING NO SENNA (text)
+   );
+
+**** normalize or not
+
+At default, alphabet normalization is enabled
+If you want to disable it, specify USING NO NORMALIZE.
+
+ex.) without normalization with NGRAM index
+
+   CREATE TABLE test (
+     id INTEGER AUTO_INCREMENT,
+     PRIMARY KEY (id),
+     text TEXT NOT NULL,
+     FULLTEXT INDEX USING SENNA, NO NORMALIZE, NGRAM (text)
+   );
+
+**** INITIAL_N_SEGMENTS parameter
+
+You can speficy INITIAL_N_SEGMENTS which is an initial value of an index buffer with 'USING number'
+
+ex.) create index with INITIAL_N_SEGMENTS=2048
+
+   CREATE TABLE test (
+     id INTEGER AUTO_INCREMENT,
+     PRIMARY KEY (id),
+     text TEXT NOT NULL,
+     FULLTEXT INDEX USING SENNA, 2048 (text)
+   );
+
+** Extensions of SHOW INDEX
+
+  mysql> SHOW INDEX FROM test;
+  +-------+------------+----------+- ... -+--------+------+--------------------------------+---------+
+  | Table | Non_unique | Key_name |       | Packed | Null | Index_type                     | Comment |
+  +-------+------------+----------+- ... -+--------+------+--------------------------------+---------+
+  | test  |          0 | PRIMARY  |       | NULL   |      | BTREE                          |         |
+  | test  |          1 | text     |       | NULL   | YES  | FULLTEXT,SENNA,NORMALIZE,NGRAM |         |
+  +-------+------------+----------+--... -+--------+------+--------------------------------+---------+ 
+  2 rows in set (0.04 sec)
+
+** Extensions of SHOW TABLE STATUS
+
+  +-------+--------+ ... -------+----------------+----------------+--------------------+---------+
+  | Name  | Type   | ... k_time | Create_options | Senna_key_size | Senna_lexicon_size | Comment | 
+  +-------+--------+ ... -------+----------------+----------------+--------------------+---------+
+  | test1 | MyISAM | ...        |                |              0 |                  0 |         |
+  | test2 | MyISAM | ...        |                |              0 |                  0 |         |
+  | test3 | MyISAM | ...        |                |              0 |                  0 |         |
+  | test4 | MyISAM | ...        |                |              0 |                  0 |         |
+  | test5 | MyISAM | ...        |                |              0 |                  0 |         |
+  +-------+--------+ ... -------+----------------+----------------+--------------------+---------+
+
+next column is added.
+
+- Senna_keys_size
+
+record number of symbol table (.SEN)
+
+- Senna_keys_file_size
+
+file size of symbol table (.SEN)
+
+- Senna_lexicon_size
+
+record number of lexicon table (.SEN.I)
+
+- Senna_lexicon_file_size
+
+file size of lexicon table (.SEN.I)
+
+- Senna_inv_seg_size
+
+file size of the buffer of lexicon table (.SEN.i)
+
+- Senna_inv_chunk_size
+
+file size of an inverted index table (.SEN.i.c)
+
+** 2ind patch(fulltext index and b-tree index bothly used at one time)
+
+*** What is 2ind patch
+
+In MySQL, only one index is used in executing one query.
+Normally, that's limit is avoided with multi-column index.
+But using fulltext index, it is very big problem like below.
+
+1. slow limited query
+
+   select columns from table where match(a) against(b) limit 1000, 10
+
+If limit offset is big, table scan occurs and response is very slow.
+
+2. slow only getting count(*)
+
+   select count(*) from table where match(a) against(b);
+
+Only getting record count, table scan occurs and response is very slow.
+
+3. slow conditional search
+
+   select columns from table where match(a) against(b) and c like 'hoge%';
+
+Although 'column c' is indexed, table scan occurs and response is very slow.
+
+4. slow sort
+
+   select columns from table where match(a) against(b) order by c;
+
+Although 'column c' is indexed, table scan occurs and response is very slow.
+
+2ind patch solves all of the problems.
+
+*** Install 2ind patch
+
+Please read [[install_en]].
+
+*** Using 2ind-patch
+- No additional query parameter is required to solve problem 1. 2 with 2ind-patch.
+- Additional query parameter is required to solve problem 3. 4 with 2ind-patch like below.
+   select columns from table force index(c) where match(a) against(b) and c like 'hoge%';
+
+   select columns from table force index(c) where match(a) against(b) order by c;
+
+(If you want to use PRIMARY key, specify 'force index(PRIMARY)'.
+
+*** Notice of 2ind-patch
+
+- 2ind-patch affects those four problem patterns, but no effect for other patterns.
+- MySQL with 2ind-patch uses it's original B-tree index.So, you have to choon parameters like key_buffer_size, which effects performance of B-tree index.
+
+** snippet UDF
+
+You can get snippet(or KWIC, KeyWords In Context) with a snippet UDF function.
+
+*** Install snippet UDF
+
+ > cd {senna-package}/bindings/mysql/udf/
+If you get Senna from Subversion repository, you have to execute autogen.sh.
+ > ./autogen.sh
+configure
+ > ./configure --prefix=/usr
+make
+ > make
+install
+ > sudo make install
+Load udf functions in MySQL.
+ > make load
+(In 'make load', 'mysql -u root -p' command is used for regist UDF.So password input is required.)
+
+*** Using snippet UDF
+
+snippet UDF is a function which have many parameters.
+
+ SELECT snippet(text or column, byte length of one snippet, number of snippets, encoding of text, 
+   html encoding or not, snippet open tag, snippet close tag,
+   word1, word1 open tag, word1 close tag,
+   word2, word2 open tag, word2 close tag, ...)
+
+Encoding of text is 'sjis', 'ujis', 'utf8' or 'default'.
+If you get html encoded text, you have to specify html encoding parameter as 1. If not, 0.
+
+ex.)
+
+ SELECT snippet(body, 120, 3, 'utf8', 
+   1, '...', '...<br>\n', 
+   'search', '<span class="word1">', '</span>', 
+   'test', '<span class="word2">', '</span>'
+ )
+ FROM contents
+ WHERE MATCH(body) AGAINST('*D+ search test' IN BOOLEAN MODE)
+ LIMIT 0,10;
+
+** skipmode-patch
+
+skipmode-patch make it's time faster that you get hit count and query which is count limited.
+It is only available in MySQL 4.0.
+
+*** Install skipmode patch
+
+Please read [[install_en]].

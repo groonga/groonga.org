@@ -1,0 +1,720 @@
+* Senna API Documentation
+
+All functions of Senna are offered through API functions.
+Senna API is formed from 3 types: basic API, advanced API, low-level API and toolkit API.
+Using basic API, you can use general functions of Senna such as inserting, updating and selecting on the index.
+Using advanced API, you can control & tuning precision of the search result. To access the internal data structures of Senna, you need to use low-level API, then, you can search and process complicated data.
+Using toolkit API, you can get snippet and a heap of sen_records.
+
+* sen_rc
+
+Many API functions return a value of the type sen_rc. The sen_rc (for result handle) is a way of returning success and error values like a below table.
+
+|sen_success = 0|success|You can check whether API successes or not with checking 0 or not
+|sen_memory_exhausted|Memory operations (malloc,alloc,realloc,mmap etc.) failed
+|sen_invalid_format|A format of a data file is something wrong.|please send us bug reports
+|sen_file_operation_error|File API failed
+|sen_invalid_argument|Invalid Argument(out of range, NULL pointer etc.)
+|sen_external_error|API of external libraries like libc(excluding memory/file APIs)/MeCab failed
+|sen_internal_error|Senna internal API failed.
+|sen_abnormal_error|abnormal state.|please send us bug reports
+|sen_other_error|other reasons
+
+* Basic API
+
+Basic API consists of two data types, the operation functions and the
+functions which initializes the senna library. The two data types are:
+sen_index type which corresponds to the index file and sen_records type
+which corresponds to the search result.
+
+** Senna Initialization Functions
+
+ sen_rc sen_init(void);
+
+Your program must call sen_init() to initialize Senna library before using
+it. For each process, you only need one sen_init() call. (In case of
+multithreaded application, one sen_init() call is sufficient for all threads)
+
+ sen_rc sen_fin(void);
+
+Call sen_fin() after you use Senna library.
+
+** sen_index Type
+
+sen_index is a struct contains information needed for high speed searching in the index file. To register a document into the index file, use a value pair consists of Document ID and document content (the character string). Later, to search in index file, use a character string as query.
+The instance of sen_index corresponds to the index file on the file system,the registered document is kept in the index file, however, it is not possible to restore the document content which correspond to Document ID using sen_index.
+
+You can use fixed length or variable length Document ID. If it is fixed length, it'll be an integer number, if it is variable length, it'll be an null terminated string.
+
+Document ID must be unique in the index.
+
+Maximum length of Document ID is 8191 bytes(If you use variable length ID, It includes NULL string).
+
+There is no restriction of maximum length for value.
+
+The encoding of the character string specified for a value can be  either SHIFT-JIS, EUC-japan or utf-8.
+
+There're two ways for splitting the document content: using morphological analysis or N-gram.
+
+When N-gram is selected, you can select whether it divides the string into alphanumerical letter or the symbolic letter or not.
+
+Normalization of text can be turned on/off.
+
+?It is possible to share one sen_index instance between multiple threads.
+
+?It is possible to open one index file simultaneously by multiple processes.
+
+It is possible to execute search operation simultaneously with the execution of update operation safely without control of exclusion. (However, the transaction isolation has not been achieved, so the uncommited data might not be appeared in the search result)
+
+Two or more process or threads cannot execute the update operation at the same time for one index. (Exclusive control is separately needed)
+
+ sen_index *sen_index_create(const char *path, int key_size, int flags, int initial_n_segments, sen_encoding encoding);
+
+Create the index file using given path, and then return the corresponding sen_index instance.
+When it fails, NULL is returned.
+
+Document ID length (byte length) is given by key_size.
+When key_size is 0, it means that the Document ID has variable length (nul terminated character string).
+
+flags is the combination of the below values.
+
+: SEN_INDEX_NORMALIZE : Turn on the normalization.
+: SEN_INDEX_SPLIT_ALPHA : The alphabetic character string is divided into the character elements(SEN_INDEX_NORMALIZE and SEN_INDEX_NGRAM required).
+: SEN_INDEX_SPLIT_DIGIT :The numeric character string is divided into the letter elements(SEN_INDEX_NORMALIZE and SEN_INDEX_NGRAM required).
+: SEN_INDEX_SPLIT_SYMBOL : The symbolic character string is divided into the letter elements(SEN_INDEX_NORMALIZE and SEN_INDEX_NGRAM required).
+: SEN_INDEX_NGRAM : Use N-gram algorithm.
+: SEN_INDEX_DELIMITED : Words are delimited by space.
+
+initial_n_segments gives the size of an initial buffer.
+The capacity at initial_n_segments*256Kbytes is secured as an initial index. The greater initial_n_segments value is, the higher updating speed we get (Within the range where the real memory size is not exceeded).
+
+encoding can be either sen_enc_default, sen_enc_none, and sen_enc_euc_jp, sen_enc_utf8 or sen_enc_sjis.
+
+ sen_index *sen_index_open(const char *path);
+
+Open an index file at given path, and then return the corresponding sen_index instance.
+When fails, NULL is returned.
+
+ sen_rc sen_index_close(sen_index *index);
+
+Close the index file and release the sen_index instance.
+If it succeeds sen_success is returned, if it fails, the error code is returned.
+
+ sen_rc sen_index_remove(const char *path);
+
+Remove the index file at given path.
+If it succeeds, sen_success is returned, if it fails, the error code is returns.
+
+ sen_rc sen_index_rename(const char *old_name, const char *new_name);
+
+Rename the name of the given index file, old_name to new_name.
+
+ sen_rc sen_index_upd(sen_index *index, const void *key,
+                      const char *oldvalue, unsigned int oldvalue_len,
+                      const char *newvalue, unsigned int newvalue_len);
+
+Update the value of document which corresponds to the given key in the index from oldvalue to newvalue.
+
+oldvalue_len is the length of oldvalue.
+
+newvalue_len is the length of newvalue.
+
+When inserting new document, oldvalue is NULL and oldvalue_len is 0.
+
+When deleting document, newvalue is NULL and oldvalue_len is 0.
+
+It is necessary to specify correct old value for when updating.
+
+ sen_records *sen_index_sel(sen_index *index,
+                            const char *string, unsigned int string_len);
+
+Search for document whose value contains string, then return a sen_records instance.
+
+string_len is the length of string.
+
+** sen_records Type
+
+Contains records which are returned as the search result.
+
+It designates one record among others as the current record.
+
+ int sen_records_next(sen_records *r, void *keybuf, int bufsize, int *score);
+
+Advance to the next record the current record if it is possible.
+Return 0 if fail, otherwise return length of the key of current record.
+If it is successful, keybuf is not NULL and bufsize is greater than length of the key, the value of the key will be copied to keybuf.
+If score is not NULL, it will be set to the score value of current record.
+
+ sen_rc sen_records_rewind(sen_records *records);
+
+The current record is cleared. To read records again from the first records, a call to sen_records_next() is needed.
+
+ int sen_records_curr_score(sen_records *records);
+
+Return score of the current record (goodness of relevant for search query).
+
+ int sen_records_curr_key(sen_records *records, void *keybuf, int bufsize);
+
+Return length of the key of current record.
+If current record doesn't exist, return 0 (zero).
+
+Right after calling to sen_index_sel(), sen_index_select() or sen_records_rewind() functions, current record doesn't valid. Therefore it must call to sen_records_next() to make current record available.
+
+If key_size of the index corresponds to the records object is greater than 0 (zero), the return value (if current record is available) is key_size.
+
+If keybuf is not NULL and bufsize is greater than the length of the key of current record, the value of the key will be copied to keybuf.
+
+ int sen_records_nhits(sen_records *records);
+
+Return the number of records which are included in records.
+
+ int sen_records_find(sen_records *records, const void *key);
+
+Find record which corresponds to given key in the records, return score value ifsuch record exist.
+After you execute sen_records_find, you have to execute sen_records_rewind before you use sen_records_next.
+
+ sen_rc sen_records_close(sen_records *records);
+
+Release the records instance.
+
+*Advanced API
+
+Advanced API is used to control & tunning the precision of search result. With advanced API, in addition to sen_index type and sen_records type, there is a sen_values type which holds the information about content of the document to be registered into index.
+
+** sen_values Type
+
+The sen_values type is a data type to temporarily store information about the content of the registered document in the memory.
+In basic API, value of the document is treated as a flat, single character string, but in advanced API, one document can be treated as sets of two or more sections. Moreover, each section can be managed as a list of the character string with different weight. Thereafter, search result can be sorted using weight values.
+
+ sen_values *sen_values_open(void);
+
+Create a new sen_values instance.
+
+ sen_rc sen_values_close(sen_values *values);
+
+Release the given sen_values instance.
+
+ sen_rc sen_values_add(sen_values *values, const char *str, unsigned int str_len,
+                       unsigned int weight);
+
+Add the character string str with weight value of which length is str_len.
+
+** sen_records Type
+
+In advanced APIs, more complex operation functions on sen_records are offered.
+
+ sen_records *sen_records_open(sen_rec_unit record_unit, sen_rec_unit subrec_unit, unsigned int max_n_subrecs);
+
+A new, empty records instance is generated. In advanced API, the unit of the records of each document in the retrieval result can be specified by record_unit. Moreover, the subrecord of each record of limited piece can be stored by the unit of the subordinate position. The unit of the subrecord is specified with subrec_unit.
+Either record_unit following subrec_unit is specified.
+
+: sen_rec_document : Document unit
+: sen_rec_section : Section unit
+: sen_rec_position : Appearance position unit
+: sen_rec_userdef : Unit of user definition value(Only making to group is effective. )
+: sen_rec_none : The subrecord is directed not to be stored.
+
+max_n_subrecs indicates the maximum amount of the sub records can be hold in each record.
+
+ sen_records *sen_records_union(sen_records *a, sen_records *b);
+
+Returns a sen_records instance which is the union of a and b.
+a and b are destroyed.
+a and b are the search results which designates the identical symbol as document ID, also the record_unit must be the same.
+
+ sen_records *sen_records_subtract(sen_records *a, sen_records *b);
+
+Returns a sen_records instance contains the records that appear in a but not appear in b.
+a and b are destroyed.
+a and b are the search result which designates the identical symbol as document ID, also record_unit must be the same.
+
+ sen_records *sen_records_intersect(sen_records *a, sen_records *b);
+
+Returns a sen_records instance which is the common of a and b.
+a and b are destroyed.
+a and b are the search result which designates the identical symbol as document ID, also record_unit must be the same.
+
+ int sen_records_difference(sen_records *a, sen_records *b);
+
+The records which appear in both a and b are removed from a and b. The number of removed records is returned.
+a and b are the search result which designates the identical symbol as document ID, also, record_unit must be the same.
+
+ sen_rc sen_records_sort(sen_records *records, int limit, sen_sort_optarg *optarg);
+
+The record in records can be sorted, and the element of high rank limit piece be taken out one by one with sen_records_next().
+Sort method can be specified by optarg. The structure of sen_sort_optarg is shown below.
+
+ struct _sen_sort_optarg {
+   sen_sort_mode mode;
+   int (*compar)(sen_records *, const sen_recordh *, sen_records *, const sen_recordh *, void *);
+   void *compar_arg;
+ };
+
+mode value can be either below.
+
+: sen_sort_descending : Descending order.
+: sen_sort_ascending : Ascending order.
+
+For call-back function compar, its first and third argument point to the first argument of sen_records_sort.
+The second and fourth arguments are the two records needed to be compared. compar_arg is passed to the fifth argument. Relationship of the second argument to the third arguments may be: 1) smaller, 2) equal and 3) greater. Those relationships correspond to the return values: 1) less than zero, 2) zero and 3) greater than zero, respectively. When two arguments are equal, two orders are undefined in records which is rearranged.
+
+If both compar and compar_arg is NULL, it sorts using the key value of each record.
+
+If optarg is NULL, sen_sort_descending mode is used and it sorts using the score value of each record.
+
+ sen_rc sen_records_group(sen_records *records, int limit, sen_group_optarg *optarg);
+
+Record_unit of records is changed to a big unit of a bigger grain degree. Two or more records where the value of new record_unit is the same are brought together in one, and stored as a subrecord. The maximum value of the subrecord of each new record is specified for limit.
+
+Method of grouping can be specified by optarg. The structure of sen_group_optarg is shown below.
+
+ struct _sen_group_optarg {
+   sen_sort_mode mode;
+   int (*func)(sen_records *, const sen_recordh *, void *, void *);
+   void *func_arg;
+   int key_size;
+ };
+
+When the limit piece or more has subrecord, mode specifies the order by which the preserved subrecord is chosen.
+
+The unit of the document, the unit of the section, each appearance position, and the record can be brought together by specifying callback function func with each key of making to the group that the user defines. As for func, records specified for sen_records_group() is passed in the first argument, and the buffer where the record  stores the key to making to the group in the third argument is passed in the second argument and func_arg is passed to the fourth argument. A record concerned is thrown away if the return value of func is numbers except 0. It is necessary to calculate the key of making to the group to the key_size byte based on the content of the record, and to store func in the buffer.
+
+ const sen_recordh * sen_records_curr_rec(sen_records *r);
+
+It returns the handle of the current record.
+
+ const sen_recordh *sen_records_at(sen_records *records, const void *key, unsigned section, unsigned pos, int *score, int *n_subrecs);
+
+A record is retrieved from records whose Document ID, section, pos are equal to the arguments, and return the handle of the record. If score and/or n_subrecs assigned is not NULL, the score value, number of subrecords of the record will be set respectively.
+After you execute sen_records_at, you have to execute sen_records_rewind before you use sen_records_next.
+
+ sen_rc sen_record_info(sen_records *r, const sen_recordh *rh,
+                        void *keybuf, int bufsize, int *keysize,
+                        int *section, int *pos, int *score, int *n_subrecs);
+
+Get the attribute information that corresponds to record rh in records.
+If keybuf is not NULL and bufsize is greater than the length of key, the value of key will be copied to keybuf.
+If section, pos, score, and/or n_subrecs are not NULL, the section number, the position, the score, and the number of subrecords are set respectively.
+
+ sen_rc sen_record_subrec_info(sen_records *r, const sen_recordh *rh, int index,
+                               void *keybuf, int bufsize, int *keysize,
+                               int *section, int *pos, int *score);
+
+From records, get the attribute information about the subrecord of the record rh indicate by index.
+If keybuf is not NULL and bufsize is greater than the length of key, then the value of key will be copied to keybuf.
+If section, pos, and/or score are not NULL, the section number, the position, and the score are set respectively.
+
+** sen_index Type
+
+In advanced API, more complex operation functions on sen_index type are offered.
+
+ sen_index *sen_index_create_with_keys(const char *path, sen_sym *keys, int flags, int initial_n_segments, sen_encoding encoding);
+
+Create an index file at the given path, then return a sen_index instance. An existing sen_sym instance can be specified for symbol table where Document ID is managed.
+
+ sen_index *sen_index_open_with_keys(const char *path, sen_sym *keys);
+
+Open an index file at the given path, then return a sen_index instance. An existing sen_sym instance can be specified for symbol table where Document ID is managed.
+
+ sen_index *sen_index_create_with_keys_lexicon(const char *path,
+                                               sen_sym *keys,
+                                               sen_sym *lexicon,
+                                               int initial_n_segments);
+
+Create an index file at the given path, then return a sen_index instance. An existing sen_sym instance can be specified for symbol table where Document ID and Vocabulary ID is managed.
+
+ sen_index *sen_index_open_with_keys_lexicon(const char *path,
+                                             sen_sym *keys,
+                                             sen_sym *lexicon);
+
+Open an index file at the given path, then return a sen_index instance. An existing sen_sym instance can be specified for symbol table where Document ID and Vocabulary ID is managed.
+
+ sen_rc sen_index_update(sen_index *index, const void *key, unsigned int section, sen_values *oldvalue, sen_values *newvalue);
+
+The content of the section(>=1) of the document that corresponds to key is updated from oldvalue to newvalue.
+
+ sen_rc sen_index_select(sen_index *index, const char *string, unsigned int string_len,
+                         sen_records *records, sen_sel_operator op, sen_select_optarg *optarg);
+
+Searches for the document which matches the given string from index and using op to control how to combine the results into records.
+
+string_len is the length of string.
+
+The op value is either below.
+
+: sen_sel_or : The record which matches to string is added to records.
+: sen_sel_and : The record which does not match to string is deleted from records.
+: sen_sel_but : The record which matches to string is deleted from records.
+: sen_sel_adjust : When the record that matches to string is originally included in records, the score value is added.
+
+In addition, the search operation can be controlled by using optarg. The structure of sen_select_optarg is shown below.
+
+ struct _sen_select_optarg {
+   sen_sel_mode mode;
+   int similarity_threshold;
+   int max_interval;
+   int *weight_vector;
+   int vector_size;
+   int (*func)(sen_records *, const void *, int, void *);
+   void *func_arg;
+ };
+
+The mode value is either below.
+
+: sen_sel_exact : Records where string appears in unison with the word are retrieved.
+: sen_sel_partial : Records where string appears in a part of the word are retrieved(suffix search is only for Japanese words without SEN_INDEX_DELIMITED).
+: sen_sel_unsplit : A record corresponding to a part of the word separating and without writing string is retrieved(this function is only for Japanese words without SEN_INDEX_DELIMITED).
+: sen_sel_near : String is separated and the record where the written each word appears within the range of max_interval is retrieved.
+: sen_sel_similar : String is separated and the record including either of the word of similarity_threshold piece with big idf value is retrieved among written words.
+: sen_sel_prefix : String is separated and the record including a word of which the forward side agrees to either of the word separated.
+: sen_sel_suffix : String is separated and the record including a word of which the rear side agrees to either of the word separated.
+
+When optarg is NULL, it is equivalent with choosing sen_sel_exact.
+
+Weight_vector is used to retrieve only a specific section when the document is composed of two or more sections, and to lift the score. When the array of int is specified for weight_vector, and the size of the array is specified for vector_size, the value of the array element corresponding to the section (one base) where string appeared is multiplied to the score value. When the value is 0, the corresponding section is excluded from the retrieval object.
+When weight_vector is NULL and vector_size is not 0, scores of the all sections are multiplied by vector_size.
+
+When weight in each section is different according to the document, callback function func is specified.
+Every time the record that matches to string is found, records, document ID, the section number, and func_arg are passed to the callback function if it is called, the return value is assumed to be weight value and the score value is calculated accordingly.
+
+ sen_rc sen_index_info(sen_index *index, int *key_size, int *flags,
+                      int *initial_n_segments, sen_encoding *encoding,
+                      unsigned *nrecords_keys, unsigned *file_size_keys,
+                      unsigned *nrecords_lexicon, unsigned *file_size_lexicon,
+                      unsigned *inv_seg_size, unsigned *inv_chunk_size);
+
+Get information of the index about: key_size, flags, initial_n_segments, encoding and internal infomation of index. If you pass NULL to those parameters when calling the function, the corresponding values will be ignored.
+
+ sen_set * sen_index_related_terms(sen_index *index, const char *string, const char *(*fetcher)(void *, void *), void *fetcher_arg);
+
+It extracts words which is related to the given string, and returns the sen_set object identified by the id of index->lexicon which stores the related words.
+Callback fetcher function is called with the arguments, 1st: the key of the document in the index, 2nd: fetcher_arg and returns the content of the document.
+
+** sen_query
+
+Struct sen_query is the data type which stores an extended query string.
+
+ sen_query *sen_query_open(const char *str, unsigned int str_len,
+                           sen_sel_operator default_op,
+                           int max_exprs, sen_encoding encoding);
+
+It creates an instance of sen_query.
+
+str is the extended query.
+
+str_len is the length of str.
+
+default_op is the default value which is used in absense of the query operator.
+You can choice it from below.
+
+: sen_sel_or : default operator is 'or'(default)
+: sen_sel_and : default operator is 'and'(with this option, you can specify a query like normal search engine)
+: sen_sel_but : default operator is '-'
+: sen_sel_adjust : default operator is '>'
+
+max_exprs is the maximum number of the expression in the extend query.
+
+encoding is the encoding of the extended query string.
+You can choise it from sen_enc_default, sen_enc_none, sen_enc_euc_jp,
+sen_enc_utf8, sen_enc_sjis.
+
+ unsigned int sen_query_rest(sen_query *q, const char ** const rest);
+
+It stores rest the extended query string which is rejected for the reason
+why the length of the query string is too long and returns the length of rest.
+
+ sen_rc sen_query_close(sen_query *q);
+
+Close the sen_query instance.
+
+ sen_rc sen_query_exec(sen_index *i, sen_query *q, sen_records *r, sen_sel_operator op);
+
+It stores the result of searching with sen_query for sen_index.
+
+You can choice op from below.
+
+: sen_sel_or : The record which matches to string is added to records.
+: sen_sel_and : The record which does not match to string is deleted from records.
+: sen_sel_but : The record which matches to string is deleted from records.
+: sen_sel_adjust : When the record that matches to string is originally included in records, the score value is added.
+
+ void sen_query_term(sen_query *q, query_term_callback func, void *func_arg);
+
+It calls func with each terms in query, it's length and func_arg.
+func is the function pointer like below.
+
+ typedef int (*query_term_callback)(const char *, unsigned int, void *);
+
+** sen_index
+ sen_rc sen_index_del(sen_index *i, const void *key);
+
+It make the delete flag up of the document in sen_index i which is specified by key.
+Normally, use sen_index_upd.
+
+*Senna low-level API
+
+Using low-level API, you can access the data structures inside Senna,
+furthermore you can search and process complicated data.
+
+** sen_set
+
+It is sets of the records that consist of the pair of the value and the data types to operate it at high speed on the memory as for the key.
+It uses it to operate sets of the retrieval results and sets of vocabularies. (The sen_records type is a data type that derives from sen_set. )
+Sen_set cannot store two or more records where the key overlaps.
+
+ sen_set *sen_set_open(unsigned key_size, unsigned value_size, unsigned index_size);
+
+Create a new sen_set instance.
+key_size is length of the key. index_size is the size of the buffer in initial condition.
+When key_size is 0, it means that key has variable length (nul terminated character string).
+When value_size is 0, the territory where value is kept is not guaranteed.
+
+ sen_rc sen_set_close(sen_set *set);
+
+Release a sen_set instance.
+
+ sen_rc sen_set_info(sen_set *set, unsigned *key_size, unsigned *value_size, unsigned *n_entries);
+
+Gets the key_size, value_size and number of entries for a sen_set instance. When NULL is passed to second, third and fourth argument, those parameters are ignored.
+
+ sen_set_eh *sen_set_get(sen_set *set, const void *key, void **value);
+
+The record that corresponds to key is registered in set, and the handle to the record is returned.
+Because the pointer to the value part of the record is returned, the value can be update through this.
+
+ sen_set_eh *sen_set_at(sen_set *set, const void *key, void **value);
+
+The record that corresponds from set to key is retrieved, and the handle to the record is returned.
+When the corresponding key doesn't exist, NULL is returned.
+Because the pointer that corresponds to the value part on the record is returned by value, the value can be updated through this.
+
+ sen_rc sen_set_del(sen_set *set, sen_set_eh *eh);
+
+The record which corresponds to the record handle which is given by eh is deleted from set.
+
+ sen_set_cursor *sen_set_cursor_open(sen_set *set);
+
+Get a cursor to interate through records of the given set.
+
+ sen_set_eh *sen_set_cursor_next(sen_set_cursor *cursor, void **key, void **value);
+
+Get the next record in the set according to the given cursor, return the handle to the record.
+The pointers correspond to the key and value of the record are returned if the 2nd and 3rd argument are not NULL, respectively.
+
+ sen_rc sen_set_cursor_close(sen_set_cursor *cursor);
+
+Release an instance of sen_set_cursor.
+
+ sen_rc sen_set_element_info(sen_set *set, const sen_set_eh *eh, void **key, void **value);
+
+The pointer to the key to the record corresponding to record handle eh included in set is set in key and the pointer to the value is set in value. When NULL is specified for the 3rd and 4th argument, the argument is disregarded, and the value is not stored.
+
+ sen_set *sen_set_union(sen_set *a, sen_set *b);
+
+Return a sen_set instance which is the union of set a and set b.
+a and b are released by calling this function.
+When there is a record in a has identical key with a record in b, the value
+of the record in a will take precedence.
+
+ sen_set *sen_set_subtract(sen_set *a, sen_set *b);
+
+Return a sen_set instance which is the difference of set a and b. a and b are released by calling to this function.
+
+ sen_set *sen_set_intersect(sen_set *a, sen_set *b);
+
+Return a sen_set instance which consists of the records where keys are identical in both of set a and b.
+a and b are released by calling to this function.
+Value of the record which is included in a takes precedence of value of the record included in b.
+
+ int sen_set_difference(sen_set *a, sen_set *b);
+
+The record which is included in both set a and set b is removed.
+The number of records which are included in both set a and set b is returned.
+
+ sen_set_eh *sen_set_sort(sen_set *set, int limit, sen_set_sort_optarg *optarg);
+
+The record inside set is sorted, higher rank limit arrangement of the
+record handle is returned.
+Method of sort can be specified in optarg. The structure of
+sen_sort_optarg is shown below.
+
+ struct _sen_set_sort_optarg {
+   sen_sort_mode mode;
+   int (*compar)(sen_set *, sen_set_eh *, sen_set *, sen_set_eh *, void *);
+   void *compar_arg;
+   sen_set *compar_arg0;
+ };
+
+The compar is passed in the first and the third argument with the value of compar_arg0.
+The second and the fourth argument are the two handles needed to be compared.
+The fifth argument is passed with value of compar_arg.
+Relationship of the second argument to the third arguments may be:
+1) smaller, 2) equal and 3) greater. Those relationships correspond to the return values: 1) less than zero, 2) zero and 3) greater than zero, respectively.
+When two elements are equal, two orders are undefined in the result which is rearranged.
+
+When NULL is specified for compar, set is sorted with element's first 4 bytes data. In this case, you have to specify 0 in compar_arg.
+
+When NULL is specified for compar_arg0, set specified for the first argument of sen_set_sort() is passed to compar.
+
+Sen_sort_descending is considered in mode when NULL is specified for optarg and it is considered that NULL was specified for compar.
+
+** sen_sym
+
+It is a data type corresponding to the symbol table file to allocate a unique number in the character string of terminal variable-length with the binary data of the fixed length or nul.
+The instance of sen_sym corresponds to a specific file in the filesystem, and the stored document is preserved lasting long.
+
+The sen_index instance contains two sym_sym instances.
+
+: keys : Correspondence your document ID and record ID
+: lexicon : Correspondence your vocabulary and the vocabulary ID which write the contents of the document with spaces between words
+
+ sen_sym * sen_sym_create(const char *path, unsigned key_size, unsigned flags, sen_encoding encoding);
+
+Create a new symbol file at given path, then return the sen_sym instance. When it fails, NULL is returned.
+
+key_size specifies length (byte length) of key. When key_size is 0, it means that variable length (nul terminated character string).
+
+When flags is SEN_SYM_WITH_SIS, it is possible to search backward.
+
+Either sen_enc_default, sen_enc_none, and sen_enc_euc_jp, sen_enc_utf8 or sen_enc_sjis is specified for encoding.
+
+ sen_sym * sen_sym_open(const char *path);
+
+Open symbol file at given path, then return a sen_sym instance. When it fails, NULL is returned.
+
+ sen_rc sen_sym_info(sen_sym *sym, int *key_size, unsigned *flags,
+                     sen_encoding *encoding, unsigned *nrecords, unsigned *file_size);
+
+Return the number of records which are correspond to given key_size, flags and encoding of a sen_sym instance. When NULL is passed to second, third, fourth, fifth and sixth argument, that argument is ignored.
+
+ sen_rc sen_sym_close(sen_sym *sym);
+
+Close symbol table file corresponding to sym and release the syn_sym instance. Return sen_success if succeeds, return error code if fails.
+
+ sen_rc sen_sym_remove(const char *path);
+
+Delete the symbol table file at given path. Return sen_success if succeeds, return error code if fails.
+
+ sen_id sen_sym_get(sen_sym *sym, const unsigned char *key);
+
+Key is registered, and corresponding ID is returned to symbol table sym.
+
+ sen_id sen_sym_at(sen_sym *sym, const unsigned char *key);
+
+ID corresponding to key is returned from symbol table sym. When it is unregistered, SEN_SYM_NIL is returned.
+
+ sen_rc sen_sym_del(sen_sym *sym, const unsigned char *key);
+
+Delete key from sym table.
+
+ unsigned int sen_sym_size(sen_sym *sym);
+
+Return number of keys in sym table.
+
+ int sen_sym_key(sen_sym *sym, sen_id id, unsigned char *keybuf, int bufsize);
+
+When the key corresponding to ID is found, the length of key is returned, otherwise it return 0 (zero)
+If keybuf is not NULL and bufsize is greater than the length of key, then the value of key will be copied to keybuf.
+
+ sen_set * sen_sym_prefix_search(sen_sym *sym, const unsigned char *key);
+
+All the entries where it agrees to key forward are extracted, and the sen_set instance to make those ID a key is returned.
+
+ sen_set * sen_sym_suffix_search(sen_sym *sym, const unsigned char *key);
+
+All the entries where the rear side agrees to key are extracted, and the sen_set instance to make those ID a key is returned. (Only when SEN_SYM_WITH_SIS is specified when sym is made, it is effective.)
+
+ sen_id sen_sym_common_prefix_search(sen_sym *sym, const unsigned char *key);
+
+Pick up the longest string from sym that match to the key as common prefix, and return ID of that string.
+
+ int sen_sym_pocket_get(sen_sym *sym, sen_id id);
+
+It returns the infomation stored in extra storage of sen_sym which is identified by id.
+
+ sen_rc sen_sym_pocket_set(sen_sym *sym, sen_id id, unsigned int value);
+
+It stored the infomation to extra storage of sen_sym which is identified by id.
+
+ sen_id sen_sym_next(sen_sym *sym, sen_id id);
+
+It returns id of the sen_sym next to the current id.
+
+* snippet API
+
+Using snippet API, you can get a snippet based on a KWIC method.
+
+ sen_snip *sen_snip_open(sen_encoding encoding, int flags, unsigned int width,
+                         unsigned int max_results,
+                         const char *defaultopentag, unsigned int defaultopentag_len,
+                         const char *defaultclosetag, unsigned int defaultclosetag_len,
+                         sen_snip_mapping *mapping);
+
+It makes an instance of sen_snip and returns it.
+
+encoding is sen_enc_default, sen_enc_none, sen_enc_euc_jp, sen_enc_utf8 or sen_enc_sjis.
+
+flags is NULL or SEN_SNIP_NORMALIZE(search with a normalized text).
+
+width is the byte length of a snippet.
+
+max_results is the maximum number of a snippet.
+
+defaultopentag is a string which is added before a snippet.
+
+defaultopentag_len is the length of defaultopentag.
+
+defaultclosetag is a string which is added after a snippet.
+
+defaultclosetag_len is the length of defaultclosetag.
+
+mapping is (now) NULL or -1.With -1, you can get an encoded text which is able to be a HTML text.
+
+ sen_rc sen_snip_close(sen_snip *snip);
+
+It destructs an instance of sen_snip.
+
+ sen_rc sen_snip_add_cond(sen_snip *snip,
+                          const char *keyword, unsigned int keyword_len,
+                          const char *opentag, unsigned int opentag_len,
+                          const char *closetag, unsigned int closetag_len);
+
+It specifies a word for searching and a string which is added before and after of the it.
+
+snip is an instance of sen_snip.
+
+keyword is a word for searching.
+
+keyword_len is the length of keyword.
+
+opentag is a string which is added before a snippet.If NULL, the default open tag is added.
+
+opentag_len is the length of opentag.
+
+closetag is a string which is added after a snippet.If NULL, the default close tag is added.
+
+closetag_len is the length of closetag.
+
+ sen_rc sen_snip_exec(sen_snip *snip, const char *string, unsigned int string_len,
+                      unsigned int *nresults, unsigned int *max_tagged_len);
+
+It creates snippets, but doesn't return it.
+
+snip is an instance of sen_snip.
+
+string is a string from which snippets are extracted.
+
+string_len is the length of string.
+
+max_tagged_len is a maximum length of snippets which includes a length of a tail NULL character.
+
+ sen_rc sen_snip_get_result(sen_snip *snip, const unsigned int index,
+                            char *result, unsigned int *result_len);
+
+It returns a snippet which is made in sen_snip_exec.
+
+index is the index number of the snippet.
+
+result is a buffer to which is stored a snippet string.
+
+result_len is stored the length of result.

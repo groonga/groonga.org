@@ -1,0 +1,85 @@
+* FAQ (English)
+
+** General Question
+
+*** Can I use Senna for business?
+Yes, you can use it by following the LGPL 2.1 license. We're welcome you to use [[Powerd by Senna banner|http://dev.razil.jp/img/senna_logo/senna_banner.gif]].
+[[Brazil|http://b.razil.jp]] is doing consulting and supports for profit. Please contact us for detail information from [[contact form|http://b.razil.jp/company/mail.html]]
+
+*** I made an application for Senna.
+
+Not only patches for Senna, we also much appliciate developing applications related to Senna. If you correspond with us about your work, we will introduce it.
+
+** Question about Senna uses
+
+:Can I use Senna without MySQL?
+You can use Senna without binding to MySQL. Senna can work in C code, and various types of languages are able to use for binding. We also produce binding with PostgresSql named [[ludia|http://www.nttdata.co.jp/services/ludia/index.html]].
+
+:Search doesn't work well.
+
+It might be occurred by following cases
+- Character sets specified in /var/senna/senna.conf or c:\senna\senna.conf, for MeCab's dictionary, and for a target index are different.
+- Using MeCab dictionary which is made with wrong character sets.
+- Senna reads old format index, when Senna loses compatibility of indexes by version up.
+
+If you encouter these kind of phenomenon, you should check those encodings are matched or not. And operate below.
+
+- If you're using Senna alone
+-- Delete index files, and restructuring them.
+- If you're using MySQL + Senna
+-- Drop full text index, and then do rcreate it.
+-- Stop MySQL server. Restructuring index by myisamchk -r
+
+:Is there a system that can search internal contents of a server like Namazu?
+No, not yet. However Perl might be able to achieve by using [[File-Extract module|http://search.cpan.org/dist/File-Extract/]] and [[Tie-Senna|http://search.cpan.org/dist/Tie-Senna/]]. In this case, MySQL is not required.
+
+:Can I use huge document sets?
+Senna is designed to be able to handling huge document sets. We recommend to set below:
++ For MySQL binding, patch the 2ind-patch, if you need to do searching refinement, getting numbers of item by count(*), and sorting by any items except score order.If you use mysql with 2ind-patch, you have to check key_buffer_size parameter is properlly chooned.
++ Set INITIAL_N_SEGMENTS suitable size. That can find in senna.conf
++ Use Linux 2.6 or above, to enable user level cache (currently it's not stable).
++ Breakup contents.
+
+** About MySQL Binding
+
+*** I get a error during MySQL compile
+MySQL + Senna is possibly shows up error like this
+
+{{{
+myisamchk.o: In function `main':
+myisamchk.c:(.text+0x72): undefined reference to `sen_init'
+libmyisam.a(mi_open.o): In function `mi_open':
+mi_open.c:(.text+0x14e7): undefined reference to `sen_log'
+...
+}}}
+
+What the reasons are:
+
+- You didn't run autotools (automake or autoconf), before you run configure.
+- Linker cannot find libraries.
+
+Second one probably avoids by these provision.
+
+- Do "ls /usr/local/lib", and confirm existence of libsenna.a
+- Add "/usr/local/lib" line in /etc/ld.so.conf as root. If there is no file, create as new file.
+- run "ldconfig -m /usr/local/lib" as root
+
+:How can I use AND Search, OR Search, or NOT Search?
+
+There is two ways:
+
++ Expand WHERE clause as WHERE MATCH(a) AGAINST('text') AND NOT MATCH(a) AGAINST('text') OR MATCH ...
++ Use IN BOOLEAN MODE (Refer [[query syntax|query_en]] for detail grammar)
+
+** Question About Install
+
+:I don't know how to configure MySQL!
+
+Please refer [[MySQL's configure option|mysql_configure_en]]
+
+:Compile stops during nfkc.c
+
+Some compiler takes very long time. If the compiling doesn't end even 15 minutes passed, halt it by Ctrl-C.
+Then configure again by either one of
+- run configure with --disable-nfkc option
+- run configure with assigned -O0 to environment variable CFLAGS

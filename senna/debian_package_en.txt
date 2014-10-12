@@ -1,0 +1,253 @@
+* How to create debian package
+
+Target: MySQl 5.0.24 and Senna 0.8.0
+
+* How to create MySQL with Senna package
+Get MySQL package and install dependent pacakges:
+{{{
+apt-get source mysql-server-5.0
+apt-get builddep mysql-server-5.0
+cd mysql-dfsg-5.0-5.0.24
+}}}
+
+Open the original source package and copy it:
+{{{
+tar xvfz mysql-dfsg-5.0_5.0.24.orig.tar.gz ~
+cd ~
+mv mysql-dfsg-5.0-5.0.24.orig mysql-5.0.24
+cp -R mysql-5.0.24 mysql-5.0.24-senna
+}}}
+
+Patch to mysql-5.0.24-senna:
+{{{
+cd mysql-5.0.24-senna
+patch -p1 < ~/senna/bindings/mysql/mysql-5.0.24.senna.diff
+patch -p1 < ~/senna/bindings/mysql/mysql-5.0.24.senna.2ind.diff
+}}}
+
+Modify to create libmysqld. And this part will be removed for future Senna. Add @SENNA_INCLUDES@ and @MECAB_INCLUDES@ to INCLUDES of libmysqld/Makefile.am. After
+
+{{{
+      done | sort -u | xargs $(AR) cq libmysqld.a ; \
+}}}
+in libmysqld/Makefile.am, add
+{{{
+      mkdir /tmp/objs; ar x /usr/lib/libsenna.a; ar x /usr/lib/libmecab.a; \
+      ls -1 /tmp/objs | xargs $(AR) cq libmysqld.a ; rm -rf /tmp/objs ; \
+}}}
+@SENNA_INCLUDES@ and @MECAB_INCLUDES@ to INCLUDE of libmysqld/examples/Makefile.am. Add @SENNA_LIBS@ and @MECAB_LIBS@ to LIBS (or LDADD) of libmysqld/examples/Makefile.am.
+
+{{{
+vim libmysqld/Makefile.am
+vim libmysqld/examples/Makefile.am
+}}}
+
+Run autotools and touch:
+{{{
+libtoolize -c -f
+aclocal-1.9
+autoheader
+automake-1.9 -c -a -i
+autoconf
+}}}
+
+Run autotools to original package:
+
+{{{
+cd ..
+cd mysql-5.0.24
+libtoolize -c -f
+aclocal-1.9
+autoheader
+automake-1.9 -c -a -i
+autoconf
+cd..
+}}}
+
+Making patch. Run belows commands. In addition, they're made from a list by 'diff -gr | grep Files' with removinf configure and Makefile.am:
+{{{
+diff -Nu mysql-5.0.24/BUILD/Makefile.in mysql-5.0.24-senna/BUILD/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/Docs/Makefile.in mysql-5.0.24-senna/Docs/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/Makefile.in mysql-5.0.24-senna/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/SSL/Makefile.in mysql-5.0.24-senna/SSL/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/client/Makefile.in mysql-5.0.24-senna/client/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/cmd-line-utils/Makefile.in mysql-5.0.24-senna/cmd-line-utils/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/cmd-line-utils/libedit/Makefile.in mysql-5.0.24-senna/cmd-line-utils/libedit/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/cmd-line-utils/readline/Makefile.in mysql-5.0.24-senna/cmd-line-utils/readline/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/config.h.in mysql-5.0.24-senna/config.h.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/configure.in mysql-5.0.24-senna/configure.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/dbug/Makefile.in mysql-5.0.24-senna/dbug/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/extra/Makefile.in mysql-5.0.24-senna/extra/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/extra/yassl/Makefile.in mysql-5.0.24-senna/extra/yassl/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/extra/yassl/src/Makefile.in mysql-5.0.24-senna/extra/yassl/src/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/extra/yassl/taocrypt/Makefile.in mysql-5.0.24-senna/extra/yassl/taocrypt/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/extra/yassl/taocrypt/benchmark/Makefile.in mysql-5.0.24-senna/extra/yassl/taocrypt/benchmark/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/extra/yassl/taocrypt/src/Makefile.in mysql-5.0.24-senna/extra/yassl/taocrypt/src/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/extra/yassl/taocrypt/test/Makefile.in mysql-5.0.24-senna/extra/yassl/taocrypt/test/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/extra/yassl/testsuite/Makefile.in mysql-5.0.24-senna/extra/yassl/testsuite/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/heap/Makefile.in mysql-5.0.24-senna/heap/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/include/Makefile.in mysql-5.0.24-senna/include/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/include/my_pthread.h mysql-5.0.24-senna/include/my_pthread.h >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/include/myisam.h mysql-5.0.24-senna/include/myisam.h >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/libmysql/Makefile.in mysql-5.0.24-senna/libmysql/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/libmysql_r/Makefile.in mysql-5.0.24-senna/libmysql_r/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/libmysqld/Makefile.in mysql-5.0.24-senna/libmysqld/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/libmysqld/examples/Makefile.in mysql-5.0.24-senna/libmysqld/examples/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/libmysqld/filesort.cc mysql-5.0.24-senna/libmysqld/filesort.cc >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/libmysqld/ha_myisam.cc mysql-5.0.24-senna/libmysqld/ha_myisam.cc >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/libmysqld/item_cmpfunc.cc mysql-5.0.24-senna/libmysqld/item_cmpfunc.cc >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/libmysqld/item_func.cc mysql-5.0.24-senna/libmysqld/item_func.cc >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/libmysqld/item_sum.cc mysql-5.0.24-senna/libmysqld/item_sum.cc >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/libmysqld/records.cc mysql-5.0.24-senna/libmysqld/records.cc >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/libmysqld/sql_db.cc mysql-5.0.24-senna/libmysqld/sql_db.cc >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/libmysqld/sql_delete.cc mysql-5.0.24-senna/libmysqld/sql_delete.cc >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/libmysqld/sql_select.cc mysql-5.0.24-senna/libmysqld/sql_select.cc >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/libmysqld/sql_show.cc mysql-5.0.24-senna/libmysqld/sql_show.cc >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/libmysqld/sql_table.cc mysql-5.0.24-senna/libmysqld/sql_table.cc >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/man/Makefile.in mysql-5.0.24-senna/man/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/myisam/Makefile.in mysql-5.0.24-senna/myisam/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/myisam/ft_boolean_search.c mysql-5.0.24-senna/myisam/ft_boolean_search.c >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/myisam/ft_nlq_search.c mysql-5.0.24-senna/myisam/ft_nlq_search.c >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/myisam/ft_update.c mysql-5.0.24-senna/myisam/ft_update.c >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/myisam/fulltext.h mysql-5.0.24-senna/myisam/fulltext.h >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/myisam/mi_check.c mysql-5.0.24-senna/myisam/mi_check.c >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/myisam/mi_close.c mysql-5.0.24-senna/myisam/mi_close.c >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/myisam/mi_create.c mysql-5.0.24-senna/myisam/mi_create.c >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/myisam/mi_delete_table.c mysql-5.0.24-senna/myisam/mi_delete_table.c >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/myisam/mi_info.c mysql-5.0.24-senna/myisam/mi_info.c >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/myisam/mi_open.c mysql-5.0.24-senna/myisam/mi_open.c >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/myisam/mi_rename.c mysql-5.0.24-senna/myisam/mi_rename.c >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/myisam/myisamchk.c mysql-5.0.24-senna/myisam/myisamchk.c >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/myisammrg/Makefile.in mysql-5.0.24-senna/myisammrg/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/mysql-test/Makefile.in mysql-5.0.24-senna/mysql-test/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/mysql-test/ndb/Makefile.in mysql-5.0.24-senna/mysql-test/ndb/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/mysys/Makefile.in mysql-5.0.24-senna/mysys/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/ndb/Makefile.in mysql-5.0.24-senna/ndb/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/ndb/docs/Makefile.in mysql-5.0.24-senna/ndb/docs/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/ndb/include/Makefile.in mysql-5.0.24-senna/ndb/include/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/ndb/src/Makefile.in mysql-5.0.24-senna/ndb/src/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/ndb/src/common/Makefile.in mysql-5.0.24-senna/ndb/src/common/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/ndb/src/common/debugger/Makefile.in mysql-5.0.24-senna/ndb/src/common/debugger/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/ndb/src/common/debugger/signaldata/Makefile.in mysql-5.0.24-senna/ndb/src/common/debugger/signaldata/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/ndb/src/common/logger/Makefile.in mysql-5.0.24-senna/ndb/src/common/logger/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/ndb/src/common/mgmcommon/Makefile.in mysql-5.0.24-senna/ndb/src/common/mgmcommon/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/ndb/src/common/portlib/Makefile.in mysql-5.0.24-senna/ndb/src/common/portlib/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/ndb/src/common/transporter/Makefile.in mysql-5.0.24-senna/ndb/src/common/transporter/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/ndb/src/common/util/Makefile.in mysql-5.0.24-senna/ndb/src/common/util/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/ndb/src/cw/Makefile.in mysql-5.0.24-senna/ndb/src/cw/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/ndb/src/cw/cpcd/Makefile.in mysql-5.0.24-senna/ndb/src/cw/cpcd/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/ndb/src/kernel/Makefile.in mysql-5.0.24-senna/ndb/src/kernel/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/ndb/src/kernel/blocks/Makefile.in mysql-5.0.24-senna/ndb/src/kernel/blocks/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/ndb/src/kernel/blocks/backup/Makefile.in mysql-5.0.24-senna/ndb/src/kernel/blocks/backup/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/ndb/src/kernel/blocks/cmvmi/Makefile.in mysql-5.0.24-senna/ndb/src/kernel/blocks/cmvmi/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/ndb/src/kernel/blocks/dbacc/Makefile.in mysql-5.0.24-senna/ndb/src/kernel/blocks/dbacc/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/ndb/src/kernel/blocks/dbdict/Makefile.in mysql-5.0.24-senna/ndb/src/kernel/blocks/dbdict/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/ndb/src/kernel/blocks/dbdih/Makefile.in mysql-5.0.24-senna/ndb/src/kernel/blocks/dbdih/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/ndb/src/kernel/blocks/dblqh/Makefile.in mysql-5.0.24-senna/ndb/src/kernel/blocks/dblqh/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/ndb/src/kernel/blocks/dbtc/Makefile.in mysql-5.0.24-senna/ndb/src/kernel/blocks/dbtc/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/ndb/src/kernel/blocks/dbtup/Makefile.in mysql-5.0.24-senna/ndb/src/kernel/blocks/dbtup/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/ndb/src/kernel/blocks/dbtux/Makefile.in mysql-5.0.24-senna/ndb/src/kernel/blocks/dbtux/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/ndb/src/kernel/blocks/dbutil/Makefile.in mysql-5.0.24-senna/ndb/src/kernel/blocks/dbutil/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/ndb/src/kernel/blocks/ndbcntr/Makefile.in mysql-5.0.24-senna/ndb/src/kernel/blocks/ndbcntr/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/ndb/src/kernel/blocks/ndbfs/Makefile.in mysql-5.0.24-senna/ndb/src/kernel/blocks/ndbfs/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/ndb/src/kernel/blocks/qmgr/Makefile.in mysql-5.0.24-senna/ndb/src/kernel/blocks/qmgr/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/ndb/src/kernel/blocks/suma/Makefile.in mysql-5.0.24-senna/ndb/src/kernel/blocks/suma/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/ndb/src/kernel/blocks/trix/Makefile.in mysql-5.0.24-senna/ndb/src/kernel/blocks/trix/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/ndb/src/kernel/error/Makefile.in mysql-5.0.24-senna/ndb/src/kernel/error/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/ndb/src/kernel/vm/Makefile.in mysql-5.0.24-senna/ndb/src/kernel/vm/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/ndb/src/mgmapi/Makefile.in mysql-5.0.24-senna/ndb/src/mgmapi/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/ndb/src/mgmclient/Makefile.in mysql-5.0.24-senna/ndb/src/mgmclient/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/ndb/src/mgmsrv/Makefile.in mysql-5.0.24-senna/ndb/src/mgmsrv/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/ndb/src/ndbapi/Makefile.in mysql-5.0.24-senna/ndb/src/ndbapi/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/ndb/test/Makefile.in mysql-5.0.24-senna/ndb/test/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/ndb/test/ndbapi/Makefile.in mysql-5.0.24-senna/ndb/test/ndbapi/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/ndb/test/ndbapi/bank/Makefile.in mysql-5.0.24-senna/ndb/test/ndbapi/bank/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/ndb/test/run-test/Makefile.in mysql-5.0.24-senna/ndb/test/run-test/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/ndb/test/src/Makefile.in mysql-5.0.24-senna/ndb/test/src/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/ndb/test/tools/Makefile.in mysql-5.0.24-senna/ndb/test/tools/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/ndb/tools/Makefile.in mysql-5.0.24-senna/ndb/tools/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/netware/Makefile.in mysql-5.0.24-senna/netware/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/os2/Makefile.in mysql-5.0.24-senna/os2/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/os2/include/Makefile.in mysql-5.0.24-senna/os2/include/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/os2/include/sys/Makefile.in mysql-5.0.24-senna/os2/include/sys/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/pstack/Makefile.in mysql-5.0.24-senna/pstack/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/pstack/aout/Makefile.in mysql-5.0.24-senna/pstack/aout/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/regex/Makefile.in mysql-5.0.24-senna/regex/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/scripts/Makefile.in mysql-5.0.24-senna/scripts/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/scripts/mysqlbug mysql-5.0.24-senna/scripts/mysqlbug >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/server-tools/Makefile.in mysql-5.0.24-senna/server-tools/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/server-tools/instance-manager/Makefile.in mysql-5.0.24-senna/server-tools/instance-manager/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/sql/Makefile.in mysql-5.0.24-senna/sql/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/sql/filesort.cc mysql-5.0.24-senna/sql/filesort.cc >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/sql/ha_myisam.cc mysql-5.0.24-senna/sql/ha_myisam.cc >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/sql/handler.h mysql-5.0.24-senna/sql/handler.h >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/sql/item.h mysql-5.0.24-senna/sql/item.h >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/sql/item_cmpfunc.cc mysql-5.0.24-senna/sql/item_cmpfunc.cc >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/sql/item_cmpfunc.h mysql-5.0.24-senna/sql/item_cmpfunc.h >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/sql/item_func.cc mysql-5.0.24-senna/sql/item_func.cc >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/sql/item_func.h mysql-5.0.24-senna/sql/item_func.h >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/sql/item_sum.cc mysql-5.0.24-senna/sql/item_sum.cc >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/sql/lex.h mysql-5.0.24-senna/sql/lex.h >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/sql/lex_hash.h mysql-5.0.24-senna/sql/lex_hash.h >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/sql/mysqld.cc mysql-5.0.24-senna/sql/mysqld.cc >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/sql/records.cc mysql-5.0.24-senna/sql/records.cc >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/sql/share/Makefile.in mysql-5.0.24-senna/sql/share/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/sql/sql_class.h mysql-5.0.24-senna/sql/sql_class.h >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/sql/sql_db.cc mysql-5.0.24-senna/sql/sql_db.cc >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/sql/sql_delete.cc mysql-5.0.24-senna/sql/sql_delete.cc >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/sql/sql_lex.h mysql-5.0.24-senna/sql/sql_lex.h >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/sql/sql_select.cc mysql-5.0.24-senna/sql/sql_select.cc >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/sql/sql_show.cc mysql-5.0.24-senna/sql/sql_show.cc >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/sql/sql_table.cc mysql-5.0.24-senna/sql/sql_table.cc >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/sql/sql_yacc.cc mysql-5.0.24-senna/sql/sql_yacc.cc >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/sql/sql_yacc.h mysql-5.0.24-senna/sql/sql_yacc.h >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/sql/sql_yacc.yy mysql-5.0.24-senna/sql/sql_yacc.yy >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/sql/structs.h mysql-5.0.24-senna/sql/structs.h >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/sql-bench/Makefile.in mysql-5.0.24-senna/sql-bench/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/sql-common/Makefile.in mysql-5.0.24-senna/sql-common/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/strings/Makefile.in mysql-5.0.24-senna/strings/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/support-files/MacOSX/Makefile.in mysql-5.0.24-senna/support-files/MacOSX/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/support-files/Makefile.in mysql-5.0.24-senna/support-files/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/tests/Makefile.in mysql-5.0.24-senna/tests/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/tools/Makefile.in mysql-5.0.24-senna/tools/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/vio/Makefile.in mysql-5.0.24-senna/vio/Makefile.in >> senna-0.8.0.patch
+diff -Nu mysql-5.0.24/zlib/Makefile.in mysql-5.0.24-senna/zlib/Makefile.in >> senna-0.8.0.patch
+}}}
+
+Go to the shell for making patch by dpatch-edit-patch. The third parmeter is tha last items of dpatch-list-patch:
+
+{{{
+dpatch-edit-patch patch 99_senna 92_TEMP__client__mysql_upgrade__defaultgroups.dpatch
+}}}
+
+Patch you made now; modify autoconf and configure.in to initial status. Delete autom4te.cache. Display rejected patches and patch them manually:
+
+{{{
+patch -p1 < ~/senna-patch
+autoconf
+cp ~/mysql-5.0.24/configure.in .
+rm -rf autom4te.cache
+find . -name '*.rej'
+find . -name '*.orig' -exec rm {} \;
+}}}
+
+Create dpatch for Senna:
+{{{
+exit
+}}}
+
+Add Made dpatch (to last line of 99_senna.dpatch):
+{{{
+vim debian/patches/00list
+}}}
+
+Modify rules (add --with-senna to configure option):
+{{{
+vim debian/rules
+}}}
+
+If you have time, modify debian/control and debian/changelog. eg. builddep and Maintainer
+Run debuild without signature (-us -uc):
+{{{
+debuild -rfakeroot -us -uc
+}}}

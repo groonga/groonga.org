@@ -1,0 +1,88 @@
+* install for English
+
+* For Unix like OS
+
+** 1) Install senna
+
+ > svn co http://svn.razil.jp/senna/trunk senna
+ > cd senna
+ > ./configure --prefix=/usr --without-mecab
+ > make
+ > sudo make install
+
+For English user, please execute configure with '--without-mecab' option.
+
+If you want to install MySQL binding, execute commands below.
+MySQL binding description is in [[mysql_binding_en]].
+
+** 2) Install MySQL
+
+If you use Senna with Mysql, you have to install patched MySQL.
+
+Get MySQL source from below.
+http://dev.mysql.com/downloads/
+
+ > cd mysql-4.0.28
+ > patch -p1 < ../senna/bindings/mysql/mysql-4.0.26.senna.diff
+
+2ind-patch is the patch which make MySQL enable to use fulltext index and normal index bothly.
+ > patch -p1 < ../senna/bindings/mysql/mysql-4.0.26.senna.2ind.diff
+
+''Aftet patched, you have to execute autotools.''
+
+''bison 1.75'', autoconf 2.59, ''automake 1.8(aclocal 1.8)'' are required.
+
+ > libtoolize -c -f
+ > aclocal-1.9
+ > autoheader
+ > automake-1.9 -c -a -i
+ > autoconf
+ > touch sql/sql_yacc.yy
+
+And execute configure, make, make install.
+''in configure, you have to specify --with-senna and --without-mecab option.''
+
+ > CFLAGS="-O3 -mcpu=pentium4 -I/usr/local/include" \
+ CXX=gcc CXXFLAGS="-O3 -mcpu=pentium4 \
+ -felide-constructors -fno-exceptions -fno-rtti -I/usr/local/include" \
+ LDFLAGS="-L/usr/local/lib" \
+ ./configure \
+ --prefix=/usr \
+ --enable-assembler \
+ --with-charset=ujis --with-extra-charsets=complex \
+ --enable-thread-safe-client \
+ --with-big-tables \
+ --with-named-curses-libs=/lib/libncurses.so.5 \
+ --localstatedir=/var/lib/mysql \
+ --with-unix-socket-path=/var/run/mysqld/mysqld.sock \
+ --with-senna \
+ --without-mecab
+ > make
+ > sudo make install
+
+Copy config file.
+
+ > cp -p ./support-files/my-medium.cnf /etc/my.cnf
+
+Init database.
+
+ > sudo ./scripts/mysql_install_db
+
+Change owner user and group.
+
+ > sudo chown -R mysql:mysql /usr/local/var
+
+Start MySQL server.
+
+ > sudo ./support-files/mysql.server start
+
+Check whether MySQL server runs or not.
+
+ > mysqladmin version
+
+Copy script for auto-execute.
+
+ > sudo cp ./support-files/mysql.server /etc/init.d/mysql
+
+After you install,
+check with [[check_install_en]].

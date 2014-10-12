@@ -1,0 +1,69 @@
+* MySQL + Sennaのrpmパッケージの作り方
+
+* ダウンロード
+MySQLのページから、Source RPMをダウンロード。
+ wget http://dev.mysql.com/get/Downloads/MySQL-5.0/MySQL-5.0.22-0.src.rpm/from/http://ftp.iij.ad.jp/pub/db/mysql/
+
+Sennaをダウンロード
+ wget http://dev.razil.jp/archive/senna/senna-latest-svn.tar.gz
+
+MeCabをダウンロード
+ wget http://prdownloads.sourceforge.jp/mecab/20917/mecab-0.92.tar.gz
+ wget http://prdownloads.sourceforge.jp/mecab/20904/mecab-ipadic-2.7.0-20060707.tar.gz
+
+*MeCabのrpm化
+-MeCabパッケージ0.91以前にはmecab.specが入っている。mecab.spec.inも入っていて、configure実行後にmecab.specが生成される。
+-0.92以降にはmecab.spec.inが入っていないので、0.91以前のパッケージから持ってくる。
+-0.91以前のmecab.specは文法がちょっと古いので、適宜修正する。
+-MeCab自身はどのエンコーディングにも対応している。
+
+ tar xvfz mecab-0.91.tar.gz
+ tar xvfz mecab-0.93.tar.gz
+ cd mecab-0.91
+ cp ../mecab-0.91/mecab.spec .
+ vi mecab.spec
+  versionを0.93に編集
+  copyright: LGPLをLicense: LGPLに編集
+  configureオプションを好きなように編集
+ cp mecab-0.93.tar.gz /usr/src/redhat/SOURCES/
+ rpmbuild -ba --target i686 mecab.spec
+
+*IPADICのrpm化
+-configureを実行して、mecab-ipadic.spec.inからmecab-ipadic.specを生成する
+-辞書の文字コード設定を忘れない！！！
+
+ tar xvfz mecab-ipadic-2.7.0-20060707.tar.gz
+ cd mecab-ipadic-2.7.0-20060707
+ ./configure
+ vi mecab.spec
+  copyright: LGPLをLicense: LGPLに編集
+  configureオプションを好きなように編集（辞書の文字コードはここで設定！！）
+ cp mecab-ipadic-2.7.0-20060707.tar.gz /usr/src/redhat/SOURCES/
+ rpmbuild -ba mecab-ipadic.spec
+
+*Sennaのrpm化
+-configureを実行して、senna.spec.inからsenna.specを作成する
+ tar xvfz senna-latest-svn.tar.gz
+ cd senna
+ ./configure
+ vi senna.spec
+  configureオプションを好きなように編集
+ cp senna-latest-svn.tar.gz /usr/src/redhat/SOURCES/libsenna-0.8.0.tar.gz
+ rpmbuild -ba --target i686 senna.spec
+
+*MySQL with Sennaのrpm化
+-MySQLのソースrpmを利用する
+-MySQL binding patchについて
+--MySQLのソースrpm中のMySQL tarballにはconfigure.acがない。よってその部分のパッチを削る。
+--上記の代わりに、configureそのものに対するパッチを生成する。
+-specファイルについて
+--上記の修正を加えたMySQL bindingのパッチを追加
+--上記configureに対するパッチの追加
+--NameをMySQLからMySQL-sennaに変更
+--Providesを適宜追加
+--BuildRequiresにlibsenna-develとmecab-develを追加
+--Obsoletesを適宜追加
+--configureオプションに--with-sennaを追記
+
+''まだ記載中です。''
+

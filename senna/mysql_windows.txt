@@ -1,0 +1,150 @@
+* WindowsでSennaがついたMySQLをビルドする方法
+
+''Windowsでのビルドは手間がかかります。''
+
+* 前提条件
+
+** ビルド環境
+-Windows XP Professional SP2
+-Debian GNU Linux 3.1(sarge) その他 Linux環境
+
+** 使っているVisual Studio
+-Visual Studio 2005 Professional Edition
+
+Express EditonではMySQL本体のコンパイルで修正が必要な場合があります。
+-参照:[ senna-dev 502 ]井原様の投稿
+
+** MySQL
+MySQL 5.0以前。5.1以降はWindowsとLinuxのソースが共通化されているらしい。
+
+* 手順
+
+1.MySQLインストーラー・ソースのダウンロード
+
+http://dev.mysql.com/downloads/mysql/5.0.html
+から、ソースコードとインストーラーをダウンロード。
+
+2.MySQLのインストール
+
+まずは、
+Windows用MySQLインストーラーを用いてMySQLをインストールしてください。
+dataディレクトリの作成や、
+サービスの登録をやってくれます。
+
+3.Linux上でのMySQLのmake
+
+まずは、Linux上でSennaを組み込んだMySQLをmakeします。
+以下では、~/mysql-5.0.24a.sennaというディレクトリでmakeしたと仮定します。
+makeの方法は[[install]]を参考にしてください。
+
+4.mysql-5.0.24a-winにWindows用ソースディストリを展開。
+
+ダウンロードした、Windows用のMySQLのソースを展開します。
+~/mysql-5.0.24a-winに解凍したと展開します。
+
+5.必要なファイルをコピーする
+以下のコマンドを実行する。
+
+ cp mysql-5.0.24a.senna/include/my_pthread.h mysql-5.0.24a-win/include/my_pthread.h
+ cp mysql-5.0.24a.senna/include/myisam.h mysql-5.0.24a-win/include/myisam.h
+ cp mysql-5.0.24a.senna/libmysqld/filesort.cc mysql-5.0.24a-win/libmysqld/filesort.cpp
+ cp mysql-5.0.24a.senna/libmysqld/ha_myisam.cc mysql-5.0.24a-win/libmysqld/ha_myisam.cpp
+ cp mysql-5.0.24a.senna/libmysqld/item_cmpfunc.cc mysql-5.0.24a-win/libmysqld/item_cmpfunc.cpp
+ cp mysql-5.0.24a.senna/libmysqld/item_func.cc mysql-5.0.24a-win/libmysqld/item_func.cpp
+ cp mysql-5.0.24a.senna/libmysqld/item_sum.cc mysql-5.0.24a-win/libmysqld/item_sum.cpp
+ cp mysql-5.0.24a.senna/libmysqld/records.cc mysql-5.0.24a-win/libmysqld/records.cpp
+ cp mysql-5.0.24a.senna/libmysqld/sql_db.cc mysql-5.0.24a-win/libmysqld/sql_db.cpp
+ cp mysql-5.0.24a.senna/libmysqld/sql_delete.cc mysql-5.0.24a-win/libmysqld/sql_delete.cpp
+ cp mysql-5.0.24a.senna/libmysqld/sql_select.cc mysql-5.0.24a-win/libmysqld/sql_select.cpp
+ cp mysql-5.0.24a.senna/libmysqld/sql_show.cc mysql-5.0.24a-win/libmysqld/sql_show.cpp
+ cp mysql-5.0.24a.senna/libmysqld/sql_table.cc mysql-5.0.24a-win/libmysqld/sql_table.cpp
+ cp mysql-5.0.24a.senna/myisam/ft_boolean_search.c mysql-5.0.24a-win/myisam/ft_boolean_search.c
+ cp mysql-5.0.24a.senna/myisam/ft_nlq_search.c mysql-5.0.24a-win/myisam/ft_nlq_search.c
+ cp mysql-5.0.24a.senna/myisam/ft_update.c mysql-5.0.24a-win/myisam/ft_update.c
+ cp mysql-5.0.24a.senna/myisam/fulltext.h mysql-5.0.24a-win/myisam/fulltext.h
+ cp mysql-5.0.24a.senna/myisam/mi_check.c mysql-5.0.24a-win/myisam/mi_check.c
+ cp mysql-5.0.24a.senna/myisam/mi_close.c mysql-5.0.24a-win/myisam/mi_close.c
+ cp mysql-5.0.24a.senna/myisam/mi_create.c mysql-5.0.24a-win/myisam/mi_create.c
+ cp mysql-5.0.24a.senna/myisam/mi_delete_all.c mysql-5.0.24a-win/myisam/mi_delete_all.c
+ cp mysql-5.0.24a.senna/myisam/mi_delete_table.c mysql-5.0.24a-win/myisam/mi_delete_table.c
+ cp mysql-5.0.24a.senna/myisam/mi_info.c mysql-5.0.24a-win/myisam/mi_info.c
+ cp mysql-5.0.24a.senna/myisam/mi_open.c mysql-5.0.24a-win/myisam/mi_open.c
+ cp mysql-5.0.24a.senna/myisam/mi_rename.c mysql-5.0.24a-win/myisam/mi_rename.c
+ cp mysql-5.0.24a.senna/myisam/myisam_ftdump.c mysql-5.0.24a-win/myisam/myisam_ftdump.c
+ cp mysql-5.0.24a.senna/myisam/myisamchk.c mysql-5.0.24a-win/myisam/myisamchk.c
+ cp mysql-5.0.24a.senna/myisam/myisamlog.c mysql-5.0.24a-win/myisam/myisamlog.c
+ cp mysql-5.0.24a.senna/myisam/myisampack.c mysql-5.0.24a-win/myisam/myisampack.c
+ cp mysql-5.0.24a.senna/sql/filesort.cc mysql-5.0.24a-win/sql/filesort.cpp
+ cp mysql-5.0.24a.senna/sql/ha_myisam.cc mysql-5.0.24a-win/sql/ha_myisam.cpp
+ cp mysql-5.0.24a.senna/sql/handler.h mysql-5.0.24a-win/sql/handler.h
+ cp mysql-5.0.24a.senna/sql/item.h mysql-5.0.24a-win/sql/item.h
+ cp mysql-5.0.24a.senna/sql/item_cmpfunc.cc mysql-5.0.24a-win/sql/item_cmpfunc.cpp
+ cp mysql-5.0.24a.senna/sql/item_cmpfunc.h mysql-5.0.24a-win/sql/item_cmpfunc.h
+ cp mysql-5.0.24a.senna/sql/item_func.cc mysql-5.0.24a-win/sql/item_func.cpp
+ cp mysql-5.0.24a.senna/sql/item_func.h mysql-5.0.24a-win/sql/item_func.h
+ cp mysql-5.0.24a.senna/sql/item_sum.cc mysql-5.0.24a-win/sql/item_sum.cpp
+ cp mysql-5.0.24a.senna/sql/lex.h mysql-5.0.24a-win/sql/lex.h
+ cp mysql-5.0.24a.senna/sql/lex_hash.h mysql-5.0.24a-win/sql/lex_hash.h
+ cp mysql-5.0.24a.senna/sql/mysqld.cc mysql-5.0.24a-win/sql/mysqld.cpp
+ cp mysql-5.0.24a.senna/sql/records.cc mysql-5.0.24a-win/sql/records.cpp
+ cp mysql-5.0.24a.senna/sql/sql_class.h mysql-5.0.24a-win/sql/sql_class.h
+ cp mysql-5.0.24a.senna/sql/sql_db.cc mysql-5.0.24a-win/sql/sql_db.cpp
+ cp mysql-5.0.24a.senna/sql/sql_delete.cc mysql-5.0.24a-win/sql/sql_delete.cpp
+ cp mysql-5.0.24a.senna/sql/sql_lex.h mysql-5.0.24a-win/sql/sql_lex.h
+ cp mysql-5.0.24a.senna/sql/sql_select.cc mysql-5.0.24a-win/sql/sql_select.cpp
+ cp mysql-5.0.24a.senna/sql/sql_show.cc mysql-5.0.24a-win/sql/sql_show.cpp
+ cp mysql-5.0.24a.senna/sql/sql_table.cc mysql-5.0.24a-win/sql/sql_table.cpp
+ cp mysql-5.0.24a.senna/sql/sql_yacc.cc mysql-5.0.24a-win/sql/sql_yacc.cpp
+ cp mysql-5.0.24a.senna/sql/sql_yacc.h mysql-5.0.24a-win/sql/sql_yacc.h
+ cp mysql-5.0.24a.senna/sql/structs.h mysql-5.0.24a-win/sql/structs.h
+
+6.windows用ソースの変更
+
+config-win.hに
+ #define ENABLE_SENNA 1
+を入れる。
+
+7.Windowsのソースパッケージを固める
+
+ tar cvfz mysql-5.0.24a-senna-win-src.tar.gz mysql-5.0.24a-win
+と実行し、Windows用のソースパッケージを作成する。
+
+8.Windows上でソースパッケージをbuild
+
+できたソースパッケージをWindows上に持っていき、展開。
+
+mysql.dswを開きます。
+
+プロジェクトmysqld,myisamchk,myisamlog,myisam_ftdump,myisampackをソリューション構成releaseでコンパイルします。
+プロジェクトmysqldをソリューション構成Debug,Max,Max nt,nt,Releaseでコンパイルします。
+
+なお、上記コンパイルの際、
+mysqld,myisamchk,myisamlog,myisam_ftdump,myisampackプロジェクトのプロパティに設定が必要となります。
+「追加のインクルード ディレクトリ」にsenna.hのパスを、
+「追加のライブラリ」に「libsenna.lib」を、それぞれ追加します。
+
+9.Windows上で以下のコマンドを実行
+
+c:\mydoc\mysql-5.0.24a-winが作業ディレクトリ、
+mysqlのインストール先がc:\mysqlだとすると、
+
+ cd c:\mydoc\mysql-5.0.24a-win
+ copy client_release\*.exe C:\mysql\bin
+ copy client_debug\mysqld.exe C:\mysql\bin\mysqld-debug.exe
+ xcopy scripts\*.* C:\mysql\scripts /E
+ xcopy share\*.* C:\mysql\share /E
+
+ライブラリも入れたい場合には
+
+ copy lib_debug\mysqlclient.lib C:\mysql\lib\debug
+ copy lib_debug\libmysql.* C:\mysql\lib\debug
+ copy lib_debug\zlib.* C:\mysql\lib\debug
+ copy lib_release\mysqlclient.lib C:\mysql\lib\opt
+ copy lib_release\libmysql.* C:\mysql\lib\opt
+ copy lib_release\zlib.* C:\mysql\lib\opt
+ copy include\*.h C:\mysql\include
+ copy libmysql\libmysql.def C:\mysql\include
+
+MySQL benchを入れたい場合には
+
+ xcopy sql-bench\*.* C:\mysql\bench /E

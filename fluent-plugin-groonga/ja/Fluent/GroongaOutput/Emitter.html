@@ -1,6 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>
@@ -17,7 +17,7 @@
 <script type="text/javascript" charset="utf-8">
   hasFrames = window.top.frames.main ? true : false;
   relpath = '../../';
-  framesUrl = "../../frames.html#!" + escape(window.location.href);
+  framesUrl = "../../frames.html#!Fluent/GroongaOutput/Emitter.html";
 </script>
 
 
@@ -117,7 +117,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#emit-instance_method" title="#emit (instance method)">- (Object) <strong>emit</strong>(tag, record) </a>
+      <a href="#emit-instance_method" title="#emit (instance method)">- (Object) <strong>emit</strong>(chunk) </a>
     
 
     
@@ -162,6 +162,50 @@
 </li>
 
       
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#shutdown-instance_method" title="#shutdown (instance method)">- (Object) <strong>shutdown</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#start-instance_method" title="#start (instance method)">- (Object) <strong>start</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
     </ul>
   
 
@@ -194,17 +238,19 @@
       <pre class="lines">
 
 
-85
-86
-87
-88</pre>
+276
+277
+278
+279
+280</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/fluent/plugin/out_groonga.rb', line 85</span>
+      <pre class="code"><span class="info file"># File 'lib/fluent/plugin/out_groonga.rb', line 276</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_client'>client</span><span class='comma'>,</span> <span class='id identifier rubyid_table'>table</span><span class='rparen'>)</span>
   <span class='ivar'>@client</span> <span class='op'>=</span> <span class='id identifier rubyid_client'>client</span>
   <span class='ivar'>@table</span> <span class='op'>=</span> <span class='id identifier rubyid_table'>table</span>
+  <span class='ivar'>@schema</span> <span class='op'>=</span> <span class='kw'>nil</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -221,7 +267,7 @@
       <div class="method_details first">
   <h3 class="signature first" id="emit-instance_method">
   
-    - (<tt>Object</tt>) <strong>emit</strong>(tag, record) 
+    - (<tt>Object</tt>) <strong>emit</strong>(chunk) 
   
 
   
@@ -233,25 +279,101 @@
       <pre class="lines">
 
 
-90
-91
-92
-93
-94
-95
-96
-97</pre>
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/fluent/plugin/out_groonga.rb', line 90</span>
+      <pre class="code"><span class="info file"># File 'lib/fluent/plugin/out_groonga.rb', line 289</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_emit'>emit</span><span class='lparen'>(</span><span class='id identifier rubyid_tag'>tag</span><span class='comma'>,</span> <span class='id identifier rubyid_record'>record</span><span class='rparen'>)</span>
-  <span class='kw'>if</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\Agroonga\.command\.</span><span class='regexp_end'>/</span></span> <span class='op'>=~</span> <span class='id identifier rubyid_tag'>tag</span>
-    <span class='id identifier rubyid_name'>name</span> <span class='op'>=</span> <span class='gvar'>$POSTMATCH</span>
-    <span class='id identifier rubyid_send_command'>send_command</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_record'>record</span><span class='rparen'>)</span>
-  <span class='kw'>else</span>
-    <span class='id identifier rubyid_store_chunk'>store_chunk</span><span class='lparen'>(</span><span class='id identifier rubyid_data'>data</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_emit'>emit</span><span class='lparen'>(</span><span class='id identifier rubyid_chunk'>chunk</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_records'>records</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+  <span class='id identifier rubyid_chunk'>chunk</span><span class='period'>.</span><span class='id identifier rubyid_msgpack_each'>msgpack_each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_message'>message</span><span class='op'>|</span>
+    <span class='id identifier rubyid_tag'>tag</span><span class='comma'>,</span> <span class='id identifier rubyid__'>_</span><span class='comma'>,</span> <span class='id identifier rubyid_record'>record</span> <span class='op'>=</span> <span class='id identifier rubyid_message'>message</span>
+    <span class='kw'>if</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\Agroonga\.command\.</span><span class='regexp_end'>/</span></span> <span class='op'>=~</span> <span class='id identifier rubyid_tag'>tag</span>
+      <span class='id identifier rubyid_name'>name</span> <span class='op'>=</span> <span class='gvar'>$POSTMATCH</span>
+      <span class='kw'>unless</span> <span class='id identifier rubyid_records'>records</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+        <span class='id identifier rubyid_store_records'>store_records</span><span class='lparen'>(</span><span class='id identifier rubyid_records'>records</span><span class='rparen'>)</span>
+        <span class='id identifier rubyid_records'>records</span><span class='period'>.</span><span class='id identifier rubyid_clear'>clear</span>
+      <span class='kw'>end</span>
+      <span class='ivar'>@client</span><span class='period'>.</span><span class='id identifier rubyid_execute'>execute</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_record'>record</span><span class='rparen'>)</span>
+    <span class='kw'>else</span>
+      <span class='id identifier rubyid_records'>records</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_record'>record</span>
+    <span class='kw'>end</span>
   <span class='kw'>end</span>
+  <span class='id identifier rubyid_store_records'>store_records</span><span class='lparen'>(</span><span class='id identifier rubyid_records'>records</span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_records'>records</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="shutdown-instance_method">
+  
+    - (<tt>Object</tt>) <strong>shutdown</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+286
+287</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/fluent/plugin/out_groonga.rb', line 286</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_shutdown'>shutdown</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="start-instance_method">
+  
+    - (<tt>Object</tt>) <strong>start</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+282
+283
+284</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/fluent/plugin/out_groonga.rb', line 282</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_start'>start</span>
+  <span class='ivar'>@schema</span> <span class='op'>=</span> <span class='const'>Schema</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='ivar'>@client</span><span class='comma'>,</span> <span class='ivar'>@table</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -263,9 +385,9 @@
 </div>
 
     <div id="footer">
-  Generated on Thu Aug  8 22:18:49 2013 by
+  Generated on Mon Oct 20 18:37:50 2014 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.8.7 (ruby-1.9.3).
+  0.8.7.4 (ruby-2.1.3).
 </div>
 
   </body>

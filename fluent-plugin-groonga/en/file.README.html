@@ -2,7 +2,7 @@
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <title>
   File: README
   
@@ -17,7 +17,7 @@
 <script type="text/javascript" charset="utf-8">
   hasFrames = window.top.frames.main ? true : false;
   relpath = '';
-  framesUrl = "frames.html#!" + escape(window.location.href);
+  framesUrl = "frames.html#!file.README.html";
 </script>
 
 
@@ -69,19 +69,62 @@
 
 <h2>Description</h2>
 
-<p>Fluent-plugin-groonga is fluentd plugin collection for
-<a href="http://groonga.org/">groonga</a> users. Groonga users can replicate
-their data by fluent-plugin-groonga.</p>
+<p>Fluent-plugin-groonga is a Fluentd plugin collection to use
+<a href="http://groonga.org/">Groonga</a> with Fluentd. Fluent-plugin-groonga
+supports the following two usages:</p>
+
+<ul>
+<li>Store logs collected by Fluentd to Groonga.</li>
+<li>Implement replication system for Groonga.</li>
+</ul>
+
+<p>The first usage is normal usage. You can store logs to Groonga and
+find logs by full-text search.</p>
+
+<p>The second usage is for Groonga users. Groonga itself doesn&#39;t support
+replication. But Groonga users can replicate their data by
+fluent-plugin-groonga.</p>
 
 <p>Fluent-plugin-groonga includes an input plugin and an output
 plugin. Both of them are named <code>groonga</code>.</p>
 
-<p>The input plugin provides groonga compatible interface. It means that
-HTTP and GQTP interface. You can use the input plugin as groonga
-server. The input plugin receives groonga commands and sends them to
-the output plugin through zero or more fluentds.</p>
+<p>If you want to use fluent-plugin-groonga to store logs to Groonga, you
+need to use only <code>groonga</code> output plugin.</p>
 
-<p>The output plugin sends received groonga commands to groonga. The
+<p>The following configuration stores all data in <code>/var/log/messages</code>
+into Groonga:</p>
+
+<pre class="code ruby"><code class="ruby">&lt;source&gt;
+  type tail
+  format syslog
+  path /var/log/syslog.1
+  pos_file /tmp/messages.pos
+  tag log.messages
+  read_from_head true
+&lt;/source&gt;
+
+&lt;match log.**&gt;
+  type groonga
+  table logs
+
+  protocol http
+  host 127.0.0.1
+
+  buffer_type file
+  buffer_path /tmp/buffer
+  flush_interval 1
+&lt;/match&gt;
+</code></pre>
+
+<p>If you want to use fluent-plugin-groonga to implement Groonga
+replication system, you need to use both plugins.</p>
+
+<p>The input plugin provides Groonga compatible interface. It means that
+HTTP and GQTP interface. You can use the input plugin as Groonga
+server. The input plugin receives Groonga commands and sends them to
+the output plugin through zero or more Fluentds.</p>
+
+<p>The output plugin sends received Groonga commands to Groonga. The
 output plugin supports all interfaces, HTTP, GQTP and command
 interface.</p>
 
@@ -93,6 +136,96 @@ interface.</p>
 </code></pre>
 
 <h2>Usage</h2>
+
+<p>There are two usages:</p>
+
+<ul>
+<li>Store logs collected by Fluentd to Groonga.</li>
+<li>Implement replication system for Groonga.</li>
+</ul>
+
+<p>They are described in other sections.</p>
+
+<h3>Store logs into Groonga</h3>
+
+<p>You need to use <code>groonga</code> output plugin to store logs into Groonga.</p>
+
+<p>The output plugin has auto schema define feature. So you don&#39;t need to
+define schema in Groonga before running Fluentd. You just run Groonga.</p>
+
+<p>There is one required parameter:</p>
+
+<ul>
+<li><code>table</code>: It specifies table name for storing logs.</li>
+</ul>
+
+<p>Here is a minimum configuration:</p>
+
+<pre class="code ruby"><code class="ruby">&lt;match log.**&gt;
+  type groonga
+  table logs
+&lt;/match&gt;
+</code></pre>
+
+<p>The configuration stores logs into <code>logs</code> table in Groonga that runs
+on <code>localhost</code>.</p>
+
+<p>There are optional parameters:</p>
+
+<ul>
+<li><code>protocol</code>: It specifies protocol to communicate Groonga server.
+
+<ul>
+<li>Available values: <code>http</code>, <code>gqtp</code>, <code>command</code></li>
+<li>Default: <code>http</code></li>
+</ul></li>
+<li><code>host</code>: It specifies host name or IP address of Groonga server.
+
+<ul>
+<li>Default: <code>127.0.0.1</code></li>
+</ul></li>
+<li><code>port</code>: It specifies port number of Groonga server.
+
+<ul>
+<li>Default for <code>http</code> protocol: <code>10041</code></li>
+<li>Default for <code>gqtp</code> protocol: <code>10043</code></li>
+</ul></li>
+</ul>
+
+<p>Here is a configuration that specifies optional parameters explicitly:</p>
+
+<pre class="code ruby"><code class="ruby">&lt;match log.**&gt;
+  type groonga
+  table logs
+
+  protocol http
+  host 127.0.0.1
+  port 10041
+&lt;/match&gt;
+</code></pre>
+
+<p><code>groonga</code> output plugin supports buffer. So you can use buffer related
+parameters. See
+<a href="http://docs.fluentd.org/articles/buffer-plugin-overview">Buffer Plugin Overview | Fluentd</a>
+for details.</p>
+
+<p>Note that there is special tag name. You can&#39;t use
+<code>groonga.command.XXX</code> tag name for this usage. It means that you can&#39;t
+use the following configuration:</p>
+
+<pre class="code ruby"><code class="ruby">&lt;match groonga.command.*&gt;
+  type groonga
+  # ...
+&lt;/match&gt;
+</code></pre>
+
+<p><code>groonga.command.XXX</code> tag name is reserved for implementing
+replication system for Groonga.</p>
+
+<h3>Implement replication system for Groonga</h3>
+
+<p>See the following documents how to implement replication system for
+Groonga:</p>
 
 <ul>
 <li><a href="doc/text/configuration.md">Configuration</a>

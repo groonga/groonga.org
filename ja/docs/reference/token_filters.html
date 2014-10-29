@@ -1,0 +1,340 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>7.9. Token filters &mdash; Groonga v4.0.7ドキュメント</title>
+    
+    <link rel="stylesheet" href="../static/groonga.css" type="text/css" />
+    <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '4.0.7',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../static/jquery.js"></script>
+    <script type="text/javascript" src="../static/underscore.js"></script>
+    <script type="text/javascript" src="../static/doctools.js"></script>
+    <script type="text/javascript" src="../static/translations.js"></script>
+    <link rel="shortcut icon" href="../static/favicon.ico"/>
+    <link rel="top" title="Groonga v4.0.7ドキュメント" href="../index.html" />
+    <link rel="up" title="7. リファレンスマニュアル" href="../reference.html" />
+    <link rel="next" title="7.10. クエリー展開オブジェクト一覧" href="query_expanders.html" />
+    <link rel="prev" title="7.8. Tokenizers" href="tokenizers.html" /> 
+      <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
+    <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
+    <meta property="og:type" content="product" />
+    <meta property="og:image" content="http://groonga.org/images/logos/groonga-icon-full-size.png" />
+    <meta property="og:site_name" content="groonga" />
+
+    <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
+  </head>
+
+    <body>
+    <div id="fb-root"></div>
+
+<div class="header">
+  <h1 class="title">
+    <a id="top-link" href="../../">
+      <span class="project">groonga</span>
+      <span class="separator">-</span>
+      <span class="description">オープンソースのカラムストア機能付き全文検索エンジン</span>
+    </a>
+  </h1>
+
+      <div class="facebook-buttons">
+      <fb:like href="http://www.facebook.com/pages/groonga/201193596592346"
+               layout="standard"
+               width="290"></fb:like>
+    </div>
+    <div class="other-language-links">
+
+    <ul>
+      <li><a href="../../../docs/reference/token_filters.html"><img src="../static/us.png" alt="English">English page</a></li>
+    </ul>
+  </div>
+</div>
+  
+
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="query_expanders.html" title="7.10. クエリー展開オブジェクト一覧"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="tokenizers.html" title="7.8. Tokenizers"
+             accesskey="P">前へ</a> |</li>
+        <li><a href="../index.html">Groonga v4.0.7ドキュメント</a> &raquo;</li>
+          <li><a href="../reference.html" accesskey="U">7. リファレンスマニュアル</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="token-filters">
+<h1>7.9. Token filters<a class="headerlink" href="#token-filters" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<div class="section" id="summary">
+<h2>7.9.1. 概要<a class="headerlink" href="#summary" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>Groongaにはトークナイズされたトークンに所定の処理を行うトークンフィルターモジュールがあります。</p>
+<p>トークンフィルターモジュールはプラグインとして追加できます。</p>
+<p>トークンフィルタープラグインをGroongaに追加することでトークナイズされたトークンをカスタマイズできます。</p>
+<p>テーブルは0個以上のトークンフィルターを持てます。テーブルにトークンフィルターを付けるには <a class="reference internal" href="commands/table_create.html"><em>table_create</em></a> の <a class="reference internal" href="commands/table_create.html#table-create-token-filters"><em>token_filters</em></a> オプションを使います。</p>
+<p>以下は <tt class="docutils literal"><span class="pre">TokenFilterStopWord</span></tt> トークンフィルターモジュールを使う <tt class="docutils literal"><span class="pre">table_create</span></tt> の例です。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Terms TABLE_PAT_KEY ShortText \
+  --default_tokenizer TokenBigram \
+  --normalizer NormalizerAuto \
+  --token_filters TokenFilterStopWord
+# [[0,0.0,0.0],true]
+</pre></div>
+</div>
+</div>
+<div class="section" id="available-token-filters">
+<h2>7.9.2. 利用可能なトークンフィルター<a class="headerlink" href="#available-token-filters" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>以下は組み込みのトークンフィルターのリストです。</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">TokenFilterStopWord</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">TokenFilterStem</span></tt></li>
+</ul>
+<div class="section" id="tokenfilterstopword">
+<span id="token-filter-stop-word"></span><h3>7.9.2.1. <tt class="docutils literal"><span class="pre">TokenFilterStopWord</span></tt><a class="headerlink" href="#tokenfilterstopword" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p><tt class="docutils literal"><span class="pre">TokenFilterStopWord</span></tt> は、文書を検索する時にトークナイズされたトークンからストップワードを除去します。</p>
+<p><tt class="docutils literal"><span class="pre">TokenFilterStopWord</span></tt> は、文書を検索する時のみトークン除去するため、文書を追加した後でストップワードを指定することもできます。</p>
+<p>ストップワードは、語彙表の <tt class="docutils literal"><span class="pre">is_stop_word</span></tt> カラムで指定します。</p>
+<p>以下は <tt class="docutils literal"><span class="pre">TokenFilterStopWord</span></tt> トークンフィルターを使う例です。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>register token_filters/stop_word
+# [[0,0.0,0.0],true]
+table_create Memos TABLE_NO_KEY
+# [[0,0.0,0.0],true]
+column_create Memos content COLUMN_SCALAR ShortText
+# [[0,0.0,0.0],true]
+table_create Terms TABLE_PAT_KEY ShortText \
+  --default_tokenizer TokenBigram \
+  --normalizer NormalizerAuto \
+  --token_filters TokenFilterStopWord
+# [[0,0.0,0.0],true]
+column_create Terms memos_content COLUMN_INDEX|WITH_POSITION Memos content
+# [[0,0.0,0.0],true]
+column_create Terms is_stop_word COLUMN_SCALAR Bool
+# [[0,0.0,0.0],true]
+load --table Terms
+[
+{&quot;_key&quot;: &quot;and&quot;, &quot;is_stop_word&quot;: true}
+]
+# [[0,0.0,0.0],1]
+load --table Memos
+[
+{&quot;content&quot;: &quot;Hello&quot;},
+{&quot;content&quot;: &quot;Hello and Good-bye&quot;},
+{&quot;content&quot;: &quot;Good-bye&quot;}
+]
+# [[0,0.0,0.0],3]
+select Memos --match_columns content --query &quot;Hello and&quot;
+# [
+#   [
+#     0,
+#     0.0,
+#     0.0
+#   ],
+#   [
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;Hello&quot;
+#       ],
+#       [
+#         2,
+#         &quot;Hello and Good-bye&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">and</span></tt> というトークンは <tt class="docutils literal"><span class="pre">Terms</span></tt> テーブルでストップワードと指定されています。</p>
+<p><tt class="docutils literal"><span class="pre">&quot;Hello&quot;</span></tt> は文書内に <tt class="docutils literal"><span class="pre">and</span></tt> がありませんがマッチしています。なぜなら、 <tt class="docutils literal"><span class="pre">and</span></tt> はストップワードと指定されているため、クエリーから除去されているからです。</p>
+</div>
+<div class="section" id="tokenfilterstem">
+<span id="token-filter-stem"></span><h3>7.9.2.2. <tt class="docutils literal"><span class="pre">TokenFilterStem</span></tt><a class="headerlink" href="#tokenfilterstem" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p><tt class="docutils literal"><span class="pre">TokenFilterStem</span></tt> は、トークナイズされたトークンをステミングします。</p>
+<p>以下は <tt class="docutils literal"><span class="pre">TokenFilterStem</span></tt> トークンフィルターを使う例です。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>register token_filters/stem
+# [[0,0.0,0.0],true]
+table_create Memos TABLE_NO_KEY
+# [[0,0.0,0.0],true]
+column_create Memos content COLUMN_SCALAR ShortText
+# [[0,0.0,0.0],true]
+table_create Terms TABLE_PAT_KEY ShortText \
+  --default_tokenizer TokenBigram \
+  --normalizer NormalizerAuto \
+  --token_filters TokenFilterStem
+# [[0,0.0,0.0],true]
+column_create Terms memos_content COLUMN_INDEX|WITH_POSITION Memos content
+# [[0,0.0,0.0],true]
+load --table Memos
+[
+{&quot;content&quot;: &quot;I develop Groonga&quot;},
+{&quot;content&quot;: &quot;I&#39;m developing Groonga&quot;},
+{&quot;content&quot;: &quot;I developed Groonga&quot;}
+]
+# [[0,0.0,0.0],3]
+select Memos --match_columns content --query &quot;develops&quot;
+# [
+#   [
+#     0,
+#     0.0,
+#     0.0
+#   ],
+#   [
+#     [
+#       [
+#         3
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;I develop Groonga&quot;
+#       ],
+#       [
+#         2,
+#         &quot;I&#39;m developing Groonga&quot;
+#       ],
+#       [
+#         3,
+#         &quot;I developed Groonga&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">develop</span></tt> も <tt class="docutils literal"><span class="pre">developing</span></tt> も <tt class="docutils literal"><span class="pre">developed</span></tt> も <tt class="docutils literal"><span class="pre">develops</span></tt> も、すべてステミングすると <tt class="docutils literal"><span class="pre">develop</span></tt> になります。そのため、 <tt class="docutils literal"><span class="pre">develops</span></tt> というクエリーで <tt class="docutils literal"><span class="pre">develop</span></tt> も <tt class="docutils literal"><span class="pre">developing</span></tt> も <tt class="docutils literal"><span class="pre">developed</span></tt> も検索できます。</p>
+</div>
+</div>
+<div class="section" id="see-also">
+<h2>7.9.3. 参考<a class="headerlink" href="#see-also" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<ul class="simple">
+<li><a class="reference internal" href="commands/table_create.html"><em>table_create</em></a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">7.9. Token filters</a><ul>
+<li><a class="reference internal" href="#summary">7.9.1. 概要</a></li>
+<li><a class="reference internal" href="#available-token-filters">7.9.2. 利用可能なトークンフィルター</a><ul>
+<li><a class="reference internal" href="#tokenfilterstopword">7.9.2.1. <tt class="docutils literal"><span class="pre">TokenFilterStopWord</span></tt></a></li>
+<li><a class="reference internal" href="#tokenfilterstem">7.9.2.2. <tt class="docutils literal"><span class="pre">TokenFilterStem</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#see-also">7.9.3. 参考</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="tokenizers.html"
+                        title="前の章へ">7.8. Tokenizers</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="query_expanders.html"
+                        title="次の章へ">7.10. クエリー展開オブジェクト一覧</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../sources/reference/token_filters.txt"
+           rel="nofollow">ソースコードを表示（英語）</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="query_expanders.html" title="7.10. クエリー展開オブジェクト一覧"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="tokenizers.html" title="7.8. Tokenizers"
+             >前へ</a> |</li>
+        <li><a href="../index.html">Groonga v4.0.7ドキュメント</a> &raquo;</li>
+          <li><a href="../reference.html" >7. リファレンスマニュアル</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009-2014, Brazil, Inc.
+    </div>
+      <script src="http://connect.facebook.net/ja_JP/all.js"></script>
+
+    <script>
+      FB.init({
+         appId  : null,
+         status : true, // check login status
+         cookie : true, // enable cookies to allow the server to access the session
+         xfbml  : true  // parse XFBML
+      });
+    </script>
+  </body>
+
+</html>

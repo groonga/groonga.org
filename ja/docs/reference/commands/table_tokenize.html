@@ -1,0 +1,292 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>7.3.32. table_tokenize &mdash; Groonga v4.0.7ドキュメント</title>
+    
+    <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
+    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '4.0.7',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../static/doctools.js"></script>
+    <script type="text/javascript" src="../../static/translations.js"></script>
+    <link rel="shortcut icon" href="../../static/favicon.ico"/>
+    <link rel="top" title="Groonga v4.0.7ドキュメント" href="../../index.html" />
+    <link rel="up" title="7.3. コマンド" href="../command.html" />
+    <link rel="next" title="7.3.33. tokenize" href="tokenize.html" />
+    <link rel="prev" title="7.3.31. table_remove" href="table_remove.html" /> 
+      <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
+    <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
+    <meta property="og:type" content="product" />
+    <meta property="og:image" content="http://groonga.org/images/logos/groonga-icon-full-size.png" />
+    <meta property="og:site_name" content="groonga" />
+
+    <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
+  </head>
+
+    <body>
+    <div id="fb-root"></div>
+
+<div class="header">
+  <h1 class="title">
+    <a id="top-link" href="../../../">
+      <span class="project">groonga</span>
+      <span class="separator">-</span>
+      <span class="description">オープンソースのカラムストア機能付き全文検索エンジン</span>
+    </a>
+  </h1>
+
+      <div class="facebook-buttons">
+      <fb:like href="http://www.facebook.com/pages/groonga/201193596592346"
+               layout="standard"
+               width="290"></fb:like>
+    </div>
+    <div class="other-language-links">
+
+    <ul>
+      <li><a href="../../../../docs/reference/commands/table_tokenize.html"><img src="../../static/us.png" alt="English">English page</a></li>
+    </ul>
+  </div>
+</div>
+  
+
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="tokenize.html" title="7.3.33. tokenize"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="table_remove.html" title="7.3.31. table_remove"
+             accesskey="P">前へ</a> |</li>
+        <li><a href="../../index.html">Groonga v4.0.7ドキュメント</a> &raquo;</li>
+          <li><a href="../../reference.html" >7. リファレンスマニュアル</a> &raquo;</li>
+          <li><a href="../command.html" accesskey="U">7.3. コマンド</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="table-tokenize">
+<h1>7.3.32. <tt class="docutils literal"><span class="pre">table_tokenize</span></tt><a class="headerlink" href="#table-tokenize" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<div class="section" id="summary">
+<h2>7.3.32.1. 概要<a class="headerlink" href="#summary" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">table_tokenize</span></tt> コマンドは指定したテーブルのトークナイザーでテキストをトークナイズします。</p>
+</div>
+<div class="section" id="syntax">
+<h2>7.3.32.2. 構文<a class="headerlink" href="#syntax" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">table_tokenize</span></tt> コマンドには必須の引数と省略可能な引数があります。 <tt class="docutils literal"><span class="pre">table</span></tt> と <tt class="docutils literal"><span class="pre">string</span></tt> が必須の引数で、他の引数はすべて省略可能です。</p>
+<div class="highlight-none"><div class="highlight"><pre>table_tokenize table
+               string
+               [flags=NONE]
+               [mode=GET]
+</pre></div>
+</div>
+</div>
+<div class="section" id="usage">
+<h2>7.3.32.3. 使い方<a class="headerlink" href="#usage" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>以下は簡単な使用例です。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>register token_filters/stop_word
+# [[0,0.0,0.0],true]
+table_create Terms TABLE_PAT_KEY ShortText \
+  --default_tokenizer TokenBigram \
+  --normalizer NormalizerAuto \
+  --token_filters TokenFilterStopWord
+# [[0,0.0,0.0],true]
+column_create Terms is_stop_word COLUMN_SCALAR Bool
+# [[0,0.0,0.0],true]
+load --table Terms
+[
+{&quot;_key&quot;: &quot;and&quot;, &quot;is_stop_word&quot;: true}
+]
+# [[0,0.0,0.0],1]
+table_tokenize Terms &quot;Hello and Good-bye&quot; --mode GET
+# [
+#  [
+#    0,
+#    0.0,
+#    0.0
+#  ],
+#  [
+#    {
+#      &quot;value&quot;: &quot;hello&quot;,
+#      &quot;position&quot;: 0
+#    },
+#    {
+#      &quot;value&quot;: &quot;good&quot;,
+#      &quot;position&quot;: 2
+#    },
+#    {
+#      &quot;value&quot;: &quot;-&quot;,
+#      &quot;position&quot;: 3
+#    },
+#    {
+#      &quot;value&quot;: &quot;bye&quot;,
+#      &quot;position&quot;: 4
+#    }
+#  ]
+# ]
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">Terms</span></tt> テーブルには、 <tt class="docutils literal"><span class="pre">TokenBigram</span></tt> トークナイザーと、 <tt class="docutils literal"><span class="pre">NormalizerAuto</span></tt> ノーマライザーと、 <tt class="docutils literal"><span class="pre">TokenFilterStopWord</span></tt> トークンフィルターがセットされています。 この例は <tt class="docutils literal"><span class="pre">TokenBigram</span></tt> トークナイザーで <tt class="docutils literal"><span class="pre">&quot;Hello</span> <span class="pre">and</span> <span class="pre">Good-bye&quot;</span></tt> をトークナイズしたトークンを返します。トークンは、 <tt class="docutils literal"><span class="pre">NormalizerAuto</span></tt> ノーマライザーで正規化されています。 <tt class="docutils literal"><span class="pre">and</span></tt> トークンは、 <tt class="docutils literal"><span class="pre">TokenFilterStopWord</span></tt> トークンフィルターで除去されています。</p>
+</div>
+<div class="section" id="parameters">
+<h2>7.3.32.4. 引数<a class="headerlink" href="#parameters" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>このセクションではすべての引数について説明します。引数はカテゴリわけしています。</p>
+<div class="section" id="required-parameters">
+<h3>7.3.32.4.1. 必須引数<a class="headerlink" href="#required-parameters" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>必須引数は二つあります。 <tt class="docutils literal"><span class="pre">table</span></tt> と <tt class="docutils literal"><span class="pre">string</span></tt> です。</p>
+<div class="section" id="table">
+<h4>7.3.32.4.1.1. <tt class="docutils literal"><span class="pre">table</span></tt><a class="headerlink" href="#table" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>語彙表テーブルを指定します。 <tt class="docutils literal"><span class="pre">table_tokenize</span></tt> コマンドは、語彙表テーブルにセットされたトークナイザーとノーマライザーとトークンフィルターを使います。</p>
+</div>
+<div class="section" id="string">
+<h4>7.3.32.4.1.2. <tt class="docutils literal"><span class="pre">string</span></tt><a class="headerlink" href="#string" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>トークナイズしたい文字列を指定します。</p>
+<p>詳細は、 <a class="reference internal" href="tokenize.html"><em>tokenize</em></a> の <a class="reference internal" href="tokenize.html#tokenize-string"><em>string</em></a> オプションを参照してください。</p>
+</div>
+</div>
+<div class="section" id="optional-parameters">
+<h3>7.3.32.4.2. 省略可能引数<a class="headerlink" href="#optional-parameters" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>いくつか省略可能な引数があります。</p>
+<div class="section" id="flags">
+<h4>7.3.32.4.2.1. <tt class="docutils literal"><span class="pre">flags</span></tt><a class="headerlink" href="#flags" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>トークナイズ処理をカスタマイズするオプションを指定します。「 <tt class="docutils literal"><span class="pre">|</span></tt> 」で区切って複数のオプションを指定することができます。</p>
+<p>The default value is <tt class="docutils literal"><span class="pre">NONE</span></tt>.</p>
+<p>詳細は、 <a class="reference internal" href="tokenize.html"><em>tokenize</em></a> の <a class="reference internal" href="tokenize.html#tokenize-flags"><em>flags</em></a> オプションを参照してください。</p>
+</div>
+<div class="section" id="mode">
+<h4>7.3.32.4.2.2. <tt class="docutils literal"><span class="pre">mode</span></tt><a class="headerlink" href="#mode" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>トークナイズモードを指定します。</p>
+<p>The default value is <tt class="docutils literal"><span class="pre">GET</span></tt>.</p>
+<p>詳細は、 <a class="reference internal" href="tokenize.html"><em>tokenize</em></a> の <a class="reference internal" href="tokenize.html#tokenize-mode"><em>mode</em></a> オプションを参照してください。</p>
+</div>
+</div>
+</div>
+<div class="section" id="return-value">
+<h2>7.3.32.5. 戻り値<a class="headerlink" href="#return-value" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">table_tokenize</span></tt> コマンドはトークナイズしたトークンを返します。</p>
+<p>詳細は、 <a class="reference internal" href="tokenize.html"><em>tokenize</em></a> の <a class="reference internal" href="tokenize.html#tokenize-return-value"><em>戻り値</em></a> オプションを参照してください。</p>
+</div>
+<div class="section" id="see-also">
+<h2>7.3.32.6. 参考<a class="headerlink" href="#see-also" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<ul class="simple">
+<li><a class="reference internal" href="../tokenizers.html"><em>Tokenizers</em></a></li>
+<li><a class="reference internal" href="tokenize.html"><em>tokenize</em></a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">7.3.32. <tt class="docutils literal"><span class="pre">table_tokenize</span></tt></a><ul>
+<li><a class="reference internal" href="#summary">7.3.32.1. 概要</a></li>
+<li><a class="reference internal" href="#syntax">7.3.32.2. 構文</a></li>
+<li><a class="reference internal" href="#usage">7.3.32.3. 使い方</a></li>
+<li><a class="reference internal" href="#parameters">7.3.32.4. 引数</a><ul>
+<li><a class="reference internal" href="#required-parameters">7.3.32.4.1. 必須引数</a><ul>
+<li><a class="reference internal" href="#table">7.3.32.4.1.1. <tt class="docutils literal"><span class="pre">table</span></tt></a></li>
+<li><a class="reference internal" href="#string">7.3.32.4.1.2. <tt class="docutils literal"><span class="pre">string</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#optional-parameters">7.3.32.4.2. 省略可能引数</a><ul>
+<li><a class="reference internal" href="#flags">7.3.32.4.2.1. <tt class="docutils literal"><span class="pre">flags</span></tt></a></li>
+<li><a class="reference internal" href="#mode">7.3.32.4.2.2. <tt class="docutils literal"><span class="pre">mode</span></tt></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#return-value">7.3.32.5. 戻り値</a></li>
+<li><a class="reference internal" href="#see-also">7.3.32.6. 参考</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="table_remove.html"
+                        title="前の章へ">7.3.31. <tt class="docutils literal"><span class="pre">table_remove</span></tt></a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="tokenize.html"
+                        title="次の章へ">7.3.33. <tt class="docutils literal"><span class="pre">tokenize</span></tt></a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../sources/reference/commands/table_tokenize.txt"
+           rel="nofollow">ソースコードを表示（英語）</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="tokenize.html" title="7.3.33. tokenize"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="table_remove.html" title="7.3.31. table_remove"
+             >前へ</a> |</li>
+        <li><a href="../../index.html">Groonga v4.0.7ドキュメント</a> &raquo;</li>
+          <li><a href="../../reference.html" >7. リファレンスマニュアル</a> &raquo;</li>
+          <li><a href="../command.html" >7.3. コマンド</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009-2014, Brazil, Inc.
+    </div>
+      <script src="http://connect.facebook.net/ja_JP/all.js"></script>
+
+    <script>
+      FB.init({
+         appId  : null,
+         status : true, // check login status
+         cookie : true, // enable cookies to allow the server to access the session
+         xfbml  : true  // parse XFBML
+      });
+    </script>
+  </body>
+
+</html>

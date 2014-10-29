@@ -1,0 +1,300 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>7.3.32. table_tokenize &mdash; Groonga v4.0.7 documentation</title>
+    
+    <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
+    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '4.0.7',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../static/favicon.ico"/>
+    <link rel="top" title="Groonga v4.0.7 documentation" href="../../index.html" />
+    <link rel="up" title="7.3. Command" href="../command.html" />
+    <link rel="next" title="7.3.33. tokenize" href="tokenize.html" />
+    <link rel="prev" title="7.3.31. table_remove" href="table_remove.html" /> 
+      <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
+    <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
+    <meta property="og:type" content="product" />
+    <meta property="og:image" content="http://groonga.org/images/logos/groonga-icon-full-size.png" />
+    <meta property="og:site_name" content="groonga" />
+
+    <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
+  </head>
+
+    <body>
+    <div id="fb-root"></div>
+
+<div class="header">
+  <h1 class="title">
+    <a id="top-link" href="../../../">
+      <span class="project">groonga</span>
+      <span class="separator">-</span>
+      <span class="description">An open-source fulltext search engine and column store.</span>
+    </a>
+  </h1>
+
+      <div class="facebook-buttons">
+      <fb:like href="http://www.facebook.com/pages/groonga/201193596592346"
+               layout="standard"
+               width="290"></fb:like>
+    </div>
+    <div class="other-language-links">
+
+    <ul>
+      <li><a href="../../../ja/docs/reference/commands/table_tokenize.html"><img src="../../static/jp.png" alt="日本語">日本語版はこちら</a></li>
+    </ul>
+  </div>
+</div>
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="tokenize.html" title="7.3.33. tokenize"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="table_remove.html" title="7.3.31. table_remove"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">Groonga v4.0.7 documentation</a> &raquo;</li>
+          <li><a href="../../reference.html" >7. Reference manual</a> &raquo;</li>
+          <li><a href="../command.html" accesskey="U">7.3. Command</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="table-tokenize">
+<h1>7.3.32. <tt class="docutils literal"><span class="pre">table_tokenize</span></tt><a class="headerlink" href="#table-tokenize" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="summary">
+<h2>7.3.32.1. Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">table_tokenize</span></tt> command tokenizes text by the specified table's tokenizer.</p>
+</div>
+<div class="section" id="syntax">
+<h2>7.3.32.2. Syntax<a class="headerlink" href="#syntax" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">table_tokenize</span></tt> command has required parameters and optional parameters.
+<tt class="docutils literal"><span class="pre">table</span></tt> and <tt class="docutils literal"><span class="pre">string</span></tt> are required parameters. Others are
+optional:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_tokenize table
+               string
+               [flags=NONE]
+               [mode=GET]
+</pre></div>
+</div>
+</div>
+<div class="section" id="usage">
+<h2>7.3.32.3. Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>Here is a simple example.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>register token_filters/stop_word
+# [[0,0.0,0.0],true]
+table_create Terms TABLE_PAT_KEY ShortText \
+  --default_tokenizer TokenBigram \
+  --normalizer NormalizerAuto \
+  --token_filters TokenFilterStopWord
+# [[0,0.0,0.0],true]
+column_create Terms is_stop_word COLUMN_SCALAR Bool
+# [[0,0.0,0.0],true]
+load --table Terms
+[
+{&quot;_key&quot;: &quot;and&quot;, &quot;is_stop_word&quot;: true}
+]
+# [[0,0.0,0.0],1]
+table_tokenize Terms &quot;Hello and Good-bye&quot; --mode GET
+# [
+#  [
+#    0,
+#    0.0,
+#    0.0
+#  ],
+#  [
+#    {
+#      &quot;value&quot;: &quot;hello&quot;,
+#      &quot;position&quot;: 0
+#    },
+#    {
+#      &quot;value&quot;: &quot;good&quot;,
+#      &quot;position&quot;: 2
+#    },
+#    {
+#      &quot;value&quot;: &quot;-&quot;,
+#      &quot;position&quot;: 3
+#    },
+#    {
+#      &quot;value&quot;: &quot;bye&quot;,
+#      &quot;position&quot;: 4
+#    }
+#  ]
+# ]
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">Terms</span></tt> table is set <tt class="docutils literal"><span class="pre">TokenBigram</span></tt> tokenizer, <tt class="docutils literal"><span class="pre">NormalizerAuto</span></tt> normalizer,
+<tt class="docutils literal"><span class="pre">TokenFilterStopWord</span></tt> token filter. It returns tokens that is
+generated by tokenizeing <tt class="docutils literal"><span class="pre">&quot;Hello</span> <span class="pre">and</span> <span class="pre">Good-bye&quot;</span></tt> with <tt class="docutils literal"><span class="pre">TokenBigram</span></tt> tokenizer.
+It is normalized by <tt class="docutils literal"><span class="pre">NormalizerAuto</span></tt> normalizer.
+<tt class="docutils literal"><span class="pre">and</span></tt> token is removed with <tt class="docutils literal"><span class="pre">TokenFilterStopWord</span></tt> token filter.</p>
+</div>
+<div class="section" id="parameters">
+<h2>7.3.32.4. Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+<p>This section describes all parameters. Parameters are categorized.</p>
+<div class="section" id="required-parameters">
+<h3>7.3.32.4.1. Required parameters<a class="headerlink" href="#required-parameters" title="Permalink to this headline">¶</a></h3>
+<p>There are required parameters, <tt class="docutils literal"><span class="pre">table</span></tt> and <tt class="docutils literal"><span class="pre">string</span></tt>.</p>
+<div class="section" id="table">
+<h4>7.3.32.4.1.1. <tt class="docutils literal"><span class="pre">table</span></tt><a class="headerlink" href="#table" title="Permalink to this headline">¶</a></h4>
+<p>It specifies the lexicon table. <tt class="docutils literal"><span class="pre">table_tokenize</span></tt> command uses the
+tokenizer, the normalizer, the token filters that is set the
+lexicon table.</p>
+</div>
+<div class="section" id="string">
+<h4>7.3.32.4.1.2. <tt class="docutils literal"><span class="pre">string</span></tt><a class="headerlink" href="#string" title="Permalink to this headline">¶</a></h4>
+<p>It specifies any string which you want to tokenize.</p>
+<p>See <a class="reference internal" href="tokenize.html#tokenize-string"><em>string</em></a> option in <a class="reference internal" href="tokenize.html"><em>tokenize</em></a> about details.</p>
+</div>
+</div>
+<div class="section" id="optional-parameters">
+<h3>7.3.32.4.2. Optional parameters<a class="headerlink" href="#optional-parameters" title="Permalink to this headline">¶</a></h3>
+<p>There are optional parameters.</p>
+<div class="section" id="flags">
+<h4>7.3.32.4.2.1. <tt class="docutils literal"><span class="pre">flags</span></tt><a class="headerlink" href="#flags" title="Permalink to this headline">¶</a></h4>
+<p>It specifies a tokenization customize options. You can specify
+multiple options separated by &quot;<tt class="docutils literal"><span class="pre">|</span></tt>&quot;.</p>
+<p>The default value is <tt class="docutils literal"><span class="pre">NONE</span></tt>.</p>
+<p>See <a class="reference internal" href="tokenize.html#tokenize-flags"><em>flags</em></a> option in <a class="reference internal" href="tokenize.html"><em>tokenize</em></a> about details.</p>
+</div>
+<div class="section" id="mode">
+<h4>7.3.32.4.2.2. <tt class="docutils literal"><span class="pre">mode</span></tt><a class="headerlink" href="#mode" title="Permalink to this headline">¶</a></h4>
+<p>It specifies a tokenize mode.</p>
+<p>The default value is <tt class="docutils literal"><span class="pre">GET</span></tt>.</p>
+<p>See <a class="reference internal" href="tokenize.html#tokenize-mode"><em>mode</em></a> option in <a class="reference internal" href="tokenize.html"><em>tokenize</em></a> about details.</p>
+</div>
+</div>
+</div>
+<div class="section" id="return-value">
+<h2>7.3.32.5. Return value<a class="headerlink" href="#return-value" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">table_tokenize</span></tt> command returns tokenized tokens.</p>
+<p>See <a class="reference internal" href="tokenize.html#tokenize-return-value"><em>Return value</em></a> option in <a class="reference internal" href="tokenize.html"><em>tokenize</em></a> about details.</p>
+</div>
+<div class="section" id="see-also">
+<h2>7.3.32.6. See also<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference internal" href="../tokenizers.html"><em>Tokenizers</em></a></li>
+<li><a class="reference internal" href="tokenize.html"><em>tokenize</em></a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">7.3.32. <tt class="docutils literal"><span class="pre">table_tokenize</span></tt></a><ul>
+<li><a class="reference internal" href="#summary">7.3.32.1. Summary</a></li>
+<li><a class="reference internal" href="#syntax">7.3.32.2. Syntax</a></li>
+<li><a class="reference internal" href="#usage">7.3.32.3. Usage</a></li>
+<li><a class="reference internal" href="#parameters">7.3.32.4. Parameters</a><ul>
+<li><a class="reference internal" href="#required-parameters">7.3.32.4.1. Required parameters</a><ul>
+<li><a class="reference internal" href="#table">7.3.32.4.1.1. <tt class="docutils literal"><span class="pre">table</span></tt></a></li>
+<li><a class="reference internal" href="#string">7.3.32.4.1.2. <tt class="docutils literal"><span class="pre">string</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#optional-parameters">7.3.32.4.2. Optional parameters</a><ul>
+<li><a class="reference internal" href="#flags">7.3.32.4.2.1. <tt class="docutils literal"><span class="pre">flags</span></tt></a></li>
+<li><a class="reference internal" href="#mode">7.3.32.4.2.2. <tt class="docutils literal"><span class="pre">mode</span></tt></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#return-value">7.3.32.5. Return value</a></li>
+<li><a class="reference internal" href="#see-also">7.3.32.6. See also</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="table_remove.html"
+                        title="previous chapter">7.3.31. <tt class="docutils literal"><span class="pre">table_remove</span></tt></a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="tokenize.html"
+                        title="next chapter">7.3.33. <tt class="docutils literal"><span class="pre">tokenize</span></tt></a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../sources/reference/commands/table_tokenize.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="tokenize.html" title="7.3.33. tokenize"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="table_remove.html" title="7.3.31. table_remove"
+             >previous</a> |</li>
+        <li><a href="../../index.html">Groonga v4.0.7 documentation</a> &raquo;</li>
+          <li><a href="../../reference.html" >7. Reference manual</a> &raquo;</li>
+          <li><a href="../command.html" >7.3. Command</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009-2014, Brazil, Inc.
+    </div>
+      <script src="http://connect.facebook.net/en_US/all.js"></script>
+
+    <script>
+      FB.init({
+         appId  : null,
+         status : true, // check login status
+         cookie : true, // enable cookies to allow the server to access the session
+         xfbml  : true  // parse XFBML
+      });
+    </script>
+  </body>
+
+</html>

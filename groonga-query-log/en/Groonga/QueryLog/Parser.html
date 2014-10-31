@@ -31,7 +31,7 @@
     <div id="header">
       <div id="menu">
   
-    <a href="../../_index.html">Index (P)</a> &raquo;
+    <a href="../../alphabetical_index.html">Index (P)</a> &raquo;
     <span class='title'><span class='object_link'><a href="../../Groonga.html" title="Groonga (module)">Groonga</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../QueryLog.html" title="Groonga::QueryLog (module)">QueryLog</a></span></span>
      &raquo; 
     <span class="title">Parser</span>
@@ -166,6 +166,28 @@ each query.</p>
 </li>
 
       
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#parsing_statistics-instance_method" title="#parsing_statistics (instance method)">- (Object) <strong>parsing_statistics</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
     </ul>
   
 
@@ -202,7 +224,8 @@ each query.</p>
 27
 28
 29
-30</pre>
+30
+31</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/groonga/query-log/parser.rb', line 26</span>
@@ -211,6 +234,7 @@ each query.</p>
   <span class='ivar'>@options</span> <span class='op'>=</span> <span class='id identifier rubyid_options'>options</span>
   <span class='ivar'>@slow_operation_threshold</span> <span class='op'>=</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:slow_operation_threshold</span><span class='rbracket'>]</span>
   <span class='ivar'>@slow_response_threshold</span> <span class='op'>=</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:slow_response_threshold</span><span class='rbracket'>]</span>
+  <span class='ivar'>@parsing_statistics</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -311,7 +335,6 @@ parsing.</p>
       <pre class="lines">
 
 
-41
 42
 43
 44
@@ -327,14 +350,12 @@ parsing.</p>
 54
 55
 56
-57
-58</pre>
+57</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/groonga/query-log/parser.rb', line 41</span>
+      <pre class="code"><span class="info file"># File 'lib/groonga/query-log/parser.rb', line 42</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='id identifier rubyid_input'>input</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_current_statistics'>current_statistics</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
   <span class='id identifier rubyid_input'>input</span><span class='period'>.</span><span class='id identifier rubyid_each_line'>each_line</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_line'>line</span><span class='op'>|</span>
     <span class='kw'>next</span> <span class='kw'>unless</span> <span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_valid_encoding?'>valid_encoding?</span>
     <span class='kw'>case</span> <span class='id identifier rubyid_line'>line</span>
@@ -346,10 +367,39 @@ parsing.</p>
       <span class='id identifier rubyid_rest'>rest</span> <span class='op'>=</span> <span class='gvar'>$POSTMATCH</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span>
       <span class='id identifier rubyid_time_stamp'>time_stamp</span> <span class='op'>=</span> <span class='const'>Time</span><span class='period'>.</span><span class='id identifier rubyid_local'>local</span><span class='lparen'>(</span><span class='id identifier rubyid_year'>year</span><span class='comma'>,</span> <span class='id identifier rubyid_month'>month</span><span class='comma'>,</span> <span class='id identifier rubyid_day'>day</span><span class='comma'>,</span> <span class='id identifier rubyid_hour'>hour</span><span class='comma'>,</span> <span class='id identifier rubyid_minutes'>minutes</span><span class='comma'>,</span> <span class='id identifier rubyid_seconds'>seconds</span><span class='comma'>,</span>
                               <span class='id identifier rubyid_micro_seconds'>micro_seconds</span><span class='rparen'>)</span>
-      <span class='id identifier rubyid_parse_line'>parse_line</span><span class='lparen'>(</span><span class='id identifier rubyid_current_statistics'>current_statistics</span><span class='comma'>,</span>
-                 <span class='id identifier rubyid_time_stamp'>time_stamp</span><span class='comma'>,</span> <span class='id identifier rubyid_context_id'>context_id</span><span class='comma'>,</span> <span class='id identifier rubyid_type'>type</span><span class='comma'>,</span> <span class='id identifier rubyid_rest'>rest</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_parse_line'>parse_line</span><span class='lparen'>(</span><span class='id identifier rubyid_time_stamp'>time_stamp</span><span class='comma'>,</span> <span class='id identifier rubyid_context_id'>context_id</span><span class='comma'>,</span> <span class='id identifier rubyid_type'>type</span><span class='comma'>,</span> <span class='id identifier rubyid_rest'>rest</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
     <span class='kw'>end</span>
   <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="parsing_statistics-instance_method">
+  
+    - (<tt>Object</tt>) <strong>parsing_statistics</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+59
+60
+61</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/groonga/query-log/parser.rb', line 59</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_parsing_statistics'>parsing_statistics</span>
+  <span class='ivar'>@parsing_statistics</span><span class='period'>.</span><span class='id identifier rubyid_values'>values</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>

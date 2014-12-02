@@ -17,7 +17,7 @@ Groongaプロジェクトも利用しているVPSサービスである[ConoHa](h
 発表資料は次の通りです。（今はリンクになっていない発表も資料が公開されしだいリンクを張ります。）
 
   * 「[Groonga族 2014](http://slide.rabbit-shocker.org/authors/kou/groonga-night-5/)」 - [@ktou](https://twitter.com/ktou)さん
-  * 「今年のMroonga」 - 斯波健徳さん
+  * 「[今年のMroonga](http://www.slideshare.net/Kentoku/mroonga-20141129)」 - 斯波健徳さん
   * 「[Grnxx](http://www.slideshare.net/s5yata/2014-1129-grnxx)」 - [@s5yata](https://twitter.com/s5yata)さん
   * 「[Droonga - 分散Groongaで快適レプリケーション生活](http://www.slideshare.net/pirooutsiderreflex/droonga-asgroongawithreplicationdroongaasgroongawithreplication)」 - [@piro_or](https://twitter.com/piro_or)さん
   * 「[Groongaの改良型Ngramトークナイザーの紹介](http://slide.rabbit-shocker.org/authors/naoa/groonga-night-5-naoa/)」 - [@naoa_y](https://twitter.com/naoa_y)さん

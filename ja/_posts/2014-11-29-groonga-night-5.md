@@ -22,7 +22,7 @@ Groongaプロジェクトも利用しているVPSサービスである[ConoHa](h
   * 「[Droonga - 分散Groongaで快適レプリケーション生活](http://www.slideshare.net/pirooutsiderreflex/droonga-asgroongawithreplicationdroongaasgroongawithreplication)」 - [@piro_or](https://twitter.com/piro_or)さん
   * 「[Groongaの改良型Ngramトークナイザーの紹介](http://slide.rabbit-shocker.org/authors/naoa/groonga-night-5-naoa/)」 - [@naoa_y](https://twitter.com/naoa_y)さん
   * 「[Groongaのテーブル構築をRubyでもっと簡単に書けるgrn_mini](http://ongaeshi.me/slide/grn_mini-groonga05/)」 - [おんがえし](https://twitter.com/ongaeshi/)さん
-  * 「Goクライアントgorooの紹介」 - [@hhatto](https://twitter.com/hhatto)さん
+  * 「[Goクライアントgorooの紹介](http://www.hexacosa.net/documents/groonga-party5/)」 - [@hhatto](https://twitter.com/hhatto)さん
   * 「[某blogサービスの全文検索システムの話](http://www.slideshare.net/kazeburo/mroonga-in-ablogservice)」 - [@kazeburo](https://twitter.com/kazeburo)さん
   * 「Mroongaを社内クラウド的なMySQLプラットフォームに標準搭載している話」 - [よしの](https://twitter.com/y055ie)さん
   * 「ちいさなRailsアプリのRroonga」 - [@hyoshihara04](https://twitter.com/hyoshihara04)さん

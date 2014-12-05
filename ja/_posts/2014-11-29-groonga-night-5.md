@@ -34,6 +34,8 @@ Groongaプロジェクトも利用しているVPSサービスである[ConoHa](h
 
 Twitterの様子は[全文検索エンジンGroongaを囲む夕べ5 - Togetterまとめ](http://togetter.com/li/752124)を参照してください。
 
+イベントは記者の方が取材に来てくれていました。[全文検索エンジンGroongaのこれから](http://enterprisezine.jp/dbonline/detail/6385)にまとまっているので発表資料などとあわせて読んでみてください。
+
 ### 「検索エンジン自作入門」サイン会
 
 イベント会場内で[検索エンジン自作入門](www.amazon.co.jp/dp/4774167533)サイン会を実施しました。本書を購入済みの方々は著者2人（[グニャラくん](http://twitter.com/tasukuchan)と[山田](http://twitter.com/feeblefakie)さん）のサインをもらっていました。検索エンジンの理解にぜひ本書を役立ててください！

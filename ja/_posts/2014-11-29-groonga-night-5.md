@@ -25,7 +25,7 @@ Groongaプロジェクトも利用しているVPSサービスである[ConoHa](h
   * 「[Goクライアントgorooの紹介](http://www.hexacosa.net/documents/groonga-party5/)」 - [@hhatto](https://twitter.com/hhatto)さん
   * 「[某blogサービスの全文検索システムの話](http://www.slideshare.net/kazeburo/mroonga-in-ablogservice)」 - [@kazeburo](https://twitter.com/kazeburo)さん
   * 「Mroongaを社内クラウド的なMySQLプラットフォームに標準搭載している話」 - [よしの](https://twitter.com/y055ie)さん
-  * 「ちいさなRailsアプリのRroonga」 - [@hyoshihara04](https://twitter.com/hyoshihara04)さん
+  * 「[ちいさなRailsアプリのRroonga](https://speakerdeck.com/yoshihara/tiisanarailsapurifalserroonga)」 - [@hyoshihara04](https://twitter.com/hyoshihara04)さん
   * 「運用で使っているライブラリの話」 - [@Ch_1012](https://twitter.com/Ch_1012)さん
 
 ### イベントの様子

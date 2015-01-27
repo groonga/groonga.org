@@ -117,8 +117,40 @@
        [query_flags=ALLOW_PRAGMA|ALLOW_COLUMN|ALLOW_UPDATE|ALLOW_LEADING_NOT|NONE]
        [query_expander=null]
        [adjuster=null]
+       [drilldown_calc_types=NONE]
+       [drilldown_calc_target=null]
 </pre></div>
 </div>
+<p><tt class="docutils literal"><span class="pre">select</span></tt> には高度なドリルダウン機能のために以下の名前付き引数があります。</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">drilldown[${LABEL}].keys=null</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">drilldown[${LABEL}].sortby=null</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">drilldown[${LABEL}].output_columns=&quot;_key,</span> <span class="pre">_nsubrecs&quot;</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">drilldown[${LABEL}].offset=0</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">drilldown[${LABEL}].limit=10</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">drilldown[${LABEL}].calc_types=NONE</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">drilldown[${LABEL}].calc_target=null</span></tt></li>
+</ul>
+</div></blockquote>
+<p><tt class="docutils literal"><span class="pre">${LABEL}</span></tt> には1つ以上のアルファベット、数字、 <tt class="docutils literal"><span class="pre">_</span></tt> 、 <tt class="docutils literal"><span class="pre">.</span></tt> を使うことができます。たとえば、 <tt class="docutils literal"><span class="pre">parent.sub1</span></tt> は有効な <tt class="docutils literal"><span class="pre">${LABEL}</span></tt> です。</p>
+<p>同じ <tt class="docutils literal"><span class="pre">${LABEL}</span></tt> も持つ引数は同じグループになります。</p>
+<p>たとえば、以下の引数は1つのドリルダウンを指定しています。</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">--drilldown[label].keys</span> <span class="pre">column</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">--drilldown[label].sortby</span> <span class="pre">-_nsubrecs</span></tt></li>
+</ul>
+</div></blockquote>
+<p>以下の引数は2つのドリルダウンを指定しています。</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">--drilldown[label1].keys</span> <span class="pre">column1</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">--drilldown[label1].sortby</span> <span class="pre">-_nsubrecs</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">--drilldown[label2].keys</span> <span class="pre">column2</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">--drilldown[label2].sortby</span> <span class="pre">_key</span></tt></li>
+</ul>
+</div></blockquote>
 </div>
 <div class="section" id="usage">
 <h2>7.3.29.3. 使い方<a class="headerlink" href="#usage" title="このヘッドラインへのパーマリンク">¶</a></h2>
@@ -131,6 +163,8 @@ column_create Entries content COLUMN_SCALAR Text
 # [[0, 1337566253.89858, 0.000355720520019531], true]
 column_create Entries n_likes COLUMN_SCALAR UInt32
 # [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries tag COLUMN_SCALAR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
 table_create Terms TABLE_PAT_KEY|KEY_NORMALIZE ShortText --default_tokenizer TokenBigram
 # [[0, 1337566253.89858, 0.000355720520019531], true]
 column_create Terms entries_key_index COLUMN_INDEX|WITH_POSITION Entries _key
@@ -141,24 +175,29 @@ load --table Entries
 [
 {&quot;_key&quot;:    &quot;The first post!&quot;,
  &quot;content&quot;: &quot;Welcome! This is my first post!&quot;,
- &quot;n_likes&quot;: 5},
+ &quot;n_likes&quot;: 5,
+ &quot;tag&quot;: &quot;Hello&quot;},
 {&quot;_key&quot;:    &quot;Groonga&quot;,
- &quot;content&quot;: &quot;I started to use groonga. It&#39;s very fast!&quot;,
- &quot;n_likes&quot;: 10},
+ &quot;content&quot;: &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+ &quot;n_likes&quot;: 10,
+ &quot;tag&quot;: &quot;Groonga&quot;},
 {&quot;_key&quot;:    &quot;Mroonga&quot;,
- &quot;content&quot;: &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
- &quot;n_likes&quot;: 15},
+ &quot;content&quot;: &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
+ &quot;n_likes&quot;: 15,
+ &quot;tag&quot;: &quot;Groonga&quot;},
 {&quot;_key&quot;:    &quot;Good-bye Senna&quot;,
  &quot;content&quot;: &quot;I migrated all Senna system!&quot;,
- &quot;n_likes&quot;: 3},
+ &quot;n_likes&quot;: 3,
+ &quot;tag&quot;: &quot;Senna&quot;},
 {&quot;_key&quot;:    &quot;Good-bye Tritonn&quot;,
  &quot;content&quot;: &quot;I also migrated all Tritonn system!&quot;,
- &quot;n_likes&quot;: 3}
+ &quot;n_likes&quot;: 3,
+ &quot;tag&quot;: &quot;Senna&quot;}
 ]
 # [[0, 1337566253.89858, 0.000355720520019531], 5]
 </pre></div>
 </div>
-<p>ブログエントリ用の <tt class="docutils literal"><span class="pre">Entries</span></tt> テーブルがあります。各エントリはタイトルと内容と「いいね！」数を持っています。タイトルは <tt class="docutils literal"><span class="pre">Entries</span></tt> のキーとします。内容は <tt class="docutils literal"><span class="pre">Entries.content</span></tt> カラムの値とします。「いいね！」数は <tt class="docutils literal"><span class="pre">Entries.n_likes</span></tt> カラムの値とします。</p>
+<p>ブログエントリ用の <tt class="docutils literal"><span class="pre">Entries</span></tt> テーブルがあります。各エントリはタイトルと内容と「いいね！」数、タグを持っています。タイトルは <tt class="docutils literal"><span class="pre">Entries</span></tt> のキーとします。内容は <tt class="docutils literal"><span class="pre">Entries.content</span></tt> カラムの値とします。「いいね！」数は <tt class="docutils literal"><span class="pre">Entries.n_likes</span></tt> カラムの値とします。タグは <tt class="docutils literal"><span class="pre">Entries.tag</span></tt> カラムの値とします。</p>
 <p><tt class="docutils literal"><span class="pre">Entries._key</span></tt> カラムと <tt class="docutils literal"><span class="pre">Entries.content</span></tt> カラムには <tt class="docutils literal"><span class="pre">TokenBigram</span></tt> トークナイザーを使ったインデックスを作成します。そのため、 <tt class="docutils literal"><span class="pre">Entries._key</span></tt> と <tt class="docutils literal"><span class="pre">Entries.content</span></tt> は両方とも全文検索できます。</p>
 <p>これで例を示すためのスキーマとデータの準備ができました。</p>
 <div class="section" id="simple-usage">
@@ -193,37 +232,46 @@ load --table Entries
 #         [
 #           &quot;n_likes&quot;,
 #           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
 #         ]
 #       ],
 #       [
 #         1,
 #         &quot;The first post!&quot;,
 #         &quot;Welcome! This is my first post!&quot;,
-#         5
+#         5,
+#         &quot;Hello&quot;
 #       ],
 #       [
 #         2,
 #         &quot;Groonga&quot;,
-#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
-#         10
+#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+#         10,
+#         &quot;Groonga&quot;
 #       ],
 #       [
 #         3,
 #         &quot;Mroonga&quot;,
-#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
-#         15
+#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         15,
+#         &quot;Groonga&quot;
 #       ],
 #       [
 #         4,
 #         &quot;Good-bye Senna&quot;,
 #         &quot;I migrated all Senna system!&quot;,
-#         3
+#         3,
+#         &quot;Senna&quot;
 #       ],
 #       [
 #         5,
 #         &quot;Good-bye Tritonn&quot;,
 #         &quot;I also migrated all Tritonn system!&quot;,
-#         3
+#         3,
+#         &quot;Senna&quot;
 #       ]
 #     ]
 #   ]
@@ -270,19 +318,25 @@ load --table Entries
 #         [
 #           &quot;n_likes&quot;,
 #           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
 #         ]
 #       ],
 #       [
 #         2,
 #         &quot;Groonga&quot;,
-#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
-#         10
+#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+#         10,
+#         &quot;Groonga&quot;
 #       ],
 #       [
 #         3,
 #         &quot;Mroonga&quot;,
-#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
-#         15
+#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         15,
+#         &quot;Groonga&quot;
 #       ]
 #     ]
 #   ]
@@ -325,13 +379,18 @@ load --table Entries
 #         [
 #           &quot;n_likes&quot;,
 #           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
 #         ]
 #       ],
 #       [
 #         2,
 #         &quot;Groonga&quot;,
-#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
-#         10
+#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+#         10,
+#         &quot;Groonga&quot;
 #       ]
 #     ]
 #   ]
@@ -374,20 +433,25 @@ load --table Entries
 #         [
 #           &quot;n_likes&quot;,
 #           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
 #         ]
 #       ],
 #       [
 #         2,
 #         &quot;Groonga&quot;,
-#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
-#         10
+#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+#         10,
+#         &quot;Groonga&quot;
 #       ]
 #     ]
 #   ]
 # ]
 </pre></div>
 </div>
-<p><tt class="docutils literal"><span class="pre">offset</span></tt> は0基点です。 <tt class="docutils literal"><span class="pre">--offset</span> <span class="pre">1</span></tt> は2番目以降のレコードを出力するという意味になります。</p>
+<p><tt class="docutils literal"><span class="pre">offset</span></tt> は0始まりです。 <tt class="docutils literal"><span class="pre">--offset</span> <span class="pre">1</span></tt> は2番目以降のレコードを出力するという意味になります。</p>
 <p><tt class="docutils literal"><span class="pre">limit</span></tt> は出力レコード数の最大値を指定します。 <tt class="docutils literal"><span class="pre">--limit</span> <span class="pre">1</span></tt> は多くても1レコードを出力するという意味になります。もし、1つもレコードがマッチしていなければ <tt class="docutils literal"><span class="pre">select</span></tt> コマンドはどのレコードも出力しません。</p>
 </div>
 <div class="section" id="the-total-number-of-records">
@@ -422,6 +486,10 @@ load --table Entries
 #         [
 #           &quot;n_likes&quot;,
 #           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
 #         ]
 #       ]
 #     ]
@@ -430,6 +498,152 @@ load --table Entries
 </pre></div>
 </div>
 <p><tt class="docutils literal"><span class="pre">--limit</span> <span class="pre">0</span></tt> はマッチしたレコード数だけを取得したいときにも便利です。</p>
+</div>
+<div class="section" id="drilldown">
+<h3>7.3.29.3.5. ドリルダウン<a class="headerlink" href="#drilldown" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>1回の <tt class="docutils literal"><span class="pre">select</span></tt> で検索結果だけでなく、検索結果をグループ化した結果も一緒に取得できます。SQLでは2回以上 <tt class="docutils literal"><span class="pre">SELECT</span></tt> を使わなければいけない場合でも、Groongaの場合は1回の <tt class="docutils literal"><span class="pre">select</span></tt> で実現できます。</p>
+<p>Groongaではこの機能を <a class="reference external" href="http://en.wikipedia.org/wiki/Drill_down">ドリルダウン</a> と呼んでいます。他の検索エンジンでは <a class="reference external" href="http://en.wikipedia.org/wiki/Faceted_search">ファセット検索</a> とも呼ばれています。</p>
+<p>例えば、以下の状況を考えてみましょう。</p>
+<p><tt class="docutils literal"><span class="pre">fast</span></tt> という単語を含むエントリーを探します。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --filter &#39;content @ &quot;fast&quot;&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         2,
+#         &quot;Groonga&quot;,
+#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+#         10,
+#         &quot;Groonga&quot;
+#       ],
+#       [
+#         3,
+#         &quot;Mroonga&quot;,
+#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         15,
+#         &quot;Groonga&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">--filter</span> <span class="pre">'content</span> <span class="pre">&#64;</span> <span class="pre">&quot;fast&quot;</span> <span class="pre">&amp;&amp;</span> <span class="pre">tag</span> <span class="pre">==</span> <span class="pre">&quot;???&quot;</span></tt> というように、追加の検索条件として <tt class="docutils literal"><span class="pre">tag</span></tt> を使いたいとします。しかし、 <tt class="docutils literal"><span class="pre">content</span> <span class="pre">&#64;</span> <span class="pre">&quot;fast&quot;</span></tt> の結果を見るまでは適切なタグはわかりません。</p>
+<p>もし、有効なタグそれぞれについてマッチするレコード数がわかれば、その中から適切なタグを選ぶことができます。このような用途のためにドリルダウンを使えます。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries --filter &#39;content @ &quot;fast&quot;&#39; --drilldown tag
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         2,
+#         &quot;Groonga&quot;,
+#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+#         10,
+#         &quot;Groonga&quot;
+#       ],
+#       [
+#         3,
+#         &quot;Mroonga&quot;,
+#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         15,
+#         &quot;Groonga&quot;
+#       ]
+#     ],
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;_nsubrecs&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Groonga&quot;,
+#         2
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">--drilldown</span> <span class="pre">tag</span></tt> は「有効なタグ」と「そのタグを持っているレコード数」のペアをリストにして返します。このリストからタグを選ぶと「検索したけどヒット数0」という状況を避けることができます。また、リストの中からレコード数が少ないタグを選べば「検索結果が多すぎる」という状況も避けることができます。</p>
+<p>ドリルダウン結果を使うと次のようなUIを作ることができます。</p>
+<blockquote>
+<div><ul class="simple">
+<li><p class="first">検索結果を絞り込むリンク。（ユーザーはキーボードから検索クエリーを入力する必要がなくなります。単にリンクをクリックすればよいからです。)</p>
+</li>
+</ul>
+</div></blockquote>
+<p>多くのECサイトではこのUIを使っています。Amazonのサイドメニューを見てください。</p>
+<p>Groongaはグループ化したレコードの数を数えるだけでなく、グループ化したレコードのカラムの値の中から最大値・最小値を見つけたり、合計値を計算したりすることができます。詳細は <a class="reference internal" href="#select-drilldown-related-parameters"><em>ドリルダウン関連の引数</em></a> を参照してください。</p>
 </div>
 </div>
 <div class="section" id="parameters">
@@ -454,7 +668,7 @@ load --table Entries
 #       [
 #         &quot;grn_select&quot;,
 #         &quot;proc.c&quot;,
-#         1108
+#         1175
 #       ]
 #     ]
 #   ]
@@ -618,13 +832,18 @@ load --table Entries
 #         [
 #           &quot;n_likes&quot;,
 #           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
 #         ]
 #       ],
 #       [
 #         2,
 #         &quot;Groonga&quot;,
-#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
-#         10
+#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+#         10,
+#         &quot;Groonga&quot;
 #       ]
 #     ]
 #   ]
@@ -662,19 +881,25 @@ load --table Entries
 #         [
 #           &quot;n_likes&quot;,
 #           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
 #         ]
 #       ],
 #       [
 #         2,
 #         &quot;Groonga&quot;,
-#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
-#         10
+#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+#         10,
+#         &quot;Groonga&quot;
 #       ],
 #       [
 #         3,
 #         &quot;Mroonga&quot;,
-#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
-#         15
+#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         15,
+#         &quot;Groonga&quot;
 #       ]
 #     ]
 #   ]
@@ -714,13 +939,18 @@ load --table Entries
 #         [
 #           &quot;n_likes&quot;,
 #           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
 #         ]
 #       ],
 #       [
 #         2,
 #         &quot;Groonga&quot;,
-#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
-#         10
+#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+#         10,
+#         &quot;Groonga&quot;
 #       ]
 #     ]
 #   ]
@@ -758,31 +988,39 @@ load --table Entries
 #         [
 #           &quot;n_likes&quot;,
 #           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
 #         ]
 #       ],
 #       [
 #         1,
 #         &quot;The first post!&quot;,
 #         &quot;Welcome! This is my first post!&quot;,
-#         5
+#         5,
+#         &quot;Hello&quot;
 #       ],
 #       [
 #         2,
 #         &quot;Groonga&quot;,
-#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
-#         10
+#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+#         10,
+#         &quot;Groonga&quot;
 #       ],
 #       [
 #         4,
 #         &quot;Good-bye Senna&quot;,
 #         &quot;I migrated all Senna system!&quot;,
-#         3
+#         3,
+#         &quot;Senna&quot;
 #       ],
 #       [
 #         5,
 #         &quot;Good-bye Tritonn&quot;,
 #         &quot;I also migrated all Tritonn system!&quot;,
-#         3
+#         3,
+#         &quot;Senna&quot;
 #       ]
 #     ]
 #   ]
@@ -826,13 +1064,18 @@ load --table Entries
 #         [
 #           &quot;n_likes&quot;,
 #           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
 #         ]
 #       ],
 #       [
 #         2,
 #         &quot;Groonga&quot;,
-#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
-#         10
+#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+#         10,
+#         &quot;Groonga&quot;
 #       ]
 #     ]
 #   ]
@@ -870,31 +1113,39 @@ load --table Entries
 #         [
 #           &quot;n_likes&quot;,
 #           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
 #         ]
 #       ],
 #       [
 #         1,
 #         &quot;The first post!&quot;,
 #         &quot;Welcome! This is my first post!&quot;,
-#         5
+#         5,
+#         &quot;Hello&quot;
 #       ],
 #       [
 #         2,
 #         &quot;Groonga&quot;,
-#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
-#         10
+#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+#         10,
+#         &quot;Groonga&quot;
 #       ],
 #       [
 #         4,
 #         &quot;Good-bye Senna&quot;,
 #         &quot;I migrated all Senna system!&quot;,
-#         3
+#         3,
+#         &quot;Senna&quot;
 #       ],
 #       [
 #         5,
 #         &quot;Good-bye Tritonn&quot;,
 #         &quot;I also migrated all Tritonn system!&quot;,
-#         3
+#         3,
+#         &quot;Senna&quot;
 #       ]
 #     ]
 #   ]
@@ -908,7 +1159,7 @@ load --table Entries
 <div class="section" id="advanced-search-parameters">
 <h3>7.3.29.4.3. 高度な検索のための引数<a class="headerlink" href="#advanced-search-parameters" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <div class="section" id="match-escalation-threshold">
-<span id="id1"></span><h4>7.3.29.4.3.1. <tt class="docutils literal"><span class="pre">match_escalation_threshold</span></tt><a class="headerlink" href="#match-escalation-threshold" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<span id="id2"></span><h4>7.3.29.4.3.1. <tt class="docutils literal"><span class="pre">match_escalation_threshold</span></tt><a class="headerlink" href="#match-escalation-threshold" title="このヘッドラインへのパーマリンク">¶</a></h4>
 <p>検索方法をエスカレーションするかどうかを決定するための閾値を指定します。この閾値はマッチしたレコード数との比較に使われます。マッチしたレコード数がこの閾値以下の場合は検索方法をエスカレーションします。検索方法のエスカレーションについては <a class="reference internal" href="../../spec/search.html"><em>検索</em></a> を参照してください。</p>
 <p>デフォルトの閾値は0です。これは1つもレコードがマッチしなかったときだけ検索方法をエスカレーションするということです。</p>
 <p>デフォルトの閾値は以下の方法でカスタマイズできます。</p>
@@ -952,13 +1203,18 @@ load --table Entries
 #         [
 #           &quot;n_likes&quot;,
 #           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
 #         ]
 #       ],
 #       [
 #         2,
 #         &quot;Groonga&quot;,
-#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
-#         10
+#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+#         10,
+#         &quot;Groonga&quot;
 #       ]
 #     ]
 #   ]
@@ -991,6 +1247,10 @@ select Entries --match_columns content --query groo --match_escalation_threshold
 #         [
 #           &quot;n_likes&quot;,
 #           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
 #         ]
 #       ]
 #     ]
@@ -1002,11 +1262,11 @@ select Entries --match_columns content --query groo --match_escalation_threshold
 <p>2番目の <tt class="docutils literal"><span class="pre">select</span></tt> コマンドも <tt class="docutils literal"><span class="pre">Entries</span></tt> テーブルから <tt class="docutils literal"><span class="pre">content</span></tt> カラムの値に <tt class="docutils literal"><span class="pre">groo</span></tt> という単語を含むレコードを検索します。そして、この <tt class="docutils literal"><span class="pre">select</span></tt> コマンドもマッチしません。この場合、マッチしたレコード数（0）が <tt class="docutils literal"><span class="pre">match_escalation_threshold</span></tt> （-1）より大きいので、検索方法をエスカレーションしません。そして、1つもレコードがマッチしません。</p>
 </div>
 <div class="section" id="query-expansion">
-<span id="id2"></span><h4>7.3.29.4.3.2. <tt class="docutils literal"><span class="pre">query_expansion</span></tt><a class="headerlink" href="#query-expansion" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<span id="id3"></span><h4>7.3.29.4.3.2. <tt class="docutils literal"><span class="pre">query_expansion</span></tt><a class="headerlink" href="#query-expansion" title="このヘッドラインへのパーマリンク">¶</a></h4>
 <p>Deprecated. Use <a class="reference internal" href="#query-expander"><em>query_expander</em></a> instead.</p>
 </div>
 <div class="section" id="query-flags">
-<span id="id3"></span><h4>7.3.29.4.3.3. <tt class="docutils literal"><span class="pre">query_flags</span></tt><a class="headerlink" href="#query-flags" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<span id="id4"></span><h4>7.3.29.4.3.3. <tt class="docutils literal"><span class="pre">query_flags</span></tt><a class="headerlink" href="#query-flags" title="このヘッドラインへのパーマリンク">¶</a></h4>
 <p><tt class="docutils literal"><span class="pre">query</span></tt> パラメーターの構文をカスタマイズします。デフォルトでは <tt class="docutils literal"><span class="pre">query</span></tt> パラメーターでカラムの値を更新することはできません。しかし、 <tt class="docutils literal"><span class="pre">query_flags</span></tt> に <tt class="docutils literal"><span class="pre">ALLOW_COLUMN|ALLOW_UPDATE</span></tt> を指定することで <tt class="docutils literal"><span class="pre">query</span></tt> でカラムの値を更新することができます。</p>
 <p>指定可能な値は以下の通りです。</p>
 <ul class="simple">
@@ -1053,13 +1313,18 @@ select Entries --match_columns content --query groo --match_escalation_threshold
 #         [
 #           &quot;n_likes&quot;,
 #           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
 #         ]
 #       ],
 #       [
 #         3,
 #         &quot;Mroonga&quot;,
-#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
-#         15
+#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         15,
+#         &quot;Groonga&quot;
 #       ]
 #     ]
 #   ]
@@ -1190,31 +1455,39 @@ select Users
 #         [
 #           &quot;n_likes&quot;,
 #           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
 #         ]
 #       ],
 #       [
 #         1,
 #         &quot;The first post!&quot;,
 #         &quot;Welcome! This is my first post!&quot;,
-#         5
+#         5,
+#         &quot;Hello&quot;
 #       ],
 #       [
 #         2,
 #         &quot;Groonga&quot;,
-#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
-#         10
+#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+#         10,
+#         &quot;Groonga&quot;
 #       ],
 #       [
 #         4,
 #         &quot;Good-bye Senna&quot;,
 #         &quot;I migrated all Senna system!&quot;,
-#         3
+#         3,
+#         &quot;Senna&quot;
 #       ],
 #       [
 #         5,
 #         &quot;Good-bye Tritonn&quot;,
 #         &quot;I also migrated all Tritonn system!&quot;,
-#         3
+#         3,
+#         &quot;Senna&quot;
 #       ]
 #     ]
 #   ]
@@ -1252,13 +1525,18 @@ select Users
 #         [
 #           &quot;n_likes&quot;,
 #           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
 #         ]
 #       ],
 #       [
 #         3,
 #         &quot;Mroonga&quot;,
-#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
-#         15
+#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         15,
+#         &quot;Groonga&quot;
 #       ]
 #     ]
 #   ]
@@ -1269,7 +1547,7 @@ select Users
 <p><a class="reference internal" href="../grn_expr/query_syntax.html"><em>クエリー構文</em></a> も見てください。</p>
 </div>
 <div class="section" id="query-expander">
-<span id="id4"></span><h4>7.3.29.4.3.4. <tt class="docutils literal"><span class="pre">query_expander</span></tt><a class="headerlink" href="#query-expander" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<span id="id5"></span><h4>7.3.29.4.3.4. <tt class="docutils literal"><span class="pre">query_expander</span></tt><a class="headerlink" href="#query-expander" title="このヘッドラインへのパーマリンク">¶</a></h4>
 <p>クエリー展開用の引数です。クエリー展開はクエリー中の特定の単語を別の単語に置換します。通常は類義語検索に使います。</p>
 <p><tt class="docutils literal"><span class="pre">query</span></tt> 引数の値を置換するために使うカラムを指定します。この引数の値の書式は「 <tt class="docutils literal"><span class="pre">${TABLE}.${COLUMN}</span></tt> 」です。例えば、 「 <tt class="docutils literal"><span class="pre">Terms.synonym</span></tt> 」は <tt class="docutils literal"><span class="pre">Terms</span></tt> テーブルの <tt class="docutils literal"><span class="pre">synonym</span></tt> カラムを指定しています。</p>
 <p>クエリー展開用のテーブルを「置換テーブル」と呼びます。置換テーブルのキーは <tt class="docutils literal"><span class="pre">ShortText</span></tt> にしてください。そのため、配列テーブル（ <tt class="docutils literal"><span class="pre">TABLE_NO_KEY</span></tt> ）は置換テーブルに使うことはできません。なぜなら、配列テーブルにはキーがないからです。</p>
@@ -1321,13 +1599,18 @@ load --table Thesaurus
 #         [
 #           &quot;n_likes&quot;,
 #           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
 #         ]
 #       ],
 #       [
 #         3,
 #         &quot;Mroonga&quot;,
-#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
-#         15
+#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         15,
+#         &quot;Groonga&quot;
 #       ]
 #     ]
 #   ]
@@ -1360,19 +1643,25 @@ select Entries --match_columns content --query &quot;mroonga&quot; --query_expan
 #         [
 #           &quot;n_likes&quot;,
 #           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
 #         ]
 #       ],
 #       [
 #         3,
 #         &quot;Mroonga&quot;,
-#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
-#         15
+#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         15,
+#         &quot;Groonga&quot;
 #       ],
 #       [
 #         5,
 #         &quot;Good-bye Tritonn&quot;,
 #         &quot;I also migrated all Tritonn system!&quot;,
-#         3
+#         3,
+#         &quot;Senna&quot;
 #       ]
 #     ]
 #   ]
@@ -1405,19 +1694,25 @@ select Entries --match_columns content --query &quot;((mroonga) OR (tritonn) OR 
 #         [
 #           &quot;n_likes&quot;,
 #           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
 #         ]
 #       ],
 #       [
 #         3,
 #         &quot;Mroonga&quot;,
-#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
-#         15
+#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         15,
+#         &quot;Groonga&quot;
 #       ],
 #       [
 #         5,
 #         &quot;Good-bye Tritonn&quot;,
 #         &quot;I also migrated all Tritonn system!&quot;,
-#         3
+#         3,
+#         &quot;Senna&quot;
 #       ]
 #     ]
 #   ]
@@ -1461,19 +1756,25 @@ select Entries --match_columns content --query &quot;popular&quot; --query_expan
 #         [
 #           &quot;n_likes&quot;,
 #           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
 #         ]
 #       ],
 #       [
 #         2,
 #         &quot;Groonga&quot;,
-#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
-#         10
+#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+#         10,
+#         &quot;Groonga&quot;
 #       ],
 #       [
 #         3,
 #         &quot;Mroonga&quot;,
-#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
-#         15
+#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         15,
+#         &quot;Groonga&quot;
 #       ]
 #     ]
 #   ]
@@ -1487,7 +1788,7 @@ select Entries --match_columns content --query &quot;popular&quot; --query_expan
 <div class="section" id="output-related-parameters">
 <h3>7.3.29.4.4. 出力関連の引数<a class="headerlink" href="#output-related-parameters" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <div class="section" id="output-columns">
-<span id="id5"></span><h4>7.3.29.4.4.1. <tt class="docutils literal"><span class="pre">output_columns</span></tt><a class="headerlink" href="#output-columns" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<span id="select-output-columns"></span><h4>7.3.29.4.4.1. <tt class="docutils literal"><span class="pre">output_columns</span></tt><a class="headerlink" href="#output-columns" title="このヘッドラインへのパーマリンク">¶</a></h4>
 <p>出力するカラムを <tt class="docutils literal"><span class="pre">,</span></tt> 区切りで指定します。</p>
 <p>以下は簡単な <tt class="docutils literal"><span class="pre">output_columns</span></tt> の使用例です。</p>
 <p>実行例:</p>
@@ -1524,7 +1825,7 @@ select Entries --match_columns content --query &quot;popular&quot; --query_expan
 </div>
 <p>この <tt class="docutils literal"><span class="pre">select</span></tt> コマンドは <tt class="docutils literal"><span class="pre">_id</span></tt> と <tt class="docutils literal"><span class="pre">_key</span></tt> カラムの値だけを出力します。</p>
 <p><tt class="docutils literal"><span class="pre">*</span></tt> is a special value. It means that all columns that are not
-<a class="reference internal" href="../columns/pseudo.html"><em>疑似カラム (pseudo_column)</em></a>.</p>
+<a class="reference internal" href="../columns/pseudo.html"><em>擬似カラム</em></a>.</p>
 <p>以下は <tt class="docutils literal"><span class="pre">*</span></tt> の使用例です。</p>
 <p>実行例:</p>
 <div class="highlight-none"><div class="highlight"><pre>select Entries --output_columns &#39;_key, *&#39; --limit 1
@@ -1551,12 +1852,17 @@ select Entries --match_columns content --query &quot;popular&quot; --query_expan
 #         [
 #           &quot;n_likes&quot;,
 #           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
 #         ]
 #       ],
 #       [
 #         &quot;The first post!&quot;,
 #         &quot;Welcome! This is my first post!&quot;,
-#         5
+#         5,
+#         &quot;Hello&quot;
 #       ]
 #     ]
 #   ]
@@ -1567,7 +1873,7 @@ select Entries --match_columns content --query &quot;popular&quot; --query_expan
 <p>デフォルト値は <tt class="docutils literal"><span class="pre">_id,</span> <span class="pre">_key,</span> <span class="pre">*</span></tt> です。これは <tt class="docutils literal"><span class="pre">_score</span></tt> 以外の全てのカラムを出力するという意味です。</p>
 </div>
 <div class="section" id="sortby">
-<h4>7.3.29.4.4.2. <tt class="docutils literal"><span class="pre">sortby</span></tt><a class="headerlink" href="#sortby" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<span id="select-sortby"></span><h4>7.3.29.4.4.2. <tt class="docutils literal"><span class="pre">sortby</span></tt><a class="headerlink" href="#sortby" title="このヘッドラインへのパーマリンク">¶</a></h4>
 <p>ソートキーを <tt class="docutils literal"><span class="pre">,</span></tt> 区切りで指定します。それぞれのソートキーはカラム名を指定します。</p>
 <p>以下は簡単な <tt class="docutils literal"><span class="pre">sortby</span></tt> の使用例です。</p>
 <p>実行例:</p>
@@ -1599,37 +1905,46 @@ select Entries --match_columns content --query &quot;popular&quot; --query_expan
 #         [
 #           &quot;n_likes&quot;,
 #           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
 #         ]
 #       ],
 #       [
 #         4,
 #         &quot;Good-bye Senna&quot;,
 #         &quot;I migrated all Senna system!&quot;,
-#         3
+#         3,
+#         &quot;Senna&quot;
 #       ],
 #       [
 #         5,
 #         &quot;Good-bye Tritonn&quot;,
 #         &quot;I also migrated all Tritonn system!&quot;,
-#         3
+#         3,
+#         &quot;Senna&quot;
 #       ],
 #       [
 #         1,
 #         &quot;The first post!&quot;,
 #         &quot;Welcome! This is my first post!&quot;,
-#         5
+#         5,
+#         &quot;Hello&quot;
 #       ],
 #       [
 #         2,
 #         &quot;Groonga&quot;,
-#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
-#         10
+#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+#         10,
+#         &quot;Groonga&quot;
 #       ],
 #       [
 #         3,
 #         &quot;Mroonga&quot;,
-#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
-#         15
+#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         15,
+#         &quot;Groonga&quot;
 #       ]
 #     ]
 #   ]
@@ -1668,37 +1983,46 @@ select Entries --match_columns content --query &quot;popular&quot; --query_expan
 #         [
 #           &quot;n_likes&quot;,
 #           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
 #         ]
 #       ],
 #       [
 #         3,
 #         &quot;Mroonga&quot;,
-#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
-#         15
+#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         15,
+#         &quot;Groonga&quot;
 #       ],
 #       [
 #         2,
 #         &quot;Groonga&quot;,
-#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
-#         10
+#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+#         10,
+#         &quot;Groonga&quot;
 #       ],
 #       [
 #         1,
 #         &quot;The first post!&quot;,
 #         &quot;Welcome! This is my first post!&quot;,
-#         5
+#         5,
+#         &quot;Hello&quot;
 #       ],
 #       [
 #         4,
 #         &quot;Good-bye Senna&quot;,
 #         &quot;I migrated all Senna system!&quot;,
-#         3
+#         3,
+#         &quot;Senna&quot;
 #       ],
 #       [
 #         5,
 #         &quot;Good-bye Tritonn&quot;,
 #         &quot;I also migrated all Tritonn system!&quot;,
-#         3
+#         3,
+#         &quot;Senna&quot;
 #       ]
 #     ]
 #   ]
@@ -1747,8 +2071,8 @@ select Entries --match_columns content --query &quot;popular&quot; --query_expan
 <p><tt class="docutils literal"><span class="pre">query</span></tt> 引数も <tt class="docutils literal"><span class="pre">filter</span></tt> 引数も指定しないで <tt class="docutils literal"><span class="pre">_score</span></tt> を使った場合は、 <tt class="docutils literal"><span class="pre">_score</span></tt> を無視して、ログファイルに警告を出力します。</p>
 </div>
 <div class="section" id="offset">
-<h4>7.3.29.4.4.3. <tt class="docutils literal"><span class="pre">offset</span></tt><a class="headerlink" href="#offset" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p>出力するレコードの範囲を決めるためのオフセットを指定します。オフセットは0基点です。 <tt class="docutils literal"><span class="pre">--offset</span> <span class="pre">1</span></tt> は2番目以降のレコードを出力するという意味になります。</p>
+<span id="select-offset"></span><h4>7.3.29.4.4.3. <tt class="docutils literal"><span class="pre">offset</span></tt><a class="headerlink" href="#offset" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>出力するレコードの範囲を決めるためのオフセットを指定します。オフセットは0始まりです。 <tt class="docutils literal"><span class="pre">--offset</span> <span class="pre">1</span></tt> は2番目以降のレコードを出力するという意味になります。</p>
 <p>実行例:</p>
 <div class="highlight-none"><div class="highlight"><pre>select Entries --sortby _id --offset 3 --output_columns _key
 # [
@@ -1780,7 +2104,7 @@ select Entries --match_columns content --query &quot;popular&quot; --query_expan
 </pre></div>
 </div>
 <p>この <tt class="docutils literal"><span class="pre">select</span></tt> コマンドは4番目以降のレコードを出力します。</p>
-<p>負の値を指定することもできます。負の値の場合は <tt class="docutils literal"><span class="pre">マッチしたレコード数</span> <span class="pre">+</span> <span class="pre">offset</span></tt> 番目のレコードから始まる範囲という意味になります。もし、マッチしたレコードが3つあり、 <tt class="docutils literal"><span class="pre">--offset</span> <span class="pre">-2</span></tt> を指定した場合は1番目（ <tt class="docutils literal"><span class="pre">3</span> <span class="pre">+</span> <span class="pre">-2</span> <span class="pre">=</span> <span class="pre">1</span></tt> ） のレコードから3番目のレコードが出力されます。</p>
+<p>負の値を指定することもできます。負の値の場合は <tt class="docutils literal"><span class="pre">マッチしたレコード数</span> <span class="pre">+</span> <span class="pre">offset</span></tt> 番目のレコードから始まる範囲という意味になります。もし、マッチしたレコードが3つあり、 <tt class="docutils literal"><span class="pre">--offset</span> <span class="pre">-2</span></tt> を指定した場合は2番目（ <tt class="docutils literal"><span class="pre">3</span> <span class="pre">+</span> <span class="pre">-2</span> <span class="pre">=</span> <span class="pre">1</span></tt> 。 <tt class="docutils literal"><span class="pre">1</span></tt> は2番目という意味です。オフセットは0始まりということを思い出してください。） のレコードから3番目のレコードを取得します。</p>
 <p>実行例:</p>
 <div class="highlight-none"><div class="highlight"><pre>select Entries --sortby _id --offset -2 --output_columns _key
 # [
@@ -1883,37 +2207,46 @@ select Entries --match_columns content --query &quot;popular&quot; --query_expan
 #         [
 #           &quot;n_likes&quot;,
 #           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
 #         ]
 #       ],
 #       [
 #         1,
 #         &quot;The first post!&quot;,
 #         &quot;Welcome! This is my first post!&quot;,
-#         5
+#         5,
+#         &quot;Hello&quot;
 #       ],
 #       [
 #         2,
 #         &quot;Groonga&quot;,
-#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
-#         10
+#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+#         10,
+#         &quot;Groonga&quot;
 #       ],
 #       [
 #         3,
 #         &quot;Mroonga&quot;,
-#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
-#         15
+#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         15,
+#         &quot;Groonga&quot;
 #       ],
 #       [
 #         4,
 #         &quot;Good-bye Senna&quot;,
 #         &quot;I migrated all Senna system!&quot;,
-#         3
+#         3,
+#         &quot;Senna&quot;
 #       ],
 #       [
 #         5,
 #         &quot;Good-bye Tritonn&quot;,
 #         &quot;I also migrated all Tritonn system!&quot;,
-#         3
+#         3,
+#         &quot;Senna&quot;
 #       ]
 #     ]
 #   ]
@@ -1930,38 +2263,2050 @@ select Entries --match_columns content --query &quot;popular&quot; --query_expan
 <p>scorerは、検索処理が完了し、ソート処理が実行される前に呼び出されます。従って、各レコードのスコアを操作する式を指定しておけば、検索結果のソート順序をカスタマイズできるようになります。</p>
 </div>
 </div>
-<div class="section" id="facet-related-parameters">
-<h3>7.3.29.4.5. ファセット関連の引数<a class="headerlink" href="#facet-related-parameters" title="このヘッドラインへのパーマリンク">¶</a></h3>
-<div class="section" id="drilldown">
-<h4>7.3.29.4.5.1. <tt class="docutils literal"><span class="pre">drilldown</span></tt><a class="headerlink" href="#drilldown" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p>TODO: write in English and add example.</p>
-<p>グループ化のキーとなるカラム名のリストをカンマ(',')区切りで指定します。検索条件にマッチした各レコードを出力したのちに、drilldownに指定されたカラムの値が同一であるレコードをとりまとめて、それぞれについて結果レコードを出力します。</p>
+<div class="section" id="drilldown-related-parameters">
+<span id="select-drilldown-related-parameters"></span><h3>7.3.29.4.5. ドリルダウン関連の引数<a class="headerlink" href="#drilldown-related-parameters" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>このセクションでは基本的なドリルダウン関連の引数について説明します。高度なドリルダウン関連の引数は他のセクションで説明します。</p>
+<div class="section" id="select-drilldown">
+<span id="id6"></span><h4>7.3.29.4.5.1. <tt class="docutils literal"><span class="pre">drilldown</span></tt><a class="headerlink" href="#select-drilldown" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>グループ化するときに使うキーを <tt class="docutils literal"><span class="pre">,</span></tt> 区切りで指定します。</p>
+<p>指定した検索条件にマッチしたレコードを指定したキーのそれぞれでグループ化します。検索条件を指定していない場合はすべてのレコードを指定したキーのそれぞれでグループ化します。</p>
+<p>以下は簡単な <tt class="docutils literal"><span class="pre">drilldown</span></tt> の使用例です。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries \
+  --output_columns _key,tag \
+  --drilldown tag
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         &quot;The first post!&quot;,
+#         &quot;Hello&quot;
+#       ],
+#       [
+#         &quot;Groonga&quot;,
+#         &quot;Groonga&quot;
+#       ],
+#       [
+#         &quot;Mroonga&quot;,
+#         &quot;Groonga&quot;
+#       ],
+#       [
+#         &quot;Good-bye Senna&quot;,
+#         &quot;Senna&quot;
+#       ],
+#       [
+#         &quot;Good-bye Tritonn&quot;,
+#         &quot;Senna&quot;
+#       ]
+#     ],
+#     [
+#       [
+#         3
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;_nsubrecs&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Hello&quot;,
+#         1
+#       ],
+#       [
+#         &quot;Groonga&quot;,
+#         2
+#       ],
+#       [
+#         &quot;Senna&quot;,
+#         2
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>この <tt class="docutils literal"><span class="pre">select</span></tt> コマンドは次の情報を出力します。</p>
+<blockquote>
+<div><ul class="simple">
+<li><p class="first">「Hello」タグを持つレコードが1つある。</p>
+</li>
+<li><p class="first">「Groonga」タグを持つレコードが2つある。</p>
+</li>
+<li><p class="first">「Senna」タグを持つレコードが2つある。</p>
+</li>
+</ul>
+</div></blockquote>
+<p>以下は検索条件付きで <tt class="docutils literal"><span class="pre">drilldown</span></tt> を使う例です。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries \
+  --output_columns _key,tag \
+  --filter &#39;n_likes &gt;= 5&#39; \
+  --drilldown tag
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         3
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         &quot;The first post!&quot;,
+#         &quot;Hello&quot;
+#       ],
+#       [
+#         &quot;Groonga&quot;,
+#         &quot;Groonga&quot;
+#       ],
+#       [
+#         &quot;Mroonga&quot;,
+#         &quot;Groonga&quot;
+#       ]
+#     ],
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;_nsubrecs&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Hello&quot;,
+#         1
+#       ],
+#       [
+#         &quot;Groonga&quot;,
+#         2
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>この <tt class="docutils literal"><span class="pre">select</span></tt> コマンドは次の情報を出力します。</p>
+<blockquote>
+<div><ul class="simple">
+<li><p class="first"><tt class="docutils literal"><span class="pre">n_likes</span></tt> の値が5以上のレコードの中には…</p>
+<ul>
+<li><p class="first">「Hello」タグを持つレコードが1つある。</p>
+</li>
+<li><p class="first">「Groonga」タグを持つレコードが2つある。</p>
+</li>
+</ul>
+</li>
+</ul>
+</div></blockquote>
+<p>以下は複数のグループ化キーを指定する <tt class="docutils literal"><span class="pre">drilldown</span></tt> の例です。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries \
+  --limit 0 \
+  --output_column _id \
+  --drilldown tag,n_likes
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ]
+#     ],
+#     [
+#       [
+#         3
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;_nsubrecs&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Hello&quot;,
+#         1
+#       ],
+#       [
+#         &quot;Groonga&quot;,
+#         2
+#       ],
+#       [
+#         &quot;Senna&quot;,
+#         2
+#       ]
+#     ],
+#     [
+#       [
+#         4
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_nsubrecs&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         5,
+#         1
+#       ],
+#       [
+#         10,
+#         1
+#       ],
+#       [
+#         15,
+#         1
+#       ],
+#       [
+#         3,
+#         2
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>この <tt class="docutils literal"><span class="pre">select</span></tt> コマンドは次の情報を出力します。</p>
+<blockquote>
+<div><ul class="simple">
+<li><p class="first"><tt class="docutils literal"><span class="pre">tag</span></tt> について:</p>
+<ul>
+<li><p class="first">「Hello」タグを持つレコードが1つある。</p>
+</li>
+<li><p class="first">「Groonga」タグを持つレコードが2つある。</p>
+</li>
+<li><p class="first">「Senna」タグを持つレコードが2つある。</p>
+</li>
+</ul>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">n_likes</span></tt> について:</p>
+<ul>
+<li><p class="first">「Hello」タグを持つレコードが1つある。</p>
+</li>
+<li><p class="first">「Groonga」タグを持つレコードが2つある。</p>
+</li>
+<li><p class="first">「Senna」タグを持つレコードが2つある。</p>
+</li>
+</ul>
+</li>
+</ul>
+</div></blockquote>
 </div>
 <div class="section" id="drilldown-sortby">
-<h4>7.3.29.4.5.2. <tt class="docutils literal"><span class="pre">drilldown_sortby</span></tt><a class="headerlink" href="#drilldown-sortby" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p>TODO: write in English and add example.</p>
-<p>drilldown条件に指定されたカラムの値毎にとりまとめられたレコードについて、ソートキーとなるカラム名のリストをカンマ(',')区切りで指定します。sortbyパラメータと同様に昇降順を指定できます。</p>
+<span id="select-drilldown-sortby"></span><h4>7.3.29.4.5.2. <tt class="docutils literal"><span class="pre">drilldown_sortby</span></tt><a class="headerlink" href="#drilldown-sortby" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>ドリルダウン結果のソートキーを <tt class="docutils literal"><span class="pre">,</span></tt> 区切りで指定します。それぞれのソートキーはカラム名を指定します。</p>
+<p>グループ化されたレコード数は <tt class="docutils literal"><span class="pre">_nsubrecs</span></tt> <a class="reference internal" href="../columns/pseudo.html"><em>擬似カラム</em></a> 擬似カラムで参照できます。</p>
+<p>以下は簡単な <tt class="docutils literal"><span class="pre">drilldown_sortby</span></tt> の使用例です。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries \
+  --limit 0 \
+  --output_column _id \
+  --drilldown &#39;tag, n_likes&#39; \
+  --drilldown_sortby &#39;-_nsubrecs, _key&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ]
+#     ],
+#     [
+#       [
+#         3
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;_nsubrecs&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Groonga&quot;,
+#         2
+#       ],
+#       [
+#         &quot;Senna&quot;,
+#         2
+#       ],
+#       [
+#         &quot;Hello&quot;,
+#         1
+#       ]
+#     ],
+#     [
+#       [
+#         4
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_nsubrecs&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         3,
+#         2
+#       ],
+#       [
+#         5,
+#         1
+#       ],
+#       [
+#         10,
+#         1
+#       ],
+#       [
+#         15,
+#         1
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>ドリルダウン結果は「グループに含まれるレコード数」（= <tt class="docutils literal"><span class="pre">_nsubrecs</span></tt> ）で降順にソートします。「グループに含まれるレコード数」が同じグループが複数あった場合は、グループ化に使ったキー（= <tt class="docutils literal"><span class="pre">_key</span></tt> ）で昇順にソートします。</p>
+<p><tt class="docutils literal"><span class="pre">drilldown</span></tt> で指定したすべてのグループキーで同じソートキーを使います。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries \
+  --limit 0 \
+  --output_column _id \
+  --drilldown &#39;tag, n_likes&#39; \
+  --drilldown_sortby &#39;-_nsubrecs, _key&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ]
+#     ],
+#     [
+#       [
+#         3
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;_nsubrecs&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Groonga&quot;,
+#         2
+#       ],
+#       [
+#         &quot;Senna&quot;,
+#         2
+#       ],
+#       [
+#         &quot;Hello&quot;,
+#         1
+#       ]
+#     ],
+#     [
+#       [
+#         4
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_nsubrecs&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         3,
+#         2
+#       ],
+#       [
+#         5,
+#         1
+#       ],
+#       [
+#         10,
+#         1
+#       ],
+#       [
+#         15,
+#         1
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">tag</span></tt> のドリルダウンでも <tt class="docutils literal"><span class="pre">n_likes</span></tt> のドリルダウンでも同じソートキーを使っています。</p>
+<p>それぞれのドリルダウンで異なるソートキーを使いたい場合は <a class="reference internal" href="#select-advanced-drilldown-related-parameters"><em>Advanced drilldown related parameters</em></a> を参照してください。</p>
 </div>
 <div class="section" id="drilldown-output-columns">
-<h4>7.3.29.4.5.3. <tt class="docutils literal"><span class="pre">drilldown_output_columns</span></tt><a class="headerlink" href="#drilldown-output-columns" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p>TODO: write in English and add example.</p>
-<p>drilldown条件に指定されたカラムの値毎にとりまとめられたレコードについて、出力するカラム名のリストをカンマ(',')区切りで指定します。</p>
+<span id="select-drilldown-output-columns"></span><h4>7.3.29.4.5.3. <tt class="docutils literal"><span class="pre">drilldown_output_columns</span></tt><a class="headerlink" href="#drilldown-output-columns" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>ドリルダウン結果から出力するカラムを <tt class="docutils literal"><span class="pre">,</span></tt> 区切りで指定します。</p>
+<p>以下は <tt class="docutils literal"><span class="pre">drilldown_output_columns</span></tt> の使用例です。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries \
+  --limit 0 \
+  --output_column _id \
+  --drilldown tag \
+  --drilldown_output_columns _key
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ]
+#     ],
+#     [
+#       [
+#         3
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Hello&quot;
+#       ],
+#       [
+#         &quot;Groonga&quot;
+#       ],
+#       [
+#         &quot;Senna&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>この <tt class="docutils literal"><span class="pre">select</span></tt> コマンドはグループ化したキーを出力していくだけです。</p>
+<p>グループ化したキーが参照型のカラム（型がテーブルのカラム）だった場合、参照型のカラムが参照しているテーブルのカラムにもアクセスできます。</p>
+<p>参照型に対してドリルダウンする方法を示すために使うスキーマ定義とサンプルデータは以下の通りです。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Tags TABLE_HASH_KEY ShortText --normalizer NormalizerAuto
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Tags label COLUMN_SCALAR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Tags priority COLUMN_SCALAR Int32
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create Items TABLE_HASH_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Items tag COLUMN_SCALAR Tags
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+load --table Tags
+[
+{&quot;_key&quot;: &quot;groonga&quot;, label: &quot;Groonga&quot;, priority: 10},
+{&quot;_key&quot;: &quot;mroonga&quot;, label: &quot;Mroonga&quot;, priority: 5}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 2]
+load --table Items
+[
+{&quot;_key&quot;: &quot;A&quot;, &quot;tag&quot;: &quot;groonga&quot;},
+{&quot;_key&quot;: &quot;B&quot;, &quot;tag&quot;: &quot;groonga&quot;},
+{&quot;_key&quot;: &quot;C&quot;, &quot;tag&quot;: &quot;mroonga&quot;}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 3]
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">Tags</span></tt> テーブルは参照されているテーブルです。 <tt class="docutils literal"><span class="pre">Items.tag</span></tt> は参照型のカラムです。</p>
+<p><tt class="docutils literal"><span class="pre">Tags.label</span></tt> は <tt class="docutils literal"><span class="pre">drilldown_output_columns</span></tt> の中では <tt class="docutils literal"><span class="pre">label</span></tt> で参照できます。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Items \
+  --limit 0 \
+  --output_column _id \
+  --drilldown tag \
+  --drilldown_output_columns &#39;_key, label&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         3
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;Tags&quot;
+#         ]
+#       ]
+#     ],
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;label&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         &quot;groonga&quot;,
+#         &quot;Groonga&quot;
+#       ],
+#       [
+#         &quot;mroonga&quot;,
+#         &quot;Mroonga&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">*</span></tt> を使うと、参照されているテーブル（= <tt class="docutils literal"><span class="pre">Tags</span></tt> ）のすべてのカラムを参照できます。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Items \
+  --limit 0 \
+  --output_column _id \
+  --drilldown tag \
+  --drilldown_output_columns &#39;_key, *&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         3
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;Tags&quot;
+#         ]
+#       ]
+#     ],
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;label&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;priority&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;groonga&quot;,
+#         &quot;Groonga&quot;,
+#         10
+#       ],
+#       [
+#         &quot;mroonga&quot;,
+#         &quot;Mroonga&quot;,
+#         5
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">*</span></tt> は <tt class="docutils literal"><span class="pre">label,</span> <span class="pre">priority</span></tt> に展開されます。</p>
+<p><tt class="docutils literal"><span class="pre">drilldown_output_columns</span></tt> のデフォルト値は <tt class="docutils literal"><span class="pre">_key,</span> <span class="pre">_nsubrecs</span></tt> です。グループ化に使ったキーとグループのレコード数を出力する、ということです。</p>
+<p><a class="reference internal" href="#select-drilldown-calc-types"><em>drilldown_calc_types</em></a> を使うと、 <tt class="docutils literal"><span class="pre">drilldown_output_columns</span></tt> の中で <tt class="docutils literal"><span class="pre">_max</span></tt> 、 <tt class="docutils literal"><span class="pre">_min</span></tt> 、 <tt class="docutils literal"><span class="pre">_sum</span></tt> 、 <tt class="docutils literal"><span class="pre">_avg</span></tt> といった <a class="reference internal" href="../columns/pseudo.html"><em>擬似カラム</em></a> も使えるようになります。詳細は <tt class="docutils literal"><span class="pre">drilldown_calc_types</span></tt> のドキュメントを参照してください。</p>
 </div>
 <div class="section" id="drilldown-offset">
-<h4>7.3.29.4.5.4. <tt class="docutils literal"><span class="pre">drilldown_offset</span></tt><a class="headerlink" href="#drilldown-offset" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p>TODO: write in English and add example.</p>
-<p>drilldown条件に指定されたカラムの値毎にとりまとめられたレコードについて、出力対象となる最初のレコードの番号を0ベースで指定します。デフォルト値は0です。drilldown_offsetに負の値を指定した場合は、ヒットした件数 + drilldown_offsetによって算出される値が指定されたものとみなされます。</p>
+<span id="select-drilldown-offset"></span><h4>7.3.29.4.5.4. <tt class="docutils literal"><span class="pre">drilldown_offset</span></tt><a class="headerlink" href="#drilldown-offset" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>ドリルダウン結果を出力するレコードの範囲を決めるためのオフセットを指定します。オフセットは0始まりです。 <tt class="docutils literal"><span class="pre">--offset</span> <span class="pre">1</span></tt> は2番目以降のレコードを出力するという意味になります。</p>
+<p>以下は簡単な <tt class="docutils literal"><span class="pre">drilldown_offset</span></tt> の使用例です。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries \
+  --limit 0 \
+  --output_column _id \
+  --drilldown tag \
+  --drilldown_sortby _key \
+  --drilldown_offset 1
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ]
+#     ],
+#     [
+#       [
+#         3
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;_nsubrecs&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Hello&quot;,
+#         1
+#       ],
+#       [
+#         &quot;Senna&quot;,
+#         2
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>この <tt class="docutils literal"><span class="pre">select</span></tt> コマンドは2番目以降のレコードを出力します。</p>
+<p>負の値を指定することもできます。負の値の場合は <tt class="docutils literal"><span class="pre">グループの数</span> <span class="pre">+</span> <span class="pre">offset</span></tt> 番目のレコードから始まる範囲という意味になります。もし、グループの数が3つあり、 <tt class="docutils literal"><span class="pre">--offset</span> <span class="pre">-2</span></tt> を指定した場合は1番目（ <tt class="docutils literal"><span class="pre">3</span> <span class="pre">+</span> <span class="pre">-2</span> <span class="pre">=</span> <span class="pre">1</span></tt> 。 <tt class="docutils literal"><span class="pre">1</span></tt> は2番目です。オフセットは0始まりということを思い出してください。） のグループから3番目のグループが出力されます。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries \
+  --limit 0 \
+  --output_column _id \
+  --drilldown tag \
+  --drilldown_sortby _key \
+  --drilldown_offset -2
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ]
+#     ],
+#     [
+#       [
+#         3
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;_nsubrecs&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Hello&quot;,
+#         1
+#       ],
+#       [
+#         &quot;Senna&quot;,
+#         2
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>この <tt class="docutils literal"><span class="pre">select</span></tt> コマンドは2番目以降のグループを出力します。なぜなら、全グループ数が <tt class="docutils literal"><span class="pre">3</span></tt> だからです。</p>
+<p><tt class="docutils literal"><span class="pre">drilldown_offset</span></tt> のデフォルト値は <tt class="docutils literal"><span class="pre">0</span></tt> です。</p>
 </div>
 <div class="section" id="drilldown-limit">
-<h4>7.3.29.4.5.5. <tt class="docutils literal"><span class="pre">drilldown_limit</span></tt><a class="headerlink" href="#drilldown-limit" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p>TODO: write in English and add example.</p>
-<p>drilldown条件に指定されたカラムの値毎にとりまとめられたレコードについて、出力を行うレコードの件数を指定します。デフォルト値は10です。実際には、drilldown_offset + drilldown_limit がヒットした件数を超えない範囲でレコードが出力されます。drilldown_limitに負の値を指定した場合は、ヒットした件数 + drilldown_limit + 1 によって算出される値が指定されたものとみなされます。</p>
+<span id="select-drilldown-limit"></span><h4>7.3.29.4.5.5. <tt class="docutils literal"><span class="pre">drilldown_limit</span></tt><a class="headerlink" href="#drilldown-limit" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p><tt class="docutils literal"><span class="pre">drilldown_limit</span></tt> は出力グループ数の最大値を指定します。もし、グループ数 <tt class="docutils literal"><span class="pre">limit</span></tt> よりも小さい場合はすべてのグループが出力されます。</p>
+<p>以下は <tt class="docutils literal"><span class="pre">drilldown_limit</span></tt> の使用例です。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries \
+  --limit 0 \
+  --output_column _id \
+  --drilldown tag \
+  --drilldown_sortby _key \
+  --drilldown_offset 1 \
+  --drilldown_limit 2
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ]
+#     ],
+#     [
+#       [
+#         3
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;_nsubrecs&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Hello&quot;,
+#         1
+#       ],
+#       [
+#         &quot;Senna&quot;,
+#         2
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>この <tt class="docutils literal"><span class="pre">select</span></tt> コマンドは2番目、3番目のレコードを出力します。</p>
+<p>負の値を指定することもできます。負の値の場合は、最大で <tt class="docutils literal"><span class="pre">マッチしたレコード数</span> <span class="pre">+</span> <span class="pre">drilldown_limit</span> <span class="pre">+</span> <span class="pre">1</span></tt> 件のレコードを出力するという意味になります。 例えば、 <tt class="docutils literal"><span class="pre">--drilldown_limit</span> <span class="pre">-1</span></tt> はすべてのレコードを出力します。これはすべてのレコードを表示する場合にとても便利です。</p>
+<p>Here is a negative <tt class="docutils literal"><span class="pre">drilldown_limit</span></tt> value example.</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries \
+  --limit 0 \
+  --output_column _id \
+  --drilldown tag \
+  --drilldown_sortby _key \
+  --drilldown_limit -1
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ]
+#     ],
+#     [
+#       [
+#         3
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;_nsubrecs&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Groonga&quot;,
+#         2
+#       ],
+#       [
+#         &quot;Hello&quot;,
+#         1
+#       ],
+#       [
+#         &quot;Senna&quot;,
+#         2
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>この <tt class="docutils literal"><span class="pre">select</span></tt> コマンドはすべてのグループを出力します。</p>
+<p><tt class="docutils literal"><span class="pre">drilldown_limit</span></tt> のデフォルト値は <tt class="docutils literal"><span class="pre">10</span></tt> です。</p>
+</div>
+<div class="section" id="drilldown-calc-types">
+<span id="select-drilldown-calc-types"></span><h4>7.3.29.4.5.6. <tt class="docutils literal"><span class="pre">drilldown_calc_types</span></tt><a class="headerlink" href="#drilldown-calc-types" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>ドリルダウンでグループ内のレコードの値を計算（集計）する方法を指定します。「 <tt class="docutils literal"><span class="pre">|</span></tt> 」で区切ることで複数の計算タイプを指定することもできます。たとえば、 <tt class="docutils literal"><span class="pre">MAX|MIN</span></tt> といった具合です。</p>
+<p>計算対象の値はグループ内のレコードのカラムから取得します。このカラムは <a class="reference internal" href="#select-drilldown-calc-target"><em>drilldown_calc_target</em></a> で指定します。</p>
+<p>計算した値は <a class="reference internal" href="#select-drilldown-output-columns"><em>drilldown_output_columns</em></a> の中で <tt class="docutils literal"><span class="pre">_max</span></tt> や <tt class="docutils literal"><span class="pre">_min</span></tt> のような <a class="reference internal" href="../columns/pseudo.html"><em>擬似カラム</em></a> を指定すると取得できます。</p>
+<p>You can use the following calculation types:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="25%" />
+<col width="25%" />
+<col width="25%" />
+<col width="25%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Type name</th>
+<th class="head"><a class="reference internal" href="../columns/pseudo.html"><em>擬似カラム</em></a> name</th>
+<th class="head">Need <a class="reference internal" href="#select-drilldown-calc-target"><em>drilldown_calc_target</em></a></th>
+<th class="head"><p class="first last">説明</p>
+</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">NONE</span></tt></td>
+<td>Nothing.</td>
+<td>Not needs.</td>
+<td><p class="first last">無視されます。</p>
+</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">COUNT</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">_nsubrecs</span></tt></td>
+<td>Not needs.</td>
+<td>Counting grouped records. It's always enabled. So you don't
+specify it.</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">MAX</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">_max</span></tt></td>
+<td>Needs.</td>
+<td>Finding the maximum integer value from integer values in
+grouped records.</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">MIN</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">_min</span></tt></td>
+<td>Needs.</td>
+<td>Finding the minimum integer value from integer values in
+grouped records.</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">SUM</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">_sum</span></tt></td>
+<td>Needs.</td>
+<td>Summing integer values in grouped records.</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">AVG</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">_avg</span></tt></td>
+<td>Needs.</td>
+<td>Averaging integer/float values in grouped records.</td>
+</tr>
+</tbody>
+</table>
+<p>Here is a <tt class="docutils literal"><span class="pre">MAX</span></tt> example:</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries \
+  --limit -1 \
+  --output_column _id,n_likes \
+  --drilldown tag \
+  --drilldown_calc_types MAX \
+  --drilldown_calc_target n_likes \
+  --drilldown_output_columns _key,_max
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;The first post!&quot;,
+#         &quot;Welcome! This is my first post!&quot;,
+#         5,
+#         &quot;Hello&quot;
+#       ],
+#       [
+#         2,
+#         &quot;Groonga&quot;,
+#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+#         10,
+#         &quot;Groonga&quot;
+#       ],
+#       [
+#         3,
+#         &quot;Mroonga&quot;,
+#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         15,
+#         &quot;Groonga&quot;
+#       ],
+#       [
+#         4,
+#         &quot;Good-bye Senna&quot;,
+#         &quot;I migrated all Senna system!&quot;,
+#         3,
+#         &quot;Senna&quot;
+#       ],
+#       [
+#         5,
+#         &quot;Good-bye Tritonn&quot;,
+#         &quot;I also migrated all Tritonn system!&quot;,
+#         3,
+#         &quot;Senna&quot;
+#       ]
+#     ],
+#     [
+#       [
+#         3
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;_max&quot;,
+#           &quot;Int64&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Hello&quot;,
+#         5
+#       ],
+#       [
+#         &quot;Groonga&quot;,
+#         15
+#       ],
+#       [
+#         &quot;Senna&quot;,
+#         3
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">select</span></tt> command groups all records by <tt class="docutils literal"><span class="pre">tag</span></tt> column value,
+finding the maximum <tt class="docutils literal"><span class="pre">n_likes</span></tt> column value for each group and
+outputs pairs of grouped key and the maximum <tt class="docutils literal"><span class="pre">n_likes</span></tt> column value
+for the group. It uses <tt class="docutils literal"><span class="pre">_max</span></tt> <a class="reference internal" href="../columns/pseudo.html"><em>擬似カラム</em></a> to
+read the maximum <tt class="docutils literal"><span class="pre">n_likes</span></tt> column value.</p>
+<p>Here is a <tt class="docutils literal"><span class="pre">MIN</span></tt> example:</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries \
+  --limit -1 \
+  --output_column _id,n_likes \
+  --drilldown tag \
+  --drilldown_calc_types MIN \
+  --drilldown_calc_target n_likes \
+  --drilldown_output_columns _key,_min
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;The first post!&quot;,
+#         &quot;Welcome! This is my first post!&quot;,
+#         5,
+#         &quot;Hello&quot;
+#       ],
+#       [
+#         2,
+#         &quot;Groonga&quot;,
+#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+#         10,
+#         &quot;Groonga&quot;
+#       ],
+#       [
+#         3,
+#         &quot;Mroonga&quot;,
+#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         15,
+#         &quot;Groonga&quot;
+#       ],
+#       [
+#         4,
+#         &quot;Good-bye Senna&quot;,
+#         &quot;I migrated all Senna system!&quot;,
+#         3,
+#         &quot;Senna&quot;
+#       ],
+#       [
+#         5,
+#         &quot;Good-bye Tritonn&quot;,
+#         &quot;I also migrated all Tritonn system!&quot;,
+#         3,
+#         &quot;Senna&quot;
+#       ]
+#     ],
+#     [
+#       [
+#         3
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;_min&quot;,
+#           &quot;Int64&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Hello&quot;,
+#         5
+#       ],
+#       [
+#         &quot;Groonga&quot;,
+#         10
+#       ],
+#       [
+#         &quot;Senna&quot;,
+#         3
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">select</span></tt> command groups all records by <tt class="docutils literal"><span class="pre">tag</span></tt> column value,
+finding the minimum <tt class="docutils literal"><span class="pre">n_likes</span></tt> column value for each group and
+outputs pairs of grouped key and the minimum <tt class="docutils literal"><span class="pre">n_likes</span></tt> column value
+for the group. It uses <tt class="docutils literal"><span class="pre">_min</span></tt> <a class="reference internal" href="../columns/pseudo.html"><em>擬似カラム</em></a> to
+read the minimum <tt class="docutils literal"><span class="pre">n_likes</span></tt> column value.</p>
+<p>Here is a <tt class="docutils literal"><span class="pre">SUM</span></tt> example:</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries \
+  --limit -1 \
+  --output_column _id,n_likes \
+  --drilldown tag \
+  --drilldown_calc_types SUM \
+  --drilldown_calc_target n_likes \
+  --drilldown_output_columns _key,_sum
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;The first post!&quot;,
+#         &quot;Welcome! This is my first post!&quot;,
+#         5,
+#         &quot;Hello&quot;
+#       ],
+#       [
+#         2,
+#         &quot;Groonga&quot;,
+#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+#         10,
+#         &quot;Groonga&quot;
+#       ],
+#       [
+#         3,
+#         &quot;Mroonga&quot;,
+#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         15,
+#         &quot;Groonga&quot;
+#       ],
+#       [
+#         4,
+#         &quot;Good-bye Senna&quot;,
+#         &quot;I migrated all Senna system!&quot;,
+#         3,
+#         &quot;Senna&quot;
+#       ],
+#       [
+#         5,
+#         &quot;Good-bye Tritonn&quot;,
+#         &quot;I also migrated all Tritonn system!&quot;,
+#         3,
+#         &quot;Senna&quot;
+#       ]
+#     ],
+#     [
+#       [
+#         3
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;_sum&quot;,
+#           &quot;Int64&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Hello&quot;,
+#         5
+#       ],
+#       [
+#         &quot;Groonga&quot;,
+#         25
+#       ],
+#       [
+#         &quot;Senna&quot;,
+#         6
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">select</span></tt> command groups all records by <tt class="docutils literal"><span class="pre">tag</span></tt> column value,
+sums all <tt class="docutils literal"><span class="pre">n_likes</span></tt> column values for each group and outputs pairs
+of grouped key and the summed <tt class="docutils literal"><span class="pre">n_likes</span></tt> column values for the
+group. It uses <tt class="docutils literal"><span class="pre">_sum</span></tt> <a class="reference internal" href="../columns/pseudo.html"><em>擬似カラム</em></a> to read the
+summed <tt class="docutils literal"><span class="pre">n_likes</span></tt> column values.</p>
+<p>Here is a <tt class="docutils literal"><span class="pre">AVG</span></tt> example:</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries \
+  --limit -1 \
+  --output_column _id,n_likes \
+  --drilldown tag \
+  --drilldown_calc_types AVG \
+  --drilldown_calc_target n_likes \
+  --drilldown_output_columns _key,_avg
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;The first post!&quot;,
+#         &quot;Welcome! This is my first post!&quot;,
+#         5,
+#         &quot;Hello&quot;
+#       ],
+#       [
+#         2,
+#         &quot;Groonga&quot;,
+#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+#         10,
+#         &quot;Groonga&quot;
+#       ],
+#       [
+#         3,
+#         &quot;Mroonga&quot;,
+#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         15,
+#         &quot;Groonga&quot;
+#       ],
+#       [
+#         4,
+#         &quot;Good-bye Senna&quot;,
+#         &quot;I migrated all Senna system!&quot;,
+#         3,
+#         &quot;Senna&quot;
+#       ],
+#       [
+#         5,
+#         &quot;Good-bye Tritonn&quot;,
+#         &quot;I also migrated all Tritonn system!&quot;,
+#         3,
+#         &quot;Senna&quot;
+#       ]
+#     ],
+#     [
+#       [
+#         3
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;_avg&quot;,
+#           &quot;Float&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Hello&quot;,
+#         5.0
+#       ],
+#       [
+#         &quot;Groonga&quot;,
+#         12.5
+#       ],
+#       [
+#         &quot;Senna&quot;,
+#         3.0
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">select</span></tt> command groups all records by <tt class="docutils literal"><span class="pre">tag</span></tt> column value,
+averages all <tt class="docutils literal"><span class="pre">n_likes</span></tt> column values for each group and outputs
+pairs of grouped key and the averaged <tt class="docutils literal"><span class="pre">n_likes</span></tt> column values for
+the group. It uses <tt class="docutils literal"><span class="pre">_avg</span></tt> <a class="reference internal" href="../columns/pseudo.html"><em>擬似カラム</em></a> to read
+the averaged <tt class="docutils literal"><span class="pre">n_likes</span></tt> column values.</p>
+<p>Here is an example that uses all calculation types:</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries \
+  --limit -1 \
+  --output_column _id,n_likes \
+  --drilldown tag \
+  --drilldown_calc_types MAX|MIN|SUM|AVG \
+  --drilldown_calc_target n_likes \
+  --drilldown_output_columns _key,_nsubrecs,_max,_min,_sum,_avg
+# [
+#   [
+#     -22,
+#     1337566253.89858,
+#     0.000355720520019531,
+#     &quot;invalid table group calc type: &lt;|MIN|SUM|AVG&gt;&quot;,
+#     [
+#       [
+#         &quot;grn_parse_table_group_calc_types&quot;,
+#         &quot;proc.c&quot;,
+#         625
+#       ]
+#     ]
+#   ],
+#   []
+# ]
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">select</span></tt> command specifies multiple calculation types separated
+by &quot;<tt class="docutils literal"><span class="pre">|</span></tt>&quot; like <tt class="docutils literal"><span class="pre">MAX|MIN|SUM|AVG</span></tt>. You can use <tt class="docutils literal"><span class="pre">_nsubrecs</span></tt>
+<a class="reference internal" href="../columns/pseudo.html"><em>擬似カラム</em></a> in
+<a class="reference internal" href="#select-drilldown-output-columns"><em>drilldown_output_columns</em></a> without specifying <tt class="docutils literal"><span class="pre">COUNT</span></tt> in
+<tt class="docutils literal"><span class="pre">drilldown_calc_types</span></tt>. Because <tt class="docutils literal"><span class="pre">COUNT</span></tt> is always enabled.</p>
+<p>The default value of <tt class="docutils literal"><span class="pre">drilldown_calc_types</span></tt> is <tt class="docutils literal"><span class="pre">NONE</span></tt>. It means
+that only <tt class="docutils literal"><span class="pre">COUNT</span></tt> is enabled. Because <tt class="docutils literal"><span class="pre">NONE</span></tt> is just ignored and
+<tt class="docutils literal"><span class="pre">COUNT</span></tt> is always enabled.</p>
+</div>
+<div class="section" id="drilldown-calc-target">
+<span id="select-drilldown-calc-target"></span><h4>7.3.29.4.5.7. <tt class="docutils literal"><span class="pre">drilldown_calc_target</span></tt><a class="headerlink" href="#drilldown-calc-target" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>It specifies the target column for <a class="reference internal" href="#select-drilldown-calc-types"><em>drilldown_calc_types</em></a>.</p>
+<p>If you specify a calculation type that needs a target column such as
+<tt class="docutils literal"><span class="pre">MAX</span></tt> in <a class="reference internal" href="#select-drilldown-calc-types"><em>drilldown_calc_types</em></a> but you omit
+<tt class="docutils literal"><span class="pre">drilldown_calc_target</span></tt>, the calculation result is always <tt class="docutils literal"><span class="pre">0</span></tt>.</p>
+<p>You can specify only one column name like <tt class="docutils literal"><span class="pre">--drilldown_calc_target</span>
+<span class="pre">n_likes</span></tt>. You can't specify multiple column name like
+<tt class="docutils literal"><span class="pre">--drilldown_calc_target</span> <span class="pre">_key,n_likes</span></tt>.</p>
+<p>You can use referenced value from the target record by combining
+&quot;<tt class="docutils literal"><span class="pre">.</span></tt>&quot; like <tt class="docutils literal"><span class="pre">--drilldown_calc_target</span>
+<span class="pre">reference_column.nested_reference_column.value</span></tt>.</p>
+<p>See <a class="reference internal" href="#select-drilldown-calc-types"><em>drilldown_calc_types</em></a> to know how to use
+<tt class="docutils literal"><span class="pre">drilldown_calc_target</span></tt>.</p>
+<p>The default value of <tt class="docutils literal"><span class="pre">drilldown_calc_target</span></tt> is <tt class="docutils literal"><span class="pre">null</span></tt>. It means
+that no calculation target column is specified.</p>
+</div>
+</div>
+<div class="section" id="advanced-drilldown-related-parameters">
+<span id="select-advanced-drilldown-related-parameters"></span><h3>7.3.29.4.6. Advanced drilldown related parameters<a class="headerlink" href="#advanced-drilldown-related-parameters" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>You can get multiple drilldown results by specifying multiple group
+keys by <a class="reference internal" href="#select-drilldown"><em>drilldown</em></a>. But you need to use the same
+configuration for all drilldowns. For example,
+<a class="reference internal" href="#select-drilldown-output-columns"><em>drilldown_output_columns</em></a> is used by all drilldowns.</p>
+<p>You can use a configuration for each drilldown by the following
+parameters:</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">drilldown[${LABEL}].keys</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">drilldown[${LABEL}].sortby</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">drilldown[${LABEL}].output_columns</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">drilldown[${LABEL}].offset</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">drilldown[${LABEL}].limit</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">drilldown[${LABEL}].calc_types</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">drilldown[${LABEL}].calc_target</span></tt></li>
+</ul>
+</div></blockquote>
+<p><tt class="docutils literal"><span class="pre">${LABEL}</span></tt> is a variable. You can use the following characters for
+<tt class="docutils literal"><span class="pre">${LABEL}</span></tt>:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Alphabets</li>
+<li>Digits</li>
+<li><tt class="docutils literal"><span class="pre">.</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">_</span></tt></li>
+</ul>
+</div></blockquote>
+<p>Parameters that has the same <tt class="docutils literal"><span class="pre">${LABEL}</span></tt> value are grouped. Grouped
+parameters are used for one drilldown.</p>
+<p>For example, there are 2 groups for the following parameters:</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">--drilldown[label1].keys</span> <span class="pre">_key</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">--drilldown[label1].output_columns</span> <span class="pre">_nsubrecs</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">--drilldown[label2].keys</span> <span class="pre">tag</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">--drilldown[label2].output_columns</span> <span class="pre">_key,_nsubrecs</span></tt></li>
+</ul>
+</div></blockquote>
+<p><tt class="docutils literal"><span class="pre">drilldown[label1].keys</span></tt> and <tt class="docutils literal"><span class="pre">drilldown[label1].output_columns</span></tt>
+are grouped. <tt class="docutils literal"><span class="pre">drilldown[label2].keys</span></tt> and
+<tt class="docutils literal"><span class="pre">drilldown[label2].output_columns</span></tt> are also grouped.</p>
+<p>In <tt class="docutils literal"><span class="pre">label1</span></tt> group, <tt class="docutils literal"><span class="pre">_key</span></tt> is used for group key and <tt class="docutils literal"><span class="pre">_nsubrecs</span></tt>
+is used for output columns.</p>
+<p>In <tt class="docutils literal"><span class="pre">label2</span></tt> group, <tt class="docutils literal"><span class="pre">tag</span></tt> is used for group key and
+<tt class="docutils literal"><span class="pre">_key,_nsubrecs</span></tt> is used for output columns.</p>
+<p>See document for corresponding <tt class="docutils literal"><span class="pre">drilldown_XXX</span></tt> parameter to know how
+to use it for the following parameters:</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">drilldown[${LABEL}].sortby</span></tt>: <a class="reference internal" href="#select-drilldown-sortby"><em>drilldown_sortby</em></a></li>
+<li><tt class="docutils literal"><span class="pre">drilldown[${LABEL}].offset</span></tt>: <a class="reference internal" href="#select-drilldown-offset"><em>drilldown_offset</em></a></li>
+<li><tt class="docutils literal"><span class="pre">drilldown[${LABEL}].limit</span></tt>: <a class="reference internal" href="#select-drilldown-limit"><em>drilldown_limit</em></a></li>
+<li><tt class="docutils literal"><span class="pre">drilldown[${LABEL}].calc_types</span></tt>: <a class="reference internal" href="#select-drilldown-calc-types"><em>drilldown_calc_types</em></a></li>
+<li><tt class="docutils literal"><span class="pre">drilldown[${LABEL}].calc_target</span></tt>: <a class="reference internal" href="#select-drilldown-calc-target"><em>drilldown_calc_target</em></a></li>
+</ul>
+</div></blockquote>
+<p>The following parameters are needed more description:</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">drilldown[${LABEL}].keys</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">drilldown[${LABEL}].output_columns</span></tt></li>
+</ul>
+</div></blockquote>
+<p>Output format is different a bit. It's also needed more description.</p>
+<div class="section" id="drilldown-label-keys">
+<span id="select-drilldown-label-keys"></span><h4>7.3.29.4.6.1. <tt class="docutils literal"><span class="pre">drilldown[${LABEL}].keys</span></tt><a class="headerlink" href="#drilldown-label-keys" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p><a class="reference internal" href="#select-drilldown"><em>drilldown</em></a> can specify multiple keys for multiple
+drilldowns. But it can't specify multiple keys for one drilldown.</p>
+<p><tt class="docutils literal"><span class="pre">drilldown[${LABEL}].keys</span></tt> can't specify multiple keys for multiple
+drilldowns. But it can specify multiple keys for one drilldown.</p>
+<p>You can specify multiple keys separated by &quot;<tt class="docutils literal"><span class="pre">,</span></tt>&quot;.</p>
+<p>Here is an example to group by multiple keys, <tt class="docutils literal"><span class="pre">tag</span></tt> and <tt class="docutils literal"><span class="pre">n_likes</span></tt>
+column values:</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries \
+  --limit -1 \
+  --output_column tag,n_likes \
+  --drilldown[tag.n_likes].keys tag,n_likes \
+  --drilldown[tag.n_likes].output_columns _value.tag,_value.n_likes,_nsubrecs
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;The first post!&quot;,
+#         &quot;Welcome! This is my first post!&quot;,
+#         5,
+#         &quot;Hello&quot;
+#       ],
+#       [
+#         2,
+#         &quot;Groonga&quot;,
+#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+#         10,
+#         &quot;Groonga&quot;
+#       ],
+#       [
+#         3,
+#         &quot;Mroonga&quot;,
+#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         15,
+#         &quot;Groonga&quot;
+#       ],
+#       [
+#         4,
+#         &quot;Good-bye Senna&quot;,
+#         &quot;I migrated all Senna system!&quot;,
+#         3,
+#         &quot;Senna&quot;
+#       ],
+#       [
+#         5,
+#         &quot;Good-bye Tritonn&quot;,
+#         &quot;I also migrated all Tritonn system!&quot;,
+#         3,
+#         &quot;Senna&quot;
+#       ]
+#     ],
+#     {
+#       &quot;tag.n_likes&quot;: [
+#         [
+#           4
+#         ],
+#         [
+#           [
+#             &quot;tag&quot;,
+#             &quot;ShortText&quot;
+#           ],
+#           [
+#             &quot;n_likes&quot;,
+#             &quot;UInt32&quot;
+#           ],
+#           [
+#             &quot;_nsubrecs&quot;,
+#             &quot;Int32&quot;
+#           ]
+#         ],
+#         [
+#           &quot;Hello&quot;,
+#           5,
+#           1
+#         ],
+#         [
+#           &quot;Groonga&quot;,
+#           10,
+#           1
+#         ],
+#         [
+#           &quot;Groonga&quot;,
+#           15,
+#           1
+#         ],
+#         [
+#           &quot;Senna&quot;,
+#           3,
+#           2
+#         ]
+#       ]
+#     }
+#   ]
+# ]
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">tag.n_likes</span></tt> is used as the label for the drilldown parameters
+group. You can refer grouped keys by <tt class="docutils literal"><span class="pre">_value.${KEY_NAME}</span></tt> syntax in
+<a class="reference internal" href="#select-drilldown-label-output-columns"><em>drilldown[${LABEL}].output_columns</em></a>. <tt class="docutils literal"><span class="pre">${KEY_NAME}</span></tt> is a
+column name to be used by group key. <tt class="docutils literal"><span class="pre">tag</span></tt> and <tt class="docutils literal"><span class="pre">n_likes</span></tt> are
+<tt class="docutils literal"><span class="pre">${KEY_NAME}</span></tt> in this case.</p>
+<p>Note that you can't use <tt class="docutils literal"><span class="pre">_value.${KEY_NAME}</span></tt> syntax when you just
+specify one <tt class="docutils literal"><span class="pre">drilldown[${LABEL}].keys</span></tt> like <tt class="docutils literal"><span class="pre">--drilldown[tag].keys</span>
+<span class="pre">tag</span></tt>. You should use <tt class="docutils literal"><span class="pre">_key</span></tt> for the case. It's the same rule in
+<a class="reference internal" href="#select-drilldown-output-columns"><em>drilldown_output_columns</em></a>.</p>
+</div>
+<div class="section" id="drilldown-label-output-columns">
+<span id="select-drilldown-label-output-columns"></span><h4>7.3.29.4.6.2. <tt class="docutils literal"><span class="pre">drilldown[${LABEL}].output_columns</span></tt><a class="headerlink" href="#drilldown-label-output-columns" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>It's almost same as <a class="reference internal" href="#select-drilldown-output-columns"><em>drilldown_output_columns</em></a>. The
+difference between <a class="reference internal" href="#select-drilldown-output-columns"><em>drilldown_output_columns</em></a> and
+<tt class="docutils literal"><span class="pre">drilldown[${LABEL}].output_columns</span></tt> is how to refer group keys.</p>
+<p><a class="reference internal" href="#select-drilldown-output-columns"><em>drilldown_output_columns</em></a> uses <tt class="docutils literal"><span class="pre">_key</span></tt>
+<a class="reference internal" href="../columns/pseudo.html"><em>擬似カラム</em></a> to refer group
+key. <tt class="docutils literal"><span class="pre">drilldown[${LABEL}].output_columns</span></tt> also uses <tt class="docutils literal"><span class="pre">_key</span></tt>
+<a class="reference internal" href="../columns/pseudo.html"><em>擬似カラム</em></a> to refer group key when you specify
+only one group key by <a class="reference internal" href="#select-drilldown-label-keys"><em>drilldown[${LABEL}].keys</em></a>.</p>
+<p>Here is an example to refer single group key by <tt class="docutils literal"><span class="pre">_key</span></tt>
+<a class="reference internal" href="../columns/pseudo.html"><em>擬似カラム</em></a>:</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries \
+  --limit 0 \
+  --output_column _id \
+  --drilldown[tag.n_likes].keys tag,n_likes \
+  --drilldown[tag.n_likes].output_columns _value.tag,_value.n_likes
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ]
+#     ],
+#     {
+#       &quot;tag.n_likes&quot;: [
+#         [
+#           4
+#         ],
+#         [
+#           [
+#             &quot;tag&quot;,
+#             &quot;ShortText&quot;
+#           ],
+#           [
+#             &quot;n_likes&quot;,
+#             &quot;UInt32&quot;
+#           ]
+#         ],
+#         [
+#           &quot;Hello&quot;,
+#           5
+#         ],
+#         [
+#           &quot;Groonga&quot;,
+#           10
+#         ],
+#         [
+#           &quot;Groonga&quot;,
+#           15
+#         ],
+#         [
+#           &quot;Senna&quot;,
+#           3
+#         ]
+#       ]
+#     }
+#   ]
+# ]
+</pre></div>
+</div>
+<p>But you can't refer each group key by <tt class="docutils literal"><span class="pre">_key</span></tt>
+<a class="reference internal" href="../columns/pseudo.html"><em>擬似カラム</em></a> in
+<tt class="docutils literal"><span class="pre">drilldown[${LABEL}].output_columns</span></tt>. You need to use
+<tt class="docutils literal"><span class="pre">_value.${KEY_NAME}</span></tt> syntax. <tt class="docutils literal"><span class="pre">${KEY_NAME}</span></tt> is a column name to be
+used by group key in <a class="reference internal" href="#select-drilldown-label-keys"><em>drilldown[${LABEL}].keys</em></a>.</p>
+<p>Here is an example to refer each group key in multiple group keys by
+<tt class="docutils literal"><span class="pre">_value.${KEY_NAME}</span></tt> syntax:</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Entries \
+  --limit 0 \
+  --output_column _id \
+  --drilldown[tag.n_likes].keys tag,n_likes \
+  --drilldown[tag.n_likes].output_columns _value.tag,_value.n_likes
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ]
+#     ],
+#     {
+#       &quot;tag.n_likes&quot;: [
+#         [
+#           4
+#         ],
+#         [
+#           [
+#             &quot;tag&quot;,
+#             &quot;ShortText&quot;
+#           ],
+#           [
+#             &quot;n_likes&quot;,
+#             &quot;UInt32&quot;
+#           ]
+#         ],
+#         [
+#           &quot;Hello&quot;,
+#           5
+#         ],
+#         [
+#           &quot;Groonga&quot;,
+#           10
+#         ],
+#         [
+#           &quot;Groonga&quot;,
+#           15
+#         ],
+#         [
+#           &quot;Senna&quot;,
+#           3
+#         ]
+#       ]
+#     }
+#   ]
+# ]
+</pre></div>
+</div>
+<div class="admonition tip">
+<p class="first admonition-title">ちなみに</p>
+<p>Why <tt class="docutils literal"><span class="pre">_value.${KEY_NAME}</span></tt> syntax?</p>
+<p>It's implementation specific information.</p>
+<p><tt class="docutils literal"><span class="pre">_key</span></tt> is a vector value. The vector value is consists of all
+group keys. You can see byte sequence of the vector value by
+referring <tt class="docutils literal"><span class="pre">_key</span></tt> in <tt class="docutils literal"><span class="pre">drilldown[${LABEL}].output_columns</span></tt>.</p>
+<p>There is one grouped record in <tt class="docutils literal"><span class="pre">_value</span></tt> to refer each grouped
+values when you specify multiple group keys to
+<a class="reference internal" href="#select-drilldown-label-keys"><em>drilldown[${LABEL}].keys</em></a>. So you can refer each group key
+by <tt class="docutils literal"><span class="pre">_value.${KEY_NAME}</span></tt> syntax.</p>
+<p class="last">On the other hand, there is no grouped record in <tt class="docutils literal"><span class="pre">_value</span></tt> when
+you specify only one group key to
+<a class="reference internal" href="#select-drilldown-label-keys"><em>drilldown[${LABEL}].keys</em></a>. So you can't refer group key by
+<tt class="docutils literal"><span class="pre">_value.${KEY_NAME}</span></tt> syntax.</p>
+</div>
+</div>
+<div class="section" id="output-format-for-drilldown-label-style">
+<span id="select-drilldown-label-output-format"></span><h4>7.3.29.4.6.3. Output format for <tt class="docutils literal"><span class="pre">drilldown[${LABEL}]</span></tt> style<a class="headerlink" href="#output-format-for-drilldown-label-style" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>There is a difference in output format between <a class="reference internal" href="#select-drilldown"><em>drilldown</em></a>
+and <a class="reference internal" href="#select-drilldown-label-keys"><em>drilldown[${LABEL}].keys</em></a>. <a class="reference internal" href="#select-drilldown"><em>drilldown</em></a> uses
+array to output multiple drilldown results.
+<a class="reference internal" href="#select-drilldown-label-keys"><em>drilldown[${LABEL}].keys</em></a> uses pairs of label and drilldown
+result.</p>
+<p><a class="reference internal" href="#select-drilldown"><em>drilldown</em></a> uses the following output format:</p>
+<div class="highlight-none"><div class="highlight"><pre>[
+  HEADER,
+  [
+    SEARCH_RESULT,
+    DRILLDOWN_RESULT1,
+    DRILLDOWN_RESULT2,
+    ...
+  ]
+]
+</pre></div>
+</div>
+<p><a class="reference internal" href="#select-drilldown-label-keys"><em>drilldown[${LABEL}].keys</em></a> uses the following output format:</p>
+<div class="highlight-none"><div class="highlight"><pre>[
+  HEADER,
+  [
+    SEARCH_RESULT,
+    {
+      &quot;LABEL1&quot;: DRILLDOWN_RESULT1,
+      &quot;LABEL2&quot;: DRILLDOWN_RESULT2,
+      ...
+    }
+  ]
+]
+</pre></div>
+</div>
 </div>
 </div>
 <div class="section" id="cache-related-parameter">
-<h3>7.3.29.4.6. キャッシュ関連の引数<a class="headerlink" href="#cache-related-parameter" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<h3>7.3.29.4.7. キャッシュ関連の引数<a class="headerlink" href="#cache-related-parameter" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <div class="section" id="cache">
-<h4>7.3.29.4.6.1. <tt class="docutils literal"><span class="pre">cache</span></tt><a class="headerlink" href="#cache" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<h4>7.3.29.4.7.1. <tt class="docutils literal"><span class="pre">cache</span></tt><a class="headerlink" href="#cache" title="このヘッドラインへのパーマリンク">¶</a></h4>
 <p>TODO: write in English and add example.</p>
 <p>クエリキャッシュに関する動作を設定します。</p>
 <p><tt class="docutils literal"><span class="pre">no</span></tt></p>
@@ -1970,10 +4315,10 @@ select Entries --match_columns content --query &quot;popular&quot; --query_expan
 </div>
 </div>
 <div class="section" id="score-related-parameters">
-<h3>7.3.29.4.7. スコアー関連の引数<a class="headerlink" href="#score-related-parameters" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<h3>7.3.29.4.8. スコアー関連の引数<a class="headerlink" href="#score-related-parameters" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <p>スコアー関連のパラメーターは <tt class="docutils literal"><span class="pre">adjuster</span></tt> だけです。</p>
 <div class="section" id="adjuster">
-<span id="select-adjuster"></span><h4>7.3.29.4.7.1. <tt class="docutils literal"><span class="pre">adjuster</span></tt><a class="headerlink" href="#adjuster" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<span id="select-adjuster"></span><h4>7.3.29.4.8.1. <tt class="docutils literal"><span class="pre">adjuster</span></tt><a class="headerlink" href="#adjuster" title="このヘッドラインへのパーマリンク">¶</a></h4>
 <p>1つ以上のスコアー調整式（score adjust expression）を指定します。 <tt class="docutils literal"><span class="pre">adjuster</span></tt> は <tt class="docutils literal"><span class="pre">query</span></tt> または <tt class="docutils literal"><span class="pre">filter</span></tt> と一緒に使います。検索しないリクエストでは <tt class="docutils literal"><span class="pre">adjuster</span></tt> は動きません。</p>
 <p><tt class="docutils literal"><span class="pre">adjuster</span></tt> を使うと特定のレコードのスコアーを増やすことができます。重要なレコードに高いスコアーをつけるために <tt class="docutils literal"><span class="pre">adjuster</span></tt> を使えます。</p>
 <p>例えば、 <tt class="docutils literal"><span class="pre">groonga</span></tt> タグがついたレコードのスコアーを増やすために <tt class="docutils literal"><span class="pre">adjuster</span></tt> を使えます。</p>
@@ -2034,12 +4379,12 @@ select Entries --match_columns content --query &quot;popular&quot; --query_expan
 #       ],
 #       [
 #         &quot;Groonga&quot;,
-#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
+#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
 #         6
 #       ],
 #       [
 #         &quot;Mroonga&quot;,
-#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
 #         1
 #       ],
 #       [
@@ -2097,12 +4442,12 @@ select Entries --match_columns content --query &quot;popular&quot; --query_expan
 #       ],
 #       [
 #         &quot;Groonga&quot;,
-#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
+#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
 #         2
 #       ],
 #       [
 #         &quot;Mroonga&quot;,
-#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
 #         1
 #       ],
 #       [
@@ -2159,12 +4504,12 @@ select Entries --match_columns content --query &quot;popular&quot; --query_expan
 #       ],
 #       [
 #         &quot;Groonga&quot;,
-#         &quot;I started to use groonga. It&#39;s very fast!&quot;,
+#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
 #         9
 #       ],
 #       [
 #         &quot;Mroonga&quot;,
-#         &quot;I also started to use mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
 #         4
 #       ],
 #       [
@@ -2190,8 +4535,8 @@ select Entries --match_columns content --query &quot;popular&quot; --query_expan
 </div>
 </div>
 </div>
-<div class="section" id="id6">
-<h2>7.3.29.5. 返値<a class="headerlink" href="#id6" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<div class="section" id="id7">
+<h2>7.3.29.5. 返値<a class="headerlink" href="#id7" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <p>TODO: write in English and add example.</p>
 <p>以下のようなjson形式で値が返却されます。</p>
 <div class="highlight-none"><div class="highlight"><pre>[[リターンコード, 処理開始時間, 処理時間], [検索結果, ドリルダウン結果]]
@@ -2277,6 +4622,7 @@ select Entries --match_columns content --query &quot;popular&quot; --query_expan
 </li>
 <li><a class="reference internal" href="#paging">7.3.29.3.3. ページング</a></li>
 <li><a class="reference internal" href="#the-total-number-of-records">7.3.29.3.4. 全レコード数</a></li>
+<li><a class="reference internal" href="#drilldown">7.3.29.3.5. ドリルダウン</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#parameters">7.3.29.4. 引数</a><ul>
@@ -2305,25 +4651,33 @@ select Entries --match_columns content --query &quot;popular&quot; --query_expan
 <li><a class="reference internal" href="#scorer">7.3.29.4.4.5. <tt class="docutils literal"><span class="pre">scorer</span></tt></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#facet-related-parameters">7.3.29.4.5. ファセット関連の引数</a><ul>
-<li><a class="reference internal" href="#drilldown">7.3.29.4.5.1. <tt class="docutils literal"><span class="pre">drilldown</span></tt></a></li>
+<li><a class="reference internal" href="#drilldown-related-parameters">7.3.29.4.5. ドリルダウン関連の引数</a><ul>
+<li><a class="reference internal" href="#select-drilldown">7.3.29.4.5.1. <tt class="docutils literal"><span class="pre">drilldown</span></tt></a></li>
 <li><a class="reference internal" href="#drilldown-sortby">7.3.29.4.5.2. <tt class="docutils literal"><span class="pre">drilldown_sortby</span></tt></a></li>
 <li><a class="reference internal" href="#drilldown-output-columns">7.3.29.4.5.3. <tt class="docutils literal"><span class="pre">drilldown_output_columns</span></tt></a></li>
 <li><a class="reference internal" href="#drilldown-offset">7.3.29.4.5.4. <tt class="docutils literal"><span class="pre">drilldown_offset</span></tt></a></li>
 <li><a class="reference internal" href="#drilldown-limit">7.3.29.4.5.5. <tt class="docutils literal"><span class="pre">drilldown_limit</span></tt></a></li>
+<li><a class="reference internal" href="#drilldown-calc-types">7.3.29.4.5.6. <tt class="docutils literal"><span class="pre">drilldown_calc_types</span></tt></a></li>
+<li><a class="reference internal" href="#drilldown-calc-target">7.3.29.4.5.7. <tt class="docutils literal"><span class="pre">drilldown_calc_target</span></tt></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#cache-related-parameter">7.3.29.4.6. キャッシュ関連の引数</a><ul>
-<li><a class="reference internal" href="#cache">7.3.29.4.6.1. <tt class="docutils literal"><span class="pre">cache</span></tt></a></li>
+<li><a class="reference internal" href="#advanced-drilldown-related-parameters">7.3.29.4.6. Advanced drilldown related parameters</a><ul>
+<li><a class="reference internal" href="#drilldown-label-keys">7.3.29.4.6.1. <tt class="docutils literal"><span class="pre">drilldown[${LABEL}].keys</span></tt></a></li>
+<li><a class="reference internal" href="#drilldown-label-output-columns">7.3.29.4.6.2. <tt class="docutils literal"><span class="pre">drilldown[${LABEL}].output_columns</span></tt></a></li>
+<li><a class="reference internal" href="#output-format-for-drilldown-label-style">7.3.29.4.6.3. Output format for <tt class="docutils literal"><span class="pre">drilldown[${LABEL}]</span></tt> style</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#score-related-parameters">7.3.29.4.7. スコアー関連の引数</a><ul>
-<li><a class="reference internal" href="#adjuster">7.3.29.4.7.1. <tt class="docutils literal"><span class="pre">adjuster</span></tt></a></li>
+<li><a class="reference internal" href="#cache-related-parameter">7.3.29.4.7. キャッシュ関連の引数</a><ul>
+<li><a class="reference internal" href="#cache">7.3.29.4.7.1. <tt class="docutils literal"><span class="pre">cache</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#score-related-parameters">7.3.29.4.8. スコアー関連の引数</a><ul>
+<li><a class="reference internal" href="#adjuster">7.3.29.4.8.1. <tt class="docutils literal"><span class="pre">adjuster</span></tt></a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id6">7.3.29.5. 返値</a></li>
+<li><a class="reference internal" href="#id7">7.3.29.5. 返値</a></li>
 <li><a class="reference internal" href="#see-also">7.3.29.6. 参考</a></li>
 </ul>
 </li>

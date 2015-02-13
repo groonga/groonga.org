@@ -37,7 +37,9 @@
     <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
   </head>
 
-  <body role="document">
+    <body>
+    <div id="fb-root"></div>
+
 <div class="header">
   <h1 class="title">
     <a id="top-link" href="../../">
@@ -61,7 +63,7 @@
 </div>
   
 
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -81,7 +83,7 @@
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body" role="main">
+          <div class="body">
             
   <div class="section" id="tuning">
 <h1>7.17. Tuning<a class="headerlink" href="#tuning" title="Permalink to this headline">¶</a></h1>
@@ -147,13 +149,13 @@ be occurred. It is an example case that you dump your database.</p>
 <div class="section" id="nofile">
 <span id="tuning-linux-nofile"></span><h3>7.17.3.1. nofile<a class="headerlink" href="#nofile" title="Permalink to this headline">¶</a></h3>
 <p>You can relax the <a class="reference internal" href="#tuning-max-n-open-files"><em>The max number of open files per process</em></a> parameter by creating
-a configuration file <code class="docutils literal"><span class="pre">/etc/security/limits.d/groonga.conf</span></code> that has
+a configuration file <tt class="docutils literal"><span class="pre">/etc/security/limits.d/groonga.conf</span></tt> that has
 the following content:</p>
 <div class="highlight-none"><div class="highlight"><pre>${USER} soft nofile ${MAX_VALUE}
 ${USER} hard nofile ${MAX_VALUE}
 </pre></div>
 </div>
-<p>If you run <code class="docutils literal"><span class="pre">groonga</span></code> process by <code class="docutils literal"><span class="pre">groonga</span></code> user and your groonga
+<p>If you run <tt class="docutils literal"><span class="pre">groonga</span></tt> process by <tt class="docutils literal"><span class="pre">groonga</span></tt> user and your groonga
 process needs to open less than 10000 files, use the following
 configuration:</p>
 <div class="highlight-none"><div class="highlight"><pre>groonga soft nofile 10000
@@ -167,14 +169,14 @@ or re-login as your groonga user.</p>
 <span id="tuning-linux-overcommit-memory"></span><h3>7.17.3.2. vm.overcommit_memory<a class="headerlink" href="#vm-overcommit-memory" title="Permalink to this headline">¶</a></h3>
 <p>This is <a class="reference internal" href="#tuning-memory-usage"><em>Memory usage</em></a> related parameter. You can handle a
 database that is larger than your memory and swap by setting
-<code class="docutils literal"><span class="pre">vm.overcommit_memory</span></code> kernel parameter to 1. 1 means that Groonga
+<tt class="docutils literal"><span class="pre">vm.overcommit_memory</span></tt> kernel parameter to 1. 1 means that Groonga
 can always map database files onto memory. It is no problem until
 groonga touch mapped database files that their size is larger than
 memory and swap. Groonga recommends the configuration.</p>
 <p>See <a class="reference external" href="https://www.kernel.org/doc/Documentation/vm/overcommit-accounting">Linux kernel documentation about overcommit</a>
-about <code class="docutils literal"><span class="pre">vm.overcommit_memory</span></code> parameter details.</p>
+about <tt class="docutils literal"><span class="pre">vm.overcommit_memory</span></tt> parameter details.</p>
 <p>You can set the configuration by putting a configuration file
-<code class="docutils literal"><span class="pre">/etc/sysctl.d/groonga.conf</span></code> that has the following content:</p>
+<tt class="docutils literal"><span class="pre">/etc/sysctl.d/groonga.conf</span></tt> that has the following content:</p>
 <div class="highlight-none"><div class="highlight"><pre>vm.overcommit_memory = 1
 </pre></div>
 </div>
@@ -187,21 +189,21 @@ following command:</p>
 <div class="section" id="vm-max-map-count">
 <span id="tuning-linux-max-map-count"></span><h3>7.17.3.3. vm.max_map_count<a class="headerlink" href="#vm-max-map-count" title="Permalink to this headline">¶</a></h3>
 <p>This is <a class="reference internal" href="#tuning-memory-usage"><em>Memory usage</em></a> related parameter. You can handle a
-16GiB or more larger size database by increasing <code class="docutils literal"><span class="pre">vm.max_map_count</span></code>
+16GiB or more larger size database by increasing <tt class="docutils literal"><span class="pre">vm.max_map_count</span></tt>
 kernel parameter. The parameter limits the max number of memory maps.</p>
 <p>The default value of the kernel parameter may be 65530 or 65536.
 Groonga maps 256KiB memory chunk at one time. If a database is larger
-than 16GiB, groonga reaches the limitation. (<code class="docutils literal"><span class="pre">256KiB</span> <span class="pre">*</span> <span class="pre">65536</span> <span class="pre">=</span> <span class="pre">16GiB</span></code>)</p>
+than 16GiB, groonga reaches the limitation. (<tt class="docutils literal"><span class="pre">256KiB</span> <span class="pre">*</span> <span class="pre">65536</span> <span class="pre">=</span> <span class="pre">16GiB</span></tt>)</p>
 <p>You needs to increase the value of the kernel parameter to handle
 16GiB or more larger size database. For example, you can handle almost
-32GiB size database by <code class="docutils literal"><span class="pre">65536</span> <span class="pre">*</span> <span class="pre">2</span> <span class="pre">=</span> <span class="pre">131072</span></code>. You can set the
+32GiB size database by <tt class="docutils literal"><span class="pre">65536</span> <span class="pre">*</span> <span class="pre">2</span> <span class="pre">=</span> <span class="pre">131072</span></tt>. You can set the
 configuration by putting a configuration file
-<code class="docutils literal"><span class="pre">/etc/sysctl.d/groonga.conf</span></code> that has the following content:</p>
+<tt class="docutils literal"><span class="pre">/etc/sysctl.d/groonga.conf</span></tt> that has the following content:</p>
 <div class="highlight-none"><div class="highlight"><pre>vm.max_map_count = 131072
 </pre></div>
 </div>
 <p>Note that your real confiugration file will be the following because
-you already have <code class="docutils literal"><span class="pre">vm.overcommit_memory</span></code> configuration:</p>
+you already have <tt class="docutils literal"><span class="pre">vm.overcommit_memory</span></tt> configuration:</p>
 <div class="highlight-none"><div class="highlight"><pre>vm.overcommit_memory = 1
 vm.max_map_count = 131072
 </pre></div>
@@ -227,7 +229,7 @@ following command:</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h3><a href="../index.html">Table Of Contents</a></h3>
   <ul>
@@ -258,14 +260,12 @@ following command:</p>
   <h4>Next topic</h4>
   <p class="topless"><a href="api.html"
                         title="next chapter">7.18. API</a></p>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../sources/reference/tuning.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../sources/reference/tuning.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
       <input type="text" name="q" />
@@ -282,7 +282,7 @@ following command:</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -298,7 +298,7 @@ following command:</p>
           <li><a href="../reference.html" >7. Reference manual</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer" role="contentinfo">
+    <div class="footer">
         &copy; Copyright 2009-2015, Brazil, Inc.
     </div>
       <script src="http://connect.facebook.net/en_US/all.js"></script>

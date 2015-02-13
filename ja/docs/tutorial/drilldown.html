@@ -38,7 +38,9 @@
     <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
   </head>
 
-  <body role="document">
+    <body>
+    <div id="fb-root"></div>
+
 <div class="header">
   <h1 class="title">
     <a id="top-link" href="../../">
@@ -62,7 +64,7 @@
 </div>
   
 
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related">
       <h3>ナビゲーション</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -82,18 +84,18 @@
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body" role="main">
+          <div class="body">
             
   <div class="section" id="drilldown">
 <h1>4.5. ドリルダウン<a class="headerlink" href="#drilldown" title="このヘッドラインへのパーマリンク">¶</a></h1>
 <p>これまでのセクションで検索方法と検索結果をどのようにソートするかを学びました。思うがままに検索できるようになりましたね。それでは、次のことをするにはどうすればよいでしょか。まず、あるカラムに注目します。そして、そのカラムの値が同じレコードを集め、それぞれの値毎に集まったレコードの数を数えます。</p>
 <p>素朴な実現方法は、カラムのそれぞれの値で検索する方法です。結果として、すべてのカラムの値についてレコード数を求めることができます。シンプルな方法ですが、たくさんのレコードがある場合には現実的ではありません。</p>
-<p>SQLに慣れている人は、「GroongaにはSQLでいう <code class="docutils literal"><span class="pre">GROUP</span> <span class="pre">BY</span></code> 相当の機能はないの？」と思うでしょう。</p>
-<p>もちろん、Groongaはそのような機能を提供しています。それが <code class="docutils literal"><span class="pre">drilldown</span></code> と呼んでいる機能です。</p>
-<p><code class="docutils literal"><span class="pre">drilldown</span></code> はカラムの値ごとにレコード数を数える機能を提供します。値ごとに別々のクエリーになるのではなく、1回のクエリーですべての値に対してレコード数を数えます。</p>
+<p>SQLに慣れている人は、「GroongaにはSQLでいう <tt class="docutils literal"><span class="pre">GROUP</span> <span class="pre">BY</span></tt> 相当の機能はないの？」と思うでしょう。</p>
+<p>もちろん、Groongaはそのような機能を提供しています。それが <tt class="docutils literal"><span class="pre">drilldown</span></tt> と呼んでいる機能です。</p>
+<p><tt class="docutils literal"><span class="pre">drilldown</span></tt> はカラムの値ごとにレコード数を数える機能を提供します。値ごとに別々のクエリーになるのではなく、1回のクエリーですべての値に対してレコード数を数えます。</p>
 <p>この機能を説明するために次のケースを考えます。ドメインで分類し、ドメインが属している国ごとにグループ化する、というケースです。</p>
 <p>この機能を使った具体的な例を示します。</p>
-<p>この例では、 <code class="docutils literal"><span class="pre">Site</span></code> テーブルに2つのカラムを追加しています。 <code class="docutils literal"><span class="pre">domain</span></code> カラムはTLD(トップレベルドメイン)に使います。 <code class="docutils literal"><span class="pre">country</span></code> カラムは国名に使います。これらのカラムの型はドメイン名を主キーとする <code class="docutils literal"><span class="pre">SiteDomain</span></code> テーブルと国名を主キーとする <code class="docutils literal"><span class="pre">SiteCountry</span></code> テーブルです。</p>
+<p>この例では、 <tt class="docutils literal"><span class="pre">Site</span></tt> テーブルに2つのカラムを追加しています。 <tt class="docutils literal"><span class="pre">domain</span></tt> カラムはTLD(トップレベルドメイン)に使います。 <tt class="docutils literal"><span class="pre">country</span></tt> カラムは国名に使います。これらのカラムの型はドメイン名を主キーとする <tt class="docutils literal"><span class="pre">SiteDomain</span></tt> テーブルと国名を主キーとする <tt class="docutils literal"><span class="pre">SiteCountry</span></tt> テーブルです。</p>
 <p>実行例:</p>
 <div class="highlight-none"><div class="highlight"><pre>table_create --name SiteDomain --flags TABLE_HASH_KEY --key_type ShortText
 # [[0, 1337566253.89858, 0.000355720520019531], true]
@@ -118,7 +120,7 @@ load --table Site
 # [[0, 1337566253.89858, 0.000355720520019531], 9]
 </pre></div>
 </div>
-<p><code class="docutils literal"><span class="pre">domain</span></code> カラムでドリルダウンする例を示します。 3つの値が <code class="docutils literal"><span class="pre">domain</span></code> カラムでは使われています。&quot;.org&quot;、&quot;.net&quot;そして&quot;.com&quot;です。</p>
+<p><tt class="docutils literal"><span class="pre">domain</span></tt> カラムでドリルダウンする例を示します。 3つの値が <tt class="docutils literal"><span class="pre">domain</span></tt> カラムでは使われています。&quot;.org&quot;、&quot;.net&quot;そして&quot;.com&quot;です。</p>
 <p>実行例:</p>
 <div class="highlight-none"><div class="highlight"><pre>select --table Site --limit 0 --drilldown domain
 # [
@@ -200,7 +202,7 @@ load --table Site
 </div>
 <p>上記のクエリの集計結果です。</p>
 <table border="1" class="docutils" id="domain">
-<caption><span class="caption-text"><code class="docutils literal"><span class="pre">domain</span></code> カラムによるドリルダウン</span><a class="headerlink" href="#domain" title="Permalink to this table">¶</a></caption>
+<caption><tt class="docutils literal"><span class="pre">domain</span></tt> カラムによるドリルダウン</caption>
 <colgroup>
 <col width="33%" />
 <col width="33%" />
@@ -245,9 +247,9 @@ load --table Site
 </tr>
 </tbody>
 </table>
-<p>ドリルダウン結果は <code class="docutils literal"><span class="pre">_nsubrecs</span></code> カラムの値として返ります。この場合は、<code class="docutils literal"><span class="pre">Site</span></code> テーブルは &quot;.org&quot;、&quot;.net&quot;、&quot;.com&quot;ドメインでグループ化されています。 <code class="docutils literal"><span class="pre">_nsubrecs</span></code> はグループ化されたドメインが3つのレコードをそれぞれもつことを意味します。</p>
-<p>テーブル型を持つカラムに対してドリルダウンを行った場合、参照先のテーブルに存在するカラム値を取得することもできます。ドリルダウンを行ったテーブルには、 <code class="docutils literal"><span class="pre">_nsubrecs</span></code> という仮想的なカラムが追加されます。このカラムには、グループ化されたレコード数が入ります。</p>
-<p>では、参照されているテーブルの詳細を調べてみましょう。 <code class="docutils literal"><span class="pre">Site</span></code> テーブルは <code class="docutils literal"><span class="pre">SiteDomain</span></code> テーブルを <code class="docutils literal"><span class="pre">domain</span></code> カラムの型として使っています。 <code class="docutils literal"><span class="pre">--drilldown_output_columns</span></code> を参照されているカラムの詳細を知るのに使えます。</p>
+<p>ドリルダウン結果は <tt class="docutils literal"><span class="pre">_nsubrecs</span></tt> カラムの値として返ります。この場合は、<tt class="docutils literal"><span class="pre">Site</span></tt> テーブルは &quot;.org&quot;、&quot;.net&quot;、&quot;.com&quot;ドメインでグループ化されています。 <tt class="docutils literal"><span class="pre">_nsubrecs</span></tt> はグループ化されたドメインが3つのレコードをそれぞれもつことを意味します。</p>
+<p>テーブル型を持つカラムに対してドリルダウンを行った場合、参照先のテーブルに存在するカラム値を取得することもできます。ドリルダウンを行ったテーブルには、 <tt class="docutils literal"><span class="pre">_nsubrecs</span></tt> という仮想的なカラムが追加されます。このカラムには、グループ化されたレコード数が入ります。</p>
+<p>では、参照されているテーブルの詳細を調べてみましょう。 <tt class="docutils literal"><span class="pre">Site</span></tt> テーブルは <tt class="docutils literal"><span class="pre">SiteDomain</span></tt> テーブルを <tt class="docutils literal"><span class="pre">domain</span></tt> カラムの型として使っています。 <tt class="docutils literal"><span class="pre">--drilldown_output_columns</span></tt> を参照されているカラムの詳細を知るのに使えます。</p>
 <p>実行例:</p>
 <div class="highlight-none"><div class="highlight"><pre>select --table Site --limit 0 --drilldown domain --drilldown_output_columns _id,_key,_nsubrecs
 # [
@@ -334,7 +336,7 @@ load --table Site
 # ]
 </pre></div>
 </div>
-<p>これでグループ化されたドメインの詳細がわかります。 <code class="docutils literal"><span class="pre">domain</span></code> の値が&quot;.org&quot;であるレコードに対して <code class="docutils literal"><span class="pre">country</span></code> カラムを使ってドリルダウンしてみましょう。</p>
+<p>これでグループ化されたドメインの詳細がわかります。 <tt class="docutils literal"><span class="pre">domain</span></tt> の値が&quot;.org&quot;であるレコードに対して <tt class="docutils literal"><span class="pre">country</span></tt> カラムを使ってドリルダウンしてみましょう。</p>
 <p>実行例:</p>
 <div class="highlight-none"><div class="highlight"><pre>select --table Site --limit 0 --filter &quot;domain._id == 1&quot; --drilldown country
 # [
@@ -416,7 +418,7 @@ load --table Site
 </div>
 <div class="section" id="drilldown-with-multiple-column">
 <h2>4.5.1. 複数のカラムでドリルダウン<a class="headerlink" href="#drilldown-with-multiple-column" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>ドリルダウンでは複数のカラムをサポートしています。 <code class="docutils literal"><span class="pre">drilldown</span></code> パラメータの引数にカンマ区切りの値を指定します。すると一度にまとめてドリルダウン結果を取得できます。</p>
+<p>ドリルダウンでは複数のカラムをサポートしています。 <tt class="docutils literal"><span class="pre">drilldown</span></tt> パラメータの引数にカンマ区切りの値を指定します。すると一度にまとめてドリルダウン結果を取得できます。</p>
 <p>実行例:</p>
 <div class="highlight-none"><div class="highlight"><pre>select --table Site --limit 0 --drilldown domain,country
 # [
@@ -534,7 +536,7 @@ load --table Site
 </div>
 <div class="section" id="sorting-drildown-results">
 <h2>4.5.2. ドリルダウン結果をソートする<a class="headerlink" href="#sorting-drildown-results" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>ドリルダウン結果をソートしたい場合には <code class="docutils literal"><span class="pre">--drilldown_sortby</span></code> を使います。指定した <code class="docutils literal"><span class="pre">_nsubrecs</span></code> カラムを昇順でソートします。</p>
+<p>ドリルダウン結果をソートしたい場合には <tt class="docutils literal"><span class="pre">--drilldown_sortby</span></tt> を使います。指定した <tt class="docutils literal"><span class="pre">_nsubrecs</span></tt> カラムを昇順でソートします。</p>
 <p>実行例:</p>
 <div class="highlight-none"><div class="highlight"><pre>select --table Site --limit 0 --drilldown country --drilldown_sortby _nsubrecs
 # [
@@ -625,7 +627,7 @@ load --table Site
 </div>
 <div class="section" id="limits-drildown-results">
 <h2>4.5.3. ドリルダウン結果の制限<a class="headerlink" href="#limits-drildown-results" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>ドリルダウン結果はデフォルト10件に制限されています。 <code class="docutils literal"><span class="pre">drilldown_limit</span></code> と <code class="docutils literal"><span class="pre">drilldown_offset</span></code> パラメータをドリルダウン結果をカスタマイズするのに使います。</p>
+<p>ドリルダウン結果はデフォルト10件に制限されています。 <tt class="docutils literal"><span class="pre">drilldown_limit</span></tt> と <tt class="docutils literal"><span class="pre">drilldown_offset</span></tt> パラメータをドリルダウン結果をカスタマイズするのに使います。</p>
 <p>実行例:</p>
 <div class="highlight-none"><div class="highlight"><pre>select --table Site --limit 0 --drilldown country --drilldown_sortby _nsubrecs --drilldown_limit 2 --drilldown_offset 2
 # [
@@ -709,7 +711,7 @@ load --table Site
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h3><a href="../index.html">目次</a></h3>
   <ul>
@@ -727,14 +729,12 @@ load --table Site
   <h4>次のトピックへ</h4>
   <p class="topless"><a href="index.html"
                         title="次の章へ">4.6. タグ検索・参照関係の逆引き</a></p>
-  <div role="note" aria-label="source link">
-    <h3>このページ</h3>
-    <ul class="this-page-menu">
-      <li><a href="../sources/tutorial/drilldown.txt"
-            rel="nofollow">ソースコードを表示（英語）</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../sources/tutorial/drilldown.txt"
+           rel="nofollow">ソースコードを表示（英語）</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
   <h3>クイック検索</h3>
     <form class="search" action="../search.html" method="get">
       <input type="text" name="q" />
@@ -751,7 +751,7 @@ load --table Site
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related">
       <h3>ナビゲーション</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -767,7 +767,7 @@ load --table Site
           <li><a href="../tutorial.html" >4. チュートリアル</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer" role="contentinfo">
+    <div class="footer">
         &copy; Copyright 2009-2015, Brazil, Inc.
     </div>
       <script src="http://connect.facebook.net/ja_JP/all.js"></script>

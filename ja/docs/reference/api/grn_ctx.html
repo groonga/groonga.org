@@ -313,6 +313,58 @@ grn_rc <tt class="descname">grn_ctx_use</tt><big>(</big><a class="reference inte
 </dd></dl>
 
 <dl class="function">
+<dt id="c.grn_ctx_get_all_tables">
+grn_rc <tt class="descname">grn_ctx_get_all_tables</tt><big>(</big><a class="reference internal" href="#c.grn_ctx" title="grn_ctx">grn_ctx</a><em>&nbsp;*ctx</em>, <a class="reference internal" href="grn_obj.html#c.grn_obj" title="grn_obj">grn_obj</a><em>&nbsp;*tables_buffer</em><big>)</big><a class="headerlink" href="#c.grn_ctx_get_all_tables" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>It pushes all tables in the database of <tt class="docutils literal"><span class="pre">ctx</span></tt> into
+<tt class="docutils literal"><span class="pre">tables_buffer</span></tt>. <tt class="docutils literal"><span class="pre">tables_buffer</span></tt> should be initialized as
+<tt class="docutils literal"><span class="pre">GRN_PVECTOR</span></tt>. You can use <tt class="docutils literal"><span class="pre">GRN_PTR_INIT()</span></tt> with
+<tt class="docutils literal"><span class="pre">GRN_OBJ_VECTOR</span></tt> flags to initialize <tt class="docutils literal"><span class="pre">tables_buffer</span></tt>.</p>
+<p>以下は例です。</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="n">grn_rc</span> <span class="n">rc</span><span class="p">;</span>
+<span class="n">grn_obj</span> <span class="n">tables</span><span class="p">;</span>
+<span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
+<span class="kt">int</span> <span class="n">n_tables</span><span class="p">;</span>
+
+<span class="n">GRN_PTR_INIT</span><span class="p">(</span><span class="o">&amp;</span><span class="n">tables</span><span class="p">,</span> <span class="n">GRN_OBJ_VECTOR</span><span class="p">,</span> <span class="n">GRN_ID_NIL</span><span class="p">);</span>
+<span class="n">rc</span> <span class="o">=</span> <span class="n">grn_ctx_get_all_tables</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">tables</span><span class="p">);</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">rc</span> <span class="o">!=</span> <span class="n">GRN_SUCCESS</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">GRN_OBJ_FIN</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">tables</span><span class="p">);</span>
+  <span class="cm">/* Handle error. */</span>
+  <span class="k">return</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">n_tables</span> <span class="o">=</span> <span class="n">GRN_BULK_VSIZE</span><span class="p">(</span><span class="o">&amp;</span><span class="n">tables</span><span class="p">)</span> <span class="o">/</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">grn_obj</span> <span class="o">*</span><span class="p">);</span>
+<span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n_tables</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">grn_obj</span> <span class="o">*</span><span class="n">table</span> <span class="o">=</span> <span class="n">GRN_PTR_VALUE_AT</span><span class="p">(</span><span class="o">&amp;</span><span class="n">tables</span><span class="p">,</span> <span class="n">i</span><span class="p">);</span>
+  <span class="cm">/* Use table. */</span>
+<span class="p">}</span>
+
+<span class="cm">/* Free resources. */</span>
+<span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n_tables</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">grn_obj</span> <span class="o">*</span><span class="n">table</span> <span class="o">=</span> <span class="n">GRN_PTR_VALUE_AT</span><span class="p">(</span><span class="o">&amp;</span><span class="n">tables</span><span class="p">,</span> <span class="n">i</span><span class="p">);</span>
+  <span class="n">grn_obj_unlink</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">table</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="n">GRN_OBJ_FIN</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">tables</span><span class="p">);</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">パラメタ:</th><td class="field-body"><ul class="first simple">
+<li><strong>ctx</strong> -- その時点のコンテキスト。</li>
+<li><strong>table_buffer</strong> -- The output buffer to store tables.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">戻り値:</th><td class="field-body"><p class="first last">成功時は <tt class="docutils literal"><span class="pre">GRN_SUCCESS</span></tt> 、エラー時は <tt class="docutils literal"><span class="pre">GRN_SUCCESS</span></tt> 以外。</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="c.grn_ctx_get_output_type">
 <a class="reference internal" href="grn_content_type.html#c.grn_content_type" title="grn_content_type">grn_content_type</a> <tt class="descname">grn_ctx_get_output_type</tt><big>(</big><a class="reference internal" href="#c.grn_ctx" title="grn_ctx">grn_ctx</a><em>&nbsp;*ctx</em><big>)</big><a class="headerlink" href="#c.grn_ctx_get_output_type" title="この定義へのパーマリンク">¶</a></dt>
 <dd><p>コンテキストの出力形式を取得します。</p>

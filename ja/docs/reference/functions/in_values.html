@@ -91,20 +91,109 @@
 <h1>7.12.9. in_values<a class="headerlink" href="#in-values" title="このヘッドラインへのパーマリンク">¶</a></h1>
 <div class="section" id="summary">
 <h2>7.12.9.1. 概要<a class="headerlink" href="#summary" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>TODO</p>
+<div class="versionadded">
+<p><span class="versionmodified">バージョン 4.0.7 で追加.</span></p>
+</div>
+<p><tt class="docutils literal"><span class="pre">in_values</span></tt> は 複数の <tt class="docutils literal"><span class="pre">OR</span></tt> や <tt class="docutils literal"><span class="pre">==</span></tt> を使っているクエリを簡略化できます。複数の <tt class="docutils literal"><span class="pre">OR</span></tt> や <tt class="docutils literal"><span class="pre">==</span></tt> を使うよりは <tt class="docutils literal"><span class="pre">in_values</span></tt> を使うのがパフォーマンスの観点からおすすめです。</p>
 </div>
 <div class="section" id="syntax">
 <h2>7.12.9.2. 構文<a class="headerlink" href="#syntax" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>TODO</p>
+<p><tt class="docutils literal"><span class="pre">query</span></tt> は2以上の引数 -  <tt class="docutils literal"><span class="pre">target_value</span></tt> と 複数の <tt class="docutils literal"><span class="pre">value</span></tt> が必要です。</p>
+<div class="highlight-none"><div class="highlight"><pre>in_values(target_value, value1, ..., valueN)
+</pre></div>
+</div>
 </div>
 <div class="section" id="usage">
 <h2>7.12.9.3. 使い方<a class="headerlink" href="#usage" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>使い方を示すために使うスキーマ定義とサンプルデータは以下の通りです。</p>
+<p>サンプルスキーマ:</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Tags TABLE_PAT_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create Memos TABLE_HASH_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Memos tag COLUMN_SCALAR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Tags memos_tag COLUMN_INDEX Memos tag
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>サンプルデータ:</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>load --table Memos
+[
+{&quot;_key&quot;: &quot;Groonga is fast&quot;,          &quot;tag&quot;: &quot;groonga&quot;},
+{&quot;_key&quot;: &quot;Mroonga is fast&quot;,          &quot;tag&quot;: &quot;mroonga&quot;},
+{&quot;_key&quot;: &quot;Rroonga is fast&quot;,          &quot;tag&quot;: &quot;rroonga&quot;},
+{&quot;_key&quot;: &quot;Droonga is fast&quot;,          &quot;tag&quot;: &quot;droonga&quot;},
+{&quot;_key&quot;: &quot;Groonga is a HTTP server&quot;, &quot;tag&quot;: &quot;groonga&quot;}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 5]
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">in_values</span></tt> 関数を使って <tt class="docutils literal"><span class="pre">tag</span></tt> カラムの値が &quot;groonga&quot; 、 &quot;mroonga&quot; あるいは &quot;droonga&quot; であるものを選択する例を示します。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Memos --output_columns _key,tag --filter &#39;in_values(tag, &quot;groonga&quot;, &quot;mroonga&quot;, &quot;droonga&quot;)&#39; --sortby _id
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         4
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Groonga is fast&quot;,
+#         &quot;groonga&quot;
+#       ],
+#       [
+#         &quot;Mroonga is fast&quot;,
+#         &quot;mroonga&quot;
+#       ],
+#       [
+#         &quot;Droonga is fast&quot;,
+#         &quot;droonga&quot;
+#       ],
+#       [
+#         &quot;Groonga is a HTTP server&quot;,
+#         &quot;groonga&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>クエリを実行すると、&quot;rroonga&quot;を除いた結果を得られます。&quot;rroonga&quot;は <tt class="docutils literal"><span class="pre">in_values</span></tt> には指定していないからです。</p>
 </div>
 <div class="section" id="parameters">
 <h2>7.12.9.4. 引数<a class="headerlink" href="#parameters" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>二つ以上の引数が必須です。 <tt class="docutils literal"><span class="pre">target_valule</span></tt> と 1つ以上の <tt class="docutils literal"><span class="pre">value</span></tt> です。</p>
+<div class="section" id="target-value">
+<h3>7.12.9.4.1. <tt class="docutils literal"><span class="pre">target_value</span></tt><a class="headerlink" href="#target-value" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p><tt class="docutils literal"><span class="pre">select</span></tt> 対象の <tt class="docutils literal"><span class="pre">table</span></tt> に指定されたテーブルのカラムを指定します。</p>
+</div>
+<div class="section" id="value">
+<h3>7.12.9.4.2. <tt class="docutils literal"><span class="pre">value</span></tt><a class="headerlink" href="#value" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>選択したいカラムの値を指定します。</p>
+</div>
 </div>
 <div class="section" id="return-value">
 <h2>7.12.9.5. 戻り値<a class="headerlink" href="#return-value" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">in_values</span></tt> は対象となるカラムに指定した値が含まれるかを返します。</p>
+<p>もし該当するレコードがあれば、 <tt class="docutils literal"><span class="pre">true</span></tt> を返します。そうでなければ <tt class="docutils literal"><span class="pre">false</span></tt> を返します。</p>
 </div>
 </div>
 
@@ -120,7 +209,11 @@
 <li><a class="reference internal" href="#summary">7.12.9.1. 概要</a></li>
 <li><a class="reference internal" href="#syntax">7.12.9.2. 構文</a></li>
 <li><a class="reference internal" href="#usage">7.12.9.3. 使い方</a></li>
-<li><a class="reference internal" href="#parameters">7.12.9.4. 引数</a></li>
+<li><a class="reference internal" href="#parameters">7.12.9.4. 引数</a><ul>
+<li><a class="reference internal" href="#target-value">7.12.9.4.1. <tt class="docutils literal"><span class="pre">target_value</span></tt></a></li>
+<li><a class="reference internal" href="#value">7.12.9.4.2. <tt class="docutils literal"><span class="pre">value</span></tt></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#return-value">7.12.9.5. 戻り値</a></li>
 </ul>
 </li>

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>4.2. リモートアクセス &mdash; Groonga v5.0.0ドキュメント</title>
+    <title>4.2. リモートアクセス &mdash; Groonga v5.00ドキュメント</title>
     
     <link rel="stylesheet" href="../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '5.0.0',
+        VERSION:     '5.00',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../static/doctools.js"></script>
     <script type="text/javascript" src="../static/translations.js"></script>
     <link rel="shortcut icon" href="../static/favicon.ico"/>
-    <link rel="top" title="Groonga v5.0.0ドキュメント" href="../index.html" />
+    <link rel="top" title="Groonga v5.00ドキュメント" href="../index.html" />
     <link rel="up" title="4. チュートリアル" href="../tutorial.html" />
     <link rel="next" title="4.3. いろいろなデータの保存" href="data.html" />
     <link rel="prev" title="4.1. 基本的な操作" href="introduction.html" /> 
@@ -76,7 +76,7 @@
         <li class="right" >
           <a href="introduction.html" title="4.1. 基本的な操作"
              accesskey="P">前へ</a> |</li>
-        <li><a href="../index.html">Groonga v5.0.0ドキュメント</a> &raquo;</li>
+        <li><a href="../index.html">Groonga v5.00ドキュメント</a> &raquo;</li>
           <li><a href="../tutorial.html" accesskey="U">4. チュートリアル</a> &raquo;</li> 
       </ul>
     </div>  
@@ -89,98 +89,10 @@
   <div class="section" id="remote-access">
 <h1>4.2. リモートアクセス<a class="headerlink" href="#remote-access" title="このヘッドラインへのパーマリンク">¶</a></h1>
 <p>Groongaをサーバとして起動することにより、ネットワークを介してデータベースにアクセスできるようになります。Groongaがサポートしているプロトコルは、Groongaの専用プロトコルであるGQTP、memcachedバイナリプロトコル、HTTPの三種類です。</p>
-<div class="section" id="groonga-query-transfer-protocol-gqtp">
-<h2>4.2.1. Groonga専用プロトコル（GQTP）<a class="headerlink" href="#groonga-query-transfer-protocol-gqtp" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="section" id="how-to-run-a-gqtp-server">
-<h3>4.2.1.1. GQTPサーバの起動<a class="headerlink" href="#how-to-run-a-gqtp-server" title="このヘッドラインへのパーマリンク">¶</a></h3>
-<p>Groongaには、専用のプロトコルであるGQTPが存在します。GQTPを用いることにより、データベースへとリモートアクセスすることができます。以下の書式はGQTPサーバの起動方法を示しています。</p>
-<p>書式:</p>
-<div class="highlight-none"><div class="highlight"><pre>groonga [-p PORT_NUMBER] -s DB_PATH
-</pre></div>
-</div>
-<p><cite>-s</cite> オプションはGroongaをサーバとして起動するためのオプションです。DB_PATHには既存のデータベースのパスを指定します。 <cite>-p</cite> オプションとその引数により、サーバのポート番号を指定することができます。ポート番号を省略した場合は10043が使用されます。</p>
-<p>以下のコマンドにより、デフォルトのポート番号で待ち受けるサーバを起動することができます。サーバは指定されたデータベースへの操作を受け付けます。</p>
-<p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre>% groonga -s /tmp/groonga-databases/introduction.db
-Ctrl-c
-%
-</pre></div>
-</div>
-</div>
-<div class="section" id="how-to-run-a-gqtp-daemon">
-<h3>4.2.1.2. GQTPデーモンの起動<a class="headerlink" href="#how-to-run-a-gqtp-daemon" title="このヘッドラインへのパーマリンク">¶</a></h3>
-<p>GQTPサーバはデーモンとして起動することができます。オプションとして、 <cite>-s</cite> の代わりに <cite>-d</cite> を与えてください。</p>
-<p>書式:</p>
-<div class="highlight-none"><div class="highlight"><pre>groonga [-p PORT_NUMBER] -d DB_PATH
-</pre></div>
-</div>
-<p>Groongaをデーモンとして起動したときは、デーモンのプロセスIDが表示されます。以下の例では、12345というプロセスIDが表示されています。サーバとして起動した場合と同様に、指定されたデータベースへの操作を受け付けます。</p>
-<p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre>% groonga -d /tmp/groonga-databases/introduction.db
-12345
-%
-</pre></div>
-</div>
-</div>
-<div class="section" id="how-to-run-a-gqtp-client">
-<h3>4.2.1.3. GQTPサーバへの接続<a class="headerlink" href="#how-to-run-a-gqtp-client" title="このヘッドラインへのパーマリンク">¶</a></h3>
-<p>GQTPサーバに接続するクライアントは、以下のように起動します。</p>
-<p>書式:</p>
-<div class="highlight-none"><div class="highlight"><pre>groonga [-p PORT_NUMBER] -c [HOST_NAME_OR_IP_ADDRESS]
-</pre></div>
-</div>
-<p>上記のコマンドによって起動されたクライアントは、サーバとの接続に成功すると対話モードに入ります。HOST_NAME_OR_IP_ADDRESSにはサーバのホスト名もしくはIPアドレスを指定します。HOST_NAME_OR_IP_ADDRESSが省略されたときは&quot;localhost&quot;をサーバのホスト名として採用します。また、 <cite>-p</cite> オプションとその引数により、サーバのポート番号を指定することができます。ポート番号を省略した場合は10043が使用されます。</p>
-<p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre>% groonga -c
-status
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   {
-#     &quot;uptime&quot;: 0,
-#     &quot;max_command_version&quot;: 2,
-#     &quot;n_queries&quot;: 0,
-#     &quot;cache_hit_rate&quot;: 0.0,
-#     &quot;version&quot;: &quot;4.0.1&quot;,
-#     &quot;alloc_count&quot;: 140,
-#     &quot;command_version&quot;: 1,
-#     &quot;starttime&quot;: 1395806078,
-#     &quot;default_command_version&quot;: 1
-#   }
-# ]
-&gt; ctrl-d
-%
-</pre></div>
-</div>
-<p>対話モードでは、標準入力からコマンドを読み込んで順次実行します。</p>
-</div>
-<div class="section" id="how-to-terminate-a-gqtp-server">
-<h3>4.2.1.4. GQTPサーバの終了<a class="headerlink" href="#how-to-terminate-a-gqtp-server" title="このヘッドラインへのパーマリンク">¶</a></h3>
-<p>GQTPサーバを終了する安全は方法は、クライアントを起動して <a class="reference internal" href="../reference/commands/shutdown.html"><em>shutdown</em></a> を発行することです。</p>
-<p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre>% groonga -c
-&gt; shutdown
-%
-</pre></div>
-</div>
-</div>
-</div>
-<div class="section" id="memcached-binary-protocol">
-<h2>4.2.2. memcachedバイナリプロトコル<a class="headerlink" href="#memcached-binary-protocol" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>Groongaはmemcachedバイナリプロトコルをサポートしています。以下の書式はmemcachedバイナリプロトコルのサーバをデーモンとして起動する方法を示しています。</p>
-<p>書式:</p>
-<div class="highlight-none"><div class="highlight"><pre>groonga [-p PORT_NUMBER] -d --protocol memcached DB_PATH
-</pre></div>
-</div>
-<p><cite>--protocol</cite> オプションとその引数により、サーバのプロトコルを指定することができます。&quot;memcached&quot;はmemcachedバイナリプロトコルを示しています。</p>
-</div>
 <div class="section" id="hypertext-transfer-protocol-http">
-<h2>4.2.3. HTTP<a class="headerlink" href="#hypertext-transfer-protocol-http" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<h2>4.2.1. HTTP<a class="headerlink" href="#hypertext-transfer-protocol-http" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <div class="section" id="how-to-run-an-http-server">
-<h3>4.2.3.1. HTTPサーバの起動<a class="headerlink" href="#how-to-run-an-http-server" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<h3>4.2.1.1. HTTPサーバの起動<a class="headerlink" href="#how-to-run-an-http-server" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <p>GroongaはHTTPをサポートしています。以下の書式はHTTPサーバをデーモンとして起動する方法を示しています。</p>
 <p>書式:</p>
 <div class="highlight-none"><div class="highlight"><pre>groonga [-p PORT_NUMBER] -d --protocol http DB_PATH
@@ -199,7 +111,7 @@ status
 </div>
 </div>
 <div class="section" id="how-to-send-a-command-to-an-http-server">
-<h3>4.2.3.2. HTTPサーバへのコマンド送信<a class="headerlink" href="#how-to-send-a-command-to-an-http-server" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<h3>4.2.1.2. HTTPサーバへのコマンド送信<a class="headerlink" href="#how-to-send-a-command-to-an-http-server" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <p>GroongaがHTTPサーバとして起動されているときは、/d/COMMAND_NAME というURLにアクセスすることにより、コマンドを実行することができます。コマンドの引数は、HTTPのGETパラメータとして渡します。引数の書式は &quot;?NAME_1=VALUE_1&amp;NAME_2=VALUE_2&amp;...&quot; となります。</p>
 <p>以下の例は、HTTPサーバに対するコマンドの送り方を示しています。</p>
 <p>実行例:</p>
@@ -294,11 +206,11 @@ select --table Site --query title:@this
 </div>
 </div>
 <div class="section" id="administration-tool-http">
-<h2>4.2.4. ブラウザベースの管理ツール<a class="headerlink" href="#administration-tool-http" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<h2>4.2.2. ブラウザベースの管理ツール<a class="headerlink" href="#administration-tool-http" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <p>GroongaをHTTPサーバとして起動しているときは、ブラウザベースの管理ツールを使うことにより、データベースを簡単に管理することができます。管理ツールを使いたいときは、ブラウザを使って <a class="reference external" href="http://HOST_NAME_OR_IP_ADDRESS[:PORT_NUMBER]/">http://HOST_NAME_OR_IP_ADDRESS[:PORT_NUMBER]/</a> へとアクセスしてください。管理ツールの使用には、JavaScriptの実行が有効になっている必要があります。</p>
 </div>
 <div class="section" id="security-issues">
-<h2>4.2.5. セキュリティ<a class="headerlink" href="#security-issues" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<h2>4.2.3. セキュリティ<a class="headerlink" href="#security-issues" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <p>Groongaのサーバには認証機能がありません。誰でもデータベースの内容を閲覧・修正することができます。iptablesなどを用いてアクセス元IPアドレスを制限することを推奨します。</p>
 </div>
 </div>
@@ -312,21 +224,13 @@ select --table Site --query title:@this
   <h3><a href="../index.html">目次</a></h3>
   <ul>
 <li><a class="reference internal" href="#">4.2. リモートアクセス</a><ul>
-<li><a class="reference internal" href="#groonga-query-transfer-protocol-gqtp">4.2.1. Groonga専用プロトコル（GQTP）</a><ul>
-<li><a class="reference internal" href="#how-to-run-a-gqtp-server">4.2.1.1. GQTPサーバの起動</a></li>
-<li><a class="reference internal" href="#how-to-run-a-gqtp-daemon">4.2.1.2. GQTPデーモンの起動</a></li>
-<li><a class="reference internal" href="#how-to-run-a-gqtp-client">4.2.1.3. GQTPサーバへの接続</a></li>
-<li><a class="reference internal" href="#how-to-terminate-a-gqtp-server">4.2.1.4. GQTPサーバの終了</a></li>
+<li><a class="reference internal" href="#hypertext-transfer-protocol-http">4.2.1. HTTP</a><ul>
+<li><a class="reference internal" href="#how-to-run-an-http-server">4.2.1.1. HTTPサーバの起動</a></li>
+<li><a class="reference internal" href="#how-to-send-a-command-to-an-http-server">4.2.1.2. HTTPサーバへのコマンド送信</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#memcached-binary-protocol">4.2.2. memcachedバイナリプロトコル</a></li>
-<li><a class="reference internal" href="#hypertext-transfer-protocol-http">4.2.3. HTTP</a><ul>
-<li><a class="reference internal" href="#how-to-run-an-http-server">4.2.3.1. HTTPサーバの起動</a></li>
-<li><a class="reference internal" href="#how-to-send-a-command-to-an-http-server">4.2.3.2. HTTPサーバへのコマンド送信</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#administration-tool-http">4.2.4. ブラウザベースの管理ツール</a></li>
-<li><a class="reference internal" href="#security-issues">4.2.5. セキュリティ</a></li>
+<li><a class="reference internal" href="#administration-tool-http">4.2.2. ブラウザベースの管理ツール</a></li>
+<li><a class="reference internal" href="#security-issues">4.2.3. セキュリティ</a></li>
 </ul>
 </li>
 </ul>
@@ -371,7 +275,7 @@ select --table Site --query title:@this
         <li class="right" >
           <a href="introduction.html" title="4.1. 基本的な操作"
              >前へ</a> |</li>
-        <li><a href="../index.html">Groonga v5.0.0ドキュメント</a> &raquo;</li>
+        <li><a href="../index.html">Groonga v5.00ドキュメント</a> &raquo;</li>
           <li><a href="../tutorial.html" >4. チュートリアル</a> &raquo;</li> 
       </ul>
     </div>

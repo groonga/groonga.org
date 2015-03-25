@@ -10,6 +10,8 @@ description: 第7回フクオカRuby大賞で特別賞を受賞しました！
 
 先日、[第7回フクオカRuby大賞の結果が発表](http://www.digitalfukuoka.jp/topics/68)されました。このGroongaの取り組みは特別賞を受賞しました。ありがとうございます。
 
+![第7回フクオカRuby大賞の特別賞の賞状](/images/fukuoka-ruby-award-7-groonga-mruby.jpeg)
+
 （[応募に使った資料はGitHub上にある](https://github.com/kou/rabbit-slide-kou-fukuoka-ruby-award-7)ので、来年度以降のフクオカRuby大賞に応募したい人は参考に使えるかもしれません。）
 
 さて、そんなGroongaのmruby組み込みですが、近いうちにデフォルトで有効にする予定です。（現在はデフォルト無効で、ビルド時に明示的に有効にしなければいけません。）

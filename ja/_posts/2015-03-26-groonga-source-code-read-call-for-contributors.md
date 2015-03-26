@@ -20,6 +20,6 @@ Groongaの内部実装についてはドキュメント化されていないこ�
 
   * 会場が未定
   * 読書会の進め方をどうするのがよいかわかっていない
-    （類似なイベントとして[ Groongaドキュメント読書会](https://github.com/groonga/groonga-document-read-ja)を開催しているが、それと同じというわけにはいかなそう）
+    （類似のイベントとして[ Groongaドキュメント読書会](https://github.com/groonga/groonga-document-read-ja)を開催しているが、それと同じというわけにはいかなそう）
 
 興味のある方は協力をお願いします！

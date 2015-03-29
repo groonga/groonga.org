@@ -1,0 +1,313 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>7.11.3.2. scorer_tf_idf &mdash; Groonga v5.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
+    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '5.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../static/favicon.ico"/>
+    <link rel="top" title="Groonga v5.0.1 documentation" href="../../index.html" />
+    <link rel="up" title="7.11. Scorer" href="../scorer.html" />
+    <link rel="next" title="7.12. grn_expr" href="../grn_expr.html" />
+    <link rel="prev" title="7.11.3.1. scorer_tf_at_most" href="scorer_tf_at_most.html" /> 
+      <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
+    <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
+    <meta property="og:type" content="product" />
+    <meta property="og:image" content="http://groonga.org/images/logos/groonga-icon-full-size.png" />
+    <meta property="og:site_name" content="groonga" />
+
+    <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
+  </head>
+
+    <body>
+    <div id="fb-root"></div>
+
+<div class="header">
+  <h1 class="title">
+    <a id="top-link" href="../../../">
+      <span class="project">groonga</span>
+      <span class="separator">-</span>
+      <span class="description">An open-source fulltext search engine and column store.</span>
+    </a>
+  </h1>
+
+      <div class="facebook-buttons">
+      <fb:like href="http://www.facebook.com/pages/groonga/201193596592346"
+               layout="standard"
+               width="290"></fb:like>
+    </div>
+    <div class="other-language-links">
+
+    <ul>
+      <li><a href="../../../ja/docs/reference/scorers/scorer_tf_idf.html"><img src="../../static/jp.png" alt="日本語">日本語版はこちら</a></li>
+    </ul>
+  </div>
+</div>
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../grn_expr.html" title="7.12. grn_expr"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="scorer_tf_at_most.html" title="7.11.3.1. scorer_tf_at_most"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">Groonga v5.0.1 documentation</a> &raquo;</li>
+          <li><a href="../../reference.html" >7. Reference manual</a> &raquo;</li>
+          <li><a href="../scorer.html" accesskey="U">7.11. Scorer</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="scorer-tf-idf">
+<h1>7.11.3.2. <tt class="docutils literal"><span class="pre">scorer_tf_idf</span></tt><a class="headerlink" href="#scorer-tf-idf" title="Permalink to this headline">¶</a></h1>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This scorer is an experimental feature.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 5.0.1.</span></p>
+</div>
+<div class="section" id="summary">
+<h2>7.11.3.2.1. Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">scorer_tf_idf</span></tt> is a scorer based of <a class="reference external" href="http://en.wikipedia.org/wiki/Tf%E2%80%93idf">TF-IDF</a> (term
+frequency-inverse document frequency) score function.</p>
+<p>To put it simply, TF (term frequency) divided by DF (document
+frequency) is TF-IDF. &quot;TF&quot; means that &quot;the number of occurrences is
+more important&quot;. &quot;TF divided by DF&quot; means that &quot;the number of
+occurrences of important term is more important&quot;.</p>
+<p>The default score function in Groonga is TF (term frequency). It
+doesn't care about term importance but is fast.</p>
+<p>TF-IDF cares about term importance but is slower than TF.</p>
+<p>TF-IDF will compute more suitable score rather than TF for many cases.
+But it's not perfect.</p>
+<p>If document contains many same keywords such as &quot;They are keyword,
+keyword, keyword ... and keyword&quot;. It increases score by TF and
+TF-IDF. Search engine spammer may use the technique. But TF-IDF
+doesn't guard from the technique.</p>
+<p><a class="reference external" href="http://en.wikipedia.org/wiki/Okapi_BM25">Okapi BM25</a> can solve the
+case. But it's more slower than TF-IDF and not implemented yet in
+Groonga.</p>
+<blockquote id="note">
+<div><p>You don't need to resolve scoring only by score function. Score
+function is highly depends on search query. You may be able to use
+metadata of matched record.</p>
+<p>For example, Google uses <a class="reference external" href="http://en.wikipedia.org/wiki/PageRank">PageRank</a> for scoring. You may be
+able to use data type (&quot;title&quot; data are important rather than
+&quot;memo&quot; data), tag, geolocation and so on.</p>
+<p>Please stop to think about only score function for scoring.</p>
+</div></blockquote>
+</div>
+<div class="section" id="usage">
+<h2>7.11.3.2.2. Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>This section describes how to use this scorer.</p>
+<p>Here are a schema definition and sample data to show usage.</p>
+<p>Sample schema:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Logs TABLE_NO_KEY
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Logs message COLUMN_SCALAR Text
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create Terms TABLE_PAT_KEY ShortText \
+  --default_tokenizer TokenBigram \
+  --normalizer NormalizerAuto
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Terms message_index COLUMN_INDEX|WITH_POSITION Logs message
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>Sample data:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>load --table Logs
+[
+{&quot;message&quot;: &quot;Error&quot;},
+{&quot;message&quot;: &quot;Warning&quot;},
+{&quot;message&quot;: &quot;Warning Warning&quot;},
+{&quot;message&quot;: &quot;Warning Warning Warning&quot;},
+{&quot;message&quot;: &quot;Info&quot;},
+{&quot;message&quot;: &quot;Info Info&quot;},
+{&quot;message&quot;: &quot;Info Info Info&quot;},
+{&quot;message&quot;: &quot;Info Info Info Info&quot;},
+{&quot;message&quot;: &quot;Notice&quot;},
+{&quot;message&quot;: &quot;Notice Notice&quot;},
+{&quot;message&quot;: &quot;Notice Notice Notice&quot;},
+{&quot;message&quot;: &quot;Notice Notice Notice Notice&quot;},
+{&quot;message&quot;: &quot;Notice Notice Notice Notice Notice&quot;}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 13]
+</pre></div>
+</div>
+<p>You specify <tt class="docutils literal"><span class="pre">scorer_tf_idf</span></tt> in <a class="reference internal" href="../commands/select.html#select-match-columns"><em>match_columns</em></a> like the
+following:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Logs \
+  --match_columns &quot;scorer_tf_idf(message)&quot; \
+  --query &quot;Error OR Info&quot; \
+  --output_columns &quot;message, _score&quot; \
+  --sortby &quot;-_score&quot;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;message&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;_score&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Info Info Info Info&quot;,
+#         3
+#       ],
+#       [
+#         &quot;Error&quot;,
+#         2
+#       ],
+#       [
+#         &quot;Info Info Info&quot;,
+#         2
+#       ],
+#       [
+#         &quot;Info Info&quot;,
+#         1
+#       ],
+#       [
+#         &quot;Info&quot;,
+#         1
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>Both the score of <tt class="docutils literal"><span class="pre">Info</span> <span class="pre">Info</span> <span class="pre">Info</span></tt> and the score of <tt class="docutils literal"><span class="pre">Error</span></tt> are
+<tt class="docutils literal"><span class="pre">2</span></tt> even <tt class="docutils literal"><span class="pre">Info</span> <span class="pre">Info</span> <span class="pre">Info</span></tt> includes three <tt class="docutils literal"><span class="pre">Info</span></tt> terms. Because
+<tt class="docutils literal"><span class="pre">Error</span></tt> is more important term rather than <tt class="docutils literal"><span class="pre">Info</span></tt>. The number of
+documents that include <tt class="docutils literal"><span class="pre">Info</span></tt> is <tt class="docutils literal"><span class="pre">4</span></tt>. The number of documents that
+include <tt class="docutils literal"><span class="pre">Error</span></tt> is <tt class="docutils literal"><span class="pre">1</span></tt>. Term that is included in less documents
+means that the term is more characteristic term. Characteristic term
+is important term.</p>
+</div>
+<div class="section" id="see-also">
+<h2>7.11.3.2.3. See also<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference internal" href="../scorer.html"><em>Scorer</em></a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">7.11.3.2. <tt class="docutils literal"><span class="pre">scorer_tf_idf</span></tt></a><ul>
+<li><a class="reference internal" href="#summary">7.11.3.2.1. Summary</a></li>
+<li><a class="reference internal" href="#usage">7.11.3.2.2. Usage</a></li>
+<li><a class="reference internal" href="#see-also">7.11.3.2.3. See also</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="scorer_tf_at_most.html"
+                        title="previous chapter">7.11.3.1. <tt class="docutils literal"><span class="pre">scorer_tf_at_most</span></tt></a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../grn_expr.html"
+                        title="next chapter">7.12. grn_expr</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../sources/reference/scorers/scorer_tf_idf.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../grn_expr.html" title="7.12. grn_expr"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="scorer_tf_at_most.html" title="7.11.3.1. scorer_tf_at_most"
+             >previous</a> |</li>
+        <li><a href="../../index.html">Groonga v5.0.1 documentation</a> &raquo;</li>
+          <li><a href="../../reference.html" >7. Reference manual</a> &raquo;</li>
+          <li><a href="../scorer.html" >7.11. Scorer</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009-2015, Brazil, Inc.
+    </div>
+      <script src="http://connect.facebook.net/en_US/all.js"></script>
+
+    <script>
+      FB.init({
+         appId  : null,
+         status : true, // check login status
+         cookie : true, // enable cookies to allow the server to access the session
+         xfbml  : true  // parse XFBML
+      });
+    </script>
+  </body>
+
+</html>

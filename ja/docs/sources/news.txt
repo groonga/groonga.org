@@ -7,6 +7,169 @@
 News
 ====
 
+.. _release-5-0-1:
+
+Release 5.0.1 - 2015/03/29
+--------------------------
+
+Improvements
+^^^^^^^^^^^^
+
+* [:doc:`/reference/commands/logical_range_filter`] Supported filter
+  and sort.
+* Supported range search by multiple column index.
+* Added API :doc:`/reference/api/overview` document for users who want
+  to use Groonga as library.
+* [incompatible] Changed internal type of ``_score`` to floating point
+  number from 32bit integer number. This is incompatible change for DB
+  API users. This *isn't* incompatible change for query API users. It
+  means that users who just use :doc:`/reference/commands/select`
+  aren't affected. Use the following code that works with both older
+  and newer Groonga:
+
+  .. code-block:: c
+
+     grn_obj *score;
+     double score_value;
+
+     if (score->header.domain == GRN_DB_FLOAT) {
+       score_value = GRN_FLOAT_VALUE(score);
+     } else {
+       score_value = (double)GRN_INT32_VALUE_FLOAT_VALUE(score);
+     }
+
+* [:doc:`/reference/commands/select`] Added more strict check for
+  invalid drilldown parameter.
+* Added :c:func:`grn_ctx_get_all_tables()`. [Suggested by Masatoshi
+  Teruya]
+* Supported to customize score function. See :doc:`/reference/scorer`
+  for details.
+* [incompatible] Custom score function feature introduced API and ABI
+  incompatibilities in DB API layer. If you're using
+  :c:type:`grn_search_optarg`, please check that your code initializes
+  your :c:type:`grn_search_optarg` by ``0`` like the following:
+
+  .. code-block:: c
+
+     grn_search_optarg options;
+     memset(&options, 0, sizeof(grn_search_optarg));
+
+  If your code do the above thing, your code is API compatible and ABI
+  incompatible. You just need to rebuild your code without
+  modification.
+
+  If your code doesn't the above thing, you need to added the above
+  thing to your code.
+
+* Added the following predicates that check :c:type:`grn_obj` type to
+  DB API:
+
+  * :c:func:`grn_obj_is_table()`
+  * :c:func:`grn_obj_is_proc_proc()`
+  * :c:func:`grn_obj_is_function_proc()`
+  * :c:func:`grn_obj_is_selector_proc()`
+  * :c:func:`grn_obj_is_scorer_proc()`
+
+* [experimental] Supported skipping posting list when searching
+  popular term and rare term at the same time. It will improve
+  performance. Set ``GRN_II_CURSOR_SET_MIN_ENABLE`` environment
+  variable to ``1`` to enable the feature. The feature is disabled by
+  default.
+* [doc] Added :doc:`/reference/functions/in_values` document.
+* [doc] Added :doc:`/reference/commands/logical_count` document.
+* [mruby] Implemented custom ``#inspect`` method. Is is useful for
+  debugging.
+* Added :doc:`/reference/scorers/scorer_tf_at_most` scorer. It
+  limits not to exceed specified score regardless of term frequency.
+* [mruby] Supported estimating matched records for selecting index
+  search or sequential search.
+* Added the following functions to estimate size by index:
+
+  * :c:func:`grn_expr_estimate_size()`
+  * :c:func:`grn_ii_estimate_size_for_query()`
+  * :c:func:`grn_ii_estimate_size_for_lexicon_cursor()`
+
+* Added missing :ref:`normalizer-auto` availability check. [GitHub#283]
+  [Reported by Tasuku SUENAGA]
+* Dropped Visual Studio 2010 support.
+* [experimental][mecab] Supported chunked tokenization. This feature
+  is a workaround for MeCab's "too long sentense" error.  Specify
+  ``yes`` to ``GRN_MECAB_CHUNKED_TOKENIZE_ENABLED`` environment
+  variable to enable it. By this configuration, Groonga splits a long
+  text (8192 bytes over text by default) into small chunks and passes
+  each chunk to MeCab. By this process, the above error isn't
+  occurred. Additionally, you can customize chunk threshold bytes by
+  ``GRN_MECAB_CHUNK_SIZE_THRESHOLD`` environment variable. Note that
+  ``,``, ``.``, ``!``, ``?``, ``U+3001 IDEOGRAPHIC COMMA``, ``U+3002
+  IDEOGRAPHIC FULL STOP``, ``U+FF01 FULLWIDTH EXCLAMATION MARK`` and
+  ``U+FF1F FULLWIDTH QUESTION MARK`` are treated as chunk delimiter
+  characters.
+* Supported ``--pid-file`` in server mode of
+  :doc:`/reference/executables/groonga`.
+* [groonga-httpd] Supported graceful stop to clean Groonga. It doesn't
+  terminate the open connections immediately.
+* [experimental] Supported regular expression. See
+  :doc:`/reference/regular_expression` to know about how to use regular
+  expression.
+* [experimental] Added :doc:`/reference/commands/plugin_unregister`
+  command.
+* [http][:doc:`/reference/commands/load`] Added "," as chunk separator
+  in POST data. It decreases internal buffer size and improves load
+  time when POST data don't include any new line.
+* [doc] Added :doc:`/reference/tokenizers` document.
+* Improved POSIX.2 compatibility by using ``.`` as bash's "source"
+  command replacement. [GitHub#317] [Patch by Jun Kuriyama]
+* [windows] Changed to the default IO version 1. It reduces disk usage
+  on Windows. [groonga-dev,03118] [Tested by ongaeshi]
+* [httpd] Updated bundled nginx version to the latest mainline
+  (1.7.11).
+* Changed mime-type for TSV output to ``text/tab-separated-values``
+  from ``text/plain``.
+* [:ref:`token-filter-stop-word`] Supported
+  :ref:`offline-index-construction`. [GitHub#296] [Patch by Naoya
+  Murakami]
+
+Fixes
+^^^^^
+
+* Fixed not to use obsolete ``--address`` parameter in the default
+  groonga.conf. ``--bind-address`` is used instead.  [Groonga-talk]
+  [Reported by Dewangga]
+* [:doc:`/reference/commands/truncate`] Fixed a bug that
+  :ref:`table-no-key` table can't be truncated.
+* [mecab] Reduced needless logs for "empty token" and "ignore empty
+  token".
+* Fixed a bug that wrong section in index is used. It means that wrong
+  search result is returned. If you satisfy all of the following
+  conditions, this bug is occurred:
+
+  * Multiple indexes are available.
+  * The first defined index or the last defined index are
+    multi-column indexes.
+  * When both of the first defined index and the last defined index are
+    multi-column indexes, source column orders are different in them.
+
+* Fixed a bug that passing Groonga command line to
+  :doc:`/reference/executables/groonga` from shell command line style
+  usage always returns ``0`` as exit code. For example, ``groonga
+  DB_PATH nonexistent_command`` always returned ``0`` as exist code.
+* Fixed a bug that plugin path may be broken when two or more plugins
+  registered. [Reported by Naoya Murakami]
+* Fixed a bug that ``Lexicon.index.source_column_name`` style in
+  :ref:`select-match-columns` doesn't work when source
+  column specified by ``source_column_name`` has two or more
+  indexes. [Reported by Naoya Murakami]
+
+Thanks
+^^^^^^
+
+* Masatoshi Teruya
+* Tasuku SUENAGA
+* Dewangga
+* Jun Kuriyama
+* ongaeshi
+* Naoya Murakami
+
 .. _release-5-0-0:
 
 Release 5.0.0 - 2015/02/09

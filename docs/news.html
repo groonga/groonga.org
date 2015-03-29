@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>News &mdash; Groonga v5.00 documentation</title>
+    <title>News &mdash; Groonga v5.0.1 documentation</title>
     
     <link rel="stylesheet" href="static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '5.00',
+        VERSION:     '5.0.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="static/underscore.js"></script>
     <script type="text/javascript" src="static/doctools.js"></script>
     <link rel="shortcut icon" href="static/favicon.ico"/>
-    <link rel="top" title="Groonga v5.00 documentation" href="index.html" /> 
+    <link rel="top" title="Groonga v5.0.1 documentation" href="index.html" /> 
       <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
     <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
     <meta property="og:type" content="product" />
@@ -66,7 +66,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li><a href="index.html">Groonga v5.00 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Groonga v5.0.1 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -77,13 +77,201 @@
             
   <div class="section" id="news">
 <h1>News<a class="headerlink" href="#news" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="release-5-0-1-2015-03-29">
+<span id="release-5-0-1"></span><h2>Release 5.0.1 - 2015/03/29<a class="headerlink" href="#release-5-0-1-2015-03-29" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="improvements">
+<h3>Improvements<a class="headerlink" href="#improvements" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p class="first">[<a class="reference internal" href="reference/commands/logical_range_filter.html"><em>logical_range_filter</em></a>] Supported filter
+and sort.</p>
+</li>
+<li><p class="first">Supported range search by multiple column index.</p>
+</li>
+<li><p class="first">Added API <a class="reference internal" href="reference/api/overview.html"><em>Overview</em></a> document for users who want
+to use Groonga as library.</p>
+</li>
+<li><p class="first">[incompatible] Changed internal type of <tt class="docutils literal"><span class="pre">_score</span></tt> to floating point
+number from 32bit integer number. This is incompatible change for DB
+API users. This <em>isn't</em> incompatible change for query API users. It
+means that users who just use <a class="reference internal" href="reference/commands/select.html"><em>select</em></a>
+aren't affected. Use the following code that works with both older
+and newer Groonga:</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="n">grn_obj</span> <span class="o">*</span><span class="n">score</span><span class="p">;</span>
+<span class="kt">double</span> <span class="n">score_value</span><span class="p">;</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="n">score</span><span class="o">-&gt;</span><span class="n">header</span><span class="p">.</span><span class="n">domain</span> <span class="o">==</span> <span class="n">GRN_DB_FLOAT</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">score_value</span> <span class="o">=</span> <span class="n">GRN_FLOAT_VALUE</span><span class="p">(</span><span class="n">score</span><span class="p">);</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+  <span class="n">score_value</span> <span class="o">=</span> <span class="p">(</span><span class="kt">double</span><span class="p">)</span><span class="n">GRN_INT32_VALUE_FLOAT_VALUE</span><span class="p">(</span><span class="n">score</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">[<a class="reference internal" href="reference/commands/select.html"><em>select</em></a>] Added more strict check for
+invalid drilldown parameter.</p>
+</li>
+<li><p class="first">Added <a class="reference internal" href="reference/api/grn_ctx.html#c.grn_ctx_get_all_tables" title="grn_ctx_get_all_tables"><tt class="xref c c-func docutils literal"><span class="pre">grn_ctx_get_all_tables()</span></tt></a>. [Suggested by Masatoshi
+Teruya]</p>
+</li>
+<li><p class="first">Supported to customize score function. See <a class="reference internal" href="reference/scorer.html"><em>Scorer</em></a>
+for details.</p>
+</li>
+<li><p class="first">[incompatible] Custom score function feature introduced API and ABI
+incompatibilities in DB API layer. If you're using
+<a class="reference internal" href="reference/api/grn_search.html#c.grn_search_optarg" title="grn_search_optarg"><tt class="xref c c-type docutils literal"><span class="pre">grn_search_optarg</span></tt></a>, please check that your code initializes
+your <a class="reference internal" href="reference/api/grn_search.html#c.grn_search_optarg" title="grn_search_optarg"><tt class="xref c c-type docutils literal"><span class="pre">grn_search_optarg</span></tt></a> by <tt class="docutils literal"><span class="pre">0</span></tt> like the following:</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="n">grn_search_optarg</span> <span class="n">options</span><span class="p">;</span>
+<span class="n">memset</span><span class="p">(</span><span class="o">&amp;</span><span class="n">options</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">grn_search_optarg</span><span class="p">));</span>
+</pre></div>
+</div>
+<p>If your code do the above thing, your code is API compatible and ABI
+incompatible. You just need to rebuild your code without
+modification.</p>
+<p>If your code doesn't the above thing, you need to added the above
+thing to your code.</p>
+</li>
+<li><p class="first">Added the following predicates that check <a class="reference internal" href="reference/api/grn_obj.html#c.grn_obj" title="grn_obj"><tt class="xref c c-type docutils literal"><span class="pre">grn_obj</span></tt></a> type to
+DB API:</p>
+<ul class="simple">
+<li><tt class="xref c c-func docutils literal"><span class="pre">grn_obj_is_table()</span></tt></li>
+<li><tt class="xref c c-func docutils literal"><span class="pre">grn_obj_is_proc_proc()</span></tt></li>
+<li><tt class="xref c c-func docutils literal"><span class="pre">grn_obj_is_function_proc()</span></tt></li>
+<li><tt class="xref c c-func docutils literal"><span class="pre">grn_obj_is_selector_proc()</span></tt></li>
+<li><tt class="xref c c-func docutils literal"><span class="pre">grn_obj_is_scorer_proc()</span></tt></li>
+</ul>
+</li>
+<li><p class="first">[experimental] Supported skipping posting list when searching
+popular term and rare term at the same time. It will improve
+performance. Set <tt class="docutils literal"><span class="pre">GRN_II_CURSOR_SET_MIN_ENABLE</span></tt> environment
+variable to <tt class="docutils literal"><span class="pre">1</span></tt> to enable the feature. The feature is disabled by
+default.</p>
+</li>
+<li><p class="first">[doc] Added <a class="reference internal" href="reference/functions/in_values.html"><em>in_values</em></a> document.</p>
+</li>
+<li><p class="first">[doc] Added <a class="reference internal" href="reference/commands/logical_count.html"><em>logical_count</em></a> document.</p>
+</li>
+<li><p class="first">[mruby] Implemented custom <tt class="docutils literal"><span class="pre">#inspect</span></tt> method. Is is useful for
+debugging.</p>
+</li>
+<li><p class="first">Added <a class="reference internal" href="reference/scorers/scorer_tf_at_most.html"><em>scorer_tf_at_most</em></a> scorer. It
+limits not to exceed specified score regardless of term frequency.</p>
+</li>
+<li><p class="first">[mruby] Supported estimating matched records for selecting index
+search or sequential search.</p>
+</li>
+<li><p class="first">Added the following functions to estimate size by index:</p>
+<ul class="simple">
+<li><tt class="xref c c-func docutils literal"><span class="pre">grn_expr_estimate_size()</span></tt></li>
+<li><tt class="xref c c-func docutils literal"><span class="pre">grn_ii_estimate_size_for_query()</span></tt></li>
+<li><tt class="xref c c-func docutils literal"><span class="pre">grn_ii_estimate_size_for_lexicon_cursor()</span></tt></li>
+</ul>
+</li>
+<li><p class="first">Added missing <a class="reference internal" href="reference/normalizers.html#normalizer-auto"><em>NormalizerAuto</em></a> availability check. [GitHub#283]
+[Reported by Tasuku SUENAGA]</p>
+</li>
+<li><p class="first">Dropped Visual Studio 2010 support.</p>
+</li>
+<li><p class="first">[experimental][mecab] Supported chunked tokenization. This feature
+is a workaround for MeCab's &quot;too long sentense&quot; error.  Specify
+<tt class="docutils literal"><span class="pre">yes</span></tt> to <tt class="docutils literal"><span class="pre">GRN_MECAB_CHUNKED_TOKENIZE_ENABLED</span></tt> environment
+variable to enable it. By this configuration, Groonga splits a long
+text (8192 bytes over text by default) into small chunks and passes
+each chunk to MeCab. By this process, the above error isn't
+occurred. Additionally, you can customize chunk threshold bytes by
+<tt class="docutils literal"><span class="pre">GRN_MECAB_CHUNK_SIZE_THRESHOLD</span></tt> environment variable. Note that
+<tt class="docutils literal"><span class="pre">,</span></tt>, <tt class="docutils literal"><span class="pre">.</span></tt>, <tt class="docutils literal"><span class="pre">!</span></tt>, <tt class="docutils literal"><span class="pre">?</span></tt>, <tt class="docutils literal"><span class="pre">U+3001</span> <span class="pre">IDEOGRAPHIC</span> <span class="pre">COMMA</span></tt>, <tt class="docutils literal"><span class="pre">U+3002</span>
+<span class="pre">IDEOGRAPHIC</span> <span class="pre">FULL</span> <span class="pre">STOP</span></tt>, <tt class="docutils literal"><span class="pre">U+FF01</span> <span class="pre">FULLWIDTH</span> <span class="pre">EXCLAMATION</span> <span class="pre">MARK</span></tt> and
+<tt class="docutils literal"><span class="pre">U+FF1F</span> <span class="pre">FULLWIDTH</span> <span class="pre">QUESTION</span> <span class="pre">MARK</span></tt> are treated as chunk delimiter
+characters.</p>
+</li>
+<li><p class="first">Supported <tt class="docutils literal"><span class="pre">--pid-file</span></tt> in server mode of
+<a class="reference internal" href="reference/executables/groonga.html"><em>groonga command</em></a>.</p>
+</li>
+<li><p class="first">[groonga-httpd] Supported graceful stop to clean Groonga. It doesn't
+terminate the open connections immediately.</p>
+</li>
+<li><p class="first">[experimental] Supported regular expression. See
+<a class="reference internal" href="reference/regular_expression.html"><em>Regular expression</em></a> to know about how to use regular
+expression.</p>
+</li>
+<li><p class="first">[experimental] Added <a class="reference internal" href="reference/commands/plugin_unregister.html"><em>plugin_unregister</em></a>
+command.</p>
+</li>
+<li><p class="first">[http][<a class="reference internal" href="reference/commands/load.html"><em>load</em></a>] Added &quot;,&quot; as chunk separator
+in POST data. It decreases internal buffer size and improves load
+time when POST data don't include any new line.</p>
+</li>
+<li><p class="first">[doc] Added <a class="reference internal" href="reference/tokenizers.html"><em>Tokenizers</em></a> document.</p>
+</li>
+<li><p class="first">Improved POSIX.2 compatibility by using <tt class="docutils literal"><span class="pre">.</span></tt> as bash's &quot;source&quot;
+command replacement. [GitHub#317] [Patch by Jun Kuriyama]</p>
+</li>
+<li><p class="first">[windows] Changed to the default IO version 1. It reduces disk usage
+on Windows. [groonga-dev,03118] [Tested by ongaeshi]</p>
+</li>
+<li><p class="first">[httpd] Updated bundled nginx version to the latest mainline
+(1.7.11).</p>
+</li>
+<li><p class="first">Changed mime-type for TSV output to <tt class="docutils literal"><span class="pre">text/tab-separated-values</span></tt>
+from <tt class="docutils literal"><span class="pre">text/plain</span></tt>.</p>
+</li>
+<li><p class="first">[<a class="reference internal" href="reference/token_filters.html#token-filter-stop-word"><em>TokenFilterStopWord</em></a>] Supported
+<a class="reference internal" href="reference/indexing.html#offline-index-construction"><em>Offline index construction</em></a>. [GitHub#296] [Patch by Naoya
+Murakami]</p>
+</li>
+</ul>
+</div>
+<div class="section" id="fixes">
+<h3>Fixes<a class="headerlink" href="#fixes" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Fixed not to use obsolete <tt class="docutils literal"><span class="pre">--address</span></tt> parameter in the default
+groonga.conf. <tt class="docutils literal"><span class="pre">--bind-address</span></tt> is used instead.  [Groonga-talk]
+[Reported by Dewangga]</li>
+<li>[<a class="reference internal" href="reference/commands/truncate.html"><em>truncate</em></a>] Fixed a bug that
+<a class="reference internal" href="reference/tables.html#table-no-key"><em>TABLE_NO_KEY</em></a> table can't be truncated.</li>
+<li>[mecab] Reduced needless logs for &quot;empty token&quot; and &quot;ignore empty
+token&quot;.</li>
+<li>Fixed a bug that wrong section in index is used. It means that wrong
+search result is returned. If you satisfy all of the following
+conditions, this bug is occurred:<ul>
+<li>Multiple indexes are available.</li>
+<li>The first defined index or the last defined index are
+multi-column indexes.</li>
+<li>When both of the first defined index and the last defined index are
+multi-column indexes, source column orders are different in them.</li>
+</ul>
+</li>
+<li>Fixed a bug that passing Groonga command line to
+<a class="reference internal" href="reference/executables/groonga.html"><em>groonga command</em></a> from shell command line style
+usage always returns <tt class="docutils literal"><span class="pre">0</span></tt> as exit code. For example, <tt class="docutils literal"><span class="pre">groonga</span>
+<span class="pre">DB_PATH</span> <span class="pre">nonexistent_command</span></tt> always returned <tt class="docutils literal"><span class="pre">0</span></tt> as exist code.</li>
+<li>Fixed a bug that plugin path may be broken when two or more plugins
+registered. [Reported by Naoya Murakami]</li>
+<li>Fixed a bug that <tt class="docutils literal"><span class="pre">Lexicon.index.source_column_name</span></tt> style in
+<a class="reference internal" href="reference/commands/select.html#select-match-columns"><em>match_columns</em></a> doesn't work when source
+column specified by <tt class="docutils literal"><span class="pre">source_column_name</span></tt> has two or more
+indexes. [Reported by Naoya Murakami]</li>
+</ul>
+</div>
+<div class="section" id="thanks">
+<h3>Thanks<a class="headerlink" href="#thanks" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Masatoshi Teruya</li>
+<li>Tasuku SUENAGA</li>
+<li>Dewangga</li>
+<li>Jun Kuriyama</li>
+<li>ongaeshi</li>
+<li>Naoya Murakami</li>
+</ul>
+</div>
+</div>
 <div class="section" id="release-5-0-0-2015-02-09">
 <span id="release-5-0-0"></span><h2>Release 5.0.0 - 2015/02/09<a class="headerlink" href="#release-5-0-0-2015-02-09" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li>Bump version to 5.0.0!</li>
 </ul>
-<div class="section" id="improvements">
-<h3>Improvements<a class="headerlink" href="#improvements" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id1">
+<h3>Improvements<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>[doc] Added <a class="reference internal" href="reference/grn_expr/script_syntax.html#script-syntax-security"><em>Security</em></a> about <a class="reference internal" href="reference/grn_expr/script_syntax.html"><em>Script syntax</em></a>.</li>
 <li>[experimental] Added sharding plugin. Execute <cite>register sharding</cite> to
@@ -94,16 +282,16 @@ on FreeBSD 10.1. <a class="reference external" href="https://mariadb.atlassian.n
 <li>Supported to customize plugins directory. Set <cite>GRN_PLUGINS_DIR</cite> environment variable.</li>
 </ul>
 </div>
-<div class="section" id="fixes">
-<h3>Fixes<a class="headerlink" href="#fixes" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id2">
+<h3>Fixes<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Fixed build failure when system has an incompatible version of onigmo/oniguruma
 headers installed. [GitHub#276] [Patch by Akinori MUSHA]</li>
 <li>Fixed time related build failure on MSVC [GitHub#237]</li>
 </ul>
 </div>
-<div class="section" id="thanks">
-<h3>Thanks<a class="headerlink" href="#thanks" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id3">
+<h3>Thanks<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Akinori MUSHA</li>
 <li>Bernard Spil</li>
@@ -450,10 +638,16 @@ headers installed. [GitHub#276] [Patch by Akinori MUSHA]</li>
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">News</a><ul>
-<li><a class="reference internal" href="#release-5-0-0-2015-02-09">Release 5.0.0 - 2015/02/09</a><ul>
+<li><a class="reference internal" href="#release-5-0-1-2015-03-29">Release 5.0.1 - 2015/03/29</a><ul>
 <li><a class="reference internal" href="#improvements">Improvements</a></li>
 <li><a class="reference internal" href="#fixes">Fixes</a></li>
 <li><a class="reference internal" href="#thanks">Thanks</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#release-5-0-0-2015-02-09">Release 5.0.0 - 2015/02/09</a><ul>
+<li><a class="reference internal" href="#id1">Improvements</a></li>
+<li><a class="reference internal" href="#id2">Fixes</a></li>
+<li><a class="reference internal" href="#id3">Thanks</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#the-old-releases">The old releases</a></li>
@@ -489,7 +683,7 @@ headers installed. [GitHub#276] [Patch by Akinori MUSHA]</li>
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
-        <li><a href="index.html">Groonga v5.00 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Groonga v5.0.1 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

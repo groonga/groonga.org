@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>お知らせ &mdash; Groonga v5.00ドキュメント</title>
+    <title>お知らせ &mdash; Groonga v5.0.1ドキュメント</title>
     
     <link rel="stylesheet" href="static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '5.00',
+        VERSION:     '5.0.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="static/doctools.js"></script>
     <script type="text/javascript" src="static/translations.js"></script>
     <link rel="shortcut icon" href="static/favicon.ico"/>
-    <link rel="top" title="Groonga v5.00ドキュメント" href="index.html" /> 
+    <link rel="top" title="Groonga v5.0.1ドキュメント" href="index.html" /> 
       <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
     <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
     <meta property="og:type" content="product" />
@@ -67,7 +67,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="総合索引"
              accesskey="I">索引</a></li>
-        <li><a href="index.html">Groonga v5.00ドキュメント</a> &raquo;</li> 
+        <li><a href="index.html">Groonga v5.0.1ドキュメント</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -78,14 +78,154 @@
             
   <div class="section" id="news">
 <h1>お知らせ<a class="headerlink" href="#news" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<div class="section" id="release-5-0-1-2015-03-29">
+<span id="release-5-0-1"></span><h2>5.0.1リリース - 2015/03/29<a class="headerlink" href="#release-5-0-1-2015-03-29" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<div class="section" id="improvements">
+<h3>改良<a class="headerlink" href="#improvements" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<ul>
+<li><p class="first">[<a class="reference internal" href="reference/commands/logical_range_filter.html"><em>logical_range_filter</em></a>] filterとsortをサポートしました。</p>
+</li>
+<li><p class="first">マルチカラムインデックスを使った指定範囲の検索をサポートしました。</p>
+</li>
+<li><p class="first">Groongaをライブラリとして使う人向けにAPIの <a class="reference internal" href="reference/api/overview.html"><em>概要</em></a> を追加しました。</p>
+</li>
+<li><p class="first">[非互換] 内部で使っている <tt class="docutils literal"><span class="pre">_score</span></tt> の型を 32bit整数値から浮動小数点に変更しました。この変更はGroongaのDB APIを使っているユーザーにとって非互換な変更です。クエリAPIを使っているユーザーには影響ありません。つまり、<a class="reference internal" href="reference/commands/select.html"><em>select</em></a> を使っているだけなら影響ないということです。新旧のバージョンのGroongaで動作するようにするには次のコードを使います:</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="n">grn_obj</span> <span class="o">*</span><span class="n">score</span><span class="p">;</span>
+<span class="kt">double</span> <span class="n">score_value</span><span class="p">;</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="n">score</span><span class="o">-&gt;</span><span class="n">header</span><span class="p">.</span><span class="n">domain</span> <span class="o">==</span> <span class="n">GRN_DB_FLOAT</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">score_value</span> <span class="o">=</span> <span class="n">GRN_FLOAT_VALUE</span><span class="p">(</span><span class="n">score</span><span class="p">);</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+  <span class="n">score_value</span> <span class="o">=</span> <span class="p">(</span><span class="kt">double</span><span class="p">)</span><span class="n">GRN_INT32_VALUE_FLOAT_VALUE</span><span class="p">(</span><span class="n">score</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">[<a class="reference internal" href="reference/commands/select.html"><em>select</em></a>] ドリルダウンの引数の誤りをより厳密にチェックするようにしました。</p>
+</li>
+<li><p class="first"><a class="reference internal" href="reference/api/grn_ctx.html#c.grn_ctx_get_all_tables" title="grn_ctx_get_all_tables"><tt class="xref c c-func docutils literal"><span class="pre">grn_ctx_get_all_tables()</span></tt></a> を追加しました。 [Masatoshi Teruyaさんが提案]</p>
+</li>
+<li><p class="first">スコア関数のカスタマイズをサポートしました。詳細は <a class="reference internal" href="reference/scorer.html"><em>Scorer</em></a> を参照してください。</p>
+</li>
+<li><p class="first">[非互換] スコア関数の導入により、DB API層でAPIとABIの互換性がなくなりました。<a class="reference internal" href="reference/api/grn_search.html#c.grn_search_optarg" title="grn_search_optarg"><tt class="xref c c-type docutils literal"><span class="pre">grn_search_optarg</span></tt></a> を使っていたら、次のようなコードで <a class="reference internal" href="reference/api/grn_search.html#c.grn_search_optarg" title="grn_search_optarg"><tt class="xref c c-type docutils literal"><span class="pre">grn_search_optarg</span></tt></a> を <tt class="docutils literal"><span class="pre">0</span></tt> で初期化しているかチェックしてください。:</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="n">grn_search_optarg</span> <span class="n">options</span><span class="p">;</span>
+<span class="n">memset</span><span class="p">(</span><span class="o">&amp;</span><span class="n">options</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">grn_search_optarg</span><span class="p">));</span>
+</pre></div>
+</div>
+<p>上記のようにしていれば、あなたの書いたコードはAPIの互換性があり、ABIは互換性がない状態です。単にそのままリビルドしてください。コードの修正は不要です。</p>
+<p>もしあなたの書いたコードが上記のようにしていないなら、上記のコードを追加してください。</p>
+</li>
+<li><p class="first">DB APIに <a class="reference internal" href="reference/api/grn_obj.html#c.grn_obj" title="grn_obj"><tt class="xref c c-type docutils literal"><span class="pre">grn_obj</span></tt></a> の型をチェックするための叙述関数を追加しました。</p>
+<ul class="simple">
+<li><tt class="xref c c-func docutils literal"><span class="pre">grn_obj_is_table()</span></tt></li>
+<li><tt class="xref c c-func docutils literal"><span class="pre">grn_obj_is_proc_proc()</span></tt></li>
+<li><tt class="xref c c-func docutils literal"><span class="pre">grn_obj_is_function_proc()</span></tt></li>
+<li><tt class="xref c c-func docutils literal"><span class="pre">grn_obj_is_selector_proc()</span></tt></li>
+<li><tt class="xref c c-func docutils literal"><span class="pre">grn_obj_is_scorer_proc()</span></tt></li>
+</ul>
+</li>
+<li><p class="first">[実験的] ポスティングリストをスキップできるようにしました。頻出語とほとんど出現しない語が同時に検索されたときにスキップできます。これにより検索の速度を改善できます。この機能を有効にするには <tt class="docutils literal"><span class="pre">GRN_II_CURSOR_SET_MIN_ENABLE</span></tt> 環境変数を <tt class="docutils literal"><span class="pre">1</span></tt> にします。デフォルトでは無効です。</p>
+</li>
+<li><p class="first">[doc] <a class="reference internal" href="reference/functions/in_values.html"><em>in_values</em></a> のドキュメントを追加しました。</p>
+</li>
+<li><p class="first"><a class="reference internal" href="reference/commands/logical_count.html"><em>logical_count</em></a> のドキュメントを追加しました。</p>
+</li>
+<li><p class="first">[mruby] <tt class="docutils literal"><span class="pre">#inspect</span></tt> メソッドを実装しました。デバッグに有用です。</p>
+</li>
+<li><p class="first">スコアラー <a class="reference internal" href="reference/scorers/scorer_tf_at_most.html"><em>scorer_tf_at_most</em></a> のドキュメントを追加しました。出現頻度が高くても、指定したスコアの閾値を越えないようにします。</p>
+</li>
+<li><p class="first">[mruby] マッチする件数を推定してインデックスを使って検索するかシーケンシャルに検索するかを選択できるようにしました。</p>
+</li>
+<li><p class="first">インデックスを使ってサイズを推定するための関数を追加しました。</p>
+<ul class="simple">
+<li><tt class="xref c c-func docutils literal"><span class="pre">grn_expr_estimate_size()</span></tt></li>
+<li><tt class="xref c c-func docutils literal"><span class="pre">grn_ii_estimate_size_for_query()</span></tt></li>
+<li><tt class="xref c c-func docutils literal"><span class="pre">grn_ii_estimate_size_for_lexicon_cursor()</span></tt></li>
+</ul>
+</li>
+<li><p class="first"><a class="reference internal" href="reference/normalizers.html#normalizer-auto"><em>NormalizerAuto</em></a> が利用できるかのチェックを追加しました。[GitHub#283] [末永さんが報告]</p>
+</li>
+<li><p class="first">Visual Studio 2010のサポートをやめました。</p>
+</li>
+<li><p class="first">[実験的][mecab] チャンクに分割してトークナイズできるようにしました。この機能は MeCabの &quot;too long sentense&quot; エラーの回避策です。有効にするには <tt class="docutils literal"><span class="pre">GRN_MECAB_CHUNKED_TOKENIZE_ENABLED</span></tt> 環境変数を <tt class="docutils literal"><span class="pre">yes</span></tt> に設定します。この設定により、Groonga は長いテキスト (デフォルトでは 8192 バイトを越えるテキスト)を小さなチャンクと呼ばれるかたまりに分割してMeCabへと渡します。この処理により、上記のエラーが発生しないようになります。さらに、このチャンクの閾値は <tt class="docutils literal"><span class="pre">GRN_MECAB_CHUNK_SIZE_THRESHOLD</span></tt> 環境変数でカスタマイズできます。<tt class="docutils literal"><span class="pre">,</span></tt>, <tt class="docutils literal"><span class="pre">.</span></tt>, <tt class="docutils literal"><span class="pre">!</span></tt>, <tt class="docutils literal"><span class="pre">?</span></tt>, <tt class="docutils literal"><span class="pre">U+3001</span> <span class="pre">IDEOGRAPHIC</span> <span class="pre">COMMA</span></tt>, <tt class="docutils literal"><span class="pre">U+3002</span> <span class="pre">IDEOGRAPHIC</span> <span class="pre">FULL</span> <span class="pre">STOP</span></tt>, <tt class="docutils literal"><span class="pre">U+FF01</span> <span class="pre">FULLWIDTH</span> <span class="pre">EXCLAMATION</span> <span class="pre">MARK</span></tt> と <tt class="docutils literal"><span class="pre">U+FF1F</span> <span class="pre">FULLWIDTH</span> <span class="pre">QUESTION</span> <span class="pre">MARK</span></tt> がチャンクの区切り文字として扱われます。</p>
+</li>
+<li><p class="first"><a class="reference internal" href="reference/executables/groonga.html"><em>groongaコマンド</em></a> のサーバーモードで <tt class="docutils literal"><span class="pre">--pid-file</span></tt> をサポートしました。</p>
+</li>
+<li><p class="first">[groonga-httpd] Groongaを緩やかに停止することができるようにしました。コネクションを即座に強制終了しないようになります。</p>
+</li>
+<li><p class="first">[実験的] 正規表現をサポートしました。正規表現の使いかたについては <a class="reference internal" href="reference/regular_expression.html"><em>正規表現</em></a> を参照してください。</p>
+</li>
+<li><p class="first">[実験的] <a class="reference internal" href="reference/commands/plugin_unregister.html"><em>plugin_unregister</em></a> コマンドを追加しました。</p>
+</li>
+<li><p class="first">[http][<a class="reference internal" href="reference/commands/load.html"><em>load</em></a>] &quot;,&quot; をPOSTデータの区切り文字として使うようにしました。これにより、内部のバッファサイズが小さくて済むので、POSTデータに一切改行がない場合にロード時間を短縮できます。</p>
+</li>
+<li><p class="first">[doc] <a class="reference internal" href="reference/tokenizers.html"><em>トークナイザー</em></a> のドキュメントを追加しました。</p>
+</li>
+<li><p class="first">POSIX.2 との互換性を改善しました。<tt class="docutils literal"><span class="pre">.</span></tt>  bashの &quot;source&quot; コマンドのかわりに <tt class="docutils literal"><span class="pre">.</span></tt> を使うようにしました。[GitHub#317] [栗山さんがパッチ提供]</p>
+</li>
+<li><p class="first">[windows] デフォルトのIOバージョンを1に変更しました。これによりWindowsでディスク容量を削減できます。[groonga-dev,03118] [ongaeshiさんがテスト]</p>
+</li>
+<li><p class="first">[httpd] バンドルしているnginxのバージョンを1.7.11に更新しました。</p>
+</li>
+<li><p class="first">TSV出力時のMIMEタイプを <tt class="docutils literal"><span class="pre">text/plain</span></tt> から <tt class="docutils literal"><span class="pre">text/tab-separated-values</span></tt> に変更しました。</p>
+</li>
+<li><p class="first">[<a class="reference internal" href="reference/token_filters.html#token-filter-stop-word"><em>TokenFilterStopWord</em></a>] <a class="reference internal" href="reference/indexing.html#offline-index-construction"><em>静的なインデックス構築方法</em></a> をサポートしました。[GitHub#296] [村上さんがパッチ提供]</p>
+</li>
+</ul>
+</div>
+<div class="section" id="fixes">
+<h3>修正<a class="headerlink" href="#fixes" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<ul class="simple">
+<li><p class="first">非推奨の <tt class="docutils literal"><span class="pre">--address</span></tt> 引数をGroongaのデフォルト設定ファイル(groonga.conf)で使わないようにしました。かわりに <tt class="docutils literal"><span class="pre">--bind-address</span></tt> を使います。 [Groonga-talk] [Dewanggaさんが報告]</p>
+</li>
+<li><p class="first">[<a class="reference internal" href="reference/commands/truncate.html"><em>truncate</em></a>] キーが <a class="reference internal" href="reference/tables.html#table-no-key"><em>TABLE_NO_KEY</em></a> なテーブルでtruncateができない問題を修正しました。</p>
+</li>
+<li><p class="first">[mecab] 不必要な &quot;empty token&quot; や &quot;ignore empty token&quot; といったログが出力されないようにしました。</p>
+</li>
+<li><p class="first">誤ったインデックスのセクションが使われてしまう不具合を修正しました。これにより誤った検索結果を返していました。次の条件をすべて満すと発生します。</p>
+<ul>
+<li><p class="first">複数のインデックスが張られている</p>
+</li>
+<li><p class="first">最初に定義したインデックスか最後に定義したインデックスがマルチカラムインデックスを使っている</p>
+</li>
+<li><p class="first">最初に定義したインデックスと最後に定義したインデックスがマルチカラムインデックスだったとき、そのソースカラムの指定順が異なっている</p>
+</li>
+</ul>
+</li>
+<li><p class="first">シェルのコマンドラインからGroongaのコマンドを <a class="reference internal" href="reference/executables/groonga.html"><em>groongaコマンド</em></a> に渡すと常に <tt class="docutils literal"><span class="pre">0</span></tt> を終了コードとして返す不具合を修正しました。 例えば、 <tt class="docutils literal"><span class="pre">groonga</span> <span class="pre">DB_PATH</span> <span class="pre">存在しないコマンド名</span></tt> を実行しても終了コードとして <tt class="docutils literal"><span class="pre">0</span></tt> を常に返します。</p>
+</li>
+<li><p class="first">2つ以上のプラグインを登録しているときにプラグインのパスが壊れてしまう不具合を修正しました。 [村上さんが報告]</p>
+</li>
+<li><p class="first"><a class="reference internal" href="reference/commands/select.html#select-match-columns"><em>match_columns</em></a> に <tt class="docutils literal"><span class="pre">Lexicon.index.source_column_name</span></tt> を指定しても動作しない不具合を修正しました。<tt class="docutils literal"><span class="pre">source_column_name</span></tt> として指定されたカラムが2つ以上のインデックスをもつ場合に発生します。 [村上さんが報告]</p>
+</li>
+</ul>
+</div>
+<div class="section" id="thanks">
+<h3>感謝<a class="headerlink" href="#thanks" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<ul class="simple">
+<li><p class="first">Masatoshi Teruyaさん</p>
+</li>
+<li><p class="first">末永さん</p>
+</li>
+<li><p class="first">Dewanggaさん</p>
+</li>
+<li><p class="first">栗山さん</p>
+</li>
+<li><p class="first">ongaeshiさん</p>
+</li>
+<li><p class="first">村上さん</p>
+</li>
+</ul>
+</div>
+</div>
 <div class="section" id="release-5-0-0-2015-02-09">
 <span id="release-5-0-0"></span><h2>5.0.0リリース - 2015/02/09<a class="headerlink" href="#release-5-0-0-2015-02-09" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <ul class="simple">
 <li><p class="first">バージョン5.0.0になりました!</p>
 </li>
 </ul>
-<div class="section" id="improvements">
-<h3>改良<a class="headerlink" href="#improvements" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id1">
+<h3>改良<a class="headerlink" href="#id1" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p class="first">[doc] <a class="reference internal" href="reference/grn_expr/script_syntax.html"><em>スクリプト構文</em></a> の <a class="reference internal" href="reference/grn_expr/script_syntax.html#script-syntax-security"><em>セキュリティー</em></a> に関して追加しました。</p>
 </li>
@@ -97,8 +237,8 @@
 </li>
 </ul>
 </div>
-<div class="section" id="fixes">
-<h3>修正<a class="headerlink" href="#fixes" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id2">
+<h3>修正<a class="headerlink" href="#id2" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p class="first">システムに互換性のないバージョンのonigmoもしくはonigurumaのヘッダーがインストールされているとビルドに失敗する問題を修正しました。 [GitHub#276] [武者さんがパッチ提供]</p>
 </li>
@@ -106,8 +246,8 @@
 </li>
 </ul>
 </div>
-<div class="section" id="thanks">
-<h3>感謝<a class="headerlink" href="#thanks" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id3">
+<h3>感謝<a class="headerlink" href="#id3" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p class="first">武者さん</p>
 </li>
@@ -456,10 +596,16 @@
   <h3><a href="index.html">目次</a></h3>
   <ul>
 <li><a class="reference internal" href="#">お知らせ</a><ul>
-<li><a class="reference internal" href="#release-5-0-0-2015-02-09">5.0.0リリース - 2015/02/09</a><ul>
+<li><a class="reference internal" href="#release-5-0-1-2015-03-29">5.0.1リリース - 2015/03/29</a><ul>
 <li><a class="reference internal" href="#improvements">改良</a></li>
 <li><a class="reference internal" href="#fixes">修正</a></li>
 <li><a class="reference internal" href="#thanks">感謝</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#release-5-0-0-2015-02-09">5.0.0リリース - 2015/02/09</a><ul>
+<li><a class="reference internal" href="#id1">改良</a></li>
+<li><a class="reference internal" href="#id2">修正</a></li>
+<li><a class="reference internal" href="#id3">感謝</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#the-old-releases">古いリリース</a></li>
@@ -495,7 +641,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="総合索引"
              >索引</a></li>
-        <li><a href="index.html">Groonga v5.00ドキュメント</a> &raquo;</li> 
+        <li><a href="index.html">Groonga v5.0.1ドキュメント</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

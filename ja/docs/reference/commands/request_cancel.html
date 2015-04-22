@@ -98,23 +98,20 @@
 <div class="versionadded">
 <p><span class="versionmodified">バージョン 4.0.9 で追加.</span></p>
 </div>
-<p><tt class="docutils literal"><span class="pre">request_cancel</span></tt> command cancels a running request.</p>
+<p><tt class="docutils literal"><span class="pre">request_cancel</span></tt> コマンドは実行中のリクエストをキャンセルします。</p>
 <p>いくつか制限があります。</p>
 <blockquote>
 <div><ul class="simple">
-<li>Request ID must be managed by user. (You need to assign unique key
-for each request.)</li>
-<li>Cancel request may be ignored. (You can send <tt class="docutils literal"><span class="pre">request_cancel</span></tt>
-command multiple times for the same request ID.)</li>
-<li>Only multithreading type Groonga server is supported. (You can use
-with <a class="reference internal" href="../executables/groonga.html"><em>groongaコマンド</em></a> based server but can't
-use with <a class="reference internal" href="../executables/groonga-httpd.html"><em>groonga-httpd</em></a>.)</li>
+<li><p class="first">リクエストIDはユーザーが管理する必要があります。（各リクエストに一意のキーを割り当てる必要があります。）</p>
+</li>
+<li><p class="first">キャンセルリクエストは無視されることもあります。（同じリクエストIDに対して何度も <tt class="docutils literal"><span class="pre">request_cancel</span></tt> コマンドを送信することができます。）</p>
+</li>
+<li><p class="first">マルチスレッド型のGroongaサーバーのみサポートしています。（ <a class="reference internal" href="../executables/groonga.html"><em>groongaコマンド</em></a> ベースのサーバーでは使えますが、 <a class="reference internal" href="../executables/groonga-httpd.html"><em>groonga-httpd</em></a> では使えません。）</p>
+</li>
 </ul>
 </div></blockquote>
 <p>リクエストIDについては <a class="reference internal" href="../command/request_id.html"><em>リクエストID</em></a> を参照してください。</p>
-<p>If request is canceled, the canceled request has <tt class="docutils literal"><span class="pre">-5</span></tt>
-(<tt class="docutils literal"><span class="pre">GRN_INTERRUPTED_FUNCTION_CALL</span></tt>) as
-<a class="reference internal" href="../command/return_code.html"><em>リターンコード</em></a>.</p>
+<p>リクエストがキャンセルされたら、キャンセルされたリクエストの <a class="reference internal" href="../command/return_code.html"><em>リターンコード</em></a> は <tt class="docutils literal"><span class="pre">-5</span></tt> （ <tt class="docutils literal"><span class="pre">GRN_INTERRUPTED_FUNCTION_CALL</span></tt> ）になります。</p>
 </div>
 <div class="section" id="syntax">
 <h2>7.3.30.2. 構文<a class="headerlink" href="#syntax" title="このヘッドラインへのパーマリンク">¶</a></h2>
@@ -135,17 +132,10 @@ $ curl &#39;http://localhost:10041/d/request_cancel?id=unique-id-1&#39;
 # Point: &quot;id=unique-id-1&quot;
 </pre></div>
 </div>
-<p>Assume that the first <tt class="docutils literal"><span class="pre">select</span></tt> command takes a long
-time. <tt class="docutils literal"><span class="pre">unique-id-1</span></tt> request ID is assigned to the <tt class="docutils literal"><span class="pre">select</span></tt> command
-by <tt class="docutils literal"><span class="pre">request_id=unique-id-1</span></tt> parameter.</p>
-<p>The second <tt class="docutils literal"><span class="pre">request_cancel</span></tt> command passes <tt class="docutils literal"><span class="pre">id=unique-id-1</span></tt>
-parameter. <tt class="docutils literal"><span class="pre">unique-id-1</span></tt> is the same request ID passed in <tt class="docutils literal"><span class="pre">select</span></tt>
-command.</p>
-<p>The <tt class="docutils literal"><span class="pre">select</span></tt> command may not be canceled immediately. And the cancel
-request may be ignored.</p>
-<p>You can send cancel request for the same request ID multiple times. If
-the target request is canceled or finished, <tt class="docutils literal"><span class="pre">&quot;canceled&quot;</span></tt> value is
-changed to <tt class="docutils literal"><span class="pre">false</span></tt> from <tt class="docutils literal"><span class="pre">true</span></tt>:</p>
+<p>最初の <tt class="docutils literal"><span class="pre">select</span></tt> コマンドが長時間かかると仮定します。 <tt class="docutils literal"><span class="pre">request_id=unique-id-1</span></tt> パラメーターを指定することで <tt class="docutils literal"><span class="pre">unique-id-1</span></tt> というリクエストIDをこの <tt class="docutils literal"><span class="pre">select</span></tt> コマンドに割り当てます。</p>
+<p>2つめの <tt class="docutils literal"><span class="pre">request_cancel</span></tt> コマンドで <tt class="docutils literal"><span class="pre">id=unique-id-1</span></tt> パラメーターを指定しています。 <tt class="docutils literal"><span class="pre">unique-id-1</span></tt> は <tt class="docutils literal"><span class="pre">select</span></tt> コマンドに渡したリクエストIDと同じリクエストIDです。</p>
+<p>この <tt class="docutils literal"><span class="pre">select</span></tt> コマンドはすぐにはキャンセルされないかもしれません。また、このキャンセルリクエストは無視されることもあります。</p>
+<p>同じリクエストIDに対するキャンセルリクエストを複数回送ることができます。もし、対象のリクエストがキャンセルされたか終了した場合は戻り値の中の <tt class="docutils literal"><span class="pre">&quot;canceled&quot;</span></tt> の値が <tt class="docutils literal"><span class="pre">true</span></tt> から <tt class="docutils literal"><span class="pre">false</span></tt> に変わります。</p>
 <div class="highlight-none"><div class="highlight"><pre>$ curl &#39;http://localhost:10041/d/request_cancel?id=unique-id-1&#39;
 [[...], {&quot;id&quot;: &quot;unique-id-1&quot;, &quot;canceled&quot;: true}]
 # &quot;select&quot; is still running... (&quot;canceled&quot; is &quot;true&quot;)
@@ -157,9 +147,7 @@ $ curl &#39;http://localhost:10041/d/request_cancel?id=unique-id-1&#39;
 # &quot;select&quot; is canceled or finished. (&quot;canceled&quot; is &quot;false&quot;)
 </pre></div>
 </div>
-<p>If the <tt class="docutils literal"><span class="pre">select</span></tt> command is canceled, response of the <tt class="docutils literal"><span class="pre">select</span></tt>
-command has <tt class="docutils literal"><span class="pre">-5</span></tt> (<tt class="docutils literal"><span class="pre">GRN_INTERRUPTED_FUNCTION_CALL</span></tt>) as
-<a class="reference internal" href="../command/return_code.html"><em>リターンコード</em></a>:</p>
+<p>もし、この <tt class="docutils literal"><span class="pre">select</span></tt> コマンドがキャンセルされたら、 <tt class="docutils literal"><span class="pre">select</span></tt> コマンドの <a class="reference internal" href="../command/return_code.html"><em>リターンコード</em></a> は <tt class="docutils literal"><span class="pre">-5</span></tt> （ <tt class="docutils literal"><span class="pre">GRN_INTERRUPTED_FUNCTION_CALL</span></tt> ）になります。:</p>
 <div class="highlight-none"><div class="highlight"><pre>$ curl &#39;http://localhost:10041/d/select?table=LargeTable&amp;filter=true&amp;request_id=unique-id-1&#39; &amp;
 [[-5, ...], ...]
 </pre></div>
@@ -179,7 +167,7 @@ command has <tt class="docutils literal"><span class="pre">-5</span></tt> (<tt c
 </div>
 <div class="section" id="return-value">
 <h2>7.3.30.5. 戻り値<a class="headerlink" href="#return-value" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p><tt class="docutils literal"><span class="pre">request_cancel</span></tt> command returns the result of the cancel request:</p>
+<p><tt class="docutils literal"><span class="pre">request_cancel</span></tt> コマンドはキャンセルリクエストの結果を返します。:</p>
 <div class="highlight-none"><div class="highlight"><pre>[
   HEADER,
   {
@@ -195,17 +183,13 @@ command has <tt class="docutils literal"><span class="pre">-5</span></tt> (<tt c
 </div></blockquote>
 <p><tt class="docutils literal"><span class="pre">ID</span></tt></p>
 <blockquote>
-<div>The ID of the target request.</div></blockquote>
+<div><p>対象のリクエストのIDです。</p>
+</div></blockquote>
 <p><tt class="docutils literal"><span class="pre">CANCEL_REQUEST_IS_ACCEPTED_OR_NOT</span></tt></p>
 <blockquote>
-<div><p>If the cancel request is accepted, this is <tt class="docutils literal"><span class="pre">true</span></tt>, otherwise this
-is <tt class="docutils literal"><span class="pre">false</span></tt>.</p>
-<p>Note that &quot;cancel request is accepted&quot; doesn't means that &quot;the
-target request is canceled&quot;. It just means &quot;cancel request is
-notified to the target request but the cancel request may be ignored
-by the target request&quot;.</p>
-<p>If request assigned with the request ID doesn't exist, this is
-<tt class="docutils literal"><span class="pre">false</span></tt>.</p>
+<div><p>もし、このキャンセルリクエストが受け付けられたら <tt class="docutils literal"><span class="pre">true</span></tt> 、そうでなければ <tt class="docutils literal"><span class="pre">false</span></tt> になります。</p>
+<p>「キャンセルリクエストが受け付けられた」というのは「対象リクエストがキャンセルされた」という意味ではないことに注意してください。これは「キャンセルリクエストは対象リクエストに通知したが、対象リクエストはそのキャンセルリクエストを無視するかもしれない」という意味です。</p>
+<p>指定したリクエストIDが割り当てられているリクエストが存在しなければ <tt class="docutils literal"><span class="pre">false</span></tt> になります。</p>
 </div></blockquote>
 </div>
 <div class="section" id="see-also">

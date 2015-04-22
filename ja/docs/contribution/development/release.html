@@ -113,9 +113,13 @@
 <div class="highlight-none"><div class="highlight"><pre>% sudo apt-get install -V debootstrap createrepo rpm mercurial python-docutils python-jinja2 ruby-full mingw-w64 g++-mingw-w64 mecab libmecab-dev nsis gnupg2
 </pre></div>
 </div>
-<p>rinseのバージョンが古いとCentOS 5/6パッケージのビルドを行うことができません。
-別途debパッケージを以下のコマンドを実行して最新版をインストールします。:</p>
-<div class="highlight-none"><div class="highlight"><pre>% sudo dpkg -i rinse_1.9.2-1_all.deb
+<p>Debian系（.deb）やRed Hat系（.rpm）パッケージのビルドには <a class="reference external" href="https://www.vagrantup.com/">Vagrant</a> を使用します。apt-getでインストールできるのは古いバージョンなので、Webサイトから最新版をダウンロードしてインストールすることをおすすめします。</p>
+<p>Vagrantで使用する仮想化ソフトウェア（VirtualBox、VMwareなど）がない場合、合わせてインストールしてください。なお、VirtualBoxはsources.listにcontribセクションを追加すればapt-getでインストールできます。:</p>
+<div class="highlight-none"><div class="highlight"><pre>% cat /etc/apt/sources.list
+deb http://ftp.jp.debian.org/debian/ sid main contrib
+deb-src http://ftp.jp.debian.org/debian/ sid main contrib
+% sudo apt-get update
+% sudo apt-get install virtualbox
 </pre></div>
 </div>
 <p>また、rubyのrakeパッケージを以下のコマンドによりインストールします。:</p>
@@ -425,8 +429,8 @@ packages/source/filesディレクトリ以下へとダウンロードされま�
 <p>ビルドしたパッケージに対しリリース前の動作確認を行います。</p>
 <p>Debian系もしくはRed Hat系の場合には本番環境へとアップロードする前にローカルのaptないしyumのリポジトリを参照して正常に更新できることを確認します。</p>
 <p>ここでは以下のようにrubyを利用してリポジトリをwebサーバ経由で参照できるようにします。:</p>
-<div class="highlight-none"><div class="highlight"><pre>% ruby1.9.1 -run -e httpd -- packages/yum/repositories (yumの場合)
-% ruby1.9.1 -run -e httpd -- packages/apt/repositories (aptの場合)
+<div class="highlight-none"><div class="highlight"><pre>% ruby -run -e httpd -- packages/yum/repositories (yumの場合)
+% ruby -run -e httpd -- packages/apt/repositories (aptの場合)
 </pre></div>
 </div>
 <div class="section" id="grntest">
@@ -556,12 +560,12 @@ README.md  binlib  license  test
 <p>基本的にはリリースアナウンスの内容をそのまま記載します。</p>
 <p>cloneしたWebサイトのソースに対して以下のファイルを新規追加します。</p>
 <ul class="simple">
-<li>groonga.org/en/_post/(リリース日)-release.textile</li>
-<li>groonga.org/ja/_post/(リリース日)-release.textile</li>
+<li>groonga.org/en/_post/(リリース日)-release.md</li>
+<li>groonga.org/ja/_post/(リリース日)-release.md</li>
 </ul>
-<p>編集した内容をpushする前に確認したい場合にはjekyllおよびRedClothが必要です。
+<p>編集した内容をpushする前に確認したい場合にはJekyllおよびRedCloth（Textileパーサー）、RDiscount（Markdownパーサー）、JavaScript interpreter（therubyracer、Node.jsなど）が必要です。
 インストールするには以下のコマンドを実行します。:</p>
-<div class="highlight-none"><div class="highlight"><pre>% sudo gem1.9.1 install jekyll RedCloth
+<div class="highlight-none"><div class="highlight"><pre>% sudo gem install jekyll RedCloth rdiscount therubyracer
 </pre></div>
 </div>
 <p>jekyllのインストールを行ったら、以下のコマンドでローカルにwebサーバを起動します。:</p>
@@ -571,7 +575,7 @@ README.md  binlib  license  test
 <p>あとはブラウザにてhttp://localhost:4000にアクセスして内容に問題がないかを確認します。</p>
 <div class="admonition note">
 <p class="first admonition-title">注釈</p>
-<p>記事を非公開の状態でアップロードするには.textileファイルのpublished:をfalseに設定します。:</p>
+<p>記事を非公開の状態でアップロードするには.mdファイルのpublished:をfalseに設定します。:</p>
 <div class="last highlight-none"><div class="highlight"><pre>---
 layout: post.en
 title: Groonga 2.0.5 has been released

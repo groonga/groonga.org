@@ -31,10 +31,15 @@
 
     % sudo apt-get install -V debootstrap createrepo rpm mercurial python-docutils python-jinja2 ruby-full mingw-w64 g++-mingw-w64 mecab libmecab-dev nsis gnupg2
 
-rinseのバージョンが古いとCentOS 5/6パッケージのビルドを行うことができません。
-別途debパッケージを以下のコマンドを実行して最新版をインストールします。::
+Debian系（.deb）やRed Hat系（.rpm）パッケージのビルドには `Vagrant <https://www.vagrantup.com/>`_ を使用します。apt-getでインストールできるのは古いバージョンなので、Webサイトから最新版をダウンロードしてインストールすることをおすすめします。
 
-    % sudo dpkg -i rinse_1.9.2-1_all.deb
+Vagrantで使用する仮想化ソフトウェア（VirtualBox、VMwareなど）がない場合、合わせてインストールしてください。なお、VirtualBoxはsources.listにcontribセクションを追加すればapt-getでインストールできます。::
+
+    % cat /etc/apt/sources.list
+    deb http://ftp.jp.debian.org/debian/ sid main contrib
+    deb-src http://ftp.jp.debian.org/debian/ sid main contrib
+    % sudo apt-get update
+    % sudo apt-get install virtualbox
 
 また、rubyのrakeパッケージを以下のコマンドによりインストールします。::
 
@@ -394,8 +399,8 @@ Debian系もしくはRed Hat系の場合には本番環境へとアップロー�
 
 ここでは以下のようにrubyを利用してリポジトリをwebサーバ経由で参照できるようにします。::
 
-    % ruby1.9.1 -run -e httpd -- packages/yum/repositories (yumの場合)
-    % ruby1.9.1 -run -e httpd -- packages/apt/repositories (aptの場合)
+    % ruby -run -e httpd -- packages/yum/repositories (yumの場合)
+    % ruby -run -e httpd -- packages/apt/repositories (aptの場合)
 
 grntestの準備
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -531,14 +536,14 @@ http://groonga.org/blog/ および http://groonga.org/blog/ にて公開され�
 
 cloneしたWebサイトのソースに対して以下のファイルを新規追加します。
 
-* groonga.org/en/_post/(リリース日)-release.textile
-* groonga.org/ja/_post/(リリース日)-release.textile
+* groonga.org/en/_post/(リリース日)-release.md
+* groonga.org/ja/_post/(リリース日)-release.md
 
 
-編集した内容をpushする前に確認したい場合にはjekyllおよびRedClothが必要です。
+編集した内容をpushする前に確認したい場合にはJekyllおよびRedCloth（Textileパーサー）、RDiscount（Markdownパーサー）、JavaScript interpreter（therubyracer、Node.jsなど）が必要です。
 インストールするには以下のコマンドを実行します。::
 
-    % sudo gem1.9.1 install jekyll RedCloth
+    % sudo gem install jekyll RedCloth rdiscount therubyracer
 
 jekyllのインストールを行ったら、以下のコマンドでローカルにwebサーバを起動します。::
 
@@ -547,7 +552,7 @@ jekyllのインストールを行ったら、以下のコマンドでローカ�
 あとはブラウザにてhttp://localhost:4000にアクセスして内容に問題がないかを確認します。
 
 .. note::
-   記事を非公開の状態でアップロードするには.textileファイルのpublished:をfalseに設定します。::
+   記事を非公開の状態でアップロードするには.mdファイルのpublished:をfalseに設定します。::
 
     ---
     layout: post.en

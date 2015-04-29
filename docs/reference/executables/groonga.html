@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>7.1.3. groonga command &mdash; Groonga v5.0.2 documentation</title>
+    <title>7.1.3. groonga executable file &mdash; Groonga v5.0.3 documentation</title>
     
     <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '5.0.2',
+        VERSION:     '5.0.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../../static/underscore.js"></script>
     <script type="text/javascript" src="../../static/doctools.js"></script>
     <link rel="shortcut icon" href="../../static/favicon.ico"/>
-    <link rel="top" title="Groonga v5.0.2 documentation" href="../../index.html" />
+    <link rel="top" title="Groonga v5.0.3 documentation" href="../../index.html" />
     <link rel="up" title="7.1. Executables" href="../executables.html" />
     <link rel="next" title="7.1.4. groonga-benchmark" href="groonga-benchmark.html" />
     <link rel="prev" title="7.1.2. grnslap" href="grnslap.html" /> 
@@ -75,7 +75,7 @@
         <li class="right" >
           <a href="grnslap.html" title="7.1.2. grnslap"
              accesskey="P">previous</a> |</li>
-        <li><a href="../../index.html">Groonga v5.0.2 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">Groonga v5.0.3 documentation</a> &raquo;</li>
           <li><a href="../../reference.html" >7. Reference manual</a> &raquo;</li>
           <li><a href="../executables.html" accesskey="U">7.1. Executables</a> &raquo;</li> 
       </ul>
@@ -86,18 +86,144 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="groonga-command">
-<h1>7.1.3. groonga command<a class="headerlink" href="#groonga-command" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="groonga-executable-file">
+<h1>7.1.3. <tt class="docutils literal"><span class="pre">groonga</span></tt> executable file<a class="headerlink" href="#groonga-executable-file" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="summary">
 <h2>7.1.3.1. Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
-<p>groonga - 列指向データベース機能を持つ全文検索エンジンソフトウェア</p>
-<p>Groongaは列指向のデータベース機能を持つ高速でスケーラブルな全文検索エンジンです。
-Groongaのデータベースは、groongaコマンドかCライブラリインタフェースを通して操作することができます。このマニュアルページでは、groongaコマンドの使い方について説明します。</p>
+<p><tt class="docutils literal"><span class="pre">groonga</span></tt> executable file provides the following features:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Fulltext search server</li>
+<li>Fulltext search shell</li>
+<li>Client for Groonga fulltext search server</li>
+</ul>
+</div></blockquote>
+<p>Groonga can be used as a library. If you want to use Groonga as a
+library, you need to write a program in C, C++ and so on. Library use
+is useful for embedding fulltext search feature to your application,
+but it's not easy to use.</p>
+<p>You can use <tt class="docutils literal"><span class="pre">groonga</span></tt> executable file to get fulltext search
+feature.</p>
+<p>If you want to try Groonga, fulltext search shell usage is useful. You
+don't need any server and client. You just need one terminal. You can
+try Groonga like the following:</p>
+<div class="highlight-none"><div class="highlight"><pre>% groonga -n db
+&gt; status
+[[0,1429687763.70845,0.000115633010864258],{&quot;alloc_count&quot;:195,...}]
+&gt; quit
+%
+</pre></div>
+</div>
+<p>If you want to create an application that has fulltext search feature,
+fulltext search server usage is useful. You can use Groonga as a
+server like RDBMS (Relational DataBase Management
+System). Client-server model is a popular architecture.</p>
+<p>Normally, client for Groonga fulltext server usage isn't used.</p>
 </div>
 <div class="section" id="syntax">
 <h2>7.1.3.2. Syntax<a class="headerlink" href="#syntax" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-none"><div class="highlight"><pre>groonga [options] [dest] [command [args]]
+<p><tt class="docutils literal"><span class="pre">groonga</span></tt> executable file has the following four modes:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Standalone mode</li>
+<li>Server mode</li>
+<li>Daemon mode</li>
+<li>Client mode</li>
+</ul>
+</div></blockquote>
+<p>There are common options in these modes. These common options is
+described later section.</p>
+<div class="section" id="standalone-mode">
+<span id="groonga-executable-file-standalone-mode"></span><h3>7.1.3.2.1. Standalone mode<a class="headerlink" href="#standalone-mode" title="Permalink to this headline">¶</a></h3>
+<p>In standalone mode, <tt class="docutils literal"><span class="pre">groonga</span></tt> executable file runs one or more
+Groonga <a class="reference internal" href="../command.html"><em>Command</em></a> against a local Groonga database.</p>
+<p>Here is the syntax to run shell that executes Groonga command against
+temporary database:</p>
+<div class="highlight-none"><div class="highlight"><pre>groonga [options]
 </pre></div>
+</div>
+<p>Here is the syntax to create a new database and run shell that
+executes Groonga command against the new database:</p>
+<div class="highlight-none"><div class="highlight"><pre>groonga [options] -n DB_PATH
+</pre></div>
+</div>
+<p>Here is the syntax to run shell that executes Groonga command against
+existing database:</p>
+<div class="highlight-none"><div class="highlight"><pre>groonga [options] DB_PATH
+</pre></div>
+</div>
+<p>Here is the syntax to run Groonga command against existing database
+and exit:</p>
+<div class="highlight-none"><div class="highlight"><pre>groonga [options] DB_PATH COMMAND [command arguments]
+</pre></div>
+</div>
+</div>
+<div class="section" id="server-mode">
+<span id="groonga-executable-file-server-mode"></span><h3>7.1.3.2.2. Server mode<a class="headerlink" href="#server-mode" title="Permalink to this headline">¶</a></h3>
+<p>In server mode, <tt class="docutils literal"><span class="pre">groonga</span></tt> executable file runs as a server. The
+server accepts connections from other processes at local machine or
+remote machine and executes received Groonga <a class="reference internal" href="../command.html"><em>Command</em></a>
+against a local Groonga database.</p>
+<p>You can choose one protocol from <a class="reference internal" href="../../server/http.html"><em>HTTP</em></a> and
+<a class="reference internal" href="../../server/gqtp.html"><em>GQTP</em></a>. Normally, HTTP is suitable but GQTP is the
+default protocol. This section describes only about HTTP protocol
+usage.</p>
+<p>In server mode, <tt class="docutils literal"><span class="pre">groonga</span></tt> executable file runs in the foreground. If
+you want to run Groonga server in the background, see
+<a class="reference internal" href="#groonga-executable-file-server-mode"><em>Server mode</em></a>.</p>
+<p>Here is the syntax to run Groonga server with temporary database:</p>
+<div class="highlight-none"><div class="highlight"><pre>groonga [options] --protocol http -s
+</pre></div>
+</div>
+<p>Here is the syntax to create a new database and run Groonga server
+with the new database:</p>
+<div class="highlight-none"><div class="highlight"><pre>groonga [options] --protocol http -s -n DB_PATH
+</pre></div>
+</div>
+<p>Here is the syntax to run Groonga server with existing database:</p>
+<div class="highlight-none"><div class="highlight"><pre>groonga [options] --protocol http -s DB_PATH
+</pre></div>
+</div>
+</div>
+<div class="section" id="daemon-mode">
+<span id="groonga-executable-file-daemon-mode"></span><h3>7.1.3.2.3. Daemon mode<a class="headerlink" href="#daemon-mode" title="Permalink to this headline">¶</a></h3>
+<p>In daemon mode, <tt class="docutils literal"><span class="pre">groonga</span></tt> executable file runs as a daemon. Daemon
+is similar to server but it runs in the background. See
+<em class="xref std std-ref">_groonga-executable-file-daemon-mode</em> about server.</p>
+<p>Here is the syntax to run Groonga daemon with temporary database:</p>
+<div class="highlight-none"><div class="highlight"><pre>groonga [options] --protocol http -d
+</pre></div>
+</div>
+<p>Here is the syntax to create a new database and run Groonga daemon
+with the new database:</p>
+<div class="highlight-none"><div class="highlight"><pre>groonga [options] --protocol http -d -n DB_PATH
+</pre></div>
+</div>
+<p>Here is the syntax to run Groonga daemon with existing database:</p>
+<div class="highlight-none"><div class="highlight"><pre>groonga [options] --protocol http -d DB_PATH
+</pre></div>
+</div>
+<p><em class="xref std std-option">--pid-file</em> option will be useful for daemon mode.</p>
+</div>
+<div class="section" id="client-mode">
+<span id="groonga-executable-file-client-mode"></span><h3>7.1.3.2.4. Client mode<a class="headerlink" href="#client-mode" title="Permalink to this headline">¶</a></h3>
+<p>In client mode, <tt class="docutils literal"><span class="pre">groonga</span></tt> executable file runs as a client for GQTP
+protocol Groonga server. Its usage is similar to
+<a class="reference internal" href="#groonga-executable-file-standalone-mode"><em>Standalone mode</em></a>. You can run shell and
+execute one command. You need to specify server address instead of
+local database.</p>
+<p>Note that you can use <tt class="docutils literal"><span class="pre">groonga</span></tt> executable file as a client for HTTP
+protocol Groonga server.</p>
+<p>Here is the syntax to run shell that executes Groonga command against
+Groonga server that is running at <tt class="docutils literal"><span class="pre">192.168.0.1:10043</span></tt>:</p>
+<div class="highlight-none"><div class="highlight"><pre>groonga [options] -c --host 192.168.0.1 --port 10043
+</pre></div>
+</div>
+<p>Here is the syntax to run Groonga command against Groonga server that
+is running at <tt class="docutils literal"><span class="pre">192.168.0.1:10043</span></tt> and exit:</p>
+<div class="highlight-none"><div class="highlight"><pre>groonga [options] -c --host 192.168.0.1 --port 10043 COMMAND [command arguments]
+</pre></div>
+</div>
 </div>
 </div>
 <div class="section" id="options">
@@ -398,9 +524,15 @@ pid-file=/var/run/groonga.pid
         <div class="sphinxsidebarwrapper">
   <h3><a href="../../index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">7.1.3. groonga command</a><ul>
+<li><a class="reference internal" href="#">7.1.3. <tt class="docutils literal"><span class="pre">groonga</span></tt> executable file</a><ul>
 <li><a class="reference internal" href="#summary">7.1.3.1. Summary</a></li>
-<li><a class="reference internal" href="#syntax">7.1.3.2. Syntax</a></li>
+<li><a class="reference internal" href="#syntax">7.1.3.2. Syntax</a><ul>
+<li><a class="reference internal" href="#standalone-mode">7.1.3.2.1. Standalone mode</a></li>
+<li><a class="reference internal" href="#server-mode">7.1.3.2.2. Server mode</a></li>
+<li><a class="reference internal" href="#daemon-mode">7.1.3.2.3. Daemon mode</a></li>
+<li><a class="reference internal" href="#client-mode">7.1.3.2.4. Client mode</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#options">7.1.3.3. Options</a></li>
 <li><a class="reference internal" href="#command-line-parameters">7.1.3.4. Command line parameters</a></li>
 <li><a class="reference internal" href="#command">7.1.3.5. Command</a></li>
@@ -450,7 +582,7 @@ pid-file=/var/run/groonga.pid
         <li class="right" >
           <a href="grnslap.html" title="7.1.2. grnslap"
              >previous</a> |</li>
-        <li><a href="../../index.html">Groonga v5.0.2 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">Groonga v5.0.3 documentation</a> &raquo;</li>
           <li><a href="../../reference.html" >7. Reference manual</a> &raquo;</li>
           <li><a href="../executables.html" >7.1. Executables</a> &raquo;</li> 
       </ul>

@@ -12,17 +12,90 @@ News
 Release 5.0.3 - 2015-04-29
 --------------------------
 
+Improvements
+^^^^^^^^^^^^
+
+* [:doc:`/reference/tokenizers`][:doc:`/reference/regular_expression`]
+  Skip the last one character token.
+* [mruby] Supported regexp pattern for estimating size.
+* [mruby] Supported size estimation for accessor.
+* [:doc:`/reference/commands/logical_range_filter`] Removed ``GRN_LOGICAL_RANGE_FILTER_ENABLED``
+  environment variable which is introduced since Groonga 5.0.2.
+  Use ``GRN_LOGICAL_RANGE_FILTER_THRESHOLD=0`` to disable range index search
+  feature.
+* [:doc:`/reference/commands/logical_range_filter`] Supported negative limit and offset.
+* [:doc:`/install/windows`] Used `Groonga Admin <https://github.com/groonga/groonga-admin>`_ in package.
+* [:doc:`/reference/commands/logical_range_filter`] Changed threshold meaning:
+
+  * threshold <= 0.0: always use range index
+  * threshold >= 1.0: never use range index
+
+* [:doc:`/reference/commands/dump`] Supported plugin.
+* [:doc:`/reference/commands/dump`] Added the following options:
+
+  * ``--dump_plugins [yes(default)/no]``
+  * ``--dump_schema [yes(default)/no]``
+  * ``--dump_records [yes(default)/no]``
+  * ``--dump_indexes [yes(default)/no]``
+
+* [API] Added :c:func:`grn_plugin_get_ruby_suffix()`.
+* [:doc:`/reference/commands/dump`] Fixed order to put index columns after reference columns
+  because index column may refer reference columns.
+* [:doc:`/reference/commands/dump`] Don't dump records of lexicon.
+* [:doc:`/reference/commands/dump`] Show ``_id`` for ``TABLE_NO_KEY`` again.
+* [:doc:`/reference/commands/dump`] Used offline index construnction.
+* Increased max hash key size from 4KiB (4096Byte) to 64KiB - 1 (65535Byte).
+* Increased max cache key size from 4KiB (4096Byte) to 64KiB - 1 (65535Byte).
+* Improved performance for nested index search.
+* Used index for nonexistent reference column value.
+* [experimental] Added plugin functions/vector. It includes :doc:`/reference/functions/vector_size` function.
+* [:doc:`/install/windows`] Updated Visual Studio version
+  [GitHub groonga/meetup#4] [Reported by Hiroyuki Mizuhara]
+* [:doc:`/reference/commands/cache_limit`] Expired old caches when the max N caches is decreased.
+  [Suggested by Gurunavi, Inc.]
+* Show more information such as errno for errors.
+* [windows] Used secure functions on Windows.
+* Added the following APIs to change log rotate threshold in file size.
+
+  * :c:func:`grn_default_logger_set_rotate_threshold_size()`
+  * :c:func:`grn_default_logger_get_rotate_threshold_size()`
+  * :c:func:`grn_default_query_logger_set_rotate_threshold_size()`
+  * :c:func:`grn_default_query_logger_get_rotate_threshold_size()`
+
+* [experimental] Supported log rotation. The feature is disabled by default.
+  You can enable log rotation by the following options:
+
+  * ``--log-rotate-threshold-size``
+  * ``--query-log-rotate-threshold-size``
+
+* [:doc:`/server/gqtp`] Documented about GQTP server.
+* [:doc:`/reference/executables/groonga`] Documented groonga executable file partially.
+* Supported Ubuntu 15.04 (Vivid Vervet).
+* Supported Debian 8.0 (Jessie).
+* [:doc:`/reference/executables/groonga-httpd`] Updated bundled nginx version to the latest mainline (1.8.0).
+
 Fixes
 ^^^^^
 
 * [windows] Fixed a bug that :ref:`offline-index-construction` is
   failed for large data (at least 1GB or larger) with Groonga built by
   Microsoft Visual C++. [Reported by Hideki ARAI]
+* [mruby] Made ``\\`` index searchable in regular expression.
+* Fixed a bug that ``GRN_II_CURSOR_SET_MIN_ENABLE=yes`` doesn't return some matched records.
+* [sharding] Fixed a bug that partial range is handled as all range.
+* [:doc:`/reference/commands/logical_range_filter`] Fixed a bug that ``:order => "descending"`` doesn't work.
+* [:doc:`/reference/commands/logical_count`] Re-supported counting with range index.
+* Fixed a bug causing malfunction of :c:func:`grn_pat_del()`
+  and added a test for invalid patricia trie node add case.
+  [groonga-dev,03177] [Reported by yuya sako]
 
 Thanks
 ^^^^^^
 
 * Hideki ARAI
+* Hiroyuki Mizuhara
+* Gurunavi, Inc.
+* yuya sako
 
 .. _release-5-0-2:
 

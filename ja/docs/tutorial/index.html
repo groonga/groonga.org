@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>4.6. タグ検索・参照関係の逆引き &mdash; Groonga v5.0.2ドキュメント</title>
+    <title>4.6. タグ検索・参照関係の逆引き &mdash; Groonga v5.0.3ドキュメント</title>
     
     <link rel="stylesheet" href="../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '5.0.2',
+        VERSION:     '5.0.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../static/doctools.js"></script>
     <script type="text/javascript" src="../static/translations.js"></script>
     <link rel="shortcut icon" href="../static/favicon.ico"/>
-    <link rel="top" title="Groonga v5.0.2ドキュメント" href="../index.html" />
+    <link rel="top" title="Groonga v5.0.3ドキュメント" href="../index.html" />
     <link rel="up" title="4. チュートリアル" href="../tutorial.html" />
     <link rel="next" title="4.7. match_columnsパラメータ" href="match_columns.html" />
     <link rel="prev" title="4.5. ドリルダウン" href="drilldown.html" /> 
@@ -76,7 +76,7 @@
         <li class="right" >
           <a href="drilldown.html" title="4.5. ドリルダウン"
              accesskey="P">前へ</a> |</li>
-        <li><a href="../index.html">Groonga v5.0.2ドキュメント</a> &raquo;</li>
+        <li><a href="../index.html">Groonga v5.0.3ドキュメント</a> &raquo;</li>
           <li><a href="../tutorial.html" accesskey="U">4. チュートリアル</a> &raquo;</li> 
       </ul>
     </div>  
@@ -429,17 +429,21 @@ select --table User --query friends:@jiro --output_columns _key,username
 <h2>4.6.3. インデックス付きジオサーチ<a class="headerlink" href="#geo-location-search-with-index" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <p>Groongaでは位置情報のカラムに対して、インデックスを付与することが出来ます。大量の位置情報レコードを検索する場合に、検索速度が速くなります。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre>table_create --name GeoIndex --flags TABLE_PAT_KEY --key_type WGS84GeoPoint
+<div class="highlight-none"><div class="highlight"><pre>table_create --name GeoSite --flags TABLE_HASH_KEY --key_type ShortText
 # [[0, 1337566253.89858, 0.000355720520019531], true]
-column_create --table GeoIndex --name index_point --type Site --flags COLUMN_INDEX --source location
+column_create --table GeoSite --name location --type WGS84GeoPoint
 # [[0, 1337566253.89858, 0.000355720520019531], true]
-load --table Site
+table_create --name GeoIndex --flags TABLE_PAT_KEY --key_type WGS84GeoPoint
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create --table GeoIndex --name index_point --type GeoSite --flags COLUMN_INDEX --source location
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+load --table GeoSite
 [
  {&quot;_key&quot;:&quot;http://example.org/&quot;,&quot;location&quot;:&quot;128452975x503157902&quot;},
  {&quot;_key&quot;:&quot;http://example.net/&quot;,&quot;location&quot;:&quot;128487316x502920929&quot;}
 ]
 # [[0, 1337566253.89858, 0.000355720520019531], 2]
-select --table Site --filter &#39;geo_in_circle(location, &quot;128515259x503187188&quot;, 5000)&#39; --output_columns _key,location
+select --table GeoSite --filter &#39;geo_in_circle(location, &quot;128515259x503187188&quot;, 5000)&#39; --output_columns _key,location
 # [
 #   [
 #     0,
@@ -472,7 +476,7 @@ select --table Site --filter &#39;geo_in_circle(location, &quot;128515259x503187
 </div>
 <p>これらのインデックスは、位置情報レコードを用いてソートする場合に使われます。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre>select --table Site --filter &#39;geo_in_circle(location, &quot;128515259x503187188&quot;, 50000)&#39; --output_columns _key,location,_score --sortby &#39;-geo_distance(location, &quot;128515259x503187188&quot;)&#39; --scorer &#39;_score = geo_distance(location, &quot;128515259x503187188&quot;)&#39;
+<div class="highlight-none"><div class="highlight"><pre>select --table GeoSite --filter &#39;geo_in_circle(location, &quot;128515259x503187188&quot;, 50000)&#39; --output_columns _key,location,_score --sortby &#39;-geo_distance(location, &quot;128515259x503187188&quot;)&#39; --scorer &#39;_score = geo_distance(location, &quot;128515259x503187188&quot;)&#39;
 # [
 #   [
 #     0,
@@ -572,7 +576,7 @@ select --table Site --filter &#39;geo_in_circle(location, &quot;128515259x503187
         <li class="right" >
           <a href="drilldown.html" title="4.5. ドリルダウン"
              >前へ</a> |</li>
-        <li><a href="../index.html">Groonga v5.0.2ドキュメント</a> &raquo;</li>
+        <li><a href="../index.html">Groonga v5.0.3ドキュメント</a> &raquo;</li>
           <li><a href="../tutorial.html" >4. チュートリアル</a> &raquo;</li> 
       </ul>
     </div>

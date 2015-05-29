@@ -7,6 +7,69 @@
 News
 ====
 
+.. _release-5-0-4:
+
+Release 5.0.4 - 2015-05-29
+--------------------------
+
+Improvements
+^^^^^^^^^^^^
+
+* [mruby] Changed to use ``inspect`` to show meaningful error message for error value.
+* [mruby] Supported ``Groonga::Bulk#inspect`` to inspect bulk content.
+* [mruby] Supported ``Bulk#value`` to extract the value of record from bulk content.
+* [mruby] Supported estimating size for ``reference_column == record_id`` in
+  :doc:`/reference/commands/logical_range_filter`. In above case, it can be searched
+  more effectively.
+* [:doc:`/reference/functions/sub_filter`] Supported index column as ``scope`` parameter.
+* [:doc:`/reference/grn_expr/script_syntax`] Described clearly about numerical
+  value. [GitHub groonga/groonga.org#16] [Suggested by Hiroyuki Sato]
+* [:doc:`/reference/commands/select`] Supported accessing other table's record in filter.
+  You can use ``--filter 'OHTER_TABLE[KEY].COLUMN'`` for example.
+* [:doc:`/reference/commands/select`] Supported operator as table key.
+  You can use ``--filter 'OHTER_TABLE["SOME STRING" + "ANOTHER STRING"].COLUMN'"`` for example.
+* [example] Used Ruby 2.0 or later API in script for converting dictionary data.
+* Changed to show error message about invalid type of keys about table.
+* [doc] Fixed link from sourceforge.jp to osdn.me or osdn.jp about mailing list preference page.
+  SourceForge.jp is marked as obsoleted because of branding issue since May 11, 2015.
+* [:doc:`/reference/commands/tokenize`] Added ``force_prefix``. [Patch by Naoya Murakami]
+* Supported force prefix search when unmatured token is 2 characters or more.
+  [Patch by Naoya Murakami]
+
+Fixes
+^^^^^
+
+* Fixed a crash bug when empty key is specified for ``drilldown[label].keys``.
+* Fixed a bug that the return value of ``grn_parse_query_flags`` is not properly checked.
+  [GitHub#336] [Reported by Hiroaki Nakamura]
+* Fixed a build error on some BSD systems. They doesn't have "-i" option for sed.
+* Fixed a build error on Solaris. It is changed to initialize by ``sizeof(msghdr)`` in ``memset()`` because
+  ``msg_control``, ``msg_controllen`` and ``msg_flags`` doesn't exist on Solaris by default.
+* [:doc:`/reference/tokenizers`] Fixed a typo. [GitHub#338] [Reported by Hiroyuki Sato]
+* [:doc:`/reference/output`] Fixed markup. [GitHub groonga/groonga.org#17]
+  [Reported by Hiroyuki Sato]
+* Reduced getenv() in each ``grn_ii_cursor_set_min()``. This fixes performance
+  regression on Windows.
+* Fixed a build error on OpenBSD. [groonga-dev,03255] [Reported by fbnteqr]
+* [:doc:`/reference/executables/groonga-httpd`] Fixed a bug that same message is
+  logged.
+* Fixed a crash bug which is caused by double free memory.
+* Fixed a memory leak. It's occurred when ``--match_columns`` and ``--query`` are
+  used for non indexed text field and text fields have a value that isn't bulk
+  embeddable. Normally, 32byte over size text isn't bulk embeddable, so this bug
+  doesn't affect to the case if only small text less than 32byte are stored.
+* [:doc:`/reference/tokenizers`] [TokenRegexp] Fixed a bug that it can't be searched
+  correctly when query contains characters which are treated as blank character.
+  For example, the newline - "\\n" is typical one.
+
+Thanks
+^^^^^^
+
+* Hiroaki Nakamura
+* Hiroyuki Sato
+* Naoya Murakami
+* fbnteqr
+
 .. _release-5-0-3:
 
 Release 5.0.3 - 2015-04-29

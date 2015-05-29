@@ -17,8 +17,8 @@ PostgreSQLで高速な日本語全文検索を実現するためにはどちら�
 
 スクリプトの実行方法と結果のフィードバック先は次のGitHub Issueです。
 
-  * https://github.com/groonga/wikipedia-search/issues/2
+  * [PGroongaとpg_bigmのベンチマーク結果 · Issue #2 · groonga/wikipedia-search](https://github.com/groonga/wikipedia-search/issues/2)
 
-すでに2つ実行した結果があり、その結果をまとめたものが[別のIssue](https://github.com/groonga/wikipedia-search/issues/3)にあります。フィードバックしてもらった結果も随時このIssueにまとめていく予定です。
+すでに2つ実行した結果があり、その結果をまとめたものが[PGroongaとpg_bigmのベンチマーク結果のサマリーを作る · Issue #3 · groonga/wikipedia-search](https://github.com/groonga/wikipedia-search/issues/3)にあります。フィードバックしてもらった結果も随時このIssueにまとめていく予定です。
 
 PostgreSQLの日本語全文検索周りに興味のある方、Groongaを応援している方は、ぜひご協力お願いいたします！

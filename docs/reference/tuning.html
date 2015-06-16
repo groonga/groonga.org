@@ -89,22 +89,21 @@
 <h1>7.19. Tuning<a class="headerlink" href="#tuning" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="summary">
 <h2>7.19.1. Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
-<p>There are some tuning parameters for improving Groonga performance or
-handling a large database.</p>
+<p>There are some tuning parameters for handling a large database.</p>
 </div>
 <div class="section" id="parameters">
 <h2>7.19.2. Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
-<p>This section describes parameters.</p>
+<p>This section describes tuning parameters.</p>
 <div class="section" id="the-max-number-of-open-files-per-process">
 <span id="tuning-max-n-open-files"></span><h3>7.19.2.1. The max number of open files per process<a class="headerlink" href="#the-max-number-of-open-files-per-process" title="Permalink to this headline">¶</a></h3>
 <p>This parameter is for handling a large database.</p>
-<p>Groonga creates one or more files per table and colum. If your
-database has many tables and columns, groonga process needs to open
+<p>Groonga creates one or more files per table and column. If your
+database has many tables and columns, Groonga process needs to open
 many files.</p>
 <p>System limits the max number of open files per process. So you need to
 relax the limitation.</p>
 <p>Here is an expression that compute how many files are opened by
-groonga:</p>
+Groonga:</p>
 <div class="highlight-none"><div class="highlight"><pre>3 (for DB) +
   N tables +
   N columns (except index clumns) +
@@ -134,20 +133,23 @@ column_create Terms entries_content_index COLUMN_INDEX|WITH_POSITION Entries con
 <span id="tuning-memory-usage"></span><h3>7.19.2.2. Memory usage<a class="headerlink" href="#memory-usage" title="Permalink to this headline">¶</a></h3>
 <p>This parameter is for handling a large database.</p>
 <p>Groonga maps database files onto memory and accesses to them. Groonga
-doesn't maps unnecessary files onto memory until they are nneded.</p>
+doesn't maps unnecessary files onto memory. Groonga maps files when
+they are needed.</p>
 <p>If you access to all data in database, all database files are mapped
-onto memory.  If total size of your database files is 6GiB, your
-groonga process uses 6GiB memory.</p>
-<p>Normally, your all database files aren't mapped onto memry. But is may
+onto memory. If total size of your database files is 6GiB, your
+Groonga process uses 6GiB memory.</p>
+<p>Normally, your all database files aren't mapped onto memory. But it may
 be occurred. It is an example case that you dump your database.</p>
-<p>You must have memory and swap that is larger than database.</p>
+<p>Normally, you must have memory and swap that is larger than
+database. Linux has tuning parameter to work with less memory and swap
+than database size.</p>
 </div>
 </div>
 <div class="section" id="linux">
 <span id="tuning-linux"></span><h2>7.19.3. Linux<a class="headerlink" href="#linux" title="Permalink to this headline">¶</a></h2>
 <p>This section describes how to configure parameters on Linux.</p>
 <div class="section" id="nofile">
-<span id="tuning-linux-nofile"></span><h3>7.19.3.1. nofile<a class="headerlink" href="#nofile" title="Permalink to this headline">¶</a></h3>
+<span id="tuning-linux-nofile"></span><h3>7.19.3.1. <tt class="docutils literal"><span class="pre">nofile</span></tt><a class="headerlink" href="#nofile" title="Permalink to this headline">¶</a></h3>
 <p>You can relax the <a class="reference internal" href="#tuning-max-n-open-files"><em>The max number of open files per process</em></a> parameter by creating
 a configuration file <tt class="docutils literal"><span class="pre">/etc/security/limits.d/groonga.conf</span></tt> that has
 the following content:</p>
@@ -155,24 +157,23 @@ the following content:</p>
 ${USER} hard nofile ${MAX_VALUE}
 </pre></div>
 </div>
-<p>If you run <tt class="docutils literal"><span class="pre">groonga</span></tt> process by <tt class="docutils literal"><span class="pre">groonga</span></tt> user and your groonga
+<p>If you run Groonga process by <tt class="docutils literal"><span class="pre">groonga</span></tt> user and your Groonga
 process needs to open less than 10000 files, use the following
 configuration:</p>
 <div class="highlight-none"><div class="highlight"><pre>groonga soft nofile 10000
 groonga hard nofile 10000
 </pre></div>
 </div>
-<p>The configuration is applied after your groonga service is restarted
-or re-login as your groonga user.</p>
+<p>The configuration is applied after your Groonga service is restarted
+or re-login as your <tt class="docutils literal"><span class="pre">groonga</span></tt> user.</p>
 </div>
 <div class="section" id="vm-overcommit-memory">
-<span id="tuning-linux-overcommit-memory"></span><h3>7.19.3.2. vm.overcommit_memory<a class="headerlink" href="#vm-overcommit-memory" title="Permalink to this headline">¶</a></h3>
+<span id="tuning-linux-overcommit-memory"></span><h3>7.19.3.2. <tt class="docutils literal"><span class="pre">vm.overcommit_memory</span></tt><a class="headerlink" href="#vm-overcommit-memory" title="Permalink to this headline">¶</a></h3>
 <p>This is <a class="reference internal" href="#tuning-memory-usage"><em>Memory usage</em></a> related parameter. You can handle a
 database that is larger than your memory and swap by setting
-<tt class="docutils literal"><span class="pre">vm.overcommit_memory</span></tt> kernel parameter to 1. 1 means that Groonga
-can always map database files onto memory. It is no problem until
-groonga touch mapped database files that their size is larger than
-memory and swap. Groonga recommends the configuration.</p>
+<tt class="docutils literal"><span class="pre">vm.overcommit_memory</span></tt> kernel parameter to <tt class="docutils literal"><span class="pre">1</span></tt>. <tt class="docutils literal"><span class="pre">1</span></tt> means that
+Groonga can always map database files onto memory. Groonga recommends
+the configuration.</p>
 <p>See <a class="reference external" href="https://www.kernel.org/doc/Documentation/vm/overcommit-accounting">Linux kernel documentation about overcommit</a>
 about <tt class="docutils literal"><span class="pre">vm.overcommit_memory</span></tt> parameter details.</p>
 <p>You can set the configuration by putting a configuration file
@@ -187,13 +188,14 @@ following command:</p>
 </div>
 </div>
 <div class="section" id="vm-max-map-count">
-<span id="tuning-linux-max-map-count"></span><h3>7.19.3.3. vm.max_map_count<a class="headerlink" href="#vm-max-map-count" title="Permalink to this headline">¶</a></h3>
+<span id="tuning-linux-max-map-count"></span><h3>7.19.3.3. <tt class="docutils literal"><span class="pre">vm.max_map_count</span></tt><a class="headerlink" href="#vm-max-map-count" title="Permalink to this headline">¶</a></h3>
 <p>This is <a class="reference internal" href="#tuning-memory-usage"><em>Memory usage</em></a> related parameter. You can handle a
 16GiB or more larger size database by increasing <tt class="docutils literal"><span class="pre">vm.max_map_count</span></tt>
 kernel parameter. The parameter limits the max number of memory maps.</p>
-<p>The default value of the kernel parameter may be 65530 or 65536.
-Groonga maps 256KiB memory chunk at one time. If a database is larger
-than 16GiB, groonga reaches the limitation. (<tt class="docutils literal"><span class="pre">256KiB</span> <span class="pre">*</span> <span class="pre">65536</span> <span class="pre">=</span> <span class="pre">16GiB</span></tt>)</p>
+<p>The default value of the kernel parameter may be <tt class="docutils literal"><span class="pre">65530</span></tt> or
+<tt class="docutils literal"><span class="pre">65536</span></tt>.  Groonga maps 256KiB memory chunk at one time. If a
+database is larger than 16GiB, Groonga reaches the
+limitation. (<tt class="docutils literal"><span class="pre">256KiB</span> <span class="pre">*</span> <span class="pre">65536</span> <span class="pre">=</span> <span class="pre">16GiB</span></tt>)</p>
 <p>You needs to increase the value of the kernel parameter to handle
 16GiB or more larger size database. For example, you can handle almost
 32GiB size database by <tt class="docutils literal"><span class="pre">65536</span> <span class="pre">*</span> <span class="pre">2</span> <span class="pre">=</span> <span class="pre">131072</span></tt>. You can set the
@@ -202,7 +204,7 @@ configuration by putting a configuration file
 <div class="highlight-none"><div class="highlight"><pre>vm.max_map_count = 131072
 </pre></div>
 </div>
-<p>Note that your real confiugration file will be the following because
+<p>Note that your real configuration file will be the following because
 you already have <tt class="docutils literal"><span class="pre">vm.overcommit_memory</span></tt> configuration:</p>
 <div class="highlight-none"><div class="highlight"><pre>vm.overcommit_memory = 1
 vm.max_map_count = 131072
@@ -219,7 +221,7 @@ following command:</p>
 <h2>7.19.4. FreeBSD<a class="headerlink" href="#freebsd" title="Permalink to this headline">¶</a></h2>
 <p>This section describes how to configure parameters on FreeBSD.</p>
 <div class="section" id="kern-maxfileperproc">
-<span id="tuning-freebsd-maxfilesperproc"></span><h3>7.19.4.1. kern.maxfileperproc<a class="headerlink" href="#kern-maxfileperproc" title="Permalink to this headline">¶</a></h3>
+<span id="tuning-freebsd-maxfilesperproc"></span><h3>7.19.4.1. <tt class="docutils literal"><span class="pre">kern.maxfileperproc</span></tt><a class="headerlink" href="#kern-maxfileperproc" title="Permalink to this headline">¶</a></h3>
 <p>TODO</p>
 </div>
 </div>
@@ -241,13 +243,13 @@ following command:</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#linux">7.19.3. Linux</a><ul>
-<li><a class="reference internal" href="#nofile">7.19.3.1. nofile</a></li>
-<li><a class="reference internal" href="#vm-overcommit-memory">7.19.3.2. vm.overcommit_memory</a></li>
-<li><a class="reference internal" href="#vm-max-map-count">7.19.3.3. vm.max_map_count</a></li>
+<li><a class="reference internal" href="#nofile">7.19.3.1. <tt class="docutils literal"><span class="pre">nofile</span></tt></a></li>
+<li><a class="reference internal" href="#vm-overcommit-memory">7.19.3.2. <tt class="docutils literal"><span class="pre">vm.overcommit_memory</span></tt></a></li>
+<li><a class="reference internal" href="#vm-max-map-count">7.19.3.3. <tt class="docutils literal"><span class="pre">vm.max_map_count</span></tt></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#freebsd">7.19.4. FreeBSD</a><ul>
-<li><a class="reference internal" href="#kern-maxfileperproc">7.19.4.1. kern.maxfileperproc</a></li>
+<li><a class="reference internal" href="#kern-maxfileperproc">7.19.4.1. <tt class="docutils literal"><span class="pre">kern.maxfileperproc</span></tt></a></li>
 </ul>
 </li>
 </ul>

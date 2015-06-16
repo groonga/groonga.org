@@ -97,7 +97,7 @@
 </li>
 <li><p class="first">[<a class="reference internal" href="reference/commands/select.html"><em>select</em></a>] Select対象でない他のテーブルのレコードをフィルタに指定できるようになりました。 <tt class="docutils literal"><span class="pre">--filter</span> <span class="pre">'OTHER_TABLE[KEY].COLUMN'</span></tt> といったようにフィルタで指定できます。</p>
 </li>
-<li><p class="first">[<a class="reference internal" href="reference/commands/select.html"><em>select</em></a>] テーブルのキーでオペレータを指定できるようになりました。 <tt class="docutils literal"><span class="pre">--filter</span> <span class="pre">'OTHER_TABLE[&quot;SOME</span> <span class="pre">STRING&quot;</span> <span class="pre">+</span> <span class="pre">&quot;ANOTHER</span> <span class="pre">STRING&quot;]</span></tt> というようにキーを連結した文字列として指定することができます。</p>
+<li><p class="first">[<a class="reference internal" href="reference/commands/select.html"><em>select</em></a>] テーブルのキーを指定するためにオペレータを使えるようになりました。たとえば、 <tt class="docutils literal"><span class="pre">--filter</span> <span class="pre">'OTHER_TABLE[&quot;SOME</span> <span class="pre">STRING&quot;</span> <span class="pre">+</span> <span class="pre">&quot;ANOTHER</span> <span class="pre">STRING&quot;]</span></tt> というように連結した文字列という式でキーを指定することができます。</p>
 </li>
 <li><p class="first">[example] Ruby 2.0以降のAPIを辞書の変換スクリプトで使うようにしました。</p>
 </li>
@@ -105,24 +105,26 @@
 </li>
 <li><p class="first">[doc] メーリングリストの案内ページへのリンクをsourceforge.jpからosdn.meやosdn.jpに修正しました。</p>
 </li>
-<li><p class="first">[<a class="reference internal" href="reference/commands/tokenize.html"><em>tokenize</em></a>] <tt class="docutils literal"><span class="pre">force_prefix</span></tt> を追加しました。[村上さんがパッチ提供]</p>
+<li><p class="first">[<a class="reference internal" href="reference/commands/tokenize.html"><em>tokenize</em></a>] 各トークンの情報に <tt class="docutils literal"><span class="pre">force_prefix</span></tt> の値を追加しました。[村上さんがパッチ提供]</p>
 </li>
-<li><p class="first">TokenTrigramを使っていても、2文字以下の語句で検索できるようにしました。 [GitHub#341] [村上さんがパッチ提供]</p>
+<li><p class="first"><a class="reference internal" href="reference/tokenizers.html#token-trigram"><em>TokenTrigram</em></a> を使っていても、2文字以下の語句で検索できるようにしました。 [GitHub#341] [村上さんがパッチ提供]</p>
 </li>
 <li><p class="first">[deb] groonga-httpdとgroonga-server-gqtpのパッケージにSystemd用serviceファイルを追加しました。</p>
+</li>
+<li><p class="first">[<a class="reference internal" href="reference/commands/select.html"><em>select</em></a>] <tt class="docutils literal"><span class="pre">--query</span></tt> の値が空白文字だけなら無視するようにしました。空白文字にはいわゆる全角スペース（Unicodeでいうと <tt class="docutils literal"><span class="pre">U+3000</span> <span class="pre">IDEOGRAPHIC</span> <span class="pre">SPACE</span></tt> ）も含みます。 [TomyGXさんが提案]</p>
 </li>
 </ul>
 </div>
 <div class="section" id="fixes">
 <h3>修正<a class="headerlink" href="#fixes" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
-<li><p class="first">空のキーが <tt class="docutils literal"><span class="pre">drilldown[label].keys</span></tt>.に指定されるとクラッシュする不具合を修正しました。</p>
+<li><p class="first">空のキーが <tt class="docutils literal"><span class="pre">drilldown[label].keys</span></tt> に指定されるとクラッシュする不具合を修正しました。</p>
 </li>
 <li><p class="first"><tt class="docutils literal"><span class="pre">grn_parse_query_flags</span></tt> の返り値を適切にチェックしていないのを修正しました。 [GitHub#336] [Hiroaki Nakamuraさんが報告]</p>
 </li>
-<li><p class="first">BSD系でビルドエラーになる不具合を修正しました。sedに &quot;-i&quot; オプションがないためエラーになっていました。</p>
+<li><p class="first">BSD系でビルドエラーになる不具合を修正しました。 <tt class="docutils literal"><span class="pre">sed</span></tt> に <tt class="docutils literal"><span class="pre">-i</span></tt> オプションがないためエラーになっていました。</p>
 </li>
-<li><p class="first">Solarisでビルドエラーになる不具合を修正しました。<tt class="docutils literal"><span class="pre">memset()</span></tt> にて <tt class="docutils literal"><span class="pre">sizeof(msghdr)</span></tt> だけ初期化するようにしました。これは Solarisでは <tt class="docutils literal"><span class="pre">msg_control</span></tt> や <tt class="docutils literal"><span class="pre">msg_controllen</span></tt> <tt class="docutils literal"><span class="pre">msg_flags</span></tt>、が存在しないためです。</p>
+<li><p class="first">Solarisでビルドエラーになる不具合を修正しました。<tt class="docutils literal"><span class="pre">memset()</span></tt> にて <tt class="docutils literal"><span class="pre">sizeof(msghdr)</span></tt> だけ初期化するようにしました。これは Solarisでは <tt class="docutils literal"><span class="pre">msg_control</span></tt> と <tt class="docutils literal"><span class="pre">msg_controllen</span></tt> と <tt class="docutils literal"><span class="pre">msg_flags</span></tt> が存在しないためです。</p>
 </li>
 <li><p class="first">[<a class="reference internal" href="reference/tokenizers.html"><em>トークナイザー</em></a>] ドキュメントの誤字を修正しました。[GitHub#338] [佐藤さんが報告]</p>
 </li>
@@ -152,6 +154,8 @@
 <li><p class="first">村上さん</p>
 </li>
 <li><p class="first">fbnteqrさん</p>
+</li>
+<li><p class="first">TomyGXさん</p>
 </li>
 </ul>
 </div>

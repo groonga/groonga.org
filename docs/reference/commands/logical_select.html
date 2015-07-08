@@ -97,74 +97,646 @@
 <div class="versionadded">
 <p><span class="versionmodified">New in version 5.0.5.</span></p>
 </div>
-<p>TODO</p>
+<p><tt class="docutils literal"><span class="pre">logical_select</span></tt> is a sharding version of
+<a class="reference internal" href="select.html"><em>select</em></a>. <tt class="docutils literal"><span class="pre">logical_select</span></tt> searches records from multiple
+tables and outputs them.</p>
+<p>You need to <a class="reference internal" href="plugin_register.html"><em>plugin_register</em></a> <tt class="docutils literal"><span class="pre">sharding</span></tt> plugin because
+<tt class="docutils literal"><span class="pre">logical_select</span></tt> is included in <tt class="docutils literal"><span class="pre">sharding</span></tt> plugin.</p>
 </div>
 <div class="section" id="syntax">
 <h2>7.3.24.2. Syntax<a class="headerlink" href="#syntax" title="Permalink to this headline">¶</a></h2>
-<p><tt class="docutils literal"><span class="pre">logical_select</span></tt> command has seven parameters.</p>
-<p>The required parameters are <tt class="docutils literal"><span class="pre">logical_table</span></tt> and <tt class="docutils literal"><span class="pre">shard_key</span></tt>:</p>
+<p><tt class="docutils literal"><span class="pre">logical_select</span></tt> has many parameters.</p>
+<p>The required parameters are <tt class="docutils literal"><span class="pre">logical_table</span></tt> and <tt class="docutils literal"><span class="pre">shard_key</span></tt>. Other
+parameters are optional:</p>
 <div class="highlight-none"><div class="highlight"><pre>logical_select logical_table
                shard_key
-               [min]
-               [min_border]
-               [max]
-               [max_border]
-               [filter]
+               [min=null]
+               [min_border=&quot;include&quot;]
+               [max=null]
+               [max_border=&quot;include&quot;]
+               [filter=null]
+               [sortby=null]
+               [output_columns=&quot;_key, *&quot;]
+               [offset=0]
+               [limit=10]
+               [drilldown=null]
+               [drilldown_sortby=null]
+               [drilldown_output_columns=&quot;_key, _nsubrecs&quot;]
+               [drilldown_offset=0]
+               [drilldown_limit=10]
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">logical_select</span></tt> has the following named parameters for advanced
+drilldown:</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">drilldown[${LABEL}].keys=null</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">drilldown[${LABEL}].sortby=null</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">drilldown[${LABEL}].output_columns=&quot;_key,</span> <span class="pre">_nsubrecs&quot;</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">drilldown[${LABEL}].offset=0</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">drilldown[${LABEL}].limit=10</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">drilldown[${LABEL}].calc_types=NONE</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">drilldown[${LABEL}].calc_target=null</span></tt></li>
+</ul>
+</div></blockquote>
+<p>You can use one or more alphabets, digits, <tt class="docutils literal"><span class="pre">_</span></tt> and <tt class="docutils literal"><span class="pre">.</span></tt> for
+<tt class="docutils literal"><span class="pre">${LABEL}</span></tt>. For example, <tt class="docutils literal"><span class="pre">parent.sub1</span></tt> is a valid <tt class="docutils literal"><span class="pre">${LABEL}</span></tt>.</p>
+<p>Parameters that have the same <tt class="docutils literal"><span class="pre">${LABEL}</span></tt> are grouped.</p>
+<p>For example, the following parameters specify one drilldown:</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">--drilldown[label].keys</span> <span class="pre">column</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">--drilldown[label].sortby</span> <span class="pre">-_nsubrecs</span></tt></li>
+</ul>
+</div></blockquote>
+<p>The following parameters specify two drilldowns:</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">--drilldown[label1].keys</span> <span class="pre">column1</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">--drilldown[label1].sortby</span> <span class="pre">-_nsubrecs</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">--drilldown[label2].keys</span> <span class="pre">column2</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">--drilldown[label2].sortby</span> <span class="pre">_key</span></tt></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="differences-from-select">
+<h2>7.3.24.3. Differences from <tt class="docutils literal"><span class="pre">select</span></tt><a class="headerlink" href="#differences-from-select" title="Permalink to this headline">¶</a></h2>
+<p>Most of <tt class="docutils literal"><span class="pre">logical_select</span></tt> features can be used like corresponding
+<a class="reference internal" href="select.html"><em>select</em></a> features. For example, parameter name is same, output
+format is same and so on.</p>
+<p>But there are some differences from <a class="reference internal" href="select.html"><em>select</em></a>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">logical_table</span></tt> and <tt class="docutils literal"><span class="pre">shard_key</span></tt> parameters are required
+instead of <tt class="docutils literal"><span class="pre">table</span></tt> parameter.</li>
+<li>The default <tt class="docutils literal"><span class="pre">output_columns</span></tt> value doesn't include
+<tt class="docutils literal"><span class="pre">_id</span></tt>. Because <tt class="docutils literal"><span class="pre">_id</span></tt> is meaningless when multiple shards are
+used. <tt class="docutils literal"><span class="pre">_id</span></tt> may be duplicated because <tt class="docutils literal"><span class="pre">_id</span></tt> is managed in each
+shard not in all shards.</li>
+<li><tt class="docutils literal"><span class="pre">sortby</span></tt>, <tt class="docutils literal"><span class="pre">drilldown_sortby</span></tt> and
+<tt class="docutils literal"><span class="pre">drilldown[${LABEL}].sortby</span></tt> aren't supported when multiple
+shards are used. (Only one shard is used, they are supported.)</li>
+<li><tt class="docutils literal"><span class="pre">match_columns</span></tt> and <tt class="docutils literal"><span class="pre">query</span></tt> aren't supported yet.</li>
+<li><tt class="docutils literal"><span class="pre">cache</span></tt> isn't supported yet.</li>
+<li><tt class="docutils literal"><span class="pre">match_escalation_threshold</span></tt> isn't supported yet.</li>
+<li><tt class="docutils literal"><span class="pre">query_flags</span></tt> isn't supported yet.</li>
+<li><tt class="docutils literal"><span class="pre">query_expander</span></tt> isn't supported yet.</li>
+<li><tt class="docutils literal"><span class="pre">adjuster</span></tt> isn't supported yet.</li>
+<li><tt class="docutils literal"><span class="pre">drilldown_calc_types</span></tt> and <tt class="docutils literal"><span class="pre">drilldown_calc_target</span></tt> aren't
+supported yet.</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="usage">
+<h2>7.3.24.4. Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>Let's learn about <tt class="docutils literal"><span class="pre">logical_select</span></tt> usage with examples. This section
+shows many popular usages.</p>
+<p>You need to register <tt class="docutils literal"><span class="pre">sharding</span></tt> plugin because <tt class="docutils literal"><span class="pre">logical_select</span></tt> is
+included in <tt class="docutils literal"><span class="pre">sharding</span></tt> plugin.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>plugin_register sharding
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>Here are a schema definition and sample data to show usage.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Entries_20150708 TABLE_HASH_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries_20150708 created_at COLUMN_SCALAR Time
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries_20150708 content COLUMN_SCALAR Text
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries_20150708 n_likes COLUMN_SCALAR UInt32
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries_20150708 tag COLUMN_SCALAR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create Entries_20150709 TABLE_HASH_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries_20150709 created_at COLUMN_SCALAR Time
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries_20150709 content COLUMN_SCALAR Text
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries_20150709 n_likes COLUMN_SCALAR UInt32
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries_20150709 tag COLUMN_SCALAR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create Terms TABLE_PAT_KEY ShortText \
+  --default_tokenizer TokenBigram \
+  --normalizer NormalizerAuto
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Terms entries_key_index_20150708 \
+  COLUMN_INDEX|WITH_POSITION Entries_20150708 _key
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Terms entries_content_index_20150708 \
+  COLUMN_INDEX|WITH_POSITION Entries_20150708 content
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Terms entries_key_index_20150709 \
+  COLUMN_INDEX|WITH_POSITION Entries_20150709 _key
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Terms entries_content_index_20150709 \
+  COLUMN_INDEX|WITH_POSITION Entries_20150709 content
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+load --table Entries_20150708
+[
+{&quot;_key&quot;:       &quot;The first post!&quot;,
+ &quot;created_at&quot;: &quot;2015/07/08 00:00:00&quot;,
+ &quot;content&quot;:    &quot;Welcome! This is my first post!&quot;,
+ &quot;n_likes&quot;:    5,
+ &quot;tag&quot;:        &quot;Hello&quot;},
+{&quot;_key&quot;:       &quot;Groonga&quot;,
+ &quot;created_at&quot;: &quot;2015/07/08 01:00:00&quot;,
+ &quot;content&quot;:    &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+ &quot;n_likes&quot;:    10,
+ &quot;tag&quot;:        &quot;Groonga&quot;},
+{&quot;_key&quot;:       &quot;Mroonga&quot;,
+ &quot;created_at&quot;: &quot;2015/07/08 02:00:00&quot;,
+ &quot;content&quot;:    &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
+ &quot;n_likes&quot;:    15,
+ &quot;tag&quot;:        &quot;Groonga&quot;}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 3]
+load --table Entries_20150709
+[
+{&quot;_key&quot;:       &quot;Good-bye Senna&quot;,
+ &quot;created_at&quot;: &quot;2015/07/09 00:00:00&quot;,
+ &quot;content&quot;:    &quot;I migrated all Senna system!&quot;,
+ &quot;n_likes&quot;:    3,
+ &quot;tag&quot;:        &quot;Senna&quot;},
+{&quot;_key&quot;:       &quot;Good-bye Tritonn&quot;,
+ &quot;created_at&quot;: &quot;2015/07/09 01:00:00&quot;,
+ &quot;content&quot;:    &quot;I also migrated all Tritonn system!&quot;,
+ &quot;n_likes&quot;:    3,
+ &quot;tag&quot;:        &quot;Senna&quot;}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 2]
+</pre></div>
+</div>
+<p>There are two tables, <tt class="docutils literal"><span class="pre">Entries_20150708</span></tt> and <tt class="docutils literal"><span class="pre">Entries_20150709</span></tt>,
+for blog entries.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">You need to use <tt class="docutils literal"><span class="pre">${LOGICAL_TABLE_NAME}_${YYYYMMDD}</span></tt> naming rule
+for table names. In this example, <tt class="docutils literal"><span class="pre">LOGICAL_TABLE_NAME</span></tt> is
+<tt class="docutils literal"><span class="pre">Entries</span></tt> and <tt class="docutils literal"><span class="pre">YYYYMMDD</span></tt> is <tt class="docutils literal"><span class="pre">20150708</span></tt> or <tt class="docutils literal"><span class="pre">20150709</span></tt>.</p>
+</div>
+<p>An entry has title, created time, content, the number of likes for the
+entry and tag. Title is key of <tt class="docutils literal"><span class="pre">Entries_YYYYMMDD</span></tt>. Created time is
+value of <tt class="docutils literal"><span class="pre">Entries_YYYYMMDD.created_at</span></tt> column. Content is value of
+<tt class="docutils literal"><span class="pre">Entries_YYYYMMDD.content</span></tt> column. The number of likes is value of
+<tt class="docutils literal"><span class="pre">Entries_YYYYMMDD.n_likes</span></tt> column. Tag is value of
+<tt class="docutils literal"><span class="pre">Entries_YYYYMMDD.tag</span></tt> column.</p>
+<p><tt class="docutils literal"><span class="pre">Entries_YYYYMMDD._key</span></tt> column and <tt class="docutils literal"><span class="pre">Entries_YYYYMMDD.content</span></tt>
+column are indexed using <tt class="docutils literal"><span class="pre">TokenBigram</span></tt> tokenizer. So both
+<tt class="docutils literal"><span class="pre">Entries_YYYYMMDD._key</span></tt> and <tt class="docutils literal"><span class="pre">Entries_YYYYMMDD.content</span></tt> are
+fulltext search ready.</p>
+<p>OK. The schema and data for examples are ready.</p>
+<div class="section" id="simple-usage">
+<h3>7.3.24.4.1. Simple usage<a class="headerlink" href="#simple-usage" title="Permalink to this headline">¶</a></h3>
+<p>TODO</p>
+</div>
+</div>
+<div class="section" id="parameters">
+<h2>7.3.24.5. Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+<p>This section describes parameters of <tt class="docutils literal"><span class="pre">logical_select</span></tt>.</p>
+<div class="section" id="required-parameter">
+<h3>7.3.24.5.1. Required parameter<a class="headerlink" href="#required-parameter" title="Permalink to this headline">¶</a></h3>
+<p>There are required parameters, <tt class="docutils literal"><span class="pre">logical_table</span></tt> and <tt class="docutils literal"><span class="pre">shard_key</span></tt>.</p>
+<div class="section" id="logical-table">
+<span id="logical-select-logical-table"></span><h4>7.3.24.5.1.1. <tt class="docutils literal"><span class="pre">logical_table</span></tt><a class="headerlink" href="#logical-table" title="Permalink to this headline">¶</a></h4>
+<p>Specifies logical table name. It means table name without
+<tt class="docutils literal"><span class="pre">_YYYYMMDD</span></tt> postfix. If you use actual table such as
+<tt class="docutils literal"><span class="pre">Entries_20150708</span></tt>, <tt class="docutils literal"><span class="pre">Entries_20150709</span></tt> and so on, logical table
+name is <tt class="docutils literal"><span class="pre">Entries</span></tt>.</p>
+<p>You can show 10 records by specifying <tt class="docutils literal"><span class="pre">logical_table</span></tt> and
+<tt class="docutils literal"><span class="pre">shard_key</span></tt> parameters. They are required parameters.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>logical_select --logical_table Entries --shard_key created_at
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;created_at&quot;,
+#           &quot;Time&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         &quot;The first post!&quot;,
+#         &quot;Welcome! This is my first post!&quot;,
+#         1436281200.0,
+#         5,
+#         &quot;Hello&quot;
+#       ],
+#       [
+#         &quot;Groonga&quot;,
+#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+#         1436284800.0,
+#         10,
+#         &quot;Groonga&quot;
+#       ],
+#       [
+#         &quot;Mroonga&quot;,
+#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         1436288400.0,
+#         15,
+#         &quot;Groonga&quot;
+#       ],
+#       [
+#         &quot;Good-bye Senna&quot;,
+#         &quot;I migrated all Senna system!&quot;,
+#         1436367600.0,
+#         3,
+#         &quot;Senna&quot;
+#       ],
+#       [
+#         &quot;Good-bye Tritonn&quot;,
+#         &quot;I also migrated all Tritonn system!&quot;,
+#         1436371200.0,
+#         3,
+#         &quot;Senna&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>If nonexistent table is specified, an error is returned.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>logical_select --logical_table Nonexistent --shard_key created_at
+# [
+#   [
+#     -22,
+#     1337566253.89858,
+#     0.000355720520019531,
+#     &quot;[logical_select] no shard exists: logical_table: &lt;Nonexistent&gt;: shard_key: &lt;created_at&gt;&quot;,
+#     [
+#       [
+#         &quot;Groonga::Context.set_groonga_error&quot;,
+#         &quot;/home/kou/work/c/groonga.clean/lib/mrb/scripts/context.rb&quot;,
+#         27
+#       ]
+#     ]
+#   ]
+# ]
 </pre></div>
 </div>
 </div>
-<div class="section" id="usage">
-<h2>7.3.24.3. Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
-<p>TODO</p>
-</div>
-<div class="section" id="parameters">
-<h2>7.3.24.4. Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
-<p>This section describes parameters of <tt class="docutils literal"><span class="pre">logical_select</span></tt>.</p>
-<div class="section" id="required-parameter">
-<h3>7.3.24.4.1. Required parameter<a class="headerlink" href="#required-parameter" title="Permalink to this headline">¶</a></h3>
-<p>There are required parameters, <tt class="docutils literal"><span class="pre">logical_table</span></tt> and <tt class="docutils literal"><span class="pre">shard_key</span></tt>.</p>
-<div class="section" id="logical-table">
-<h4>7.3.24.4.1.1. <tt class="docutils literal"><span class="pre">logical_table</span></tt><a class="headerlink" href="#logical-table" title="Permalink to this headline">¶</a></h4>
-<p>Specifies logical table name. It means table name without &quot;_YYYYMMDD&quot; postfix.
-If you use actual table such as &quot;Logs_20150203&quot;, &quot;Logs_20150203&quot; and so on, logical table name is &quot;Logs&quot;.</p>
-</div>
 <div class="section" id="shard-key">
-<h4>7.3.24.4.1.2. <tt class="docutils literal"><span class="pre">shard_key</span></tt><a class="headerlink" href="#shard-key" title="Permalink to this headline">¶</a></h4>
-<p>Specifies column name which is treated as shared key in each parted table.</p>
+<span id="logical-select-shard-key"></span><h4>7.3.24.5.1.2. <tt class="docutils literal"><span class="pre">shard_key</span></tt><a class="headerlink" href="#shard-key" title="Permalink to this headline">¶</a></h4>
+<p>Specifies column name which is treated as shared key. Shard key is a
+column that stores data that is used for distributing records to
+suitable shards.</p>
+<p>Shard key must be <tt class="docutils literal"><span class="pre">Time</span></tt> type for now.</p>
+<p>See <a class="reference internal" href="#logical-select-logical-table"><em>logical_table</em></a> how to specify <tt class="docutils literal"><span class="pre">shard_key</span></tt>.</p>
 </div>
 </div>
 <div class="section" id="optional-parameters">
-<h3>7.3.24.4.2. Optional parameters<a class="headerlink" href="#optional-parameters" title="Permalink to this headline">¶</a></h3>
+<h3>7.3.24.5.2. Optional parameters<a class="headerlink" href="#optional-parameters" title="Permalink to this headline">¶</a></h3>
 <p>There are optional parameters.</p>
 <div class="section" id="min">
-<h4>7.3.24.4.2.1. <tt class="docutils literal"><span class="pre">min</span></tt><a class="headerlink" href="#min" title="Permalink to this headline">¶</a></h4>
-<p>Specifies the min value of <tt class="docutils literal"><span class="pre">shard_key</span></tt></p>
+<h4>7.3.24.5.2.1. <tt class="docutils literal"><span class="pre">min</span></tt><a class="headerlink" href="#min" title="Permalink to this headline">¶</a></h4>
+<p>Specifies the minimum value of <tt class="docutils literal"><span class="pre">shard_key</span></tt> column. If shard doesn't
+have any matched records, the shard isn't searched.</p>
+<p>For example, <tt class="docutils literal"><span class="pre">min</span></tt> is <tt class="docutils literal"><span class="pre">&quot;2015/07/09</span> <span class="pre">00:00:00&quot;</span></tt>, <tt class="docutils literal"><span class="pre">Entry_20150708</span></tt>
+isn't searched. Because <tt class="docutils literal"><span class="pre">Entry_20150708</span></tt> has only records for
+<tt class="docutils literal"><span class="pre">&quot;&quot;2015/07/08&quot;</span></tt>.</p>
+<p>The following example only uses <tt class="docutils literal"><span class="pre">Entry_20150709</span></tt>
+table. <tt class="docutils literal"><span class="pre">Entry_20150708</span></tt> isn't used.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>logical_select \
+  --logical_table Entries \
+  --shard_key created_at \
+  --min &quot;2015/07/09 00:00:00&quot;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;created_at&quot;,
+#           &quot;Time&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Good-bye Senna&quot;,
+#         &quot;I migrated all Senna system!&quot;,
+#         1436367600.0,
+#         3,
+#         &quot;Senna&quot;
+#       ],
+#       [
+#         &quot;Good-bye Tritonn&quot;,
+#         &quot;I also migrated all Tritonn system!&quot;,
+#         1436371200.0,
+#         3,
+#         &quot;Senna&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
 </div>
 <div class="section" id="min-border">
-<h4>7.3.24.4.2.2. <tt class="docutils literal"><span class="pre">min_border</span></tt><a class="headerlink" href="#min-border" title="Permalink to this headline">¶</a></h4>
-<p>Specifies whether the min value of borderline must be include or not.
-Specify <tt class="docutils literal"><span class="pre">include</span></tt> or <tt class="docutils literal"><span class="pre">exclude</span></tt> as the value of this parameter.</p>
+<h4>7.3.24.5.2.2. <tt class="docutils literal"><span class="pre">min_border</span></tt><a class="headerlink" href="#min-border" title="Permalink to this headline">¶</a></h4>
+<p>Specifies whether the minimum value is include or not. Here is
+available values.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Value</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">include</span></tt></td>
+<td>Includes <tt class="docutils literal"><span class="pre">min</span></tt> value. This is the default.</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">exclude</span></tt></td>
+<td>Doesn't include <tt class="docutils literal"><span class="pre">min</span></tt> value.</td>
+</tr>
+</tbody>
+</table>
+<p>Here is an example for <tt class="docutils literal"><span class="pre">exclude</span></tt>. The result doesn't include the
+<tt class="docutils literal"><span class="pre">&quot;Good-bye</span> <span class="pre">Senna&quot;</span></tt> record because its <tt class="docutils literal"><span class="pre">created_at</span></tt> value is
+<tt class="docutils literal"><span class="pre">&quot;2015/07/09</span> <span class="pre">00:00:00&quot;</span></tt>.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>logical_select \
+  --logical_table Entries \
+  --shard_key created_at \
+  --min &quot;2015/07/09 00:00:00&quot; \
+  --min_border &quot;exclude&quot;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;created_at&quot;,
+#           &quot;Time&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Good-bye Tritonn&quot;,
+#         &quot;I also migrated all Tritonn system!&quot;,
+#         1436371200.0,
+#         3,
+#         &quot;Senna&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
 </div>
 <div class="section" id="max">
-<h4>7.3.24.4.2.3. <tt class="docutils literal"><span class="pre">max</span></tt><a class="headerlink" href="#max" title="Permalink to this headline">¶</a></h4>
-<p>Specifies the max value of <tt class="docutils literal"><span class="pre">shard_key</span></tt>.</p>
+<h4>7.3.24.5.2.3. <tt class="docutils literal"><span class="pre">max</span></tt><a class="headerlink" href="#max" title="Permalink to this headline">¶</a></h4>
+<p>Specifies the maximum value of <tt class="docutils literal"><span class="pre">shard_key</span></tt> column. If shard doesn't
+have any matched records, the shard isn't searched.</p>
+<p>For example, <tt class="docutils literal"><span class="pre">max</span></tt> is <tt class="docutils literal"><span class="pre">&quot;2015/07/08</span> <span class="pre">23:59:59&quot;</span></tt>, <tt class="docutils literal"><span class="pre">Entry_20150709</span></tt>
+isn't searched. Because <tt class="docutils literal"><span class="pre">Entry_20150709</span></tt> has only records for
+<tt class="docutils literal"><span class="pre">&quot;&quot;2015/07/09&quot;</span></tt>.</p>
+<p>The following example only uses <tt class="docutils literal"><span class="pre">Entry_20150708</span></tt>
+table. <tt class="docutils literal"><span class="pre">Entry_20150709</span></tt> isn't used.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>logical_select \
+  --logical_table Entries \
+  --shard_key created_at \
+  --max &quot;2015/07/08 23:59:59&quot;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         3
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;created_at&quot;,
+#           &quot;Time&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         &quot;The first post!&quot;,
+#         &quot;Welcome! This is my first post!&quot;,
+#         1436281200.0,
+#         5,
+#         &quot;Hello&quot;
+#       ],
+#       [
+#         &quot;Groonga&quot;,
+#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+#         1436284800.0,
+#         10,
+#         &quot;Groonga&quot;
+#       ],
+#       [
+#         &quot;Mroonga&quot;,
+#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         1436288400.0,
+#         15,
+#         &quot;Groonga&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
 </div>
 <div class="section" id="max-border">
-<h4>7.3.24.4.2.4. <tt class="docutils literal"><span class="pre">max_border</span></tt><a class="headerlink" href="#max-border" title="Permalink to this headline">¶</a></h4>
-<p>Specifies whether the max value of borderline must be include or not.
-Specify <tt class="docutils literal"><span class="pre">include</span></tt> or <tt class="docutils literal"><span class="pre">exclude</span></tt> as the value of this parameter.</p>
+<h4>7.3.24.5.2.4. <tt class="docutils literal"><span class="pre">max_border</span></tt><a class="headerlink" href="#max-border" title="Permalink to this headline">¶</a></h4>
+<p>Specifies whether the maximum value is include or not. Here is
+available values.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Value</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">include</span></tt></td>
+<td>Includes <tt class="docutils literal"><span class="pre">max</span></tt> value. This is the default.</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">exclude</span></tt></td>
+<td>Doesn't include <tt class="docutils literal"><span class="pre">max</span></tt> value.</td>
+</tr>
+</tbody>
+</table>
+<p>Here is an example for <tt class="docutils literal"><span class="pre">exclude</span></tt>. The result doesn't include the
+<tt class="docutils literal"><span class="pre">&quot;Good-bye</span> <span class="pre">Senna&quot;</span></tt> record because its <tt class="docutils literal"><span class="pre">created_at</span></tt> value is
+<tt class="docutils literal"><span class="pre">&quot;2015/07/09</span> <span class="pre">00:00:00&quot;</span></tt>.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>logical_select \
+  --logical_table Entries \
+  --shard_key created_at \
+  --max &quot;2015/07/09 00:00:00&quot; \
+  --max_border &quot;exclude&quot;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         3
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;created_at&quot;,
+#           &quot;Time&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         &quot;The first post!&quot;,
+#         &quot;Welcome! This is my first post!&quot;,
+#         1436281200.0,
+#         5,
+#         &quot;Hello&quot;
+#       ],
+#       [
+#         &quot;Groonga&quot;,
+#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+#         1436284800.0,
+#         10,
+#         &quot;Groonga&quot;
+#       ],
+#       [
+#         &quot;Mroonga&quot;,
+#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         1436288400.0,
+#         15,
+#         &quot;Groonga&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
 </div>
 <div class="section" id="filter">
-<h4>7.3.24.4.2.5. <tt class="docutils literal"><span class="pre">filter</span></tt><a class="headerlink" href="#filter" title="Permalink to this headline">¶</a></h4>
+<h4>7.3.24.5.2.5. <tt class="docutils literal"><span class="pre">filter</span></tt><a class="headerlink" href="#filter" title="Permalink to this headline">¶</a></h4>
 </div>
 </div>
 </div>
 <div class="section" id="return-value">
-<h2>7.3.24.5. Return value<a class="headerlink" href="#return-value" title="Permalink to this headline">¶</a></h2>
-<p>TODO: add more description for RESULTS</p>
-<div class="highlight-none"><div class="highlight"><pre>[HEADER, RESULTS]
-</pre></div>
-</div>
+<h2>7.3.24.6. Return value<a class="headerlink" href="#return-value" title="Permalink to this headline">¶</a></h2>
+<p>The return value format of <tt class="docutils literal"><span class="pre">logical_select</span></tt> is compatible with
+<a class="reference internal" href="select.html"><em>select</em></a>. See <a class="reference internal" href="select.html#select-return-value"><em>Return value</em></a> for details.</p>
 </div>
 </div>
 
@@ -179,24 +751,28 @@ Specify <tt class="docutils literal"><span class="pre">include</span></tt> or <t
 <li><a class="reference internal" href="#">7.3.24. <tt class="docutils literal"><span class="pre">logical_select</span></tt></a><ul>
 <li><a class="reference internal" href="#summary">7.3.24.1. Summary</a></li>
 <li><a class="reference internal" href="#syntax">7.3.24.2. Syntax</a></li>
-<li><a class="reference internal" href="#usage">7.3.24.3. Usage</a></li>
-<li><a class="reference internal" href="#parameters">7.3.24.4. Parameters</a><ul>
-<li><a class="reference internal" href="#required-parameter">7.3.24.4.1. Required parameter</a><ul>
-<li><a class="reference internal" href="#logical-table">7.3.24.4.1.1. <tt class="docutils literal"><span class="pre">logical_table</span></tt></a></li>
-<li><a class="reference internal" href="#shard-key">7.3.24.4.1.2. <tt class="docutils literal"><span class="pre">shard_key</span></tt></a></li>
+<li><a class="reference internal" href="#differences-from-select">7.3.24.3. Differences from <tt class="docutils literal"><span class="pre">select</span></tt></a></li>
+<li><a class="reference internal" href="#usage">7.3.24.4. Usage</a><ul>
+<li><a class="reference internal" href="#simple-usage">7.3.24.4.1. Simple usage</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#optional-parameters">7.3.24.4.2. Optional parameters</a><ul>
-<li><a class="reference internal" href="#min">7.3.24.4.2.1. <tt class="docutils literal"><span class="pre">min</span></tt></a></li>
-<li><a class="reference internal" href="#min-border">7.3.24.4.2.2. <tt class="docutils literal"><span class="pre">min_border</span></tt></a></li>
-<li><a class="reference internal" href="#max">7.3.24.4.2.3. <tt class="docutils literal"><span class="pre">max</span></tt></a></li>
-<li><a class="reference internal" href="#max-border">7.3.24.4.2.4. <tt class="docutils literal"><span class="pre">max_border</span></tt></a></li>
-<li><a class="reference internal" href="#filter">7.3.24.4.2.5. <tt class="docutils literal"><span class="pre">filter</span></tt></a></li>
+<li><a class="reference internal" href="#parameters">7.3.24.5. Parameters</a><ul>
+<li><a class="reference internal" href="#required-parameter">7.3.24.5.1. Required parameter</a><ul>
+<li><a class="reference internal" href="#logical-table">7.3.24.5.1.1. <tt class="docutils literal"><span class="pre">logical_table</span></tt></a></li>
+<li><a class="reference internal" href="#shard-key">7.3.24.5.1.2. <tt class="docutils literal"><span class="pre">shard_key</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#optional-parameters">7.3.24.5.2. Optional parameters</a><ul>
+<li><a class="reference internal" href="#min">7.3.24.5.2.1. <tt class="docutils literal"><span class="pre">min</span></tt></a></li>
+<li><a class="reference internal" href="#min-border">7.3.24.5.2.2. <tt class="docutils literal"><span class="pre">min_border</span></tt></a></li>
+<li><a class="reference internal" href="#max">7.3.24.5.2.3. <tt class="docutils literal"><span class="pre">max</span></tt></a></li>
+<li><a class="reference internal" href="#max-border">7.3.24.5.2.4. <tt class="docutils literal"><span class="pre">max_border</span></tt></a></li>
+<li><a class="reference internal" href="#filter">7.3.24.5.2.5. <tt class="docutils literal"><span class="pre">filter</span></tt></a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a class="reference internal" href="#return-value">7.3.24.5. Return value</a></li>
+<li><a class="reference internal" href="#return-value">7.3.24.6. Return value</a></li>
 </ul>
 </li>
 </ul>

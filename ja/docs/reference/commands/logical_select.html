@@ -92,77 +92,619 @@
 <div class="section" id="summary">
 <h2>7.3.24.1. 概要<a class="headerlink" href="#summary" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <div class="admonition note">
-<p class="first admonition-title">注釈</p>
+<p class="first admonition-title">ノート</p>
 <p class="last">このコマンドは実験的な機能です。</p>
 </div>
 <div class="versionadded">
 <p><span class="versionmodified">バージョン 5.0.5 で追加.</span></p>
 </div>
-<p>TODO</p>
+<p><tt class="docutils literal"><span class="pre">logical_select</span></tt> は <a class="reference internal" href="select.html"><em>select</em></a> のシャーディングバージョンです。 <tt class="docutils literal"><span class="pre">logical_select</span></tt> は複数のテーブルからレコードを検索し、マッチしたレコードを出力します。</p>
+<p><tt class="docutils literal"><span class="pre">logical_select</span></tt> は <tt class="docutils literal"><span class="pre">sharding</span></tt> プラグインに含まれているので、 <tt class="docutils literal"><span class="pre">sharding</span></tt> プラグインを <a class="reference internal" href="plugin_register.html"><em>plugin_register</em></a> する必要があります。</p>
 </div>
 <div class="section" id="syntax">
 <h2>7.3.24.2. 構文<a class="headerlink" href="#syntax" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p><tt class="docutils literal"><span class="pre">logical_select</span></tt> コマンドには7つの引数があります。</p>
-<p>必須引数は二つあります。 <tt class="docutils literal"><span class="pre">logical_table</span></tt> と <tt class="docutils literal"><span class="pre">shard_key</span></tt> です。</p>
+<p><tt class="docutils literal"><span class="pre">logical_select</span></tt> コマンドにはたくさんの引数があります。</p>
+<p>必須の引数は <tt class="docutils literal"><span class="pre">logical_table</span></tt> と <tt class="docutils literal"><span class="pre">shard_key</span></tt> です。それ以外の引数は省略可能です:</p>
 <div class="highlight-none"><div class="highlight"><pre>logical_select logical_table
                shard_key
-               [min]
-               [min_border]
-               [max]
-               [max_border]
-               [filter]
+               [min=null]
+               [min_border=&quot;include&quot;]
+               [max=null]
+               [max_border=&quot;include&quot;]
+               [filter=null]
+               [sortby=null]
+               [output_columns=&quot;_key, *&quot;]
+               [offset=0]
+               [limit=10]
+               [drilldown=null]
+               [drilldown_sortby=null]
+               [drilldown_output_columns=&quot;_key, _nsubrecs&quot;]
+               [drilldown_offset=0]
+               [drilldown_limit=10]
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">logical_select</span></tt> には高度なドリルダウン機能のために以下の名前付き引数があります。</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">drilldown[${LABEL}].keys=null</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">drilldown[${LABEL}].sortby=null</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">drilldown[${LABEL}].output_columns=&quot;_key,</span> <span class="pre">_nsubrecs&quot;</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">drilldown[${LABEL}].offset=0</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">drilldown[${LABEL}].limit=10</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">drilldown[${LABEL}].calc_types=NONE</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">drilldown[${LABEL}].calc_target=null</span></tt></li>
+</ul>
+</div></blockquote>
+<p><tt class="docutils literal"><span class="pre">${LABEL}</span></tt> には1つ以上のアルファベット、数字、 <tt class="docutils literal"><span class="pre">_</span></tt> 、 <tt class="docutils literal"><span class="pre">.</span></tt> を使うことができます。たとえば、 <tt class="docutils literal"><span class="pre">parent.sub1</span></tt> は有効な <tt class="docutils literal"><span class="pre">${LABEL}</span></tt> です。</p>
+<p>同じ <tt class="docutils literal"><span class="pre">${LABEL}</span></tt> も持つ引数は同じグループになります。</p>
+<p>たとえば、以下の引数は1つのドリルダウンを指定しています。</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">--drilldown[label].keys</span> <span class="pre">column</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">--drilldown[label].sortby</span> <span class="pre">-_nsubrecs</span></tt></li>
+</ul>
+</div></blockquote>
+<p>以下の引数は2つのドリルダウンを指定しています。</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">--drilldown[label1].keys</span> <span class="pre">column1</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">--drilldown[label1].sortby</span> <span class="pre">-_nsubrecs</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">--drilldown[label2].keys</span> <span class="pre">column2</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">--drilldown[label2].sortby</span> <span class="pre">_key</span></tt></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="differences-from-select">
+<h2>7.3.24.3. <tt class="docutils literal"><span class="pre">select</span></tt> との違い<a class="headerlink" href="#differences-from-select" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">logical_select</span></tt> の多くの機能は <a class="reference internal" href="select.html"><em>select</em></a> の機能と対応しています。たとえば、引数名は同じですし、出力フォーマットも同じです。</p>
+<p>しかし、いくつか <a class="reference internal" href="select.html"><em>select</em></a> と違うところもあります。</p>
+<blockquote>
+<div><ul class="simple">
+<li><p class="first"><tt class="docutils literal"><span class="pre">table</span></tt> 引数ではなく、 <tt class="docutils literal"><span class="pre">logical_table</span></tt> と <tt class="docutils literal"><span class="pre">shard_key</span></tt> 引数が必須です。</p>
+</li>
+<li><p class="first">デフォルトの <tt class="docutils literal"><span class="pre">output_columns</span></tt> の値に <tt class="docutils literal"><span class="pre">_id</span></tt> が含まれていません。これは、複数のシャードを使った場合は <tt class="docutils literal"><span class="pre">_id</span></tt> の意味がなくなるからです。 <tt class="docutils literal"><span class="pre">_id</span></tt> はすべてのシャードをまたがって管理されているわけではなく、各シャードで管理されているので、 <tt class="docutils literal"><span class="pre">_id</span></tt> は重複する可能性があります。</p>
+</li>
+<li><p class="first">複数のシャードを使った場合の <tt class="docutils literal"><span class="pre">sortby</span></tt> と <tt class="docutils literal"><span class="pre">drilldown_sortby</span></tt> と <tt class="docutils literal"><span class="pre">drilldown[${LABEL}].sortby</span></tt> はサポートしていません。（1つのシャードのみを使った場合はサポートしています。）</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">match_columns</span></tt> と <tt class="docutils literal"><span class="pre">query</span></tt> はまだサポートしていません。</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">cache</span></tt> はまだサポートしていません。</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">match_escalation_threshold</span></tt> はまだサポートしていません。</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">query_flags</span></tt> はまだサポートしていません。</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">query_expander</span></tt> はまだサポートしていません。</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">adjuster</span></tt> はまだサポートしていません。</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">drilldown_calc_types</span></tt> と <tt class="docutils literal"><span class="pre">drilldown_calc_target</span></tt> はまだサポートしていません。</p>
+</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="usage">
+<h2>7.3.24.4. 使い方<a class="headerlink" href="#usage" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>例を使いながら <tt class="docutils literal"><span class="pre">logical_select</span></tt> の使い方を学びましょう。このセクションではよく使われる使い方を紹介します。</p>
+<p><tt class="docutils literal"><span class="pre">logical_select</span></tt> は <tt class="docutils literal"><span class="pre">sharding</span></tt> プラグインに含まれているので <tt class="docutils literal"><span class="pre">sharding</span></tt> プラグインを登録する必要があります。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>plugin_register sharding
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>使い方を示すために使うスキーマ定義とサンプルデータは以下の通りです。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Entries_20150708 TABLE_HASH_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries_20150708 created_at COLUMN_SCALAR Time
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries_20150708 content COLUMN_SCALAR Text
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries_20150708 n_likes COLUMN_SCALAR UInt32
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries_20150708 tag COLUMN_SCALAR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create Entries_20150709 TABLE_HASH_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries_20150709 created_at COLUMN_SCALAR Time
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries_20150709 content COLUMN_SCALAR Text
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries_20150709 n_likes COLUMN_SCALAR UInt32
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries_20150709 tag COLUMN_SCALAR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create Terms TABLE_PAT_KEY ShortText \
+  --default_tokenizer TokenBigram \
+  --normalizer NormalizerAuto
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Terms entries_key_index_20150708 \
+  COLUMN_INDEX|WITH_POSITION Entries_20150708 _key
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Terms entries_content_index_20150708 \
+  COLUMN_INDEX|WITH_POSITION Entries_20150708 content
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Terms entries_key_index_20150709 \
+  COLUMN_INDEX|WITH_POSITION Entries_20150709 _key
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Terms entries_content_index_20150709 \
+  COLUMN_INDEX|WITH_POSITION Entries_20150709 content
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+load --table Entries_20150708
+[
+{&quot;_key&quot;:       &quot;The first post!&quot;,
+ &quot;created_at&quot;: &quot;2015/07/08 00:00:00&quot;,
+ &quot;content&quot;:    &quot;Welcome! This is my first post!&quot;,
+ &quot;n_likes&quot;:    5,
+ &quot;tag&quot;:        &quot;Hello&quot;},
+{&quot;_key&quot;:       &quot;Groonga&quot;,
+ &quot;created_at&quot;: &quot;2015/07/08 01:00:00&quot;,
+ &quot;content&quot;:    &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+ &quot;n_likes&quot;:    10,
+ &quot;tag&quot;:        &quot;Groonga&quot;},
+{&quot;_key&quot;:       &quot;Mroonga&quot;,
+ &quot;created_at&quot;: &quot;2015/07/08 02:00:00&quot;,
+ &quot;content&quot;:    &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
+ &quot;n_likes&quot;:    15,
+ &quot;tag&quot;:        &quot;Groonga&quot;}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 3]
+load --table Entries_20150709
+[
+{&quot;_key&quot;:       &quot;Good-bye Senna&quot;,
+ &quot;created_at&quot;: &quot;2015/07/09 00:00:00&quot;,
+ &quot;content&quot;:    &quot;I migrated all Senna system!&quot;,
+ &quot;n_likes&quot;:    3,
+ &quot;tag&quot;:        &quot;Senna&quot;},
+{&quot;_key&quot;:       &quot;Good-bye Tritonn&quot;,
+ &quot;created_at&quot;: &quot;2015/07/09 01:00:00&quot;,
+ &quot;content&quot;:    &quot;I also migrated all Tritonn system!&quot;,
+ &quot;n_likes&quot;:    3,
+ &quot;tag&quot;:        &quot;Senna&quot;}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 2]
+</pre></div>
+</div>
+<p>ブログエントリー用に <tt class="docutils literal"><span class="pre">Entries_20150708</span></tt> と <tt class="docutils literal"><span class="pre">Entries_20150709</span></tt> の2つのテーブルがあります。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">テーブル名には <tt class="docutils literal"><span class="pre">${論理テーブル名}_${YYYYMMDD}</span></tt> という命名規則を使う必要があります。この例では、 <tt class="docutils literal"><span class="pre">論理テーブル名</span></tt> は <tt class="docutils literal"><span class="pre">Entries</span></tt> で <tt class="docutils literal"><span class="pre">YYYYMMDD</span></tt> は <tt class="docutils literal"><span class="pre">20150708</span></tt> または <tt class="docutils literal"><span class="pre">20150709</span></tt> です。</p>
+</div>
+<p>各エントリはタイトルと作成日時と内容と「いいね！」数、タグを持っています。タイトルは <tt class="docutils literal"><span class="pre">Entries_YYYYMMDD</span></tt> のキーとします。作成日時は <tt class="docutils literal"><span class="pre">Entries__YYYYMMDD.created_at</span></tt> カラムの値とします。内容は <tt class="docutils literal"><span class="pre">Entries_YYYYMMDD.content</span></tt> カラムの値とします。「いいね！」数は <tt class="docutils literal"><span class="pre">Entries_YYYYMMDD.n_likes</span></tt> カラムの値とします。タグは <tt class="docutils literal"><span class="pre">Entries_YYYYMMDD.tag</span></tt> カラムの値とします。</p>
+<p><tt class="docutils literal"><span class="pre">Entries_YYYYMMDD._key</span></tt> カラムと <tt class="docutils literal"><span class="pre">Entries_YYYYMMDD.content</span></tt> カラムには <tt class="docutils literal"><span class="pre">TokenBigram</span></tt> トークナイザーを使ったインデックスを作成します。そのため、 <tt class="docutils literal"><span class="pre">Entries_YYYYMMDD._key</span></tt> と <tt class="docutils literal"><span class="pre">Entries_YYYYMMDD.content</span></tt> は両方とも全文検索できます。</p>
+<p>これで例を示すためのスキーマとデータの準備ができました。</p>
+<div class="section" id="simple-usage">
+<h3>7.3.24.4.1. 簡単な使い方<a class="headerlink" href="#simple-usage" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>TODO</p>
+</div>
+</div>
+<div class="section" id="parameters">
+<h2>7.3.24.5. 引数<a class="headerlink" href="#parameters" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>このセクションでは <tt class="docutils literal"><span class="pre">logical_select</span></tt> の引数について説明します。</p>
+<div class="section" id="required-parameter">
+<h3>7.3.24.5.1. 必須引数<a class="headerlink" href="#required-parameter" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>必須引数は二つあります。 <tt class="docutils literal"><span class="pre">logical_table</span></tt> と <tt class="docutils literal"><span class="pre">shard_key</span></tt> です。</p>
+<div class="section" id="logical-table">
+<span id="logical-select-logical-table"></span><h4>7.3.24.5.1.1. <tt class="docutils literal"><span class="pre">logical_table</span></tt><a class="headerlink" href="#logical-table" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>論理テーブル名を指定します。これは <tt class="docutils literal"><span class="pre">_YYYYMMDD</span></tt> をテーブル名からのぞいたものです。実際のテーブルが <tt class="docutils literal"><span class="pre">Entries_20150708</span></tt> や <tt class="docutils literal"><span class="pre">Entries_20150709</span></tt> といったものなら、論理テーブル名は <tt class="docutils literal"><span class="pre">Entries</span></tt> です。</p>
+<p><tt class="docutils literal"><span class="pre">logical_table</span></tt> と <tt class="docutils literal"><span class="pre">shard_key</span></tt> 引数を指定すると10レコード表示できます。これらの引数は必須の引数です。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>logical_select --logical_table Entries --shard_key created_at
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;created_at&quot;,
+#           &quot;Time&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         &quot;The first post!&quot;,
+#         &quot;Welcome! This is my first post!&quot;,
+#         1436281200.0,
+#         5,
+#         &quot;Hello&quot;
+#       ],
+#       [
+#         &quot;Groonga&quot;,
+#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+#         1436284800.0,
+#         10,
+#         &quot;Groonga&quot;
+#       ],
+#       [
+#         &quot;Mroonga&quot;,
+#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         1436288400.0,
+#         15,
+#         &quot;Groonga&quot;
+#       ],
+#       [
+#         &quot;Good-bye Senna&quot;,
+#         &quot;I migrated all Senna system!&quot;,
+#         1436367600.0,
+#         3,
+#         &quot;Senna&quot;
+#       ],
+#       [
+#         &quot;Good-bye Tritonn&quot;,
+#         &quot;I also migrated all Tritonn system!&quot;,
+#         1436371200.0,
+#         3,
+#         &quot;Senna&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>存在しないテーブルを指定するとエラーが返ります。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>logical_select --logical_table Nonexistent --shard_key created_at
+# [
+#   [
+#     -22,
+#     1337566253.89858,
+#     0.000355720520019531,
+#     &quot;[logical_select] no shard exists: logical_table: &lt;Nonexistent&gt;: shard_key: &lt;created_at&gt;&quot;,
+#     [
+#       [
+#         &quot;Groonga::Context.set_groonga_error&quot;,
+#         &quot;/home/kou/work/c/groonga.clean/lib/mrb/scripts/context.rb&quot;,
+#         27
+#       ]
+#     ]
+#   ]
+# ]
 </pre></div>
 </div>
 </div>
-<div class="section" id="usage">
-<h2>7.3.24.3. 使い方<a class="headerlink" href="#usage" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>TODO</p>
-</div>
-<div class="section" id="parameters">
-<h2>7.3.24.4. 引数<a class="headerlink" href="#parameters" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>このセクションでは <tt class="docutils literal"><span class="pre">logical_select</span></tt> の引数について説明します。</p>
-<div class="section" id="required-parameter">
-<h3>7.3.24.4.1. 必須引数<a class="headerlink" href="#required-parameter" title="このヘッドラインへのパーマリンク">¶</a></h3>
-<p>必須引数は二つあります。 <tt class="docutils literal"><span class="pre">logical_table</span></tt> と <tt class="docutils literal"><span class="pre">shard_key</span></tt> です。</p>
-<div class="section" id="logical-table">
-<h4>7.3.24.4.1.1. <tt class="docutils literal"><span class="pre">logical_table</span></tt><a class="headerlink" href="#logical-table" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p>論理テーブル名を指定します。これは &quot;_YYYYMMDD&quot; をテーブル名から除いたものです。実際のテーブルが &quot;Logs_20150203&quot; や &quot;Logs_20150203&quot; といったものなら、論理テーブル名は &quot;Logs&quot; です。</p>
-</div>
 <div class="section" id="shard-key">
-<h4>7.3.24.4.1.2. <tt class="docutils literal"><span class="pre">shard_key</span></tt><a class="headerlink" href="#shard-key" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<span id="logical-select-shard-key"></span><h4>7.3.24.5.1.2. <tt class="docutils literal"><span class="pre">shard_key</span></tt><a class="headerlink" href="#shard-key" title="このヘッドラインへのパーマリンク">¶</a></h4>
 <p>個々のテーブルで共通のキーとして扱うカラム名を指定します。</p>
+<p>今のところ、シャードキーは <tt class="docutils literal"><span class="pre">Time</span></tt> 型でなければいけません。</p>
+<p><tt class="docutils literal"><span class="pre">shard_key</span></tt> の指定方法は <a class="reference internal" href="#logical-select-logical-table"><em>logical_table</em></a> を見てください。</p>
 </div>
 </div>
 <div class="section" id="optional-parameters">
-<h3>7.3.24.4.2. 省略可能引数<a class="headerlink" href="#optional-parameters" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<h3>7.3.24.5.2. 省略可能引数<a class="headerlink" href="#optional-parameters" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <p>いくつか省略可能な引数があります。</p>
 <div class="section" id="min">
-<h4>7.3.24.4.2.1. <tt class="docutils literal"><span class="pre">min</span></tt><a class="headerlink" href="#min" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p><tt class="docutils literal"><span class="pre">shard_key</span></tt> の最小値を指定します。</p>
+<h4>7.3.24.5.2.1. <tt class="docutils literal"><span class="pre">min</span></tt><a class="headerlink" href="#min" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p><tt class="docutils literal"><span class="pre">shard_key</span></tt> カラムの最小値を指定します。シャードにマッチするレコードがない場合は、そのシャードは検索対象外になります。</p>
+<p>たとえば、 <tt class="docutils literal"><span class="pre">min</span></tt> が <tt class="docutils literal"><span class="pre">&quot;2015/07/09</span> <span class="pre">00:00:00&quot;</span></tt> なら、 <tt class="docutils literal"><span class="pre">Entry_20150708</span></tt> は検索対象外です。なぜなら、 <tt class="docutils literal"><span class="pre">Entry_20150708</span></tt> は <tt class="docutils literal"><span class="pre">&quot;&quot;2015/07/08&quot;</span></tt> のレコードしかないからです。</p>
+<p>以下の例は <tt class="docutils literal"><span class="pre">Entry_20150709</span></tt> テーブルだけを使う例です。 <tt class="docutils literal"><span class="pre">Entry_20150708</span></tt> は使われません。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>logical_select \
+  --logical_table Entries \
+  --shard_key created_at \
+  --min &quot;2015/07/09 00:00:00&quot;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;created_at&quot;,
+#           &quot;Time&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Good-bye Senna&quot;,
+#         &quot;I migrated all Senna system!&quot;,
+#         1436367600.0,
+#         3,
+#         &quot;Senna&quot;
+#       ],
+#       [
+#         &quot;Good-bye Tritonn&quot;,
+#         &quot;I also migrated all Tritonn system!&quot;,
+#         1436371200.0,
+#         3,
+#         &quot;Senna&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
 </div>
 <div class="section" id="min-border">
-<h4>7.3.24.4.2.2. <tt class="docutils literal"><span class="pre">min_border</span></tt><a class="headerlink" href="#min-border" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p>最小値を境界値として含めるのか否かを指定します。 <tt class="docutils literal"><span class="pre">include</span></tt> もしくは <tt class="docutils literal"><span class="pre">exclude</span></tt> を指定します。</p>
+<h4>7.3.24.5.2.2. <tt class="docutils literal"><span class="pre">min_border</span></tt><a class="headerlink" href="#min-border" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>最小値を含めるかどうかを指定します。指定可能な値は次の通りです。</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Value</th>
+<th class="head"><p class="first last">説明</p>
+</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">include</span></tt></td>
+<td><p class="first last"><tt class="docutils literal"><span class="pre">min</span></tt> の値を含みます。これがデフォルト値です。</p>
+</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">exclude</span></tt></td>
+<td><p class="first last"><tt class="docutils literal"><span class="pre">min</span></tt> の値を含みません。</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>次の例は <tt class="docutils literal"><span class="pre">exclude</span></tt> の使用例です。結果には <tt class="docutils literal"><span class="pre">&quot;Good-bye</span> <span class="pre">Senna&quot;</span></tt> レコードは含まれません。このレコードの <tt class="docutils literal"><span class="pre">created_at</span></tt> の値が <tt class="docutils literal"><span class="pre">&quot;2015/07/09</span> <span class="pre">00:00:00&quot;</span></tt> だからです。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>logical_select \
+  --logical_table Entries \
+  --shard_key created_at \
+  --min &quot;2015/07/09 00:00:00&quot; \
+  --min_border &quot;exclude&quot;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;created_at&quot;,
+#           &quot;Time&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Good-bye Tritonn&quot;,
+#         &quot;I also migrated all Tritonn system!&quot;,
+#         1436371200.0,
+#         3,
+#         &quot;Senna&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
 </div>
 <div class="section" id="max">
-<h4>7.3.24.4.2.3. <tt class="docutils literal"><span class="pre">max</span></tt><a class="headerlink" href="#max" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p><tt class="docutils literal"><span class="pre">shard_key</span></tt> の最大値を指定します。</p>
+<h4>7.3.24.5.2.3. <tt class="docutils literal"><span class="pre">max</span></tt><a class="headerlink" href="#max" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p><tt class="docutils literal"><span class="pre">shard_key</span></tt> カラムの最大値を指定します。シャードにマッチするレコードがない場合、そのシャードは検索対象外になります。</p>
+<p>たとえば、 <tt class="docutils literal"><span class="pre">max</span></tt> が <tt class="docutils literal"><span class="pre">&quot;2015/07/08</span> <span class="pre">23:59:59&quot;</span></tt> なら <tt class="docutils literal"><span class="pre">Entry_20150709</span></tt> は検索対象外です。なぜなら <tt class="docutils literal"><span class="pre">Entry_20150709</span></tt> には <tt class="docutils literal"><span class="pre">&quot;&quot;2015/07/09&quot;</span></tt> のレコードしかないからです。</p>
+<p>以下の例は <tt class="docutils literal"><span class="pre">Entry_20150708</span></tt> テーブルだけを使います。 <tt class="docutils literal"><span class="pre">Entry_20150709</span></tt> は使いません。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>logical_select \
+  --logical_table Entries \
+  --shard_key created_at \
+  --max &quot;2015/07/08 23:59:59&quot;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         3
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;created_at&quot;,
+#           &quot;Time&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         &quot;The first post!&quot;,
+#         &quot;Welcome! This is my first post!&quot;,
+#         1436281200.0,
+#         5,
+#         &quot;Hello&quot;
+#       ],
+#       [
+#         &quot;Groonga&quot;,
+#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+#         1436284800.0,
+#         10,
+#         &quot;Groonga&quot;
+#       ],
+#       [
+#         &quot;Mroonga&quot;,
+#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         1436288400.0,
+#         15,
+#         &quot;Groonga&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
 </div>
 <div class="section" id="max-border">
-<h4>7.3.24.4.2.4. <tt class="docutils literal"><span class="pre">max_border</span></tt><a class="headerlink" href="#max-border" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p>最大値を境界値として含めるのか否かを指定します。 <tt class="docutils literal"><span class="pre">include</span></tt> もしくは <tt class="docutils literal"><span class="pre">exclude</span></tt> を指定します。</p>
+<h4>7.3.24.5.2.4. <tt class="docutils literal"><span class="pre">max_border</span></tt><a class="headerlink" href="#max-border" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>最大値を含めるかどうかを指定します。指定可能な値は次の通りです。</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Value</th>
+<th class="head"><p class="first last">説明</p>
+</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">include</span></tt></td>
+<td><p class="first last"><tt class="docutils literal"><span class="pre">max</span></tt> の値を含みます。これがデフォルト値です。</p>
+</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">exclude</span></tt></td>
+<td><p class="first last"><tt class="docutils literal"><span class="pre">max</span></tt> の値を含みません。</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>次の例は <tt class="docutils literal"><span class="pre">exclude</span></tt> の使用例です。結果には <tt class="docutils literal"><span class="pre">&quot;Good-bye</span> <span class="pre">Senna&quot;</span></tt> レコードは含まれません。このレコードの <tt class="docutils literal"><span class="pre">created_at</span></tt> の値が <tt class="docutils literal"><span class="pre">&quot;2015/07/09</span> <span class="pre">00:00:00&quot;</span></tt> だからです。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>logical_select \
+  --logical_table Entries \
+  --shard_key created_at \
+  --max &quot;2015/07/09 00:00:00&quot; \
+  --max_border &quot;exclude&quot;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         3
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;created_at&quot;,
+#           &quot;Time&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         &quot;The first post!&quot;,
+#         &quot;Welcome! This is my first post!&quot;,
+#         1436281200.0,
+#         5,
+#         &quot;Hello&quot;
+#       ],
+#       [
+#         &quot;Groonga&quot;,
+#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+#         1436284800.0,
+#         10,
+#         &quot;Groonga&quot;
+#       ],
+#       [
+#         &quot;Mroonga&quot;,
+#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         1436288400.0,
+#         15,
+#         &quot;Groonga&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
 </div>
 <div class="section" id="filter">
-<h4>7.3.24.4.2.5. <tt class="docutils literal"><span class="pre">filter</span></tt><a class="headerlink" href="#filter" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<h4>7.3.24.5.2.5. <tt class="docutils literal"><span class="pre">filter</span></tt><a class="headerlink" href="#filter" title="このヘッドラインへのパーマリンク">¶</a></h4>
 </div>
 </div>
 </div>
 <div class="section" id="return-value">
-<h2>7.3.24.5. 戻り値<a class="headerlink" href="#return-value" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>TODO: add more description for RESULTS</p>
-<div class="highlight-none"><div class="highlight"><pre>[HEADER, RESULTS]
-</pre></div>
-</div>
+<h2>7.3.24.6. 戻り値<a class="headerlink" href="#return-value" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">logical_select</span></tt> の戻り値のフォーマットは <a class="reference internal" href="select.html"><em>select</em></a> と同じです。詳細は <a class="reference internal" href="select.html#select-return-value"><em>戻り値</em></a> を見てください。</p>
 </div>
 </div>
 
@@ -177,24 +719,28 @@
 <li><a class="reference internal" href="#">7.3.24. <tt class="docutils literal"><span class="pre">logical_select</span></tt></a><ul>
 <li><a class="reference internal" href="#summary">7.3.24.1. 概要</a></li>
 <li><a class="reference internal" href="#syntax">7.3.24.2. 構文</a></li>
-<li><a class="reference internal" href="#usage">7.3.24.3. 使い方</a></li>
-<li><a class="reference internal" href="#parameters">7.3.24.4. 引数</a><ul>
-<li><a class="reference internal" href="#required-parameter">7.3.24.4.1. 必須引数</a><ul>
-<li><a class="reference internal" href="#logical-table">7.3.24.4.1.1. <tt class="docutils literal"><span class="pre">logical_table</span></tt></a></li>
-<li><a class="reference internal" href="#shard-key">7.3.24.4.1.2. <tt class="docutils literal"><span class="pre">shard_key</span></tt></a></li>
+<li><a class="reference internal" href="#differences-from-select">7.3.24.3. <tt class="docutils literal"><span class="pre">select</span></tt> との違い</a></li>
+<li><a class="reference internal" href="#usage">7.3.24.4. 使い方</a><ul>
+<li><a class="reference internal" href="#simple-usage">7.3.24.4.1. 簡単な使い方</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#optional-parameters">7.3.24.4.2. 省略可能引数</a><ul>
-<li><a class="reference internal" href="#min">7.3.24.4.2.1. <tt class="docutils literal"><span class="pre">min</span></tt></a></li>
-<li><a class="reference internal" href="#min-border">7.3.24.4.2.2. <tt class="docutils literal"><span class="pre">min_border</span></tt></a></li>
-<li><a class="reference internal" href="#max">7.3.24.4.2.3. <tt class="docutils literal"><span class="pre">max</span></tt></a></li>
-<li><a class="reference internal" href="#max-border">7.3.24.4.2.4. <tt class="docutils literal"><span class="pre">max_border</span></tt></a></li>
-<li><a class="reference internal" href="#filter">7.3.24.4.2.5. <tt class="docutils literal"><span class="pre">filter</span></tt></a></li>
+<li><a class="reference internal" href="#parameters">7.3.24.5. 引数</a><ul>
+<li><a class="reference internal" href="#required-parameter">7.3.24.5.1. 必須引数</a><ul>
+<li><a class="reference internal" href="#logical-table">7.3.24.5.1.1. <tt class="docutils literal"><span class="pre">logical_table</span></tt></a></li>
+<li><a class="reference internal" href="#shard-key">7.3.24.5.1.2. <tt class="docutils literal"><span class="pre">shard_key</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#optional-parameters">7.3.24.5.2. 省略可能引数</a><ul>
+<li><a class="reference internal" href="#min">7.3.24.5.2.1. <tt class="docutils literal"><span class="pre">min</span></tt></a></li>
+<li><a class="reference internal" href="#min-border">7.3.24.5.2.2. <tt class="docutils literal"><span class="pre">min_border</span></tt></a></li>
+<li><a class="reference internal" href="#max">7.3.24.5.2.3. <tt class="docutils literal"><span class="pre">max</span></tt></a></li>
+<li><a class="reference internal" href="#max-border">7.3.24.5.2.4. <tt class="docutils literal"><span class="pre">max_border</span></tt></a></li>
+<li><a class="reference internal" href="#filter">7.3.24.5.2.5. <tt class="docutils literal"><span class="pre">filter</span></tt></a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a class="reference internal" href="#return-value">7.3.24.5. 戻り値</a></li>
+<li><a class="reference internal" href="#return-value">7.3.24.6. 戻り値</a></li>
 </ul>
 </li>
 </ul>

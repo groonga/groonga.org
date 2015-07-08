@@ -93,12 +93,12 @@
 <p><tt class="docutils literal"><span class="pre">select</span></tt> searches records that are matched to specified conditions
 from a table and then outputs them.</p>
 <p><tt class="docutils literal"><span class="pre">select</span></tt> is the most important command in groonga. You need to
-understand <tt class="docutils literal"><span class="pre">select</span></tt> to use the full power of groonga.</p>
+understand <tt class="docutils literal"><span class="pre">select</span></tt> to use the full power of Groonga.</p>
 </div>
 <div class="section" id="syntax">
 <h2>7.3.36.2. Syntax<a class="headerlink" href="#syntax" title="Permalink to this headline">¶</a></h2>
 <p><tt class="docutils literal"><span class="pre">select</span></tt> has many parameters. The required parameter is only
-<tt class="docutils literal"><span class="pre">table</span></tt> and others are optional:</p>
+<tt class="docutils literal"><span class="pre">table</span></tt>. Other parameters are optional:</p>
 <div class="highlight-none"><div class="highlight"><pre>select table
        [match_columns=null]
        [query=null]
@@ -211,7 +211,7 @@ using <tt class="docutils literal"><span class="pre">TokenBigram</span></tt> tok
 <tt class="docutils literal"><span class="pre">Entries.content</span></tt> are fulltext search ready.</p>
 <p>OK. The schema and data for examples are ready.</p>
 <div class="section" id="simple-usage">
-<h3>7.3.36.3.1. Simple usage<a class="headerlink" href="#simple-usage" title="Permalink to this headline">¶</a></h3>
+<span id="select-simple-usage"></span><h3>7.3.36.3.1. Simple usage<a class="headerlink" href="#simple-usage" title="Permalink to this headline">¶</a></h3>
 <p>Here is the most simple usage with the above schema and data. It outputs
 all records in <tt class="docutils literal"><span class="pre">Entries</span></tt> table.</p>
 <p>Execution example:</p>
@@ -2356,7 +2356,7 @@ number of records is <tt class="docutils literal"><span class="pre">5</span></tt
 <p>The default value is <tt class="docutils literal"><span class="pre">0</span></tt>.</p>
 </div>
 <div class="section" id="limit">
-<h4>7.3.36.4.4.4. <tt class="docutils literal"><span class="pre">limit</span></tt><a class="headerlink" href="#limit" title="Permalink to this headline">¶</a></h4>
+<span id="select-limit"></span><h4>7.3.36.4.4.4. <tt class="docutils literal"><span class="pre">limit</span></tt><a class="headerlink" href="#limit" title="Permalink to this headline">¶</a></h4>
 <p>Specifies the max number of output records. If the number of
 matched records is less than <tt class="docutils literal"><span class="pre">limit</span></tt>, all records are outputted.</p>
 <p>Here is a simple <tt class="docutils literal"><span class="pre">limit</span></tt> usage example.</p>
@@ -4905,61 +4905,203 @@ the same <tt class="docutils literal"><span class="pre">&quot;KEYWORD&quot;</spa
 </div>
 </div>
 </div>
-<div class="section" id="id7">
-<h2>7.3.36.5. 返値<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
-<p>TODO: write in English and add example.</p>
-<p>以下のようなjson形式で値が返却されます。</p>
-<div class="highlight-none"><div class="highlight"><pre>[[リターンコード, 処理開始時間, 処理時間], [検索結果, ドリルダウン結果]]
+<div class="section" id="return-value">
+<span id="select-return-value"></span><h2>7.3.36.5. Return value<a class="headerlink" href="#return-value" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">select</span></tt> returns response with the following format:</p>
+<div class="highlight-none"><div class="highlight"><pre>[
+  HEADER,
+  [
+    SEARCH_RESULT,
+    DRILLDOWN_RESULT_1,
+    DRILLDOWN_RESULT_2,
+    ...,
+    DRILLDOWN_RESULT_N
+  ]
+]
 </pre></div>
 </div>
-<p><tt class="docutils literal"><span class="pre">リターンコード</span></tt></p>
-<blockquote>
-<div>grn_rcに対応する数値が返されます。0(GRN_SUCCESS)以外の場合は、続いてエラー内容を示す
-文字列が返されます。</div></blockquote>
-<p><tt class="docutils literal"><span class="pre">処理開始時間</span></tt></p>
-<blockquote>
-<div>処理を開始した時間について、1970年1月1日0時0分0秒を起点とした秒数を小数で返します。</div></blockquote>
-<p><tt class="docutils literal"><span class="pre">処理時間</span></tt></p>
-<blockquote>
-<div>処理にかかった秒数を返します。</div></blockquote>
-<p><tt class="docutils literal"><span class="pre">検索結果</span></tt></p>
-<blockquote>
-<div><p>drilldown条件が実行される前の検索結果が以下のように出力されます。:</p>
-<div class="highlight-none"><div class="highlight"><pre>[[ヒット数], [[カラム名1,カラム型1],..], 検索結果1,..]
+<p>If <tt class="docutils literal"><span class="pre">select</span></tt> fails, error details are in <tt class="docutils literal"><span class="pre">HEADER</span></tt>.</p>
+<p>See <a class="reference internal" href="../command/output_format.html"><em>Output format</em></a> for <tt class="docutils literal"><span class="pre">HEADER</span></tt>.</p>
+<p>There are zero or more <tt class="docutils literal"><span class="pre">DRILLDOWN_RESULT</span></tt>. If no <tt class="docutils literal"><span class="pre">drilldown</span></tt> and
+<tt class="docutils literal"><span class="pre">drilldown[${LABEL}].keys</span></tt> are specified, they are omitted like the
+following:</p>
+<div class="highlight-none"><div class="highlight"><pre>[
+  HEADER,
+  [
+    SEARCH_RESULT
+  ]
+]
 </pre></div>
 </div>
-<p><tt class="docutils literal"><span class="pre">ヒット数</span></tt></p>
+<p>If <tt class="docutils literal"><span class="pre">drilldown</span></tt> has two or more keys like <tt class="docutils literal"><span class="pre">--drilldown</span> <span class="pre">&quot;_key,</span>
+<span class="pre">column1,</span> <span class="pre">column2&quot;</span></tt>, multiple <tt class="docutils literal"><span class="pre">DRILLDOWN_RESULT</span></tt> exist:</p>
+<div class="highlight-none"><div class="highlight"><pre>[
+  HEADER,
+  [
+    SEARCH_RESULT,
+    DRILLDOWN_RESULT_FOR_KEY,
+    DRILLDOWN_RESULT_FOR_COLUMN1,
+    DRILLDOWN_RESULT_FOR_COLUMN2
+  ]
+]
+</pre></div>
+</div>
+<p>If <tt class="docutils literal"><span class="pre">drilldown[${LABEL}].keys</span></tt> is used, only one <tt class="docutils literal"><span class="pre">DRILLDOWN_RESULT</span></tt>
+exist:</p>
+<div class="highlight-none"><div class="highlight"><pre>[
+  HEADER,
+  [
+    SEARCH_RESULT,
+    DRILLDOWN_RESULT_FOR_LABELED_DRILLDOWN
+  ]
+]
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">DRILLDOWN_RESULT</span></tt> format is different between <tt class="docutils literal"><span class="pre">drilldown</span></tt> and
+<tt class="docutils literal"><span class="pre">drilldown[${LABEL}].keys</span></tt>. It's described later.</p>
+<p><tt class="docutils literal"><span class="pre">SEARCH_RESULT</span></tt> is the following format:</p>
+<div class="highlight-none"><div class="highlight"><pre>[
+  [N_HITS],
+  COLUMNS,
+  RECORDS
+]
+</pre></div>
+</div>
+<p>See <a class="reference internal" href="#select-simple-usage"><em>Simple usage</em></a> for concrete example of the format.</p>
+<p><tt class="docutils literal"><span class="pre">N_HITS</span></tt> is the number of matched records before <a class="reference internal" href="#select-limit"><em>limit</em></a>
+is applied.</p>
+<p><tt class="docutils literal"><span class="pre">COLUMNS</span></tt> describes about output columns specified by
+<a class="reference internal" href="#select-output-columns"><em>output_columns</em></a>. It uses the following format:</p>
+<div class="highlight-none"><div class="highlight"><pre>[
+  [COLUMN_NAME_1, COLUMN_TYPE_1],
+  [COLUMN_NAME_2, COLUMN_TYPE_2],
+  ...,
+  [COLUMN_NAME_N, COLUMN_TYPE_N]
+]
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">COLUMNS</span></tt> includes one or more output column information. Each
+output column information includes the followings:</p>
 <blockquote>
-<div>検索条件にヒットしたレコードの数が出力されます。 <tt class="docutils literal"><span class="pre">--limit</span></tt> オプションで出力件数を制限した場合は出力するレコード数と一致しません。 <tt class="docutils literal"><span class="pre">ヒット数</span></tt> は <tt class="docutils literal"><span class="pre">--limit</span></tt> オプションに関係なく常にヒットしたレコードの数になります。</div></blockquote>
-<p><tt class="docutils literal"><span class="pre">カラム名n</span></tt></p>
-<blockquote>
-<div>output_columnsに指定された条件に従って、対象となるカラム名が出力されます。</div></blockquote>
-<p><tt class="docutils literal"><span class="pre">カラム型n</span></tt></p>
-<blockquote>
-<div>output_columnsに指定された条件に従って、対象となるカラム型が出力されます。</div></blockquote>
-<p><tt class="docutils literal"><span class="pre">検索結果n</span></tt></p>
-<blockquote>
-<div>output_columns, offset, limitによって指定された条件に従って各レコードの値が出力されます。</div></blockquote>
+<div><ul class="simple">
+<li>Column name as string</li>
+<li>Column type as string or <tt class="docutils literal"><span class="pre">null</span></tt></li>
+</ul>
 </div></blockquote>
-<p><tt class="docutils literal"><span class="pre">drilldown結果</span></tt></p>
-<blockquote>
-<div><p>drilldown処理の結果が以下のように出力されます。:</p>
-<div class="highlight-none"><div class="highlight"><pre>[[[件数], [[カラム名1,カラム型1],..], 検索結果1,..],..]
+<p>Column name is extracted from value specified as
+<a class="reference internal" href="#select-output-columns"><em>output_columns</em></a>.</p>
+<p>Column type is Groonga's type name or <tt class="docutils literal"><span class="pre">null</span></tt>. It doesn't describe
+whether the column value is vector or scalar. You need to determine it
+by whether real column value is array or not.</p>
+<p>See <a class="reference internal" href="../types.html"><em>Data types</em></a> for type details.</p>
+<p><tt class="docutils literal"><span class="pre">null</span></tt> is used when column value type isn't determined. For example,
+function call in <a class="reference internal" href="#select-output-columns"><em>output_columns</em></a> such as
+<tt class="docutils literal"><span class="pre">--output_columns</span> <span class="pre">&quot;snippet_html(content)&quot;</span></tt> uses <tt class="docutils literal"><span class="pre">null</span></tt>.</p>
+<p>Here is an example of <tt class="docutils literal"><span class="pre">COLUMNS</span></tt>:</p>
+<div class="highlight-none"><div class="highlight"><pre>[
+  [&quot;_id&quot;,     &quot;UInt32&quot;],
+  [&quot;_key&quot;,    &quot;ShortText&quot;],
+  [&quot;n_likes&quot;, &quot;UInt32&quot;],
+]
 </pre></div>
 </div>
-<p><tt class="docutils literal"><span class="pre">件数</span></tt></p>
-<blockquote>
-<div>drilldownに指定されたカラムの値の異なり数が出力されます。</div></blockquote>
-<p><tt class="docutils literal"><span class="pre">カラム名n</span></tt></p>
-<blockquote>
-<div>drilldown_output_columnsに指定された条件に従って、対象となるカラム名が出力されます。</div></blockquote>
-<p><tt class="docutils literal"><span class="pre">カラム型n</span></tt></p>
-<blockquote>
-<div>drilldown_output_columnsに指定された条件に従って、対象となるカラム型が出力されます。</div></blockquote>
-<p><tt class="docutils literal"><span class="pre">ドリルダウン結果n</span></tt></p>
-<blockquote>
-<div>drilldown_output_columns, drilldown_offset, drilldown_limitによって指定された条件に従って各レコードの値が出力されます。</div></blockquote>
-</div></blockquote>
+<p><tt class="docutils literal"><span class="pre">RECORDS</span></tt> includes column values for each matched record. Included
+records are selected by <a class="reference internal" href="#select-offset"><em>offset</em></a> and
+<a class="reference internal" href="#select-limit"><em>limit</em></a>. It uses the following format:</p>
+<div class="highlight-none"><div class="highlight"><pre>[
+  [
+    RECORD_1_COLUMN_1,
+    RECORD_1_COLUMN_2,
+    ...,
+    RECORD_1_COLUMN_N
+  ],
+  [
+    RECORD_2_COLUMN_1,
+    RECORD_2_COLUMN_2,
+    ...,
+    RECORD_2_COLUMN_N
+  ],
+  ...
+  [
+    RECORD_N_COLUMN_1,
+    RECORD_N_COLUMN_2,
+    ...,
+    RECORD_N_COLUMN_N
+  ]
+]
+</pre></div>
+</div>
+<p>Here is an example <tt class="docutils literal"><span class="pre">RECORDS</span></tt>:</p>
+<div class="highlight-none"><div class="highlight"><pre>[
+  [
+    1,
+    &quot;The first post!&quot;,
+    5
+  ],
+  [
+    2,
+    &quot;Groonga&quot;,
+    10
+  ],
+  [
+    3,
+    &quot;Mroonga&quot;,
+    15
+  ]
+]
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">DRILLDOWN_RESULT</span></tt> format is different between <tt class="docutils literal"><span class="pre">drilldown</span></tt> and
+<tt class="docutils literal"><span class="pre">drilldown[${LABEL}].keys</span></tt>.</p>
+<p><tt class="docutils literal"><span class="pre">drilldown</span></tt> uses the same format as <tt class="docutils literal"><span class="pre">SEARCH_RESULT</span></tt>:</p>
+<div class="highlight-none"><div class="highlight"><pre>[
+  [N_HITS],
+  COLUMNS,
+  RECORDS
+]
+</pre></div>
+</div>
+<p>And <tt class="docutils literal"><span class="pre">drilldown</span></tt> generates one or more <tt class="docutils literal"><span class="pre">DRILLDOWN_RESULT</span></tt> when
+<a class="reference internal" href="#select-drilldown"><em>drilldown</em></a> has one ore more keys.</p>
+<p><tt class="docutils literal"><span class="pre">drilldown[${LABEL}].keys</span></tt> uses the following format. Multiple
+<tt class="docutils literal"><span class="pre">drilldown[${LABEL}].keys</span></tt> are mapped to one object (key-value
+pairs):</p>
+<div class="highlight-none"><div class="highlight"><pre>{
+  &quot;LABEL_1&quot;: [
+    [N_HITS],
+    COLUMNS,
+    RECORDS
+  ],
+  &quot;LABEL_2&quot;: [
+    [N_HITS],
+    COLUMNS,
+    RECORDS
+  ],
+  ...,
+  &quot;LABEL_N&quot;: [
+    [N_HITS],
+    COLUMNS,
+    RECORDS
+  ]
+}
+</pre></div>
+</div>
+<p>Each <tt class="docutils literal"><span class="pre">drilldown[${LABEL}].keys</span></tt> corresponds to the following:</p>
+<div class="highlight-none"><div class="highlight"><pre>&quot;LABEL&quot;: [
+  [N_HITS],
+  COLUMNS,
+  RECORDS
+]
+</pre></div>
+</div>
+<p>The following value part is the same format as <tt class="docutils literal"><span class="pre">SEARCH_RESULT</span></tt>:</p>
+<div class="highlight-none"><div class="highlight"><pre>[
+  [N_HITS],
+  COLUMNS,
+  RECORDS
+]
+</pre></div>
+</div>
 </div>
 <div class="section" id="see-also">
 <h2>7.3.36.6. See also<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
@@ -5047,7 +5189,7 @@ the same <tt class="docutils literal"><span class="pre">&quot;KEYWORD&quot;</spa
 </li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id7">7.3.36.5. 返値</a></li>
+<li><a class="reference internal" href="#return-value">7.3.36.5. Return value</a></li>
 <li><a class="reference internal" href="#see-also">7.3.36.6. See also</a></li>
 </ul>
 </li>

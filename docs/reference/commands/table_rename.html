@@ -1,0 +1,351 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>7.3.44. table_rename &mdash; Groonga v5.0.6 documentation</title>
+    
+    <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
+    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '5.0.6',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../static/favicon.ico"/>
+    <link rel="top" title="Groonga v5.0.6 documentation" href="../../index.html" />
+    <link rel="up" title="7.3. Command" href="../command.html" />
+    <link rel="next" title="7.3.45. table_tokenize" href="table_tokenize.html" />
+    <link rel="prev" title="7.3.43. table_remove" href="table_remove.html" /> 
+      <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
+    <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
+    <meta property="og:type" content="product" />
+    <meta property="og:image" content="http://groonga.org/images/logos/groonga-icon-full-size.png" />
+    <meta property="og:site_name" content="groonga" />
+
+    <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
+  </head>
+
+    <body>
+    <div id="fb-root"></div>
+
+<div class="header">
+  <h1 class="title">
+    <a id="top-link" href="../../../">
+      <span class="project">groonga</span>
+      <span class="separator">-</span>
+      <span class="description">An open-source fulltext search engine and column store.</span>
+    </a>
+  </h1>
+
+      <div class="facebook-buttons">
+      <fb:like href="http://www.facebook.com/pages/groonga/201193596592346"
+               layout="standard"
+               width="290"></fb:like>
+    </div>
+    <div class="other-language-links">
+
+    <ul>
+      <li><a href="../../../ja/docs/reference/commands/table_rename.html">日本語</a></li>
+    </ul>
+  </div>
+</div>
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="table_tokenize.html" title="7.3.45. table_tokenize"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="table_remove.html" title="7.3.43. table_remove"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">Groonga v5.0.6 documentation</a> &raquo;</li>
+          <li><a href="../../reference.html" >7. Reference manual</a> &raquo;</li>
+          <li><a href="../command.html" accesskey="U">7.3. Command</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="table-rename">
+<h1>7.3.44. <tt class="docutils literal"><span class="pre">table_rename</span></tt><a class="headerlink" href="#table-rename" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="summary">
+<h2>7.3.44.1. Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">table_rename</span></tt> command renames a table.</p>
+<p>It is a light operation. It just changes a relationship between name
+and the table object. It doesn't copy table and its column values.</p>
+<p>It is a dangerous operation. You must stop all operations including
+read operations while you run <tt class="docutils literal"><span class="pre">table_rename</span></tt>. If the following case
+is occurred, Groonga process may be crashed:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Starts an operation (like <tt class="docutils literal"><span class="pre">select</span></tt>) that accesses the table to
+be renamed by the current table name. The current table name is
+called as <tt class="docutils literal"><span class="pre">the</span> <span class="pre">old</span> <span class="pre">table</span> <span class="pre">name</span></tt> in the below because the table
+name is renamed.</li>
+<li>Runs <tt class="docutils literal"><span class="pre">table_rename</span></tt>. The <tt class="docutils literal"><span class="pre">select</span></tt> is still running.</li>
+<li>The <tt class="docutils literal"><span class="pre">select</span></tt> accesses the table to be renamed by the old table
+name. But the <tt class="docutils literal"><span class="pre">select</span></tt> can't find the table by the old name
+because the table has been renamed to the new table name. It may
+crash the Groonga process.</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="syntax">
+<h2>7.3.44.2. Syntax<a class="headerlink" href="#syntax" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">table_rename</span></tt> command takes two parameters. All parameters are
+required:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_rename name new_name
+</pre></div>
+</div>
+</div>
+<div class="section" id="usage">
+<h2>7.3.44.3. Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>Here is a simple example of <tt class="docutils literal"><span class="pre">table_rename</span></tt> command.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Users TABLE_PAT_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Users score COLUMN_SCALAR Int32
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+load --table Users
+[
+{&quot;_key&quot;: &quot;Alice&quot;,  &quot;score&quot;: 2},
+{&quot;_key&quot;: &quot;Bob&quot;,    &quot;score&quot;: 0},
+{&quot;_key&quot;: &quot;Carlos&quot;, &quot;score&quot;: -1}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 3]
+table_rename Users Players
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_list
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         &quot;id&quot;,
+#         &quot;UInt32&quot;
+#       ],
+#       [
+#         &quot;name&quot;,
+#         &quot;ShortText&quot;
+#       ],
+#       [
+#         &quot;path&quot;,
+#         &quot;ShortText&quot;
+#       ],
+#       [
+#         &quot;flags&quot;,
+#         &quot;ShortText&quot;
+#       ],
+#       [
+#         &quot;domain&quot;,
+#         &quot;ShortText&quot;
+#       ],
+#       [
+#         &quot;range&quot;,
+#         &quot;ShortText&quot;
+#       ],
+#       [
+#         &quot;default_tokenizer&quot;,
+#         &quot;ShortText&quot;
+#       ],
+#       [
+#         &quot;normalizer&quot;,
+#         &quot;ShortText&quot;
+#       ]
+#     ],
+#     [
+#       256,
+#       &quot;Players&quot;,
+#       &quot;/tmp/groonga-databases/commands_table_rename.0000100&quot;,
+#       &quot;TABLE_PAT_KEY|PERSISTENT&quot;,
+#       &quot;ShortText&quot;,
+#       null,
+#       null,
+#       null
+#     ]
+#   ]
+# ]
+select Players
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         3
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;score&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;Alice&quot;,
+#         2
+#       ],
+#       [
+#         2,
+#         &quot;Bob&quot;,
+#         0
+#       ],
+#       [
+#         3,
+#         &quot;Carlos&quot;,
+#         -1
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
+<div class="section" id="parameters">
+<h2>7.3.44.4. Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+<p>This section describes parameters of <tt class="docutils literal"><span class="pre">table_rename</span></tt>.</p>
+<div class="section" id="required-parameters">
+<h3>7.3.44.4.1. Required parameters<a class="headerlink" href="#required-parameters" title="Permalink to this headline">¶</a></h3>
+<p>All parameters are required.</p>
+<div class="section" id="name">
+<h4>7.3.44.4.1.1. <tt class="docutils literal"><span class="pre">name</span></tt><a class="headerlink" href="#name" title="Permalink to this headline">¶</a></h4>
+<p>Specifies the table name to be renamed.</p>
+</div>
+<div class="section" id="new-name">
+<h4>7.3.44.4.1.2. <tt class="docutils literal"><span class="pre">new_name</span></tt><a class="headerlink" href="#new-name" title="Permalink to this headline">¶</a></h4>
+<p>Specifies the new table name.</p>
+</div>
+</div>
+</div>
+<div class="section" id="return-value">
+<h2>7.3.44.5. Return value<a class="headerlink" href="#return-value" title="Permalink to this headline">¶</a></h2>
+<p>The command returns <tt class="docutils literal"><span class="pre">true</span></tt> as body on success such as:</p>
+<div class="highlight-none"><div class="highlight"><pre>[HEADER, true]
+</pre></div>
+</div>
+<p>If the command fails, error details are in <tt class="docutils literal"><span class="pre">HEADER</span></tt>.</p>
+<p>See <a class="reference internal" href="../command/output_format.html"><em>Output format</em></a> for <tt class="docutils literal"><span class="pre">HEADER</span></tt>.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">7.3.44. <tt class="docutils literal"><span class="pre">table_rename</span></tt></a><ul>
+<li><a class="reference internal" href="#summary">7.3.44.1. Summary</a></li>
+<li><a class="reference internal" href="#syntax">7.3.44.2. Syntax</a></li>
+<li><a class="reference internal" href="#usage">7.3.44.3. Usage</a></li>
+<li><a class="reference internal" href="#parameters">7.3.44.4. Parameters</a><ul>
+<li><a class="reference internal" href="#required-parameters">7.3.44.4.1. Required parameters</a><ul>
+<li><a class="reference internal" href="#name">7.3.44.4.1.1. <tt class="docutils literal"><span class="pre">name</span></tt></a></li>
+<li><a class="reference internal" href="#new-name">7.3.44.4.1.2. <tt class="docutils literal"><span class="pre">new_name</span></tt></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#return-value">7.3.44.5. Return value</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="table_remove.html"
+                        title="previous chapter">7.3.43. <tt class="docutils literal"><span class="pre">table_remove</span></tt></a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="table_tokenize.html"
+                        title="next chapter">7.3.45. <tt class="docutils literal"><span class="pre">table_tokenize</span></tt></a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../sources/reference/commands/table_rename.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="table_tokenize.html" title="7.3.45. table_tokenize"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="table_remove.html" title="7.3.43. table_remove"
+             >previous</a> |</li>
+        <li><a href="../../index.html">Groonga v5.0.6 documentation</a> &raquo;</li>
+          <li><a href="../../reference.html" >7. Reference manual</a> &raquo;</li>
+          <li><a href="../command.html" >7.3. Command</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009-2015, Brazil, Inc.
+    </div>
+      <script src="http://connect.facebook.net/en_US/all.js"></script>
+
+    <script>
+      FB.init({
+         appId  : null,
+         status : true, // check login status
+         cookie : true, // enable cookies to allow the server to access the session
+         xfbml  : true  // parse XFBML
+      });
+    </script>
+  </body>
+
+</html>

@@ -7,6 +7,187 @@
 News
 ====
 
+.. _release-5-0-6:
+
+Release 5.0.6 - 2015-07-29
+--------------------------
+
+Improvements
+^^^^^^^^^^^^
+
+* Supported offline index construction for reference vector. For example, ``load``
+  data before ``column_create`` an index::
+
+    table_create Entries TABLE_NO_KEY
+    column_create Entries numbers COLUMN_VECTOR Int32
+
+    load --table Entries
+    [
+    ["numbers"],
+    [[18, 19, 20]],
+    [[100, 200]]
+    ]
+
+    table_create Numbers TABLE_PAT_KEY Int32
+    column_create Numbers entries_numbers COLUMN_INDEX Entries numbers
+
+    select Numbers --output_columns _key
+
+* Supported ``'vector_text_column @ "element"'`` without index. For example, the
+  ``select`` command in the following commands::
+
+    table_create Memos TABLE_NO_KEY
+    column_create Memos tags COLUMN_VECTOR Text
+
+    load --table Memos
+    [
+    {"tags": ["Groonga", "Rroonga", "Mroonga"]}
+    ]
+
+    select Memos --filter 'tags @ "Rroonga"'
+
+* Supported ``'fixed_size_type_vector_column @ n'`` without index. For example, the
+  ``select`` command in the following commands::
+
+    table_create Memos TABLE_NO_KEY
+    column_create Memos numbers COLUMN_VECTOR Int32
+
+    load --table Memos
+    [
+    {"numbers": [1, 2, 3]}
+    ]
+
+    select Memos --filter 'numbers @ 2'
+
+* [:doc:`/install/centos`][:doc:`/server/package`][:doc:`/reference/executables/groonga-httpd`]
+  Show exit status. [GitHub#357] [Patch by jacob16bit]
+* [:doc:`/install/windows`][:doc:`/reference/executables/groonga`] Supported ``--pid-path``.
+* [:doc:`/install/windows`] Allowed to delete file that is opened by other process.
+* Accepted selector only proc. Note that the proc can't be used as function. It means
+  that the proc can't be used with sequential search.
+* Supported function call with complex argument. An example complex argument is
+  ``Table["key"].column``. For example::
+
+    function(_key, Table["key"].column)
+
+* [doc][:doc:`/tutorial`] Added more description about database creation fails if DB_PATH
+  points to an existing file. [GitHub#354] [Suggested by Hirotaka Takayama]
+* [doc][:doc:`/tutorial`] Described JSON formatting tools.
+  [GitHub#355] [Suggested by tiwawan]
+* [experimental] Added an API to get/set the number of threads. It's a experimental API.
+* [experimental][thread_count] Added a command that get/set the number of threads.
+  It's a experimental command.
+* [experimental][:doc:`/reference/executables/groonga`] Supported changing the number
+  of threads by thread_count command. It's a experimental feature.
+* [experimental][:doc:`/install/windows`] Added Windows event log support.
+  It's a experimental feature.
+* [experimental][:doc:`/reference/executables/groonga`] Added Windows event log related
+  option ``--use-windows-event-log``. It reports logs as Windows events.
+  It's a experimental feature.
+* [:doc:`/install/windows`] Used Groonga's default encoding for log message.
+* Log used indexes in ``INFO`` level. The default level ``NOTICE``. So the logs aren't
+  showed by default.
+* [API] Added :c:func:`grn_log_level_to_string()` and :c:func:`grn_log_level_parse()`.
+* [:doc:`/reference/executables/groonga`] Accepted log level name (e.g. ``info``,
+  ``debug`` and so on) for ``--log-level`` value.
+* [:doc:`/reference/commands/log_level`][:doc:`/reference/commands/log_put`]
+  Accepted log level name for ``--level`` argument.
+* [plugin] Added :c:func:`grn_command_input_get_arguments()`.
+* Updated sharding plugins.
+
+  * [:doc:`/reference/commands/logical_select`] Fixed output format.
+    It has become :doc:`/reference/commands/select` compatible format.
+  * [:doc:`/reference/commands/logical_select`] Supported the following parameters.
+
+    * ``--output_columns``
+    * ``--offset``
+    * ``--limit``
+    * ``--drilldown``
+    * ``--drilldown_sortby``
+    * ``--drilldown_offset``
+    * ``--drilldown_limit``
+
+  * [:doc:`/reference/commands/logical_select`] Used the same default output_columns
+    (``"_id, _key, *"``) as :doc:`/reference/commands/select`.
+  * [:doc:`/reference/commands/logical_select`] Supported
+    :ref:`logical-select-drilldown-label-calc-types` and
+    :ref:`logical-select-drilldown-label-calc-target` for labeled drilldown.
+  * [:doc:`/reference/commands/logical_select`] Supported cache.
+  * [:doc:`/reference/commands/logical_count`] Supported logging whether range index is
+    used or not.
+  * [:doc:`/reference/commands/logical_count`] Show target table name in debug log.
+  * [:doc:`/reference/commands/logical_count`] Supported cache.
+  * [:doc:`/reference/commands/logical_range_filter`] Supported
+    ``'fixed_size_type_vector_column @ element'``.
+  * [:doc:`/reference/commands/logical_range_filter`] Added ``use_range_index`` parameter.
+    It's a parameter for test. It should not be used for production.
+  * [:doc:`/reference/commands/logical_range_filter`] Log which mode (range-index or
+    select mode) is used.
+  * [:doc:`/reference/commands/logical_range_filter`] Supported cache.
+  * [:doc:`/reference/commands/logical_range_filter`] Supported nested reference vector
+    accessor.
+  * [:doc:`/reference/commands/logical_range_filter`] Used range_index value set by
+    :doc:`/reference/commands/logical_parameters`.
+  * [:doc:`/reference/commands/logical_parameters`] Added.
+
+* Added mruby APIs.
+
+  * [mrb] Added ``Accessor#name``.
+  * [mrb] Added ``Column#[]``.
+  * [mrb] Added ``Column#scalar?``, ``Column#vector?`` and ``Column#index?``.
+  * [mrb] Added ``Context#command_version`` and ``Context#command_version=`` (accessors).
+  * [mrb] Added ``Context#with_command_version``.
+  * [mrb] Added ``Database#each_name``.
+  * [mrb] Added ``Groonga::Cache.current``.
+  * [mrb] Added ``Record``.
+  * [mrb] Added ``Table#each``.
+  * [mrb] Added ``TableCursor#key``.
+  * [mrb] Binded :c:func:`grn_command_input_get_arguments()` to ``CommandInput#arguments``.
+  * [mrb] Binded :c:func:`grn_table_group()` to ``Table#group``.
+  * [mrb] Binded :c:func:`grn_table_group_flags()` to ``TableGroupFlags``.
+  * [mrb] Binded ``GRN_COMMAND_VERSION_DEFAULT``.
+  * [mrb] Binded ``grn_cache``.
+  * [mrb][estimate_size] Supported ``(... || ...) && (... || ...)`` as expression case.
+  * [mrb] Supported query log.
+
+Fixes
+^^^^^
+
+* Fixed a memory leak when an error is occurred in :c:func:`grn_expr_exec()`.
+  For example, unsupported operator (e.g. ``GRN_OP_TERM_EXTRACT``) is used
+  (``not implemented operator assigned`` is occurred for the case).
+* [bindings/php] Added a missing check for a memory allocation failure.
+  [Reported by Bill Parker]
+* [:doc:`/install/centos`][:doc:`/server/package`][logrotate] Fixed syntax error in script.
+* [:doc:`/install/centos`][:doc:`/server/package`][logrotate] Fixed wrong daemon running check.
+* [:doc:`/install/centos`][:doc:`/server/package`][logrotate] Stop to set owner/group to log files.
+  Because it's not consistent. groonga-httpd creates log files with root
+  owner/group. But logrotated log files are created with groonga
+  owner/group. [GitHub#358] [Reported by jacob16bit]
+* [:doc:`/reference/executables/groonga`] Fixed reported the maximum number of threads.
+* [:doc:`/reference/executables/groonga-httpd`] Remove a needless space in log message::
+
+    |n|  grn_fin (0) ->
+    |n| grn_fin (0)
+        ^
+
+* Fixed a bug that estimating size by regexp query with anchor (e.g. ``\\\\A`` in
+  ``--filter 'comment @~ "\\\\Abc"'``) doesn't work. The feature is used in
+  :doc:`/reference/commands/logical_range_filter`.
+* [:doc:`/reference/command/request_id`] Fixed a memory leak when ``request_id`` byte size >= 24.
+* [:doc:`/reference/commands/lock_clear`] Fixed a typo in command name in Syntax section.
+  [GitHub#363] [Reported by Christian Kakesa]
+* [sharding] Fixed wrong min include detection for month range type.
+
+Thanks
+^^^^^^
+
+* Bill Parker
+* jacob16bit
+* Hirotaka Takayama
+* tiwawan
+* Christian Kakesa
+
 .. _release-5-0-5:
 
 Release 5.0.5 - 2015-06-29

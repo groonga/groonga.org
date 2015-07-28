@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>News &mdash; Groonga v5.0.5 documentation</title>
+    <title>News &mdash; Groonga v5.0.6 documentation</title>
     
     <link rel="stylesheet" href="static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '5.0.5',
+        VERSION:     '5.0.6',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="static/underscore.js"></script>
     <script type="text/javascript" src="static/doctools.js"></script>
     <link rel="shortcut icon" href="static/favicon.ico"/>
-    <link rel="top" title="Groonga v5.0.5 documentation" href="index.html" /> 
+    <link rel="top" title="Groonga v5.0.6 documentation" href="index.html" /> 
       <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
     <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
     <meta property="og:type" content="product" />
@@ -66,7 +66,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li><a href="index.html">Groonga v5.0.5 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Groonga v5.0.6 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -77,10 +77,227 @@
             
   <div class="section" id="news">
 <h1>News<a class="headerlink" href="#news" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="release-5-0-5-2015-06-29">
-<span id="release-5-0-5"></span><h2>Release 5.0.5 - 2015-06-29<a class="headerlink" href="#release-5-0-5-2015-06-29" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="release-5-0-6-2015-07-29">
+<span id="release-5-0-6"></span><h2>Release 5.0.6 - 2015-07-29<a class="headerlink" href="#release-5-0-6-2015-07-29" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="improvements">
 <h3>Improvements<a class="headerlink" href="#improvements" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p class="first">Supported offline index construction for reference vector. For example, <tt class="docutils literal"><span class="pre">load</span></tt>
+data before <tt class="docutils literal"><span class="pre">column_create</span></tt> an index:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Entries TABLE_NO_KEY
+column_create Entries numbers COLUMN_VECTOR Int32
+
+load --table Entries
+[
+[&quot;numbers&quot;],
+[[18, 19, 20]],
+[[100, 200]]
+]
+
+table_create Numbers TABLE_PAT_KEY Int32
+column_create Numbers entries_numbers COLUMN_INDEX Entries numbers
+
+select Numbers --output_columns _key
+</pre></div>
+</div>
+</li>
+<li><p class="first">Supported <tt class="docutils literal"><span class="pre">'vector_text_column</span> <span class="pre">&#64;</span> <span class="pre">&quot;element&quot;'</span></tt> without index. For example, the
+<tt class="docutils literal"><span class="pre">select</span></tt> command in the following commands:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Memos TABLE_NO_KEY
+column_create Memos tags COLUMN_VECTOR Text
+
+load --table Memos
+[
+{&quot;tags&quot;: [&quot;Groonga&quot;, &quot;Rroonga&quot;, &quot;Mroonga&quot;]}
+]
+
+select Memos --filter &#39;tags @ &quot;Rroonga&quot;&#39;
+</pre></div>
+</div>
+</li>
+<li><p class="first">Supported <tt class="docutils literal"><span class="pre">'fixed_size_type_vector_column</span> <span class="pre">&#64;</span> <span class="pre">n'</span></tt> without index. For example, the
+<tt class="docutils literal"><span class="pre">select</span></tt> command in the following commands:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Memos TABLE_NO_KEY
+column_create Memos numbers COLUMN_VECTOR Int32
+
+load --table Memos
+[
+{&quot;numbers&quot;: [1, 2, 3]}
+]
+
+select Memos --filter &#39;numbers @ 2&#39;
+</pre></div>
+</div>
+</li>
+<li><p class="first">[<a class="reference internal" href="install/centos.html"><em>CentOS</em></a>][<a class="reference internal" href="server/package.html"><em>Server packages</em></a>][<a class="reference internal" href="reference/executables/groonga-httpd.html"><em>groonga-httpd</em></a>]
+Show exit status. [GitHub#357] [Patch by jacob16bit]</p>
+</li>
+<li><p class="first">[<a class="reference internal" href="install/windows.html"><em>Windows</em></a>][<a class="reference internal" href="reference/executables/groonga.html"><em>groonga executable file</em></a>] Supported <tt class="docutils literal"><span class="pre">--pid-path</span></tt>.</p>
+</li>
+<li><p class="first">[<a class="reference internal" href="install/windows.html"><em>Windows</em></a>] Allowed to delete file that is opened by other process.</p>
+</li>
+<li><p class="first">Accepted selector only proc. Note that the proc can't be used as function. It means
+that the proc can't be used with sequential search.</p>
+</li>
+<li><p class="first">Supported function call with complex argument. An example complex argument is
+<tt class="docutils literal"><span class="pre">Table[&quot;key&quot;].column</span></tt>. For example:</p>
+<div class="highlight-none"><div class="highlight"><pre>function(_key, Table[&quot;key&quot;].column)
+</pre></div>
+</div>
+</li>
+<li><p class="first">[doc][<a class="reference internal" href="tutorial.html"><em>Tutorial</em></a>] Added more description about database creation fails if DB_PATH
+points to an existing file. [GitHub#354] [Suggested by Hirotaka Takayama]</p>
+</li>
+<li><p class="first">[doc][<a class="reference internal" href="tutorial.html"><em>Tutorial</em></a>] Described JSON formatting tools.
+[GitHub#355] [Suggested by tiwawan]</p>
+</li>
+<li><p class="first">[experimental] Added an API to get/set the number of threads. It's a experimental API.</p>
+</li>
+<li><p class="first">[experimental][thread_count] Added a command that get/set the number of threads.
+It's a experimental command.</p>
+</li>
+<li><p class="first">[experimental][<a class="reference internal" href="reference/executables/groonga.html"><em>groonga executable file</em></a>] Supported changing the number
+of threads by thread_count command. It's a experimental feature.</p>
+</li>
+<li><p class="first">[experimental][<a class="reference internal" href="install/windows.html"><em>Windows</em></a>] Added Windows event log support.
+It's a experimental feature.</p>
+</li>
+<li><p class="first">[experimental][<a class="reference internal" href="reference/executables/groonga.html"><em>groonga executable file</em></a>] Added Windows event log related
+option <tt class="docutils literal"><span class="pre">--use-windows-event-log</span></tt>. It reports logs as Windows events.
+It's a experimental feature.</p>
+</li>
+<li><p class="first">[<a class="reference internal" href="install/windows.html"><em>Windows</em></a>] Used Groonga's default encoding for log message.</p>
+</li>
+<li><p class="first">Log used indexes in <tt class="docutils literal"><span class="pre">INFO</span></tt> level. The default level <tt class="docutils literal"><span class="pre">NOTICE</span></tt>. So the logs aren't
+showed by default.</p>
+</li>
+<li><p class="first">[API] Added <tt class="xref c c-func docutils literal"><span class="pre">grn_log_level_to_string()</span></tt> and <tt class="xref c c-func docutils literal"><span class="pre">grn_log_level_parse()</span></tt>.</p>
+</li>
+<li><p class="first">[<a class="reference internal" href="reference/executables/groonga.html"><em>groonga executable file</em></a>] Accepted log level name (e.g. <tt class="docutils literal"><span class="pre">info</span></tt>,
+<tt class="docutils literal"><span class="pre">debug</span></tt> and so on) for <tt class="docutils literal"><span class="pre">--log-level</span></tt> value.</p>
+</li>
+<li><p class="first">[<a class="reference internal" href="reference/commands/log_level.html"><em>log_level</em></a>][<a class="reference internal" href="reference/commands/log_put.html"><em>log_put</em></a>]
+Accepted log level name for <tt class="docutils literal"><span class="pre">--level</span></tt> argument.</p>
+</li>
+<li><p class="first">[plugin] Added <tt class="xref c c-func docutils literal"><span class="pre">grn_command_input_get_arguments()</span></tt>.</p>
+</li>
+<li><p class="first">Updated sharding plugins.</p>
+<ul class="simple">
+<li>[<a class="reference internal" href="reference/commands/logical_select.html"><em>logical_select</em></a>] Fixed output format.
+It has become <a class="reference internal" href="reference/commands/select.html"><em>select</em></a> compatible format.</li>
+<li>[<a class="reference internal" href="reference/commands/logical_select.html"><em>logical_select</em></a>] Supported the following parameters.<ul>
+<li><tt class="docutils literal"><span class="pre">--output_columns</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">--offset</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">--limit</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">--drilldown</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">--drilldown_sortby</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">--drilldown_offset</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">--drilldown_limit</span></tt></li>
+</ul>
+</li>
+<li>[<a class="reference internal" href="reference/commands/logical_select.html"><em>logical_select</em></a>] Used the same default output_columns
+(<tt class="docutils literal"><span class="pre">&quot;_id,</span> <span class="pre">_key,</span> <span class="pre">*&quot;</span></tt>) as <a class="reference internal" href="reference/commands/select.html"><em>select</em></a>.</li>
+<li>[<a class="reference internal" href="reference/commands/logical_select.html"><em>logical_select</em></a>] Supported
+<a class="reference internal" href="reference/commands/logical_select.html#logical-select-drilldown-label-calc-types"><em>drilldown[${LABEL}].calc_types</em></a> and
+<a class="reference internal" href="reference/commands/logical_select.html#logical-select-drilldown-label-calc-target"><em>drilldown[${LABEL}].calc_target</em></a> for labeled drilldown.</li>
+<li>[<a class="reference internal" href="reference/commands/logical_select.html"><em>logical_select</em></a>] Supported cache.</li>
+<li>[<a class="reference internal" href="reference/commands/logical_count.html"><em>logical_count</em></a>] Supported logging whether range index is
+used or not.</li>
+<li>[<a class="reference internal" href="reference/commands/logical_count.html"><em>logical_count</em></a>] Show target table name in debug log.</li>
+<li>[<a class="reference internal" href="reference/commands/logical_count.html"><em>logical_count</em></a>] Supported cache.</li>
+<li>[<a class="reference internal" href="reference/commands/logical_range_filter.html"><em>logical_range_filter</em></a>] Supported
+<tt class="docutils literal"><span class="pre">'fixed_size_type_vector_column</span> <span class="pre">&#64;</span> <span class="pre">element'</span></tt>.</li>
+<li>[<a class="reference internal" href="reference/commands/logical_range_filter.html"><em>logical_range_filter</em></a>] Added <tt class="docutils literal"><span class="pre">use_range_index</span></tt> parameter.
+It's a parameter for test. It should not be used for production.</li>
+<li>[<a class="reference internal" href="reference/commands/logical_range_filter.html"><em>logical_range_filter</em></a>] Log which mode (range-index or
+select mode) is used.</li>
+<li>[<a class="reference internal" href="reference/commands/logical_range_filter.html"><em>logical_range_filter</em></a>] Supported cache.</li>
+<li>[<a class="reference internal" href="reference/commands/logical_range_filter.html"><em>logical_range_filter</em></a>] Supported nested reference vector
+accessor.</li>
+<li>[<a class="reference internal" href="reference/commands/logical_range_filter.html"><em>logical_range_filter</em></a>] Used range_index value set by
+<a class="reference internal" href="reference/commands/logical_parameters.html"><em>logical_parameters</em></a>.</li>
+<li>[<a class="reference internal" href="reference/commands/logical_parameters.html"><em>logical_parameters</em></a>] Added.</li>
+</ul>
+</li>
+<li><p class="first">Added mruby APIs.</p>
+<ul class="simple">
+<li>[mrb] Added <tt class="docutils literal"><span class="pre">Accessor#name</span></tt>.</li>
+<li>[mrb] Added <tt class="docutils literal"><span class="pre">Column#[]</span></tt>.</li>
+<li>[mrb] Added <tt class="docutils literal"><span class="pre">Column#scalar?</span></tt>, <tt class="docutils literal"><span class="pre">Column#vector?</span></tt> and <tt class="docutils literal"><span class="pre">Column#index?</span></tt>.</li>
+<li>[mrb] Added <tt class="docutils literal"><span class="pre">Context#command_version</span></tt> and <tt class="docutils literal"><span class="pre">Context#command_version=</span></tt> (accessors).</li>
+<li>[mrb] Added <tt class="docutils literal"><span class="pre">Context#with_command_version</span></tt>.</li>
+<li>[mrb] Added <tt class="docutils literal"><span class="pre">Database#each_name</span></tt>.</li>
+<li>[mrb] Added <tt class="docutils literal"><span class="pre">Groonga::Cache.current</span></tt>.</li>
+<li>[mrb] Added <tt class="docutils literal"><span class="pre">Record</span></tt>.</li>
+<li>[mrb] Added <tt class="docutils literal"><span class="pre">Table#each</span></tt>.</li>
+<li>[mrb] Added <tt class="docutils literal"><span class="pre">TableCursor#key</span></tt>.</li>
+<li>[mrb] Binded <tt class="xref c c-func docutils literal"><span class="pre">grn_command_input_get_arguments()</span></tt> to <tt class="docutils literal"><span class="pre">CommandInput#arguments</span></tt>.</li>
+<li>[mrb] Binded <a class="reference internal" href="reference/api/grn_table.html#c.grn_table_group" title="grn_table_group"><tt class="xref c c-func docutils literal"><span class="pre">grn_table_group()</span></tt></a> to <tt class="docutils literal"><span class="pre">Table#group</span></tt>.</li>
+<li>[mrb] Binded <a class="reference internal" href="reference/api/grn_table.html#c.grn_table_group_flags" title="grn_table_group_flags"><tt class="xref c c-func docutils literal"><span class="pre">grn_table_group_flags()</span></tt></a> to <tt class="docutils literal"><span class="pre">TableGroupFlags</span></tt>.</li>
+<li>[mrb] Binded <tt class="docutils literal"><span class="pre">GRN_COMMAND_VERSION_DEFAULT</span></tt>.</li>
+<li>[mrb] Binded <tt class="docutils literal"><span class="pre">grn_cache</span></tt>.</li>
+<li>[mrb][estimate_size] Supported <tt class="docutils literal"><span class="pre">(...</span> <span class="pre">||</span> <span class="pre">...)</span> <span class="pre">&amp;&amp;</span> <span class="pre">(...</span> <span class="pre">||</span> <span class="pre">...)</span></tt> as expression case.</li>
+<li>[mrb] Supported query log.</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="fixes">
+<h3>Fixes<a class="headerlink" href="#fixes" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p class="first">Fixed a memory leak when an error is occurred in <a class="reference internal" href="reference/api/grn_expr.html#c.grn_expr_exec" title="grn_expr_exec"><tt class="xref c c-func docutils literal"><span class="pre">grn_expr_exec()</span></tt></a>.
+For example, unsupported operator (e.g. <tt class="docutils literal"><span class="pre">GRN_OP_TERM_EXTRACT</span></tt>) is used
+(<tt class="docutils literal"><span class="pre">not</span> <span class="pre">implemented</span> <span class="pre">operator</span> <span class="pre">assigned</span></tt> is occurred for the case).</p>
+</li>
+<li><p class="first">[bindings/php] Added a missing check for a memory allocation failure.
+[Reported by Bill Parker]</p>
+</li>
+<li><p class="first">[<a class="reference internal" href="install/centos.html"><em>CentOS</em></a>][<a class="reference internal" href="server/package.html"><em>Server packages</em></a>][logrotate] Fixed syntax error in script.</p>
+</li>
+<li><p class="first">[<a class="reference internal" href="install/centos.html"><em>CentOS</em></a>][<a class="reference internal" href="server/package.html"><em>Server packages</em></a>][logrotate] Fixed wrong daemon running check.</p>
+</li>
+<li><p class="first">[<a class="reference internal" href="install/centos.html"><em>CentOS</em></a>][<a class="reference internal" href="server/package.html"><em>Server packages</em></a>][logrotate] Stop to set owner/group to log files.
+Because it's not consistent. groonga-httpd creates log files with root
+owner/group. But logrotated log files are created with groonga
+owner/group. [GitHub#358] [Reported by jacob16bit]</p>
+</li>
+<li><p class="first">[<a class="reference internal" href="reference/executables/groonga.html"><em>groonga executable file</em></a>] Fixed reported the maximum number of threads.</p>
+</li>
+<li><p class="first">[<a class="reference internal" href="reference/executables/groonga-httpd.html"><em>groonga-httpd</em></a>] Remove a needless space in log message:</p>
+<div class="highlight-none"><div class="highlight"><pre>|n|  grn_fin (0) -&gt;
+|n| grn_fin (0)
+    ^
+</pre></div>
+</div>
+</li>
+<li><p class="first">Fixed a bug that estimating size by regexp query with anchor (e.g. <tt class="docutils literal"><span class="pre">\\\\A</span></tt> in
+<tt class="docutils literal"><span class="pre">--filter</span> <span class="pre">'comment</span> <span class="pre">&#64;~</span> <span class="pre">&quot;\\\\Abc&quot;'</span></tt>) doesn't work. The feature is used in
+<a class="reference internal" href="reference/commands/logical_range_filter.html"><em>logical_range_filter</em></a>.</p>
+</li>
+<li><p class="first">[<a class="reference internal" href="reference/command/request_id.html"><em>Request ID</em></a>] Fixed a memory leak when <tt class="docutils literal"><span class="pre">request_id</span></tt> byte size &gt;= 24.</p>
+</li>
+<li><p class="first">[<a class="reference internal" href="reference/commands/lock_clear.html"><em>lock_clear</em></a>] Fixed a typo in command name in Syntax section.
+[GitHub#363] [Reported by Christian Kakesa]</p>
+</li>
+<li><p class="first">[sharding] Fixed wrong min include detection for month range type.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="thanks">
+<h3>Thanks<a class="headerlink" href="#thanks" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Bill Parker</li>
+<li>jacob16bit</li>
+<li>Hirotaka Takayama</li>
+<li>tiwawan</li>
+<li>Christian Kakesa</li>
+</ul>
+</div>
+</div>
+<div class="section" id="release-5-0-5-2015-06-29">
+<span id="release-5-0-5"></span><h2>Release 5.0.5 - 2015-06-29<a class="headerlink" href="#release-5-0-5-2015-06-29" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>Improvements<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
 <ul>
 <li><p class="first">Show correct error information such as NoSuchFileOrDirectory when opening a database.</p>
 </li>
@@ -131,8 +348,8 @@ XXX_20150604 &lt;- includes only 2015-06-04 records
 </li>
 </ul>
 </div>
-<div class="section" id="fixes">
-<h3>Fixes<a class="headerlink" href="#fixes" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id2">
+<h3>Fixes<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Fixed wrong macro to include netinet/in.h.
 [GitHub#348] [Reported by OBATA Akio]</li>
@@ -140,8 +357,8 @@ XXX_20150604 &lt;- includes only 2015-06-04 records
 [GitHub#351] [Patch by jacob16bit]</li>
 </ul>
 </div>
-<div class="section" id="thanks">
-<h3>Thanks<a class="headerlink" href="#thanks" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id3">
+<h3>Thanks<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>OBATA Akio</li>
 <li>jacob16bit</li>
@@ -150,8 +367,8 @@ XXX_20150604 &lt;- includes only 2015-06-04 records
 </div>
 <div class="section" id="release-5-0-4-2015-05-29">
 <span id="release-5-0-4"></span><h2>Release 5.0.4 - 2015-05-29<a class="headerlink" href="#release-5-0-4-2015-05-29" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id1">
-<h3>Improvements<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id4">
+<h3>Improvements<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>[mruby] Changed to use <tt class="docutils literal"><span class="pre">inspect</span></tt> to show meaningful error message for error value.</li>
 <li>[mruby] Supported <tt class="docutils literal"><span class="pre">Groonga::Bulk#inspect</span></tt> to inspect bulk content.</li>
@@ -180,8 +397,8 @@ full-width space (<tt class="docutils literal"><span class="pre">U+3000</span> <
 Unicode). [Suggested by TomyGX]</li>
 </ul>
 </div>
-<div class="section" id="id2">
-<h3>Fixes<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id5">
+<h3>Fixes<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Fixed a crash bug when empty key is specified for <tt class="docutils literal"><span class="pre">drilldown[label].keys</span></tt>.</li>
 <li>Fixed a bug that the return value of <tt class="docutils literal"><span class="pre">grn_parse_query_flags</span></tt> is not properly checked.
@@ -207,8 +424,8 @@ correctly when query contains characters which are treated as blank character.
 For example, the newline - &quot;\n&quot; is typical one.</li>
 </ul>
 </div>
-<div class="section" id="id3">
-<h3>Thanks<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id6">
+<h3>Thanks<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Hiroaki Nakamura</li>
 <li>Hiroyuki Sato</li>
@@ -220,8 +437,8 @@ For example, the newline - &quot;\n&quot; is typical one.</li>
 </div>
 <div class="section" id="release-5-0-3-2015-04-29">
 <span id="release-5-0-3"></span><h2>Release 5.0.3 - 2015-04-29<a class="headerlink" href="#release-5-0-3-2015-04-29" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id4">
-<h3>Improvements<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id7">
+<h3>Improvements<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>[<a class="reference internal" href="reference/tokenizers.html"><em>Tokenizers</em></a>][<a class="reference internal" href="reference/regular_expression.html"><em>Regular expression</em></a>]
 Skip the last one character token.</li>
@@ -283,8 +500,8 @@ You can enable log rotation by the following options:<ul>
 <li>[<a class="reference internal" href="reference/executables/groonga-httpd.html"><em>groonga-httpd</em></a>] Updated bundled nginx version to the latest mainline (1.8.0).</li>
 </ul>
 </div>
-<div class="section" id="id5">
-<h3>Fixes<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id8">
+<h3>Fixes<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>[windows] Fixed a bug that <a class="reference internal" href="reference/indexing.html#offline-index-construction"><em>Offline index construction</em></a> is
 failed for large data (at least 1GB or larger) with Groonga built by
@@ -299,8 +516,8 @@ and added a test for invalid patricia trie node add case.
 [groonga-dev,03177] [Reported by yuya sako]</li>
 </ul>
 </div>
-<div class="section" id="id6">
-<h3>Thanks<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id9">
+<h3>Thanks<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Hideki ARAI</li>
 <li>Hiroyuki Mizuhara</li>
@@ -312,8 +529,8 @@ and added a test for invalid patricia trie node add case.
 <div class="section" id="release-5-0-2-2015-03-31">
 <span id="release-5-0-2"></span><h2>Release 5.0.2 - 2015-03-31<a class="headerlink" href="#release-5-0-2-2015-03-31" title="Permalink to this headline">¶</a></h2>
 <p>It's a bug fix release of 5.0.1.</p>
-<div class="section" id="id7">
-<h3>Improvements<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id10">
+<h3>Improvements<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Supported MessagePack 1.0.1. [Reported by Hiroshi Hatake]</li>
 <li>[logical_range_filter] Disabled range index by default. It's enabled
@@ -321,8 +538,8 @@ when you set the enviromnent variable <tt class="docutils literal"><span class="
 to <tt class="docutils literal"><span class="pre">yes</span></tt>.</li>
 </ul>
 </div>
-<div class="section" id="id8">
-<h3>Fixes<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id11">
+<h3>Fixes<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Fixed a regression bug that JSONP doesn't work. It was introduced
 in Groonga 4.1.1.</li>
@@ -332,8 +549,8 @@ in Groonga 4.1.1.</li>
 problem is fixed in the environment such as CentOS 7.</li>
 </ul>
 </div>
-<div class="section" id="id9">
-<h3>Thanks<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id12">
+<h3>Thanks<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Atsushi Shinoda</li>
 <li>Hiroshi Hatake</li>
@@ -342,8 +559,8 @@ problem is fixed in the environment such as CentOS 7.</li>
 </div>
 <div class="section" id="release-5-0-1-2015-03-29">
 <span id="release-5-0-1"></span><h2>Release 5.0.1 - 2015-03-29<a class="headerlink" href="#release-5-0-1-2015-03-29" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id10">
-<h3>Improvements<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id13">
+<h3>Improvements<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
 <ul>
 <li><p class="first">[<a class="reference internal" href="reference/commands/logical_range_filter.html"><em>logical_range_filter</em></a>] Supported filter
 and sort.</p>
@@ -484,8 +701,8 @@ Murakami]</p>
 </li>
 </ul>
 </div>
-<div class="section" id="id11">
-<h3>Fixes<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id14">
+<h3>Fixes<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Fixed not to use obsolete <tt class="docutils literal"><span class="pre">--address</span></tt> parameter in the default
 groonga.conf. <tt class="docutils literal"><span class="pre">--bind-address</span></tt> is used instead.  [Groonga-talk]
@@ -516,8 +733,8 @@ column specified by <tt class="docutils literal"><span class="pre">source_column
 indexes. [Reported by Naoya Murakami]</li>
 </ul>
 </div>
-<div class="section" id="id12">
-<h3>Thanks<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id15">
+<h3>Thanks<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Masatoshi Teruya</li>
 <li>Tasuku SUENAGA</li>
@@ -533,8 +750,8 @@ indexes. [Reported by Naoya Murakami]</li>
 <ul class="simple">
 <li>Bump version to 5.0.0!</li>
 </ul>
-<div class="section" id="id13">
-<h3>Improvements<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id16">
+<h3>Improvements<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>[doc] Added <a class="reference internal" href="reference/grn_expr/script_syntax.html#script-syntax-security"><em>Security</em></a> about <a class="reference internal" href="reference/grn_expr/script_syntax.html"><em>Script syntax</em></a>.</li>
 <li>[experimental] Added sharding plugin. Execute <cite>register sharding</cite> to
@@ -545,16 +762,16 @@ on FreeBSD 10.1. <a class="reference external" href="https://mariadb.atlassian.n
 <li>Supported to customize plugins directory. Set <cite>GRN_PLUGINS_DIR</cite> environment variable.</li>
 </ul>
 </div>
-<div class="section" id="id14">
-<h3>Fixes<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id17">
+<h3>Fixes<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Fixed build failure when system has an incompatible version of onigmo/oniguruma
 headers installed. [GitHub#276] [Patch by Akinori MUSHA]</li>
 <li>Fixed time related build failure on MSVC [GitHub#237]</li>
 </ul>
 </div>
-<div class="section" id="id15">
-<h3>Thanks<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id18">
+<h3>Thanks<a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Akinori MUSHA</li>
 <li>Bernard Spil</li>
@@ -901,40 +1118,46 @@ headers installed. [GitHub#276] [Patch by Akinori MUSHA]</li>
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">News</a><ul>
-<li><a class="reference internal" href="#release-5-0-5-2015-06-29">Release 5.0.5 - 2015-06-29</a><ul>
+<li><a class="reference internal" href="#release-5-0-6-2015-07-29">Release 5.0.6 - 2015-07-29</a><ul>
 <li><a class="reference internal" href="#improvements">Improvements</a></li>
 <li><a class="reference internal" href="#fixes">Fixes</a></li>
 <li><a class="reference internal" href="#thanks">Thanks</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#release-5-0-4-2015-05-29">Release 5.0.4 - 2015-05-29</a><ul>
+<li><a class="reference internal" href="#release-5-0-5-2015-06-29">Release 5.0.5 - 2015-06-29</a><ul>
 <li><a class="reference internal" href="#id1">Improvements</a></li>
 <li><a class="reference internal" href="#id2">Fixes</a></li>
 <li><a class="reference internal" href="#id3">Thanks</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#release-5-0-3-2015-04-29">Release 5.0.3 - 2015-04-29</a><ul>
+<li><a class="reference internal" href="#release-5-0-4-2015-05-29">Release 5.0.4 - 2015-05-29</a><ul>
 <li><a class="reference internal" href="#id4">Improvements</a></li>
 <li><a class="reference internal" href="#id5">Fixes</a></li>
 <li><a class="reference internal" href="#id6">Thanks</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#release-5-0-2-2015-03-31">Release 5.0.2 - 2015-03-31</a><ul>
+<li><a class="reference internal" href="#release-5-0-3-2015-04-29">Release 5.0.3 - 2015-04-29</a><ul>
 <li><a class="reference internal" href="#id7">Improvements</a></li>
 <li><a class="reference internal" href="#id8">Fixes</a></li>
 <li><a class="reference internal" href="#id9">Thanks</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#release-5-0-1-2015-03-29">Release 5.0.1 - 2015-03-29</a><ul>
+<li><a class="reference internal" href="#release-5-0-2-2015-03-31">Release 5.0.2 - 2015-03-31</a><ul>
 <li><a class="reference internal" href="#id10">Improvements</a></li>
 <li><a class="reference internal" href="#id11">Fixes</a></li>
 <li><a class="reference internal" href="#id12">Thanks</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#release-5-0-0-2015-02-09">Release 5.0.0 - 2015-02-09</a><ul>
+<li><a class="reference internal" href="#release-5-0-1-2015-03-29">Release 5.0.1 - 2015-03-29</a><ul>
 <li><a class="reference internal" href="#id13">Improvements</a></li>
 <li><a class="reference internal" href="#id14">Fixes</a></li>
 <li><a class="reference internal" href="#id15">Thanks</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#release-5-0-0-2015-02-09">Release 5.0.0 - 2015-02-09</a><ul>
+<li><a class="reference internal" href="#id16">Improvements</a></li>
+<li><a class="reference internal" href="#id17">Fixes</a></li>
+<li><a class="reference internal" href="#id18">Thanks</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#the-old-releases">The old releases</a></li>
@@ -970,7 +1193,7 @@ headers installed. [GitHub#276] [Patch by Akinori MUSHA]</li>
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
-        <li><a href="index.html">Groonga v5.0.5 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Groonga v5.0.6 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

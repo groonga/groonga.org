@@ -1,0 +1,345 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>7.3.44. table_rename &mdash; Groonga v5.0.6ドキュメント</title>
+    
+    <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
+    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '5.0.6',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../static/doctools.js"></script>
+    <script type="text/javascript" src="../../static/translations.js"></script>
+    <link rel="shortcut icon" href="../../static/favicon.ico"/>
+    <link rel="top" title="Groonga v5.0.6ドキュメント" href="../../index.html" />
+    <link rel="up" title="7.3. コマンド" href="../command.html" />
+    <link rel="next" title="7.3.45. table_tokenize" href="table_tokenize.html" />
+    <link rel="prev" title="7.3.43. table_remove" href="table_remove.html" /> 
+      <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
+    <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
+    <meta property="og:type" content="product" />
+    <meta property="og:image" content="http://groonga.org/images/logos/groonga-icon-full-size.png" />
+    <meta property="og:site_name" content="groonga" />
+
+    <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
+  </head>
+
+    <body>
+    <div id="fb-root"></div>
+
+<div class="header">
+  <h1 class="title">
+    <a id="top-link" href="../../../">
+      <span class="project">groonga</span>
+      <span class="separator">-</span>
+      <span class="description">オープンソースのカラムストア機能付き全文検索エンジン</span>
+    </a>
+  </h1>
+
+      <div class="facebook-buttons">
+      <fb:like href="http://www.facebook.com/pages/groonga/201193596592346"
+               layout="standard"
+               width="290"></fb:like>
+    </div>
+    <div class="other-language-links">
+
+    <ul>
+      <li><a href="../../../../docs/reference/commands/table_rename.html">English</a></li>
+    </ul>
+  </div>
+</div>
+  
+
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="table_tokenize.html" title="7.3.45. table_tokenize"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="table_remove.html" title="7.3.43. table_remove"
+             accesskey="P">前へ</a> |</li>
+        <li><a href="../../index.html">Groonga v5.0.6ドキュメント</a> &raquo;</li>
+          <li><a href="../../reference.html" >7. リファレンスマニュアル</a> &raquo;</li>
+          <li><a href="../command.html" accesskey="U">7.3. コマンド</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="table-rename">
+<h1>7.3.44. <tt class="docutils literal"><span class="pre">table_rename</span></tt><a class="headerlink" href="#table-rename" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<div class="section" id="summary">
+<h2>7.3.44.1. 概要<a class="headerlink" href="#summary" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">table_rename</span></tt> コマンドはテーブル名を変更します。</p>
+<p>これは軽い操作です。名前とテーブルオブジェクト間の関係を変更するだけです。テーブルの値とテーブルのカラムの値をコピーしません。</p>
+<p>これは危険な操作です。 <tt class="docutils literal"><span class="pre">table_rename</span></tt> を実行している間、読み取り操作を含むすべての操作を停止しなければいけません。以下のケースが起こった場合、Groongaプロセスはクラッシュするかもしれません。</p>
+<blockquote>
+<div><ul class="simple">
+<li><p class="first">現在のテーブル名で名前を変更しようとしているテーブルにアクセスする操作（たとえば <tt class="docutils literal"><span class="pre">select</span></tt> ）を開始します。以降、現在のテーブル名を <tt class="docutils literal"><span class="pre">古いテーブル名</span></tt> と呼ぶことにします。これは、今、このテーブル名を変更しようとしているからです。</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">table_rename</span></tt> を実行します。 <tt class="docutils literal"><span class="pre">select</span></tt> は実行中です。</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">select</span></tt> は古いテーブル名で、名前が変更されたテーブルにアクセスします。しかし、テーブルはすでに新しいテーブル名に変更されているため、 <tt class="docutils literal"><span class="pre">select</span></tt> は古いテーブル名でテーブルを見つけることができません。このときGroongaプロセスがクラッシュするかもしれません。</p>
+</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="syntax">
+<h2>7.3.44.2. 構文<a class="headerlink" href="#syntax" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">table_rename</span></tt> コマンドは引数を3つとります。すべて必須です。:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_rename name new_name
+</pre></div>
+</div>
+</div>
+<div class="section" id="usage">
+<h2>7.3.44.3. 使い方<a class="headerlink" href="#usage" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>以下は <tt class="docutils literal"><span class="pre">table_rename</span></tt> コマンドの簡単な使用例です。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Users TABLE_PAT_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Users score COLUMN_SCALAR Int32
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+load --table Users
+[
+{&quot;_key&quot;: &quot;Alice&quot;,  &quot;score&quot;: 2},
+{&quot;_key&quot;: &quot;Bob&quot;,    &quot;score&quot;: 0},
+{&quot;_key&quot;: &quot;Carlos&quot;, &quot;score&quot;: -1}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 3]
+table_rename Users Players
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_list
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         &quot;id&quot;,
+#         &quot;UInt32&quot;
+#       ],
+#       [
+#         &quot;name&quot;,
+#         &quot;ShortText&quot;
+#       ],
+#       [
+#         &quot;path&quot;,
+#         &quot;ShortText&quot;
+#       ],
+#       [
+#         &quot;flags&quot;,
+#         &quot;ShortText&quot;
+#       ],
+#       [
+#         &quot;domain&quot;,
+#         &quot;ShortText&quot;
+#       ],
+#       [
+#         &quot;range&quot;,
+#         &quot;ShortText&quot;
+#       ],
+#       [
+#         &quot;default_tokenizer&quot;,
+#         &quot;ShortText&quot;
+#       ],
+#       [
+#         &quot;normalizer&quot;,
+#         &quot;ShortText&quot;
+#       ]
+#     ],
+#     [
+#       256,
+#       &quot;Players&quot;,
+#       &quot;/tmp/groonga-databases/commands_table_rename.0000100&quot;,
+#       &quot;TABLE_PAT_KEY|PERSISTENT&quot;,
+#       &quot;ShortText&quot;,
+#       null,
+#       null,
+#       null
+#     ]
+#   ]
+# ]
+select Players
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         3
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;score&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;Alice&quot;,
+#         2
+#       ],
+#       [
+#         2,
+#         &quot;Bob&quot;,
+#         0
+#       ],
+#       [
+#         3,
+#         &quot;Carlos&quot;,
+#         -1
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
+<div class="section" id="parameters">
+<h2>7.3.44.4. 引数<a class="headerlink" href="#parameters" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>このセクションでは <tt class="docutils literal"><span class="pre">table_rename</span></tt> の引数について説明します。</p>
+<div class="section" id="required-parameters">
+<h3>7.3.44.4.1. 必須引数<a class="headerlink" href="#required-parameters" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>すべての引数は必須です。</p>
+<div class="section" id="name">
+<h4>7.3.44.4.1.1. <tt class="docutils literal"><span class="pre">name</span></tt><a class="headerlink" href="#name" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>名前を変更するテーブルの名前を指定します。</p>
+</div>
+<div class="section" id="new-name">
+<h4>7.3.44.4.1.2. <tt class="docutils literal"><span class="pre">new_name</span></tt><a class="headerlink" href="#new-name" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>新しいテーブル名を指定します。</p>
+</div>
+</div>
+</div>
+<div class="section" id="return-value">
+<h2>7.3.44.5. 戻り値<a class="headerlink" href="#return-value" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>このコマンドが成功したときは以下のようにボディは <tt class="docutils literal"><span class="pre">true</span></tt> になります:</p>
+<div class="highlight-none"><div class="highlight"><pre>[HEADER, true]
+</pre></div>
+</div>
+<p>このコマンドが失敗すると、 <tt class="docutils literal"><span class="pre">HEADER</span></tt> にエラーの詳細が含まれます。</p>
+<p><tt class="docutils literal"><span class="pre">HEADER</span></tt> については <a class="reference internal" href="../command/output_format.html"><em>出力形式</em></a> を参照してください。</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">7.3.44. <tt class="docutils literal"><span class="pre">table_rename</span></tt></a><ul>
+<li><a class="reference internal" href="#summary">7.3.44.1. 概要</a></li>
+<li><a class="reference internal" href="#syntax">7.3.44.2. 構文</a></li>
+<li><a class="reference internal" href="#usage">7.3.44.3. 使い方</a></li>
+<li><a class="reference internal" href="#parameters">7.3.44.4. 引数</a><ul>
+<li><a class="reference internal" href="#required-parameters">7.3.44.4.1. 必須引数</a><ul>
+<li><a class="reference internal" href="#name">7.3.44.4.1.1. <tt class="docutils literal"><span class="pre">name</span></tt></a></li>
+<li><a class="reference internal" href="#new-name">7.3.44.4.1.2. <tt class="docutils literal"><span class="pre">new_name</span></tt></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#return-value">7.3.44.5. 戻り値</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="table_remove.html"
+                        title="前の章へ">7.3.43. <tt class="docutils literal"><span class="pre">table_remove</span></tt></a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="table_tokenize.html"
+                        title="次の章へ">7.3.45. <tt class="docutils literal"><span class="pre">table_tokenize</span></tt></a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../sources/reference/commands/table_rename.txt"
+           rel="nofollow">ソースコードを表示（英語）</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="table_tokenize.html" title="7.3.45. table_tokenize"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="table_remove.html" title="7.3.43. table_remove"
+             >前へ</a> |</li>
+        <li><a href="../../index.html">Groonga v5.0.6ドキュメント</a> &raquo;</li>
+          <li><a href="../../reference.html" >7. リファレンスマニュアル</a> &raquo;</li>
+          <li><a href="../command.html" >7.3. コマンド</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009-2015, Brazil, Inc.
+    </div>
+      <script src="http://connect.facebook.net/ja_JP/all.js"></script>
+
+    <script>
+      FB.init({
+         appId  : null,
+         status : true, // check login status
+         cookie : true, // enable cookies to allow the server to access the session
+         xfbml  : true  // parse XFBML
+      });
+    </script>
+  </body>
+
+</html>

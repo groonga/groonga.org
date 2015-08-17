@@ -1,0 +1,320 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>7.21.23. grn_thread_* &mdash; Groonga v5.0.6 documentation</title>
+    
+    <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
+    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '5.0.6',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../static/favicon.ico"/>
+    <link rel="top" title="Groonga v5.0.6 documentation" href="../../index.html" />
+    <link rel="up" title="7.21. API" href="../api.html" />
+    <link rel="next" title="7.21.24. grn_type" href="grn_type.html" />
+    <link rel="prev" title="7.21.22. grn_table_cursor" href="grn_table_cursor.html" /> 
+      <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
+    <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
+    <meta property="og:type" content="product" />
+    <meta property="og:image" content="http://groonga.org/images/logos/groonga-icon-full-size.png" />
+    <meta property="og:site_name" content="groonga" />
+
+    <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
+  </head>
+
+  <body role="document">
+<div class="header">
+  <h1 class="title">
+    <a id="top-link" href="../../../">
+      <span class="project">groonga</span>
+      <span class="separator">-</span>
+      <span class="description">An open-source fulltext search engine and column store.</span>
+    </a>
+  </h1>
+
+      <div class="facebook-buttons">
+      <fb:like href="http://www.facebook.com/pages/groonga/201193596592346"
+               layout="standard"
+               width="290"></fb:like>
+    </div>
+    <div class="other-language-links">
+
+    <ul>
+      <li><a href="../../../ja/docs/reference/api/grn_thread.html">日本語</a></li>
+    </ul>
+  </div>
+</div>
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="grn_type.html" title="7.21.24. grn_type"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="grn_table_cursor.html" title="7.21.22. grn_table_cursor"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v5.0.6 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../reference.html" >7. Reference manual</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="../api.html" accesskey="U">7.21. API</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="grn-thread">
+<h1>7.21.23. <code class="docutils literal"><span class="pre">grn_thread_*</span></code><a class="headerlink" href="#grn-thread" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="summary">
+<h2>7.21.23.1. Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>Groonga provides thread related APIs with <code class="docutils literal"><span class="pre">grn_thread_</span></code> prefix.</p>
+<p>Normally, you don't need to use these APIs.</p>
+<p>You may want to use these APIs when you write a Groonga server.</p>
+</div>
+<div class="section" id="example">
+<h2>7.21.23.2. Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
+<p>Here is a real word use case of <code class="docutils literal"><span class="pre">grn_thread_*</span></code> APIs by
+<a class="reference internal" href="../executables/groonga.html"><em>groonga executable file</em></a>. <a class="reference internal" href="../executables/groonga.html"><em>groonga executable file</em></a>
+increases its thread pool size when the max number of threads is
+increased. <a class="reference internal" href="../executables/groonga.html"><em>groonga executable file</em></a> decreases its thread
+pool size and stops too many threads when the max number of threads is
+decreased.</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="k">static</span> <span class="n">grn_mutex</span> <span class="n">q_mutex</span><span class="p">;</span>
+<span class="k">static</span> <span class="n">grn_cond</span> <span class="n">q_cond</span><span class="p">;</span>
+<span class="k">static</span> <span class="kt">uint32_t</span> <span class="n">nfthreads</span><span class="p">;</span>
+<span class="k">static</span> <span class="kt">uint32_t</span> <span class="n">max_nfthreads</span><span class="p">;</span>
+
+<span class="k">static</span> <span class="kt">uint32_t</span>
+<span class="nf">groonga_get_thread_count</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">data</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="k">return</span> <span class="n">max_nfthreads</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">static</span> <span class="kt">void</span>
+<span class="nf">groonga_set_thread_count</span><span class="p">(</span><span class="kt">uint32_t</span> <span class="n">new_count</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">data</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="kt">uint32_t</span> <span class="n">i</span><span class="p">;</span>
+  <span class="kt">uint32_t</span> <span class="n">current_nfthreads</span><span class="p">;</span>
+
+  <span class="n">MUTEX_LOCK</span><span class="p">(</span><span class="n">q_mutex</span><span class="p">);</span>
+  <span class="n">current_nfthreads</span> <span class="o">=</span> <span class="n">nfthreads</span><span class="p">;</span>
+  <span class="n">max_nfthreads</span> <span class="o">=</span> <span class="n">new_count</span><span class="p">;</span>
+  <span class="n">MUTEX_UNLOCK</span><span class="p">(</span><span class="n">q_mutex</span><span class="p">);</span>
+
+  <span class="k">if</span> <span class="p">(</span><span class="n">current_nfthreads</span> <span class="o">&gt;</span> <span class="n">new_count</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">current_nfthreads</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">MUTEX_LOCK</span><span class="p">(</span><span class="n">q_mutex</span><span class="p">);</span>
+      <span class="n">COND_SIGNAL</span><span class="p">(</span><span class="n">q_cond</span><span class="p">);</span>
+      <span class="n">MUTEX_UNLOCK</span><span class="p">(</span><span class="n">q_mutex</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kt">int</span>
+<span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="cm">/* ... */</span>
+  <span class="n">grn_thread_set_get_count_func</span><span class="p">(</span><span class="n">groonga_get_thread_count</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+  <span class="n">grn_thread_set_set_count_func</span><span class="p">(</span><span class="n">groonga_set_thread_count</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+
+  <span class="n">grn_init</span><span class="p">();</span>
+
+  <span class="cm">/* ... */</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="reference">
+<h2>7.21.23.3. Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt id="c.grn_thread_get_count_func">
+uint32_t <code class="descname">(*grn_thread_get_count_func)</code><span class="sig-paren">(</span>void<em>&nbsp;*data</em><span class="sig-paren">)</span><a class="headerlink" href="#c.grn_thread_get_count_func" title="Permalink to this definition">¶</a></dt>
+<dd><p>It's the type of function that returns the max number of threads.</p>
+</dd></dl>
+
+<dl class="type">
+<dt id="c.grn_thread_set_count_func">
+void <code class="descname">(*grn_thread_set_count_func)</code><span class="sig-paren">(</span>uint32_t<em>&nbsp;new_count</em>, void<em>&nbsp;*data</em><span class="sig-paren">)</span><a class="headerlink" href="#c.grn_thread_set_count_func" title="Permalink to this definition">¶</a></dt>
+<dd><p>It's the type of function that sets the max number of threads.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.grn_thread_get_count">
+uint32_t <code class="descname">grn_thread_get_count</code><span class="sig-paren">(</span>void<span class="sig-paren">)</span><a class="headerlink" href="#c.grn_thread_get_count" title="Permalink to this definition">¶</a></dt>
+<dd><p>It returns the max number of threads.</p>
+<p>If <a class="reference internal" href="#c.grn_thread_get_count_func" title="grn_thread_get_count_func"><code class="xref c c-type docutils literal"><span class="pre">grn_thread_get_count_func</span></code></a> isn't set by
+<a class="reference internal" href="#c.grn_thread_set_get_count_func" title="grn_thread_set_get_count_func"><code class="xref c c-func docutils literal"><span class="pre">grn_thread_set_get_count_func()</span></code></a>, it always returns <code class="docutils literal"><span class="pre">0</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The max number of threads or <code class="docutils literal"><span class="pre">0</span></code>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.grn_thread_set_count">
+void_t <code class="descname">grn_thread_set_count</code><span class="sig-paren">(</span>uint32_t<em>&nbsp;new_count</em><span class="sig-paren">)</span><a class="headerlink" href="#c.grn_thread_set_count" title="Permalink to this definition">¶</a></dt>
+<dd><p>It sets the max number of threads.</p>
+<p>If <a class="reference internal" href="#c.grn_thread_set_count_func" title="grn_thread_set_count_func"><code class="xref c c-type docutils literal"><span class="pre">grn_thread_set_count_func</span></code></a> isn't set by
+<a class="reference internal" href="#c.grn_thread_set_set_count_func" title="grn_thread_set_set_count_func"><code class="xref c c-func docutils literal"><span class="pre">grn_thread_set_set_count_func()</span></code></a>, it does nothing.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>new_count</strong> -- The new max number of threads.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.grn_thread_set_get_count_func">
+void <code class="descname">grn_thread_set_get_count_func</code><span class="sig-paren">(</span><a class="reference internal" href="#c.grn_thread_get_count_func" title="grn_thread_get_count_func">grn_thread_get_count_func</a><em>&nbsp;func</em>, void<em>&nbsp;*data</em><span class="sig-paren">)</span><a class="headerlink" href="#c.grn_thread_set_get_count_func" title="Permalink to this definition">¶</a></dt>
+<dd><p>It sets the custom function that returns the max number of threads.</p>
+<p><code class="docutils literal"><span class="pre">data</span></code> is passed to <code class="docutils literal"><span class="pre">func</span></code> when <code class="docutils literal"><span class="pre">func</span></code> is called from
+<a class="reference internal" href="#c.grn_thread_get_count" title="grn_thread_get_count"><code class="xref c c-func docutils literal"><span class="pre">grn_thread_get_count()</span></code></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>func</strong> -- The custom function that returns the max number of threads.</li>
+<li><strong>data</strong> -- An user data to be passed to <code class="docutils literal"><span class="pre">func</span></code> when <code class="docutils literal"><span class="pre">func</span></code>
+is called.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.grn_thread_set_set_count_func">
+void <code class="descname">grn_thread_set_set_count_func</code><span class="sig-paren">(</span><a class="reference internal" href="#c.grn_thread_set_count_func" title="grn_thread_set_count_func">grn_thread_set_count_func</a><em>&nbsp;func</em>, void<em>&nbsp;*data</em><span class="sig-paren">)</span><a class="headerlink" href="#c.grn_thread_set_set_count_func" title="Permalink to this definition">¶</a></dt>
+<dd><p>It sets the custom function that sets the max number of threads.</p>
+<p><code class="docutils literal"><span class="pre">data</span></code> is passed to <code class="docutils literal"><span class="pre">func</span></code> when <code class="docutils literal"><span class="pre">func</span></code> is called from
+<a class="reference internal" href="#c.grn_thread_set_count" title="grn_thread_set_count"><code class="xref c c-func docutils literal"><span class="pre">grn_thread_set_count()</span></code></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>func</strong> -- The custom function that sets the max number of threads.</li>
+<li><strong>data</strong> -- An user data to be passed to <code class="docutils literal"><span class="pre">func</span></code> when <code class="docutils literal"><span class="pre">func</span></code>
+is called.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">7.21.23. <code class="docutils literal"><span class="pre">grn_thread_*</span></code></a><ul>
+<li><a class="reference internal" href="#summary">7.21.23.1. Summary</a></li>
+<li><a class="reference internal" href="#example">7.21.23.2. Example</a></li>
+<li><a class="reference internal" href="#reference">7.21.23.3. Reference</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="grn_table_cursor.html"
+                        title="previous chapter">7.21.22. <code class="docutils literal"><span class="pre">grn_table_cursor</span></code></a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="grn_type.html"
+                        title="next chapter">7.21.24. <code class="docutils literal"><span class="pre">grn_type</span></code></a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../sources/reference/api/grn_thread.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="grn_type.html" title="7.21.24. grn_type"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="grn_table_cursor.html" title="7.21.22. grn_table_cursor"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v5.0.6 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../reference.html" >7. Reference manual</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="../api.html" >7.21. API</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2009-2015, Brazil, Inc.
+    </div>
+      <script src="http://connect.facebook.net/en_US/all.js"></script>
+
+    <script>
+      FB.init({
+         appId  : null,
+         status : true, // check login status
+         cookie : true, // enable cookies to allow the server to access the session
+         xfbml  : true  // parse XFBML
+      });
+    </script>
+  </body>
+
+</html>

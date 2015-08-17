@@ -1,0 +1,247 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>7.18. シャーディング &mdash; Groonga v5.0.6ドキュメント</title>
+    
+    <link rel="stylesheet" href="../static/groonga.css" type="text/css" />
+    <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '5.0.6',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../static/jquery.js"></script>
+    <script type="text/javascript" src="../static/underscore.js"></script>
+    <script type="text/javascript" src="../static/doctools.js"></script>
+    <script type="text/javascript" src="../static/translations.js"></script>
+    <link rel="shortcut icon" href="../static/favicon.ico"/>
+    <link rel="top" title="Groonga v5.0.6ドキュメント" href="../index.html" />
+    <link rel="up" title="7. リファレンスマニュアル" href="../reference.html" />
+    <link rel="next" title="7.3.23. logical_count" href="commands/logical_count.html" />
+    <link rel="prev" title="7.17. インデックス構築" href="indexing.html" /> 
+      <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
+    <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
+    <meta property="og:type" content="product" />
+    <meta property="og:image" content="http://groonga.org/images/logos/groonga-icon-full-size.png" />
+    <meta property="og:site_name" content="groonga" />
+
+    <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
+  </head>
+
+  <body role="document">
+<div class="header">
+  <h1 class="title">
+    <a id="top-link" href="../../">
+      <span class="project">groonga</span>
+      <span class="separator">-</span>
+      <span class="description">オープンソースのカラムストア機能付き全文検索エンジン</span>
+    </a>
+  </h1>
+
+      <div class="facebook-buttons">
+      <fb:like href="http://www.facebook.com/pages/groonga/201193596592346"
+               layout="standard"
+               width="290"></fb:like>
+    </div>
+    <div class="other-language-links">
+
+    <ul>
+      <li><a href="../../../docs/reference/sharding.html">English</a></li>
+    </ul>
+  </div>
+</div>
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="commands/logical_count.html" title="7.3.23. logical_count"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="indexing.html" title="7.17. インデックス構築"
+             accesskey="P">前へ</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Groonga v5.0.6ドキュメント</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../reference.html" accesskey="U">7. リファレンスマニュアル</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="sharding">
+<h1>7.18. シャーディング<a class="headerlink" href="#sharding" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<div class="admonition note">
+<p class="first admonition-title">注釈</p>
+<p class="last">このコマンドは実験的な機能です。</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified">バージョン 5.0.0 で追加.</span></p>
+</div>
+<p>Groongaにはテーブルに格納できるレコード数に <a class="reference internal" href="../limitations.html"><em>制限事項</em></a> があります。1つのテーブルに268,435,455以上のレコードを追加できません。</p>
+<p>この制限を解決するために、Groongaは時間ベースのシャーディング機能をサポートしています。</p>
+<p>この機能は同一データベース内で動きます。複数のデータベースをまたいでは動きません。これは、このシャーディング機能はデータを複数のマシンに分散する用途では使えないということです。</p>
+<p>もし、分散対応のシャーディング機能が欲しい場合は、 <a class="reference external" href="http://mroonga.org/">Mroonga</a> または <a class="reference external" href="http://pgroonga.github.io/">PGroonga</a> を使ってください。MySQLまたはPostgreSQLが提供しているシャーディング機能を使うことができます。近い将来、 <a class="reference external" href="http://droonga.org/">Droonga</a> でも分散対応のシャーディング機能を使えるようになる予定です。</p>
+<div class="section" id="summary">
+<h2>7.18.1. 概要<a class="headerlink" href="#summary" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>シャーディングは <code class="docutils literal"><span class="pre">sharding</span></code> プラグインとして実装されています。このプラグインはmrubyで書かれています。そのため、Groongaをビルドするときにmrubyを有効にする必要があります。</p>
+<p>Groongaがmrubyをサポートしているかは <a class="reference internal" href="executables/groonga.html"><em>groonga executable file</em></a> の <code class="docutils literal"><span class="pre">--version</span></code> 引数を使うとわかります:</p>
+<div class="highlight-none"><div class="highlight"><pre>% groonga --version
+groonga 5.0.5 [...,mruby,...]
+
+configure options: &lt;...&gt;
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">mruby</span></code> があればあなたのGroongaはmrubyをサポートしています。</p>
+<p><code class="docutils literal"><span class="pre">sharding</span></code> プラグインは検索系のコマンドだけを提供しています。これらのコマンドは <a class="reference internal" href="commands/logical_select.html"><em>logical_select</em></a> や <a class="reference internal" href="commands/logical_range_filter.html"><em>logical_range_filter</em></a> というように、コマンド名に <code class="docutils literal"><span class="pre">logical_</span></code> プレフィックスがついています。</p>
+<p><code class="docutils literal"><span class="pre">sharding</span></code> プラグインはスキーマ定義コマンドとデータロードコマンドをまだ提供していません。そのため、既存の <a class="reference internal" href="commands/table_create.html"><em>table_create</em></a> 、 <a class="reference internal" href="commands/column_create.html"><em>column_create</em></a> 、 <a class="reference internal" href="commands/load.html"><em>load</em></a> コマンドを使う必要があります。</p>
+<p><code class="docutils literal"><span class="pre">sharding</span></code> プラグインを使うにはいくつかのルールに則ってテーブルとカラムを作る必要があります。これについては後述します。</p>
+</div>
+<div class="section" id="glossary">
+<span id="sharding-glossary"></span><h2>7.18.2. 用語集<a class="headerlink" href="#glossary" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><p class="first last">名前</p>
+</th>
+<th class="head"><p class="first last">説明</p>
+</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><p class="first last">論理テーブル</p>
+</td>
+<td><p class="first last">複数のシャードをあわせて1つに見せているテーブルです。Groongaのデータベースの中には存在しません。私たちの頭の中にだけあります。</p>
+</td>
+</tr>
+<tr class="row-odd"><td><p class="first last">論理テーブル名</p>
+</td>
+<td><p class="first last">論理テーブルの名前です。これはシャード名のプレフィックスです。例えば、 <code class="docutils literal"><span class="pre">Logs</span></code> が論理テーブル名で、 <code class="docutils literal"><span class="pre">Logs_20150814</span></code> と <code class="docutils literal"><span class="pre">Logs_20150815</span></code> がシャード名です。</p>
+</td>
+</tr>
+<tr class="row-even"><td><p class="first last">シャード</p>
+</td>
+<td><p class="first">1日分または1ヶ月分のレコードを格納しているテーブルです。1つのシャードには一部のレコードのみがあります。</p>
+<p>シャード名（＝テーブル名）は <code class="docutils literal"><span class="pre">${LOGICAL_TABLE_NAME}_${YYYYMMDD}</span></code> というフォーマットか <code class="docutils literal"><span class="pre">${LOGICAL_TABLE_NAME}_${YYYYMM}</span></code> というフォーマットになっています。 <code class="docutils literal"><span class="pre">${LOGICAL_TABLE_NAME}</span></code> は論理テーブル名に置き換えてください。 <code class="docutils literal"><span class="pre">${YYYYMMDD}</span></code> は日に置き換えてください。 <code class="docutils literal"><span class="pre">${YYYYMM}</span></code> は月に置き換えてください。</p>
+<p class="last">例えば、 <code class="docutils literal"><span class="pre">Logs_20150814</span></code> を分解すると <code class="docutils literal"><span class="pre">Logs</span></code> という論理テーブル名と <code class="docutils literal"><span class="pre">20150814</span></code> という日になります。</p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="rules">
+<span id="sharding-rules"></span><h2>7.18.3. ルール<a class="headerlink" href="#rules" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>TODO</p>
+</div>
+<div class="section" id="commands">
+<span id="sharding-commands"></span><h2>7.18.4. コマンド一覧<a class="headerlink" href="#commands" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="commands/logical_count.html">7.3.23. <code class="docutils literal"><span class="pre">logical_count</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="commands/logical_parameters.html">7.3.24. <code class="docutils literal"><span class="pre">logical_parameters</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="commands/logical_range_filter.html">7.3.25. <code class="docutils literal"><span class="pre">logical_range_filter</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="commands/logical_select.html">7.3.26. <code class="docutils literal"><span class="pre">logical_select</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="commands/logical_shard_list.html">7.3.27. <code class="docutils literal"><span class="pre">logical_shard_list</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="commands/logical_table_remove.html">7.3.28. <code class="docutils literal"><span class="pre">logical_table_remove</span></code></a></li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">7.18. シャーディング</a><ul>
+<li><a class="reference internal" href="#summary">7.18.1. 概要</a></li>
+<li><a class="reference internal" href="#glossary">7.18.2. 用語集</a></li>
+<li><a class="reference internal" href="#rules">7.18.3. ルール</a></li>
+<li><a class="reference internal" href="#commands">7.18.4. コマンド一覧</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="indexing.html"
+                        title="前の章へ">7.17. インデックス構築</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="commands/logical_count.html"
+                        title="次の章へ">7.3.23. <code class="docutils literal"><span class="pre">logical_count</span></code></a></p>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../sources/reference/sharding.txt"
+            rel="nofollow">ソースコードを表示（英語）</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="commands/logical_count.html" title="7.3.23. logical_count"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="indexing.html" title="7.17. インデックス構築"
+             >前へ</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Groonga v5.0.6ドキュメント</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../reference.html" >7. リファレンスマニュアル</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2009-2015, Brazil, Inc.
+    </div>
+      <script src="http://connect.facebook.net/ja_JP/all.js"></script>
+
+    <script>
+      FB.init({
+         appId  : null,
+         status : true, // check login status
+         cookie : true, // enable cookies to allow the server to access the session
+         xfbml  : true  // parse XFBML
+      });
+    </script>
+  </body>
+
+</html>

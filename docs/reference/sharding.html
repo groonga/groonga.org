@@ -1,0 +1,265 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>7.18. Sharding &mdash; Groonga v5.0.6 documentation</title>
+    
+    <link rel="stylesheet" href="../static/groonga.css" type="text/css" />
+    <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '5.0.6',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../static/jquery.js"></script>
+    <script type="text/javascript" src="../static/underscore.js"></script>
+    <script type="text/javascript" src="../static/doctools.js"></script>
+    <link rel="shortcut icon" href="../static/favicon.ico"/>
+    <link rel="top" title="Groonga v5.0.6 documentation" href="../index.html" />
+    <link rel="up" title="7. Reference manual" href="../reference.html" />
+    <link rel="next" title="7.3.23. logical_count" href="commands/logical_count.html" />
+    <link rel="prev" title="7.17. Indexing" href="indexing.html" /> 
+      <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
+    <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
+    <meta property="og:type" content="product" />
+    <meta property="og:image" content="http://groonga.org/images/logos/groonga-icon-full-size.png" />
+    <meta property="og:site_name" content="groonga" />
+
+    <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
+  </head>
+
+  <body role="document">
+<div class="header">
+  <h1 class="title">
+    <a id="top-link" href="../../">
+      <span class="project">groonga</span>
+      <span class="separator">-</span>
+      <span class="description">An open-source fulltext search engine and column store.</span>
+    </a>
+  </h1>
+
+      <div class="facebook-buttons">
+      <fb:like href="http://www.facebook.com/pages/groonga/201193596592346"
+               layout="standard"
+               width="290"></fb:like>
+    </div>
+    <div class="other-language-links">
+
+    <ul>
+      <li><a href="../../ja/docs/reference/sharding.html">日本語</a></li>
+    </ul>
+  </div>
+</div>
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="commands/logical_count.html" title="7.3.23. logical_count"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="indexing.html" title="7.17. Indexing"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Groonga v5.0.6 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../reference.html" accesskey="U">7. Reference manual</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="sharding">
+<h1>7.18. Sharding<a class="headerlink" href="#sharding" title="Permalink to this headline">¶</a></h1>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This command is an experimental feature.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 5.0.0.</span></p>
+</div>
+<p>Groonga has <a class="reference internal" href="../limitations.html"><em>Limitations</em></a> against table size. You can't add
+268,435,455 more records in one table.</p>
+<p>Groonga supports time based sharding to resolve the limitation.</p>
+<p>It works in the same database. It doesn't work with multiple
+databases. It means that this sharding feature isn't for distributing
+large data to multiple hosts.</p>
+<p>If you want distributed sharding feature, use <a class="reference external" href="http://mroonga.org/">Mroonga</a> or <a class="reference external" href="http://pgroonga.github.io/">PGroonga</a>. You can use sharding feature by MySQL
+or PostgreSQL. You'll be able to use <a class="reference external" href="http://droonga.org/">Droonga</a>
+for distributed sharding feature soon.</p>
+<div class="section" id="summary">
+<h2>7.18.1. Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>Sharding is implemented in <code class="docutils literal"><span class="pre">sharding</span></code> plugin. The plugin is written
+in mruby. You need to enable mruby when you build Groonga.</p>
+<p>You can confirm whether your Groonga supports mruby or not by
+<code class="docutils literal"><span class="pre">--version</span></code> command line argument of
+<a class="reference internal" href="executables/groonga.html"><em>groonga executable file</em></a>:</p>
+<div class="highlight-none"><div class="highlight"><pre>% groonga --version
+groonga 5.0.5 [...,mruby,...]
+
+configure options: &lt;...&gt;
+</pre></div>
+</div>
+<p>If you find <code class="docutils literal"><span class="pre">mruby</span></code>, your Groonga supports mruby.</p>
+<p><code class="docutils literal"><span class="pre">sharding</span></code> plugin provides only search commands. They have
+<code class="docutils literal"><span class="pre">logical_</span></code> prefix in their command names such as
+<a class="reference internal" href="commands/logical_select.html"><em>logical_select</em></a> and
+<a class="reference internal" href="commands/logical_range_filter.html"><em>logical_range_filter</em></a>.</p>
+<p><code class="docutils literal"><span class="pre">sharding</span></code> plugin doesn't provide schema define commands and data
+load commands yet. You need to use existing commands such as
+<a class="reference internal" href="commands/table_create.html"><em>table_create</em></a>,
+<a class="reference internal" href="commands/column_create.html"><em>column_create</em></a> and
+<a class="reference internal" href="commands/load.html"><em>load</em></a>.</p>
+<p><code class="docutils literal"><span class="pre">sharding</span></code> plugin requires some rules against table and column. You
+need to follow these rules. They are described later.</p>
+</div>
+<div class="section" id="glossary">
+<span id="sharding-glossary"></span><h2>7.18.2. Glossary<a class="headerlink" href="#glossary" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Logical table</td>
+<td>It's a table that consists of shards. It doesn't exist in
+Groonga database. It just exists in our minds.</td>
+</tr>
+<tr class="row-odd"><td>Logical table name</td>
+<td>The name of logical table. It's prefix of shard names. For
+example, <code class="docutils literal"><span class="pre">Logs</span></code> is a logical table name and <code class="docutils literal"><span class="pre">Logs_20150814</span></code>
+and <code class="docutils literal"><span class="pre">Logs_20150815</span></code> are shard names.</td>
+</tr>
+<tr class="row-even"><td>Shard</td>
+<td><p class="first">It's a table that has records in a day or month.  One shard has
+only partial records.</p>
+<p>Shard name (= table name) must follow
+<code class="docutils literal"><span class="pre">${LOGICAL_TABLE_NAME}_${YYYYMMDD}</span></code> format or
+<code class="docutils literal"><span class="pre">${LOGICAL_TABLE_NAME}_${YYYYMM}</span></code>
+format. <code class="docutils literal"><span class="pre">${LOGICAL_TABLE_NAME}</span></code> is expanded to logical table
+name. <code class="docutils literal"><span class="pre">${YYYYMMDD}</span></code> is expanded to day. <code class="docutils literal"><span class="pre">${YYYYMM}</span></code> is
+expanded to month.</p>
+<p class="last">For example, <code class="docutils literal"><span class="pre">Logs_20150814</span></code> is consists of <code class="docutils literal"><span class="pre">Logs</span></code> logical
+name and <code class="docutils literal"><span class="pre">20150814</span></code> day.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="rules">
+<span id="sharding-rules"></span><h2>7.18.3. Rules<a class="headerlink" href="#rules" title="Permalink to this headline">¶</a></h2>
+<p>TODO</p>
+</div>
+<div class="section" id="commands">
+<span id="sharding-commands"></span><h2>7.18.4. Commands<a class="headerlink" href="#commands" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="commands/logical_count.html">7.3.23. <code class="docutils literal"><span class="pre">logical_count</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="commands/logical_parameters.html">7.3.24. <code class="docutils literal"><span class="pre">logical_parameters</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="commands/logical_range_filter.html">7.3.25. <code class="docutils literal"><span class="pre">logical_range_filter</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="commands/logical_select.html">7.3.26. <code class="docutils literal"><span class="pre">logical_select</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="commands/logical_shard_list.html">7.3.27. <code class="docutils literal"><span class="pre">logical_shard_list</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="commands/logical_table_remove.html">7.3.28. <code class="docutils literal"><span class="pre">logical_table_remove</span></code></a></li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">7.18. Sharding</a><ul>
+<li><a class="reference internal" href="#summary">7.18.1. Summary</a></li>
+<li><a class="reference internal" href="#glossary">7.18.2. Glossary</a></li>
+<li><a class="reference internal" href="#rules">7.18.3. Rules</a></li>
+<li><a class="reference internal" href="#commands">7.18.4. Commands</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="indexing.html"
+                        title="previous chapter">7.17. Indexing</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="commands/logical_count.html"
+                        title="next chapter">7.3.23. <code class="docutils literal"><span class="pre">logical_count</span></code></a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../sources/reference/sharding.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="commands/logical_count.html" title="7.3.23. logical_count"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="indexing.html" title="7.17. Indexing"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Groonga v5.0.6 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../reference.html" >7. Reference manual</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2009-2015, Brazil, Inc.
+    </div>
+      <script src="http://connect.facebook.net/en_US/all.js"></script>
+
+    <script>
+      FB.init({
+         appId  : null,
+         status : true, // check login status
+         cookie : true, // enable cookies to allow the server to access the session
+         xfbml  : true  // parse XFBML
+      });
+    </script>
+  </body>
+
+</html>

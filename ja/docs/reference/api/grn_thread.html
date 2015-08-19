@@ -102,23 +102,23 @@
 <span class="k">static</span> <span class="kt">uint32_t</span> <span class="n">max_nfthreads</span><span class="p">;</span>
 
 <span class="k">static</span> <span class="kt">uint32_t</span>
-<span class="nf">groonga_get_thread_count</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">data</span><span class="p">)</span>
+<span class="nf">groonga_get_thread_limit</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">data</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="k">return</span> <span class="n">max_nfthreads</span><span class="p">;</span>
 <span class="p">}</span>
 
 <span class="k">static</span> <span class="kt">void</span>
-<span class="nf">groonga_set_thread_count</span><span class="p">(</span><span class="kt">uint32_t</span> <span class="n">new_count</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">data</span><span class="p">)</span>
+<span class="nf">groonga_set_thread_limit</span><span class="p">(</span><span class="kt">uint32_t</span> <span class="n">new_limit</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">data</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="kt">uint32_t</span> <span class="n">i</span><span class="p">;</span>
   <span class="kt">uint32_t</span> <span class="n">current_nfthreads</span><span class="p">;</span>
 
   <span class="n">MUTEX_LOCK</span><span class="p">(</span><span class="n">q_mutex</span><span class="p">);</span>
   <span class="n">current_nfthreads</span> <span class="o">=</span> <span class="n">nfthreads</span><span class="p">;</span>
-  <span class="n">max_nfthreads</span> <span class="o">=</span> <span class="n">new_count</span><span class="p">;</span>
+  <span class="n">max_nfthreads</span> <span class="o">=</span> <span class="n">new_limit</span><span class="p">;</span>
   <span class="n">MUTEX_UNLOCK</span><span class="p">(</span><span class="n">q_mutex</span><span class="p">);</span>
 
-  <span class="k">if</span> <span class="p">(</span><span class="n">current_nfthreads</span> <span class="o">&gt;</span> <span class="n">new_count</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">current_nfthreads</span> <span class="o">&gt;</span> <span class="n">new_limit</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">current_nfthreads</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
       <span class="n">MUTEX_LOCK</span><span class="p">(</span><span class="n">q_mutex</span><span class="p">);</span>
       <span class="n">COND_SIGNAL</span><span class="p">(</span><span class="n">q_cond</span><span class="p">);</span>
@@ -131,8 +131,8 @@
 <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="cm">/* ... */</span>
-  <span class="n">grn_thread_set_get_count_func</span><span class="p">(</span><span class="n">groonga_get_thread_count</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
-  <span class="n">grn_thread_set_set_count_func</span><span class="p">(</span><span class="n">groonga_set_thread_count</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+  <span class="n">grn_thread_set_get_limit_func</span><span class="p">(</span><span class="n">groonga_get_thread_limit</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+  <span class="n">grn_thread_set_set_limit_func</span><span class="p">(</span><span class="n">groonga_set_thread_limit</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
 
   <span class="n">grn_init</span><span class="p">();</span>
 
@@ -144,22 +144,22 @@
 <div class="section" id="reference">
 <h2>7.21.23.3. リファレンス<a class="headerlink" href="#reference" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <dl class="type">
-<dt id="c.grn_thread_get_count_func">
-uint32_t <code class="descname">(*grn_thread_get_count_func)</code><span class="sig-paren">(</span>void<em>&nbsp;*data</em><span class="sig-paren">)</span><a class="headerlink" href="#c.grn_thread_get_count_func" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="c.grn_thread_get_limit_func">
+uint32_t <code class="descname">(*grn_thread_get_limit_func)</code><span class="sig-paren">(</span>void<em>&nbsp;*data</em><span class="sig-paren">)</span><a class="headerlink" href="#c.grn_thread_get_limit_func" title="この定義へのパーマリンク">¶</a></dt>
 <dd><p>最大スレッド数を返す関数の型です。</p>
 </dd></dl>
 
 <dl class="type">
-<dt id="c.grn_thread_set_count_func">
-void <code class="descname">(*grn_thread_set_count_func)</code><span class="sig-paren">(</span>uint32_t<em>&nbsp;new_count</em>, void<em>&nbsp;*data</em><span class="sig-paren">)</span><a class="headerlink" href="#c.grn_thread_set_count_func" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="c.grn_thread_set_limit_func">
+void <code class="descname">(*grn_thread_set_limit_func)</code><span class="sig-paren">(</span>uint32_t<em>&nbsp;new_limit</em>, void<em>&nbsp;*data</em><span class="sig-paren">)</span><a class="headerlink" href="#c.grn_thread_set_limit_func" title="この定義へのパーマリンク">¶</a></dt>
 <dd><p>最大スレッド数を設定する関数の型です。</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="c.grn_thread_get_count">
-uint32_t <code class="descname">grn_thread_get_count</code><span class="sig-paren">(</span>void<span class="sig-paren">)</span><a class="headerlink" href="#c.grn_thread_get_count" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="c.grn_thread_get_limit">
+uint32_t <code class="descname">grn_thread_get_limit</code><span class="sig-paren">(</span>void<span class="sig-paren">)</span><a class="headerlink" href="#c.grn_thread_get_limit" title="この定義へのパーマリンク">¶</a></dt>
 <dd><p>最大スレッド数を返します。</p>
-<p><a class="reference internal" href="#c.grn_thread_set_get_count_func" title="grn_thread_set_get_count_func"><code class="xref c c-func docutils literal"><span class="pre">grn_thread_set_get_count_func()</span></code></a> で <a class="reference internal" href="#c.grn_thread_get_count_func" title="grn_thread_get_count_func"><code class="xref c c-type docutils literal"><span class="pre">grn_thread_get_count_func</span></code></a> を設定していない場合は、常に <code class="docutils literal"><span class="pre">0</span></code> を返します。</p>
+<p><a class="reference internal" href="#c.grn_thread_set_get_limit_func" title="grn_thread_set_get_limit_func"><code class="xref c c-func docutils literal"><span class="pre">grn_thread_set_get_limit_func()</span></code></a> で <a class="reference internal" href="#c.grn_thread_get_limit_func" title="grn_thread_get_limit_func"><code class="xref c c-type docutils literal"><span class="pre">grn_thread_get_limit_func</span></code></a> を設定していない場合は、常に <code class="docutils literal"><span class="pre">0</span></code> を返します。</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -171,16 +171,16 @@ uint32_t <code class="descname">grn_thread_get_count</code><span class="sig-pare
 </dd></dl>
 
 <dl class="function">
-<dt id="c.grn_thread_set_count">
-void_t <code class="descname">grn_thread_set_count</code><span class="sig-paren">(</span>uint32_t<em>&nbsp;new_count</em><span class="sig-paren">)</span><a class="headerlink" href="#c.grn_thread_set_count" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="c.grn_thread_set_limit">
+void_t <code class="descname">grn_thread_set_limit</code><span class="sig-paren">(</span>uint32_t<em>&nbsp;new_limit</em><span class="sig-paren">)</span><a class="headerlink" href="#c.grn_thread_set_limit" title="この定義へのパーマリンク">¶</a></dt>
 <dd><p>最大スレッド数を設定します。</p>
-<p><a class="reference internal" href="#c.grn_thread_set_set_count_func" title="grn_thread_set_set_count_func"><code class="xref c c-func docutils literal"><span class="pre">grn_thread_set_set_count_func()</span></code></a> で <a class="reference internal" href="#c.grn_thread_set_count_func" title="grn_thread_set_count_func"><code class="xref c c-type docutils literal"><span class="pre">grn_thread_set_count_func</span></code></a> を設定していない場合はなにもしません。</p>
+<p><a class="reference internal" href="#c.grn_thread_set_set_limit_func" title="grn_thread_set_set_limit_func"><code class="xref c c-func docutils literal"><span class="pre">grn_thread_set_set_limit_func()</span></code></a> で <a class="reference internal" href="#c.grn_thread_set_limit_func" title="grn_thread_set_limit_func"><code class="xref c c-type docutils literal"><span class="pre">grn_thread_set_limit_func</span></code></a> を設定していない場合はなにもしません。</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">パラメタ:</th><td class="field-body"><ul class="first last simple">
-<li><strong>new_count</strong> -- 新しい最大スレッド数。</li>
+<li><strong>new_limit</strong> -- 新しい最大スレッド数。</li>
 </ul>
 </td>
 </tr>
@@ -189,10 +189,10 @@ void_t <code class="descname">grn_thread_set_count</code><span class="sig-paren"
 </dd></dl>
 
 <dl class="function">
-<dt id="c.grn_thread_set_get_count_func">
-void <code class="descname">grn_thread_set_get_count_func</code><span class="sig-paren">(</span><a class="reference internal" href="#c.grn_thread_get_count_func" title="grn_thread_get_count_func">grn_thread_get_count_func</a><em>&nbsp;func</em>, void<em>&nbsp;*data</em><span class="sig-paren">)</span><a class="headerlink" href="#c.grn_thread_set_get_count_func" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="c.grn_thread_set_get_limit_func">
+void <code class="descname">grn_thread_set_get_limit_func</code><span class="sig-paren">(</span><a class="reference internal" href="#c.grn_thread_get_limit_func" title="grn_thread_get_limit_func">grn_thread_get_limit_func</a><em>&nbsp;func</em>, void<em>&nbsp;*data</em><span class="sig-paren">)</span><a class="headerlink" href="#c.grn_thread_set_get_limit_func" title="この定義へのパーマリンク">¶</a></dt>
 <dd><p>最大スレッド数を返すカスタム関数を設定します。</p>
-<p><code class="docutils literal"><span class="pre">data</span></code> は <a class="reference internal" href="#c.grn_thread_get_count" title="grn_thread_get_count"><code class="xref c c-func docutils literal"><span class="pre">grn_thread_get_count()</span></code></a> が <code class="docutils literal"><span class="pre">func</span></code> を呼ぶときに <code class="docutils literal"><span class="pre">func</span></code> に渡されます。</p>
+<p><code class="docutils literal"><span class="pre">data</span></code> は <a class="reference internal" href="#c.grn_thread_get_limit" title="grn_thread_get_limit"><code class="xref c c-func docutils literal"><span class="pre">grn_thread_get_limit()</span></code></a> が <code class="docutils literal"><span class="pre">func</span></code> を呼ぶときに <code class="docutils literal"><span class="pre">func</span></code> に渡されます。</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -208,10 +208,10 @@ void <code class="descname">grn_thread_set_get_count_func</code><span class="sig
 </dd></dl>
 
 <dl class="function">
-<dt id="c.grn_thread_set_set_count_func">
-void <code class="descname">grn_thread_set_set_count_func</code><span class="sig-paren">(</span><a class="reference internal" href="#c.grn_thread_set_count_func" title="grn_thread_set_count_func">grn_thread_set_count_func</a><em>&nbsp;func</em>, void<em>&nbsp;*data</em><span class="sig-paren">)</span><a class="headerlink" href="#c.grn_thread_set_set_count_func" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="c.grn_thread_set_set_limit_func">
+void <code class="descname">grn_thread_set_set_limit_func</code><span class="sig-paren">(</span><a class="reference internal" href="#c.grn_thread_set_limit_func" title="grn_thread_set_limit_func">grn_thread_set_limit_func</a><em>&nbsp;func</em>, void<em>&nbsp;*data</em><span class="sig-paren">)</span><a class="headerlink" href="#c.grn_thread_set_set_limit_func" title="この定義へのパーマリンク">¶</a></dt>
 <dd><p>最大スレッド数を設定するカスタム関数を設定します。</p>
-<p><code class="docutils literal"><span class="pre">data</span></code> は <a class="reference internal" href="#c.grn_thread_set_count" title="grn_thread_set_count"><code class="xref c c-func docutils literal"><span class="pre">grn_thread_set_count()</span></code></a> が <code class="docutils literal"><span class="pre">func</span></code> を呼ぶときに <code class="docutils literal"><span class="pre">func</span></code> に渡されます。</p>
+<p><code class="docutils literal"><span class="pre">data</span></code> は <a class="reference internal" href="#c.grn_thread_set_limit" title="grn_thread_set_limit"><code class="xref c c-func docutils literal"><span class="pre">grn_thread_set_limit()</span></code></a> が <code class="docutils literal"><span class="pre">func</span></code> を呼ぶときに <code class="docutils literal"><span class="pre">func</span></code> に渡されます。</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />

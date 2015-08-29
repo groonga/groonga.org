@@ -164,7 +164,7 @@ column_create Entries n_likes COLUMN_SCALAR UInt32
 # [[0, 1337566253.89858, 0.000355720520019531], true]
 column_create Entries tag COLUMN_SCALAR ShortText
 # [[0, 1337566253.89858, 0.000355720520019531], true]
-table_create Terms TABLE_PAT_KEY|KEY_NORMALIZE ShortText --default_tokenizer TokenBigram
+table_create Terms TABLE_PAT_KEY ShortText --default_tokenizer TokenBigram --normalizer NormalizerAuto
 # [[0, 1337566253.89858, 0.000355720520019531], true]
 column_create Terms entries_key_index COLUMN_INDEX|WITH_POSITION Entries _key
 # [[0, 1337566253.89858, 0.000355720520019531], true]
@@ -1554,7 +1554,7 @@ select Users
 <p>クエリー展開はクエリーの中にある置換テーブルのキーを置換カラムの値で置換します。 <code class="docutils literal"><span class="pre">query</span></code> の中にある単語が置換テーブルのキーだったら、キーに対応する置換カラムの値でその単語を置換します。置換は再帰的に実行しません。これは、置換されたクエリー内に置換対象の単語があっても置換されないということです。</p>
 <p>以下は <code class="docutils literal"><span class="pre">query_expander</span></code> の簡単な使用例を示すためのサンプル置換テーブルです。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre>table_create Thesaurus TABLE_PAT_KEY|KEY_NORMALIZE ShortText
+<div class="highlight-none"><div class="highlight"><pre>table_create Thesaurus TABLE_PAT_KEY ShortText --normalizer NormalizerAuto
 # [[0, 1337566253.89858, 0.000355720520019531], true]
 column_create Thesaurus synonym COLUMN_VECTOR ShortText
 # [[0, 1337566253.89858, 0.000355720520019531], true]
@@ -1566,7 +1566,8 @@ load --table Thesaurus
 # [[0, 1337566253.89858, 0.000355720520019531], 2]
 </pre></div>
 </div>
-<p><code class="docutils literal"><span class="pre">Thesaurus</span></code> 置換テーブルは2つの類義語があります。 <code class="docutils literal"><span class="pre">&quot;mroonga&quot;</span></code> と <code class="docutils literal"><span class="pre">&quot;groonga&quot;</span></code> です。ユーザが <code class="docutils literal"><span class="pre">&quot;mroonga&quot;</span></code> で検索すると、groongaは <code class="docutils literal"><span class="pre">&quot;((mroonga)</span> <span class="pre">OR</span> <span class="pre">(tritonn)</span> <span class="pre">OR</span> <span class="pre">(groonga</span> <span class="pre">mysql))&quot;</span></code> で検索します。ユーザーが <code class="docutils literal"><span class="pre">&quot;groonga&quot;</span></code> で検索すると、groongaは <code class="docutils literal"><span class="pre">&quot;((groonga)</span> <span class="pre">OR</span> <span class="pre">(senna))&quot;</span></code> で検索します。通常、置換テーブルには <code class="docutils literal"><span class="pre">KEY_NORMALIZE</span></code> フラグをつけた方がよいです。このフラグを使うと、置換対象の単語が大文字小文字区別せずにマッチするようになります。</p>
+<p><code class="docutils literal"><span class="pre">Thesaurus</span></code> 置換テーブルは2つの類義語があります。 <code class="docutils literal"><span class="pre">&quot;mroonga&quot;</span></code> と <code class="docutils literal"><span class="pre">&quot;groonga&quot;</span></code> です。ユーザが <code class="docutils literal"><span class="pre">&quot;mroonga&quot;</span></code> で検索すると、Groongaは <code class="docutils literal"><span class="pre">&quot;((mroonga)</span> <span class="pre">OR</span> <span class="pre">(tritonn)</span> <span class="pre">OR</span> <span class="pre">(groonga</span> <span class="pre">mysql))&quot;</span></code> で検索します。ユーザーが <code class="docutils literal"><span class="pre">&quot;groonga&quot;</span></code> で検索すると、Groongaは <code class="docutils literal"><span class="pre">&quot;((groonga)</span> <span class="pre">OR</span> <span class="pre">(senna))&quot;</span></code> で検索します。</p>
+<p>通常、置換テーブルにはノーマライザーを指定したほうがよいです。たとえば、ノーマライザーを指定すると、置換対象の単語に対して大文字小文字区別せずにマッチするようになります。利用可能なノーマライザーは <a class="reference internal" href="../normalizers.html"><em>ノーマライザー</em></a> を参照してください。</p>
 <p>これらの類義語の値の中に <code class="docutils literal"><span class="pre">&quot;mroonga&quot;</span></code> や <code class="docutils literal"><span class="pre">&quot;groonga&quot;</span></code> といったキーの値も含まれていることに注意してください。このように類義語にキーの値も含めることを推奨します。もしキーの値を含めないと、置換した値には元の置換対象の値が含まれません。通常、元の値が含まれていた方がよい検索結果になります。もし、検索してほしくない単語がある場合は、元の単語を含めないでください。例えば、空のベクター値を指定することで「ストップワード」機能を実現することもできます。</p>
 <p>以下は簡単な <code class="docutils literal"><span class="pre">query_expander</span></code> の使用例です。</p>
 <p>実行例:</p>

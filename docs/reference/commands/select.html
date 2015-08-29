@@ -168,7 +168,7 @@ column_create Entries n_likes COLUMN_SCALAR UInt32
 # [[0, 1337566253.89858, 0.000355720520019531], true]
 column_create Entries tag COLUMN_SCALAR ShortText
 # [[0, 1337566253.89858, 0.000355720520019531], true]
-table_create Terms TABLE_PAT_KEY|KEY_NORMALIZE ShortText --default_tokenizer TokenBigram
+table_create Terms TABLE_PAT_KEY ShortText --default_tokenizer TokenBigram --normalizer NormalizerAuto
 # [[0, 1337566253.89858, 0.000355720520019531], true]
 column_create Terms entries_key_index COLUMN_INDEX|WITH_POSITION Entries _key
 # [[0, 1337566253.89858, 0.000355720520019531], true]
@@ -1729,7 +1729,7 @@ query aren't substituted.</p>
 <p>Here is a sample substitution table to show a simple
 <code class="docutils literal"><span class="pre">query_expander</span></code> usage example.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>table_create Thesaurus TABLE_PAT_KEY|KEY_NORMALIZE ShortText
+<div class="highlight-none"><div class="highlight"><pre>table_create Thesaurus TABLE_PAT_KEY ShortText --normalizer NormalizerAuto
 # [[0, 1337566253.89858, 0.000355720520019531], true]
 column_create Thesaurus synonym COLUMN_VECTOR ShortText
 # [[0, 1337566253.89858, 0.000355720520019531], true]
@@ -1742,12 +1742,14 @@ load --table Thesaurus
 </pre></div>
 </div>
 <p><code class="docutils literal"><span class="pre">Thesaurus</span></code> substitution table has two synonyms, <code class="docutils literal"><span class="pre">&quot;mroonga&quot;</span></code> and
-<code class="docutils literal"><span class="pre">&quot;groonga&quot;</span></code>. If an user searches with <code class="docutils literal"><span class="pre">&quot;mroonga&quot;</span></code>, groonga
+<code class="docutils literal"><span class="pre">&quot;groonga&quot;</span></code>. If an user searches with <code class="docutils literal"><span class="pre">&quot;mroonga&quot;</span></code>, Groonga
 searches with <code class="docutils literal"><span class="pre">&quot;((mroonga)</span> <span class="pre">OR</span> <span class="pre">(tritonn)</span> <span class="pre">OR</span> <span class="pre">(groonga</span> <span class="pre">mysql))&quot;</span></code>. If an
-user searches with <code class="docutils literal"><span class="pre">&quot;groonga&quot;</span></code>, groonga searches with <code class="docutils literal"><span class="pre">&quot;((groonga)</span>
-<span class="pre">OR</span> <span class="pre">(senna))&quot;</span></code>. Nomrally, it's good idea that substitution table has
-<code class="docutils literal"><span class="pre">KEY_NORMALIZE</span></code> flag. If the flag is used, substitute target word is
-matched in case insensitive manner.</p>
+user searches with <code class="docutils literal"><span class="pre">&quot;groonga&quot;</span></code>, Groonga searches with <code class="docutils literal"><span class="pre">&quot;((groonga)</span>
+<span class="pre">OR</span> <span class="pre">(senna))&quot;</span></code>.</p>
+<p>Normally, it's good idea that substitution table uses a
+normalizer. For example, if normalizer is used, substitute target word
+is matched in case insensitive manner. See
+<a class="reference internal" href="../normalizers.html"><em>Normalizers</em></a> for available normalizers.</p>
 <p>Note that those synonym values include the key value such as
 <code class="docutils literal"><span class="pre">&quot;mroonga&quot;</span></code> and <code class="docutils literal"><span class="pre">&quot;groonga&quot;</span></code>. It's recommended that you include the
 key value. If you don't include key value, substituted value doesn't

@@ -1,0 +1,820 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>7.3.8. column_copy &mdash; Groonga v5.0.7 documentation</title>
+    
+    <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
+    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '5.0.7',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../static/favicon.ico"/>
+    <link rel="top" title="Groonga v5.0.7 documentation" href="../../index.html" />
+    <link rel="up" title="7.3. Command" href="../command.html" />
+    <link rel="next" title="7.3.9. column_create" href="column_create.html" />
+    <link rel="prev" title="7.3.7. clearlock" href="clearlock.html" /> 
+      <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
+    <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
+    <meta property="og:type" content="product" />
+    <meta property="og:image" content="http://groonga.org/images/logos/groonga-icon-full-size.png" />
+    <meta property="og:site_name" content="groonga" />
+
+    <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
+  </head>
+
+  <body role="document">
+<div class="header">
+  <h1 class="title">
+    <a id="top-link" href="../../../">
+      <span class="project">groonga</span>
+      <span class="separator">-</span>
+      <span class="description">An open-source fulltext search engine and column store.</span>
+    </a>
+  </h1>
+
+      <div class="facebook-buttons">
+      <fb:like href="http://www.facebook.com/pages/groonga/201193596592346"
+               layout="standard"
+               width="290"></fb:like>
+    </div>
+    <div class="other-language-links">
+
+    <ul>
+      <li><a href="../../../ja/docs/reference/commands/column_copy.html">日本語</a></li>
+    </ul>
+  </div>
+</div>
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="column_create.html" title="7.3.9. column_create"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="clearlock.html" title="7.3.7. clearlock"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v5.0.7 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../reference.html" >7. Reference manual</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="../command.html" accesskey="U">7.3. Command</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="column-copy">
+<h1>7.3.8. <code class="docutils literal"><span class="pre">column_copy</span></code><a class="headerlink" href="#column-copy" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="summary">
+<h2>7.3.8.1. Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 5.0.7.</span></p>
+</div>
+<p><code class="docutils literal"><span class="pre">column_copy</span></code> copies all column values to other column.</p>
+<p>You can implement the following features with this command:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Changing column configuration</li>
+<li>Changing table configuration</li>
+</ul>
+</div></blockquote>
+<p>You can change column configuration by the following steps:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>Create a new column with new configuration</li>
+<li>Copy all values from the current column to the new column</li>
+<li>Remove the current column</li>
+<li>Rename the new column to the current column</li>
+</ol>
+</div></blockquote>
+<p>You can change table configuration by the following steps:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>Create a new table with new configuration</li>
+<li>Create all same columns to the new table</li>
+<li>Copy all column values from the current table to the new table</li>
+<li>Remove the current table</li>
+<li>Rename the new table to the current table</li>
+</ol>
+</div></blockquote>
+<p>Concrete examples are showed later.</p>
+<p>You can't copy column values from a <code class="docutils literal"><span class="pre">TABLE_NO_KEY</span></code> table to another
+table. And you can't copy column values to a <code class="docutils literal"><span class="pre">TABLE_NO_KEY</span></code> table
+from another table. Because Groonga can't map records without record
+key.</p>
+<p>You can copy column values from a <code class="docutils literal"><span class="pre">TABLE_NO_KEY</span></code> table to the same
+<code class="docutils literal"><span class="pre">TABLE_NO_KEY</span></code> table.</p>
+<p>You can copy column values from a <code class="docutils literal"><span class="pre">TABLE_HASH_KEY</span></code> /
+<code class="docutils literal"><span class="pre">TABLE_PAT_KEY</span></code> / <code class="docutils literal"><span class="pre">TABLE_DAT_KEY</span></code> table to the same or another
+<code class="docutils literal"><span class="pre">TABLE_HASH_KEY</span></code> / <code class="docutils literal"><span class="pre">TABLE_PAT_KEY</span></code> / <code class="docutils literal"><span class="pre">TABLE_DAT_KEY</span></code> table.</p>
+</div>
+<div class="section" id="syntax">
+<h2>7.3.8.2. Syntax<a class="headerlink" href="#syntax" title="Permalink to this headline">¶</a></h2>
+<p>This command takes four parameters.</p>
+<p>All parameters are required:</p>
+<div class="highlight-none"><div class="highlight"><pre>column_copy from_table
+            from_name
+            to_table
+            to_name
+</pre></div>
+</div>
+</div>
+<div class="section" id="usage">
+<h2>7.3.8.3. Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>Here are use cases of this command:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Changing column configuration</li>
+<li>Changing table configuration</li>
+</ul>
+</div></blockquote>
+<div class="section" id="how-to-change-column-configuration">
+<h3>7.3.8.3.1. How to change column configuration<a class="headerlink" href="#how-to-change-column-configuration" title="Permalink to this headline">¶</a></h3>
+<p>You can change column value type. For example, you can change
+<code class="docutils literal"><span class="pre">UInt32</span></code> column value to <code class="docutils literal"><span class="pre">ShortText</span></code> column value.</p>
+<p>You can change column type. For example, you can change
+<code class="docutils literal"><span class="pre">COLUMN_SCALAR</span></code> column to <code class="docutils literal"><span class="pre">COLUMN_VECTOR</span></code> column.</p>
+<p>You can move a column to other table. For example, you can move
+<code class="docutils literal"><span class="pre">high_score</span></code> column to <code class="docutils literal"><span class="pre">Users</span></code> table from <code class="docutils literal"><span class="pre">Players</span></code> table.</p>
+<p>Here are basic steps to change column configuration:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>Create a new column with new configuration</li>
+<li>Copy all values from the current column to the new column</li>
+<li>Remove the current column</li>
+<li>Rename the new column to the current column</li>
+</ol>
+</div></blockquote>
+<p>Here is an example to change column value type to <code class="docutils literal"><span class="pre">Int32</span></code> from
+<code class="docutils literal"><span class="pre">ShortText</span></code>.</p>
+<p>Here are schema and data:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Logs TABLE_HASH_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Logs serial COLUMN_SCALAR Int32
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+load --table Logs
+[
+{&quot;_key&quot;: &quot;log1&quot;, &quot;serial&quot;: 1}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 1]
+</pre></div>
+</div>
+<p>The following commands change <code class="docutils literal"><span class="pre">Logs.serial</span></code> column value type to
+<code class="docutils literal"><span class="pre">ShortText</span></code> from <code class="docutils literal"><span class="pre">Int32</span></code>:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>column_create Logs new_serial COLUMN_SCALAR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_copy Logs serial Logs new_serial
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_remove Logs serial
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_rename Logs new_serial serial
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+select Logs
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;serial&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;log1&quot;,
+#         &quot;1&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>You can find <code class="docutils literal"><span class="pre">Logs.serial</span></code> stores <code class="docutils literal"><span class="pre">ShortText</span></code> value from the
+response of <code class="docutils literal"><span class="pre">select</span></code>.</p>
+<p>Here is an example to change column type to <code class="docutils literal"><span class="pre">COLUMN_VECTOR</span></code> from
+<code class="docutils literal"><span class="pre">COLUMN_SCALAR</span></code>.</p>
+<p>Here are schema and data:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Entries TABLE_HASH_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries tag COLUMN_SCALAR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+load --table Entries
+[
+{&quot;_key&quot;: &quot;entry1&quot;, &quot;tag&quot;: &quot;Groonga&quot;}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 1]
+</pre></div>
+</div>
+<p>The following commands change <code class="docutils literal"><span class="pre">Entries.tag</span></code> column to
+<code class="docutils literal"><span class="pre">COLUMN_VECTOR</span></code> from <code class="docutils literal"><span class="pre">COLUMN_SCALAR</span></code>:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>column_create Entries new_tag COLUMN_VECTOR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_copy Entries tag Entries new_tag
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_remove Entries tag
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_rename Entries new_tag tag
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+select Entries
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;entry1&quot;,
+#         [
+#           &quot;Groonga&quot;
+#         ]
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>You can find <code class="docutils literal"><span class="pre">Entries.tag</span></code> stores <code class="docutils literal"><span class="pre">COLUMN_VECTOR</span></code> value from the
+response of <code class="docutils literal"><span class="pre">select</span></code>.</p>
+<p>Here is an example to move <code class="docutils literal"><span class="pre">high_score</span></code> column to <code class="docutils literal"><span class="pre">Users</span></code> table
+from <code class="docutils literal"><span class="pre">Players</span></code> table.</p>
+<p>Here are schema and data:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Players TABLE_HASH_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Players high_score COLUMN_SCALAR Int32
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+load --table Players
+[
+{&quot;_key&quot;: &quot;player1&quot;, &quot;high_score&quot;: 100}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 1]
+</pre></div>
+</div>
+<p>The following commands move <code class="docutils literal"><span class="pre">high_score</span></code> column to <code class="docutils literal"><span class="pre">Users</span></code> table
+from <code class="docutils literal"><span class="pre">Players</span></code> table:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Users TABLE_HASH_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Users high_score COLUMN_SCALAR Int32
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_copy Players high_score Users high_score
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_remove Players high_score
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+select Users
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;high_score&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;player1&quot;,
+#         100
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>You can find <code class="docutils literal"><span class="pre">Users.high_score</span></code> is moved from <code class="docutils literal"><span class="pre">Players.high_score</span></code>
+from the response of <code class="docutils literal"><span class="pre">select</span></code>.</p>
+</div>
+<div class="section" id="how-to-change-table-configuration">
+<h3>7.3.8.3.2. How to change table configuration<a class="headerlink" href="#how-to-change-table-configuration" title="Permalink to this headline">¶</a></h3>
+<p>You can change table key type. For example, you can change
+key type to <code class="docutils literal"><span class="pre">ShortText</span></code> from <code class="docutils literal"><span class="pre">Int32</span></code>.</p>
+<p>You can change table type. For example, you can change
+<code class="docutils literal"><span class="pre">TABLE_HASH_KEY</span></code> table to <code class="docutils literal"><span class="pre">TABLE_PAT_KEY</span></code> table.</p>
+<p>You can also change other options such as default tokenizer and
+normalizer. For example, you can change default tokenizer to
+<code class="docutils literal"><span class="pre">TokenBigramSplitSymbolAlphaDigit</span></code> from <code class="docutils literal"><span class="pre">TokenBigrm</span></code>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">You can't change <code class="docutils literal"><span class="pre">TABLE_NO_KEY</span></code> table. Because <code class="docutils literal"><span class="pre">TABLE_NO_KEY</span></code>
+doesn't have record key. Groonga can't identify copy destination
+record without record key.</p>
+</div>
+<p>Here are basic steps to change table configuration:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>Create a new table with new configuration</li>
+<li>Create all same columns to the new table</li>
+<li>Copy all column values from the current table to the new table</li>
+<li>Remove the current table</li>
+<li>Rename the new table to the current table</li>
+</ol>
+</div></blockquote>
+<p>Here is an example to change table key type to <code class="docutils literal"><span class="pre">ShortText</span></code> from
+<code class="docutils literal"><span class="pre">Int32</span></code>.</p>
+<p>Here are schema and data:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create IDs TABLE_HASH_KEY Int32
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create IDs label COLUMN_SCALAR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create IDs used COLUMN_SCALAR Bool
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+load --table IDs
+[
+{&quot;_key&quot;: 100, &quot;label&quot;: &quot;ID 100&quot;, used: true}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 1]
+</pre></div>
+</div>
+<p>The following commands change <code class="docutils literal"><span class="pre">IDs</span></code> table key type to <code class="docutils literal"><span class="pre">ShortText</span></code>
+from <code class="docutils literal"><span class="pre">Int32</span></code>:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create NewIDs TABLE_HASH_KEY Int32
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create NewIDs label COLUMN_SCALAR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create NewIDs used COLUMN_SCALAR Bool
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_copy IDs label NewIDs label
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_copy IDs used  NewIDs used
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_remove IDs
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_rename NewIDs IDs
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+select IDs
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;Int32&quot;
+#         ],
+#         [
+#           &quot;label&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;used&quot;,
+#           &quot;Bool&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         100,
+#         &quot;ID 100&quot;,
+#         true
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>You can find <code class="docutils literal"><span class="pre">IDs</span></code> stores <code class="docutils literal"><span class="pre">ShortText</span></code> key from the response of
+<code class="docutils literal"><span class="pre">select</span></code>.</p>
+<p>Here is an example to change table type to <code class="docutils literal"><span class="pre">TABLE_PAT_KEY</span></code> from
+<code class="docutils literal"><span class="pre">TABLE_HASH_KEY</span></code>.</p>
+<p>Here are schema and data:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Names TABLE_HASH_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Names used COLUMN_SCALAR Bool
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+load --table Entries
+[
+{&quot;_key&quot;: &quot;alice&quot;, &quot;used&quot;: false}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 1]
+</pre></div>
+</div>
+<p>The following commands change <code class="docutils literal"><span class="pre">Names</span></code> table to <code class="docutils literal"><span class="pre">TABLE_PAT_KEY</span></code>
+from <code class="docutils literal"><span class="pre">TABLE_HASH_KEY</span></code>:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create NewNames TABLE_PAT_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create NewNames used COLUMN_SCALAR Bool
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_copy Names used NewNames used
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_remove Names
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_rename NewNames Names
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+select Names --filter &#39;_key @^ &quot;ali&quot;&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         0
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;used&quot;,
+#           &quot;Bool&quot;
+#         ]
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>You can find <code class="docutils literal"><span class="pre">Names</span></code> is a <code class="docutils literal"><span class="pre">TABLE_PAT_KEY</span></code> because <code class="docutils literal"><span class="pre">select</span></code> can
+use <a class="reference internal" href="../grn_expr/script_syntax.html#script-syntax-prefix-search-operator"><span>Prefix search operator</span></a>. You can't use
+<a class="reference internal" href="../grn_expr/script_syntax.html#script-syntax-prefix-search-operator"><span>Prefix search operator</span></a> with <code class="docutils literal"><span class="pre">TABLE_HASH_KEY</span></code>.</p>
+</div>
+</div>
+<div class="section" id="parameters">
+<h2>7.3.8.4. Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+<p>This section describes parameters.</p>
+<div class="section" id="required-parameters">
+<h3>7.3.8.4.1. Required parameters<a class="headerlink" href="#required-parameters" title="Permalink to this headline">¶</a></h3>
+<p>All parameters are required.</p>
+<div class="section" id="from-table">
+<span id="column-copy-from-table"></span><h4>7.3.8.4.1.1. <code class="docutils literal"><span class="pre">from_table</span></code><a class="headerlink" href="#from-table" title="Permalink to this headline">¶</a></h4>
+<p>Specifies the table name of source column.</p>
+<p>You can specify any table including <code class="docutils literal"><span class="pre">TABLE_NO_KEY</span></code> table.</p>
+<p>If you specify <code class="docutils literal"><span class="pre">TABLE_NO_KEY</span></code> table, <a class="reference internal" href="#column-copy-to-table"><span>to_table</span></a>
+must be the same table.</p>
+<p>Here is an example to use <code class="docutils literal"><span class="pre">from_table</span></code>.</p>
+<p>Here are schema and data:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create FromTable TABLE_HASH_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create FromTable from_column COLUMN_SCALAR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create FromTable to_column   COLUMN_SCALAR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+load --table FromTable
+[
+{&quot;_key&quot;: &quot;key1&quot;, &quot;from_column&quot;: &quot;value1&quot;}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 1]
+select FromTable --output_columns _key,from_column,to_column
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;from_column&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;to_column&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         &quot;key1&quot;,
+#         &quot;value1&quot;,
+#         &quot;&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>You can copy all values to <code class="docutils literal"><span class="pre">to_column</span></code> from <code class="docutils literal"><span class="pre">from_column</span></code>:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>column_copy FromTable from_column FromTable to_column
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+select FromTable --output_columns _key,from_column,to_column
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;from_column&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;to_column&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         &quot;key1&quot;,
+#         &quot;value1&quot;,
+#         &quot;value1&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
+<div class="section" id="from-name">
+<span id="column-copy-from-name"></span><h4>7.3.8.4.1.2. <code class="docutils literal"><span class="pre">from_name</span></code><a class="headerlink" href="#from-name" title="Permalink to this headline">¶</a></h4>
+<p>Specifies the column name to be copied values.</p>
+<p>See <a class="reference internal" href="#column-copy-from-table"><span>from_table</span></a> for example.</p>
+</div>
+<div class="section" id="to-table">
+<span id="column-copy-to-table"></span><h4>7.3.8.4.1.3. <code class="docutils literal"><span class="pre">to_table</span></code><a class="headerlink" href="#to-table" title="Permalink to this headline">¶</a></h4>
+<p>Specifies the table name of destination column.</p>
+<p>You can specify the same table name as <a class="reference internal" href="#column-copy-from-table"><span>from_table</span></a>
+when you want to copy column values in the same table.</p>
+<p>You can't specify <code class="docutils literal"><span class="pre">TABLE_NO_KEY</span></code> table to <code class="docutils literal"><span class="pre">to_table</span></code> because
+Groonga can't identify destination records without record key.</p>
+<p>There is one exception. If you specify the same name as <code class="docutils literal"><span class="pre">from_table</span></code>
+to <code class="docutils literal"><span class="pre">to_table</span></code>, you can use <code class="docutils literal"><span class="pre">TABLE_NO_KEY</span></code> table as
+<code class="docutils literal"><span class="pre">to_table</span></code>. Because Groonga can identify destination records when
+source table and destination table is the same table.</p>
+<p>Here is an example to use <code class="docutils literal"><span class="pre">to_table</span></code>.</p>
+<p>Here are schema and data:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Table TABLE_HASH_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Table column COLUMN_SCALAR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create ToTable TABLE_HASH_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create ToTable to_column COLUMN_SCALAR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+load --table Table
+[
+{&quot;_key&quot;: &quot;key1&quot;, &quot;column&quot;: &quot;value1&quot;}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 1]
+</pre></div>
+</div>
+<p>You can copy all values to <code class="docutils literal"><span class="pre">ToTable.to_column</span></code> from
+<code class="docutils literal"><span class="pre">Table.column</span></code>:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>column_copy Table column ToTable to_column
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+select ToTable --output_columns _key,to_column
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;to_column&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         &quot;key1&quot;,
+#         &quot;value1&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
+<div class="section" id="to-name">
+<span id="column-copy-to-name"></span><h4>7.3.8.4.1.4. <code class="docutils literal"><span class="pre">to_name</span></code><a class="headerlink" href="#to-name" title="Permalink to this headline">¶</a></h4>
+<p>Specifies the destination column name.</p>
+<p>See <a class="reference internal" href="#column-copy-to-table"><span>to_table</span></a> for example.</p>
+</div>
+</div>
+<div class="section" id="optional-parameters">
+<h3>7.3.8.4.2. Optional parameters<a class="headerlink" href="#optional-parameters" title="Permalink to this headline">¶</a></h3>
+<p>There is no optional parameters.</p>
+</div>
+</div>
+<div class="section" id="return-value">
+<h2>7.3.8.5. Return value<a class="headerlink" href="#return-value" title="Permalink to this headline">¶</a></h2>
+<p>The command returns <code class="docutils literal"><span class="pre">true</span></code> as body on success such as:</p>
+<div class="highlight-none"><div class="highlight"><pre>[HEADER, true]
+</pre></div>
+</div>
+<p>If the command fails, error details are in <code class="docutils literal"><span class="pre">HEADER</span></code>.</p>
+<p>See <a class="reference internal" href="../command/output_format.html"><em>Output format</em></a> for <code class="docutils literal"><span class="pre">HEADER</span></code>.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">7.3.8. <code class="docutils literal"><span class="pre">column_copy</span></code></a><ul>
+<li><a class="reference internal" href="#summary">7.3.8.1. Summary</a></li>
+<li><a class="reference internal" href="#syntax">7.3.8.2. Syntax</a></li>
+<li><a class="reference internal" href="#usage">7.3.8.3. Usage</a><ul>
+<li><a class="reference internal" href="#how-to-change-column-configuration">7.3.8.3.1. How to change column configuration</a></li>
+<li><a class="reference internal" href="#how-to-change-table-configuration">7.3.8.3.2. How to change table configuration</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#parameters">7.3.8.4. Parameters</a><ul>
+<li><a class="reference internal" href="#required-parameters">7.3.8.4.1. Required parameters</a><ul>
+<li><a class="reference internal" href="#from-table">7.3.8.4.1.1. <code class="docutils literal"><span class="pre">from_table</span></code></a></li>
+<li><a class="reference internal" href="#from-name">7.3.8.4.1.2. <code class="docutils literal"><span class="pre">from_name</span></code></a></li>
+<li><a class="reference internal" href="#to-table">7.3.8.4.1.3. <code class="docutils literal"><span class="pre">to_table</span></code></a></li>
+<li><a class="reference internal" href="#to-name">7.3.8.4.1.4. <code class="docutils literal"><span class="pre">to_name</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#optional-parameters">7.3.8.4.2. Optional parameters</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#return-value">7.3.8.5. Return value</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="clearlock.html"
+                        title="previous chapter">7.3.7. <code class="docutils literal"><span class="pre">clearlock</span></code></a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="column_create.html"
+                        title="next chapter">7.3.9. <code class="docutils literal"><span class="pre">column_create</span></code></a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../sources/reference/commands/column_copy.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="column_create.html" title="7.3.9. column_create"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="clearlock.html" title="7.3.7. clearlock"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v5.0.7 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../reference.html" >7. Reference manual</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="../command.html" >7.3. Command</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2009-2015, Brazil, Inc.
+    </div>
+      <script src="http://connect.facebook.net/en_US/all.js"></script>
+
+    <script>
+      FB.init({
+         appId  : null,
+         status : true, // check login status
+         cookie : true, // enable cookies to allow the server to access the session
+         xfbml  : true  // parse XFBML
+      });
+    </script>
+  </body>
+
+</html>

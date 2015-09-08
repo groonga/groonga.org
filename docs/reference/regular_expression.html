@@ -102,6 +102,23 @@ sequential search. It'll be slow for many records and many texts.</p>
 <p>In some cases, pattern match by regular expression can be evaluated
 by index. It's very fast rather than sequential search. Patterns
 that can be evaluated by index are described later.</p>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 5.0.7: </span>Groonga normalizes match target text by <a class="reference internal" href="normalizers.html#normalizer-auto"><span>NormalizerAuto</span></a>
+normalizer when Groonga doesn't use index for regular expression
+search. It means that regular expression that has upper case such
+as <code class="docutils literal"><span class="pre">Groonga</span></code> never match. Because <a class="reference internal" href="normalizers.html#normalizer-auto"><span>NormalizerAuto</span></a>
+normalizer normalizes all alphabets to lower case. <code class="docutils literal"><span class="pre">groonga</span></code>
+matches to both <code class="docutils literal"><span class="pre">Groonga</span></code> and <code class="docutils literal"><span class="pre">groonga</span></code>.</p>
+<p>Why is match target text normalizered? It's for increasing index
+search-able patterns. If Groonga doesn't normalize match target
+text, you need to write complex regular expression such as
+<code class="docutils literal"><span class="pre">[Dd][Ii][Ss][Kk]</span></code> and <code class="docutils literal"><span class="pre">(?i)disk</span></code> for case-insensitive match.
+Groonga can't use index against complex regular expression.</p>
+<p>If you write <code class="docutils literal"><span class="pre">disk</span></code> regular expression for case-insensitive
+match, Groonga can search the pattern with index. It's fast.</p>
+<p>You may feel the behavior is strange. But fast search based on this
+behavior will help you.</p>
+</div>
 <p>There are many regular expression syntaxes. Groonga uses the same
 syntax in Ruby. Because Groonga uses the same regular expression
 engine as Ruby. The regular expression engine is <a class="reference external" href="https://github.com/k-takata/Onigmo/">Onigmo</a>. Characteristic difference
@@ -111,8 +128,12 @@ means the end of line. <code class="docutils literal"><span class="pre">^</span>
 means the end of text in other most regular expression syntaxes. The regular
 expression syntax in Ruby uses <code class="docutils literal"><span class="pre">\A</span></code> for the beginning of text and
 <code class="docutils literal"><span class="pre">\z</span></code> for the end of text.</p>
-<p>Groonga uses multiline mode since 5.0.6. It means that <code class="docutils literal"><span class="pre">.</span></code> matches
-on <code class="docutils literal"><span class="pre">\n</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 5.0.6: </span>Groonga uses multiline mode since 5.0.6. It means that <code class="docutils literal"><span class="pre">.</span></code>
+matches on <code class="docutils literal"><span class="pre">\n</span></code>.</p>
+<p>But it's meaningless. Because <code class="docutils literal"><span class="pre">\n</span></code> is removed by
+<a class="reference internal" href="normalizers.html#normalizer-auto"><span>NormalizerAuto</span></a> normalizer.</p>
+</div>
 <p>You can use regular expression in <a class="reference internal" href="commands/select.html#select-query"><span>query</span></a> and
 <a class="reference internal" href="commands/select.html#select-filter"><span>filter</span></a> options of <a class="reference internal" href="commands/select.html"><em>select</em></a>
 command.</p>
@@ -142,7 +163,7 @@ load --table Logs
 <a class="reference internal" href="commands/select.html#select-query"><span>query</span></a>. You need to use
 <code class="docutils literal"><span class="pre">${COLUMN}:~${REGULAR_EXPRESSION}</span></code> syntax.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>select Logs --query &#39;message:~&quot;[Dd]isk&quot;&#39;
+<div class="highlight-none"><div class="highlight"><pre>select Logs --query &#39;message:~&quot;disk (space|full)&quot;&#39;
 # [
 #   [
 #     0,
@@ -181,7 +202,7 @@ load --table Logs
 <a class="reference internal" href="commands/select.html#select-filter"><span>filter</span></a>. You need to use
 <code class="docutils literal"><span class="pre">${COLUMN}</span> <span class="pre">&#64;~</span> <span class="pre">${REGULAR_EXPRESSION}</span></code> syntax.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>select Logs --filter &#39;message @~ &quot;[Dd]isk&quot;&#39;
+<div class="highlight-none"><div class="highlight"><pre>select Logs --filter &#39;message @~ &quot;disk (space|full)&quot;&#39;
 # [
 #   [
 #     0,
@@ -627,9 +648,9 @@ index.</p>
 <span id="regular-expression-character-class"></span><h3>7.13.4.4. Character class<a class="headerlink" href="#character-class" title="Permalink to this headline">¶</a></h3>
 <p>Character class syntax is <code class="docutils literal"><span class="pre">[...]</span></code>. Character class is useful to
 specify multiple characters to be matched.</p>
-<p>For example, <code class="docutils literal"><span class="pre">[Dd]</span></code> matches <code class="docutils literal"><span class="pre">D</span></code> or <code class="docutils literal"><span class="pre">d</span></code>.</p>
+<p>For example, <code class="docutils literal"><span class="pre">[12]</span></code> matches <code class="docutils literal"><span class="pre">1</span></code> or <code class="docutils literal"><span class="pre">2</span></code>.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>select Logs --filter &#39;message @~ &quot;[Dd]isk&quot;&#39;
+<div class="highlight-none"><div class="highlight"><pre>select Logs --filter &#39;message @~ &quot;host[12]&quot;&#39;
 # [
 #   [
 #     0,
@@ -639,7 +660,7 @@ specify multiple characters to be matched.</p>
 #   [
 #     [
 #       [
-#         2
+#         5
 #       ],
 #       [
 #         [
@@ -652,12 +673,24 @@ specify multiple characters to be matched.</p>
 #         ]
 #       ],
 #       [
+#         1,
+#         &quot;host1:[error]: No memory&quot;
+#       ],
+#       [
 #         2,
 #         &quot;host1:[warning]: Remained disk space is less than 30%&quot;
 #       ],
 #       [
 #         3,
 #         &quot;host1:[error]: Disk full&quot;
+#       ],
+#       [
+#         4,
+#         &quot;host2:[error]: No memory&quot;
+#       ],
+#       [
+#         5,
+#         &quot;host2:[info]: Shutdown&quot;
 #       ]
 #     ]
 #   ]

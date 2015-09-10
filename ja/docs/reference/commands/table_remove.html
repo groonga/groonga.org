@@ -89,39 +89,260 @@
 <h1>7.3.47. <code class="docutils literal"><span class="pre">table_remove</span></code><a class="headerlink" href="#table-remove" title="このヘッドラインへのパーマリンク">¶</a></h1>
 <div class="section" id="summary">
 <h2>7.3.47.1. 概要<a class="headerlink" href="#summary" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>table_remove - テーブルの削除</p>
-<p>groonga組込コマンドの一つであるtable_removeについて説明します。組込コマンドは、groonga実行ファイルの引数、標準入力、またはソケット経由でgroongaサーバにリクエストを送信することによって実行します。</p>
-<p>table_removeはテーブルと定義されているカラムを削除します。カラムに付随するインデックスも再帰的に削除されます。</p>
+<p><code class="docutils literal"><span class="pre">table_remove</span></code> はテーブルとそのカラムを削除します。もし、テーブルのキーあるいはそのテーブルのカラムにインデックスが張ってある場合はそれらも削除されます。</p>
 </div>
 <div class="section" id="syntax">
 <h2>7.3.47.2. 構文<a class="headerlink" href="#syntax" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>このコマンドの引数は1つで必須です:</p>
 <div class="highlight-none"><div class="highlight"><pre>table_remove name
 </pre></div>
 </div>
 </div>
 <div class="section" id="usage">
-<h2>7.3.47.3. 使い方<a class="headerlink" href="#usage" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="highlight-none"><div class="highlight"><pre>table_remove Entry
-
-[true]
+<span id="table-remove-usage"></span><h2>7.3.47.3. 使い方<a class="headerlink" href="#usage" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>削除したいテーブルの名前を指定するだけです。 <code class="docutils literal"><span class="pre">table_remove</span></code> は指定されたテーブルとそのテーブルのカラムを削除します。もし、テーブルとそのテーブルのカラムにインデックスが張ってある場合は、張ってあるすべてのインデックスも削除します。</p>
+<p>このセクションでは次のことについて説明します。</p>
+<blockquote>
+<div><ul class="simple">
+<li><p class="first">基本的な使い方</p>
+</li>
+<li><p class="first">削除できないケース</p>
+</li>
+<li><p class="first">利用リソースの削減</p>
+</li>
+</ul>
+</div></blockquote>
+<div class="section" id="basic-usage">
+<span id="table-remove-basic-usage"></span><h3>7.3.47.3.1. 基本的な使い方<a class="headerlink" href="#basic-usage" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>次のケースを考えてみましょう。</p>
+<blockquote>
+<div><ul class="simple">
+<li><p class="first"><code class="docutils literal"><span class="pre">Entries</span></code> というテーブルがあります。</p>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">Entries</span></code> テーブルにはいくつかカラムがあります。</p>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">Entries</span></code> テーブルのキーにはインデックスが張ってあります。</p>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">Entries</span></code> のあるカラムにはインデックスが張ってあります。</p>
+</li>
+</ul>
+</div></blockquote>
+<p>以下は <code class="docutils literal"><span class="pre">Entries</span></code> テーブルを作成するコマンドです。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Entries TABLE_HASH_KEY UInt32
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries title COLUMN_SCALAR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries content COLUMN_SCALAR Text
+# [[0, 1337566253.89858, 0.000355720520019531], true]
 </pre></div>
+</div>
+<p>以下は <code class="docutils literal"><span class="pre">Entries</span></code> テーブルのキーにインデックスを張るコマンドです。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create EntryKeys TABLE_HASH_KEY UInt32
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create EntryKeys key_index COLUMN_INDEX Entries _key
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>以下は <code class="docutils literal"><span class="pre">Entries</span></code> テーブルのカラムにインデックスを張るコマンドです。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Terms TABLE_PAT_KEY ShortText \
+  --default_tokenizer TokenBigram \
+  --normalizer NormalizerAuto
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Terms content_index COLUMN_INDEX Entries content
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">table_remove</span></code> を実行する前に現在のスキーマを確認しましょう。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>dump
+# table_create Entries TABLE_HASH_KEY UInt32
+# column_create Entries content COLUMN_SCALAR Text
+# column_create Entries title COLUMN_SCALAR ShortText
+#
+# table_create EntryKeys TABLE_HASH_KEY UInt32
+#
+# table_create Terms TABLE_PAT_KEY ShortText --default_tokenizer TokenBigram --normalizer NormalizerAuto
+#
+# column_create EntryKeys key_index COLUMN_INDEX Entries _key
+# column_create Terms content_index COLUMN_INDEX Entries content
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">Entries</span></code> テーブルを削除すると、次のテーブルとカラムが削除されます。</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">Entries</span></code></li>
+<li><code class="docutils literal"><span class="pre">Entries.title</span></code></li>
+<li><code class="docutils literal"><span class="pre">Entries.context</span></code></li>
+<li><code class="docutils literal"><span class="pre">EntryKeys.key_index</span></code></li>
+<li><code class="docutils literal"><span class="pre">Terms.content_index</span></code></li>
+</ul>
+</div></blockquote>
+<p>次のテーブル（語彙表）は削除されません。</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">EntryKeys</span></code></li>
+<li><code class="docutils literal"><span class="pre">Terms</span></code></li>
+</ul>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">table_remove</span></code> を実行しましょう。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_remove Entries
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>以下が <code class="docutils literal"><span class="pre">table_remove</span></code> 実行後のスキーマです。 <code class="docutils literal"><span class="pre">EntryKeys</span></code> と <code class="docutils literal"><span class="pre">Terms</span></code> だけが残っています。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>dump
+# table_create EntryKeys TABLE_HASH_KEY UInt32
+#
+# table_create Terms TABLE_PAT_KEY ShortText --default_tokenizer TokenBigram --normalizer NormalizerAuto
+</pre></div>
+</div>
+</div>
+<div class="section" id="unremovable-cases">
+<span id="table-remove-unremovable-cases"></span><h3>7.3.47.3.2. 削除できないケース<a class="headerlink" href="#unremovable-cases" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>以下は削除できないケースです。</p>
+<blockquote>
+<div><ul class="simple">
+<li><p class="first">1つ以上のテーブルがこの削除対象のテーブルをキーの型として使っている。</p>
+</li>
+<li><p class="first">1つ以上のカラムがこの削除対象のテーブルを値の型として使っている。</p>
+</li>
+</ul>
+</div></blockquote>
+<p>どちらのケースも参照先がなくなることを防ぎます。もし、削除対象のテーブルが型として参照されれているままそのテーブルが削除されてしまうと、そのテーブルを参照しているテーブルとカラムは壊れてしまいます。</p>
+<p>もし、削除対象のテーブルがどれかの条件を満たしたら <code class="docutils literal"><span class="pre">table_remove</span></code> は失敗します。削除対象のテーブルも削除対象のテーブルのカラムも削除されません。</p>
+<p>以下は削除対象のテーブルがキーの型に使われるケースの例です。</p>
+<p>次のコマンドは削除対象のテーブルとそのテーブルをキーの型として使うテーブルを作成します。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create ReferencedByTable TABLE_HASH_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create ReferenceTable TABLE_HASH_KEY ReferencedByTable
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">ReferencedByTable</span></code> に対する <code class="docutils literal"><span class="pre">table_remove</span></code> は失敗します。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_remove ReferencedByTable
+# [
+#   [
+#     -2,
+#     1337566253.89858,
+#     0.000355720520019531,
+#     &quot;[table][remove] a table that references the table exists: &lt;ReferenceTable._key&gt; -&gt; &lt;ReferencedByTable&gt;&quot;,
+#     [
+#       [
+#         &quot;is_removable_table&quot;,
+#         &quot;db.c&quot;,
+#         8480
+#       ]
+#     ]
+#   ],
+#   false
+# ]
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">ReferencedByTable</span></code> を削除する前に <code class="docutils literal"><span class="pre">ReferenceTable</span></code> を削除する必要があります。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_remove ReferenceTable
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_remove ReferencedByTable
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>以下は削除対象のテーブルが値の型に使われるケースの例です。</p>
+<p>次のコマンドは削除対象のテーブルとそのテーブルを値の型として使うカラムを作成します。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create ReferencedByColumn TABLE_HASH_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create Table TABLE_NO_KEY
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Table reference_column COLUMN_SCALAR ReferencedByColumn
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">ReferencedByColumn</span></code> に対する <code class="docutils literal"><span class="pre">table_remove</span></code> は失敗します。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_remove ReferencedByColumn
+# [
+#   [
+#     -2,
+#     1337566253.89858,
+#     0.000355720520019531,
+#     &quot;[table][remove] a column that references the table exists: &lt;Table.reference_column&gt; -&gt; &lt;ReferencedByColumn&gt;&quot;,
+#     [
+#       [
+#         &quot;is_removable_table&quot;,
+#         &quot;db.c&quot;,
+#         8500
+#       ]
+#     ]
+#   ],
+#   false
+# ]
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">ReferencedByColumn</span></code> を削除する前に <code class="docutils literal"><span class="pre">Table.reference_column</span></code> を削除する必要があります。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>column_remove Table reference_column
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_remove ReferencedByColumn
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+</div>
+<div class="section" id="decreases-used-resources">
+<h3>7.3.47.3.3. 利用リソースの削減<a class="headerlink" href="#decreases-used-resources" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">table_remove</span></code> は <a class="reference internal" href="#table-remove-unremovable-cases"><span>削除できないケース</span></a> のチェックをするためにデータベース内のすべてのテーブルとカラムを開きます。</p>
+<p>もし、大量のテーブルとカラムがある場合、 <code class="docutils literal"><span class="pre">table_remove</span></code> はたくさんのリソースを使うかもしれません。このケース用の回避策があります。</p>
+<p><code class="docutils literal"><span class="pre">table_remove</span></code> は最大スレッド数が <code class="docutils literal"><span class="pre">1</span></code> のときはチェック用に一時的に開いたテーブルとカラムを閉じます。</p>
+<p><a class="reference internal" href="thread_limit.html"><em>thread_limit</em></a> を使うと現在の最大スレッド数を確認・変更できます。</p>
+<p>この機能は次のケースでは使われます。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Entries TABLE_NO_KEY
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+thread_limit 2
+# [[0, 1337566253.89858, 0.000355720520019531], 1]
+table_remove Entries
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>この機能は次のケースでは使われません。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Entries TABLE_NO_KEY
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+thread_limit 2
+# [[0, 1337566253.89858, 0.000355720520019531], 1]
+table_remove Entries
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
 </div>
 </div>
 <div class="section" id="parameters">
 <h2>7.3.47.4. 引数<a class="headerlink" href="#parameters" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<dl class="docutils">
-<dt><code class="docutils literal"><span class="pre">name</span></code></dt>
-<dd>削除対象のカラムが定義されているテーブルの名前を指定します。</dd>
-</dl>
+<p>このセクションではすべての引数について説明します。</p>
+<div class="section" id="required-parameters">
+<h3>7.3.47.4.1. 必須引数<a class="headerlink" href="#required-parameters" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>1つだけ必須の引数があります。</p>
+<div class="section" id="name">
+<span id="table-remove-name"></span><h4>7.3.47.4.1.1. <code class="docutils literal"><span class="pre">name</span></code><a class="headerlink" href="#name" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>削除するテーブルの名前を指定します。</p>
+<p>このパラメーターの使い方は <a class="reference internal" href="#table-remove-usage"><span>使い方</span></a> を参照してください。</p>
+</div>
+</div>
 </div>
 <div class="section" id="return-value">
 <h2>7.3.47.5. 戻り値<a class="headerlink" href="#return-value" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="highlight-none"><div class="highlight"><pre>[成功かどうかのフラグ]
+<p>このコマンドが成功したときは以下のようにボディは <code class="docutils literal"><span class="pre">true</span></code> になります:</p>
+<div class="highlight-none"><div class="highlight"><pre>[HEADER, true]
 </pre></div>
 </div>
-<p><code class="docutils literal"><span class="pre">成功かどうかのフラグ</span></code></p>
-<blockquote>
-<div>エラーが生じなかった場合にはtrue、エラーが生じた場合にはfalseを返す。</div></blockquote>
+<p>このコマンドが失敗すると、 <code class="docutils literal"><span class="pre">HEADER</span></code> にエラーの詳細が含まれます。</p>
+<p><code class="docutils literal"><span class="pre">HEADER</span></code> については <a class="reference internal" href="../command/output_format.html"><em>出力形式</em></a> を参照してください。</p>
 </div>
 </div>
 
@@ -136,8 +357,19 @@
 <li><a class="reference internal" href="#">7.3.47. <code class="docutils literal"><span class="pre">table_remove</span></code></a><ul>
 <li><a class="reference internal" href="#summary">7.3.47.1. 概要</a></li>
 <li><a class="reference internal" href="#syntax">7.3.47.2. 構文</a></li>
-<li><a class="reference internal" href="#usage">7.3.47.3. 使い方</a></li>
-<li><a class="reference internal" href="#parameters">7.3.47.4. 引数</a></li>
+<li><a class="reference internal" href="#usage">7.3.47.3. 使い方</a><ul>
+<li><a class="reference internal" href="#basic-usage">7.3.47.3.1. 基本的な使い方</a></li>
+<li><a class="reference internal" href="#unremovable-cases">7.3.47.3.2. 削除できないケース</a></li>
+<li><a class="reference internal" href="#decreases-used-resources">7.3.47.3.3. 利用リソースの削減</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#parameters">7.3.47.4. 引数</a><ul>
+<li><a class="reference internal" href="#required-parameters">7.3.47.4.1. 必須引数</a><ul>
+<li><a class="reference internal" href="#name">7.3.47.4.1.1. <code class="docutils literal"><span class="pre">name</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li><a class="reference internal" href="#return-value">7.3.47.5. 戻り値</a></li>
 </ul>
 </li>

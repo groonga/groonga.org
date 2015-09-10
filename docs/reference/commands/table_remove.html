@@ -88,39 +88,269 @@
 <h1>7.3.47. <code class="docutils literal"><span class="pre">table_remove</span></code><a class="headerlink" href="#table-remove" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="summary">
 <h2>7.3.47.1. Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
-<p>table_remove - テーブルの削除</p>
-<p>groonga組込コマンドの一つであるtable_removeについて説明します。組込コマンドは、groonga実行ファイルの引数、標準入力、またはソケット経由でgroongaサーバにリクエストを送信することによって実行します。</p>
-<p>table_removeはテーブルと定義されているカラムを削除します。カラムに付随するインデックスも再帰的に削除されます。</p>
+<p><code class="docutils literal"><span class="pre">table_remove</span></code> removes a table and its columns. If there are one or
+more indexes against key of the table and its columns, they are also
+removed.</p>
 </div>
 <div class="section" id="syntax">
 <h2>7.3.47.2. Syntax<a class="headerlink" href="#syntax" title="Permalink to this headline">¶</a></h2>
+<p>This command takes only one required parameter:</p>
 <div class="highlight-none"><div class="highlight"><pre>table_remove name
 </pre></div>
 </div>
 </div>
 <div class="section" id="usage">
-<h2>7.3.47.3. Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-none"><div class="highlight"><pre>table_remove Entry
-
-[true]
+<span id="table-remove-usage"></span><h2>7.3.47.3. Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>You just specify table name that you want to remove. <code class="docutils literal"><span class="pre">table_remove</span></code>
+removes the table and its columns. If the table and its columns are
+indexed, all index columns for the table and its columns are also
+removed.</p>
+<p>This section describes about the followings:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Basic usage</li>
+<li>Unremovable cases</li>
+<li>Decreases used resources</li>
+</ul>
+</div></blockquote>
+<div class="section" id="basic-usage">
+<span id="table-remove-basic-usage"></span><h3>7.3.47.3.1. Basic usage<a class="headerlink" href="#basic-usage" title="Permalink to this headline">¶</a></h3>
+<p>Let's think about the following case:</p>
+<blockquote>
+<div><ul class="simple">
+<li>There is one table <code class="docutils literal"><span class="pre">Entries</span></code>.</li>
+<li><code class="docutils literal"><span class="pre">Entries</span></code> table has some columns.</li>
+<li><code class="docutils literal"><span class="pre">Entries</span></code> table's key is indexed.</li>
+<li>A column of <code class="docutils literal"><span class="pre">Entries</span></code> is indexed.</li>
+</ul>
+</div></blockquote>
+<p>Here are commands that create <code class="docutils literal"><span class="pre">Entries</span></code> table:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Entries TABLE_HASH_KEY UInt32
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries title COLUMN_SCALAR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries content COLUMN_SCALAR Text
+# [[0, 1337566253.89858, 0.000355720520019531], true]
 </pre></div>
+</div>
+<p>Here are commands that create an index for <code class="docutils literal"><span class="pre">Entries</span></code> table's key:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create EntryKeys TABLE_HASH_KEY UInt32
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create EntryKeys key_index COLUMN_INDEX Entries _key
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>Here are commands that create an index for <code class="docutils literal"><span class="pre">Entries</span></code> table's column:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Terms TABLE_PAT_KEY ShortText \
+  --default_tokenizer TokenBigram \
+  --normalizer NormalizerAuto
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Terms content_index COLUMN_INDEX Entries content
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>Let's confirm the current schema before running <code class="docutils literal"><span class="pre">table_remove</span></code>:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>dump
+# table_create Entries TABLE_HASH_KEY UInt32
+# column_create Entries content COLUMN_SCALAR Text
+# column_create Entries title COLUMN_SCALAR ShortText
+#
+# table_create EntryKeys TABLE_HASH_KEY UInt32
+#
+# table_create Terms TABLE_PAT_KEY ShortText --default_tokenizer TokenBigram --normalizer NormalizerAuto
+#
+# column_create EntryKeys key_index COLUMN_INDEX Entries _key
+# column_create Terms content_index COLUMN_INDEX Entries content
+</pre></div>
+</div>
+<p>If you remove <code class="docutils literal"><span class="pre">Entries</span></code> table, the following tables and columns are
+removed:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">Entries</span></code></li>
+<li><code class="docutils literal"><span class="pre">Entries.title</span></code></li>
+<li><code class="docutils literal"><span class="pre">Entries.context</span></code></li>
+<li><code class="docutils literal"><span class="pre">EntryKeys.key_index</span></code></li>
+<li><code class="docutils literal"><span class="pre">Terms.content_index</span></code></li>
+</ul>
+</div></blockquote>
+<p>The following tables (lexicons) aren't removed:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">EntryKeys</span></code></li>
+<li><code class="docutils literal"><span class="pre">Terms</span></code></li>
+</ul>
+</div></blockquote>
+<p>Let's run <code class="docutils literal"><span class="pre">table_remove</span></code>:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_remove Entries
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>Here is schema after <code class="docutils literal"><span class="pre">table_remove</span></code>. Only <code class="docutils literal"><span class="pre">EntryKeys</span></code> and
+<code class="docutils literal"><span class="pre">Terms</span></code> exist:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>dump
+# table_create EntryKeys TABLE_HASH_KEY UInt32
+#
+# table_create Terms TABLE_PAT_KEY ShortText --default_tokenizer TokenBigram --normalizer NormalizerAuto
+</pre></div>
+</div>
+</div>
+<div class="section" id="unremovable-cases">
+<span id="table-remove-unremovable-cases"></span><h3>7.3.47.3.2. Unremovable cases<a class="headerlink" href="#unremovable-cases" title="Permalink to this headline">¶</a></h3>
+<p>There are some unremovable cases:</p>
+<blockquote>
+<div><ul class="simple">
+<li>One or more tables use the table as key type.</li>
+<li>One or more columns use the table as value type.</li>
+</ul>
+</div></blockquote>
+<p>Both cases blocks dangling references. If the table is referenced as
+type and the table is removed, tables and columns that refer the table
+are broken.</p>
+<p>If the target table satisfies one of them, <code class="docutils literal"><span class="pre">table_remove</span></code> is
+failed. The target table and its columns aren't removed.</p>
+<p>Here is an example for the table is used as key type case.</p>
+<p>The following commands create a table to be removed and a table that
+uses the table to be removed as key type:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create ReferencedByTable TABLE_HASH_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create ReferenceTable TABLE_HASH_KEY ReferencedByTable
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">table_remove</span></code> against <code class="docutils literal"><span class="pre">ReferencedByTable</span></code> is failed:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_remove ReferencedByTable
+# [
+#   [
+#     -2,
+#     1337566253.89858,
+#     0.000355720520019531,
+#     &quot;[table][remove] a table that references the table exists: &lt;ReferenceTable._key&gt; -&gt; &lt;ReferencedByTable&gt;&quot;,
+#     [
+#       [
+#         &quot;is_removable_table&quot;,
+#         &quot;db.c&quot;,
+#         8480
+#       ]
+#     ]
+#   ],
+#   false
+# ]
+</pre></div>
+</div>
+<p>You need to remove <code class="docutils literal"><span class="pre">ReferenceTable</span></code> before you remove
+<code class="docutils literal"><span class="pre">ReferencedByTable</span></code>:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_remove ReferenceTable
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_remove ReferencedByTable
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>Here is an example for the table is used as value type case.</p>
+<p>The following commands create a table to be removed and a column that
+uses the table to be removed as value type:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create ReferencedByColumn TABLE_HASH_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create Table TABLE_NO_KEY
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Table reference_column COLUMN_SCALAR ReferencedByColumn
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">table_remove</span></code> against <code class="docutils literal"><span class="pre">ReferencedByColumn</span></code> is failed:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_remove ReferencedByColumn
+# [
+#   [
+#     -2,
+#     1337566253.89858,
+#     0.000355720520019531,
+#     &quot;[table][remove] a column that references the table exists: &lt;Table.reference_column&gt; -&gt; &lt;ReferencedByColumn&gt;&quot;,
+#     [
+#       [
+#         &quot;is_removable_table&quot;,
+#         &quot;db.c&quot;,
+#         8500
+#       ]
+#     ]
+#   ],
+#   false
+# ]
+</pre></div>
+</div>
+<p>You need to remove <code class="docutils literal"><span class="pre">Table.reference_column</span></code> before you remove
+<code class="docutils literal"><span class="pre">ReferencedByColumn</span></code>:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>column_remove Table reference_column
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_remove ReferencedByColumn
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+</div>
+<div class="section" id="decreases-used-resources">
+<h3>7.3.47.3.3. Decreases used resources<a class="headerlink" href="#decreases-used-resources" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">table_remove</span></code> opens all tables and columns in database to check
+<a class="reference internal" href="#table-remove-unremovable-cases"><span>Unremovable cases</span></a>.</p>
+<p>If you have many tables and columns, <code class="docutils literal"><span class="pre">table_remove</span></code> may use many
+resources. There is a workaround to avoid the case.</p>
+<p><code class="docutils literal"><span class="pre">table_remove</span></code> closes temporary opened tables and columns for
+checking when the max number of threads is <code class="docutils literal"><span class="pre">1</span></code>.</p>
+<p>You can confirm and change the current max number of threads by
+<a class="reference internal" href="thread_limit.html"><em>thread_limit</em></a>.</p>
+<p>The feature is used in the following case:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Entries TABLE_NO_KEY
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+thread_limit 2
+# [[0, 1337566253.89858, 0.000355720520019531], 1]
+table_remove Entries
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>The feature isn't used in the following case:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Entries TABLE_NO_KEY
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+thread_limit 2
+# [[0, 1337566253.89858, 0.000355720520019531], 1]
+table_remove Entries
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
 </div>
 </div>
 <div class="section" id="parameters">
 <h2>7.3.47.4. Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
-<dl class="docutils">
-<dt><code class="docutils literal"><span class="pre">name</span></code></dt>
-<dd>削除対象のカラムが定義されているテーブルの名前を指定します。</dd>
-</dl>
+<p>This section describes all parameters.</p>
+<div class="section" id="required-parameters">
+<h3>7.3.47.4.1. Required parameters<a class="headerlink" href="#required-parameters" title="Permalink to this headline">¶</a></h3>
+<p>There is only one required parameters.</p>
+<div class="section" id="name">
+<span id="table-remove-name"></span><h4>7.3.47.4.1.1. <code class="docutils literal"><span class="pre">name</span></code><a class="headerlink" href="#name" title="Permalink to this headline">¶</a></h4>
+<p>Specifies the table name to be removed.</p>
+<p>See <a class="reference internal" href="#table-remove-usage"><span>Usage</span></a> how to use this parameter.</p>
+</div>
+</div>
 </div>
 <div class="section" id="return-value">
 <h2>7.3.47.5. Return value<a class="headerlink" href="#return-value" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-none"><div class="highlight"><pre>[成功かどうかのフラグ]
+<p>The command returns <code class="docutils literal"><span class="pre">true</span></code> as body on success such as:</p>
+<div class="highlight-none"><div class="highlight"><pre>[HEADER, true]
 </pre></div>
 </div>
-<p><code class="docutils literal"><span class="pre">成功かどうかのフラグ</span></code></p>
-<blockquote>
-<div>エラーが生じなかった場合にはtrue、エラーが生じた場合にはfalseを返す。</div></blockquote>
+<p>If the command fails, error details are in <code class="docutils literal"><span class="pre">HEADER</span></code>.</p>
+<p>See <a class="reference internal" href="../command/output_format.html"><em>Output format</em></a> for <code class="docutils literal"><span class="pre">HEADER</span></code>.</p>
 </div>
 </div>
 
@@ -135,8 +365,19 @@
 <li><a class="reference internal" href="#">7.3.47. <code class="docutils literal"><span class="pre">table_remove</span></code></a><ul>
 <li><a class="reference internal" href="#summary">7.3.47.1. Summary</a></li>
 <li><a class="reference internal" href="#syntax">7.3.47.2. Syntax</a></li>
-<li><a class="reference internal" href="#usage">7.3.47.3. Usage</a></li>
-<li><a class="reference internal" href="#parameters">7.3.47.4. Parameters</a></li>
+<li><a class="reference internal" href="#usage">7.3.47.3. Usage</a><ul>
+<li><a class="reference internal" href="#basic-usage">7.3.47.3.1. Basic usage</a></li>
+<li><a class="reference internal" href="#unremovable-cases">7.3.47.3.2. Unremovable cases</a></li>
+<li><a class="reference internal" href="#decreases-used-resources">7.3.47.3.3. Decreases used resources</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#parameters">7.3.47.4. Parameters</a><ul>
+<li><a class="reference internal" href="#required-parameters">7.3.47.4.1. Required parameters</a><ul>
+<li><a class="reference internal" href="#name">7.3.47.4.1.1. <code class="docutils literal"><span class="pre">name</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li><a class="reference internal" href="#return-value">7.3.47.5. Return value</a></li>
 </ul>
 </li>

@@ -85,21 +85,24 @@
           <div class="body" role="main">
             
   <div class="section" id="status">
-<span id="command-status"></span><h1>7.3.43. <code class="docutils literal"><span class="pre">status</span></code><a class="headerlink" href="#status" title="Permalink to this headline">¶</a></h1>
+<h1>7.3.43. <code class="docutils literal"><span class="pre">status</span></code><a class="headerlink" href="#status" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="summary">
 <h2>7.3.43.1. Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
-<p>status - groongaプロセスの状態表示</p>
-<p>Groonga組込コマンドの一つであるstatusについて説明します。組込コマンドは、groonga実行ファイルの引数、標準入力、またはソケット経由でgroongaサーバにリクエストを送信することによって実行します。</p>
-<p>statusコマンドは、groongaプロセスの状態を表示します。主にgroongaサーバプロセスに対して使用することを想定しています。</p>
+<p><code class="docutils literal"><span class="pre">status</span></code> returns the current status of the context that processes
+the request.</p>
+<p>Context is an unit that processes requests. Normally, context is
+created for each thread.</p>
 </div>
 <div class="section" id="syntax">
 <h2>7.3.43.2. Syntax<a class="headerlink" href="#syntax" title="Permalink to this headline">¶</a></h2>
+<p>This command takes no parameters:</p>
 <div class="highlight-none"><div class="highlight"><pre>status
 </pre></div>
 </div>
 </div>
 <div class="section" id="usage">
-<h2>7.3.43.3. Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<span id="status-usage"></span><h2>7.3.43.3. Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>Here is a simple example:</p>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre>status
 # [
@@ -109,38 +112,152 @@
 #     0.000355720520019531
 #   ],
 #   {
-#     &quot;uptime&quot;: 1,
+#     &quot;uptime&quot;: 0,
 #     &quot;max_command_version&quot;: 2,
-#     &quot;n_queries&quot;: 0,
+#     &quot;start_time&quot;: 1441980651,
 #     &quot;cache_hit_rate&quot;: 0.0,
-#     &quot;version&quot;: &quot;5.0.6-128-g8029ddb&quot;,
+#     &quot;version&quot;: &quot;5.0.7-126-gb6fd7f7&quot;,
 #     &quot;alloc_count&quot;: 206,
 #     &quot;command_version&quot;: 1,
-#     &quot;starttime&quot;: 1439994621,
-#     &quot;default_command_version&quot;: 1
+#     &quot;starttime&quot;: 1441980651,
+#     &quot;default_command_version&quot;: 1,
+#     &quot;n_queries&quot;: 0
 #   }
 # ]
 </pre></div>
 </div>
+<p>It returns the current status of the context that processes the
+request. See <a class="reference internal" href="#status-return-value"><span>Return value</span></a> for details.</p>
 </div>
 <div class="section" id="parameters">
 <h2>7.3.43.4. Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
-<p>ありません。</p>
+<p>This section describes all parameters.</p>
+<div class="section" id="required-parameters">
+<h3>7.3.43.4.1. Required parameters<a class="headerlink" href="#required-parameters" title="Permalink to this headline">¶</a></h3>
+<p>There is no required parameters.</p>
+</div>
+<div class="section" id="optional-parameters">
+<h3>7.3.43.4.2. Optional parameters<a class="headerlink" href="#optional-parameters" title="Permalink to this headline">¶</a></h3>
+<p>There is no optional parameters.</p>
+</div>
 </div>
 <div class="section" id="return-value">
-<h2>7.3.43.5. Return value<a class="headerlink" href="#return-value" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-none"><div class="highlight"><pre>下記の項目がハッシュ形式で出力されます。
+<span id="status-return-value"></span><h2>7.3.43.5. Return value<a class="headerlink" href="#return-value" title="Permalink to this headline">¶</a></h2>
+<p>The command returns the current status as an object:</p>
+<div class="highlight-none"><div class="highlight"><pre>[
+  HEADER,
+  {
+    &quot;alloc_count&quot;: ALLOC_COUNT,
+    &quot;cache_hit_rate&quot;: CACHE_HIT_RATE,
+    &quot;command_version&quot;: COMMAND_VERSION,
+    &quot;default_command_version&quot;: DEFAULT_COMMAND_VERSION,
+    &quot;max_command_version&quot;: MAX_COMMAND_VERSION,
+    &quot;n_queries&quot;: N_QUERIES,
+    &quot;start_time&quot;: START_TIME,
+    &quot;starttime&quot;: STARTTIME,
+    &quot;uptime&quot;: UPTIME,
+    &quot;version&quot;: VERSION
+  }
+]
 </pre></div>
 </div>
-<p><code class="docutils literal"><span class="pre">alloc_count</span></code></p>
-<blockquote>
-<div>groongaプロセスの内部でアロケートされ、まだ解放されてないメモリブロックの数を示します。Groongaをbuildする際に、configureオプションで --enable-exact-alloc-countが指定されていたならば、正確な値を返します。それ以外の場合は不正確な値を返す場合があります。</div></blockquote>
-<p><code class="docutils literal"><span class="pre">starttime</span></code></p>
-<blockquote>
-<div>groongaプロセスが起動した時刻のtvsec値を返します。</div></blockquote>
-<p><code class="docutils literal"><span class="pre">uptime</span></code></p>
-<blockquote>
-<div>groongaプロセスが起動してから経過した秒数を返します。</div></blockquote>
+<p>See <a class="reference internal" href="../command/output_format.html"><em>Output format</em></a> for <code class="docutils literal"><span class="pre">HEADER</span></code>.</p>
+<p>Here are descriptions about values. See <a class="reference internal" href="#status-usage"><span>Usage</span></a> for real
+values:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key</th>
+<th class="head">Description</th>
+<th class="head">Example</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">alloc_count</span></code></td>
+<td>The number of allocated memory blocks that aren't freed.  If
+this value is continuously increased, there may be a memory
+leak.</td>
+<td><code class="docutils literal"><span class="pre">1400</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">cache_hit_rate</span></code></td>
+<td><p class="first">Percentage of cache used responses in the Groonga process. If
+there are 10 requests and 7 responses are created from cache,
+<code class="docutils literal"><span class="pre">cache_hit_rate</span></code> is <code class="docutils literal"><span class="pre">70.0</span></code>. The percentage is computed from
+only requests that use commands that support cache.</p>
+<p>Here are commands that support cache:</p>
+<blockquote class="last">
+<div><ul class="simple">
+<li><a class="reference internal" href="select.html"><em>select</em></a></li>
+<li><a class="reference internal" href="logical_select.html"><em>logical_select</em></a></li>
+<li><a class="reference internal" href="logical_range_filter.html"><em>logical_range_filter</em></a></li>
+<li><a class="reference internal" href="logical_count.html"><em>logical_count</em></a></li>
+</ul>
+</div></blockquote>
+</td>
+<td><code class="docutils literal"><span class="pre">29.4</span></code></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">command_version</span></code></td>
+<td>The <a class="reference internal" href="../command/command_version.html"><em>コマンドバージョン</em></a> that is used by
+the context.</td>
+<td><code class="docutils literal"><span class="pre">1</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">default_command_version</span></code></td>
+<td>The default <a class="reference internal" href="../command/command_version.html"><em>コマンドバージョン</em></a> of the
+Groonga process.</td>
+<td><code class="docutils literal"><span class="pre">1</span></code></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">max_command_version</span></code></td>
+<td>The max <a class="reference internal" href="../command/command_version.html"><em>コマンドバージョン</em></a> of the
+Groonga process.</td>
+<td><code class="docutils literal"><span class="pre">2</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">n_queries</span></code></td>
+<td><p class="first">The number of requests processed by the Groonga process. It
+counts only requests that use commands that support cache.</p>
+<p>Here are commands that support cache:</p>
+<blockquote class="last">
+<div><ul class="simple">
+<li><a class="reference internal" href="select.html"><em>select</em></a></li>
+<li><a class="reference internal" href="logical_select.html"><em>logical_select</em></a></li>
+<li><a class="reference internal" href="logical_range_filter.html"><em>logical_range_filter</em></a></li>
+<li><a class="reference internal" href="logical_count.html"><em>logical_count</em></a></li>
+</ul>
+</div></blockquote>
+</td>
+<td><code class="docutils literal"><span class="pre">29</span></code></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">start_time</span></code></td>
+<td><div class="first versionadded">
+<p><span class="versionmodified">New in version 5.0.8.</span></p>
+</div>
+<p class="last">The time that the Groonga process started in UNIX time.</p>
+</td>
+<td><code class="docutils literal"><span class="pre">1441761403</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">starttime</span></code></td>
+<td><div class="first last deprecated">
+<p><span class="versionmodified">Deprecated since version 5.0.8: </span>Use <code class="docutils literal"><span class="pre">start_time</span></code> instead.</p>
+</div>
+</td>
+<td><code class="docutils literal"><span class="pre">1441761403</span></code></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">uptime</span></code></td>
+<td><p class="first">The elapsed time since the Groonga process started in second.</p>
+<p class="last">For example, <code class="docutils literal"><span class="pre">216639</span></code> means that <code class="docutils literal"><span class="pre">2.5</span></code> (= <code class="docutils literal"><span class="pre">216639</span> <span class="pre">/</span> <span class="pre">60</span> <span class="pre">/</span>
+<span class="pre">60</span> <span class="pre">/</span> <span class="pre">24</span> <span class="pre">=</span> <span class="pre">2.507</span></code>) days.</p>
+</td>
+<td><code class="docutils literal"><span class="pre">216639</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">version</span></code></td>
+<td>The version of the Groonga process.</td>
+<td><code class="docutils literal"><span class="pre">5.0.7</span></code></td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 
@@ -156,7 +273,11 @@
 <li><a class="reference internal" href="#summary">7.3.43.1. Summary</a></li>
 <li><a class="reference internal" href="#syntax">7.3.43.2. Syntax</a></li>
 <li><a class="reference internal" href="#usage">7.3.43.3. Usage</a></li>
-<li><a class="reference internal" href="#parameters">7.3.43.4. Parameters</a></li>
+<li><a class="reference internal" href="#parameters">7.3.43.4. Parameters</a><ul>
+<li><a class="reference internal" href="#required-parameters">7.3.43.4.1. Required parameters</a></li>
+<li><a class="reference internal" href="#optional-parameters">7.3.43.4.2. Optional parameters</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#return-value">7.3.43.5. Return value</a></li>
 </ul>
 </li>

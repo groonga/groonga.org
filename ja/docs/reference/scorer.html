@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>7.11. Scorer &mdash; Groonga v5.0.7ドキュメント</title>
+    <title>7.11. スコアラー &mdash; Groonga v5.0.7ドキュメント</title>
     
     <link rel="stylesheet" href="../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
@@ -85,52 +85,30 @@
           <div class="body" role="main">
             
   <div class="section" id="scorer">
-<h1>7.11. Scorer<a class="headerlink" href="#scorer" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<h1>7.11. スコアラー<a class="headerlink" href="#scorer" title="このヘッドラインへのパーマリンク">¶</a></h1>
 <div class="section" id="summary">
 <h2>7.11.1. 概要<a class="headerlink" href="#summary" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>Groonga has scorer module that customizes score function. Score
-function computes score of matched record. The default scorer function
-uses the number of appeared terms. It is also known as TF (term
-frequency).</p>
-<p>TF is a fast score function but it's not suitable for the following
-cases:</p>
+<p>Groongaにはスコアー関数をカスタマイズするスコアーモジュールがあります。スコアー関数はマッチしたレコードのスコアーを計算します。デフォルトのスコアー関数は出現単語数をスコアーにします。これはTF（term frequency。単語の出現数）と呼ばれている計算方法です。</p>
+<p>TFは高速なスコアー関数ですが、次のケースには適していません。</p>
 <blockquote>
 <div><ul class="simple">
-<li>Search query contains one or more frequently-appearing words such
-as &quot;the&quot; and &quot;a&quot;.</li>
-<li>Document contains many same keywords such as &quot;They are keyword,
-keyword, keyword ... and keyword&quot;. Search engine spammer may use
-the technique.</li>
+<li><p class="first">検索クエリーが「the」や「a」のように非常によく出現する単語を含んでいる。</p>
+</li>
+<li><p class="first">文書中に「They are keyword, keyword, keyword ... and keyword」というように同じキーワードが大量に含まれている。検索エンジンのスパマーはこのテクニックを使うかもしれません。</p>
+</li>
 </ul>
 </div></blockquote>
-<p>Score function can solve these cases. For example, <a class="reference external" href="http://en.wikipedia.org/wiki/Tf%E2%80%93idf">TF-IDF</a> (term
-frequency-inverse document frequency) can solve the first case.
-<a class="reference external" href="http://en.wikipedia.org/wiki/Okapi_BM25">Okapi BM25</a> can solve the
-second case. But their are slower than TF.</p>
-<p>Groonga provides TF-IDF based scorer as
-<a class="reference internal" href="scorers/scorer_tf_idf.html"><em>scorer_tf_idf</em></a> but doesn't provide Okapi BM25
-based scorer yet.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">orphan:</th><td class="field-body"></td>
-</tr>
-</tbody>
-</table>
+<p>スコアー関数でこれらのケースを解決できます。例えば、 <a class="reference external" href="https://ja.wikipedia.org/wiki/Tf-idf">TF-IDF</a> （term frequency-inverse document frequency。その文書中での単語の出現数を、文書全体での単語の出現数で割ったもの）は最初のケースを解決できます。 <a class="reference external" href="https://en.wikipedia.org/wiki/Okapi_BM25">Okapi BM25</a> は2番目のケースを解決できます。しかし、これらはTFより遅いです。</p>
+<p>Groongaは <a class="reference internal" href="scorers/scorer_tf_idf.html"><em>scorer_tf_idf</em></a> としてTF-IDFベースのスコアラーを提供しています。しかし、Okapi BM25ベースのスコアラーはまだ提供していません。</p>
 <blockquote id="note">
-<div><p>You don't need to resolve scoring only by score function. Score
-function is highly depends on search query. You may be able to use
-metadata of matched record.</p>
-<p>For example, Google uses <a class="reference external" href="http://en.wikipedia.org/wiki/PageRank">PageRank</a> for scoring. You may be
-able to use data type (&quot;title&quot; data are important rather than
-&quot;memo&quot; data), tag, geolocation and so on.</p>
-<p>Please stop to think about only score function for scoring.</p>
+<div><p>スコアー関数だけでスコアの計算をする必要はありません。スコアー関数は検索クエリーに非常に依存しています。検索クエリーだけでなく、マッチしたレコードのメタデータも使えないか検討しましょう。</p>
+<p>たとえば、Googleはスコアーの計算に <a class="reference external" href="https://ja.wikipedia.org/wiki/%E3%83%9A%E3%83%BC%E3%82%B8%E3%83%A9%E3%83%B3%E3%82%AF">ページランク</a> を使っています。あなたも、データの種類（たとえば、「メモ」データよりも「タイトル」データの方が重要など）、タグ、位置情報などを使えないか検討してみましょう。</p>
+<p>スコアーの計算をスコアー関数だけで考えることはやめましょう。</p>
 </div></blockquote>
 </div>
 <div class="section" id="usage">
 <h2>7.11.2. 使い方<a class="headerlink" href="#usage" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>このセクションではscorerの使い方について説明します。</p>
+<p>このセクションではスコアラーの使い方について説明します。</p>
 <p>使い方を示すために使うスキーマ定義とサンプルデータは以下の通りです。</p>
 <p>サンプルスキーマ:</p>
 <p>実行例:</p>
@@ -194,21 +172,19 @@ column_create Terms content_index COLUMN_INDEX|WITH_POSITION Memos content
 </pre></div>
 </div>
 <p><a class="reference internal" href="commands/select.html#select-match-columns"><span>match_columns</span></a> の中でscore関数を使うことができます。次に構文を示します。</p>
-<p>For score function that doesn't require any parameter such as
-<a class="reference internal" href="scorers/scorer_tf_idf.html"><em>scorer_tf_idf</em></a>:</p>
+<p><a class="reference internal" href="scorers/scorer_tf_idf.html"><em>scorer_tf_idf</em></a> のように、いくつかのスコアー関数には引数はありません。:</p>
 <div class="highlight-none"><div class="highlight"><pre>SCORE_FUNCTION(COLUMN)
 </pre></div>
 </div>
-<p>You can specify weight:</p>
+<p>重みを指定することができます。:</p>
 <div class="highlight-none"><div class="highlight"><pre>SCORE_FUNCTION(COLUMN) * WEIGHT
 </pre></div>
 </div>
-<p>For score function that requires one or more parameters such as
-<a class="reference internal" href="scorers/scorer_tf_at_most.html"><em>scorer_tf_at_most</em></a>:</p>
+<p><a class="reference internal" href="scorers/scorer_tf_at_most.html"><em>scorer_tf_at_most</em></a> のように引数が必要なスコアー関数もあります。:</p>
 <div class="highlight-none"><div class="highlight"><pre>SCORE_FUNCTION(COLUMN, ARGUMENT1, ARGUMENT2, ...)
 </pre></div>
 </div>
-<p>You can specify weight:</p>
+<p>重みを指定することができます。:</p>
 <div class="highlight-none"><div class="highlight"><pre>SCORE_FUNCTION(COLUMN, ARGUMENT1, ARGUMENT2, ...) * WEIGHT
 </pre></div>
 </div>
@@ -260,10 +236,7 @@ column_create Terms content_index COLUMN_INDEX|WITH_POSITION Memos content
 # ]
 </pre></div>
 </div>
-<p><code class="docutils literal"><span class="pre">Groonga!</span> <span class="pre">Groonga!</span> <span class="pre">Groonga!</span> <span class="pre">Groonga</span> <span class="pre">is</span> <span class="pre">very</span> <span class="pre">fast!</span></code> contains 4
-<code class="docutils literal"><span class="pre">Groonga</span></code>. If you use TF based scorer that is the default scorer,
-<code class="docutils literal"><span class="pre">_score</span></code> is <code class="docutils literal"><span class="pre">4</span></code>. But the actual <code class="docutils literal"><span class="pre">_score</span></code> is <code class="docutils literal"><span class="pre">2</span></code>. Because the
-<code class="docutils literal"><span class="pre">select</span></code> command uses TF-IDF based scorer <code class="docutils literal"><span class="pre">scorer_tf_idf()</span></code>.</p>
+<p><code class="docutils literal"><span class="pre">Groonga!</span> <span class="pre">Groonga!</span> <span class="pre">Groonga!</span> <span class="pre">Groonga</span> <span class="pre">is</span> <span class="pre">very</span> <span class="pre">fast!</span></code> には <code class="docutils literal"><span class="pre">Groonga</span></code> が4つ含まれています。デフォルトのTFベースのスコアラーを使うと、 <code class="docutils literal"><span class="pre">_score</span></code> は <code class="docutils literal"><span class="pre">4</span></code> です。しかし、実際は <code class="docutils literal"><span class="pre">_score</span></code> は <code class="docutils literal"><span class="pre">2</span></code> になります。なぜなら、この <code class="docutils literal"><span class="pre">select</span></code> コマンドはTF-IDFベースの  <code class="docutils literal"><span class="pre">scorer_tf_idf()</span></code> スコアラーを使っているからです。</p>
 <p>以下は重みを使った例です。</p>
 <p>実行例:</p>
 <div class="highlight-none"><div class="highlight"><pre>select Memos \
@@ -305,12 +278,8 @@ column_create Terms content_index COLUMN_INDEX|WITH_POSITION Memos content
 # ]
 </pre></div>
 </div>
-<p><code class="docutils literal"><span class="pre">Groonga!</span> <span class="pre">Groonga!</span> <span class="pre">Groonga!</span> <span class="pre">Groonga</span> <span class="pre">is</span> <span class="pre">very</span> <span class="pre">fast!</span></code> has <code class="docutils literal"><span class="pre">22</span></code> as
-<code class="docutils literal"><span class="pre">_score</span></code>. It had <code class="docutils literal"><span class="pre">2</span></code> as <code class="docutils literal"><span class="pre">_score</span></code> in the previous example that
-doesn't specify weight.</p>
-<p>Here is an example that uses scorer that requires one
-argument. <a class="reference internal" href="scorers/scorer_tf_at_most.html"><em>scorer_tf_at_most</em></a> scorer requires
-one argument. You can limit TF score by the scorer.</p>
+<p><code class="docutils literal"><span class="pre">Groonga!</span> <span class="pre">Groonga!</span> <span class="pre">Groonga!</span> <span class="pre">Groonga</span> <span class="pre">is</span> <span class="pre">very</span> <span class="pre">fast!</span></code> の <code class="docutils literal"><span class="pre">_score</span></code> は <code class="docutils literal"><span class="pre">22</span></code> です。重みを指定していない前の例では <code class="docutils literal"><span class="pre">_score</span></code> は <code class="docutils literal"><span class="pre">2</span></code> でした。</p>
+<p>以下は必ず引数を1つ指定しなければいけないスコアラーを使う例です。 <a class="reference internal" href="scorers/scorer_tf_at_most.html"><em>scorer_tf_at_most</em></a> スコアラーには引数を1つ指定しなければいけません。このスコアラーを使うと、TFのスコアーの最大値を制限することができます。</p>
 <p>実行例:</p>
 <div class="highlight-none"><div class="highlight"><pre>select Memos \
   --match_columns &quot;scorer_tf_at_most(content, 2.0)&quot; \
@@ -351,38 +320,103 @@ one argument. You can limit TF score by the scorer.</p>
 # ]
 </pre></div>
 </div>
-<p><code class="docutils literal"><span class="pre">Groonga!</span> <span class="pre">Groonga!</span> <span class="pre">Groonga!</span> <span class="pre">Groonga</span> <span class="pre">is</span> <span class="pre">very</span> <span class="pre">fast!</span></code> contains 4
-<code class="docutils literal"><span class="pre">Groonga</span></code>. If you use normal TF based scorer that is the default
-scorer, <code class="docutils literal"><span class="pre">_score</span></code> is <code class="docutils literal"><span class="pre">4</span></code>. But the actual <code class="docutils literal"><span class="pre">_score</span></code> is <code class="docutils literal"><span class="pre">2</span></code>.
-Because the scorer used in the <code class="docutils literal"><span class="pre">select</span></code> command limits the maximum
-score value to <code class="docutils literal"><span class="pre">2</span></code>.</p>
+<p><code class="docutils literal"><span class="pre">Groonga!</span> <span class="pre">Groonga!</span> <span class="pre">Groonga!</span> <span class="pre">Groonga</span> <span class="pre">is</span> <span class="pre">very</span> <span class="pre">fast!</span></code> は <code class="docutils literal"><span class="pre">Groonga</span></code> を4つ含んでいます。もし、デフォルトのスコアラーである標準のTFベースのスコアラーを使っていた場合、 <code class="docutils literal"><span class="pre">_score</span></code> は <code class="docutils literal"><span class="pre">4</span></code> になります。しかし、実際の <code class="docutils literal"><span class="pre">_score</span></code> は <code class="docutils literal"><span class="pre">2</span></code> です。なぜなら、この <code class="docutils literal"><span class="pre">select</span></code> コマンドが使っているスコアラーは最大スコアーを <code class="docutils literal"><span class="pre">2</span></code> に制限しているからです。</p>
 <p>以下は複数のスコアラーを使う例です。</p>
-<div class="highlight-none"><div class="highlight"><pre>.. groonga-command
-.. include:: ../example/reference/scorer/usage_multiple_scorers.log
-.. select Memos \
-..   --match_columns &quot;scorer_tf_idf(title) || scorer_tf_at_most(content, 2.0)&quot; \
-..   --query &quot;Groonga&quot; \
-..   --output_columns &quot;title, content, _score&quot; \
-..   --sortby &quot;-_score&quot;
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Memos \
+  --match_columns &quot;scorer_tf_idf(title) || scorer_tf_at_most(content, 2.0)&quot; \
+  --query &quot;Groonga&quot; \
+  --output_columns &quot;title, content, _score&quot; \
+  --sortby &quot;-_score&quot;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;title&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;_score&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Groonga is fast&quot;,
+#         &quot;Groonga! Groonga! Groonga! Groonga is very fast!&quot;,
+#         3
+#       ],
+#       [
+#         &quot;Groonga is easy&quot;,
+#         &quot;Groonga is very easy full text search engine!&quot;,
+#         2
+#       ]
+#     ]
+#   ]
+# ]
 </pre></div>
 </div>
-<p>The <code class="docutils literal"><span class="pre">--match_columns</span></code> uses <code class="docutils literal"><span class="pre">scorer_tf_idf(title)</span></code> and
-<code class="docutils literal"><span class="pre">scorer_tf_at_most(content,</span> <span class="pre">2.0)</span></code>. <code class="docutils literal"><span class="pre">_score</span></code> value is sum of them.</p>
-<p>You can use the default scorer and custom scorer in the same
-<code class="docutils literal"><span class="pre">--match_columns</span></code>. You can use the default scorer by just specifying
-a match column:</p>
-<div class="highlight-none"><div class="highlight"><pre>.. groonga-command
-.. include:: ../example/reference/scorer/usage_default_and_custom_scorers.log
-.. select Memos \
-..   --match_columns &quot;title || scorer_tf_at_most(content, 2.0)&quot; \
-..   --query &quot;Groonga&quot; \
-..   --output_columns &quot;title, content, _score&quot; \
-..   --sortby &quot;-_score&quot;
+<p>この <code class="docutils literal"><span class="pre">--match_columns</span></code> は <code class="docutils literal"><span class="pre">scorer_tf_idf(title)</span></code> と <code class="docutils literal"><span class="pre">scorer_tf_at_most(content,</span> <span class="pre">2.0)</span></code> を使っています。 <code class="docutils literal"><span class="pre">_score</span></code> の値はこれら2つの値の合計になります。</p>
+<p>同じ <code class="docutils literal"><span class="pre">--match_columns</span></code> の中でデフォルトのスコアラーとカスタムスコアラーを使うことができます。単にマッチ対象のカラムを指定するとデフォルトのスコアラーを使います。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Memos \
+  --match_columns &quot;title || scorer_tf_at_most(content, 2.0)&quot; \
+  --query &quot;Groonga&quot; \
+  --output_columns &quot;title, content, _score&quot; \
+  --sortby &quot;-_score&quot;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;title&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;_score&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Groonga is fast&quot;,
+#         &quot;Groonga! Groonga! Groonga! Groonga is very fast!&quot;,
+#         3
+#       ],
+#       [
+#         &quot;Groonga is easy&quot;,
+#         &quot;Groonga is very easy full text search engine!&quot;,
+#         2
+#       ]
+#     ]
+#   ]
+# ]
 </pre></div>
 </div>
-<p>The <code class="docutils literal"><span class="pre">--match_columns</span></code> uses the default scorer (TF) for <code class="docutils literal"><span class="pre">title</span></code> and
-<a class="reference internal" href="scorers/scorer_tf_at_most.html"><em>scorer_tf_at_most</em></a> for
-<code class="docutils literal"><span class="pre">content</span></code>. <code class="docutils literal"><span class="pre">_score</span></code> value is sum of them.</p>
+<p>この <code class="docutils literal"><span class="pre">--match_columns</span></code> は <code class="docutils literal"><span class="pre">title</span></code> にはデフォルトのスコアラー（TF）を使い、 <code class="docutils literal"><span class="pre">content</span></code> には <a class="reference internal" href="scorers/scorer_tf_at_most.html"><em>scorer_tf_at_most</em></a> を使います。 <code class="docutils literal"><span class="pre">_score</span></code> の値はこれらのスコアラーの結果の合計になります。</p>
 </div>
 <div class="section" id="built-in-scorers">
 <h2>7.11.3. 組み込みスコアラー<a class="headerlink" href="#built-in-scorers" title="このヘッドラインへのパーマリンク">¶</a></h2>
@@ -404,7 +438,7 @@ a match column:</p>
         <div class="sphinxsidebarwrapper">
   <h3><a href="../index.html">目次</a></h3>
   <ul>
-<li><a class="reference internal" href="#">7.11. Scorer</a><ul>
+<li><a class="reference internal" href="#">7.11. スコアラー</a><ul>
 <li><a class="reference internal" href="#summary">7.11.1. 概要</a></li>
 <li><a class="reference internal" href="#usage">7.11.2. 使い方</a></li>
 <li><a class="reference internal" href="#built-in-scorers">7.11.3. 組み込みスコアラー</a></li>

@@ -95,7 +95,7 @@
 </div>
 <div class="section" id="summary">
 <h2>7.11.3.2.1. Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
-<p><code class="docutils literal"><span class="pre">scorer_tf_idf</span></code> is a scorer based of <a class="reference external" href="http://en.wikipedia.org/wiki/Tf%E2%80%93idf">TF-IDF</a> (term
+<p><code class="docutils literal"><span class="pre">scorer_tf_idf</span></code> is a scorer based of <a class="reference external" href="https://en.wikipedia.org/wiki/Tf%E2%80%93idf">TF-IDF</a> (term
 frequency-inverse document frequency) score function.</p>
 <p>To put it simply, TF (term frequency) divided by DF (document
 frequency) is TF-IDF. &quot;TF&quot; means that &quot;the number of occurrences is
@@ -107,32 +107,34 @@ doesn't care about term importance but is fast.</p>
 <p>TF-IDF will compute more suitable score rather than TF for many cases.
 But it's not perfect.</p>
 <p>If document contains many same keywords such as &quot;They are keyword,
-keyword, keyword ... and keyword&quot;. It increases score by TF and
+keyword, keyword ... and keyword&quot;, it increases score by TF and
 TF-IDF. Search engine spammer may use the technique. But TF-IDF
 doesn't guard from the technique.</p>
-<p><a class="reference external" href="http://en.wikipedia.org/wiki/Okapi_BM25">Okapi BM25</a> can solve the
+<p><a class="reference external" href="https://en.wikipedia.org/wiki/Okapi_BM25">Okapi BM25</a> can solve the
 case. But it's more slower than TF-IDF and not implemented yet in
 Groonga.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">orphan:</th><td class="field-body"></td>
-</tr>
-</tbody>
-</table>
+<p>Groonga provides <a class="reference internal" href="scorer_tf_at_most.html"><em>scorer_tf_at_most</em></a> scorer that can also solve
+the case.</p>
 <blockquote id="note">
 <div><p>You don't need to resolve scoring only by score function. Score
 function is highly depends on search query. You may be able to use
 metadata of matched record.</p>
-<p>For example, Google uses <a class="reference external" href="http://en.wikipedia.org/wiki/PageRank">PageRank</a> for scoring. You may be
+<p>For example, Google uses <a class="reference external" href="https://en.wikipedia.org/wiki/PageRank">PageRank</a> for scoring. You may be
 able to use data type (&quot;title&quot; data are important rather than
 &quot;memo&quot; data), tag, geolocation and so on.</p>
 <p>Please stop to think about only score function for scoring.</p>
 </div></blockquote>
 </div>
+<div class="section" id="syntax">
+<h2>7.11.3.2.2. Syntax<a class="headerlink" href="#syntax" title="Permalink to this headline">¶</a></h2>
+<p>This scorer has only one parameter:</p>
+<div class="highlight-none"><div class="highlight"><pre>scorer_tf_idf(column)
+scorer_tf_idf(index)
+</pre></div>
+</div>
+</div>
 <div class="section" id="usage">
-<h2>7.11.3.2.2. Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<h2>7.11.3.2.3. Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
 <p>This section describes how to use this scorer.</p>
 <p>Here are a schema definition and sample data to show usage.</p>
 <p>Sample schema:</p>
@@ -232,8 +234,36 @@ include <code class="docutils literal"><span class="pre">Error</span></code> is 
 means that the term is more characteristic term. Characteristic term
 is important term.</p>
 </div>
+<div class="section" id="parameters">
+<h2>7.11.3.2.4. Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+<p>This section describes all parameters.</p>
+<div class="section" id="required-parameters">
+<h3>7.11.3.2.4.1. Required parameters<a class="headerlink" href="#required-parameters" title="Permalink to this headline">¶</a></h3>
+<p>There is only one required parameters.</p>
+<div class="section" id="column">
+<h4>7.11.3.2.4.1.1. <code class="docutils literal"><span class="pre">column</span></code><a class="headerlink" href="#column" title="Permalink to this headline">¶</a></h4>
+<p>The data column that is match target. The data column must be indexed.</p>
+</div>
+<div class="section" id="index">
+<h4>7.11.3.2.4.1.2. <code class="docutils literal"><span class="pre">index</span></code><a class="headerlink" href="#index" title="Permalink to this headline">¶</a></h4>
+<p>The index column to be used for search.</p>
+</div>
+</div>
+<div class="section" id="optional-parameters">
+<h3>7.11.3.2.4.2. Optional parameters<a class="headerlink" href="#optional-parameters" title="Permalink to this headline">¶</a></h3>
+<p>There is no optional parameters.</p>
+</div>
+</div>
+<div class="section" id="return-value">
+<h2>7.11.3.2.5. Return value<a class="headerlink" href="#return-value" title="Permalink to this headline">¶</a></h2>
+<p>This scorer returns score as <a class="reference internal" href="../types.html#builtin-type-float"><span>Float</span></a>.</p>
+<p><a class="reference internal" href="../commands/select.html"><em>select</em></a> returns <code class="docutils literal"><span class="pre">_score</span></code> as <code class="docutils literal"><span class="pre">Int32</span></code> not
+<code class="docutils literal"><span class="pre">Float</span></code>. Because it casts to <code class="docutils literal"><span class="pre">Int32</span></code> from <code class="docutils literal"><span class="pre">Float</span></code> for keeping
+backward compatibility.</p>
+<p>Score is computed as TF-IDF based algorithm.</p>
+</div>
 <div class="section" id="see-also">
-<h2>7.11.3.2.3. See also<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<h2>7.11.3.2.6. See also<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><a class="reference internal" href="../scorer.html"><em>Scorer</em></a></li>
 </ul>
@@ -250,8 +280,19 @@ is important term.</p>
   <ul>
 <li><a class="reference internal" href="#">7.11.3.2. <code class="docutils literal"><span class="pre">scorer_tf_idf</span></code></a><ul>
 <li><a class="reference internal" href="#summary">7.11.3.2.1. Summary</a></li>
-<li><a class="reference internal" href="#usage">7.11.3.2.2. Usage</a></li>
-<li><a class="reference internal" href="#see-also">7.11.3.2.3. See also</a></li>
+<li><a class="reference internal" href="#syntax">7.11.3.2.2. Syntax</a></li>
+<li><a class="reference internal" href="#usage">7.11.3.2.3. Usage</a></li>
+<li><a class="reference internal" href="#parameters">7.11.3.2.4. Parameters</a><ul>
+<li><a class="reference internal" href="#required-parameters">7.11.3.2.4.1. Required parameters</a><ul>
+<li><a class="reference internal" href="#column">7.11.3.2.4.1.1. <code class="docutils literal"><span class="pre">column</span></code></a></li>
+<li><a class="reference internal" href="#index">7.11.3.2.4.1.2. <code class="docutils literal"><span class="pre">index</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#optional-parameters">7.11.3.2.4.2. Optional parameters</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#return-value">7.11.3.2.5. Return value</a></li>
+<li><a class="reference internal" href="#see-also">7.11.3.2.6. See also</a></li>
 </ul>
 </li>
 </ul>

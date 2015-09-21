@@ -218,7 +218,7 @@ select --table ToyBox --output_columns _key,price,weight
 <div class="section" id="string-types">
 <h2>4.3.4. 文字列<a class="headerlink" href="#string-types" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <p>文字列型は、長さの上限によって分けることができます。詳しくは <a class="reference internal" href="../reference/types.html"><em>データ型</em></a> を参照してください。文字列型のデフォルト値は長さ0の文字列です。</p>
-<p>以下の例では、ShortText型のカラムを作成し、IDが1と2のレコードを更新します。更新しないレコードについては、デフォルト値のままとなります。</p>
+<p>以下の例では、 <code class="docutils literal"><span class="pre">ShortText</span></code> 型のカラムを作成し、既存のレコードを更新します。3つ目のレコード（キーが <code class="docutils literal"><span class="pre">&quot;Block&quot;</span></code> のレコード）は更新していないのでデフォルト値（長さが0の文字列）になります。</p>
 <p>実行例:</p>
 <div class="highlight-none"><div class="highlight"><pre>column_create --table ToyBox --name name --type ShortText
 # [[0, 1337566253.89858, 0.000355720520019531], true]
@@ -275,7 +275,7 @@ select --table ToyBox --output_columns _key,name
 <p class="first admonition-title">注釈</p>
 <p class="last">Groonga内部では経過秒数を整数のペアで保持しています。最初の整数で秒を表現し、もう一方でマイクロ秒を表現します。それゆえGroongaでは小数で経過秒数を表示します。整数部が秒数で、小数部はマイクロ秒の値です。</p>
 </div>
-<p>以下の例では、Time型のカラムを作成し、IDが2と3のレコードを更新します。更新しないレコードについては、デフォルト値のままとなります。</p>
+<p>以下の例では、 <code class="docutils literal"><span class="pre">Time</span></code> 型のカラムを作成し、既存のレコードを更新します。1つ目のレコード（キーが <code class="docutils literal"><span class="pre">&quot;Monkey&quot;</span></code> のレコード）は更新していないのでデフォルト値（ <code class="docutils literal"><span class="pre">0.0</span></code> ）になります。</p>
 <p>実行例:</p>
 <div class="highlight-none"><div class="highlight"><pre>column_create --table ToyBox --name time --type Time
 # [[0, 1337566253.89858, 0.000355720520019531], true]
@@ -335,7 +335,7 @@ select --table ToyBox --output_columns _key,time
 </li>
 </ul>
 <p>小数点を含んでいなければミリ秒表記、小数点を含んでいれば度数表記として扱われます。ミリ秒表記と度数表記を混ぜたときの動作は未定義なので注意してください。経度と緯度の区切りとしては、'x' のほかに ',' を使うことができます。経緯度のデフォルト値は &quot;0x0&quot; です。</p>
-<p>以下の例では、世界測地系を用いるWGS84GeoPoint型のカラムを作成し、IDが1と3のレコードを更新します。更新しないレコードについては、デフォルト値のままとなります。</p>
+<p>以下の例では、世界測地系を用いる <code class="docutils literal"><span class="pre">WGS84GeoPoint</span></code> 型のカラムを作成し、既存のレコードを更新します。2つ目のレコード（キーが <code class="docutils literal"><span class="pre">&quot;Flower&quot;</span></code> のレコード）は更新していないのでデフォルト値（ <code class="docutils literal"><span class="pre">&quot;0x0&quot;</span></code> ）になります。</p>
 <p>実行例:</p>
 <div class="highlight-none"><div class="highlight"><pre>column_create --table ToyBox --name location --type WGS84GeoPoint
 # [[0, 1337566253.89858, 0.000355720520019531], true]
@@ -388,8 +388,8 @@ select --table ToyBox --output_columns _key,location
 <div class="section" id="reference-types">
 <h2>4.3.7. テーブル参照<a class="headerlink" href="#reference-types" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <p>Groongaでは、テーブル参照のカラム、すなわち関連付けたテーブルを参照するカラムを作成できます。より正確には、カラム作成時に参照先となるテーブルとの関連付けをおこない、参照先テーブルにおけるレコードIDを格納しておくことにより、参照先のレコードにアクセスできるようにします。</p>
-<p>テーブル参照のカラムがあるときは、 <a class="reference internal" href="../reference/commands/select.html"><em>select</em></a> コマンドの <cite>output_columns</cite> 引数に &quot;参照元カラム.参照先カラム&quot; と指定することにより、参照先カラムの値を取り出すことができます。参照元カラムのみを指定したときは、 &quot;参照元カラム名._key&quot; と同様の扱いとなり、参照先レコードの主キーが取り出されます。テーブル参照が有効なレコードを指していないときは、 <a class="reference internal" href="../reference/commands/select.html"><em>select</em></a> コマンドは参照先カラムのデフォルト値を取り出すようになっています。</p>
-<p>ここでは、先のチュートリアルで作成したSiteテーブルにlinkという新たなカラムを作成し、サイト間のリンク関係を保存できるようにしてみましょう。</p>
+<p>テーブル参照のカラムがあるときは、 <a class="reference internal" href="../reference/commands/select.html"><em>select</em></a> コマンドの <code class="docutils literal"><span class="pre">output_columns</span></code> 引数に <code class="docutils literal"><span class="pre">参照元カラム.参照先カラム</span></code> と指定することにより、参照先カラムの値を取り出すことができます。参照元カラムのみを指定したときは、 <code class="docutils literal"><span class="pre">参照元カラム名._key</span></code> と同様の扱いとなり、参照先レコードの主キーが取り出されます。テーブル参照が有効なレコードを指していないときは、 <a class="reference internal" href="../reference/commands/select.html"><em>select</em></a> コマンドは参照先カラムのデフォルト値を取り出すようになっています。</p>
+<p>ここでは、 <a class="reference internal" href="introduction.html#tutorial-introduction-create-table"><span>テーブルの作成</span></a> で作成した <code class="docutils literal"><span class="pre">Site</span></code> テーブルに参照カラムを作成します。作成する参照カラムは <code class="docutils literal"><span class="pre">link</span></code> という名前にします。このカラムには <code class="docutils literal"><span class="pre">Site</span></code> テーブルのレコード間でのリンク関係を保存します。</p>
 <p>実行例:</p>
 <div class="highlight-none"><div class="highlight"><pre>column_create --table Site --name link --type Site
 # [[0, 1337566253.89858, 0.000355720520019531], true]

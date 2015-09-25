@@ -57,6 +57,7 @@ description: 「Groongaで学ぶ全文検索」という全文検索を学ぶ会
   * [Groongaで学ぶ全文検索の仕組みに関して理解したことをまとめてみたの巻 | いきあたりばったり](http://www.shokola.net/?p=1242)
   * [Groongaで学ぶ全文検索 2015-09-18に参加してきた - アペフチ(2015-09-18)](http://apehuci-kitaitimakoto.sqale.jp/apehuci/?date=20150918)
   * [Groongaで学ぶ全文検索 第１回 - Qiita](http://qiita.com/yamamaijp/items/c4cfb545abb0e142e225)
+  * [GakuBlog | Groongaで学ぶ全文検索 2015-09-18に参加](http://gakublog.fam.cx/2015/09/18/groonga/)
 
 ### まとめ
 

@@ -63,6 +63,6 @@ description: 「Groongaで学ぶ全文検索」という全文検索を学ぶ会
 
 「Groongaで学ぶ全文検索」という全文検索とGroongaを学ぶ会を隔週で金曜日の夜に開催することにしました。
 
-次回開催予定日は2015年10月2日です。[イベントページ](https://groonga.doorkeeper.jp/events/31859)で参加登録を受け付けています。
+次回開催予定日は2015年10月2日です。[イベントページ](https://groonga.doorkeeper.jp/events/31859)で参加登録を受け付けています。最新の開催予定日は[最新イベント一覧ページ](https://groonga.doorkeeper.jp/events/upcoming)でご確認ください。
 
 今回は参加できないけど都合があえば参加したい、という方は[Groongaコミュニティに参加](https://groonga.doorkeeper.jp/member/new)してください。申し込みが始まったら通知が届くようになります。

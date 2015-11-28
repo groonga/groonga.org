@@ -1,0 +1,458 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>7.14.11. prefix_rk_search() &mdash; Groonga v5.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
+    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '5.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../static/favicon.ico"/>
+    <link rel="top" title="Groonga v5.1.0 documentation" href="../../index.html" />
+    <link rel="up" title="7.14. Function" href="../function.html" />
+    <link rel="next" title="7.14.12. query" href="query.html" />
+    <link rel="prev" title="7.14.10. now" href="now.html" /> 
+      <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
+    <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
+    <meta property="og:type" content="product" />
+    <meta property="og:image" content="http://groonga.org/images/logos/groonga-icon-full-size.png" />
+    <meta property="og:site_name" content="groonga" />
+
+    <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
+  </head>
+
+  <body role="document">
+<div class="header">
+  <h1 class="title">
+    <a id="top-link" href="../../../">
+      <span class="project">groonga</span>
+      <span class="separator">-</span>
+      <span class="description">An open-source fulltext search engine and column store.</span>
+    </a>
+  </h1>
+
+      <div class="facebook-buttons">
+      <fb:like href="http://www.facebook.com/pages/groonga/201193596592346"
+               layout="standard"
+               width="290"></fb:like>
+    </div>
+    <div class="other-language-links">
+
+    <ul>
+      <li><a href="../../../ja/docs/reference/functions/prefix_rk_search.html">日本語</a></li>
+    </ul>
+  </div>
+</div>
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="query.html" title="7.14.12. query"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="now.html" title="7.14.10. now"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v5.1.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../reference.html" >7. Reference manual</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="../function.html" accesskey="U">7.14. Function</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="prefix-rk-search">
+<h1>7.14.11. <code class="docutils literal"><span class="pre">prefix_rk_search()</span></code><a class="headerlink" href="#prefix-rk-search" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="summary">
+<h2>7.14.11.1. Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal"><span class="pre">prefix_rk_search()</span></code> selects records by
+<a class="reference internal" href="../operations/prefix_rk_search.html"><em>Prefix RK search</em></a>.</p>
+<p>You need to create <a class="reference internal" href="../tables.html#table-pat-key"><span>TABLE_PAT_KEY</span></a> table for prefix RK search.</p>
+<p>You can't use <code class="docutils literal"><span class="pre">prefix_rk_search()</span></code> for sequential scan. It's a
+selector only procedure.</p>
+</div>
+<div class="section" id="syntax">
+<h2>7.14.11.2. Syntax<a class="headerlink" href="#syntax" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal"><span class="pre">prefix_rk_search()</span></code> requires two arguments. They are <code class="docutils literal"><span class="pre">column</span></code> and
+<code class="docutils literal"><span class="pre">query</span></code>:</p>
+<div class="highlight-none"><div class="highlight"><pre>prefix_rk_search(column, query)
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">column</span></code> must be <code class="docutils literal"><span class="pre">_key</span></code> for now.</p>
+<p><code class="docutils literal"><span class="pre">query</span></code> must be string.</p>
+</div>
+<div class="section" id="usage">
+<h2>7.14.11.3. Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>Here are a schema definition and sample data to show usage:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Readings TABLE_PAT_KEY ShortText --normalizer NormalizerAuto
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+load --table Readings
+[
+{&quot;_key&quot;: &quot;ニホン&quot;},
+{&quot;_key&quot;: &quot;ニッポン&quot;},
+{&quot;_key&quot;: &quot;ローマジ&quot;}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 3]
+</pre></div>
+</div>
+<p>Here is the simple usage of <code class="docutils literal"><span class="pre">prefix_rk_search()</span></code> function which
+selects <code class="docutils literal"><span class="pre">ニホン</span></code> and <code class="docutils literal"><span class="pre">ニッポン</span></code> by <code class="docutils literal"><span class="pre">ni</span></code>:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Readings --filter &#39;prefix_rk_search(_key, &quot;ni&quot;)&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         2,
+#         &quot;ニッポン&quot;
+#       ],
+#       [
+#         1,
+#         &quot;ニホン&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>You can implement <a class="reference internal" href="../suggest/completion.html"><em>Completion</em></a> like feature by
+combining <a class="reference internal" href="sub_filter.html"><em>sub_filter</em></a>.</p>
+<p>Create a table that has candidates of completion as records. Each
+records have zero or more readings. They are stored into <code class="docutils literal"><span class="pre">Readings</span></code>
+table. Don't forget define an index column for <code class="docutils literal"><span class="pre">Items.readings</span></code> in
+<code class="docutils literal"><span class="pre">Readings</span></code> table. The index column is needed for <a class="reference internal" href="sub_filter.html"><em>sub_filter</em></a>:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Items TABLE_HASH_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Items readings COLUMN_VECTOR Readings
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Readings items_index COLUMN_INDEX Items readings
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+load --table Items
+[
+{&quot;_key&quot;: &quot;日本&quot;,     &quot;readings&quot;: [&quot;ニホン&quot;, &quot;ニッポン&quot;]},
+{&quot;_key&quot;: &quot;ローマ字&quot;, &quot;readings&quot;: [&quot;ローマジ&quot;]},
+{&quot;_key&quot;: &quot;漢字&quot;,     &quot;readings&quot;: [&quot;カンジ&quot;]}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 3]
+</pre></div>
+</div>
+<p>You can find <code class="docutils literal"><span class="pre">日本</span></code> record in <code class="docutils literal"><span class="pre">Items</span></code> table by <code class="docutils literal"><span class="pre">niho</span></code>. Because
+prefix RK search with <code class="docutils literal"><span class="pre">niho</span></code> selects <code class="docutils literal"><span class="pre">ニホン</span></code> reading and <code class="docutils literal"><span class="pre">ニホン</span></code>
+reading is one of readings of <code class="docutils literal"><span class="pre">日本</span></code> record:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Items \
+ --filter &#39;sub_filter(readings, &quot;prefix_rk_search(_key, \\&quot;niho\\&quot;)&quot;)&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;readings&quot;,
+#           &quot;Readings&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;日本&quot;,
+#         [
+#           &quot;ニホン&quot;,
+#           &quot;ニッポン&quot;
+#         ]
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>You need to combine <a class="reference internal" href="../grn_expr/script_syntax.html#script-syntax-prefix-search-operator"><span>Prefix search operator</span></a> to
+support no reading completion targets.</p>
+<p>Add one no reading completion target:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>load --table Items
+[
+{&quot;_key&quot;: &quot;nihon&quot;, &quot;readings&quot;: []}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 1]
+</pre></div>
+</div>
+<p>Combine <a class="reference internal" href="../grn_expr/script_syntax.html#script-syntax-prefix-search-operator"><span>Prefix search operator</span></a> to
+support no reading completion targets:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Items \
+ --filter &#39;sub_filter(readings, &quot;prefix_rk_search(_key, \\&quot;niho\\&quot;)&quot;) || \
+           _key @^ &quot;niho&quot;&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;readings&quot;,
+#           &quot;Readings&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;日本&quot;,
+#         [
+#           &quot;ニホン&quot;,
+#           &quot;ニッポン&quot;
+#         ]
+#       ],
+#       [
+#         4,
+#         &quot;nihon&quot;,
+#         []
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>Normally, you want to use case insensitive search for completion. Use
+<code class="docutils literal"><span class="pre">--normalizer</span> <span class="pre">NormalizerAuto</span></code> and <code class="docutils literal"><span class="pre">label</span></code> column for the case:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create LooseItems TABLE_HASH_KEY ShortText --normalizer NormalizerAuto
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create LooseItems label COLUMN_SCALAR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create LooseItems readings COLUMN_VECTOR Readings
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Readings loose_items_index COLUMN_INDEX LooseItems readings
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+load --table LooseItems
+[
+{&quot;_key&quot;: &quot;日本&quot;,     &quot;label&quot;: &quot;日本&quot;,     &quot;readings&quot;: [&quot;ニホン&quot;, &quot;ニッポン&quot;]},
+{&quot;_key&quot;: &quot;ローマ字&quot;, &quot;label&quot;: &quot;ローマ字&quot;, &quot;readings&quot;: [&quot;ローマジ&quot;]},
+{&quot;_key&quot;: &quot;漢字&quot;,     &quot;label&quot;: &quot;漢字&quot;,     &quot;readings&quot;: [&quot;カンジ&quot;]},
+{&quot;_key&quot;: &quot;Nihon&quot;,    &quot;label&quot;: &quot;日本&quot;,     &quot;readings&quot;: []}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 4]
+</pre></div>
+</div>
+<p>Use <code class="docutils literal"><span class="pre">LooseItems.label</span></code> for display:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select LooseItems \
+ --filter &#39;sub_filter(readings, &quot;prefix_rk_search(_key, \\&quot;nIhO\\&quot;)&quot;) || \
+           _key @^ &quot;nIhO&quot;&#39; \
+ --output_columns &#39;_key,label&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;label&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         &quot;日本&quot;,
+#         &quot;日本&quot;
+#       ],
+#       [
+#         &quot;nihon&quot;,
+#         &quot;日本&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
+<div class="section" id="parameters">
+<h2>7.14.11.4. Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+<p>There are two required parameter, <code class="docutils literal"><span class="pre">column</span></code> and <code class="docutils literal"><span class="pre">query</span></code>.</p>
+<div class="section" id="column">
+<h3>7.14.11.4.1. <code class="docutils literal"><span class="pre">column</span></code><a class="headerlink" href="#column" title="Permalink to this headline">¶</a></h3>
+<p>Always specifies <code class="docutils literal"><span class="pre">_key</span></code> for now.</p>
+</div>
+<div class="section" id="query">
+<h3>7.14.11.4.2. <code class="docutils literal"><span class="pre">query</span></code><a class="headerlink" href="#query" title="Permalink to this headline">¶</a></h3>
+<p>Specifies a query in romaji, katakana or hiragana as string.</p>
+</div>
+</div>
+<div class="section" id="return-value">
+<h2>7.14.11.5. Return value<a class="headerlink" href="#return-value" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal"><span class="pre">prefix_rk_search()</span></code> function returns matched records.</p>
+</div>
+<div class="section" id="see-also">
+<h2>7.14.11.6. See also<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference internal" href="../operations/prefix_rk_search.html"><em>Prefix RK search</em></a></li>
+<li><a class="reference internal" href="sub_filter.html"><em>sub_filter</em></a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">7.14.11. <code class="docutils literal"><span class="pre">prefix_rk_search()</span></code></a><ul>
+<li><a class="reference internal" href="#summary">7.14.11.1. Summary</a></li>
+<li><a class="reference internal" href="#syntax">7.14.11.2. Syntax</a></li>
+<li><a class="reference internal" href="#usage">7.14.11.3. Usage</a></li>
+<li><a class="reference internal" href="#parameters">7.14.11.4. Parameters</a><ul>
+<li><a class="reference internal" href="#column">7.14.11.4.1. <code class="docutils literal"><span class="pre">column</span></code></a></li>
+<li><a class="reference internal" href="#query">7.14.11.4.2. <code class="docutils literal"><span class="pre">query</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#return-value">7.14.11.5. Return value</a></li>
+<li><a class="reference internal" href="#see-also">7.14.11.6. See also</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="now.html"
+                        title="previous chapter">7.14.10. now</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="query.html"
+                        title="next chapter">7.14.12. <code class="docutils literal"><span class="pre">query</span></code></a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../sources/reference/functions/prefix_rk_search.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="query.html" title="7.14.12. query"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="now.html" title="7.14.10. now"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v5.1.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../reference.html" >7. Reference manual</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="../function.html" >7.14. Function</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2009-2015, Brazil, Inc.
+    </div>
+      <script src="http://connect.facebook.net/en_US/all.js"></script>
+
+    <script>
+      FB.init({
+         appId  : null,
+         status : true, // check login status
+         cookie : true, // enable cookies to allow the server to access the session
+         xfbml  : true  // parse XFBML
+      });
+    </script>
+  </body>
+
+</html>

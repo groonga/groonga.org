@@ -1,0 +1,303 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>7.3.39. reindex &mdash; Groonga v5.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
+    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '5.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../static/favicon.ico"/>
+    <link rel="top" title="Groonga v5.1.0 documentation" href="../../index.html" />
+    <link rel="up" title="7.3. Command" href="../command.html" />
+    <link rel="next" title="7.3.40. request_cancel" href="request_cancel.html" />
+    <link rel="prev" title="7.3.38. register" href="register.html" /> 
+      <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
+    <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
+    <meta property="og:type" content="product" />
+    <meta property="og:image" content="http://groonga.org/images/logos/groonga-icon-full-size.png" />
+    <meta property="og:site_name" content="groonga" />
+
+    <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
+  </head>
+
+  <body role="document">
+<div class="header">
+  <h1 class="title">
+    <a id="top-link" href="../../../">
+      <span class="project">groonga</span>
+      <span class="separator">-</span>
+      <span class="description">An open-source fulltext search engine and column store.</span>
+    </a>
+  </h1>
+
+      <div class="facebook-buttons">
+      <fb:like href="http://www.facebook.com/pages/groonga/201193596592346"
+               layout="standard"
+               width="290"></fb:like>
+    </div>
+    <div class="other-language-links">
+
+    <ul>
+      <li><a href="../../../ja/docs/reference/commands/reindex.html">日本語</a></li>
+    </ul>
+  </div>
+</div>
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="request_cancel.html" title="7.3.40. request_cancel"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="register.html" title="7.3.38. register"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v5.1.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../reference.html" >7. Reference manual</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="../command.html" accesskey="U">7.3. Command</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="reindex">
+<h1>7.3.39. <code class="docutils literal"><span class="pre">reindex</span></code><a class="headerlink" href="#reindex" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="summary">
+<h2>7.3.39.1. Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 5.1.0.</span></p>
+</div>
+<p><code class="docutils literal"><span class="pre">reindex</span></code> command recreates one or more index columns.</p>
+<p>If you specify a database as target object, all index columns are
+recreated.</p>
+<p>If you specify a table as target object, all index columns in the
+table are recreated.</p>
+<p>If you specify a data column as target object, all index columns for
+the data column are recreated.</p>
+<p>If you specify an index column as target object, the index column is
+recreated.</p>
+<p>This command is a useful when your index column is broken.
+The target object is one of database, table and column.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">You can't use target index columns while <code class="docutils literal"><span class="pre">reindex</span></code> command is
+running. If you use the same database from multiple processes, all
+processes except running <code class="docutils literal"><span class="pre">reindex</span></code> should reopen the
+database. You can use <a class="reference internal" href="database_unmap.html"><em>database_unmap</em></a> for reopening database.</p>
+</div>
+</div>
+<div class="section" id="syntax">
+<h2>7.3.39.2. Syntax<a class="headerlink" href="#syntax" title="Permalink to this headline">¶</a></h2>
+<p>This command takes only one optional parameter:</p>
+<div class="highlight-none"><div class="highlight"><pre>reindex [target_name=null]
+</pre></div>
+</div>
+<p>If <code class="docutils literal"><span class="pre">target_name</span></code> parameters is omitted, database is used for the
+target object. It means that all index columns in the database are
+recreated.</p>
+</div>
+<div class="section" id="usage">
+<h2>7.3.39.3. Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>Here is an example to recreate all index columns in the database:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>reindex
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>Here is an example to recreate all index columns
+(<code class="docutils literal"><span class="pre">Lexicon.entry_key</span></code> and <code class="docutils literal"><span class="pre">Lexicon.entry_body</span></code>) in <code class="docutils literal"><span class="pre">Lexicon</span></code>
+table:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Entry TABLE_HASH_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entry body COLUMN_SCALAR Text
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create Lexicon TABLE_PAT_KEY ShortText \
+  --default_tokenizer TokenBigram \
+  --normalizer NormalizerAuto
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Lexicon entry_key COLUMN_INDEX|WITH_POSITION \
+  Entry _key
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Lexicon entry_body COLUMN_INDEX|WITH_POSITION \
+  Entry body
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+reindex Lexicon
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>Here is an example to recreate all index columns
+(<code class="docutils literal"><span class="pre">BigramLexicon.site_title</span></code> and <code class="docutils literal"><span class="pre">RegexpLexicon.site_title</span></code>) of
+<code class="docutils literal"><span class="pre">Site.title</span></code> data column:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Site TABLE_HASH_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Site title COLUMN_SCALAR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create BigramLexicon TABLE_PAT_KEY ShortText \
+  --default_tokenizer TokenBigram \
+  --normalizer NormalizerAuto
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create BigramLexicon site_title COLUMN_INDEX|WITH_POSITION \
+  Site title
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create RegexpLexicon TABLE_PAT_KEY ShortText \
+  --default_tokenizer TokenRegexp \
+  --normalizer NormalizerAuto
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create RegexpLexicon site_title COLUMN_INDEX|WITH_POSITION \
+  Site title
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+reindex Site.title
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>Here is an example to recreate an index column (<code class="docutils literal"><span class="pre">Timestamp.index</span></code>):</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Logs TABLE_NO_KEY
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Logs timestamp COLUMN_SCALAR Time
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create Timestamp TABLE_PAT_KEY Time
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Timestamp logs_timestamp COLUMN_INDEX  Logs timestamp
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+reindex Timestamp.logs_timestamp
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+</div>
+<div class="section" id="parameters">
+<h2>7.3.39.4. Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+<p>This section describes all parameters.</p>
+<div class="section" id="target-name">
+<h3>7.3.39.4.1. <code class="docutils literal"><span class="pre">target_name</span></code><a class="headerlink" href="#target-name" title="Permalink to this headline">¶</a></h3>
+<p>Specifies the name of table or column.</p>
+<p>If you don't specify it, database is used for the target object.</p>
+<p>The default is none. It means that the target object is database.</p>
+</div>
+</div>
+<div class="section" id="return-value">
+<h2>7.3.39.5. Return value<a class="headerlink" href="#return-value" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal"><span class="pre">reindex</span></code> command returns whether recreation is succeeded or not:</p>
+<div class="highlight-none"><div class="highlight"><pre>[HEADER, SUCCEEDED_OR_NOT]
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">HEADER</span></code></p>
+<blockquote>
+<div>See <a class="reference internal" href="../command/output_format.html"><em>Output format</em></a> about <code class="docutils literal"><span class="pre">HEADER</span></code>.</div></blockquote>
+<p><code class="docutils literal"><span class="pre">SUCCEEDED_OR_NOT</span></code></p>
+<blockquote>
+<div>If command succeeded, it returns true, otherwise it returns false on
+error.</div></blockquote>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">7.3.39. <code class="docutils literal"><span class="pre">reindex</span></code></a><ul>
+<li><a class="reference internal" href="#summary">7.3.39.1. Summary</a></li>
+<li><a class="reference internal" href="#syntax">7.3.39.2. Syntax</a></li>
+<li><a class="reference internal" href="#usage">7.3.39.3. Usage</a></li>
+<li><a class="reference internal" href="#parameters">7.3.39.4. Parameters</a><ul>
+<li><a class="reference internal" href="#target-name">7.3.39.4.1. <code class="docutils literal"><span class="pre">target_name</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#return-value">7.3.39.5. Return value</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="register.html"
+                        title="previous chapter">7.3.38. <code class="docutils literal"><span class="pre">register</span></code></a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="request_cancel.html"
+                        title="next chapter">7.3.40. <code class="docutils literal"><span class="pre">request_cancel</span></code></a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../sources/reference/commands/reindex.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="request_cancel.html" title="7.3.40. request_cancel"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="register.html" title="7.3.38. register"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v5.1.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../reference.html" >7. Reference manual</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="../command.html" >7.3. Command</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2009-2015, Brazil, Inc.
+    </div>
+      <script src="http://connect.facebook.net/en_US/all.js"></script>
+
+    <script>
+      FB.init({
+         appId  : null,
+         status : true, // check login status
+         cookie : true, // enable cookies to allow the server to access the session
+         xfbml  : true  // parse XFBML
+      });
+    </script>
+  </body>
+
+</html>

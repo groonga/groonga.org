@@ -1,0 +1,291 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>7.3.39. reindex &mdash; Groonga v5.1.0ドキュメント</title>
+    
+    <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
+    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '5.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../static/doctools.js"></script>
+    <script type="text/javascript" src="../../static/translations.js"></script>
+    <link rel="shortcut icon" href="../../static/favicon.ico"/>
+    <link rel="top" title="Groonga v5.1.0ドキュメント" href="../../index.html" />
+    <link rel="up" title="7.3. コマンド" href="../command.html" />
+    <link rel="next" title="7.3.40. request_cancel" href="request_cancel.html" />
+    <link rel="prev" title="7.3.38. register" href="register.html" /> 
+      <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
+    <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
+    <meta property="og:type" content="product" />
+    <meta property="og:image" content="http://groonga.org/images/logos/groonga-icon-full-size.png" />
+    <meta property="og:site_name" content="groonga" />
+
+    <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
+  </head>
+
+  <body role="document">
+<div class="header">
+  <h1 class="title">
+    <a id="top-link" href="../../../">
+      <span class="project">groonga</span>
+      <span class="separator">-</span>
+      <span class="description">オープンソースのカラムストア機能付き全文検索エンジン</span>
+    </a>
+  </h1>
+
+      <div class="facebook-buttons">
+      <fb:like href="http://www.facebook.com/pages/groonga/201193596592346"
+               layout="standard"
+               width="290"></fb:like>
+    </div>
+    <div class="other-language-links">
+
+    <ul>
+      <li><a href="../../../../docs/reference/commands/reindex.html">English</a></li>
+    </ul>
+  </div>
+</div>
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="request_cancel.html" title="7.3.40. request_cancel"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="register.html" title="7.3.38. register"
+             accesskey="P">前へ</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v5.1.0ドキュメント</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../reference.html" >7. リファレンスマニュアル</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="../command.html" accesskey="U">7.3. コマンド</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="reindex">
+<h1>7.3.39. <code class="docutils literal"><span class="pre">reindex</span></code><a class="headerlink" href="#reindex" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<div class="section" id="summary">
+<h2>7.3.39.1. 概要<a class="headerlink" href="#summary" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified">バージョン 5.1.0 で追加.</span></p>
+</div>
+<p><code class="docutils literal"><span class="pre">reindex</span></code> コマンドは1つ以上のインデックスカラムを作り直します。</p>
+<p>対象オブジェクトにデータベースを指定するとすべてのインデックスカラムを作り直します。</p>
+<p>対象オブジェクトにテーブルを指定すると、そのテーブル内のすべてのインデックスカラムを作り直します。</p>
+<p>対象オブジェクトにデータカラムを指定すると、そのデータカラム用のすべてのインデックスカラムを作り直します。</p>
+<p>対象オブジェクトにインデックスカラムを指定すると、そのインデックスカラムを作り直します。</p>
+<p>このコマンドはインデックスカラムが壊れたときに便利です。対象オブジェクトはデータベース、テーブル、カラムのどれかです。</p>
+<div class="admonition note">
+<p class="first admonition-title">注釈</p>
+<p class="last"><code class="docutils literal"><span class="pre">reindex</span></code> コマンドを実行している間は対象インデックスカラムを使うことはできません。もし、複数のプロセスから同じデータベースを使っている場合、 <code class="docutils literal"><span class="pre">reindex</span></code> を実行したプロセス以外のすべてのプロセスはデータベースを開き直すべきです。データベースを開き直すには <a class="reference internal" href="database_unmap.html"><em>database_unmap</em></a> を使えます。</p>
+</div>
+</div>
+<div class="section" id="syntax">
+<h2>7.3.39.2. 構文<a class="headerlink" href="#syntax" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>このコマンドの引数は1つで省略できます:</p>
+<div class="highlight-none"><div class="highlight"><pre>reindex [target_name=null]
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">target_name</span></code> パラメーターを省略した場合は対象オブジェクトはデータベースになります。これは、データベース中のすべてのインデックスカラムを作りなおすという意味です。</p>
+</div>
+<div class="section" id="usage">
+<h2>7.3.39.3. 使い方<a class="headerlink" href="#usage" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>以下はデータベースの中のすべてのインデックスカラムを作り直す例です。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>reindex
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>以下は <code class="docutils literal"><span class="pre">Lexicon</span></code> テーブルの中のすべてのインデックスカラム（ <code class="docutils literal"><span class="pre">Lexicon.entry_key</span></code> と <code class="docutils literal"><span class="pre">Lexicon.entry_body</span></code> ）を作り直す例です。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Entry TABLE_HASH_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entry body COLUMN_SCALAR Text
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create Lexicon TABLE_PAT_KEY ShortText \
+  --default_tokenizer TokenBigram \
+  --normalizer NormalizerAuto
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Lexicon entry_key COLUMN_INDEX|WITH_POSITION \
+  Entry _key
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Lexicon entry_body COLUMN_INDEX|WITH_POSITION \
+  Entry body
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+reindex Lexicon
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>以下は <code class="docutils literal"><span class="pre">Site.title</span></code> データカラムのすべてのインデックスカラム（ <code class="docutils literal"><span class="pre">BigramLexicon.site_title</span></code> と <code class="docutils literal"><span class="pre">RegexpLexicon.site_title</span></code> ）を作り直す例です。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Site TABLE_HASH_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Site title COLUMN_SCALAR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create BigramLexicon TABLE_PAT_KEY ShortText \
+  --default_tokenizer TokenBigram \
+  --normalizer NormalizerAuto
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create BigramLexicon site_title COLUMN_INDEX|WITH_POSITION \
+  Site title
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create RegexpLexicon TABLE_PAT_KEY ShortText \
+  --default_tokenizer TokenRegexp \
+  --normalizer NormalizerAuto
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create RegexpLexicon site_title COLUMN_INDEX|WITH_POSITION \
+  Site title
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+reindex Site.title
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>以下は1つのインデックスカラム（ <code class="docutils literal"><span class="pre">Timestamp.index</span></code> ）を作り直す例です。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Logs TABLE_NO_KEY
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Logs timestamp COLUMN_SCALAR Time
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create Timestamp TABLE_PAT_KEY Time
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Timestamp logs_timestamp COLUMN_INDEX  Logs timestamp
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+reindex Timestamp.logs_timestamp
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+</div>
+<div class="section" id="parameters">
+<h2>7.3.39.4. 引数<a class="headerlink" href="#parameters" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>このセクションではすべての引数について説明します。</p>
+<div class="section" id="target-name">
+<h3>7.3.39.4.1. <code class="docutils literal"><span class="pre">target_name</span></code><a class="headerlink" href="#target-name" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>テーブル名またはカラム名を指定します。</p>
+<p>指定しなかったら対象オブジェクトはデータベースになります。</p>
+<p>デフォルト値はありません。これは対象オブジェクトはデータベースになるということです。</p>
+</div>
+</div>
+<div class="section" id="return-value">
+<h2>7.3.39.5. 戻り値<a class="headerlink" href="#return-value" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><code class="docutils literal"><span class="pre">reindex</span></code> コマンドは作り直しが成功したかどうかを返します。:</p>
+<div class="highlight-none"><div class="highlight"><pre>[HEADER, SUCCEEDED_OR_NOT]
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">HEADER</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">HEADER</span></code> については <a class="reference internal" href="../command/output_format.html"><em>出力形式</em></a> を参照してください。</p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">SUCCEEDED_OR_NOT</span></code></p>
+<blockquote>
+<div><p>コマンドの実行が成功するとtrueを返します。失敗するとエラーとしてfalseを返します。</p>
+</div></blockquote>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">7.3.39. <code class="docutils literal"><span class="pre">reindex</span></code></a><ul>
+<li><a class="reference internal" href="#summary">7.3.39.1. 概要</a></li>
+<li><a class="reference internal" href="#syntax">7.3.39.2. 構文</a></li>
+<li><a class="reference internal" href="#usage">7.3.39.3. 使い方</a></li>
+<li><a class="reference internal" href="#parameters">7.3.39.4. 引数</a><ul>
+<li><a class="reference internal" href="#target-name">7.3.39.4.1. <code class="docutils literal"><span class="pre">target_name</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#return-value">7.3.39.5. 戻り値</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="register.html"
+                        title="前の章へ">7.3.38. <code class="docutils literal"><span class="pre">register</span></code></a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="request_cancel.html"
+                        title="次の章へ">7.3.40. <code class="docutils literal"><span class="pre">request_cancel</span></code></a></p>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../sources/reference/commands/reindex.txt"
+            rel="nofollow">ソースコードを表示（英語）</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>クイック検索</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="request_cancel.html" title="7.3.40. request_cancel"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="register.html" title="7.3.38. register"
+             >前へ</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v5.1.0ドキュメント</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../reference.html" >7. リファレンスマニュアル</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="../command.html" >7.3. コマンド</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2009-2015, Brazil, Inc.
+    </div>
+      <script src="http://connect.facebook.net/ja_JP/all.js"></script>
+
+    <script>
+      FB.init({
+         appId  : null,
+         status : true, // check login status
+         cookie : true, // enable cookies to allow the server to access the session
+         xfbml  : true  // parse XFBML
+      });
+    </script>
+  </body>
+
+</html>

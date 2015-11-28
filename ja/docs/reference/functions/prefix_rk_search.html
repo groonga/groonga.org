@@ -1,0 +1,446 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>7.14.11. prefix_rk_search() &mdash; Groonga v5.1.0ドキュメント</title>
+    
+    <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
+    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '5.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../static/doctools.js"></script>
+    <script type="text/javascript" src="../../static/translations.js"></script>
+    <link rel="shortcut icon" href="../../static/favicon.ico"/>
+    <link rel="top" title="Groonga v5.1.0ドキュメント" href="../../index.html" />
+    <link rel="up" title="7.14. 関数" href="../function.html" />
+    <link rel="next" title="7.14.12. query" href="query.html" />
+    <link rel="prev" title="7.14.10. now" href="now.html" /> 
+      <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
+    <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
+    <meta property="og:type" content="product" />
+    <meta property="og:image" content="http://groonga.org/images/logos/groonga-icon-full-size.png" />
+    <meta property="og:site_name" content="groonga" />
+
+    <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
+  </head>
+
+  <body role="document">
+<div class="header">
+  <h1 class="title">
+    <a id="top-link" href="../../../">
+      <span class="project">groonga</span>
+      <span class="separator">-</span>
+      <span class="description">オープンソースのカラムストア機能付き全文検索エンジン</span>
+    </a>
+  </h1>
+
+      <div class="facebook-buttons">
+      <fb:like href="http://www.facebook.com/pages/groonga/201193596592346"
+               layout="standard"
+               width="290"></fb:like>
+    </div>
+    <div class="other-language-links">
+
+    <ul>
+      <li><a href="../../../../docs/reference/functions/prefix_rk_search.html">English</a></li>
+    </ul>
+  </div>
+</div>
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="query.html" title="7.14.12. query"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="now.html" title="7.14.10. now"
+             accesskey="P">前へ</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v5.1.0ドキュメント</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../reference.html" >7. リファレンスマニュアル</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="../function.html" accesskey="U">7.14. 関数</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="prefix-rk-search">
+<h1>7.14.11. <code class="docutils literal"><span class="pre">prefix_rk_search()</span></code><a class="headerlink" href="#prefix-rk-search" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<div class="section" id="summary">
+<h2>7.14.11.1. 概要<a class="headerlink" href="#summary" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><code class="docutils literal"><span class="pre">prefix_rk_search()</span></code> は <a class="reference internal" href="../operations/prefix_rk_search.html"><em>前方一致RK検索</em></a> を使ってレコードを選択します。</p>
+<p>前方一致RK検索を使うには <a class="reference internal" href="../tables.html#table-pat-key"><span>TABLE_PAT_KEY</span></a> テーブルを作る必要があります。</p>
+<p>シーケンシャルスキャンでは <code class="docutils literal"><span class="pre">prefix_rk_search()</span></code> を使うことはできません。これはセレクターのみのプロシージャです。</p>
+</div>
+<div class="section" id="syntax">
+<h2>7.14.11.2. 構文<a class="headerlink" href="#syntax" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><code class="docutils literal"><span class="pre">prefix_rk_search()</span></code> には2つ引数があります。 <code class="docutils literal"><span class="pre">column</span></code> と <code class="docutils literal"><span class="pre">query</span></code> です。</p>
+<div class="highlight-none"><div class="highlight"><pre>prefix_rk_search(column, query)
+</pre></div>
+</div>
+<p>今のところ、 <code class="docutils literal"><span class="pre">column</span></code> は必ず <code class="docutils literal"><span class="pre">_key</span></code> にしなければいけません。</p>
+<p><code class="docutils literal"><span class="pre">query</span></code> は文字列です。</p>
+</div>
+<div class="section" id="usage">
+<h2>7.14.11.3. 使い方<a class="headerlink" href="#usage" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>使い方を示すために使うスキーマ定義とサンプルデータは以下の通りです。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Readings TABLE_PAT_KEY ShortText --normalizer NormalizerAuto
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+load --table Readings
+[
+{&quot;_key&quot;: &quot;ニホン&quot;},
+{&quot;_key&quot;: &quot;ニッポン&quot;},
+{&quot;_key&quot;: &quot;ローマジ&quot;}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 3]
+</pre></div>
+</div>
+<p>以下は簡単な <code class="docutils literal"><span class="pre">prefix_rk_search()</span></code> 関数の使い方です。この使い方では <code class="docutils literal"><span class="pre">ni</span></code> で <code class="docutils literal"><span class="pre">ニホン</span></code> と <code class="docutils literal"><span class="pre">ニッポン</span></code> を検索しています。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Readings --filter &#39;prefix_rk_search(_key, &quot;ni&quot;)&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         2,
+#         &quot;ニッポン&quot;
+#       ],
+#       [
+#         1,
+#         &quot;ニホン&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p><a class="reference internal" href="sub_filter.html"><em>sub_filter</em></a> と組み合わせることで <a class="reference internal" href="../suggest/completion.html"><em>補完</em></a> のような機能を実現することができます。</p>
+<p>レコードが補完候補となるテーブルを作成します。各レコードには0個以上の読みがあります。読みは <code class="docutils literal"><span class="pre">Readings</span></code> テーブルに格納します。 <code class="docutils literal"><span class="pre">Readings</span></code> テーブルに <code class="docutils literal"><span class="pre">Items.readings</span></code> 用のインデックスカラムを定義することを忘れないでください。このインデックスカラムは <a class="reference internal" href="sub_filter.html"><em>sub_filter</em></a> で必要になります。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Items TABLE_HASH_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Items readings COLUMN_VECTOR Readings
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Readings items_index COLUMN_INDEX Items readings
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+load --table Items
+[
+{&quot;_key&quot;: &quot;日本&quot;,     &quot;readings&quot;: [&quot;ニホン&quot;, &quot;ニッポン&quot;]},
+{&quot;_key&quot;: &quot;ローマ字&quot;, &quot;readings&quot;: [&quot;ローマジ&quot;]},
+{&quot;_key&quot;: &quot;漢字&quot;,     &quot;readings&quot;: [&quot;カンジ&quot;]}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 3]
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">niho</span></code> で <code class="docutils literal"><span class="pre">Items</span></code> テーブルの中にある <code class="docutils literal"><span class="pre">日本</span></code> レコードを見つけることができます。なぜなら、 <code class="docutils literal"><span class="pre">niho</span></code> で前方一致RK検索をすると <code class="docutils literal"><span class="pre">ニホン</span></code> という読みが見つかり、 <code class="docutils literal"><span class="pre">ニホン</span></code> という読みは <code class="docutils literal"><span class="pre">日本</span></code> レコードの読みの1つだからです。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Items \
+ --filter &#39;sub_filter(readings, &quot;prefix_rk_search(_key, \\&quot;niho\\&quot;)&quot;)&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;readings&quot;,
+#           &quot;Readings&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;日本&quot;,
+#         [
+#           &quot;ニホン&quot;,
+#           &quot;ニッポン&quot;
+#         ]
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>読みがない補完候補をサポートするために <a class="reference internal" href="../grn_expr/script_syntax.html#script-syntax-prefix-search-operator"><span>前方一致検索演算子</span></a> も組み合わせる必要があります。</p>
+<p>読みがない補完候補を1つ追加します。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>load --table Items
+[
+{&quot;_key&quot;: &quot;nihon&quot;, &quot;readings&quot;: []}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 1]
+</pre></div>
+</div>
+<p>読みがない補完候補をサポートするために <a class="reference internal" href="../grn_expr/script_syntax.html#script-syntax-prefix-search-operator"><span>前方一致検索演算子</span></a> を組み合わせます。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Items \
+ --filter &#39;sub_filter(readings, &quot;prefix_rk_search(_key, \\&quot;niho\\&quot;)&quot;) || \
+           _key @^ &quot;niho&quot;&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;readings&quot;,
+#           &quot;Readings&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;日本&quot;,
+#         [
+#           &quot;ニホン&quot;,
+#           &quot;ニッポン&quot;
+#         ]
+#       ],
+#       [
+#         4,
+#         &quot;nihon&quot;,
+#         []
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>多くの場合、補完時は大文字小文字を無視して検索したいものです。その場合は、 <code class="docutils literal"><span class="pre">--normalizer</span> <span class="pre">NormalizerAuto</span></code> と <code class="docutils literal"><span class="pre">label</span></code> カラムを使います。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create LooseItems TABLE_HASH_KEY ShortText --normalizer NormalizerAuto
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create LooseItems label COLUMN_SCALAR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create LooseItems readings COLUMN_VECTOR Readings
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Readings loose_items_index COLUMN_INDEX LooseItems readings
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+load --table LooseItems
+[
+{&quot;_key&quot;: &quot;日本&quot;,     &quot;label&quot;: &quot;日本&quot;,     &quot;readings&quot;: [&quot;ニホン&quot;, &quot;ニッポン&quot;]},
+{&quot;_key&quot;: &quot;ローマ字&quot;, &quot;label&quot;: &quot;ローマ字&quot;, &quot;readings&quot;: [&quot;ローマジ&quot;]},
+{&quot;_key&quot;: &quot;漢字&quot;,     &quot;label&quot;: &quot;漢字&quot;,     &quot;readings&quot;: [&quot;カンジ&quot;]},
+{&quot;_key&quot;: &quot;Nihon&quot;,    &quot;label&quot;: &quot;日本&quot;,     &quot;readings&quot;: []}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 4]
+</pre></div>
+</div>
+<p>表示するときは <code class="docutils literal"><span class="pre">LooseItems.label</span></code> を使います。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre>select LooseItems \
+ --filter &#39;sub_filter(readings, &quot;prefix_rk_search(_key, \\&quot;nIhO\\&quot;)&quot;) || \
+           _key @^ &quot;nIhO&quot;&#39; \
+ --output_columns &#39;_key,label&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;label&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         &quot;日本&quot;,
+#         &quot;日本&quot;
+#       ],
+#       [
+#         &quot;nihon&quot;,
+#         &quot;日本&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
+<div class="section" id="parameters">
+<h2>7.14.11.4. 引数<a class="headerlink" href="#parameters" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>必須引数は二つあります。 <code class="docutils literal"><span class="pre">column</span></code> と <code class="docutils literal"><span class="pre">query</span></code> です。</p>
+<div class="section" id="column">
+<h3>7.14.11.4.1. <code class="docutils literal"><span class="pre">column</span></code><a class="headerlink" href="#column" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>今のところ、常に <code class="docutils literal"><span class="pre">_key</span></code> を指定してください。</p>
+</div>
+<div class="section" id="query">
+<h3>7.14.11.4.2. <code class="docutils literal"><span class="pre">query</span></code><a class="headerlink" href="#query" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>クエリー文字列をローマ字、カタカナ、ひらがなのどれかで指定します。</p>
+</div>
+</div>
+<div class="section" id="return-value">
+<h2>7.14.11.5. 戻り値<a class="headerlink" href="#return-value" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><code class="docutils literal"><span class="pre">prefix_rk_search()</span></code> 関数はマッチしたレコードを返します。</p>
+</div>
+<div class="section" id="see-also">
+<h2>7.14.11.6. 参考<a class="headerlink" href="#see-also" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<ul class="simple">
+<li><a class="reference internal" href="../operations/prefix_rk_search.html"><em>前方一致RK検索</em></a></li>
+<li><a class="reference internal" href="sub_filter.html"><em>sub_filter</em></a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">7.14.11. <code class="docutils literal"><span class="pre">prefix_rk_search()</span></code></a><ul>
+<li><a class="reference internal" href="#summary">7.14.11.1. 概要</a></li>
+<li><a class="reference internal" href="#syntax">7.14.11.2. 構文</a></li>
+<li><a class="reference internal" href="#usage">7.14.11.3. 使い方</a></li>
+<li><a class="reference internal" href="#parameters">7.14.11.4. 引数</a><ul>
+<li><a class="reference internal" href="#column">7.14.11.4.1. <code class="docutils literal"><span class="pre">column</span></code></a></li>
+<li><a class="reference internal" href="#query">7.14.11.4.2. <code class="docutils literal"><span class="pre">query</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#return-value">7.14.11.5. 戻り値</a></li>
+<li><a class="reference internal" href="#see-also">7.14.11.6. 参考</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="now.html"
+                        title="前の章へ">7.14.10. now</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="query.html"
+                        title="次の章へ">7.14.12. <code class="docutils literal"><span class="pre">query</span></code></a></p>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../sources/reference/functions/prefix_rk_search.txt"
+            rel="nofollow">ソースコードを表示（英語）</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>クイック検索</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="query.html" title="7.14.12. query"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="now.html" title="7.14.10. now"
+             >前へ</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v5.1.0ドキュメント</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../reference.html" >7. リファレンスマニュアル</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="../function.html" >7.14. 関数</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2009-2015, Brazil, Inc.
+    </div>
+      <script src="http://connect.facebook.net/ja_JP/all.js"></script>
+
+    <script>
+      FB.init({
+         appId  : null,
+         status : true, // check login status
+         cookie : true, // enable cookies to allow the server to access the session
+         xfbml  : true  // parse XFBML
+      });
+    </script>
+  </body>
+
+</html>

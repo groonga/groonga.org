@@ -30,14 +30,23 @@ description: Groonga Meatup 2015を開催しました！
 イベントの内容がわかる情報を以下に列挙するので、当日参加できなかった方、参加したけど復習したい方は活用してください。（情報が更新されたら随時ここを更新します。）
 
   * [「Groonga Meatup 2015」のまとめ - Togetterまとめ](http://togetter.com/li/904224)
-  * [Groonga Meatup 2015 - YouTube](https://www.youtube.com/watch?v=_Ep-OnP1lhA)：当日の内容を録画した動画です。（編集予定）
-  * [20151129-Groonga Meatup \| Flickr](https://www.flickr.com/photos/koyhoge/sets/72157659465505463)：[@koyhoge](https://twitter.com/koyhoge)さんが撮影してくれた写真です。
-  * [Groonga族2015 - Kouhei Sutou - Rabbit Slide Show](http://slide.rabbit-shocker.org/authors/kou/groonga-meatup-2015/)：[@ktou](https://twitter.com/ktou)さんの発表資料です。
-  * [grn_ts の紹介 - Groonga Meatup 2015](http://www.slideshare.net/s5yata/grnts-groonga-meatup-2015)：[@s-yata](https://github.com/s-yata)さんの発表資料です。
-  * [Mroongaの導入事例を話してきました #groonga - (ﾟ∀ﾟ)o彡 sasata299's blog](http://blog.livedoor.jp/sasata299/archives/52201195.html)：[@sasata299](https://twitter.com/sasata299)さんの発表資料です。
-  * [Rubyでプラグインを作れる分散全文検索エンジンDroonga](https://kitaitimakoto.github.io/apehuci/2015/11/29.html)：[@KitaitiMakoto](https://github.com/KitaitiMakoto)さんの発表資料です。
-  * [MroongaとownCloudの良い関係 Groonga Meetup 2015](http://www.slideshare.net/ukitiyan/mroongaowncloud-groonga-meetup-2015)：[@ukitiyan](https://github.com/ukitiyan)さんの発表資料です。
-  * [Groongaでのタグ検索と表記揺れとの戦い at Groonga Meatup 2015 - CreateField Blog](http://blog.createfield.com/entry/2015/11/30/120556)：[@naoa_y](https://twitter.com/naoa_y)さんの発表資料です。
-  * [GroongaアプリケーションをDockerコンテナ化して配布する](http://www.slideshare.net/GaeshiGaeshi/groongadocker)：[@ongaeshi](https://github.com/ongaeshi)さんの発表資料です。
+  * [Groonga Meatup 2015 - YouTube](https://www.youtube.com/watch?v=_Ep-OnP1lhA)
+    * 当日の内容を録画した動画です。（編集予定）
+  * [20151129-Groonga Meatup \| Flickr](https://www.flickr.com/photos/koyhoge/sets/72157659465505463)
+    * [@koyhoge](https://twitter.com/koyhoge)さんが撮影してくれた写真です。
+  * [Groonga族2015 - Kouhei Sutou - Rabbit Slide Show](http://slide.rabbit-shocker.org/authors/kou/groonga-meatup-2015/)
+    * [@ktou](https://twitter.com/ktou)さんの発表資料です。
+  * [grn_ts の紹介 - Groonga Meatup 2015](http://www.slideshare.net/s5yata/grnts-groonga-meatup-2015)
+    * [@s-yata](https://github.com/s-yata)さんの発表資料です。
+  * [Mroongaの導入事例を話してきました #groonga - (ﾟ∀ﾟ)o彡 sasata299's blog](http://blog.livedoor.jp/sasata299/archives/52201195.html)
+    * [@sasata299](https://twitter.com/sasata299)さんの発表資料です。
+  * [Rubyでプラグインを作れる分散全文検索エンジンDroonga](https://kitaitimakoto.github.io/apehuci/2015/11/29.html)
+    * [@KitaitiMakoto](https://github.com/KitaitiMakoto)さんの発表資料です。
+  * [MroongaとownCloudの良い関係 Groonga Meetup 2015](http://www.slideshare.net/ukitiyan/mroongaowncloud-groonga-meetup-2015)
+    * [@ukitiyan](https://github.com/ukitiyan)さんの発表資料です。
+  * [Groongaでのタグ検索と表記揺れとの戦い at Groonga Meatup 2015 - CreateField Blog](http://blog.createfield.com/entry/2015/11/30/120556)
+    * [@naoa_y](https://twitter.com/naoa_y)さんの発表資料です。
+  * [GroongaアプリケーションをDockerコンテナ化して配布する](http://www.slideshare.net/GaeshiGaeshi/groongadocker)
+    * [@ongaeshi](https://github.com/ongaeshi)さんの発表資料です。
 
 それでは、また来年、いい肉の日にお会いしましょう！

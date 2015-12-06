@@ -34,7 +34,7 @@ description: Groonga Meatup 2015を開催しました！
     * 当日の内容を録画した動画です。（編集予定）
   * [20151129-Groonga Meatup \| Flickr](https://www.flickr.com/photos/koyhoge/sets/72157659465505463)
     * [@koyhoge](https://twitter.com/koyhoge)さんが撮影してくれた写真です。
-  * [Groonga族2015 - Kouhei Sutou - Rabbit Slide Show](http://slide.rabbit-shocker.org/authors/kou/groonga-meatup-2015/)
+  * [Groonga Meatup 2015：Groonga族2015 #groonga](http://www.clear-code.com/blog/2015/12/6.html)
     * [@ktou](https://twitter.com/ktou)さんの発表資料です。
   * [grn_ts の紹介 - Groonga Meatup 2015](http://www.slideshare.net/s5yata/grnts-groonga-meatup-2015)
     * [@s-yata](https://github.com/s-yata)さんの発表資料です。

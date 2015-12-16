@@ -30,6 +30,7 @@ description: Groonga Meatup 2015を開催しました！
 イベントの内容がわかる情報を以下に列挙するので、当日参加できなかった方、参加したけど復習したい方は活用してください。（情報が更新されたら随時ここを更新します。）
 
   * [「Groonga Meatup 2015」のまとめ - Togetterまとめ](http://togetter.com/li/904224)
+  * [いい肉の日に開催，Groonga Meatup 2015レポート ～今年は新たにPGroongaが仲間に：レポート｜gihyo.jp … 技術評論社](http://gihyo.jp/news/report/2015/12/0801)
   * [Groonga Meatup 2015 - YouTube](https://www.youtube.com/watch?v=_Ep-OnP1lhA)
     * 当日の内容を録画した動画です。（編集予定）
   * [20151129-Groonga Meatup \| Flickr](https://www.flickr.com/photos/koyhoge/sets/72157659465505463)

@@ -46,8 +46,10 @@ description: Groonga Meatup 2015を開催しました！
     * [@ukitiyan](https://github.com/ukitiyan)さんの発表資料です。
   * [Groongaでのタグ検索と表記揺れとの戦い at Groonga Meatup 2015 - CreateField Blog](http://blog.createfield.com/entry/2015/11/30/120556)
     * [@naoa_y](https://twitter.com/naoa_y)さんの発表資料です。
+  * [Droongaを転職情報サイトで使ってみた話](http://www.slideshare.net/JSUXDesign/groonga-meetup20151129)
+    * 瀬戸隆太さんの発表資料です。
   * [Groonga導入事例](http://slide.rabbit-shocker.org/authors/hiroyuki-sato/groonga-meatup-2015/)
-    * Hiroyuki Sato（[@hiroysato](https://twitter.com/hiroysato)）さん
+    * Hiroyuki Sato（[@hiroysato](https://twitter.com/hiroysato)）さんの発表資料です。
   * [GroongaアプリケーションをDockerコンテナ化して配布する](http://www.slideshare.net/GaeshiGaeshi/groongadocker)
     * [@ongaeshi](https://github.com/ongaeshi)さんの発表資料です。
 

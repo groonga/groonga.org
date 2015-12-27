@@ -31,8 +31,8 @@ description: Groonga Meatup 2015を開催しました！
 
   * [「Groonga Meatup 2015」のまとめ - Togetterまとめ](http://togetter.com/li/904224)
   * [いい肉の日に開催，Groonga Meatup 2015レポート ～今年は新たにPGroongaが仲間に：レポート｜gihyo.jp … 技術評論社](http://gihyo.jp/news/report/2015/12/0801)
-  * [Groonga Meatup 2015 - YouTube](https://www.youtube.com/watch?v=_Ep-OnP1lhA)
-    * 当日の内容を録画した動画です。（編集予定）
+  * [Groonga Meatup 2015 - YouTube](https://www.youtube.com/playlist?list=PLLwHraQ4jf7MRIR36oO_Zys4V5oJ8DGDb)
+    * 当日の内容を録画した動画です。
   * [20151129-Groonga Meatup \| Flickr](https://www.flickr.com/photos/koyhoge/sets/72157659465505463)
     * [@koyhoge](https://twitter.com/koyhoge)さんが撮影してくれた写真です。
   * [Groonga Meatup 2015：Groonga族2015 #groonga](http://www.clear-code.com/blog/2015/12/6.html)

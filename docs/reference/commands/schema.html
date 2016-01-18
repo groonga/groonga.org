@@ -1,0 +1,1195 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>7.3.43. schema &mdash; Groonga v5.1.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
+    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '5.1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../static/favicon.ico"/>
+    <link rel="top" title="Groonga v5.1.1 documentation" href="../../index.html" />
+    <link rel="up" title="7.3. Command" href="../command.html" />
+    <link rel="next" title="7.3.44. select" href="select.html" />
+    <link rel="prev" title="7.3.42. ruby_load" href="ruby_load.html" /> 
+      <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
+    <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
+    <meta property="og:type" content="product" />
+    <meta property="og:image" content="http://groonga.org/images/logos/groonga-icon-full-size.png" />
+    <meta property="og:site_name" content="groonga" />
+
+    <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
+  </head>
+
+  <body role="document">
+<div class="header">
+  <h1 class="title">
+    <a id="top-link" href="../../../">
+      <span class="project">groonga</span>
+      <span class="separator">-</span>
+      <span class="description">An open-source fulltext search engine and column store.</span>
+    </a>
+  </h1>
+
+      <div class="facebook-buttons">
+      <fb:like href="http://www.facebook.com/pages/groonga/201193596592346"
+               layout="standard"
+               width="290"></fb:like>
+    </div>
+    <div class="other-language-links">
+
+    <ul>
+      <li><a href="../../../ja/docs/reference/commands/schema.html">日本語</a></li>
+    </ul>
+  </div>
+</div>
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="select.html" title="7.3.44. select"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="ruby_load.html" title="7.3.42. ruby_load"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v5.1.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../reference.html" >7. Reference manual</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="../command.html" accesskey="U">7.3. Command</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="schema">
+<h1>7.3.43. <code class="docutils literal"><span class="pre">schema</span></code><a class="headerlink" href="#schema" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="summary">
+<h2>7.3.43.1. Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 5.0.9.</span></p>
+</div>
+<p><code class="docutils literal"><span class="pre">schema</span></code> command returns schema in the database.</p>
+<p>This command is useful when you want to inspect the database. For
+example, visualizing the database, creating GUI for the database and
+so on.</p>
+</div>
+<div class="section" id="syntax">
+<h2>7.3.43.2. Syntax<a class="headerlink" href="#syntax" title="Permalink to this headline">¶</a></h2>
+<p>This command takes no parameters:</p>
+<div class="highlight-none"><div class="highlight"><pre>schema
+</pre></div>
+</div>
+</div>
+<div class="section" id="usage">
+<h2>7.3.43.3. Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>Here is an example schema to show example output:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Memos TABLE_HASH_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Memos content COLUMN_SCALAR Text
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create Terms TABLE_PAT_KEY ShortText \
+  --default_tokenizer TokenBigram \
+  --normalizer NormalizerAuto
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Terms memos_content_index \
+  COLUMN_INDEX|WITH_POSITION \
+  Memos content
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>Here is an output of <code class="docutils literal"><span class="pre">schema</span></code> command against this example schema:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>schema
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   {
+#     &quot;tables&quot;: {
+#       &quot;Terms&quot;: {
+#         &quot;normalizer&quot;: {
+#           &quot;name&quot;: &quot;NormalizerAuto&quot;
+#         },
+#         &quot;name&quot;: &quot;Terms&quot;,
+#         &quot;tokenizer&quot;: {
+#           &quot;name&quot;: &quot;TokenBigram&quot;
+#         },
+#         &quot;command&quot;: {
+#           &quot;command_line&quot;: &quot;table_create --name Terms --flags TABLE_PAT_KEY --key_type ShortText --default_tokenizer TokenBigram --normalizer NormalizerAuto&quot;,
+#           &quot;name&quot;: &quot;table_create&quot;,
+#           &quot;arguments&quot;: {
+#             &quot;key_type&quot;: &quot;ShortText&quot;,
+#             &quot;default_tokenizer&quot;: &quot;TokenBigram&quot;,
+#             &quot;normalizer&quot;: &quot;NormalizerAuto&quot;,
+#             &quot;flags&quot;: &quot;TABLE_PAT_KEY&quot;,
+#             &quot;name&quot;: &quot;Terms&quot;
+#           }
+#         },
+#         &quot;indexes&quot;: [],
+#         &quot;key_type&quot;: {
+#           &quot;type&quot;: &quot;type&quot;,
+#           &quot;name&quot;: &quot;ShortText&quot;
+#         },
+#         &quot;value_type&quot;: null,
+#         &quot;token_filters&quot;: [],
+#         &quot;type&quot;: &quot;patricia trie&quot;,
+#         &quot;columns&quot;: {
+#           &quot;memos_content_index&quot;: {
+#             &quot;name&quot;: &quot;memos_content_index&quot;,
+#             &quot;weight&quot;: false,
+#             &quot;section&quot;: false,
+#             &quot;compress&quot;: null,
+#             &quot;command&quot;: {
+#               &quot;command_line&quot;: &quot;column_create --table Terms --name memos_content_index --flags COLUMN_INDEX|WITH_POSITION --type Memos --sources content&quot;,
+#               &quot;name&quot;: &quot;column_create&quot;,
+#               &quot;arguments&quot;: {
+#                 &quot;table&quot;: &quot;Terms&quot;,
+#                 &quot;flags&quot;: &quot;COLUMN_INDEX|WITH_POSITION&quot;,
+#                 &quot;name&quot;: &quot;memos_content_index&quot;,
+#                 &quot;sources&quot;: &quot;content&quot;,
+#                 &quot;type&quot;: &quot;Memos&quot;
+#               }
+#             },
+#             &quot;indexes&quot;: [],
+#             &quot;sources&quot;: [
+#               {
+#                 &quot;table&quot;: &quot;Memos&quot;,
+#                 &quot;name&quot;: &quot;content&quot;,
+#                 &quot;full_name&quot;: &quot;Memos.content&quot;
+#               }
+#             ],
+#             &quot;value_type&quot;: {
+#               &quot;type&quot;: &quot;reference&quot;,
+#               &quot;name&quot;: &quot;Memos&quot;
+#             },
+#             &quot;full_name&quot;: &quot;Terms.memos_content_index&quot;,
+#             &quot;position&quot;: true,
+#             &quot;table&quot;: &quot;Terms&quot;,
+#             &quot;type&quot;: &quot;index&quot;
+#           }
+#         }
+#       },
+#       &quot;Memos&quot;: {
+#         &quot;normalizer&quot;: null,
+#         &quot;name&quot;: &quot;Memos&quot;,
+#         &quot;tokenizer&quot;: null,
+#         &quot;command&quot;: {
+#           &quot;command_line&quot;: &quot;table_create --name Memos --flags TABLE_HASH_KEY --key_type ShortText&quot;,
+#           &quot;name&quot;: &quot;table_create&quot;,
+#           &quot;arguments&quot;: {
+#             &quot;key_type&quot;: &quot;ShortText&quot;,
+#             &quot;flags&quot;: &quot;TABLE_HASH_KEY&quot;,
+#             &quot;name&quot;: &quot;Memos&quot;
+#           }
+#         },
+#         &quot;indexes&quot;: [],
+#         &quot;key_type&quot;: {
+#           &quot;type&quot;: &quot;type&quot;,
+#           &quot;name&quot;: &quot;ShortText&quot;
+#         },
+#         &quot;value_type&quot;: null,
+#         &quot;token_filters&quot;: [],
+#         &quot;type&quot;: &quot;hash table&quot;,
+#         &quot;columns&quot;: {
+#           &quot;content&quot;: {
+#             &quot;name&quot;: &quot;content&quot;,
+#             &quot;weight&quot;: false,
+#             &quot;section&quot;: false,
+#             &quot;compress&quot;: null,
+#             &quot;command&quot;: {
+#               &quot;command_line&quot;: &quot;column_create --table Memos --name content --flags COLUMN_SCALAR --type Text&quot;,
+#               &quot;name&quot;: &quot;column_create&quot;,
+#               &quot;arguments&quot;: {
+#                 &quot;table&quot;: &quot;Memos&quot;,
+#                 &quot;flags&quot;: &quot;COLUMN_SCALAR&quot;,
+#                 &quot;name&quot;: &quot;content&quot;,
+#                 &quot;type&quot;: &quot;Text&quot;
+#               }
+#             },
+#             &quot;indexes&quot;: [
+#               {
+#                 &quot;table&quot;: &quot;Terms&quot;,
+#                 &quot;section&quot;: 0,
+#                 &quot;name&quot;: &quot;memos_content_index&quot;,
+#                 &quot;full_name&quot;: &quot;Terms.memos_content_index&quot;
+#               }
+#             ],
+#             &quot;sources&quot;: [],
+#             &quot;value_type&quot;: {
+#               &quot;type&quot;: &quot;type&quot;,
+#               &quot;name&quot;: &quot;Text&quot;
+#             },
+#             &quot;full_name&quot;: &quot;Memos.content&quot;,
+#             &quot;position&quot;: false,
+#             &quot;table&quot;: &quot;Memos&quot;,
+#             &quot;type&quot;: &quot;scalar&quot;
+#           }
+#         }
+#       }
+#     },
+#     &quot;normalizers&quot;: {
+#       &quot;NormalizerNFKC51&quot;: {
+#         &quot;name&quot;: &quot;NormalizerNFKC51&quot;
+#       },
+#       &quot;NormalizerAuto&quot;: {
+#         &quot;name&quot;: &quot;NormalizerAuto&quot;
+#       }
+#     },
+#     &quot;token_filters&quot;: {},
+#     &quot;tokenizers&quot;: {
+#       &quot;TokenBigramSplitSymbolAlphaDigit&quot;: {
+#         &quot;name&quot;: &quot;TokenBigramSplitSymbolAlphaDigit&quot;
+#       },
+#       &quot;TokenRegexp&quot;: {
+#         &quot;name&quot;: &quot;TokenRegexp&quot;
+#       },
+#       &quot;TokenBigramIgnoreBlankSplitSymbolAlphaDigit&quot;: {
+#         &quot;name&quot;: &quot;TokenBigramIgnoreBlankSplitSymbolAlphaDigit&quot;
+#       },
+#       &quot;TokenBigram&quot;: {
+#         &quot;name&quot;: &quot;TokenBigram&quot;
+#       },
+#       &quot;TokenDelimit&quot;: {
+#         &quot;name&quot;: &quot;TokenDelimit&quot;
+#       },
+#       &quot;TokenUnigram&quot;: {
+#         &quot;name&quot;: &quot;TokenUnigram&quot;
+#       },
+#       &quot;TokenBigramSplitSymbol&quot;: {
+#         &quot;name&quot;: &quot;TokenBigramSplitSymbol&quot;
+#       },
+#       &quot;TokenDelimitNull&quot;: {
+#         &quot;name&quot;: &quot;TokenDelimitNull&quot;
+#       },
+#       &quot;TokenBigramIgnoreBlankSplitSymbolAlpha&quot;: {
+#         &quot;name&quot;: &quot;TokenBigramIgnoreBlankSplitSymbolAlpha&quot;
+#       },
+#       &quot;TokenBigramSplitSymbolAlpha&quot;: {
+#         &quot;name&quot;: &quot;TokenBigramSplitSymbolAlpha&quot;
+#       },
+#       &quot;TokenTrigram&quot;: {
+#         &quot;name&quot;: &quot;TokenTrigram&quot;
+#       },
+#       &quot;TokenMecab&quot;: {
+#         &quot;name&quot;: &quot;TokenMecab&quot;
+#       },
+#       &quot;TokenBigramIgnoreBlankSplitSymbol&quot;: {
+#         &quot;name&quot;: &quot;TokenBigramIgnoreBlankSplitSymbol&quot;
+#       },
+#       &quot;TokenBigramIgnoreBlank&quot;: {
+#         &quot;name&quot;: &quot;TokenBigramIgnoreBlank&quot;
+#       }
+#     },
+#     &quot;plugins&quot;: {},
+#     &quot;types&quot;: {
+#       &quot;UInt64&quot;: {
+#         &quot;can_be_key_type&quot;: true,
+#         &quot;name&quot;: &quot;UInt64&quot;,
+#         &quot;can_be_value_type&quot;: true,
+#         &quot;size&quot;: 8
+#       },
+#       &quot;Int32&quot;: {
+#         &quot;can_be_key_type&quot;: true,
+#         &quot;name&quot;: &quot;Int32&quot;,
+#         &quot;can_be_value_type&quot;: true,
+#         &quot;size&quot;: 4
+#       },
+#       &quot;Int16&quot;: {
+#         &quot;can_be_key_type&quot;: true,
+#         &quot;name&quot;: &quot;Int16&quot;,
+#         &quot;can_be_value_type&quot;: true,
+#         &quot;size&quot;: 2
+#       },
+#       &quot;LongText&quot;: {
+#         &quot;can_be_key_type&quot;: false,
+#         &quot;name&quot;: &quot;LongText&quot;,
+#         &quot;can_be_value_type&quot;: false,
+#         &quot;size&quot;: 2147483648
+#       },
+#       &quot;TokyoGeoPoint&quot;: {
+#         &quot;can_be_key_type&quot;: true,
+#         &quot;name&quot;: &quot;TokyoGeoPoint&quot;,
+#         &quot;can_be_value_type&quot;: true,
+#         &quot;size&quot;: 8
+#       },
+#       &quot;Text&quot;: {
+#         &quot;can_be_key_type&quot;: false,
+#         &quot;name&quot;: &quot;Text&quot;,
+#         &quot;can_be_value_type&quot;: false,
+#         &quot;size&quot;: 65536
+#       },
+#       &quot;ShortText&quot;: {
+#         &quot;can_be_key_type&quot;: true,
+#         &quot;name&quot;: &quot;ShortText&quot;,
+#         &quot;can_be_value_type&quot;: false,
+#         &quot;size&quot;: 4096
+#       },
+#       &quot;Float&quot;: {
+#         &quot;can_be_key_type&quot;: true,
+#         &quot;name&quot;: &quot;Float&quot;,
+#         &quot;can_be_value_type&quot;: true,
+#         &quot;size&quot;: 8
+#       },
+#       &quot;UInt8&quot;: {
+#         &quot;can_be_key_type&quot;: true,
+#         &quot;name&quot;: &quot;UInt8&quot;,
+#         &quot;can_be_value_type&quot;: true,
+#         &quot;size&quot;: 1
+#       },
+#       &quot;UInt32&quot;: {
+#         &quot;can_be_key_type&quot;: true,
+#         &quot;name&quot;: &quot;UInt32&quot;,
+#         &quot;can_be_value_type&quot;: true,
+#         &quot;size&quot;: 4
+#       },
+#       &quot;Object&quot;: {
+#         &quot;can_be_key_type&quot;: true,
+#         &quot;name&quot;: &quot;Object&quot;,
+#         &quot;can_be_value_type&quot;: true,
+#         &quot;size&quot;: 8
+#       },
+#       &quot;UInt16&quot;: {
+#         &quot;can_be_key_type&quot;: true,
+#         &quot;name&quot;: &quot;UInt16&quot;,
+#         &quot;can_be_value_type&quot;: true,
+#         &quot;size&quot;: 2
+#       },
+#       &quot;Int64&quot;: {
+#         &quot;can_be_key_type&quot;: true,
+#         &quot;name&quot;: &quot;Int64&quot;,
+#         &quot;can_be_value_type&quot;: true,
+#         &quot;size&quot;: 8
+#       },
+#       &quot;Time&quot;: {
+#         &quot;can_be_key_type&quot;: true,
+#         &quot;name&quot;: &quot;Time&quot;,
+#         &quot;can_be_value_type&quot;: true,
+#         &quot;size&quot;: 8
+#       },
+#       &quot;Bool&quot;: {
+#         &quot;can_be_key_type&quot;: true,
+#         &quot;name&quot;: &quot;Bool&quot;,
+#         &quot;can_be_value_type&quot;: true,
+#         &quot;size&quot;: 1
+#       },
+#       &quot;WGS84GeoPoint&quot;: {
+#         &quot;can_be_key_type&quot;: true,
+#         &quot;name&quot;: &quot;WGS84GeoPoint&quot;,
+#         &quot;can_be_value_type&quot;: true,
+#         &quot;size&quot;: 8
+#       },
+#       &quot;Int8&quot;: {
+#         &quot;can_be_key_type&quot;: true,
+#         &quot;name&quot;: &quot;Int8&quot;,
+#         &quot;can_be_value_type&quot;: true,
+#         &quot;size&quot;: 1
+#       }
+#     }
+#   }
+# ]
+</pre></div>
+</div>
+</div>
+<div class="section" id="return-value">
+<h2>7.3.43.4. Return value<a class="headerlink" href="#return-value" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal"><span class="pre">schema</span></code> command returns schema in the database:</p>
+<div class="highlight-none"><div class="highlight"><pre>[HEADER, SCHEMA]
+</pre></div>
+</div>
+<div class="section" id="header">
+<h3>7.3.43.4.1. <code class="docutils literal"><span class="pre">HEADER</span></code><a class="headerlink" href="#header" title="Permalink to this headline">¶</a></h3>
+<p>See <a class="reference internal" href="../command/output_format.html"><em>Output format</em></a> about <code class="docutils literal"><span class="pre">HEADER</span></code>.</p>
+</div>
+<div class="section" id="id1">
+<h3>7.3.43.4.2. <code class="docutils literal"><span class="pre">SCHEMA</span></code><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">SCHEMA</span></code> is an object that consists of the following information:</p>
+<div class="highlight-none"><div class="highlight"><pre>{
+  &quot;plugins&quot;:       PLUGINS,
+  &quot;types&quot;:         TYPES,
+  &quot;tokenizers&quot;:    TOKENIZERS,
+  &quot;normalizers&quot;:   NORMALIZERS,
+  &quot;token_filters&quot;: TOKEN_FITLERS,
+  &quot;tables&quot;:        TABLES
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="plugins">
+<h3>7.3.43.4.3. <code class="docutils literal"><span class="pre">PLUGINS</span></code><a class="headerlink" href="#plugins" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">PLUGINS</span></code> is an object. Its key is plugin name and its value is
+plugin detail:</p>
+<div class="highlight-none"><div class="highlight"><pre>{
+  &quot;PLUGIN_NAME_1&quot;: PLUGIN_1,
+  &quot;PLUGIN_NAME_2&quot;: PLUGIN_2,
+  ...
+  &quot;PLUGIN_NAME_n&quot;: PLUGIN_n
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="plugin">
+<h3>7.3.43.4.4. <code class="docutils literal"><span class="pre">PLUGIN</span></code><a class="headerlink" href="#plugin" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">PLUGIN</span></code> is an object that describes plugin detail:</p>
+<div class="highlight-none"><div class="highlight"><pre>{
+  &quot;name&quot;: PLUGIN_NAME
+}
+</pre></div>
+</div>
+<p>Here are properties of <code class="docutils literal"><span class="pre">PLUGIN</span></code>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">name</span></code></td>
+<td>The plugin name. It's used in <a class="reference internal" href="plugin_register.html"><em>plugin_register</em></a>.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="types">
+<h3>7.3.43.4.5. <code class="docutils literal"><span class="pre">TYPES</span></code><a class="headerlink" href="#types" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">TYPES</span></code> is an object. Its key is type name and its value is
+type detail:</p>
+<div class="highlight-none"><div class="highlight"><pre>{
+  &quot;TYPE_NAME_1&quot;: TYPE_1,
+  &quot;TYPE_NAME_2&quot;: TYPE_2,
+  ...
+  &quot;TYPE_NAME_n&quot;: TYPE_n
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="type">
+<h3>7.3.43.4.6. <code class="docutils literal"><span class="pre">TYPE</span></code><a class="headerlink" href="#type" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">TYPE</span></code> is an object that describes type detail:</p>
+<div class="highlight-none"><div class="highlight"><pre>{
+  &quot;name&quot;: TYPE_NAME,
+  &quot;size&quot;: SIZE_OF_ONE_VALUE_IN_BYTE,
+  &quot;can_be_key_type&quot;: BOOLEAN,
+  &quot;can_be_value_type&quot;: BOOLEAN
+}
+</pre></div>
+</div>
+<p>Here are properties of <code class="docutils literal"><span class="pre">TYPE</span></code>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">name</span></code></td>
+<td>The type name.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">size</span></code></td>
+<td>The number of bytes of one value.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">can_be_key_type</span></code></td>
+<td><code class="docutils literal"><span class="pre">true</span></code> when the type can be used for table key, <code class="docutils literal"><span class="pre">false</span></code>
+otherwise.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">can_be_value_type</span></code></td>
+<td><code class="docutils literal"><span class="pre">true</span></code> when the type can be used for table value, <code class="docutils literal"><span class="pre">false</span></code>
+otherwise.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="tokenizers">
+<h3>7.3.43.4.7. <code class="docutils literal"><span class="pre">TOKENIZERS</span></code><a class="headerlink" href="#tokenizers" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">TOKENIZERS</span></code> is an object. Its key is tokenizer name and its value
+is tokenizer detail:</p>
+<div class="highlight-none"><div class="highlight"><pre>{
+  &quot;TOKENIZER_NAME_1&quot;: TOKENIZER_1,
+  &quot;TOKENIZER_NAME_2&quot;: TOKENIZER_2,
+  ...
+  &quot;TOKENIZER_NAME_n&quot;: TOKENIZER_n
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="tokenizer">
+<h3>7.3.43.4.8. <code class="docutils literal"><span class="pre">TOKENIZER</span></code><a class="headerlink" href="#tokenizer" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">TOKENIZER</span></code> is an object that describes tokenizer detail:</p>
+<div class="highlight-none"><div class="highlight"><pre>{
+  &quot;name&quot;: TOKENIZER_NAME
+}
+</pre></div>
+</div>
+<p>Here are properties of <code class="docutils literal"><span class="pre">TOKENIZER</span></code>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">name</span></code></td>
+<td>The tokenizer name. It's used for
+<a class="reference internal" href="table_create.html#table-create-default-tokenizer"><span>default_tokenizer</span></a>.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="normalizers">
+<h3>7.3.43.4.9. <code class="docutils literal"><span class="pre">NORMALIZERS</span></code><a class="headerlink" href="#normalizers" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">NORMALIZERS</span></code> is an object. Its key is normalizer name and its value
+is normalizer detail:</p>
+<div class="highlight-none"><div class="highlight"><pre>{
+  &quot;NORMALIZER_NAME_1&quot;: NORMALIZER_1,
+  &quot;NORMALIZER_NAME_2&quot;: NORMALIZER_2,
+  ...
+  &quot;NORMALIZER_NAME_n&quot;: NORMALIZER_n
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="normalizer">
+<h3>7.3.43.4.10. <code class="docutils literal"><span class="pre">NORMALIZER</span></code><a class="headerlink" href="#normalizer" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">NORMALIZER</span></code> is an object that describes normalizer detail:</p>
+<div class="highlight-none"><div class="highlight"><pre>{
+  &quot;name&quot;: NORMALIZER_NAME
+}
+</pre></div>
+</div>
+<p>Here are properties of <code class="docutils literal"><span class="pre">NORMALIZER</span></code>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">name</span></code></td>
+<td>The normalizer name. It's used for
+<a class="reference internal" href="table_create.html#table-create-normalizer"><span>normalizer</span></a>.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="token-filters">
+<h3>7.3.43.4.11. <code class="docutils literal"><span class="pre">TOKEN_FILTERS</span></code><a class="headerlink" href="#token-filters" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">TOKEN_FILTERS</span></code> is an object. Its key is token filter name and its value
+is token filter detail:</p>
+<div class="highlight-none"><div class="highlight"><pre>{
+  &quot;TOKEN_FILTER_NAME_1&quot;: TOKEN_FILTER_1,
+  &quot;TOKEN_FILTER_NAME_2&quot;: TOKEN_FILTER_2,
+  ...
+  &quot;TOKEN_FILTER_NAME_n&quot;: TOKEN_FILTER_n
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="token-filter">
+<h3>7.3.43.4.12. <code class="docutils literal"><span class="pre">TOKEN_FILTER</span></code><a class="headerlink" href="#token-filter" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">TOKEN_FILTER</span></code> is an object that describes token filter detail:</p>
+<div class="highlight-none"><div class="highlight"><pre>{
+  &quot;name&quot;: TOKEN_FILTER_NAME
+}
+</pre></div>
+</div>
+<p>Here are properties of <code class="docutils literal"><span class="pre">TOKEN_FILTER</span></code>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">name</span></code></td>
+<td>The token filter name. It's used for
+<a class="reference internal" href="table_create.html#table-create-token-filters"><span>token_filters</span></a>.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="tables">
+<h3>7.3.43.4.13. <code class="docutils literal"><span class="pre">TABLES</span></code><a class="headerlink" href="#tables" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">TABLES</span></code> is an object. Its key is table name and its value
+is table detail:</p>
+<div class="highlight-none"><div class="highlight"><pre>{
+  &quot;TABLE_NAME_1&quot;: TABLE_1,
+  &quot;TABLE_NAME_2&quot;: TABLE_2,
+  ...
+  &quot;TABLE_NAME_n&quot;: TABLE_n
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="table">
+<h3>7.3.43.4.14. <code class="docutils literal"><span class="pre">TABLE</span></code><a class="headerlink" href="#table" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">TABLE</span></code> is an object that describes table detail:</p>
+<div class="highlight-none"><div class="highlight"><pre>{
+  &quot;name&quot;: TABLE_NAME
+  &quot;type&quot;: TYPE,
+  &quot;key_type&quot;: KEY_TYPE,
+  &quot;value_type&quot;: VALUE_TYPE,
+  &quot;tokenizer&quot;: TOKENIZER,
+  &quot;normalizer&quot;: NORMALIZER,
+  &quot;token_filters&quot;: [
+    TOKEN_FILTER_1,
+    TOKEN_FILTER_2,
+    ...,
+    TOKEN_FILTER_n,
+  ],
+  &quot;indexes&quot;: [
+    INDEX_1,
+    INDEX_2,
+    ...,
+    INDEX_n
+  ],
+  &quot;command&quot;: COMMAND,
+  &quot;columns&quot;: {
+    &quot;COLUMN_NAME_1&quot;: COLUMN_1,
+    &quot;COLUMN_NAME_2&quot;: COLUMN_2,
+    ...,
+    &quot;COLUMN_NAME_3&quot;: COLUMN_3,
+  }
+}
+</pre></div>
+</div>
+<p>Here are properties of <code class="docutils literal"><span class="pre">TABLE</span></code>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">name</span></code></td>
+<td>The table name.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">type</span></code></td>
+<td><p class="first">The table type.</p>
+<p>This is one of the followings:</p>
+<blockquote class="last">
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">array</span></code>: <a class="reference internal" href="../tables.html#table-no-key"><span>TABLE_NO_KEY</span></a></li>
+<li><code class="docutils literal"><span class="pre">hash</span></code>: <a class="reference internal" href="../tables.html#table-hash-key"><span>TABLE_HASH_KEY</span></a></li>
+<li><code class="docutils literal"><span class="pre">patricia</span> <span class="pre">trie</span></code>: <a class="reference internal" href="../tables.html#table-pat-key"><span>TABLE_PAT_KEY</span></a></li>
+<li><code class="docutils literal"><span class="pre">double</span> <span class="pre">array</span> <span class="pre">trie</span></code>: <a class="reference internal" href="../tables.html#table-dat-key"><span>TABLE_DAT_KEY</span></a></li>
+</ul>
+</div></blockquote>
+</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">key_type</span></code></td>
+<td><p class="first">The type of the table's key.</p>
+<p>If the table type is <code class="docutils literal"><span class="pre">array</span></code>, this is <code class="docutils literal"><span class="pre">null</span></code>.</p>
+<p>If the table type isn't <code class="docutils literal"><span class="pre">array</span></code>, this is an object
+that has the following properties:</p>
+<blockquote class="last">
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">name</span></code>: The type name.</li>
+<li><code class="docutils literal"><span class="pre">type</span></code>: <code class="docutils literal"><span class="pre">reference</span></code> if the type is an table, <code class="docutils literal"><span class="pre">type</span></code>
+otherwise.</li>
+</ul>
+</div></blockquote>
+</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">value_type</span></code></td>
+<td><p class="first">The type of the table's value.</p>
+<p>If the table doesn't use value, this is <code class="docutils literal"><span class="pre">null</span></code>.</p>
+<p>If the table uses value, this is an object that has the
+following properties:</p>
+<blockquote class="last">
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">name</span></code>: The type name.</li>
+<li><code class="docutils literal"><span class="pre">type</span></code>: <code class="docutils literal"><span class="pre">reference</span></code> if the type is an table, <code class="docutils literal"><span class="pre">type</span></code>
+otherwise.</li>
+</ul>
+</div></blockquote>
+</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">tokenizer</span></code></td>
+<td><p class="first">The tokenizer of the table. It's specified by
+<a class="reference internal" href="table_create.html#table-create-default-tokenizer"><span>default_tokenizer</span></a>.</p>
+<p>If the table doesn't use tokenizer, this is <code class="docutils literal"><span class="pre">null</span></code>.</p>
+<p>If the table uses tokenizer, this is an object that has the
+following properties:</p>
+<blockquote class="last">
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">name</span></code>: The tokenizer name.</li>
+</ul>
+</div></blockquote>
+</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">normalizer</span></code></td>
+<td><p class="first">The normalizer of the table. It's specified by
+<a class="reference internal" href="table_create.html#table-create-normalizer"><span>normalizer</span></a>.</p>
+<p>If the table doesn't use normalizer, this is <code class="docutils literal"><span class="pre">null</span></code>.</p>
+<p>If the table uses normalizer, this is an object that has the
+following properties:</p>
+<blockquote class="last">
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">name</span></code>: The normalizer name.</li>
+</ul>
+</div></blockquote>
+</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">token_filters</span></code></td>
+<td><p class="first">The token filters of the table. It's specified by
+<a class="reference internal" href="table_create.html#table-create-token-filters"><span>token_filters</span></a>.</p>
+<p>This is an array of an object. The object has the following
+properties:</p>
+<blockquote class="last">
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">name</span></code>: The token filter name.</li>
+</ul>
+</div></blockquote>
+</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">indexes</span></code></td>
+<td><p class="first">The indexes of the table's key.</p>
+<p class="last">This is an array of <a class="reference internal" href="#schema-return-value-index"><span>INDEX</span></a>.</p>
+</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">command</span></code></td>
+<td><p class="first">The Groonga command information to create the table.</p>
+<p class="last">This is <a class="reference internal" href="#schema-return-value-command"><span>COMMAND</span></a>.</p>
+</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">columns</span></code></td>
+<td><p class="first">The columns of the table.</p>
+<p class="last">This is an object that its key is a column name and its value
+is <a class="reference internal" href="#schema-return-value-column"><span>COLUMN</span></a>.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="index">
+<span id="schema-return-value-index"></span><h3>7.3.43.4.15. <code class="docutils literal"><span class="pre">INDEX</span></code><a class="headerlink" href="#index" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">INDEX</span></code> is an object that describes index detail:</p>
+<div class="highlight-none"><div class="highlight"><pre>{
+  &quot;full_name&quot;: INDEX_COLUMN_NAME_WITH_TABLE_NAME,
+  &quot;table&quot;:     TABLE_NAME,
+  &quot;name&quot;:      INDEX_COLUMN_NAME,
+  &quot;section&quot;:   SECTION
+}
+</pre></div>
+</div>
+<p>Here are properties of <code class="docutils literal"><span class="pre">INDEX</span></code>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">full_name</span></code></td>
+<td><p class="first">The index column name with table name.</p>
+<p class="last">For example, <code class="docutils literal"><span class="pre">Terms.index</span></code>.</p>
+</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">table</span></code></td>
+<td><p class="first">The table name of the index column.</p>
+<p class="last">For example, <code class="docutils literal"><span class="pre">Terms</span></code>.</p>
+</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">name</span></code></td>
+<td><p class="first">The index column name.</p>
+<p class="last">For example, <code class="docutils literal"><span class="pre">index</span></code>.</p>
+</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">section</span></code></td>
+<td><p class="first">The section number in the index column for the table's key.</p>
+<p class="last">If the index column isn't multiple column index, this is <code class="docutils literal"><span class="pre">0</span></code>.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="command">
+<span id="schema-return-value-command"></span><h3>7.3.43.4.16. <code class="docutils literal"><span class="pre">COMMAND</span></code><a class="headerlink" href="#command" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">COMMAND</span></code> is an object that describes how to create the table or
+column:</p>
+<div class="highlight-none"><div class="highlight"><pre>{
+  &quot;name&quot;: COMMAND_NAME,
+  &quot;arguments&quot;: {
+    &quot;KEY_1&quot;: &quot;VALUE_1&quot;,
+    &quot;KEY_2&quot;: &quot;VALUE_2&quot;,
+    ...,
+    &quot;KEY_n&quot;: &quot;VALUE_n&quot;
+  },
+  &quot;command_line&quot;: COMMAND_LINE
+}
+</pre></div>
+</div>
+<p>Here are properties of <code class="docutils literal"><span class="pre">COMMAND</span></code>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">name</span></code></td>
+<td>The Groonga command name to create the table or column.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">arguments</span></code></td>
+<td><p class="first">The arguments of the Groonga command to create the
+table or column.</p>
+<p class="last">This is an object that its key is argument name and its value
+is argument value.</p>
+</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">command_line</span></code></td>
+<td><p class="first">The Groonga command line to create the table or column.</p>
+<p class="last">This is a string that can be evaluated by Groonga.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="column">
+<span id="schema-return-value-column"></span><h3>7.3.43.4.17. <code class="docutils literal"><span class="pre">COLUMN</span></code><a class="headerlink" href="#column" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">COLUMN</span></code> is an object that describes column detail:</p>
+<div class="highlight-none"><div class="highlight"><pre>{
+  &quot;name&quot;: COLUMN_NAME,
+  &quot;table&quot;: TABLE_NAME,
+  &quot;full_name&quot;: COLUMN_NAME_WITH_TABLE,
+  &quot;type&quot;: TYPE,
+  &quot;value_type&quot;: VALUE_TYPE,
+  &quot;compress&quot;: COMPRESS,
+  &quot;section&quot;: SECTION,
+  &quot;weight&quot;: WEIGHT,
+  &quot;compress&quot;: COMPRESS,
+  &quot;section&quot;: BOOLEAN,
+  &quot;weight&quot;: BOOLEAN,
+  &quot;position&quot;: BOOLEAN,
+  &quot;sources&quot;: [
+    SOURCE_1,
+    SOURCE_2,
+    ...,
+    SOURCE_n
+  ],
+  &quot;indexes&quot;: [
+    INDEX_1,
+    INDEX_2,
+    ...,
+    INDEX_n
+  ],
+  &quot;command&quot;: COMMAND
+}
+</pre></div>
+</div>
+<p>Here are properties of <code class="docutils literal"><span class="pre">COLUMN</span></code>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">name</span></code></td>
+<td><p class="first">The column name.</p>
+<p class="last">For example, <code class="docutils literal"><span class="pre">age</span></code>.</p>
+</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">table</span></code></td>
+<td><p class="first">The table name of the column.</p>
+<p class="last">For example, <code class="docutils literal"><span class="pre">Users</span></code>.</p>
+</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">full_name</span></code></td>
+<td><p class="first">The column name with table name.</p>
+<p class="last">For example, <code class="docutils literal"><span class="pre">Users.age</span></code>.</p>
+</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">type</span></code></td>
+<td><p class="first">The column type.</p>
+<p>This is one of the followings:</p>
+<blockquote class="last">
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">scalar</span></code>: <a class="reference internal" href="../columns/scalar.html"><em>Scalar column</em></a></li>
+<li><code class="docutils literal"><span class="pre">vector</span></code>: <a class="reference internal" href="../columns/vector.html"><em>Vector column</em></a></li>
+<li><code class="docutils literal"><span class="pre">index</span></code>: <a class="reference internal" href="../columns/index.html"><em>Index column</em></a></li>
+</ul>
+</div></blockquote>
+</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">value_type</span></code></td>
+<td><p class="first">The type of the column's value.</p>
+<p>This is an object that has the following properties:</p>
+<blockquote class="last">
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">name</span></code>: The type name.</li>
+<li><code class="docutils literal"><span class="pre">type</span></code>: <code class="docutils literal"><span class="pre">reference</span></code> if the type is an table, <code class="docutils literal"><span class="pre">type</span></code>
+otherwise.</li>
+</ul>
+</div></blockquote>
+</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">compress</span></code></td>
+<td><p class="first">The compression method of the column.</p>
+<p>If the column doesn't use any compression methods, this is
+<code class="docutils literal"><span class="pre">null</span></code>.</p>
+<p>If the column uses a compression method, this is one of the
+followings:</p>
+<blockquote class="last">
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">zlib</span></code>: The column uses zlib to compress column value.</li>
+<li><code class="docutils literal"><span class="pre">lz4</span></code>: The column uses LZ4 to compress column value.</li>
+</ul>
+</div></blockquote>
+</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">section</span></code></td>
+<td><p class="first">Whether the column can store section information or not.</p>
+<p><code class="docutils literal"><span class="pre">true</span></code> if the column is created with <code class="docutils literal"><span class="pre">WITH_SECTION</span></code> flag,
+<code class="docutils literal"><span class="pre">false</span></code> otherwise.</p>
+<p class="last">Normally, if the column isn't an index column, this is <code class="docutils literal"><span class="pre">false</span></code>.</p>
+</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">weight</span></code></td>
+<td><p class="first">Whether the column can store weight information or not.</p>
+<p class="last"><code class="docutils literal"><span class="pre">true</span></code> if the column is created with <code class="docutils literal"><span class="pre">WITH_WEIGHT</span></code> flag,
+<code class="docutils literal"><span class="pre">false</span></code> otherwise.</p>
+</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">position</span></code></td>
+<td><p class="first">Whether the column can store position information or not.</p>
+<p><code class="docutils literal"><span class="pre">true</span></code> if the column is created with <code class="docutils literal"><span class="pre">WITH_POSITION</span></code> flag,
+<code class="docutils literal"><span class="pre">false</span></code> otherwise.</p>
+<p class="last">Normally, if the column isn't an index column, this is <code class="docutils literal"><span class="pre">false</span></code>.</p>
+</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">sources</span></code></td>
+<td><p class="first">The source columns of the index column.</p>
+<p>This is an array of <a class="reference internal" href="#schema-return-value-source"><span>SOURCE</span></a>.</p>
+<p class="last">Normally, if the column isn't an index column, this is an
+empty array.</p>
+</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">indexes</span></code></td>
+<td><p class="first">The indexes of the column.</p>
+<p class="last">This is an array of <a class="reference internal" href="#schema-return-value-index"><span>INDEX</span></a>.</p>
+</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">command</span></code></td>
+<td><p class="first">The Groonga command information to create the column.</p>
+<p class="last">This is <a class="reference internal" href="#schema-return-value-command"><span>COMMAND</span></a>.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="source">
+<span id="schema-return-value-source"></span><h3>7.3.43.4.18. <code class="docutils literal"><span class="pre">SOURCE</span></code><a class="headerlink" href="#source" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">SOURCE</span></code> is an object that describes source detail:</p>
+<div class="highlight-none"><div class="highlight"><pre>{
+  &quot;name&quot;:      COLUMN_NAME,
+  &quot;table&quot;:     TABLE_NAME,
+  &quot;full_name&quot;: COLUMN_NAME_WITH_TABLE_NAME
+}
+</pre></div>
+</div>
+<p>Here are properties of <code class="docutils literal"><span class="pre">SOURCE</span></code>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">name</span></code></td>
+<td><p class="first">The source column name.</p>
+<p>For example, <code class="docutils literal"><span class="pre">content</span></code>.</p>
+<p class="last">This may be a <code class="docutils literal"><span class="pre">_key</span></code> pseudo column.</p>
+</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">table</span></code></td>
+<td><p class="first">The table name of the source column.</p>
+<p class="last">For example, <code class="docutils literal"><span class="pre">Memos</span></code>.</p>
+</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">full_name</span></code></td>
+<td><p class="first">The source column name with table name.</p>
+<p class="last">For example, <code class="docutils literal"><span class="pre">Memos.content</span></code>.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="see-also">
+<h2>7.3.43.5. See also<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference internal" href="table_create.html"><em>table_create</em></a></li>
+<li><a class="reference internal" href="column_create.html"><em>column_create</em></a></li>
+</ul>
+</div></blockquote>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">7.3.43. <code class="docutils literal"><span class="pre">schema</span></code></a><ul>
+<li><a class="reference internal" href="#summary">7.3.43.1. Summary</a></li>
+<li><a class="reference internal" href="#syntax">7.3.43.2. Syntax</a></li>
+<li><a class="reference internal" href="#usage">7.3.43.3. Usage</a></li>
+<li><a class="reference internal" href="#return-value">7.3.43.4. Return value</a><ul>
+<li><a class="reference internal" href="#header">7.3.43.4.1. <code class="docutils literal"><span class="pre">HEADER</span></code></a></li>
+<li><a class="reference internal" href="#id1">7.3.43.4.2. <code class="docutils literal"><span class="pre">SCHEMA</span></code></a></li>
+<li><a class="reference internal" href="#plugins">7.3.43.4.3. <code class="docutils literal"><span class="pre">PLUGINS</span></code></a></li>
+<li><a class="reference internal" href="#plugin">7.3.43.4.4. <code class="docutils literal"><span class="pre">PLUGIN</span></code></a></li>
+<li><a class="reference internal" href="#types">7.3.43.4.5. <code class="docutils literal"><span class="pre">TYPES</span></code></a></li>
+<li><a class="reference internal" href="#type">7.3.43.4.6. <code class="docutils literal"><span class="pre">TYPE</span></code></a></li>
+<li><a class="reference internal" href="#tokenizers">7.3.43.4.7. <code class="docutils literal"><span class="pre">TOKENIZERS</span></code></a></li>
+<li><a class="reference internal" href="#tokenizer">7.3.43.4.8. <code class="docutils literal"><span class="pre">TOKENIZER</span></code></a></li>
+<li><a class="reference internal" href="#normalizers">7.3.43.4.9. <code class="docutils literal"><span class="pre">NORMALIZERS</span></code></a></li>
+<li><a class="reference internal" href="#normalizer">7.3.43.4.10. <code class="docutils literal"><span class="pre">NORMALIZER</span></code></a></li>
+<li><a class="reference internal" href="#token-filters">7.3.43.4.11. <code class="docutils literal"><span class="pre">TOKEN_FILTERS</span></code></a></li>
+<li><a class="reference internal" href="#token-filter">7.3.43.4.12. <code class="docutils literal"><span class="pre">TOKEN_FILTER</span></code></a></li>
+<li><a class="reference internal" href="#tables">7.3.43.4.13. <code class="docutils literal"><span class="pre">TABLES</span></code></a></li>
+<li><a class="reference internal" href="#table">7.3.43.4.14. <code class="docutils literal"><span class="pre">TABLE</span></code></a></li>
+<li><a class="reference internal" href="#index">7.3.43.4.15. <code class="docutils literal"><span class="pre">INDEX</span></code></a></li>
+<li><a class="reference internal" href="#command">7.3.43.4.16. <code class="docutils literal"><span class="pre">COMMAND</span></code></a></li>
+<li><a class="reference internal" href="#column">7.3.43.4.17. <code class="docutils literal"><span class="pre">COLUMN</span></code></a></li>
+<li><a class="reference internal" href="#source">7.3.43.4.18. <code class="docutils literal"><span class="pre">SOURCE</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#see-also">7.3.43.5. See also</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="ruby_load.html"
+                        title="previous chapter">7.3.42. <code class="docutils literal"><span class="pre">ruby_load</span></code></a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="select.html"
+                        title="next chapter">7.3.44. <code class="docutils literal"><span class="pre">select</span></code></a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../sources/reference/commands/schema.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="select.html" title="7.3.44. select"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="ruby_load.html" title="7.3.42. ruby_load"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v5.1.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../reference.html" >7. Reference manual</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="../command.html" >7.3. Command</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2009-2016, Brazil, Inc.
+    </div>
+      <script src="http://connect.facebook.net/en_US/all.js"></script>
+
+    <script>
+      FB.init({
+         appId  : null,
+         status : true, // check login status
+         cookie : true, // enable cookies to allow the server to access the session
+         xfbml  : true  // parse XFBML
+      });
+    </script>
+  </body>
+
+</html>

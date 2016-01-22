@@ -1,0 +1,433 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>
+  File: README
+  
+    &mdash; fluent-plugin-groonga-query-log
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  hasFrames = window.top.frames.main ? true : false;
+  relpath = '';
+  framesUrl = "frames.html#!file.README.html";
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="header">
+      <div id="menu">
+  
+    <a href="alphabetical_index.html">Index</a> &raquo; 
+    <span class="title">File: README</span>
+  
+
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+      Class List
+    </a>
+  
+    <a class="full_list_link" id="method_list_link"
+        href="method_list.html">
+      Method List
+    </a>
+  
+    <a class="full_list_link" id="file_list_link"
+        href="file_list.html">
+      File List
+    </a>
+  
+</div>
+      <div class="clear"></div>
+    </div>
+
+    <iframe id="search_frame"></iframe>
+
+    <div id="content"><div id='filecontents'><h1 id="readme">README</h1>
+
+<h2 id="section">名前</h2>
+
+<p>fluent-plugin-groonga-query-log</p>
+
+<h2 id="section-1">説明</h2>
+
+<p>fluent-plugin-groonga-query-logはFluentdで<a href="http://groonga.org/ja/">Groonga</a>の<a href="http://groonga.org/ja/docs/reference/log.html#query-log">クエリーログ</a>をパースするFluentdのフィルタープラグインです。</p>
+
+<p>このプラグインを使うことでリアルタイムにスロークエリーを検出することができます。</p>
+
+<p>以下はスロークエリーをGroongaに保存するサンプル設定です。</p>
+
+<pre class="code ruby"><code class="ruby">&lt;source&gt;
+  @type tail
+  path /var/log/groonga/query.log
+  pos_file /var/log/fluentd/groonga-query-log.pos
+  tag groonga.query
+  format none
+&lt;/source&gt;
+
+&lt;filter groonga.query&gt;
+  @type groonga_query_log
+&lt;/filter&gt;
+
+&lt;filter groonga.query&gt;
+  @type grep
+  regexp1 slow \Atrue\z
+&lt;/filter&gt;
+
+&lt;filter groonga.query&gt;
+  @type record_transformer
+  enable_ruby true
+  renew_record true
+  keep_keys elapsed
+  &lt;record&gt;
+    log ${JSON.generate(to_h)}
+  &lt;/record&gt;
+&lt;/filter&gt;
+
+&lt;match groonga.query&gt;
+  @type groonga
+  store_table SlowQueries
+
+  protocol http
+  host 127.0.0.1
+
+  buffer_type file
+  buffer_path /var/lib/fluentd/groonga.buffer
+  flush_interval 1
+&lt;/match&gt;
+</code></pre>
+
+<p>この設定を使うためには環境設定する必要があります。</p>
+
+<p>以下のディレクトリーを作成します。</p>
+
+<pre class="code ruby"><code class="ruby">% sudo mkdir -p /var/log/fluentd
+% sudo mkdir -p /var/lib/fluentd
+</code></pre>
+
+<p>Fluentdを実行するユーザーはこれらのディレクトリーに書き込み権限がなければいけません。これらのディレクトリーに適切な権限を設定します。</p>
+
+<pre class="code ruby"><code class="ruby">% sudo chown -R fluentd-user:fluentd-user /var/log/fluentd
+% sudo chown -R fluentd-user:fluentd-user /var/lib/fluentd
+</code></pre>
+
+<p>スロークエリーを保存するGroongaを<code>127.0.0.1</code>で起動します。</p>
+
+<pre class="code ruby"><code class="ruby">% groonga --protocol http -s DB_PATH
+</code></pre>
+
+<p>この設定で<code>fluentd</code>を起動します。</p>
+
+<pre class="code ruby"><code class="ruby">% fluentd --config groonga-slow-queries.conf
+</code></pre>
+
+<p>これでGroongaの<code>SlowQueries</code>テーブルにスロークエリーが保存されるようになりました。</p>
+
+<pre class="code ruby"><code class="ruby">% curl &#39;localhost:10041/d/select?table=SlowQueries&amp;output_pretty=yes&#39;
+[
+  [
+    0,
+    1453454123.58033,
+    8.70227813720703e-05
+  ],
+  [
+    [
+      [
+        66
+      ],
+      [
+        [
+          &quot;_id&quot;,
+          &quot;UInt32&quot;
+        ],
+        [
+          &quot;elapsed&quot;,
+          &quot;Float&quot;
+        ],
+        [
+          &quot;log&quot;,
+          &quot;Text&quot;
+        ]
+      ],
+      [
+        1,
+        0.265,
+        &quot;{\&quot;start_time\&quot;:...}&quot;
+      ],
+      [
+        2,
+        0.303,
+        &quot;{\&quot;start_time\&quot;:...}&quot;
+      ],
+      ...
+    ]
+  ]
+]
+</code></pre>
+
+<p>クエリーログ1つにつき1つのレコードとして保存されています。レコードには次の2つのカラムがあります。</p>
+
+<ul>
+  <li>
+    <p><code>elapsed</code>: このクエリーの実行にかかった時間です。</p>
+  </li>
+  <li>
+    <p><code>log</code>: JSONフォーマットのクエリーの詳細です。実行したコマンドや各条件の実行時間などが入っています。</p>
+  </li>
+</ul>
+
+<h2 id="section-2">インストール</h2>
+
+<pre class="code ruby"><code class="ruby">% gem install fluent-plugin-groonga-query-log
+</code></pre>
+
+<h2 id="section-3">使用法</h2>
+
+<p>生のGroongaのクエリーログテキストをパースするために<code>groonga-query-log</code>フィルターを使います。</p>
+
+<p>以下はサンプルの生のGroongaのクエリーログテキストです。</p>
+
+<pre class="code ruby"><code class="ruby">2015-08-12 15:50:40.130990|0x7fb07d113da0|&gt;/d/select?table=Entries&amp;match_columns=name&amp;query=xml
+2015-08-12 15:50:40.296165|0x7fb07d113da0|:000000165177838 filter(10)
+2015-08-12 15:50:40.296172|0x7fb07d113da0|:000000165184723 select(10)
+2015-08-12 15:50:41.228129|0x7fb07d113da0|:000001097153433 output(10)
+2015-08-12 15:50:41.228317|0x7fb07d113da0|&lt;000001097334986 rc=0
+</code></pre>
+
+<p><code>groonga-query-log</code>フィルターは上述の生のGroongaのクエリーログをパースして次のレコードを作ります。</p>
+
+<pre class="code ruby"><code class="ruby"><span class='lbrace'>{</span>
+  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>start_time</span><span class='label_end'>&quot;:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>2015-08-12T06:50:40.130990Z</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>last_time</span><span class='label_end'>&quot;:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>2015-08-12T06:50:41.228324Z</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>elapsed</span><span class='label_end'>&quot;:</span> <span class='float'>1.0973349860000001</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>return_code</span><span class='label_end'>&quot;:</span> <span class='int'>0</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>slow</span><span class='label_end'>&quot;:</span> <span class='kw'>true</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>command</span><span class='label_end'>&quot;:</span> <span class='lbrace'>{</span>
+    <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>raw</span><span class='label_end'>&quot;:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>/d/select?table=Entries&amp;match_columns=name&amp;query=xml</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+    <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>name</span><span class='label_end'>&quot;:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>select</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+    <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>parameters</span><span class='label_end'>&quot;:</span> <span class='lbracket'>[</span>
+      <span class='lbrace'>{</span>
+        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>key</span><span class='label_end'>&quot;:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>table</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>value</span><span class='label_end'>&quot;:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Entries</span><span class='tstring_end'>&quot;</span></span>
+      <span class='rbrace'>}</span><span class='comma'>,</span>
+      <span class='lbrace'>{</span>
+        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>key</span><span class='label_end'>&quot;:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>match_columns</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>value</span><span class='label_end'>&quot;:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>name</span><span class='tstring_end'>&quot;</span></span>
+      <span class='rbrace'>}</span><span class='comma'>,</span>
+      <span class='lbrace'>{</span>
+        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>key</span><span class='label_end'>&quot;:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>query</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>value</span><span class='label_end'>&quot;:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>xml</span><span class='tstring_end'>&quot;</span></span>
+      <span class='rbrace'>}</span>
+    <span class='rbracket'>]</span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>operations</span><span class='label_end'>&quot;:</span> <span class='lbracket'>[</span>
+    <span class='lbrace'>{</span>
+      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>context</span><span class='label_end'>&quot;:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>query: xml</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>name</span><span class='label_end'>&quot;:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>filter</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>relative_elapsed</span><span class='label_end'>&quot;:</span> <span class='float'>0.165177838</span><span class='comma'>,</span>
+      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>slow</span><span class='label_end'>&quot;:</span> <span class='kw'>true</span>
+    <span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='lbrace'>{</span>
+      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>context</span><span class='label_end'>&quot;:</span> <span class='id identifier rubyid_null'>null</span><span class='comma'>,</span>
+      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>name</span><span class='label_end'>&quot;:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>select</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>relative_elapsed</span><span class='label_end'>&quot;:</span> <span class='float'>6.884999999999999e-06</span><span class='comma'>,</span>
+      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>slow</span><span class='label_end'>&quot;:</span> <span class='kw'>false</span>
+    <span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='lbrace'>{</span>
+      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>context</span><span class='label_end'>&quot;:</span> <span class='id identifier rubyid_null'>null</span><span class='comma'>,</span>
+      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>name</span><span class='label_end'>&quot;:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>output</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>relative_elapsed</span><span class='label_end'>&quot;:</span> <span class='float'>0.93196871</span><span class='comma'>,</span>
+      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>slow</span><span class='label_end'>&quot;:</span> <span class='kw'>true</span>
+    <span class='rbrace'>}</span>
+  <span class='rbracket'>]</span>
+<span class='rbrace'>}</span>
+</code></pre>
+
+<p>このフィルターのパラメーターは次の通りです。</p>
+
+<ul>
+  <li><code>raw_data_column_name</code>: 生のGroongaのクエリーログテキストが入っているカラム名を指定します。
+    <ul>
+      <li>デフォルト: <code>message</code></li>
+    </ul>
+  </li>
+  <li><code>slow_operation_threshold</code>: 操作が遅いと判断する閾値です。クエリー内の操作のどれか1つでも、実行にこの閾値以上の時間がかかったらそのクエリーはスロークエリーとして扱います。
+    <ul>
+      <li>デフォルト: <code>0.1</code></li>
+    </ul>
+  </li>
+  <li><code>slow_response_threshold</code>: リクエストを遅いと判断する閾値です。もし、リクエストの実行にこの閾値以上の時間がかかったらこのリクエストが実行するクエリーをスロークエリーとして扱います。
+    <ul>
+      <li>デフォルト: <code>0.2</code></li>
+    </ul>
+  </li>
+  <li>
+    <p><code>flatten</code>: パースしたクエリーログをネストがないオブジェクトにするかネストありのオブジェクトにするかを指定します。ネストがないオブジェクトはRDBMSのようなドキュメント志向データベース以外のデータベースにパースしたクエリーログを格納するときに便利です。</p>
+
+    <p>以下はパースしたクエリーログのレコードのサンプルです。</p>
+
+    <pre class="code ruby"><code class="ruby">{
+  ...,
+  &quot;command&quot;: {
+    &quot;raw&quot;: &quot;/d/select?table=Entries&amp;match_columns=name&amp;query=xml&quot;,
+    &quot;name&quot;: &quot;select&quot;,
+    &quot;parameters&quot;: [
+      {
+        &quot;key&quot;: &quot;table&quot;,
+        &quot;value&quot;: &quot;Entries&quot;
+      },
+      {
+        &quot;key&quot;: &quot;match_columns&quot;,
+        &quot;value&quot;: &quot;name&quot;
+      },
+      {
+        &quot;key&quot;: &quot;query&quot;,
+        &quot;value&quot;: &quot;xml&quot;
+      }
+    ]
+  },
+  ...
+}
+</code></pre>
+
+    <p>以下は上述のレコードをネストなしのオブジェクトにしたときの例です。</p>
+
+    <pre class="code ruby"><code class="ruby">{
+  ...,
+  &quot;command.raw&quot;: &quot;/d/select?table=Entries&amp;match_columns=name&amp;query=xml&quot;,
+  &quot;command.name&quot;: &quot;select&quot;,
+  &quot;command.parameters[0].key&quot;: &quot;table&quot;,
+  &quot;command.parameters[0].value&quot;: &quot;Entries&quot;,
+  &quot;command.parameters[1].key&quot;: &quot;match_columns&quot;,
+  &quot;command.parameters[1].value&quot;: &quot;name&quot;,
+  &quot;command.parameters[0].key&quot;: &quot;query&quot;,
+  &quot;command.parameters[0].value&quot;: &quot;xml&quot;,
+  ...
+}
+</code></pre>
+
+    <ul>
+      <li>デフォルト: <code>false</code>（ネストしたオブジェクト）</li>
+    </ul>
+  </li>
+  <li>
+    <p><code>flatten_separator</code>: <code>flatten</code>が<code>true</code>のときに使う区切り文字を指定します。<code>flatten</code>が<code>true</code>のときはネストした複数のキーをネストしていない1つのキーに変換する必要があります。区切り文字はネストした複数のキーを結合するときに使います。</p>
+
+    <p>デフォルトではネストしたオブジェクトのときは<code>.</code>を使います。たとえば、</p>
+
+    <pre class="code ruby"><code class="ruby"> <span class='lbrace'>{</span>
+   <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>a</span><span class='label_end'>&quot;:</span> <span class='lbrace'>{</span>
+     <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>b</span><span class='label_end'>&quot;:</span> <span class='int'>1</span>
+   <span class='rbrace'>}</span>
+ <span class='rbrace'>}</span>
+</code></pre>
+
+    <p>は次のようにネストをなくします。</p>
+
+    <pre class="code ruby"><code class="ruby"> <span class='lbrace'>{</span>
+   <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>a.b</span><span class='label_end'>&quot;:</span> <span class='int'>1</span>
+ <span class='rbrace'>}</span>
+</code></pre>
+
+    <p>デフォルトでは配列の要素には<code>[...]</code>を使います。たとえば、</p>
+
+    <pre class="code ruby"><code class="ruby"> <span class='lbrace'>{</span>
+   <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>a</span><span class='label_end'>&quot;:</span> <span class='lbracket'>[</span>
+     <span class='int'>1</span><span class='comma'>,</span>
+     <span class='int'>2</span>
+   <span class='rbracket'>]</span>
+ <span class='rbrace'>}</span>
+</code></pre>
+
+    <p>は次のようにネストをなくします。</p>
+
+    <pre class="code ruby"><code class="ruby"> <span class='lbrace'>{</span>
+   <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>a[0]</span><span class='label_end'>&quot;:</span> <span class='int'>1</span><span class='comma'>,</span>
+   <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>a[1]</span><span class='label_end'>&quot;:</span> <span class='int'>2</span>
+ <span class='rbrace'>}</span>
+</code></pre>
+
+    <p>もし、区切り文字に<code>"_"</code>を指定した場合は、</p>
+
+    <pre class="code ruby"><code class="ruby"> <span class='lbrace'>{</span>
+   <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>a</span><span class='label_end'>&quot;:</span> <span class='lbracket'>[</span>
+     <span class='int'>1</span><span class='comma'>,</span>
+     <span class='int'>2</span>
+   <span class='rbracket'>]</span><span class='comma'>,</span>
+   <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>b</span><span class='label_end'>&quot;:</span> <span class='lbrace'>{</span>
+     <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>c</span><span class='label_end'>&quot;:</span> <span class='int'>3</span>
+   <span class='rbrace'>}</span>
+ <span class='rbrace'>}</span>
+</code></pre>
+
+    <p>は次のようにネストをなくします。</p>
+
+    <pre class="code ruby"><code class="ruby"> <span class='lbrace'>{</span>
+   <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>a_0</span><span class='label_end'>&quot;:</span> <span class='int'>1</span><span class='comma'>,</span>
+   <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>a_1</span><span class='label_end'>&quot;:</span> <span class='int'>2</span><span class='comma'>,</span>
+   <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>b_c</span><span class='label_end'>&quot;:</span> <span class='int'>3</span>
+ <span class='rbrace'>}</span>
+</code></pre>
+
+    <ul>
+      <li>デフォルト: オブジェクトには<code>.</code>、配列には<code>[...]</code></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="section-4">作者</h2>
+
+<ul>
+  <li>Kouhei Sutou <code>&lt;kou@clear-code.com&gt;</code></li>
+</ul>
+
+<h2 id="section-5">ライセンス</h2>
+
+<p>LGPL 3またはそれ以降のバージョンです。詳細はdoc/text/lgpl-3.txtを参照してください。</p>
+
+<p>（提供してもらったパッチも含め、須藤功平がライセンスを変更できる権利を持つことに同意してもらったこととします。）</p>
+
+<h2 id="section-6">メーリングリスト</h2>
+
+<ul>
+  <li>英語: <a href="https://lists.sourceforge.net/lists/listinfo/groonga-talk">groonga-talk</a></li>
+  <li>日本語: <a href="http://lists.sourceforge.jp/mailman/listinfo/groonga-dev">groonga-dev</a></li>
+</ul>
+
+<h2 id="section-7">ソース</h2>
+
+<p>fluent-plugin-groonga-query-logのリポジトリーは<a href="https://github.com/groonga/fluent-plugin-groonga-query-log/">GitHub</a>にあります。</p>
+
+<h2 id="section-8">感謝</h2>
+
+<ul>
+  <li>…</li>
+</ul>
+</div></div>
+
+    <div id="footer">
+  Generated on Fri Jan 22 19:24:26 2016 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.8.7.6 (ruby-2.3.0).
+</div>
+
+  </body>
+</html>

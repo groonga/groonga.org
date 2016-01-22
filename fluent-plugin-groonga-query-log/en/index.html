@@ -1,0 +1,450 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>
+  File: README
+  
+    &mdash; fluent-plugin-groonga-query-log
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  hasFrames = window.top.frames.main ? true : false;
+  relpath = '';
+  framesUrl = "frames.html#!file.README.html";
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="header">
+      <div id="menu">
+  
+    <a href="alphabetical_index.html">Index</a> &raquo; 
+    <span class="title">File: README</span>
+  
+
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+      Class List
+    </a>
+  
+    <a class="full_list_link" id="method_list_link"
+        href="method_list.html">
+      Method List
+    </a>
+  
+    <a class="full_list_link" id="file_list_link"
+        href="file_list.html">
+      File List
+    </a>
+  
+</div>
+      <div class="clear"></div>
+    </div>
+
+    <iframe id="search_frame"></iframe>
+
+    <div id="content"><div id='filecontents'><h1 id="readme">README</h1>
+
+<h2 id="name">Name</h2>
+
+<p>fluent-plugin-groonga-query-log</p>
+
+<h2 id="description">Description</h2>
+
+<p>Fluent-plugin-groonga-query-log is a Fluentd filter plugin to parse
+<a href="http://groonga.org/">Groonga</a>’s
+<a href="http://groonga.org/docs/reference/log.html#query-log">query log</a> with
+Fluentd.</p>
+
+<p>You can detect slow query in real time by using this plugin.</p>
+
+<p>Here is a sample configuration that stores slow queries to Groonga:</p>
+
+<pre class="code ruby"><code class="ruby">&lt;source&gt;
+  @type tail
+  path /var/log/groonga/query.log
+  pos_file /var/log/fluentd/groonga-query-log.pos
+  tag groonga.query
+  format none
+&lt;/source&gt;
+
+&lt;filter groonga.query&gt;
+  @type groonga_query_log
+&lt;/filter&gt;
+
+&lt;filter groonga.query&gt;
+  @type grep
+  regexp1 slow \Atrue\z
+&lt;/filter&gt;
+
+&lt;filter groonga.query&gt;
+  @type record_transformer
+  enable_ruby true
+  renew_record true
+  keep_keys elapsed
+  &lt;record&gt;
+    log ${JSON.generate(to_h)}
+  &lt;/record&gt;
+&lt;/filter&gt;
+
+&lt;match groonga.query&gt;
+  @type groonga
+  store_table SlowQueries
+
+  protocol http
+  host 127.0.0.1
+
+  buffer_type file
+  buffer_path /var/lib/fluentd/groonga.buffer
+  flush_interval 1
+&lt;/match&gt;
+</code></pre>
+
+<p>You need to prepare your environment to use the configuration.</p>
+
+<p>Create the following directories:</p>
+
+<pre class="code ruby"><code class="ruby">% sudo mkdir -p /var/log/fluentd
+% sudo mkdir -p /var/lib/fluentd
+</code></pre>
+
+<p>User who runs Fluentd must have write permission of the
+directories. Set suitable permission to the directories:</p>
+
+<pre class="code ruby"><code class="ruby">% sudo chown -R fluentd-user:fluentd-user /var/log/fluentd
+% sudo chown -R fluentd-user:fluentd-user /var/lib/fluentd
+</code></pre>
+
+<p>Run Groonga that stores slow queries on <code>127.0.0.1</code>:</p>
+
+<pre class="code ruby"><code class="ruby">% groonga --protocol http -s DB_PATH
+</code></pre>
+
+<p>Run <code>fluentd</code> with the configuration:</p>
+
+<pre class="code ruby"><code class="ruby">% fluentd --config groonga-slow-queries.conf
+</code></pre>
+
+<p>Now, slow queries are stored <code>SlowQueries</code> table in Groonga:</p>
+
+<pre class="code ruby"><code class="ruby">% curl &#39;localhost:10041/d/select?table=SlowQueries&amp;output_pretty=yes&#39;
+[
+  [
+    0,
+    1453454123.58033,
+    8.70227813720703e-05
+  ],
+  [
+    [
+      [
+        66
+      ],
+      [
+        [
+          &quot;_id&quot;,
+          &quot;UInt32&quot;
+        ],
+        [
+          &quot;elapsed&quot;,
+          &quot;Float&quot;
+        ],
+        [
+          &quot;log&quot;,
+          &quot;Text&quot;
+        ]
+      ],
+      [
+        1,
+        0.265,
+        &quot;{\&quot;start_time\&quot;:...}&quot;
+      ],
+      [
+        2,
+        0.303,
+        &quot;{\&quot;start_time\&quot;:...}&quot;
+      ],
+      ...
+    ]
+  ]
+]
+</code></pre>
+
+<p>Each query log is stored as one record. Record has the following two
+columns:</p>
+
+<ul>
+  <li>
+    <p><code>elapsed</code>: The elapsed time to execute the query.</p>
+  </li>
+  <li>
+    <p><code>log</code>: The query details as JSON. It includes executed command,
+elapsed time for each condition and so on.</p>
+  </li>
+</ul>
+
+<h2 id="install">Install</h2>
+
+<pre class="code ruby"><code class="ruby">% gem install fluent-plugin-groonga-query-log
+</code></pre>
+
+<h2 id="usage">Usage</h2>
+
+<p>You can use <code>groonga-query-log</code> filter for parsing raw Groonga’s query
+log text.</p>
+
+<p>Here is a sample raw Groonga’s query log text:</p>
+
+<pre class="code ruby"><code class="ruby">2015-08-12 15:50:40.130990|0x7fb07d113da0|&gt;/d/select?table=Entries&amp;match_columns=name&amp;query=xml
+2015-08-12 15:50:40.296165|0x7fb07d113da0|:000000165177838 filter(10)
+2015-08-12 15:50:40.296172|0x7fb07d113da0|:000000165184723 select(10)
+2015-08-12 15:50:41.228129|0x7fb07d113da0|:000001097153433 output(10)
+2015-08-12 15:50:41.228317|0x7fb07d113da0|&lt;000001097334986 rc=0
+</code></pre>
+
+<p><code>groonga-query-log</code> filter emits the following record by parsing the
+above raw Groonga’s query log text:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='lbrace'>{</span>
+  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>start_time</span><span class='label_end'>&quot;:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>2015-08-12T06:50:40.130990Z</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>last_time</span><span class='label_end'>&quot;:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>2015-08-12T06:50:41.228324Z</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>elapsed</span><span class='label_end'>&quot;:</span> <span class='float'>1.0973349860000001</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>return_code</span><span class='label_end'>&quot;:</span> <span class='int'>0</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>slow</span><span class='label_end'>&quot;:</span> <span class='kw'>true</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>command</span><span class='label_end'>&quot;:</span> <span class='lbrace'>{</span>
+    <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>raw</span><span class='label_end'>&quot;:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>/d/select?table=Entries&amp;match_columns=name&amp;query=xml</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+    <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>name</span><span class='label_end'>&quot;:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>select</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+    <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>parameters</span><span class='label_end'>&quot;:</span> <span class='lbracket'>[</span>
+      <span class='lbrace'>{</span>
+        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>key</span><span class='label_end'>&quot;:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>table</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>value</span><span class='label_end'>&quot;:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Entries</span><span class='tstring_end'>&quot;</span></span>
+      <span class='rbrace'>}</span><span class='comma'>,</span>
+      <span class='lbrace'>{</span>
+        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>key</span><span class='label_end'>&quot;:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>match_columns</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>value</span><span class='label_end'>&quot;:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>name</span><span class='tstring_end'>&quot;</span></span>
+      <span class='rbrace'>}</span><span class='comma'>,</span>
+      <span class='lbrace'>{</span>
+        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>key</span><span class='label_end'>&quot;:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>query</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>value</span><span class='label_end'>&quot;:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>xml</span><span class='tstring_end'>&quot;</span></span>
+      <span class='rbrace'>}</span>
+    <span class='rbracket'>]</span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>operations</span><span class='label_end'>&quot;:</span> <span class='lbracket'>[</span>
+    <span class='lbrace'>{</span>
+      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>context</span><span class='label_end'>&quot;:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>query: xml</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>name</span><span class='label_end'>&quot;:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>filter</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>relative_elapsed</span><span class='label_end'>&quot;:</span> <span class='float'>0.165177838</span><span class='comma'>,</span>
+      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>slow</span><span class='label_end'>&quot;:</span> <span class='kw'>true</span>
+    <span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='lbrace'>{</span>
+      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>context</span><span class='label_end'>&quot;:</span> <span class='id identifier rubyid_null'>null</span><span class='comma'>,</span>
+      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>name</span><span class='label_end'>&quot;:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>select</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>relative_elapsed</span><span class='label_end'>&quot;:</span> <span class='float'>6.884999999999999e-06</span><span class='comma'>,</span>
+      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>slow</span><span class='label_end'>&quot;:</span> <span class='kw'>false</span>
+    <span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='lbrace'>{</span>
+      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>context</span><span class='label_end'>&quot;:</span> <span class='id identifier rubyid_null'>null</span><span class='comma'>,</span>
+      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>name</span><span class='label_end'>&quot;:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>output</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>relative_elapsed</span><span class='label_end'>&quot;:</span> <span class='float'>0.93196871</span><span class='comma'>,</span>
+      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>slow</span><span class='label_end'>&quot;:</span> <span class='kw'>true</span>
+    <span class='rbrace'>}</span>
+  <span class='rbracket'>]</span>
+<span class='rbrace'>}</span>
+</code></pre>
+
+<p>Here are parameters of this filter:</p>
+
+<ul>
+  <li><code>raw_data_column_name</code>: It specifies column name that stores raw
+Groonga’s query log text.
+    <ul>
+      <li>Default: <code>message</code></li>
+    </ul>
+  </li>
+  <li><code>slow_operation_threshold</code>: It specifies threshold to treat an
+operation is slow. If one or more operations in a query spend more
+than the threshold, the query is slow query.
+    <ul>
+      <li>Default: <code>0.1</code></li>
+    </ul>
+  </li>
+  <li><code>slow_response_threshold</code>: It specifies threshold to treat a
+request is slow. If a request spends more than the threshold, the
+query in the request is slow query.
+    <ul>
+      <li>Default: <code>0.2</code></li>
+    </ul>
+  </li>
+  <li>
+    <p><code>flatten</code>: It specifies whether parsed query log is mapped to a
+flat object or a nested object. A float object will be useful to
+store the parsed log to non document oriented database such as
+RDBMS.</p>
+
+    <p>Here is a sample record of parsed query log:</p>
+
+    <pre class="code ruby"><code class="ruby">{
+  ...,
+  &quot;command&quot;: {
+    &quot;raw&quot;: &quot;/d/select?table=Entries&amp;match_columns=name&amp;query=xml&quot;,
+    &quot;name&quot;: &quot;select&quot;,
+    &quot;parameters&quot;: [
+      {
+        &quot;key&quot;: &quot;table&quot;,
+        &quot;value&quot;: &quot;Entries&quot;
+      },
+      {
+        &quot;key&quot;: &quot;match_columns&quot;,
+        &quot;value&quot;: &quot;name&quot;
+      },
+      {
+        &quot;key&quot;: &quot;query&quot;,
+        &quot;value&quot;: &quot;xml&quot;
+      }
+    ]
+  },
+  ...
+}
+</code></pre>
+
+    <p>Here is the flatten record of the above record:</p>
+
+    <pre class="code ruby"><code class="ruby">{
+  ...,
+  &quot;command.raw&quot;: &quot;/d/select?table=Entries&amp;match_columns=name&amp;query=xml&quot;,
+  &quot;command.name&quot;: &quot;select&quot;,
+  &quot;command.parameters[0].key&quot;: &quot;table&quot;,
+  &quot;command.parameters[0].value&quot;: &quot;Entries&quot;,
+  &quot;command.parameters[1].key&quot;: &quot;match_columns&quot;,
+  &quot;command.parameters[1].value&quot;: &quot;name&quot;,
+  &quot;command.parameters[0].key&quot;: &quot;query&quot;,
+  &quot;command.parameters[0].value&quot;: &quot;xml&quot;,
+  ...
+}
+</code></pre>
+
+    <ul>
+      <li>Default: <code>false</code> (nested object)</li>
+    </ul>
+  </li>
+  <li>
+    <p><code>flatten_separator</code>: It specifies separator that is used when
+<code>flatten</code> is <code>true</code>. If <code>flatten</code> is <code>true</code>, nested keys are
+mapped to one flatten key. This separator is used to concatenate
+nested keys.</p>
+
+    <p><code>.</code> is used for nested object by default. For example,</p>
+
+    <pre class="code ruby"><code class="ruby"> <span class='lbrace'>{</span>
+   <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>a</span><span class='label_end'>&quot;:</span> <span class='lbrace'>{</span>
+     <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>b</span><span class='label_end'>&quot;:</span> <span class='int'>1</span>
+   <span class='rbrace'>}</span>
+ <span class='rbrace'>}</span>
+</code></pre>
+
+    <p>is flatten to the following:</p>
+
+    <pre class="code ruby"><code class="ruby"> <span class='lbrace'>{</span>
+   <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>a.b</span><span class='label_end'>&quot;:</span> <span class='int'>1</span>
+ <span class='rbrace'>}</span>
+</code></pre>
+
+    <p><code>[...]</code> is used for element in an array by default. For example,</p>
+
+    <pre class="code ruby"><code class="ruby"> <span class='lbrace'>{</span>
+   <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>a</span><span class='label_end'>&quot;:</span> <span class='lbracket'>[</span>
+     <span class='int'>1</span><span class='comma'>,</span>
+     <span class='int'>2</span>
+   <span class='rbracket'>]</span>
+ <span class='rbrace'>}</span>
+</code></pre>
+
+    <p>is flatten to the following:</p>
+
+    <pre class="code ruby"><code class="ruby"> <span class='lbrace'>{</span>
+   <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>a[0]</span><span class='label_end'>&quot;:</span> <span class='int'>1</span><span class='comma'>,</span>
+   <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>a[1]</span><span class='label_end'>&quot;:</span> <span class='int'>2</span>
+ <span class='rbrace'>}</span>
+</code></pre>
+
+    <p>If <code>"_"</code> is used as the separator,</p>
+
+    <pre class="code ruby"><code class="ruby"> <span class='lbrace'>{</span>
+   <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>a</span><span class='label_end'>&quot;:</span> <span class='lbracket'>[</span>
+     <span class='int'>1</span><span class='comma'>,</span>
+     <span class='int'>2</span>
+   <span class='rbracket'>]</span><span class='comma'>,</span>
+   <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>b</span><span class='label_end'>&quot;:</span> <span class='lbrace'>{</span>
+     <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>c</span><span class='label_end'>&quot;:</span> <span class='int'>3</span>
+   <span class='rbrace'>}</span>
+ <span class='rbrace'>}</span>
+</code></pre>
+
+    <p>is flatten to the following:</p>
+
+    <pre class="code ruby"><code class="ruby"> <span class='lbrace'>{</span>
+   <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>a_0</span><span class='label_end'>&quot;:</span> <span class='int'>1</span><span class='comma'>,</span>
+   <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>a_1</span><span class='label_end'>&quot;:</span> <span class='int'>2</span><span class='comma'>,</span>
+   <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>b_c</span><span class='label_end'>&quot;:</span> <span class='int'>3</span>
+ <span class='rbrace'>}</span>
+</code></pre>
+
+    <ul>
+      <li>Default: <code>.</code> for object and <code>[...]</code> for array</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="authors">Authors</h2>
+
+<ul>
+  <li>Kouhei Sutou <code>&lt;kou@clear-code.com&gt;</code></li>
+</ul>
+
+<h2 id="license">License</h2>
+
+<p>LGPL 3 or later. See doc/text/lgpl-3.txt for details.</p>
+
+<p>(Kouhei Sutou has a right to change the license including
+contributed patches.)</p>
+
+<h2 id="mailing-list">Mailing list</h2>
+
+<ul>
+  <li>English: <a href="https://lists.sourceforge.net/lists/listinfo/groonga-talk">groonga-talk</a></li>
+  <li>Japanese: <a href="http://lists.sourceforge.jp/mailman/listinfo/groonga-dev">groonga-dev</a></li>
+</ul>
+
+<h2 id="source">Source</h2>
+
+<p>The repository for fluent-plugin-groonga-query-log is on
+<a href="https://github.com/groonga/fluent-plugin-groonga-query-log/">GitHub</a>.</p>
+
+<h2 id="thanks">Thanks</h2>
+
+<ul>
+  <li>…</li>
+</ul>
+</div></div>
+
+    <div id="footer"></div>
+
+  </body>
+</html>

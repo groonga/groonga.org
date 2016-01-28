@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>7.1.1. grndb &mdash; Groonga v5.1.1 documentation</title>
+    <title>7.1.1. grndb &mdash; Groonga v5.1.2 documentation</title>
     
     <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '5.1.1',
+        VERSION:     '5.1.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../../static/underscore.js"></script>
     <script type="text/javascript" src="../../static/doctools.js"></script>
     <link rel="shortcut icon" href="../../static/favicon.ico"/>
-    <link rel="top" title="Groonga v5.1.1 documentation" href="../../index.html" />
+    <link rel="top" title="Groonga v5.1.2 documentation" href="../../index.html" />
     <link rel="up" title="7.1. Executables" href="../executables.html" />
     <link rel="next" title="7.1.2. grnslap" href="grnslap.html" />
     <link rel="prev" title="7.1. Executables" href="../executables.html" /> 
@@ -73,7 +73,7 @@
         <li class="right" >
           <a href="../executables.html" title="7.1. Executables"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v5.1.1 documentation</a> &raquo;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v5.1.2 documentation</a> &raquo;</li>
           <li class="nav-item nav-item-1"><a href="../../reference.html" >7. Reference manual</a> &raquo;</li>
           <li class="nav-item nav-item-2"><a href="../executables.html" accesskey="U">7.1. Executables</a> &raquo;</li> 
       </ul>
@@ -122,11 +122,11 @@ recoverable.</li>
 <div class="section" id="usage">
 <h2>7.1.1.3. Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
 <p>Here is an example to check the database at <code class="docutils literal"><span class="pre">/var/lib/groonga/db/db</span></code>:</p>
-<div class="highlight-none"><div class="highlight"><pre>$ grndb check /var/lib/groonga/db/db
+<div class="highlight-none"><div class="highlight"><pre>% grndb check /var/lib/groonga/db/db
 </pre></div>
 </div>
 <p>Here is an example to recover the database at <code class="docutils literal"><span class="pre">/var/lib/groonga/db/db</span></code>:</p>
-<div class="highlight-none"><div class="highlight"><pre>$ grndb recover /var/lib/groonga/db/db
+<div class="highlight-none"><div class="highlight"><pre>% grndb recover /var/lib/groonga/db/db
 </pre></div>
 </div>
 </div>
@@ -141,6 +141,36 @@ recoverable.</li>
 <p class="first admonition-title">Note</p>
 <p class="last">You must not use this command for opened database. If the database
 is opened, this command may report wrong result.</p>
+</div>
+<p><code class="docutils literal"><span class="pre">check</span></code> has some options.</p>
+<div class="section" id="target">
+<h4>7.1.1.4.1.1. <code class="docutils literal"><span class="pre">--target</span></code><a class="headerlink" href="#target" title="Permalink to this headline">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 5.1.2.</span></p>
+</div>
+<p>It specifies a check target object.</p>
+<p>If your database is large and you know an unreliable object, this
+option will help you. <code class="docutils literal"><span class="pre">check</span></code> need more time for large database. You
+can reduce check time by <code class="docutils literal"><span class="pre">--target</span></code> option to reduce check target.</p>
+<p>The check target is checked recursive. Because related objects of
+unreliable object will be unreliable.</p>
+<p>If the check target is a table, all columns of the table are also
+checked recursive.</p>
+<p>If the check target is a table and its key type is another table, the
+another table is also checked recursive.</p>
+<p>If the check target is a column and its value type is a table, the
+table is also checked recursive.</p>
+<p>If the check target is an index column, the table specified as value
+type and all sources are also checked recursive.</p>
+<p>Here is an example that checks only <code class="docutils literal"><span class="pre">Entries</span></code> table and its
+columns:</p>
+<div class="highlight-none"><div class="highlight"><pre>% grndb check --target Entries /var/lib/groonga/db/db
+</pre></div>
+</div>
+<p>Here is an example that checks only <code class="docutils literal"><span class="pre">Entries.name</span></code> column:</p>
+<div class="highlight-none"><div class="highlight"><pre>% grndb check --target Entries.name /var/lib/groonga/db/db
+</pre></div>
+</div>
 </div>
 </div>
 <div class="section" id="recover">
@@ -177,7 +207,10 @@ is opened, this command may break the database.</p>
 <li><a class="reference internal" href="#syntax">7.1.1.2. Syntax</a></li>
 <li><a class="reference internal" href="#usage">7.1.1.3. Usage</a></li>
 <li><a class="reference internal" href="#commands">7.1.1.4. Commands</a><ul>
-<li><a class="reference internal" href="#check">7.1.1.4.1. <code class="docutils literal"><span class="pre">check</span></code></a></li>
+<li><a class="reference internal" href="#check">7.1.1.4.1. <code class="docutils literal"><span class="pre">check</span></code></a><ul>
+<li><a class="reference internal" href="#target">7.1.1.4.1.1. <code class="docutils literal"><span class="pre">--target</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#recover">7.1.1.4.2. <code class="docutils literal"><span class="pre">recover</span></code></a></li>
 </ul>
 </li>
@@ -227,7 +260,7 @@ is opened, this command may break the database.</p>
         <li class="right" >
           <a href="../executables.html" title="7.1. Executables"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v5.1.1 documentation</a> &raquo;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v5.1.2 documentation</a> &raquo;</li>
           <li class="nav-item nav-item-1"><a href="../../reference.html" >7. Reference manual</a> &raquo;</li>
           <li class="nav-item nav-item-2"><a href="../executables.html" >7.1. Executables</a> &raquo;</li> 
       </ul>

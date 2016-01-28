@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>7.1.1. grndb &mdash; Groonga v5.1.1ドキュメント</title>
+    <title>7.1.1. grndb &mdash; Groonga v5.1.2ドキュメント</title>
     
     <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '5.1.1',
+        VERSION:     '5.1.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../../static/doctools.js"></script>
     <script type="text/javascript" src="../../static/translations.js"></script>
     <link rel="shortcut icon" href="../../static/favicon.ico"/>
-    <link rel="top" title="Groonga v5.1.1ドキュメント" href="../../index.html" />
+    <link rel="top" title="Groonga v5.1.2ドキュメント" href="../../index.html" />
     <link rel="up" title="7.1. 実行ファイル" href="../executables.html" />
     <link rel="next" title="7.1.2. grnslap" href="grnslap.html" />
     <link rel="prev" title="7.1. 実行ファイル" href="../executables.html" /> 
@@ -74,7 +74,7 @@
         <li class="right" >
           <a href="../executables.html" title="7.1. 実行ファイル"
              accesskey="P">前へ</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v5.1.1ドキュメント</a> &raquo;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v5.1.2ドキュメント</a> &raquo;</li>
           <li class="nav-item nav-item-1"><a href="../../reference.html" >7. リファレンスマニュアル</a> &raquo;</li>
           <li class="nav-item nav-item-2"><a href="../executables.html" accesskey="U">7.1. 実行ファイル</a> &raquo;</li> 
       </ul>
@@ -126,11 +126,11 @@
 <div class="section" id="usage">
 <h2>7.1.1.3. 使い方<a class="headerlink" href="#usage" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <p>以下は <code class="docutils literal"><span class="pre">/var/lib/groonga/db/db</span></code> にあるデータベースをチェックする例です:</p>
-<div class="highlight-none"><div class="highlight"><pre>$ grndb check /var/lib/groonga/db/db
+<div class="highlight-none"><div class="highlight"><pre>% grndb check /var/lib/groonga/db/db
 </pre></div>
 </div>
 <p>以下は <code class="docutils literal"><span class="pre">/var/lib/groonga/db/db</span></code> にあるデータベースを復旧する例です:</p>
-<div class="highlight-none"><div class="highlight"><pre>$ grndb recover /var/lib/groonga/db/db
+<div class="highlight-none"><div class="highlight"><pre>% grndb recover /var/lib/groonga/db/db
 </pre></div>
 </div>
 </div>
@@ -143,6 +143,28 @@
 <div class="admonition note">
 <p class="first admonition-title">注釈</p>
 <p class="last">このコマンドを他のプロセスが開いているデータベースに対しては使ってはいけません。もし、データベースが他のプロセスから開かれていると、このコマンドは間違った結果を報告する可能性があります。</p>
+</div>
+<p><code class="docutils literal"><span class="pre">check</span></code> にはいくつかオプションがあります。</p>
+<div class="section" id="target">
+<h4>7.1.1.4.1.1. <code class="docutils literal"><span class="pre">--target</span></code><a class="headerlink" href="#target" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">バージョン 5.1.2 で追加.</span></p>
+</div>
+<p>チェック対象のオブジェクトを指定します。</p>
+<p>もし、データベースが大きく、かつ、信頼できないオブジェクトがわかっているなら、このオプションが役に立つでしょう。 <code class="docutils literal"><span class="pre">check</span></code> は大きなデータベースほど処理に時間がかかります。 <code class="docutils literal"><span class="pre">--target</span></code> オプションでチェック対象を限定することでチェック時間を削減できます。</p>
+<p><code class="docutils literal"><span class="pre">check</span></code> はチェック対象を再帰的にチェックします。なぜなら、信頼できないオブジェクトに関連するオブジェクトも信頼できないことが多いからです。</p>
+<p>チェック対象がテーブルの場合、そのテーブルのすべてのカラムも再帰的にチェックします。</p>
+<p>チェック対象がテーブルでテーブルのキーの型が他のテーブルの場合、他のテーブルも再帰的にチェックします。</p>
+<p>チェック対象がカラムで値の型がテーブルの場合、そのテーブルも再帰的にチェックします。</p>
+<p>チェック対象がインデックスカラムの場合、値の型に指定したテーブルとすべてのソースも再帰的にチェックします。</p>
+<p>以下は <code class="docutils literal"><span class="pre">Entries</span></code> テーブルとそのカラムだけをチェックする例です。:</p>
+<div class="highlight-none"><div class="highlight"><pre>% grndb check --target Entries /var/lib/groonga/db/db
+</pre></div>
+</div>
+<p>以下は <code class="docutils literal"><span class="pre">Entries.name</span></code> カラムだけをチェックする例です。:</p>
+<div class="highlight-none"><div class="highlight"><pre>% grndb check --target Entries.name /var/lib/groonga/db/db
+</pre></div>
+</div>
 </div>
 </div>
 <div class="section" id="recover">
@@ -172,7 +194,10 @@
 <li><a class="reference internal" href="#syntax">7.1.1.2. 構文</a></li>
 <li><a class="reference internal" href="#usage">7.1.1.3. 使い方</a></li>
 <li><a class="reference internal" href="#commands">7.1.1.4. コマンド一覧</a><ul>
-<li><a class="reference internal" href="#check">7.1.1.4.1. <code class="docutils literal"><span class="pre">check</span></code></a></li>
+<li><a class="reference internal" href="#check">7.1.1.4.1. <code class="docutils literal"><span class="pre">check</span></code></a><ul>
+<li><a class="reference internal" href="#target">7.1.1.4.1.1. <code class="docutils literal"><span class="pre">--target</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#recover">7.1.1.4.2. <code class="docutils literal"><span class="pre">recover</span></code></a></li>
 </ul>
 </li>
@@ -222,7 +247,7 @@
         <li class="right" >
           <a href="../executables.html" title="7.1. 実行ファイル"
              >前へ</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v5.1.1ドキュメント</a> &raquo;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v5.1.2ドキュメント</a> &raquo;</li>
           <li class="nav-item nav-item-1"><a href="../../reference.html" >7. リファレンスマニュアル</a> &raquo;</li>
           <li class="nav-item nav-item-2"><a href="../executables.html" >7.1. 実行ファイル</a> &raquo;</li> 
       </ul>

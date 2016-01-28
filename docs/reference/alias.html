@@ -1,0 +1,471 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>7.17. Alias &mdash; Groonga v5.1.2 documentation</title>
+    
+    <link rel="stylesheet" href="../static/groonga.css" type="text/css" />
+    <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '5.1.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../static/jquery.js"></script>
+    <script type="text/javascript" src="../static/underscore.js"></script>
+    <script type="text/javascript" src="../static/doctools.js"></script>
+    <link rel="shortcut icon" href="../static/favicon.ico"/>
+    <link rel="top" title="Groonga v5.1.2 documentation" href="../index.html" />
+    <link rel="up" title="7. Reference manual" href="../reference.html" />
+    <link rel="next" title="7.18. Suggest" href="suggest.html" />
+    <link rel="prev" title="7.16. Configuration" href="configuration.html" /> 
+      <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
+    <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
+    <meta property="og:type" content="product" />
+    <meta property="og:image" content="http://groonga.org/images/logos/groonga-icon-full-size.png" />
+    <meta property="og:site_name" content="groonga" />
+
+    <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
+  </head>
+
+  <body role="document">
+<div class="header">
+  <h1 class="title">
+    <a id="top-link" href="../../">
+      <span class="project">groonga</span>
+      <span class="separator">-</span>
+      <span class="description">An open-source fulltext search engine and column store.</span>
+    </a>
+  </h1>
+
+      <div class="facebook-buttons">
+      <fb:like href="http://www.facebook.com/pages/groonga/201193596592346"
+               layout="standard"
+               width="290"></fb:like>
+    </div>
+    <div class="other-language-links">
+
+    <ul>
+      <li><a href="../../ja/docs/reference/alias.html">日本語</a></li>
+    </ul>
+  </div>
+</div>
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="suggest.html" title="7.18. Suggest"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="configuration.html" title="7.16. Configuration"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Groonga v5.1.2 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../reference.html" accesskey="U">7. Reference manual</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="alias">
+<h1>7.17. Alias<a class="headerlink" href="#alias" title="Permalink to this headline">¶</a></h1>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 5.1.2.</span></p>
+</div>
+<p>You can refer a table and column by multiple names by using alias
+feature.</p>
+<div class="section" id="summary">
+<h2>7.17.1. Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>The alias feature is useful for the following cases:</p>
+<blockquote>
+<div><ul class="simple">
+<li>You want to rename a table but you can't change some Groonga
+clients that uses the current table name.</li>
+<li>You want to change column type without downtime.</li>
+</ul>
+</div></blockquote>
+<p>In the former case, some Groonga clients can use the current table
+name after you rename a table. Because the alias feature maps the
+current table name to the renamed new table name.</p>
+<p>In the latter case, all Groonga clients access the column by aliased
+name such as <code class="docutils literal"><span class="pre">aliased_column</span></code>. <code class="docutils literal"><span class="pre">aliased_column</span></code> refers
+<code class="docutils literal"><span class="pre">current_column</span></code>. You create a new column <code class="docutils literal"><span class="pre">new_column</span></code> with new
+type and copy data from <code class="docutils literal"><span class="pre">current_column</span></code> by
+<a class="reference internal" href="commands/column_copy.html"><em>column_copy</em></a>. You change <code class="docutils literal"><span class="pre">aliased_column</span></code>
+to refer <code class="docutils literal"><span class="pre">new_column</span></code> from <code class="docutils literal"><span class="pre">current_column</span></code>. Now, all Groonga
+clients access <code class="docutils literal"><span class="pre">new_column</span></code> by <code class="docutils literal"><span class="pre">aliased_column</span></code> without stopping
+search requests.</p>
+</div>
+<div class="section" id="usage">
+<h2>7.17.2. Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>You manage alias to real name mapping by a normal table and a normal
+column.</p>
+<p>You can use any table type except <a class="reference internal" href="tables.html#table-no-key"><span>TABLE_NO_KEY</span></a> for the
+table. <a class="reference internal" href="tables.html#table-hash-key"><span>TABLE_HASH_KEY</span></a> is recommended because exact key match
+search is only used for the alias feature. <a class="reference internal" href="tables.html#table-hash-key"><span>TABLE_HASH_KEY</span></a> is
+the fastest table type for exact key match search.</p>
+<p>The column must be <a class="reference internal" href="columns/scalar.html"><em>Scalar column</em></a> and type is
+<code class="docutils literal"><span class="pre">ShortText</span></code>. You can also use <code class="docutils literal"><span class="pre">Text</span></code> and <code class="docutils literal"><span class="pre">LongText</span></code> types but
+they are meaningless. Because the max table/column name size is
+4KiB. <code class="docutils literal"><span class="pre">ShortText</span></code> can store 4KiB data.</p>
+<p>Here are example definitions of table and column for managing aliases:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Aliases TABLE_HASH_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Aliases real_name COLUMN_SCALAR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>You need to register the table and column by <a class="reference internal" href="configuration.html"><em>Configuration</em></a>.
+The alias feature uses <code class="docutils literal"><span class="pre">alias.column</span></code> configuration item. You can
+register the table and column by the following
+<a class="reference internal" href="commands/config_set.html"><em>config_set</em></a>:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>config_set alias.column Aliases.real_name
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>Here are schema and data to show how to use alias:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>table_create Users TABLE_HASH_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Users age COLUMN_SCALAR UInt8
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+load --table Users
+[
+{&quot;_key&quot;: &quot;alice&quot;, &quot;age&quot;: 14},
+{&quot;_key&quot;: &quot;bob&quot;,   &quot;age&quot;: 29}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 2]
+</pre></div>
+</div>
+<p>You can use <code class="docutils literal"><span class="pre">Users.age</span></code> in <a class="reference internal" href="commands/select.html"><em>select</em></a>:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>select Users --filter &#39;age &lt; 20&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;age&quot;,
+#           &quot;UInt8&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;alice&quot;,
+#         14
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>You can't use <code class="docutils literal"><span class="pre">Users.age</span></code> when you rename <code class="docutils literal"><span class="pre">Users.age</span></code> to
+<code class="docutils literal"><span class="pre">Users.years</span></code> by <a class="reference internal" href="commands/column_rename.html"><em>column_rename</em></a>:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>column_rename Users age years
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+select Users --filter &#39;age &lt; 20&#39;
+# [
+#   [
+#     -63,
+#     1337566253.89858,
+#     0.000355720520019531,
+#     &quot;Syntax error: &lt;age| |&lt; 20&gt;&quot;,
+#     [
+#       [
+#         &quot;yy_syntax_error&quot;,
+#         &quot;grn_ecmascript.lemon&quot;,
+#         34
+#       ]
+#     ]
+#   ],
+#   []
+# ]
+</pre></div>
+</div>
+<p>But you can use <code class="docutils literal"><span class="pre">Users.age</span></code> by registering <code class="docutils literal"><span class="pre">Users.age</span></code> to
+<code class="docutils literal"><span class="pre">Users.years</span></code> mapping to <code class="docutils literal"><span class="pre">Aliases</span></code>.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>load --table Aliases
+[
+{&quot;_key&quot;: &quot;Users.age&quot;, &quot;real_name&quot;: &quot;Users.years&quot;}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 1]
+select Users --filter &#39;age &lt; 20&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;years&quot;,
+#           &quot;UInt8&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;alice&quot;,
+#         14
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>Now, you can use <code class="docutils literal"><span class="pre">Users.age</span></code> as alias of <code class="docutils literal"><span class="pre">Users.years</span></code>.</p>
+</div>
+<div class="section" id="how-to-resolve-alias">
+<h2>7.17.3. How to resolve alias<a class="headerlink" href="#how-to-resolve-alias" title="Permalink to this headline">¶</a></h2>
+<p>This section describes how to resolve alias.</p>
+<p>Groonga uses the alias feature when nonexistent object name (table
+name, column name, command name, function name and so on) is
+referred. It means that you can't override existing object (table,
+column, command, function and so on) by the alias feature.</p>
+<p>For example, alias isn't resolved in the following example because
+<code class="docutils literal"><span class="pre">Users.years</span></code> exists:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>column_rename Users years years_old
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+select Users --filter &#39;age &lt; 20&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;years_old&quot;,
+#           &quot;UInt8&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;alice&quot;,
+#         14
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>Alias is resolved recursively. If you rename <code class="docutils literal"><span class="pre">Users.years</span></code> to
+<code class="docutils literal"><span class="pre">Users.years_old</span></code> and you refer <code class="docutils literal"><span class="pre">Users.age</span></code>, Groonga replaces
+<code class="docutils literal"><span class="pre">Users.age</span></code> with <code class="docutils literal"><span class="pre">Users.years</span></code> and then <code class="docutils literal"><span class="pre">Users.years</span></code> with
+<code class="docutils literal"><span class="pre">Users.years_old</span></code>. Because <code class="docutils literal"><span class="pre">Aliases</span></code> table has the following
+records:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><code class="docutils literal"><span class="pre">_key</span></code></th>
+<th class="head"><code class="docutils literal"><span class="pre">real_name</span></code></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">Users.age</span></code></td>
+<td><code class="docutils literal"><span class="pre">Users.years</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">Users.years</span></code></td>
+<td><code class="docutils literal"><span class="pre">Users.years_old</span></code></td>
+</tr>
+</tbody>
+</table>
+<p>Here is an example to <code class="docutils literal"><span class="pre">Users.age</span></code> is resolved recursively:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre>column_rename Users years years_old
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+select Users --filter &#39;age &lt; 20&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;years_old&quot;,
+#           &quot;UInt8&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;alice&quot;,
+#         14
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
+<div class="section" id="see-also">
+<h2>7.17.4. See also<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference internal" href="configuration.html"><em>Configuration</em></a></li>
+<li><a class="reference internal" href="commands/config_set.html"><em>config_set</em></a></li>
+<li><a class="reference internal" href="commands/table_create.html"><em>table_create</em></a></li>
+<li><a class="reference internal" href="commands/column_create.html"><em>column_create</em></a></li>
+<li><a class="reference internal" href="commands/select.html"><em>select</em></a></li>
+</ul>
+</div></blockquote>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">7.17. Alias</a><ul>
+<li><a class="reference internal" href="#summary">7.17.1. Summary</a></li>
+<li><a class="reference internal" href="#usage">7.17.2. Usage</a></li>
+<li><a class="reference internal" href="#how-to-resolve-alias">7.17.3. How to resolve alias</a></li>
+<li><a class="reference internal" href="#see-also">7.17.4. See also</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="configuration.html"
+                        title="previous chapter">7.16. Configuration</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="suggest.html"
+                        title="next chapter">7.18. Suggest</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../sources/reference/alias.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="suggest.html" title="7.18. Suggest"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="configuration.html" title="7.16. Configuration"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Groonga v5.1.2 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../reference.html" >7. Reference manual</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2009-2016, Brazil, Inc.
+    </div>
+      <script src="http://connect.facebook.net/en_US/all.js"></script>
+
+    <script>
+      FB.init({
+         appId  : null,
+         status : true, // check login status
+         cookie : true, // enable cookies to allow the server to access the session
+         xfbml  : true  // parse XFBML
+      });
+    </script>
+  </body>
+
+</html>

@@ -7,12 +7,10 @@ description: APIドキュメント化始めました
 APIドキュメント化始めました (2013/8/12に完了しました)
 -----------------------------------------------------
 
-<div class="note">
-**2013-08-12更新** APIドキュメント化作業は
-[`whombx":https://github.com/whombx さんのご協力により目標としていた作業を完成させることができました。pull requestをたくさん送ってくれた "`whombx](https://github.com/whombx)
-さんのおかげです。とても助かりました。
+> *2013-08-12更新* APIドキュメント化作業は
+> [whombx](https://github.com/whombx) さんのご協力により目標としていた作業を完成させることができました。pull requestをたくさん送ってくれた [whombx](https://github.com/whombx)
+> さんのおかげです。とても助かりました。
 
-</div>
 長い間懸案であった、groongaのAPIをドキュメント化する作業を始めました。
 
 始めた理由は二つあります。

@@ -12,8 +12,8 @@ Groonga Meetup 2014/04/29を開催しました！
 
 イベントに参加してくれた人にレポート書いてみませんか、と声掛けしてみたところ、以下の3名の方に快く応じていただけました。ありがとうございます！参加者目線で見た当日の様子が伺えますね。
 
--   [`redfigure":https://twitter.com/redfigure さん
-    * "`flame1980](https://twitter.com/flame1980) さん
+-   [redfigure](https://twitter.com/redfigure) さん
+-   [flame1980](https://twitter.com/flame1980) さん
 -   [@OsamuIchikawa](https://twitter.com/OsamuIckw) さん
 
 ### [@redfigure](https://twitter.com/redfigure) さんの参加レポート

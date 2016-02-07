@@ -2,7 +2,7 @@
 layout: post.en
 title: Removed 1.x packages from repository
 ---
-h2. Removed 1.x packages from repository
+## Removed 1.x packages from repository
 
 We had released groonga 3.0.3 Apr 29, 2013. At that time, we also
 reorganized self hosted groonga repository.

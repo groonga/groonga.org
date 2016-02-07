@@ -3,7 +3,7 @@ layout: post.ja
 title: groonga勉強会「全文検索エンジンgroongaを囲む夕べ3」開催のお知らせ
 description: 今年もgroonga勉強会「全文検索エンジンgroongaを囲む夕べ3」を開催します！
 ---
-h2. groonga勉強会「全文検索エンジンgroongaを囲む夕べ 3」開催のお知らせ
+## groonga勉強会「全文検索エンジンgroongaを囲む夕べ 3」開催のお知らせ
 
 今年も「いい肉の日」である11/29に、「 [全文検索エンジンgroongaを囲む夕べ
 3](http://atnd.org/events/33070)

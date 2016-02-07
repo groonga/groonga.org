@@ -3,7 +3,7 @@ layout: post.ja
 title: 「全文検索エンジンGroongaを囲む夕べ 4」開催しました
 description: 11/29に「全文検索エンジンGroongaを囲む夕べ4」を開催しました。
 ---
-h2. 「全文検索エンジンGroongaを囲む夕べ 4」を開催しました
+## 「全文検索エンジンGroongaを囲む夕べ 4」を開催しました
 
 昨年に引き続き、今年もいい肉の日に
 [「全文検索エンジンGroongaを囲む夕べ4」](http://atnd.org/events/43461)

@@ -2,7 +2,7 @@
 layout: post.ja
 title: 「全文検索エンジンgroongaを囲む夕べ 2」参加者へのお知らせ
 ---
-h2. 「全文検索エンジンgroongaを囲む夕べ 2」参加者へのお知らせ
+## 「全文検索エンジンgroongaを囲む夕べ 2」参加者へのお知らせ
 
 いよいよ2週間後に迫った [全文検索エンジンgroongaを囲む夕べ
 2](http://atnd.org/events/20446)

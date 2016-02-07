@@ -2,7 +2,7 @@
 layout: post.ja
 title: InnoDB純正の全文検索エンジンInnoDB FTS
 ---
-h2. InnoDB純正の全文検索エンジンInnoDB FTS
+## InnoDB純正の全文検索エンジンInnoDB FTS
 
 つい先日、MySQL-5.6.3-labs版がリリースがされました。この中にはInnoDBで動作する全文検索エンジン"InnoDB
 FTS"が含まれています。これまでは、MySQLとInnoDBの組み合わせで全文検索を行うためにはサードパーティの製品([mroonga](http://mroonga.org/)

@@ -2,7 +2,7 @@
 layout: post.ja
 title: 全文検索エンジンgroongaを囲む夕べ 2開催
 ---
-h2. 全文検索エンジンgroongaを囲む夕べ 2開催
+## 全文検索エンジンgroongaを囲む夕べ 2開催
 
 昨年に引き続き、今年もいい肉の日に
 [全文検索エンジンgroongaを囲む夕べ](http://atnd.org/events/20446)

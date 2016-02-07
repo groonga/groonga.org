@@ -3,7 +3,7 @@ layout: post.ja
 title: 第8回OSS奨励賞を受賞
 description: groonga開発チームが第8回OSS奨励賞を受賞しました！
 ---
-h2. groonga開発チームが第8回OSS奨励賞を受賞しました！
+## groonga開発チームが第8回OSS奨励賞を受賞しました！
 
 groonga開発チームが2月22日に
 [第8回日本OSS奨励賞を受賞しました！](http://www.ossforum.jp/ossaward8th2)

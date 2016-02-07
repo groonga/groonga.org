@@ -2,7 +2,7 @@
 layout: post.en
 title: Groonga CloudSearch 1.2.0 has been released
 ---
-h2. Groonga CloudSearch 1.2.0 has been released
+## Groonga CloudSearch 1.2.0 has been released
 
 We have released [Groonga CloudSearch](http://gcs.groonga.org/) 1.2.0.
 

@@ -1,9 +1,7 @@
 ---
 layout: post.en
-title: Drop package support for Debian 6.0(squeeze) and Ubuntu
-10.04(lucid)
-description: Drop package support for Debian 6.0(squeeze) and Ubuntu
-10.04(lucid)
+title: Drop package support for Debian 6.0(squeeze) and Ubuntu 10.04(lucid)
+description: Drop package support for Debian 6.0(squeeze) and Ubuntu 10.04(lucid)
 ---
 
 Drop package support for Debian 6.0(squeeze) and Ubuntu 10.04(lucid)

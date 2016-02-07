@@ -1,8 +1,7 @@
 ---
 layout: post.ja
 title: gihyo.jpさんで連載「隔週連載groonga」を開始しました！
-description:
-gihyo.jpさんでgroongaを使いたくなる情報を隔週で紹介する連載についての紹介
+description: gihyo.jpさんでgroongaを使いたくなる情報を隔週で紹介する連載についての紹介
 ---
 h2. gihyo.jpさんで連載「隔週連載groonga」を開始しました！
 

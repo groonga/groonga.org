@@ -1,8 +1,7 @@
 ---
 layout: post.ja
 title: 「全文検索エンジンGroongaを囲む夕べ 4」開催しました
-description: 11/29に「全文検索エンジンGroongaを囲む夕べ
-4」を開催しました。
+description: 11/29に「全文検索エンジンGroongaを囲む夕べ4」を開催しました。
 ---
 h2. 「全文検索エンジンGroongaを囲む夕べ 4」を開催しました
 

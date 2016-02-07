@@ -1,9 +1,7 @@
 ---
 layout: post.ja
-title: Groonga勉強会「全文検索エンジンGroongaを囲む夕べ
-4」開催のお知らせ
-description: 今年もGroonga勉強会「全文検索エンジンGroongaを囲む夕べ
-4」を開催します！
+title: Groonga勉強会「全文検索エンジンGroongaを囲む夕べ4」開催のお知らせ
+description: 今年もGroonga勉強会「全文検索エンジンGroongaを囲む夕べ4」を開催します！
 ---
 h2. Groonga勉強会「全文検索エンジンGroongaを囲む夕べ 4」開催のお知らせ
 

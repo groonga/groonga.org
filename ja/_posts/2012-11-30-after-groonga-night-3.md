@@ -1,8 +1,7 @@
 ---
 layout: post.ja
 title: groonga勉強会「全文検索エンジンgroongaを囲む夕べ 3」開催しました
-description: 11/29にgroonga勉強会「全文検索エンジンgroongaを囲む夕べ
-3」を開催しました。
+description: 11/29にgroonga勉強会「全文検索エンジンgroongaを囲む夕べ3」を開催しました。
 ---
 h2. groonga勉強会「全文検索エンジンgroongaを囲む夕べ 3」を開催しました
 

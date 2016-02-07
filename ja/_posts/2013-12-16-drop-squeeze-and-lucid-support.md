@@ -1,9 +1,7 @@
 ---
 layout: post.ja
-title: Debian 6.0(squeeze)およびUbuntu
-10.04(lucid)サポート終了予定について
-description: Debian 6.0(squeeze)およびUbuntu
-10.04(lucid)サポート終了予定について
+title: Debian 6.0(squeeze)およびUbuntu 10.04(lucid)サポート終了予定について
+description: Debian 6.0(squeeze)およびUbuntu 10.04(lucid)サポート終了予定について
 ---
 
 Debian 6.0(squeeze)およびUbuntu 10.04(lucid)サポート終了予定について

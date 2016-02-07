@@ -1,8 +1,7 @@
 ---
 layout: post.ja
 title: fluent-plugin-groongaについて
-description:
-groongaデータベースのレプリケーションを行うfluent-plugin-groongaについて説明します。
+description: groongaデータベースのレプリケーションを行うfluent-plugin-groongaについて説明します。
 ---
 去年最後の肉の日である12/29に、ログ収集ツール
 [fluentd](http://fluentd.org/)

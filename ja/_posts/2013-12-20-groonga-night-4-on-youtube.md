@@ -1,9 +1,7 @@
 ---
 layout: post.ja
-title: 「全文検索エンジンGroongaを囲む夕べ
-4」の様子がYouTubeでも視聴できます
-description: 「全文検索エンジンGroongaを囲む夕べ
-4」の様子がYouTubeでも視聴できます
+title: 「全文検索エンジンGroongaを囲む夕べ4」の様子がYouTubeでも視聴できます
+description: 「全文検索エンジンGroongaを囲む夕べ4」の様子がYouTubeでも視聴できます
 ---
 h2. 「全文検索エンジンGroongaを囲む夕べ
 4」の様子がYouTubeでも視聴できます

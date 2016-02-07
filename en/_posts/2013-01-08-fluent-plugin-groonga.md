@@ -1,8 +1,7 @@
 ---
 layout: post.en
 title: fluent-plugin-groonga
-description: The introduction of fluent-plugin-groonga for replication
-of groonga databases.
+description: The introduction of fluent-plugin-groonga for replication of groonga databases.
 ---
 
 2012-12-29, fluent-plugin-groonga 1.0.1 was released. You can use

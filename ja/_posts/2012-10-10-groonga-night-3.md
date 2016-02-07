@@ -56,9 +56,9 @@ groongaを実際に使っているユーザーさんで、今回の勉強会で�
 募集テーマは、「普段groongaをどのように使っているか」です。当日はスライドなどの講演資料を使って発表していただきます。発表時間は15分で、その後に10分のQ&Aを予定しています。
 
 発表申し込みは先着順です。発表を申し込んでくださる方は、twitterで
-[`groonga":https://twitter.com/groonga/ 宛にツイートしてください。詳しい応募方法については "ATND":http://atnd.org/events/33070 をご覧ください。
+[@groonga](https://twitter.com/groonga/) 宛にツイートしてください。詳しい応募方法については [ATND](http://atnd.org/events/33070) をご覧ください。
 申し込みの締め切りは10/28です。
-発表に関しての質問は、 "`groonga](https://twitter.com/groonga/)
+発表に関しての質問は、 [@groonga](https://twitter.com/groonga/)
 宛にツイートしてください。
 
 #### 参加希望者を募集します！

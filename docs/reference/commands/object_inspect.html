@@ -1,0 +1,616 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>7.3.39. object_inspect &mdash; Groonga v6.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
+    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '6.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../static/favicon.ico"/>
+    <link rel="top" title="Groonga v6.0.0 documentation" href="../../index.html" />
+    <link rel="up" title="7.3. Command" href="../command.html" />
+    <link rel="next" title="7.3.40. object_remove" href="object_remove.html" />
+    <link rel="prev" title="7.3.38. object_exist" href="object_exist.html" /> 
+      <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
+    <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
+    <meta property="og:type" content="product" />
+    <meta property="og:image" content="http://groonga.org/images/logos/groonga-icon-full-size.png" />
+    <meta property="og:site_name" content="groonga" />
+
+    <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
+  </head>
+
+  <body role="document">
+<div class="header">
+  <h1 class="title">
+    <a id="top-link" href="../../../">
+      <span class="project">groonga</span>
+      <span class="separator">-</span>
+      <span class="description">An open-source fulltext search engine and column store.</span>
+    </a>
+  </h1>
+
+      <div class="facebook-buttons">
+      <fb:like href="http://www.facebook.com/pages/groonga/201193596592346"
+               layout="standard"
+               width="290"></fb:like>
+    </div>
+    <div class="other-language-links">
+
+    <ul>
+      <li><a href="../../../ja/docs/reference/commands/object_inspect.html">日本語</a></li>
+    </ul>
+  </div>
+</div>
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="object_remove.html" title="7.3.40. object_remove"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="object_exist.html" title="7.3.38. object_exist"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v6.0.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../reference.html" >7. Reference manual</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="../command.html" accesskey="U">7.3. Command</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="object-inspect">
+<h1>7.3.39. <code class="docutils literal"><span class="pre">object_inspect</span></code><a class="headerlink" href="#object-inspect" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="summary">
+<h2>7.3.39.1. Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 6.0.0.</span></p>
+</div>
+<p><code class="docutils literal"><span class="pre">object_inspect</span></code> inspects an object. You can confirm details of an
+object.</p>
+<p>For example:</p>
+<blockquote>
+<div><ul class="simple">
+<li>If the object is a table, you can confirm the number of records in
+the table.</li>
+<li>If the object is a column, you can confirm the type of value of
+the column.</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="syntax">
+<h2>7.3.39.2. Syntax<a class="headerlink" href="#syntax" title="Permalink to this headline">¶</a></h2>
+<p>This command takes only one optional parameter:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>object_inspect [name=null]
+</pre></div>
+</div>
+</div>
+<div class="section" id="usage">
+<h2>7.3.39.3. Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>You can inspect an object in the database specified by <code class="docutils literal"><span class="pre">name</span></code>:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>table_create Users TABLE_HASH_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+load --table Users
+[
+{&quot;_key&quot;: &quot;Alice&quot;}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 1]
+object_inspect Users
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   {
+#     &quot;name&quot;: &quot;Users&quot;,
+#     &quot;n_records&quot;: 1,
+#     &quot;value&quot;: {
+#       &quot;type&quot;: null
+#     },
+#     &quot;key&quot;: {
+#       &quot;total_size&quot;: 5,
+#       &quot;max_total_size&quot;: 4294967295,
+#       &quot;type&quot;: {
+#         &quot;size&quot;: 4096,
+#         &quot;type&quot;: {
+#           &quot;id&quot;: 32,
+#           &quot;name&quot;: &quot;type&quot;
+#         },
+#         &quot;id&quot;: 14,
+#         &quot;name&quot;: &quot;ShortText&quot;
+#       }
+#     },
+#     &quot;type&quot;: {
+#       &quot;id&quot;: 48,
+#       &quot;name&quot;: &quot;table:hash_key&quot;
+#     },
+#     &quot;id&quot;: 256
+#   }
+# ]
+</pre></div>
+</div>
+<p>The <code class="docutils literal"><span class="pre">object_inspect</span> <span class="pre">Users</span></code> returns the following information:</p>
+<blockquote>
+<div><ul class="simple">
+<li>The name of the table: <code class="docutils literal"><span class="pre">&quot;name&quot;:</span> <span class="pre">Users</span></code></li>
+<li>The total used key size: <code class="docutils literal"><span class="pre">&quot;key&quot;:</span> <span class="pre">{&quot;total_size&quot;:</span> <span class="pre">5}</span></code>
+(<code class="docutils literal"><span class="pre">&quot;Alice&quot;</span></code> is 5 byte data)</li>
+<li>The maximum total key size: <code class="docutils literal"><span class="pre">&quot;key&quot;:</span> <span class="pre">{&quot;max_total_size&quot;:</span> <span class="pre">4294967295}</span></code></li>
+<li>and so on.</li>
+</ul>
+</div></blockquote>
+<p>You can inspect the database by not specifying <code class="docutils literal"><span class="pre">name</span></code>:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>object_inspect
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   {
+#     &quot;name_table&quot;: {
+#       &quot;name&quot;: &quot;&quot;,
+#       &quot;n_records&quot;: 256,
+#       &quot;value&quot;: null,
+#       &quot;key&quot;: {
+#         &quot;type&quot;: null
+#       },
+#       &quot;type&quot;: {
+#         &quot;id&quot;: 50,
+#         &quot;name&quot;: &quot;table:dat_key&quot;
+#       },
+#       &quot;id&quot;: 0
+#     },
+#     &quot;type&quot;: {
+#       &quot;id&quot;: 55,
+#       &quot;name&quot;: &quot;db&quot;
+#     }
+#   }
+# ]
+</pre></div>
+</div>
+<p>The <code class="docutils literal"><span class="pre">object_inspect</span></code> returns the following information:</p>
+<blockquote>
+<div><ul class="simple">
+<li>The table type for object name management:
+<code class="docutils literal"><span class="pre">&quot;key&quot;:</span> <span class="pre">{&quot;type&quot;:</span> <span class="pre">{&quot;name&quot;:</span> <span class="pre">&quot;table:dat_key&quot;}}</span></code></li>
+<li>and so on.</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="parameters">
+<h2>7.3.39.4. Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+<p>This section describes all parameters.</p>
+<div class="section" id="required-parameters">
+<h3>7.3.39.4.1. Required parameters<a class="headerlink" href="#required-parameters" title="Permalink to this headline">¶</a></h3>
+<p>There is no required parameters.</p>
+</div>
+<div class="section" id="optional-parameters">
+<h3>7.3.39.4.2. Optional parameters<a class="headerlink" href="#optional-parameters" title="Permalink to this headline">¶</a></h3>
+<p>There is only one optional parameter.</p>
+<div class="section" id="name">
+<span id="object-inspect-name"></span><h4>7.3.39.4.2.1. <code class="docutils literal"><span class="pre">name</span></code><a class="headerlink" href="#name" title="Permalink to this headline">¶</a></h4>
+<p>Specifies the object name to be inspected.</p>
+<p>If <code class="docutils literal"><span class="pre">name</span></code> isn't specified, the database is inspected.</p>
+</div>
+</div>
+</div>
+<div class="section" id="return-value">
+<h2>7.3.39.5. Return value<a class="headerlink" href="#return-value" title="Permalink to this headline">¶</a></h2>
+<p>The command returns an object (nested key and value pairs) that
+includes details of the object (such as table) as body:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>[HEADER, object]
+</pre></div>
+</div>
+<p>See <a class="reference internal" href="../command/output_format.html"><em>Output format</em></a> for <code class="docutils literal"><span class="pre">HEADER</span></code>.</p>
+<p>The format of the details is depends on object type. For example,
+table has key information but function doesn't have key information.</p>
+<div class="section" id="database">
+<span id="object-inspect-return-value-database"></span><h3>7.3.39.5.1. Database<a class="headerlink" href="#database" title="Permalink to this headline">¶</a></h3>
+<p>Database inspection returns the following information:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>{
+  &quot;type&quot;: {
+    &quot;id&quot;: DATABASE_TYPE_ID,
+    &quot;name&quot;: DATABASE_TYPE_NAME
+  },
+  &quot;name_table&quot;: DATABASE_NAME_TABLE
+}
+</pre></div>
+</div>
+<div class="section" id="database-type-id">
+<span id="object-inspect-return-value-database-type-id"></span><h4>7.3.39.5.1.1. <code class="docutils literal"><span class="pre">DATABASE_TYPE_ID</span></code><a class="headerlink" href="#database-type-id" title="Permalink to this headline">¶</a></h4>
+<p><code class="docutils literal"><span class="pre">DATABASE_TYPE_ID</span></code> is always <code class="docutils literal"><span class="pre">55</span></code>.</p>
+</div>
+<div class="section" id="database-type-name">
+<span id="object-inspect-return-value-database-type-name"></span><h4>7.3.39.5.1.2. <code class="docutils literal"><span class="pre">DATABASE_TYPE_NAME</span></code><a class="headerlink" href="#database-type-name" title="Permalink to this headline">¶</a></h4>
+<p><code class="docutils literal"><span class="pre">DATABASE_TYPE_NAME</span></code> is always <code class="docutils literal"><span class="pre">&quot;db&quot;</span></code>.</p>
+</div>
+<div class="section" id="database-name-table">
+<span id="object-inspect-return-value-database-name-table"></span><h4>7.3.39.5.1.3. <code class="docutils literal"><span class="pre">DATABASE_NAME_TABLE</span></code><a class="headerlink" href="#database-name-table" title="Permalink to this headline">¶</a></h4>
+<p><code class="docutils literal"><span class="pre">DATABASE_NAME_TABLE</span></code> is a table for managing object names in the
+database. The table is <a class="reference internal" href="../tables.html#table-pat-key"><span>TABLE_PAT_KEY</span></a> or
+<a class="reference internal" href="../tables.html#table-dat-key"><span>TABLE_DAT_KEY</span></a>. Normally, it's <a class="reference internal" href="../tables.html#table-dat-key"><span>TABLE_DAT_KEY</span></a>.</p>
+<p>See <a class="reference internal" href="#object-inspect-return-value-table"><span>Table</span></a> for format details.</p>
+</div>
+</div>
+<div class="section" id="table">
+<span id="object-inspect-return-value-table"></span><h3>7.3.39.5.2. Table<a class="headerlink" href="#table" title="Permalink to this headline">¶</a></h3>
+<p>Table inspection returns the following information:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>{
+  &quot;name&quot;: TABLE_NAME,
+  &quot;type&quot;: {
+    &quot;id&quot;: TABLE_TYPE_ID,
+    &quot;name&quot;: TABLE_TYPE_NAME
+  },
+  &quot;key&quot;: {
+    &quot;type&quot;: TABLE_KEY_TYPE,
+    &quot;total_size&quot;: TABLE_KEY_TOTAL_SIZE
+    &quot;max_total_size&quot;: TABLE_KEY_MAX_TOTAL_SIZE
+  },
+  &quot;value&quot;: {
+    &quot;type&quot;: TABLE_VALUE_TYPE,
+  },
+  &quot;n_records&quot;: TABLE_N_RECORDS
+}
+</pre></div>
+</div>
+<p>There are some exceptions:</p>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference internal" href="../tables.html#table-no-key"><span>TABLE_NO_KEY</span></a> doesn't return key information because it
+doesn't have key.</li>
+<li><a class="reference internal" href="../tables.html#table-dat-key"><span>TABLE_DAT_KEY</span></a> doesn't return value information because it
+doesn't have value.</li>
+</ul>
+</div></blockquote>
+<div class="section" id="table-name">
+<span id="object-inspect-return-value-table-name"></span><h4>7.3.39.5.2.1. <code class="docutils literal"><span class="pre">TABLE_NAME</span></code><a class="headerlink" href="#table-name" title="Permalink to this headline">¶</a></h4>
+<p>The name of the inspected table.</p>
+</div>
+<div class="section" id="table-type-id">
+<span id="object-inspect-return-value-table-type-id"></span><h4>7.3.39.5.2.2. <code class="docutils literal"><span class="pre">TABLE_TYPE_ID</span></code><a class="headerlink" href="#table-type-id" title="Permalink to this headline">¶</a></h4>
+<p>The type ID of the inspected table.</p>
+<p>Here is a list of type IDs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Table type</th>
+<th class="head">ID</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><a class="reference internal" href="../tables.html#table-hash-key"><span>TABLE_HASH_KEY</span></a></td>
+<td><code class="docutils literal"><span class="pre">48</span></code></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="../tables.html#table-pat-key"><span>TABLE_PAT_KEY</span></a></td>
+<td><code class="docutils literal"><span class="pre">49</span></code></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="../tables.html#table-dat-key"><span>TABLE_DAT_KEY</span></a></td>
+<td><code class="docutils literal"><span class="pre">50</span></code></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="../tables.html#table-no-key"><span>TABLE_NO_KEY</span></a></td>
+<td><code class="docutils literal"><span class="pre">51</span></code></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="table-type-name">
+<span id="object-inspect-return-value-table-type-name"></span><h4>7.3.39.5.2.3. <code class="docutils literal"><span class="pre">TABLE_TYPE_NAME</span></code><a class="headerlink" href="#table-type-name" title="Permalink to this headline">¶</a></h4>
+<p>The type name of the inspected table.</p>
+<p>Here is a list of type names:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Table type</th>
+<th class="head">Name</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><a class="reference internal" href="../tables.html#table-hash-key"><span>TABLE_HASH_KEY</span></a></td>
+<td><code class="docutils literal"><span class="pre">&quot;table:hash_key&quot;</span></code></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="../tables.html#table-pat-key"><span>TABLE_PAT_KEY</span></a></td>
+<td><code class="docutils literal"><span class="pre">&quot;table:pat_key&quot;</span></code></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="../tables.html#table-dat-key"><span>TABLE_DAT_KEY</span></a></td>
+<td><code class="docutils literal"><span class="pre">&quot;table:dat_key&quot;</span></code></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="../tables.html#table-no-key"><span>TABLE_NO_KEY</span></a></td>
+<td><code class="docutils literal"><span class="pre">&quot;table:no_key&quot;</span></code></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="table-key-type">
+<span id="object-inspect-return-value-table-key-type"></span><h4>7.3.39.5.2.4. <code class="docutils literal"><span class="pre">TABLE_KEY_TYPE</span></code><a class="headerlink" href="#table-key-type" title="Permalink to this headline">¶</a></h4>
+<p>The type of key of the inspected table.</p>
+<p>See <a class="reference internal" href="#object-inspect-return-value-type"><span>Type</span></a> for format details.</p>
+</div>
+<div class="section" id="table-key-total-size">
+<span id="object-inspect-return-value-table-total-key-size"></span><h4>7.3.39.5.2.5. <code class="docutils literal"><span class="pre">TABLE_KEY_TOTAL_SIZE</span></code><a class="headerlink" href="#table-key-total-size" title="Permalink to this headline">¶</a></h4>
+<p>The total key size of the inspected table in bytes.</p>
+</div>
+<div class="section" id="table-key-max-total-size">
+<span id="object-inspect-return-value-table-max-total-key-size"></span><h4>7.3.39.5.2.6. <code class="docutils literal"><span class="pre">TABLE_KEY_MAX_TOTAL_SIZE</span></code><a class="headerlink" href="#table-key-max-total-size" title="Permalink to this headline">¶</a></h4>
+<p>The maximum total key size of the inspected table in bytes.</p>
+</div>
+<div class="section" id="table-value-type">
+<span id="object-inspect-return-value-table-value-type"></span><h4>7.3.39.5.2.7. <code class="docutils literal"><span class="pre">TABLE_VALUE_TYPE</span></code><a class="headerlink" href="#table-value-type" title="Permalink to this headline">¶</a></h4>
+<p>The type of value of the inspected table.</p>
+<p>See <a class="reference internal" href="#object-inspect-return-value-type"><span>Type</span></a> for format details.</p>
+</div>
+<div class="section" id="table-n-records">
+<span id="object-inspect-return-value-table-n-records"></span><h4>7.3.39.5.2.8. <code class="docutils literal"><span class="pre">TABLE_N_RECORDS</span></code><a class="headerlink" href="#table-n-records" title="Permalink to this headline">¶</a></h4>
+<p>The number of records of the inspected table.</p>
+<p>It's a 64bit unsigned integer value.</p>
+</div>
+<div class="section" id="type">
+<span id="object-inspect-return-value-type"></span><h4>7.3.39.5.2.9. Type<a class="headerlink" href="#type" title="Permalink to this headline">¶</a></h4>
+<p>Type inspection returns the following information:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>{
+  &quot;id&quot;: TYPE_ID,
+  &quot;name&quot;: TYPE_NAME,
+  &quot;type&quot;: {
+    &quot;id&quot;: TYPE_ID_OF_TYPE,
+    &quot;name&quot;: TYPE_NAME_OF_TYPE
+  },
+  &quot;size&quot;: TYPE_SIZE
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="type-id">
+<span id="object-inspect-return-value-type-id"></span><h4>7.3.39.5.2.10. <code class="docutils literal"><span class="pre">TYPE_ID</span></code><a class="headerlink" href="#type-id" title="Permalink to this headline">¶</a></h4>
+<p>The ID of the inspected type.</p>
+<p>Here is an ID list of builtin types:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Type</th>
+<th class="head">ID</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><a class="reference internal" href="../types.html#builtin-type-bool"><span>Bool</span></a></td>
+<td><code class="docutils literal"><span class="pre">3</span></code></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="../types.html#builtin-type-int8"><span>Int8</span></a></td>
+<td><code class="docutils literal"><span class="pre">4</span></code></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="../types.html#builtin-type-uint8"><span>UInt8</span></a></td>
+<td><code class="docutils literal"><span class="pre">5</span></code></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="../types.html#builtin-type-int16"><span>Int16</span></a></td>
+<td><code class="docutils literal"><span class="pre">6</span></code></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="../types.html#builtin-type-uint16"><span>UInt16</span></a></td>
+<td><code class="docutils literal"><span class="pre">7</span></code></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="../types.html#builtin-type-int32"><span>Int32</span></a></td>
+<td><code class="docutils literal"><span class="pre">8</span></code></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="../types.html#builtin-type-uint32"><span>UInt32</span></a></td>
+<td><code class="docutils literal"><span class="pre">9</span></code></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="../types.html#builtin-type-int64"><span>Int64</span></a></td>
+<td><code class="docutils literal"><span class="pre">10</span></code></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="../types.html#builtin-type-uint64"><span>UInt64</span></a></td>
+<td><code class="docutils literal"><span class="pre">11</span></code></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="../types.html#builtin-type-float"><span>Float</span></a></td>
+<td><code class="docutils literal"><span class="pre">12</span></code></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="../types.html#builtin-type-time"><span>Time</span></a></td>
+<td><code class="docutils literal"><span class="pre">13</span></code></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="../types.html#builtin-type-short-text"><span>ShortText</span></a></td>
+<td><code class="docutils literal"><span class="pre">14</span></code></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="../types.html#builtin-type-text"><span>Text</span></a></td>
+<td><code class="docutils literal"><span class="pre">15</span></code></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="../types.html#builtin-type-long-text"><span>LongText</span></a></td>
+<td><code class="docutils literal"><span class="pre">16</span></code></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="../types.html#builtin-type-tokyo-geo-point"><span>TokyoGeoPoint</span></a></td>
+<td><code class="docutils literal"><span class="pre">17</span></code></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="../types.html#builtin-type-wgs84-geo-point"><span>WGS84GeoPoint</span></a></td>
+<td><code class="docutils literal"><span class="pre">18</span></code></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="type-name">
+<span id="object-inspect-return-value-type-name"></span><h4>7.3.39.5.2.11. <code class="docutils literal"><span class="pre">TYPE_NAME</span></code><a class="headerlink" href="#type-name" title="Permalink to this headline">¶</a></h4>
+<p>The name of the inspected type.</p>
+<p>Here is a name list of builtin types:</p>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference internal" href="../types.html#builtin-type-bool"><span>Bool</span></a></li>
+<li><a class="reference internal" href="../types.html#builtin-type-int8"><span>Int8</span></a></li>
+<li><a class="reference internal" href="../types.html#builtin-type-uint8"><span>UInt8</span></a></li>
+<li><a class="reference internal" href="../types.html#builtin-type-int16"><span>Int16</span></a></li>
+<li><a class="reference internal" href="../types.html#builtin-type-uint16"><span>UInt16</span></a></li>
+<li><a class="reference internal" href="../types.html#builtin-type-int32"><span>Int32</span></a></li>
+<li><a class="reference internal" href="../types.html#builtin-type-uint32"><span>UInt32</span></a></li>
+<li><a class="reference internal" href="../types.html#builtin-type-int64"><span>Int64</span></a></li>
+<li><a class="reference internal" href="../types.html#builtin-type-uint64"><span>UInt64</span></a></li>
+<li><a class="reference internal" href="../types.html#builtin-type-float"><span>Float</span></a></li>
+<li><a class="reference internal" href="../types.html#builtin-type-time"><span>Time</span></a></li>
+<li><a class="reference internal" href="../types.html#builtin-type-short-text"><span>ShortText</span></a></li>
+<li><a class="reference internal" href="../types.html#builtin-type-text"><span>Text</span></a></li>
+<li><a class="reference internal" href="../types.html#builtin-type-long-text"><span>LongText</span></a></li>
+<li><a class="reference internal" href="../types.html#builtin-type-tokyo-geo-point"><span>TokyoGeoPoint</span></a></li>
+<li><a class="reference internal" href="../types.html#builtin-type-wgs84-geo-point"><span>WGS84GeoPoint</span></a></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="type-id-of-type">
+<span id="object-inspect-return-value-type-id-of-type"></span><h4>7.3.39.5.2.12. <code class="docutils literal"><span class="pre">TYPE_ID_OF_TYPE</span></code><a class="headerlink" href="#type-id-of-type" title="Permalink to this headline">¶</a></h4>
+<p><code class="docutils literal"><span class="pre">TYPE_ID_OF_TYPE</span></code> is always <code class="docutils literal"><span class="pre">32</span></code>.</p>
+</div>
+<div class="section" id="type-name-of-type">
+<span id="object-inspect-return-value-type-name-of-type"></span><h4>7.3.39.5.2.13. <code class="docutils literal"><span class="pre">TYPE_NAME_OF_TYPE</span></code><a class="headerlink" href="#type-name-of-type" title="Permalink to this headline">¶</a></h4>
+<p><code class="docutils literal"><span class="pre">TYPE_NAME_OF_TYPE</span></code> is always <code class="docutils literal"><span class="pre">type</span></code>.</p>
+</div>
+<div class="section" id="type-size">
+<span id="object-inspect-return-value-type-size"></span><h4>7.3.39.5.2.14. <code class="docutils literal"><span class="pre">TYPE_SIZE</span></code><a class="headerlink" href="#type-size" title="Permalink to this headline">¶</a></h4>
+<p><code class="docutils literal"><span class="pre">TYPE_SIZE</span></code> is the size of the inspected type in bytes. If the
+inspected type is variable size type, the size means the maximum size.</p>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">7.3.39. <code class="docutils literal"><span class="pre">object_inspect</span></code></a><ul>
+<li><a class="reference internal" href="#summary">7.3.39.1. Summary</a></li>
+<li><a class="reference internal" href="#syntax">7.3.39.2. Syntax</a></li>
+<li><a class="reference internal" href="#usage">7.3.39.3. Usage</a></li>
+<li><a class="reference internal" href="#parameters">7.3.39.4. Parameters</a><ul>
+<li><a class="reference internal" href="#required-parameters">7.3.39.4.1. Required parameters</a></li>
+<li><a class="reference internal" href="#optional-parameters">7.3.39.4.2. Optional parameters</a><ul>
+<li><a class="reference internal" href="#name">7.3.39.4.2.1. <code class="docutils literal"><span class="pre">name</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#return-value">7.3.39.5. Return value</a><ul>
+<li><a class="reference internal" href="#database">7.3.39.5.1. Database</a><ul>
+<li><a class="reference internal" href="#database-type-id">7.3.39.5.1.1. <code class="docutils literal"><span class="pre">DATABASE_TYPE_ID</span></code></a></li>
+<li><a class="reference internal" href="#database-type-name">7.3.39.5.1.2. <code class="docutils literal"><span class="pre">DATABASE_TYPE_NAME</span></code></a></li>
+<li><a class="reference internal" href="#database-name-table">7.3.39.5.1.3. <code class="docutils literal"><span class="pre">DATABASE_NAME_TABLE</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#table">7.3.39.5.2. Table</a><ul>
+<li><a class="reference internal" href="#table-name">7.3.39.5.2.1. <code class="docutils literal"><span class="pre">TABLE_NAME</span></code></a></li>
+<li><a class="reference internal" href="#table-type-id">7.3.39.5.2.2. <code class="docutils literal"><span class="pre">TABLE_TYPE_ID</span></code></a></li>
+<li><a class="reference internal" href="#table-type-name">7.3.39.5.2.3. <code class="docutils literal"><span class="pre">TABLE_TYPE_NAME</span></code></a></li>
+<li><a class="reference internal" href="#table-key-type">7.3.39.5.2.4. <code class="docutils literal"><span class="pre">TABLE_KEY_TYPE</span></code></a></li>
+<li><a class="reference internal" href="#table-key-total-size">7.3.39.5.2.5. <code class="docutils literal"><span class="pre">TABLE_KEY_TOTAL_SIZE</span></code></a></li>
+<li><a class="reference internal" href="#table-key-max-total-size">7.3.39.5.2.6. <code class="docutils literal"><span class="pre">TABLE_KEY_MAX_TOTAL_SIZE</span></code></a></li>
+<li><a class="reference internal" href="#table-value-type">7.3.39.5.2.7. <code class="docutils literal"><span class="pre">TABLE_VALUE_TYPE</span></code></a></li>
+<li><a class="reference internal" href="#table-n-records">7.3.39.5.2.8. <code class="docutils literal"><span class="pre">TABLE_N_RECORDS</span></code></a></li>
+<li><a class="reference internal" href="#type">7.3.39.5.2.9. Type</a></li>
+<li><a class="reference internal" href="#type-id">7.3.39.5.2.10. <code class="docutils literal"><span class="pre">TYPE_ID</span></code></a></li>
+<li><a class="reference internal" href="#type-name">7.3.39.5.2.11. <code class="docutils literal"><span class="pre">TYPE_NAME</span></code></a></li>
+<li><a class="reference internal" href="#type-id-of-type">7.3.39.5.2.12. <code class="docutils literal"><span class="pre">TYPE_ID_OF_TYPE</span></code></a></li>
+<li><a class="reference internal" href="#type-name-of-type">7.3.39.5.2.13. <code class="docutils literal"><span class="pre">TYPE_NAME_OF_TYPE</span></code></a></li>
+<li><a class="reference internal" href="#type-size">7.3.39.5.2.14. <code class="docutils literal"><span class="pre">TYPE_SIZE</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="object_exist.html"
+                        title="previous chapter">7.3.38. <code class="docutils literal"><span class="pre">object_exist</span></code></a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="object_remove.html"
+                        title="next chapter">7.3.40. <code class="docutils literal"><span class="pre">object_remove</span></code></a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../sources/reference/commands/object_inspect.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="object_remove.html" title="7.3.40. object_remove"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="object_exist.html" title="7.3.38. object_exist"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v6.0.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../reference.html" >7. Reference manual</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="../command.html" >7.3. Command</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2009-2016, Brazil, Inc.
+    </div>
+      <script src="http://connect.facebook.net/en_US/all.js"></script>
+
+    <script>
+      FB.init({
+         appId  : null,
+         status : true, // check login status
+         cookie : true, // enable cookies to allow the server to access the session
+         xfbml  : true  // parse XFBML
+      });
+    </script>
+  </body>
+
+</html>

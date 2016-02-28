@@ -99,7 +99,7 @@
 <p>Groongaは1つのテーブル・カラムごとに1つ以上のファイルを作ります。もし、データベース内にたくさんのテーブル・カラムがある場合は、Groongaプロセスはたくさんのファイルを開く必要があります。</p>
 <p>システムでは1プロセスごとに開ける最大ファイル数を制限しています。そのため、この制限を緩和する必要があります。</p>
 <p>Groongaがどのくらいファイルを開くのかを計算する式は次の通りです。:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>3 (for DB) +
+<div class="highlight-none"><div class="highlight"><pre>3 (for DB) +
   N tables +
   N columns (except index clumns) +
   (N index columns * 2) +
@@ -107,7 +107,7 @@
 </pre></div>
 </div>
 <p>次のスキーマを例として考えます。:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>table_create Entries TABLE_HASH_KEY ShortText
+<div class="highlight-none"><div class="highlight"><pre>table_create Entries TABLE_HASH_KEY ShortText
 column_create Entries content COLUMN_SCALAR Text
 column_create Entries n_likes COLUMN_SCALAR UInt32
 table_create Terms TABLE_PAT_KEY ShortText --default_tokenizer TokenBigram --normalizer NormalizerAuto
@@ -116,7 +116,7 @@ column_create Terms entries_content_index COLUMN_INDEX|WITH_POSITION Entries con
 </pre></div>
 </div>
 <p>この例では少なくとも11ファイル開きます。:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>3 +
+<div class="highlight-none"><div class="highlight"><pre>3 +
   2 (Entries and Terms) +
   2 (Entries.content and Entries.n_likes) +
   4 (Terms.entries_key_index and Terms.entries_content_index) +
@@ -139,12 +139,12 @@ column_create Terms entries_content_index COLUMN_INDEX|WITH_POSITION Entries con
 <div class="section" id="nofile">
 <span id="tuning-linux-nofile"></span><h3>7.22.3.1. <code class="docutils literal"><span class="pre">nofile</span></code><a class="headerlink" href="#nofile" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <p>次の内容の <code class="docutils literal"><span class="pre">/etc/security/limits.d/groonga.conf</span></code> 設定ファイルを作ることで <a class="reference internal" href="#tuning-max-n-open-files"><span>1プロセスで開ける最大ファイル数</span></a> パラメーターの制限を緩和することができます。:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>${USER} soft nofile ${MAX_VALUE}
+<div class="highlight-none"><div class="highlight"><pre>${USER} soft nofile ${MAX_VALUE}
 ${USER} hard nofile ${MAX_VALUE}
 </pre></div>
 </div>
 <p>Groongaプロセスを <code class="docutils literal"><span class="pre">groonga</span></code> ユーザーで動かし、Groongaプロセスが10000以下のファイルを開くなら、次の設定を使います。:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>groonga soft nofile 10000
+<div class="highlight-none"><div class="highlight"><pre>groonga soft nofile 10000
 groonga hard nofile 10000
 </pre></div>
 </div>
@@ -155,11 +155,11 @@ groonga hard nofile 10000
 <p>これは <a class="reference internal" href="#tuning-memory-usage"><span>メモリ使用量</span></a> 関連のパラメーターです。 <code class="docutils literal"><span class="pre">vm.overcommit_memory</span></code> カーネルパラメーターを <code class="docutils literal"><span class="pre">1</span></code> に設定することで、メモリーとスワップの総量以上のサイズのデータベースを扱うことができます。 <code class="docutils literal"><span class="pre">1</span></code> は「Groongaは常にデータベースファイルをメモリー上にマップできる」という意味です。Groongaはこの設定を推奨しています。</p>
 <p><code class="docutils literal"><span class="pre">vm.overcommit_memory</span></code> パラメーターの詳細は <a class="reference external" href="https://www.kernel.org/doc/Documentation/vm/overcommit-accounting">overcommitに関するLinuxカーネルのドキュメント</a> を参照してください。</p>
 <p>次の内容の <code class="docutils literal"><span class="pre">/etc/sysctl.d/groonga.conf</span></code> 設定ファイルを作成することでこの設定をすることができます。:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>vm.overcommit_memory = 1
+<div class="highlight-none"><div class="highlight"><pre>vm.overcommit_memory = 1
 </pre></div>
 </div>
 <p>設定した内容はシステムを再起動するか、次のコマンドを実行することで反映されます。:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>% sudo sysctl --system
+<div class="highlight-none"><div class="highlight"><pre>% sudo sysctl --system
 </pre></div>
 </div>
 </div>
@@ -168,16 +168,16 @@ groonga hard nofile 10000
 <p>これは <a class="reference internal" href="#tuning-memory-usage"><span>メモリ使用量</span></a> 関連のパラメーターです。 <code class="docutils literal"><span class="pre">vm.max_map_count</span></code> カーネルパラメーターの値を増やすことで16GiB以上のサイズのデータベースを扱うことができます。このパラメーターはメモリーマップの回数を制限します。</p>
 <p>このカーネルパラメーターのデフォルト値は <code class="docutils literal"><span class="pre">65530</span></code> か <code class="docutils literal"><span class="pre">65536</span></code> です。Groongaは一度に256KiBずつメモリー上にマップします。データベースが16GiBよりも大きい場合、Groongaはこの制限に達します。（ <code class="docutils literal"><span class="pre">256KiB</span> <span class="pre">*</span> <span class="pre">65536</span> <span class="pre">=</span> <span class="pre">16GiB</span></code> ）</p>
 <p>16GiB以上のサイズのデータベースを扱う場合はこのカーネルパラメーターの値を増やす必要があります。たとえば、 <code class="docutils literal"><span class="pre">65536</span> <span class="pre">*</span> <span class="pre">2</span> <span class="pre">=</span> <span class="pre">131072</span></code> まで増やすと32GiBくらいのデータベースを扱うことができます。次の内容の設定ファイルを <code class="docutils literal"><span class="pre">/etc/sysctl.d/groonga.conf</span></code> に置くとこの設定適用できます。:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>vm.max_map_count = 131072
+<div class="highlight-none"><div class="highlight"><pre>vm.max_map_count = 131072
 </pre></div>
 </div>
 <p>すでに <code class="docutils literal"><span class="pre">vm.overcommit_memory</span></code> の設定があるはずなので、実際の設定ファイルの内容は次のようになることに注意してください。:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>vm.overcommit_memory = 1
+<div class="highlight-none"><div class="highlight"><pre>vm.overcommit_memory = 1
 vm.max_map_count = 131072
 </pre></div>
 </div>
 <p>設定した内容はシステムを再起動するか、次のコマンドを実行することで反映されます。:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>% sudo sysctl -p
+<div class="highlight-none"><div class="highlight"><pre>% sudo sysctl -p
 </pre></div>
 </div>
 </div>

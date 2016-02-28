@@ -112,7 +112,7 @@
 <p>使い方を示すために使うスキーマ定義とサンプルデータは以下の通りです。</p>
 <p>サンプルスキーマ:</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>table_create Memos TABLE_HASH_KEY ShortText
+<div class="highlight-none"><div class="highlight"><pre>table_create Memos TABLE_HASH_KEY ShortText
 # [[0, 1337566253.89858, 0.000355720520019531], true]
 column_create Memos title COLUMN_SCALAR ShortText
 # [[0, 1337566253.89858, 0.000355720520019531], true]
@@ -130,7 +130,7 @@ column_create Terms content_index COLUMN_INDEX|WITH_POSITION Memos content
 </div>
 <p>サンプルデータ:</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>load --table Memos
+<div class="highlight-none"><div class="highlight"><pre>load --table Memos
 [
 {
   &quot;_key&quot;: &quot;memo1&quot;,
@@ -173,23 +173,23 @@ column_create Terms content_index COLUMN_INDEX|WITH_POSITION Memos content
 </div>
 <p><a class="reference internal" href="commands/select.html#select-match-columns"><span>match_columns</span></a> の中でscore関数を使うことができます。次に構文を示します。</p>
 <p><a class="reference internal" href="scorers/scorer_tf_idf.html"><em>scorer_tf_idf</em></a> のように、いくつかのスコアー関数には引数はありません。:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>SCORE_FUNCTION(COLUMN)
+<div class="highlight-none"><div class="highlight"><pre>SCORE_FUNCTION(COLUMN)
 </pre></div>
 </div>
 <p>重みを指定することができます。:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>SCORE_FUNCTION(COLUMN) * WEIGHT
+<div class="highlight-none"><div class="highlight"><pre>SCORE_FUNCTION(COLUMN) * WEIGHT
 </pre></div>
 </div>
 <p><a class="reference internal" href="scorers/scorer_tf_at_most.html"><em>scorer_tf_at_most</em></a> のように引数が必要なスコアー関数もあります。:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>SCORE_FUNCTION(COLUMN, ARGUMENT1, ARGUMENT2, ...)
+<div class="highlight-none"><div class="highlight"><pre>SCORE_FUNCTION(COLUMN, ARGUMENT1, ARGUMENT2, ...)
 </pre></div>
 </div>
 <p>重みを指定することができます。:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>SCORE_FUNCTION(COLUMN, ARGUMENT1, ARGUMENT2, ...) * WEIGHT
+<div class="highlight-none"><div class="highlight"><pre>SCORE_FUNCTION(COLUMN, ARGUMENT1, ARGUMENT2, ...) * WEIGHT
 </pre></div>
 </div>
 <p><a class="reference internal" href="commands/select.html#select-match-columns"><span>match_columns</span></a> ではカラムごとに異なるスコア関数を使うことができます。:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>SCORE_FUNCTION1(COLUMN1) ||
+<div class="highlight-none"><div class="highlight"><pre>SCORE_FUNCTION1(COLUMN1) ||
   SCORE_FUNCTION2(COLUMN2) * WEIGHT ||
   SCORE_FUNCTION3(COLUMN3, ARGUMENT1) ||
   ...
@@ -197,7 +197,7 @@ column_create Terms content_index COLUMN_INDEX|WITH_POSITION Memos content
 </div>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Memos \
+<div class="highlight-none"><div class="highlight"><pre>select Memos \
   --match_columns &quot;scorer_tf_idf(content)&quot; \
   --query &quot;Groonga&quot; \
   --output_columns &quot;content, _score&quot; \
@@ -239,7 +239,7 @@ column_create Terms content_index COLUMN_INDEX|WITH_POSITION Memos content
 <p><code class="docutils literal"><span class="pre">Groonga!</span> <span class="pre">Groonga!</span> <span class="pre">Groonga!</span> <span class="pre">Groonga</span> <span class="pre">is</span> <span class="pre">very</span> <span class="pre">fast!</span></code> には <code class="docutils literal"><span class="pre">Groonga</span></code> が4つ含まれています。デフォルトのTFベースのスコアラーを使うと、 <code class="docutils literal"><span class="pre">_score</span></code> は <code class="docutils literal"><span class="pre">4</span></code> です。しかし、実際は <code class="docutils literal"><span class="pre">_score</span></code> は <code class="docutils literal"><span class="pre">2</span></code> になります。なぜなら、この <code class="docutils literal"><span class="pre">select</span></code> コマンドはTF-IDFベースの  <code class="docutils literal"><span class="pre">scorer_tf_idf()</span></code> スコアラーを使っているからです。</p>
 <p>以下は重みを使った例です。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Memos \
+<div class="highlight-none"><div class="highlight"><pre>select Memos \
   --match_columns &quot;scorer_tf_idf(content) * 10&quot; \
   --query &quot;Groonga&quot; \
   --output_columns &quot;content, _score&quot; \
@@ -281,7 +281,7 @@ column_create Terms content_index COLUMN_INDEX|WITH_POSITION Memos content
 <p><code class="docutils literal"><span class="pre">Groonga!</span> <span class="pre">Groonga!</span> <span class="pre">Groonga!</span> <span class="pre">Groonga</span> <span class="pre">is</span> <span class="pre">very</span> <span class="pre">fast!</span></code> の <code class="docutils literal"><span class="pre">_score</span></code> は <code class="docutils literal"><span class="pre">22</span></code> です。重みを指定していない前の例では <code class="docutils literal"><span class="pre">_score</span></code> は <code class="docutils literal"><span class="pre">2</span></code> でした。</p>
 <p>以下は必ず引数を1つ指定しなければいけないスコアラーを使う例です。 <a class="reference internal" href="scorers/scorer_tf_at_most.html"><em>scorer_tf_at_most</em></a> スコアラーには引数を1つ指定しなければいけません。このスコアラーを使うと、TFのスコアーの最大値を制限することができます。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Memos \
+<div class="highlight-none"><div class="highlight"><pre>select Memos \
   --match_columns &quot;scorer_tf_at_most(content, 2.0)&quot; \
   --query &quot;Groonga&quot; \
   --output_columns &quot;content, _score&quot; \
@@ -323,7 +323,7 @@ column_create Terms content_index COLUMN_INDEX|WITH_POSITION Memos content
 <p><code class="docutils literal"><span class="pre">Groonga!</span> <span class="pre">Groonga!</span> <span class="pre">Groonga!</span> <span class="pre">Groonga</span> <span class="pre">is</span> <span class="pre">very</span> <span class="pre">fast!</span></code> は <code class="docutils literal"><span class="pre">Groonga</span></code> を4つ含んでいます。もし、デフォルトのスコアラーである標準のTFベースのスコアラーを使っていた場合、 <code class="docutils literal"><span class="pre">_score</span></code> は <code class="docutils literal"><span class="pre">4</span></code> になります。しかし、実際の <code class="docutils literal"><span class="pre">_score</span></code> は <code class="docutils literal"><span class="pre">2</span></code> です。なぜなら、この <code class="docutils literal"><span class="pre">select</span></code> コマンドが使っているスコアラーは最大スコアーを <code class="docutils literal"><span class="pre">2</span></code> に制限しているからです。</p>
 <p>以下は複数のスコアラーを使う例です。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Memos \
+<div class="highlight-none"><div class="highlight"><pre>select Memos \
   --match_columns &quot;scorer_tf_idf(title) || scorer_tf_at_most(content, 2.0)&quot; \
   --query &quot;Groonga&quot; \
   --output_columns &quot;title, content, _score&quot; \
@@ -371,7 +371,7 @@ column_create Terms content_index COLUMN_INDEX|WITH_POSITION Memos content
 <p>この <code class="docutils literal"><span class="pre">--match_columns</span></code> は <code class="docutils literal"><span class="pre">scorer_tf_idf(title)</span></code> と <code class="docutils literal"><span class="pre">scorer_tf_at_most(content,</span> <span class="pre">2.0)</span></code> を使っています。 <code class="docutils literal"><span class="pre">_score</span></code> の値はこれら2つの値の合計になります。</p>
 <p>同じ <code class="docutils literal"><span class="pre">--match_columns</span></code> の中でデフォルトのスコアラーとカスタムスコアラーを使うことができます。単にマッチ対象のカラムを指定するとデフォルトのスコアラーを使います。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Memos \
+<div class="highlight-none"><div class="highlight"><pre>select Memos \
   --match_columns &quot;title || scorer_tf_at_most(content, 2.0)&quot; \
   --query &quot;Groonga&quot; \
   --output_columns &quot;title, content, _score&quot; \

@@ -95,7 +95,7 @@
 </li>
 <li><p class="first">[<code class="docutils literal"><span class="pre">grn_obj_search()</span></code>] <code class="docutils literal"><span class="pre">GRN_OP_FUZZY</span></code> 演算子をサポートしました。 [GitHub#463][村上さんがパッチ提供]</p>
 </li>
-<li><p class="first">[<code class="docutils literal"><span class="pre">GRN_TABLE_FUZZY_WITH_TRANSPOSITION</span></code>] <code class="docutils literal"><span class="pre">grn_table_fuzzy_search()</span></code> 用のフラグを追加しました。 [GitHub#463][村上さんがパッチ提供]</p>
+<li><p class="first">[<code class="docutils literal"><span class="pre">GRN_TABLE_FUZZY_SEARCH_WITH_TRANSPOSITION</span></code>] <code class="docutils literal"><span class="pre">grn_table_fuzzy_search()</span></code> 用のフラグを追加しました。 [GitHub#463][村上さんがパッチ提供]</p>
 </li>
 <li><p class="first">[<code class="docutils literal"><span class="pre">GRN_TOKENIZE_ONLY</span></code>] 語彙表に存在しないトークンでもすべてのトークンを返す新しいトークナイズモードを追加しました。 [GitHub#463][村上さんがパッチ提供]</p>
 </li>
@@ -105,7 +105,7 @@
 </li>
 <li><p class="first">ベクターに対する比較演算をサポートしました。左辺のベクターが <code class="docutils literal"><span class="pre">左辺の要素</span> <span class="pre">（演算子）</span> <span class="pre">右辺</span></code> を満たす要素を1つでも含んでいれば真になります。</p>
 <p>例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>[1, 2, 3] &lt; 2 # -&gt; true because 1 is less than 2
+<div class="highlight-none"><div class="highlight"><pre>[1, 2, 3] &lt; 2 # -&gt; true because 1 is less than 2
 [1, 2, 3] &gt; 4 # -&gt; false because all elements are less than 4
 </pre></div>
 </div>
@@ -637,7 +637,7 @@
 </li>
 <li><p class="first">[<a class="reference internal" href="reference/commands/select.html#select-filter"><span>filter</span></a>] 符号なし整数に <a class="reference internal" href="reference/grn_expr/script_syntax.html#script-syntax-bitwise-not"><span>ビット否定演算子</span></a> を使うと、  <code class="docutils literal"><span class="pre">-数値リテラル</span></code> との比較が正常に動かないバグを修正しました。</p>
 <p>たとえば、次の式は正常に動きません。:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>~UINT32_COLUMN == -6
+<div class="highlight-none"><div class="highlight"><pre>~UINT32_COLUMN == -6
 </pre></div>
 </div>
 </li>
@@ -673,7 +673,7 @@
 <li><p class="first">[<a class="reference internal" href="install/ubuntu.html"><em>Ubuntu</em></a>] Ubuntu 14.10（Utopic Unicorn）のサポートをやめました。2015年7月23日でサポートが切れた（EOLになった）ためです。</p>
 </li>
 <li><p class="first">参照ベクターカラムの静的なインデックス構築をサポートしました。例えば、 <code class="docutils literal"><span class="pre">column_create</span></code> でインデックスカラムを作成する前にデータを <code class="docutils literal"><span class="pre">load</span></code> する場合です:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>table_create Entries TABLE_NO_KEY
+<div class="highlight-none"><div class="highlight"><pre>table_create Entries TABLE_NO_KEY
 column_create Entries numbers COLUMN_VECTOR Int32
 
 load --table Entries
@@ -691,7 +691,7 @@ select Numbers --output_columns _key
 </div>
 </li>
 <li><p class="first">インデックスなしの <code class="docutils literal"><span class="pre">'vector_text_column</span> <span class="pre">&#64;</span> <span class="pre">&quot;element&quot;'</span></code> をサポートしました。例えば、以下のコマンド内の <code class="docutils literal"><span class="pre">select</span></code> コマンドです:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>table_create Memos TABLE_NO_KEY
+<div class="highlight-none"><div class="highlight"><pre>table_create Memos TABLE_NO_KEY
 column_create Memos tags COLUMN_VECTOR Text
 
 load --table Memos
@@ -704,7 +704,7 @@ select Memos --filter &#39;tags @ &quot;Rroonga&quot;&#39;
 </div>
 </li>
 <li><p class="first">インデックスなしの <code class="docutils literal"><span class="pre">'fixed_size_type_vector_column</span> <span class="pre">&#64;</span> <span class="pre">n'</span></code> をサポートしました。例えば、以下のコマンド内の <code class="docutils literal"><span class="pre">select</span></code> コマンドです:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>table_create Memos TABLE_NO_KEY
+<div class="highlight-none"><div class="highlight"><pre>table_create Memos TABLE_NO_KEY
 column_create Memos numbers COLUMN_VECTOR Int32
 
 load --table Memos
@@ -725,7 +725,7 @@ select Memos --filter &#39;numbers @ 2&#39;
 <li><p class="first">セレクターのみで使えるprocを作れるようになりました。ただし、そのようなprocは関数として使えません（シーケンシャルサーチに使えないため）。</p>
 </li>
 <li><p class="first">複雑な引数の関数呼び出しをサポートしました。複雑な引数とは、例えば <code class="docutils literal"><span class="pre">Table[&quot;key&quot;].column</span></code> です。例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>function(_key, Table[&quot;key&quot;].column)
+<div class="highlight-none"><div class="highlight"><pre>function(_key, Table[&quot;key&quot;].column)
 </pre></div>
 </div>
 </li>
@@ -854,7 +854,7 @@ select Memos --filter &#39;numbers @ 2&#39;
 <li><p class="first">[<a class="reference internal" href="reference/executables/groonga.html"><em>groonga executable file</em></a>] 報告されるスレッドの最大数を修正しました。</p>
 </li>
 <li><p class="first">[<a class="reference internal" href="reference/executables/groonga-httpd.html"><em>groonga-httpd</em></a>] ログメッセージ内の不要なスペースを削除しました:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>|n|  grn_fin (0) -&gt;
+<div class="highlight-none"><div class="highlight"><pre>|n|  grn_fin (0) -&gt;
 |n| grn_fin (0)
     ^
 </pre></div>
@@ -926,7 +926,7 @@ select Memos --filter &#39;numbers @ 2&#39;
 <li><p class="first">[cmake] MeCabトークナイザーの組み込みをサポートしました。</p>
 </li>
 <li><p class="first">[<a class="reference internal" href="reference/commands/logical_count.html"><em>logical_count</em></a>] 月次と日次が混在するケースをサポートしました。同じ月内では、日次に切り替わる前のレコードが月次として扱われます。例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>XXX_201506   &lt;- includes only 2015-06-01 and 2015-06-02 records
+<div class="highlight-none"><div class="highlight"><pre>XXX_201506   &lt;- includes only 2015-06-01 and 2015-06-02 records
 XXX_20150603 &lt;- includes only 2015-06-03 records
 XXX_20150604 &lt;- includes only 2015-06-04 records
 </pre></div>
@@ -1202,7 +1202,7 @@ XXX_20150604 &lt;- includes only 2015-06-04 records
 <li><p class="first">Groongaをライブラリとして使う人向けにAPIの <a class="reference internal" href="reference/api/overview.html"><em>概要</em></a> を追加しました。</p>
 </li>
 <li><p class="first">[非互換] 内部で使っている <code class="docutils literal"><span class="pre">_score</span></code> の型を 32bit整数値から浮動小数点数に変更しました。この変更はGroongaのDB APIを使っているユーザーにとって非互換な変更です。クエリAPIを使っているユーザーには影響ありません。つまり、<a class="reference internal" href="reference/commands/select.html"><em>select</em></a> を使っているだけなら影響ないということです。新旧のバージョンのGroongaで動作するようにするには次のコードを使います:</p>
-<div class="highlight-c"><div class="highlight"><pre><span></span><span class="n">grn_obj</span> <span class="o">*</span><span class="n">score</span><span class="p">;</span>
+<div class="highlight-c"><div class="highlight"><pre><span class="n">grn_obj</span> <span class="o">*</span><span class="n">score</span><span class="p">;</span>
 <span class="kt">double</span> <span class="n">score_value</span><span class="p">;</span>
 
 <span class="k">if</span> <span class="p">(</span><span class="n">score</span><span class="o">-&gt;</span><span class="n">header</span><span class="p">.</span><span class="n">domain</span> <span class="o">==</span> <span class="n">GRN_DB_FLOAT</span><span class="p">)</span> <span class="p">{</span>
@@ -1220,7 +1220,7 @@ XXX_20150604 &lt;- includes only 2015-06-04 records
 <li><p class="first">スコア関数のカスタマイズをサポートしました。詳細は <a class="reference internal" href="reference/scorer.html"><em>スコアラー</em></a> を参照してください。</p>
 </li>
 <li><p class="first">[非互換] スコア関数の導入により、DB API層でAPIとABIの互換性がなくなりました。<a class="reference internal" href="reference/api/grn_search.html#c.grn_search_optarg" title="grn_search_optarg"><code class="xref c c-type docutils literal"><span class="pre">grn_search_optarg</span></code></a> を使っていたら、次のようなコードで <a class="reference internal" href="reference/api/grn_search.html#c.grn_search_optarg" title="grn_search_optarg"><code class="xref c c-type docutils literal"><span class="pre">grn_search_optarg</span></code></a> を <code class="docutils literal"><span class="pre">0</span></code> で初期化しているかチェックしてください。:</p>
-<div class="highlight-c"><div class="highlight"><pre><span></span><span class="n">grn_search_optarg</span> <span class="n">options</span><span class="p">;</span>
+<div class="highlight-c"><div class="highlight"><pre><span class="n">grn_search_optarg</span> <span class="n">options</span><span class="p">;</span>
 <span class="n">memset</span><span class="p">(</span><span class="o">&amp;</span><span class="n">options</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">grn_search_optarg</span><span class="p">));</span>
 </pre></div>
 </div>

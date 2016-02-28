@@ -96,7 +96,7 @@
 <p>まず、 <code class="docutils literal"><span class="pre">Blog1</span></code> テーブルを作成し、 <code class="docutils literal"><span class="pre">title</span></code> カラムと <code class="docutils literal"><span class="pre">message</span></code> カラムを追加します。 <code class="docutils literal"><span class="pre">title</span></code> カラムにブログのタイトルを保存し、 <code class="docutils literal"><span class="pre">message</span></code> カラムにブログの本文を保存します。</p>
 <p>インデックス用の <code class="docutils literal"><span class="pre">IndexBlog1</span></code> テーブルも作り、 <code class="docutils literal"><span class="pre">title</span></code> カラムのインデックス用に <code class="docutils literal"><span class="pre">index_title</span></code> カラム、 <code class="docutils literal"><span class="pre">message</span></code> カラムのインデックス用に <code class="docutils literal"><span class="pre">index_message</span></code> カラムと、それぞれ1カラムごとに1つずつ追加しています。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>table_create --name Blog1 --flags TABLE_HASH_KEY --key_type ShortText
+<div class="highlight-none"><div class="highlight"><pre>table_create --name Blog1 --flags TABLE_HASH_KEY --key_type ShortText
 # [[0, 1337566253.89858, 0.000355720520019531], true]
 column_create --table Blog1 --name title --flags COLUMN_SCALAR --type ShortText
 # [[0, 1337566253.89858, 0.000355720520019531], true]
@@ -120,7 +120,7 @@ load --table Blog1
 <p><code class="docutils literal"><span class="pre">match_columns</span></code> オプションで、検索対象のカラムを複数指定することが出来ます。検索する文字列は <code class="docutils literal"><span class="pre">query</span></code> オプションで指定します。これを使うことで、タイトルと本文を全文検索することができます。</p>
 <p>実際にブログエントリを検索してみましょう。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select --table Blog1 --match_columns title||message --query groonga
+<div class="highlight-none"><div class="highlight"><pre>select --table Blog1 --match_columns title||message --query groonga
 # [
 #   [
 #     0,
@@ -264,7 +264,7 @@ select --table Blog1 --match_columns title --query message
 <p>インデックスカラムが1つしかないというのが違いです。 <code class="docutils literal"><span class="pre">title</span></code> と <code class="docutils literal"><span class="pre">message</span></code> の2つのカラムに対するインデックスが共通になっています。</p>
 <p>共通のインデックスを用いても、 <code class="docutils literal"><span class="pre">title</span></code> カラムのみでの検索、 <code class="docutils literal"><span class="pre">message</span></code> カラムのみでの検索、 <code class="docutils literal"><span class="pre">title</span></code> もしくは <code class="docutils literal"><span class="pre">message</span></code> カラムでの検索、全ての検索を行うことができます。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>table_create --name Blog2 --flags TABLE_HASH_KEY --key_type ShortText
+<div class="highlight-none"><div class="highlight"><pre>table_create --name Blog2 --flags TABLE_HASH_KEY --key_type ShortText
 # [[0, 1337566253.89858, 0.000355720520019531], true]
 column_create --table Blog2 --name title --flags COLUMN_SCALAR --type ShortText
 # [[0, 1337566253.89858, 0.000355720520019531], true]
@@ -285,7 +285,7 @@ load --table Blog2
 </div>
 <p>実際に前と同じ例で検索してみましょう。結果は上の例と同じになります。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select --table Blog2 --match_columns title||message --query groonga
+<div class="highlight-none"><div class="highlight"><pre>select --table Blog2 --match_columns title||message --query groonga
 # [
 #   [
 #     0,
@@ -447,7 +447,7 @@ select --table Blog2 --match_columns title --query message
 <p>しかし、カラムインデックスを指定することで一度にレコードを検索することができます。</p>
 <p>サンプルのスキーマ定義はこちらです。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>table_create Comments TABLE_HASH_KEY UInt32
+<div class="highlight-none"><div class="highlight"><pre>table_create Comments TABLE_HASH_KEY UInt32
 # [[0, 1337566253.89858, 0.000355720520019531], true]
 column_create Comments content COLUMN_SCALAR ShortText
 # [[0, 1337566253.89858, 0.000355720520019531], true]
@@ -469,7 +469,7 @@ column_create Comments article COLUMN_INDEX Articles comment
 </div>
 <p>サンプルデータはこちらです。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>load --table Comments
+<div class="highlight-none"><div class="highlight"><pre>load --table Comments
 [
 {&quot;_key&quot;: 1, &quot;content&quot;: &quot;I&#39;m using Groonga too!&quot;},
 {&quot;_key&quot;: 2, &quot;content&quot;: &quot;I&#39;m using Groonga and Mroonga!&quot;},
@@ -487,13 +487,13 @@ load --table Articles
 </div>
 <p>特定のキーワードをコメントに含むレコードを検索するクエリを書くことができ、それによりレコードを参照する記事を取得します。</p>
 <p>これまでに記述したレコードを検索するクエリ:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Articles --match_columns comment.content --query groonga --output_columns &quot;_id, _score, *&quot;
+<div class="highlight-none"><div class="highlight"><pre>select Articles --match_columns comment.content --query groonga --output_columns &quot;_id, _score, *&quot;
 </pre></div>
 </div>
 <p>ArticlesテーブルのcommentカラムとCommentsテーブルのcontentカラムをピリオド( <code class="docutils literal"><span class="pre">.</span></code> )で連結し <code class="docutils literal"><span class="pre">--match_columns</span></code> の引数とする必要があります。</p>
 <p>最初に、このクエリはCommentsテーブルのcontentを全文検索し、次にCommentsテーブルを検索した結果のレコードを参照するArticlesテーブルのレコードを取得します。(これにより、Commentsテーブルの <code class="docutils literal"><span class="pre">article</span></code> インデックスカラムを生成するクエリをコメントアウトすると、意図した検索結果が得られません。)</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Articles --match_columns comment.content --query groonga --output_columns &quot;_id, _score, *&quot;
+<div class="highlight-none"><div class="highlight"><pre>select Articles --match_columns comment.content --query groonga --output_columns &quot;_id, _score, *&quot;
 # [
 #   [
 #     0,
@@ -538,7 +538,7 @@ load --table Articles
 <p>このネストしたインデックスの検索という特徴には関連するテーブルが2つだけに制限されません。</p>
 <p>前のものと似たサンプルのスキーマ定義です。違いは'返信'を表現するテーブルの追加と関連するテーブルが3つに増えたことです。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>table_create Replies2 TABLE_HASH_KEY UInt32
+<div class="highlight-none"><div class="highlight"><pre>table_create Replies2 TABLE_HASH_KEY UInt32
 # [[0, 1337566253.89858, 0.000355720520019531], true]
 column_create Replies2 content COLUMN_SCALAR ShortText
 # [[0, 1337566253.89858, 0.000355720520019531], true]
@@ -570,7 +570,7 @@ column_create Replies2 reply_to COLUMN_INDEX Comments2 comment
 </div>
 <p>サンプルデータはこちらです。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>load --table Replies2
+<div class="highlight-none"><div class="highlight"><pre>load --table Replies2
 [
 {&quot;_key&quot;: 1, &quot;content&quot;: &quot;I&#39;m using Rroonga too!&quot;},
 {&quot;_key&quot;: 2, &quot;content&quot;: &quot;I&#39;m using Groonga and Mroonga and Rroonga!&quot;},
@@ -594,13 +594,13 @@ load --table Articles2
 </pre></div>
 </div>
 <p>これまでに記述したレコードを検索するクエリ:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Articles2 --match_columns comment.content --query mroonga --output_columns &quot;_id, _score, *&quot;
+<div class="highlight-none"><div class="highlight"><pre>select Articles2 --match_columns comment.content --query mroonga --output_columns &quot;_id, _score, *&quot;
 select Articles2 --match_columns comment.comment.content --query mroonga --output_columns &quot;_id, _score, *&quot;
 </pre></div>
 </div>
 <p>最初のクエリは <code class="docutils literal"><span class="pre">Comments2</span></code> テーブルから <code class="docutils literal"><span class="pre">mroonga</span></code> を検索します。2つめのクエリは <code class="docutils literal"><span class="pre">Replies2</span></code> と <code class="docutils literal"><span class="pre">Comments2</span></code> テーブルからカラムインデックスによる参照を用いて``mroonga``を検索します。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Articles2 --match_columns comment.content --query mroonga --output_columns &quot;_id, _score, *&quot;
+<div class="highlight-none"><div class="highlight"><pre>select Articles2 --match_columns comment.content --query mroonga --output_columns &quot;_id, _score, *&quot;
 # [
 #   [
 #     0,

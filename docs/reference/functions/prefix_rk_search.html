@@ -98,7 +98,7 @@ selector only procedure.</p>
 <h2>7.14.11.2. Syntax<a class="headerlink" href="#syntax" title="Permalink to this headline">¶</a></h2>
 <p><code class="docutils literal"><span class="pre">prefix_rk_search()</span></code> requires two arguments. They are <code class="docutils literal"><span class="pre">column</span></code> and
 <code class="docutils literal"><span class="pre">query</span></code>:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>prefix_rk_search(column, query)
+<div class="highlight-none"><div class="highlight"><pre>prefix_rk_search(column, query)
 </pre></div>
 </div>
 <p><code class="docutils literal"><span class="pre">column</span></code> must be <code class="docutils literal"><span class="pre">_key</span></code> for now.</p>
@@ -108,7 +108,7 @@ selector only procedure.</p>
 <h2>7.14.11.3. Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
 <p>Here are a schema definition and sample data to show usage:</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>table_create Readings TABLE_PAT_KEY ShortText --normalizer NormalizerAuto
+<div class="highlight-none"><div class="highlight"><pre>table_create Readings TABLE_PAT_KEY ShortText --normalizer NormalizerAuto
 # [[0, 1337566253.89858, 0.000355720520019531], true]
 load --table Readings
 [
@@ -122,7 +122,7 @@ load --table Readings
 <p>Here is the simple usage of <code class="docutils literal"><span class="pre">prefix_rk_search()</span></code> function which
 selects <code class="docutils literal"><span class="pre">ニホン</span></code> and <code class="docutils literal"><span class="pre">ニッポン</span></code> by <code class="docutils literal"><span class="pre">ni</span></code>:</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Readings --filter &#39;prefix_rk_search(_key, &quot;ni&quot;)&#39;
+<div class="highlight-none"><div class="highlight"><pre>select Readings --filter &#39;prefix_rk_search(_key, &quot;ni&quot;)&#39;
 # [
 #   [
 #     0,
@@ -164,7 +164,7 @@ records have zero or more readings. They are stored into <code class="docutils l
 table. Don't forget define an index column for <code class="docutils literal"><span class="pre">Items.readings</span></code> in
 <code class="docutils literal"><span class="pre">Readings</span></code> table. The index column is needed for <a class="reference internal" href="sub_filter.html"><em>sub_filter</em></a>:</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>table_create Items TABLE_HASH_KEY ShortText
+<div class="highlight-none"><div class="highlight"><pre>table_create Items TABLE_HASH_KEY ShortText
 # [[0, 1337566253.89858, 0.000355720520019531], true]
 column_create Items readings COLUMN_VECTOR Readings
 # [[0, 1337566253.89858, 0.000355720520019531], true]
@@ -183,7 +183,7 @@ load --table Items
 prefix RK search with <code class="docutils literal"><span class="pre">niho</span></code> selects <code class="docutils literal"><span class="pre">ニホン</span></code> reading and <code class="docutils literal"><span class="pre">ニホン</span></code>
 reading is one of readings of <code class="docutils literal"><span class="pre">日本</span></code> record:</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Items \
+<div class="highlight-none"><div class="highlight"><pre>select Items \
  --filter &#39;sub_filter(readings, &quot;prefix_rk_search(_key, \\&quot;niho\\&quot;)&quot;)&#39;
 # [
 #   [
@@ -227,7 +227,7 @@ reading is one of readings of <code class="docutils literal"><span class="pre">�
 support no reading completion targets.</p>
 <p>Add one no reading completion target:</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>load --table Items
+<div class="highlight-none"><div class="highlight"><pre>load --table Items
 [
 {&quot;_key&quot;: &quot;nihon&quot;, &quot;readings&quot;: []}
 ]
@@ -237,7 +237,7 @@ support no reading completion targets.</p>
 <p>Combine <a class="reference internal" href="../grn_expr/script_syntax.html#script-syntax-prefix-search-operator"><span>Prefix search operator</span></a> to
 support no reading completion targets:</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Items \
+<div class="highlight-none"><div class="highlight"><pre>select Items \
  --filter &#39;sub_filter(readings, &quot;prefix_rk_search(_key, \\&quot;niho\\&quot;)&quot;) || \
            _key @^ &quot;niho&quot;&#39;
 # [
@@ -286,7 +286,7 @@ support no reading completion targets:</p>
 <p>Normally, you want to use case insensitive search for completion. Use
 <code class="docutils literal"><span class="pre">--normalizer</span> <span class="pre">NormalizerAuto</span></code> and <code class="docutils literal"><span class="pre">label</span></code> column for the case:</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>table_create LooseItems TABLE_HASH_KEY ShortText --normalizer NormalizerAuto
+<div class="highlight-none"><div class="highlight"><pre>table_create LooseItems TABLE_HASH_KEY ShortText --normalizer NormalizerAuto
 # [[0, 1337566253.89858, 0.000355720520019531], true]
 column_create LooseItems label COLUMN_SCALAR ShortText
 # [[0, 1337566253.89858, 0.000355720520019531], true]
@@ -306,7 +306,7 @@ load --table LooseItems
 </div>
 <p>Use <code class="docutils literal"><span class="pre">LooseItems.label</span></code> for display:</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select LooseItems \
+<div class="highlight-none"><div class="highlight"><pre>select LooseItems \
  --filter &#39;sub_filter(readings, &quot;prefix_rk_search(_key, \\&quot;nIhO\\&quot;)&quot;) || \
            _key @^ &quot;nIhO&quot;&#39; \
  --output_columns &#39;_key,label&#39;

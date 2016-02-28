@@ -95,7 +95,7 @@ In fact, you can do tag search by using array data which refers other table.</p>
 <p>First, create the <code class="docutils literal"><span class="pre">Video</span></code> table which stores movie information. the <code class="docutils literal"><span class="pre">Video</span></code> table has two columns. the <code class="docutils literal"><span class="pre">title</span></code> column stores title of the movie. the <code class="docutils literal"><span class="pre">tags</span></code> column stores multiple tag information in reference Tag table.</p>
 <p>Next, create the <code class="docutils literal"><span class="pre">Tag</span></code> table which stores tag information. the <code class="docutils literal"><span class="pre">Tag</span></code> table has one column. The tag string is stored as primary key, then <code class="docutils literal"><span class="pre">index_tags</span></code> stores indexes for tags column of Video table.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>table_create --name Video --flags TABLE_HASH_KEY --key_type UInt32
+<div class="highlight-none"><div class="highlight"><pre>table_create --name Video --flags TABLE_HASH_KEY --key_type UInt32
 # [[0, 1337566253.89858, 0.000355720520019531], true]
 table_create --name Tag --flags TABLE_HASH_KEY --key_type ShortText
 # [[0, 1337566253.89858, 0.000355720520019531], true]
@@ -122,7 +122,7 @@ load --table Video
 <p>After creating indexed column, you can do full-text search very fast. The indexed column is also automatically updated when stored data is refreshed.</p>
 <p>List up the movies that specific keywords are given.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select --table Video --query tags:@Variety --output_columns _key,title
+<div class="highlight-none"><div class="highlight"><pre>select --table Video --query tags:@Variety --output_columns _key,title
 # [
 #   [
 #     0,
@@ -235,7 +235,7 @@ select --table Video --query tags:@Animation --output_columns _key,title
 <p>For example, you can search friendships by reverse resolution in social networking site.</p>
 <p>Following example shows how to create <code class="docutils literal"><span class="pre">User</span></code> table which stores user information, <code class="docutils literal"><span class="pre">username</span></code> column which stores user name, <code class="docutils literal"><span class="pre">friends</span></code> column which stores list of user's friends in array, <code class="docutils literal"><span class="pre">index_friends</span></code> column as indexed column.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>table_create --name User --flags TABLE_HASH_KEY --key_type ShortText
+<div class="highlight-none"><div class="highlight"><pre>table_create --name User --flags TABLE_HASH_KEY --key_type ShortText
 # [[0, 1337566253.89858, 0.000355720520019531], true]
 column_create --table User --name username --flags COLUMN_SCALAR --type ShortText
 # [[0, 1337566253.89858, 0.000355720520019531], true]
@@ -257,7 +257,7 @@ load --table User
 </div>
 <p>Let's show list of users who contains specified user in friend list.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select --table User --query friends:@tomo --output_columns _key,username
+<div class="highlight-none"><div class="highlight"><pre>select --table User --query friends:@tomo --output_columns _key,username
 # [
 #   [
 #     0,
@@ -343,7 +343,7 @@ select --table User --query friends:@jiro --output_columns _key,username
 </div>
 <p>Then drilldown the count which shows user is listed as friend.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select --table User --limit 0 --drilldown friends
+<div class="highlight-none"><div class="highlight"><pre>select --table User --limit 0 --drilldown friends
 # [
 #   [
 #     0,
@@ -428,7 +428,7 @@ select --table User --query friends:@jiro --output_columns _key,username
 <p>Groonga supports to add indexes to the column which stores geo location information.
 Groonga is very fast because it use such indexes against the column which contains geo location information to search enormous number of records.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>table_create --name GeoSite --flags TABLE_HASH_KEY --key_type ShortText
+<div class="highlight-none"><div class="highlight"><pre>table_create --name GeoSite --flags TABLE_HASH_KEY --key_type ShortText
 # [[0, 1337566253.89858, 0.000355720520019531], true]
 column_create --table GeoSite --name location --type WGS84GeoPoint
 # [[0, 1337566253.89858, 0.000355720520019531], true]
@@ -475,7 +475,7 @@ select --table GeoSite --filter &#39;geo_in_circle(location, &quot;128515259x503
 </div>
 <p>These indexes are also used when sorting the records with geo location search.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select --table GeoSite --filter &#39;geo_in_circle(location, &quot;128515259x503187188&quot;, 50000)&#39; --output_columns _key,location,_score --sortby &#39;-geo_distance(location, &quot;128515259x503187188&quot;)&#39; --scorer &#39;_score = geo_distance(location, &quot;128515259x503187188&quot;)&#39;
+<div class="highlight-none"><div class="highlight"><pre>select --table GeoSite --filter &#39;geo_in_circle(location, &quot;128515259x503187188&quot;, 50000)&#39; --output_columns _key,location,_score --sortby &#39;-geo_distance(location, &quot;128515259x503187188&quot;)&#39; --scorer &#39;_score = geo_distance(location, &quot;128515259x503187188&quot;)&#39;
 # [
 #   [
 #     0,

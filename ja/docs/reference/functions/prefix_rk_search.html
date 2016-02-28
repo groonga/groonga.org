@@ -96,7 +96,7 @@
 <div class="section" id="syntax">
 <h2>7.14.11.2. 構文<a class="headerlink" href="#syntax" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <p><code class="docutils literal"><span class="pre">prefix_rk_search()</span></code> には2つ引数があります。 <code class="docutils literal"><span class="pre">column</span></code> と <code class="docutils literal"><span class="pre">query</span></code> です。</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>prefix_rk_search(column, query)
+<div class="highlight-none"><div class="highlight"><pre>prefix_rk_search(column, query)
 </pre></div>
 </div>
 <p>今のところ、 <code class="docutils literal"><span class="pre">column</span></code> は必ず <code class="docutils literal"><span class="pre">_key</span></code> にしなければいけません。</p>
@@ -106,7 +106,7 @@
 <h2>7.14.11.3. 使い方<a class="headerlink" href="#usage" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <p>使い方を示すために使うスキーマ定義とサンプルデータは以下の通りです。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>table_create Readings TABLE_PAT_KEY ShortText --normalizer NormalizerAuto
+<div class="highlight-none"><div class="highlight"><pre>table_create Readings TABLE_PAT_KEY ShortText --normalizer NormalizerAuto
 # [[0, 1337566253.89858, 0.000355720520019531], true]
 load --table Readings
 [
@@ -119,7 +119,7 @@ load --table Readings
 </div>
 <p>以下は簡単な <code class="docutils literal"><span class="pre">prefix_rk_search()</span></code> 関数の使い方です。この使い方では <code class="docutils literal"><span class="pre">ni</span></code> で <code class="docutils literal"><span class="pre">ニホン</span></code> と <code class="docutils literal"><span class="pre">ニッポン</span></code> を検索しています。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Readings --filter &#39;prefix_rk_search(_key, &quot;ni&quot;)&#39;
+<div class="highlight-none"><div class="highlight"><pre>select Readings --filter &#39;prefix_rk_search(_key, &quot;ni&quot;)&#39;
 # [
 #   [
 #     0,
@@ -157,7 +157,7 @@ load --table Readings
 <p><a class="reference internal" href="sub_filter.html"><em>sub_filter</em></a> と組み合わせることで <a class="reference internal" href="../suggest/completion.html"><em>補完</em></a> のような機能を実現することができます。</p>
 <p>レコードが補完候補となるテーブルを作成します。各レコードには0個以上の読みがあります。読みは <code class="docutils literal"><span class="pre">Readings</span></code> テーブルに格納します。 <code class="docutils literal"><span class="pre">Readings</span></code> テーブルに <code class="docutils literal"><span class="pre">Items.readings</span></code> 用のインデックスカラムを定義することを忘れないでください。このインデックスカラムは <a class="reference internal" href="sub_filter.html"><em>sub_filter</em></a> で必要になります。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>table_create Items TABLE_HASH_KEY ShortText
+<div class="highlight-none"><div class="highlight"><pre>table_create Items TABLE_HASH_KEY ShortText
 # [[0, 1337566253.89858, 0.000355720520019531], true]
 column_create Items readings COLUMN_VECTOR Readings
 # [[0, 1337566253.89858, 0.000355720520019531], true]
@@ -174,7 +174,7 @@ load --table Items
 </div>
 <p><code class="docutils literal"><span class="pre">niho</span></code> で <code class="docutils literal"><span class="pre">Items</span></code> テーブルの中にある <code class="docutils literal"><span class="pre">日本</span></code> レコードを見つけることができます。なぜなら、 <code class="docutils literal"><span class="pre">niho</span></code> で前方一致RK検索をすると <code class="docutils literal"><span class="pre">ニホン</span></code> という読みが見つかり、 <code class="docutils literal"><span class="pre">ニホン</span></code> という読みは <code class="docutils literal"><span class="pre">日本</span></code> レコードの読みの1つだからです。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Items \
+<div class="highlight-none"><div class="highlight"><pre>select Items \
  --filter &#39;sub_filter(readings, &quot;prefix_rk_search(_key, \\&quot;niho\\&quot;)&quot;)&#39;
 # [
 #   [
@@ -217,7 +217,7 @@ load --table Items
 <p>読みがない補完候補をサポートするために <a class="reference internal" href="../grn_expr/script_syntax.html#script-syntax-prefix-search-operator"><span>前方一致検索演算子</span></a> も組み合わせる必要があります。</p>
 <p>読みがない補完候補を1つ追加します。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>load --table Items
+<div class="highlight-none"><div class="highlight"><pre>load --table Items
 [
 {&quot;_key&quot;: &quot;nihon&quot;, &quot;readings&quot;: []}
 ]
@@ -226,7 +226,7 @@ load --table Items
 </div>
 <p>読みがない補完候補をサポートするために <a class="reference internal" href="../grn_expr/script_syntax.html#script-syntax-prefix-search-operator"><span>前方一致検索演算子</span></a> を組み合わせます。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Items \
+<div class="highlight-none"><div class="highlight"><pre>select Items \
  --filter &#39;sub_filter(readings, &quot;prefix_rk_search(_key, \\&quot;niho\\&quot;)&quot;) || \
            _key @^ &quot;niho&quot;&#39;
 # [
@@ -274,7 +274,7 @@ load --table Items
 </div>
 <p>多くの場合、補完時は大文字小文字を無視して検索したいものです。その場合は、 <code class="docutils literal"><span class="pre">--normalizer</span> <span class="pre">NormalizerAuto</span></code> と <code class="docutils literal"><span class="pre">label</span></code> カラムを使います。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>table_create LooseItems TABLE_HASH_KEY ShortText --normalizer NormalizerAuto
+<div class="highlight-none"><div class="highlight"><pre>table_create LooseItems TABLE_HASH_KEY ShortText --normalizer NormalizerAuto
 # [[0, 1337566253.89858, 0.000355720520019531], true]
 column_create LooseItems label COLUMN_SCALAR ShortText
 # [[0, 1337566253.89858, 0.000355720520019531], true]
@@ -294,7 +294,7 @@ load --table LooseItems
 </div>
 <p>表示するときは <code class="docutils literal"><span class="pre">LooseItems.label</span></code> を使います。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select LooseItems \
+<div class="highlight-none"><div class="highlight"><pre>select LooseItems \
  --filter &#39;sub_filter(readings, &quot;prefix_rk_search(_key, \\&quot;nIhO\\&quot;)&quot;) || \
            _key @^ &quot;nIhO&quot;&#39; \
  --output_columns &#39;_key,label&#39;

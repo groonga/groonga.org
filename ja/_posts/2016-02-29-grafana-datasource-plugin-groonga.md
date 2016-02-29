@@ -2,7 +2,6 @@
 layout: post.ja
 title: grafana-datasource-plugin-groonga 0.1.0リリース
 description: grafana-datasource-plugin-groonga 0.1.0をリリースしました！
-published: false
 ---
 
 ## grafana-datasource-plugin-groonga 0.1.0リリース

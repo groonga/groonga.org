@@ -25,7 +25,6 @@ grafana-datasource-plugin-groongaは、[Grafana](http://grafana.org/)にGroonga�
 
 * 複数カラムを一つのグラフに描画
 * ドリルダウン結果をグラフ化
-* ...
 
 上記は今後のリリースで対応していく予定です。
 
@@ -45,7 +44,7 @@ grafana-datasource-plugin-groongaのGitリポジトリーまたはアーカイ�
 
 詳細は[README](https://github.com/groonga/grafana-datasource-plugin-groonga#usage)をご覧ください。
 
-### おねがい
+### フィードバックのおねがい
 
 今後は、複数カラムのデータを同時に表示したり、ドリルダウン結果を表示したりといった機能を追加していく予定です。が、どの機能にどの程度ニーズがあるのかよくわかっていません。そこで、こういうデータをこうやって可視化したいという希望があれば教えてもらえますか？ニーズがありそうな機能を優先して追加していきたいと思っています。連絡先は[GitHub Issues](https://github.com/groonga/grafana-datasource-plugin-groonga/issues)やREADMEの[コミュニティ](https://github.com/groonga/grafana-datasource-plugin-groonga#community)から好きな方法を選んでください。Grafanaの使い方などの質問も歓迎します。
 

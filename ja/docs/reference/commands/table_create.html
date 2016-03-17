@@ -95,7 +95,7 @@
 <h2>7.3.55.2. 構文<a class="headerlink" href="#syntax" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <p>このコマンドにはたくさんの引数があります。</p>
 <p>必須の引数は <code class="docutils literal"><span class="pre">name</span></code> だけで、残りは省略できます:</p>
-<div class="highlight-none"><div class="highlight"><pre>table_create name
+<div class="highlight-none"><div class="highlight"><pre><span></span>table_create name
              [flags=TABLE_HASH_KEY]
              [key_type=null]
              [value_type=null]
@@ -114,7 +114,7 @@
 <p>テーブルの型は <code class="docutils literal"><span class="pre">TABLE_${TYPE}</span></code> を <code class="docutils literal"><span class="pre">flags</span></code> 引数に指定します。</p>
 <p>以下は <code class="docutils literal"><span class="pre">TABLE_NO_KEY</span></code> テーブルを使う例です。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre>table_create Logs TABLE_NO_KEY
+<div class="highlight-none"><div class="highlight"><pre><span></span>table_create Logs TABLE_NO_KEY
 # [[0, 1337566253.89858, 0.000355720520019531], true]
 </pre></div>
 </div>
@@ -122,12 +122,24 @@
 <p>キーでレコードを検索しないのであれば、 <code class="docutils literal"><span class="pre">TABLE_NO_KEY</span></code> 型のテーブルが適切です。なぜなら、 <code class="docutils literal"><span class="pre">TABLE_NO_KEY</span></code> はキーをサポートしていませんが、速くて小さいサイズのテーブルだからです。ログをGroongaのデータベースに保存するという使い方はこのケースです。</p>
 <p>キーでレコードを検索したり、カラムからレコードを参照したりする場合は、 <code class="docutils literal"><span class="pre">TABLE_NO_KEY</span></code> 型は適していません。全文検索用の語彙表として使うケースはこのケースです。</p>
 </div>
+<div class="section" id="create-large-data-store-table">
+<h3>7.3.55.3.2. 大きなデータ保存用テーブルの作成<a class="headerlink" href="#create-large-data-store-table" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>たくさんの大きなキーを保存したいとき、テーブルにすべてのキーを保存できないかもしれません。もし、総キーデータが4GiBより大きいなら、デフォルトではすべてのキーデータをテーブルに保存できません。</p>
+<p><code class="docutils literal"><span class="pre">KEY_LARGE</span></code> フラグを使うと4GiBから1TiBに最大総キーサイズを拡張できます。 <code class="docutils literal"><span class="pre">KEY_LARGE</span></code> フラグは <code class="docutils literal"><span class="pre">TABLE_HASH_KEY</span></code> を使っているときだけ使えます。 <code class="docutils literal"><span class="pre">KEY_LARGE</span></code> フラグは <code class="docutils literal"><span class="pre">TABLE_NO_KEY</span></code> 、 <code class="docutils literal"><span class="pre">TABLE_PAT_KEY</span></code> 、 <code class="docutils literal"><span class="pre">TABLE_DAT_KEY</span></code> と一緒に使えません。</p>
+<p>以下はたくさんの大きなキーを保存することができるテーブルを作る例です。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>table_create Paths TABLE_HASH_KEY|KEY_LARGE ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>この <code class="docutils literal"><span class="pre">table_create</span></code> コマンドは、名前が <code class="docutils literal"><span class="pre">Paths</span></code> で <code class="docutils literal"><span class="pre">TABLE_HASH_KEY</span></code> 型のテーブルを作成します。 <code class="docutils literal"><span class="pre">Paths</span></code> テーブルはたくさんの大きなキーを保存できます。</p>
+</div>
 <div class="section" id="create-lexicon-table">
-<h3>7.3.55.3.2. 語彙表テーブルの作成<a class="headerlink" href="#create-lexicon-table" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<h3>7.3.55.3.3. 語彙表テーブルの作成<a class="headerlink" href="#create-lexicon-table" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <p>語彙表テーブル用のテーブルには <code class="docutils literal"><span class="pre">TABLE_NO_KEY</span></code> 以外の型のテーブルを使います。語彙表テーブルはキーをサポートしていないといけませんが、 <code class="docutils literal"><span class="pre">TABLE_NO_KEY</span></code> はキーをサポートしていません。</p>
 <p>以下は <code class="docutils literal"><span class="pre">TABLE_PAT_KEY</span></code> テーブルを作る例です。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre>table_create Lexicon TABLE_PAT_KEY ShortText --default_tokenizer TokenBigram --normalizer NormalizerAuto
+<div class="highlight-none"><div class="highlight"><pre><span></span>table_create Lexicon TABLE_PAT_KEY ShortText --default_tokenizer TokenBigram --normalizer NormalizerAuto
 # [[0, 1337566253.89858, 0.000355720520019531], true]
 </pre></div>
 </div>
@@ -150,11 +162,11 @@
 <p>上記の理由から、 <code class="docutils literal"><span class="pre">TABLE_PAT_KEY</span></code> が語彙表テーブルに適したテーブルの型です。</p>
 </div>
 <div class="section" id="create-tag-index-table">
-<h3>7.3.55.3.3. タグインデックス用テーブルの作成<a class="headerlink" href="#create-tag-index-table" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<h3>7.3.55.3.4. タグインデックス用テーブルの作成<a class="headerlink" href="#create-tag-index-table" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <p>タグインデックス用のテーブルには <code class="docutils literal"><span class="pre">TABLE_NO_KEY</span></code> 以外の型のテーブルを使えます。タグインデックス用のテーブルはキーのサポートが必要ですが、 <code class="docutils literal"><span class="pre">TABLE_NO_KEY</span></code> はキーをサポートしていません。</p>
 <p>以下は <code class="docutils literal"><span class="pre">TABLE_HASH_KEY</span></code> 型のテーブルを作る例です。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre>table_create Tags TABLE_HASH_KEY ShortText
+<div class="highlight-none"><div class="highlight"><pre><span></span>table_create Tags TABLE_HASH_KEY ShortText
 # [[0, 1337566253.89858, 0.000355720520019531], true]
 </pre></div>
 </div>
@@ -164,11 +176,11 @@
 <p>もし、前方一致検索機能も必要な場合（例えば、 <code class="docutils literal"><span class="pre">&quot;gr&quot;</span></code> というキーワードで <code class="docutils literal"><span class="pre">&quot;groonga&quot;</span></code> を検索する場合）は、 <code class="docutils literal"><span class="pre">TABLE_DAT_KEY</span></code> が適切です。 <code class="docutils literal"><span class="pre">TABLE_DAT_KEY</span></code> はサイズの大きなテーブルですが、タグの数はそれほど多くならないので、サイズは重要ではありません。</p>
 </div>
 <div class="section" id="create-range-index-table">
-<h3>7.3.55.3.4. 範囲検索用のインデックステーブルの作成<a class="headerlink" href="#create-range-index-table" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<h3>7.3.55.3.5. 範囲検索用のインデックステーブルの作成<a class="headerlink" href="#create-range-index-table" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <p>範囲検索用のインデックステーブルには <code class="docutils literal"><span class="pre">TABLE_PAT_KEY</span></code> 型と <code class="docutils literal"><span class="pre">TABLE_DAT_KEY</span></code> 型を使えます。範囲検索用のインデックステーブルは範囲検索をサポートしている必要がありますが、 <code class="docutils literal"><span class="pre">TABLE_NO_KEY</span></code> 型と <code class="docutils literal"><span class="pre">TABLE_HASH_KEY</span></code> 型はサポートしていません。</p>
 <p>以下は <code class="docutils literal"><span class="pre">TABLE_DAT_KEY</span></code> テーブルを作成する例です。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre>table_create Ages TABLE_DAT_KEY UInt32
+<div class="highlight-none"><div class="highlight"><pre><span></span>table_create Ages TABLE_DAT_KEY UInt32
 # [[0, 1337566253.89858, 0.000355720520019531], true]
 </pre></div>
 </div>
@@ -209,33 +221,39 @@
 <p>指定可能なフラグは以下の通りです。</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="40%" />
-<col width="60%" />
+<col width="50%" />
+<col width="50%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><p class="first last">フラグ</p>
-</td>
-<td><p class="first last">説明</p>
-</td>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><p class="first last">フラグ</p>
+</th>
+<th class="head"><p class="first last">説明</p>
+</th>
 </tr>
+</thead>
+<tbody valign="top">
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">TABLE_NO_KEY</span></code></td>
-<td><p class="first last">配列テーブル。</p>
+<td><p class="first last">配列テーブル。 <a class="reference internal" href="../tables.html#table-no-key"><span>TABLE_NO_KEY</span></a> 参照。</p>
 </td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal"><span class="pre">TABLE_HASH_KEY</span></code></td>
-<td><p class="first last">ハッシュテーブル。</p>
+<td><p class="first last">ハッシュテーブル。 <a class="reference internal" href="../tables.html#table-hash-key"><span>TABLE_HASH_KEY</span></a> 参照。</p>
 </td>
 </tr>
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">TABLE_PAT_KEY</span></code></td>
-<td><p class="first last">パトリシアトライ。</p>
+<td><p class="first last">パトリシアトライ。 <a class="reference internal" href="../tables.html#table-pat-key"><span>TABLE_PAT_KEY</span></a> 参照。</p>
 </td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal"><span class="pre">TABLE_DAT_KEY</span></code></td>
-<td><p class="first last">ダブル配列トライ。</p>
+<td><p class="first last">ダブル配列トライ。 <a class="reference internal" href="../tables.html#table-dat-key"><span>TABLE_DAT_KEY</span></a> 参照。</p>
 </td>
 </tr>
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">KEY_WITH_SIS</span></code></td>
-<td><p class="first last">半無限文字列を有効にします。 <code class="docutils literal"><span class="pre">TABLE_PAT_KEY</span></code> を使う必要があります。</p>
+<td><p class="first last">半無限文字列を有効にします。 <code class="docutils literal"><span class="pre">TABLE_PAT_KEY</span></code> と使う必要があります。</p>
+</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">KEY_LARGE</span></code></td>
+<td><p class="first last">最大総キーサイズを4GiBから1TiBへ拡張します。 <code class="docutils literal"><span class="pre">TABLE_HASH_KEY</span></code> と使う必要があります。</p>
 </td>
 </tr>
 </tbody>
@@ -305,7 +323,7 @@
 <div class="section" id="return-value">
 <h2>7.3.55.5. 戻り値<a class="headerlink" href="#return-value" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <p><code class="docutils literal"><span class="pre">table_create</span></code> が成功したときは以下のようにボディは <code class="docutils literal"><span class="pre">true</span></code> になります:</p>
-<div class="highlight-none"><div class="highlight"><pre>[HEADER, true]
+<div class="highlight-none"><div class="highlight"><pre><span></span>[HEADER, true]
 </pre></div>
 </div>
 <p><code class="docutils literal"><span class="pre">table_create</span></code> が失敗すると、エラーの詳細は <code class="docutils literal"><span class="pre">HEADER</span></code> に含まれます。</p>
@@ -336,9 +354,10 @@
 <li><a class="reference internal" href="#syntax">7.3.55.2. 構文</a></li>
 <li><a class="reference internal" href="#usage">7.3.55.3. 使い方</a><ul>
 <li><a class="reference internal" href="#create-data-store-table">7.3.55.3.1. データ保存用テーブルの作成</a></li>
-<li><a class="reference internal" href="#create-lexicon-table">7.3.55.3.2. 語彙表テーブルの作成</a></li>
-<li><a class="reference internal" href="#create-tag-index-table">7.3.55.3.3. タグインデックス用テーブルの作成</a></li>
-<li><a class="reference internal" href="#create-range-index-table">7.3.55.3.4. 範囲検索用のインデックステーブルの作成</a></li>
+<li><a class="reference internal" href="#create-large-data-store-table">7.3.55.3.2. 大きなデータ保存用テーブルの作成</a></li>
+<li><a class="reference internal" href="#create-lexicon-table">7.3.55.3.3. 語彙表テーブルの作成</a></li>
+<li><a class="reference internal" href="#create-tag-index-table">7.3.55.3.4. タグインデックス用テーブルの作成</a></li>
+<li><a class="reference internal" href="#create-range-index-table">7.3.55.3.5. 範囲検索用のインデックステーブルの作成</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#parameters">7.3.55.4. 引数</a><ul>

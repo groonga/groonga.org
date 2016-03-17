@@ -95,7 +95,7 @@
 <p>First, create <code class="docutils literal"><span class="pre">Blog1</span></code> table, add <code class="docutils literal"><span class="pre">title</span></code> column which stores title string, <code class="docutils literal"><span class="pre">message</span></code> column which stores content of blog entry.</p>
 <p>Then create <code class="docutils literal"><span class="pre">IndexBlog1</span></code> table for column indexes, add <code class="docutils literal"><span class="pre">index_title</span></code> column for <code class="docutils literal"><span class="pre">title</span></code> column, <code class="docutils literal"><span class="pre">index_message</span></code> column for <code class="docutils literal"><span class="pre">message</span></code> column.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>table_create --name Blog1 --flags TABLE_HASH_KEY --key_type ShortText
+<div class="highlight-none"><div class="highlight"><pre><span></span>table_create --name Blog1 --flags TABLE_HASH_KEY --key_type ShortText
 # [[0, 1337566253.89858, 0.000355720520019531], true]
 column_create --table Blog1 --name title --flags COLUMN_SCALAR --type ShortText
 # [[0, 1337566253.89858, 0.000355720520019531], true]
@@ -120,7 +120,7 @@ load --table Blog1
 Specify query string to <code class="docutils literal"><span class="pre">query</span></code> option. Then you can do full-text search title and content of blog entries.</p>
 <p>Let's try to search blog entries.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>select --table Blog1 --match_columns title||message --query groonga
+<div class="highlight-none"><div class="highlight"><pre><span></span>select --table Blog1 --match_columns title||message --query groonga
 # [
 #   [
 #     0,
@@ -264,7 +264,7 @@ select --table Blog1 --match_columns title --query message
 <p>The difference for previous example is only one column index exists. Thus, There is one common column index against title and message column.</p>
 <p>Even though same column index is used, Groonga supports to search against title column only, message column only and title or message column.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>table_create --name Blog2 --flags TABLE_HASH_KEY --key_type ShortText
+<div class="highlight-none"><div class="highlight"><pre><span></span>table_create --name Blog2 --flags TABLE_HASH_KEY --key_type ShortText
 # [[0, 1337566253.89858, 0.000355720520019531], true]
 column_create --table Blog2 --name title --flags COLUMN_SCALAR --type ShortText
 # [[0, 1337566253.89858, 0.000355720520019531], true]
@@ -285,7 +285,7 @@ load --table Blog2
 </div>
 <p>Let's search same query in previous section. You can get same search results.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>select --table Blog2 --match_columns title||message --query groonga
+<div class="highlight-none"><div class="highlight"><pre><span></span>select --table Blog2 --match_columns title||message --query groonga
 # [
 #   [
 #     0,
@@ -451,7 +451,7 @@ you need to execute fulltext search for table of comment, then search the record
 <p>But, you can search the records by specifying the reference column index at once.</p>
 <p>Here is the sample schema.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>table_create Comments TABLE_HASH_KEY UInt32
+<div class="highlight-none"><div class="highlight"><pre><span></span>table_create Comments TABLE_HASH_KEY UInt32
 # [[0, 1337566253.89858, 0.000355720520019531], true]
 column_create Comments content COLUMN_SCALAR ShortText
 # [[0, 1337566253.89858, 0.000355720520019531], true]
@@ -473,7 +473,7 @@ column_create Comments article COLUMN_INDEX Articles comment
 </div>
 <p>Here is the sample data.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>load --table Comments
+<div class="highlight-none"><div class="highlight"><pre><span></span>load --table Comments
 [
 {&quot;_key&quot;: 1, &quot;content&quot;: &quot;I&#39;m using Groonga too!&quot;},
 {&quot;_key&quot;: 2, &quot;content&quot;: &quot;I&#39;m using Groonga and Mroonga!&quot;},
@@ -491,14 +491,14 @@ load --table Articles
 </div>
 <p>You can write the query that search the records which contains specified keyword as a comment, then fetch the articles which refers to it.</p>
 <p>Query for searching the records described above:</p>
-<div class="highlight-none"><div class="highlight"><pre>select Articles --match_columns comment.content --query groonga --output_columns &quot;_id, _score, *&quot;
+<div class="highlight-none"><div class="highlight"><pre><span></span>select Articles --match_columns comment.content --query groonga --output_columns &quot;_id, _score, *&quot;
 </pre></div>
 </div>
 <p>You need to concatenate comment column of Articles table and content column of Comments table with period( <code class="docutils literal"><span class="pre">.</span></code> ) as <code class="docutils literal"><span class="pre">--match_columns</span></code> arguments.</p>
 <p>At first, this query execute fulltext search from content of Comments table, then fetch the records of Articles table which refers to already searched records of Comments table.
 (Because of this, if you comment out the query which creates index column <code class="docutils literal"><span class="pre">article</span></code> of Comments table, you can't get intended search results.)</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>select Articles --match_columns comment.content --query groonga --output_columns &quot;_id, _score, *&quot;
+<div class="highlight-none"><div class="highlight"><pre><span></span>select Articles --match_columns comment.content --query groonga --output_columns &quot;_id, _score, *&quot;
 # [
 #   [
 #     0,
@@ -543,7 +543,7 @@ load --table Articles
 <p>The feature of nested index search is not limited to the relationship between two table only.</p>
 <p>Here is the sample schema similar to previous one. The difference is added table which express 'Reply' and relationship is extended to three tables.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>table_create Replies2 TABLE_HASH_KEY UInt32
+<div class="highlight-none"><div class="highlight"><pre><span></span>table_create Replies2 TABLE_HASH_KEY UInt32
 # [[0, 1337566253.89858, 0.000355720520019531], true]
 column_create Replies2 content COLUMN_SCALAR ShortText
 # [[0, 1337566253.89858, 0.000355720520019531], true]
@@ -575,7 +575,7 @@ column_create Replies2 reply_to COLUMN_INDEX Comments2 comment
 </div>
 <p>Here is the sample data.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>load --table Replies2
+<div class="highlight-none"><div class="highlight"><pre><span></span>load --table Replies2
 [
 {&quot;_key&quot;: 1, &quot;content&quot;: &quot;I&#39;m using Rroonga too!&quot;},
 {&quot;_key&quot;: 2, &quot;content&quot;: &quot;I&#39;m using Groonga and Mroonga and Rroonga!&quot;},
@@ -599,13 +599,13 @@ load --table Articles2
 </pre></div>
 </div>
 <p>Query for searching the records described above:</p>
-<div class="highlight-none"><div class="highlight"><pre>select Articles2 --match_columns comment.content --query mroonga --output_columns &quot;_id, _score, *&quot;
+<div class="highlight-none"><div class="highlight"><pre><span></span>select Articles2 --match_columns comment.content --query mroonga --output_columns &quot;_id, _score, *&quot;
 select Articles2 --match_columns comment.comment.content --query mroonga --output_columns &quot;_id, _score, *&quot;
 </pre></div>
 </div>
 <p>The first query searches <code class="docutils literal"><span class="pre">mroonga</span></code> from <code class="docutils literal"><span class="pre">Comments2</span></code> table, the second one searches <code class="docutils literal"><span class="pre">mroonga</span></code> from <code class="docutils literal"><span class="pre">Replies2</span></code> and <code class="docutils literal"><span class="pre">Comments2</span></code> table by using reference column index.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>select Articles2 --match_columns comment.content --query mroonga --output_columns &quot;_id, _score, *&quot;
+<div class="highlight-none"><div class="highlight"><pre><span></span>select Articles2 --match_columns comment.content --query mroonga --output_columns &quot;_id, _score, *&quot;
 # [
 #   [
 #     0,

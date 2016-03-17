@@ -95,7 +95,7 @@ to create one or more tables to store and search data.</p>
 <h2>7.3.55.2. Syntax<a class="headerlink" href="#syntax" title="Permalink to this headline">¶</a></h2>
 <p>This command takes many parameters.</p>
 <p>The required parameter is only <code class="docutils literal"><span class="pre">name</span></code> and otehrs are optional:</p>
-<div class="highlight-none"><div class="highlight"><pre>table_create name
+<div class="highlight-none"><div class="highlight"><pre><span></span>table_create name
              [flags=TABLE_HASH_KEY]
              [key_type=null]
              [value_type=null]
@@ -116,7 +116,7 @@ to create one or more tables to store and search data.</p>
 <p>Table type is specified as <code class="docutils literal"><span class="pre">TABLE_${TYPE}</span></code> to <code class="docutils literal"><span class="pre">flags</span></code> parameter.</p>
 <p>Here is an example to create <code class="docutils literal"><span class="pre">TABLE_NO_KEY</span></code> table:</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>table_create Logs TABLE_NO_KEY
+<div class="highlight-none"><div class="highlight"><pre><span></span>table_create Logs TABLE_NO_KEY
 # [[0, 1337566253.89858, 0.000355720520019531], true]
 </pre></div>
 </div>
@@ -129,14 +129,33 @@ and small table. Storing logs into Groonga database is the case.</p>
 columns, <code class="docutils literal"><span class="pre">TABLE_NO_KEY</span></code> type isn't suitable. Lexicon for fulltext
 search is the case.</p>
 </div>
+<div class="section" id="create-large-data-store-table">
+<h3>7.3.55.3.2. Create large data store table<a class="headerlink" href="#create-large-data-store-table" title="Permalink to this headline">¶</a></h3>
+<p>If you want to store many large keys, your table may not be able to
+store them. If total key data is larger than 4GiB, you can't store all
+key data into your table by default.</p>
+<p>You can expand the maximum total key size to 1TiB from 4GiB by
+<code class="docutils literal"><span class="pre">KEY_LARGE</span></code> flag. <code class="docutils literal"><span class="pre">KEY_LARGE</span></code> flag can be used with only
+<code class="docutils literal"><span class="pre">TABLE_HASH_KEY</span></code>. You can't use <code class="docutils literal"><span class="pre">KEY_LARGE</span></code> flag with
+<code class="docutils literal"><span class="pre">TABLE_NO_KEY</span></code>, <code class="docutils literal"><span class="pre">TABLE_PAT_KEY</span></code> nor <code class="docutils literal"><span class="pre">TABLE_DAT_KEY</span></code>.</p>
+<p>Here is an example to create a table that can store many large keys:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>table_create Paths TABLE_HASH_KEY|KEY_LARGE ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>The <code class="docutils literal"><span class="pre">table_create</span></code> command creates a table that is named <code class="docutils literal"><span class="pre">Paths</span></code>
+and is <code class="docutils literal"><span class="pre">TABLE_HASH_KEY</span></code> type. The <code class="docutils literal"><span class="pre">Paths</span></code> table can store many
+large keys.</p>
+</div>
 <div class="section" id="create-lexicon-table">
-<h3>7.3.55.3.2. Create lexicon table<a class="headerlink" href="#create-lexicon-table" title="Permalink to this headline">¶</a></h3>
+<h3>7.3.55.3.3. Create lexicon table<a class="headerlink" href="#create-lexicon-table" title="Permalink to this headline">¶</a></h3>
 <p>You can use all table types except <code class="docutils literal"><span class="pre">TABLE_NO_KEY</span></code> for lexicon table.
 Lexicon table needs key support but <code class="docutils literal"><span class="pre">TABLE_NO_KEY</span></code> doesn't support
 key.</p>
 <p>Here is an example to create <code class="docutils literal"><span class="pre">TABLE_PAT_KEY</span></code> table:</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>table_create Lexicon TABLE_PAT_KEY ShortText --default_tokenizer TokenBigram --normalizer NormalizerAuto
+<div class="highlight-none"><div class="highlight"><pre><span></span>table_create Lexicon TABLE_PAT_KEY ShortText --default_tokenizer TokenBigram --normalizer NormalizerAuto
 # [[0, 1337566253.89858, 0.000355720520019531], true]
 </pre></div>
 </div>
@@ -164,13 +183,13 @@ that has many keys. <code class="docutils literal"><span class="pre">TABLE_PAT_K
 for lexicon table.</p>
 </div>
 <div class="section" id="create-tag-index-table">
-<h3>7.3.55.3.3. Create tag index table<a class="headerlink" href="#create-tag-index-table" title="Permalink to this headline">¶</a></h3>
+<h3>7.3.55.3.4. Create tag index table<a class="headerlink" href="#create-tag-index-table" title="Permalink to this headline">¶</a></h3>
 <p>You can use all table types except <code class="docutils literal"><span class="pre">TABLE_NO_KEY</span></code> for tag index
 table. Tag index table needs key support but <code class="docutils literal"><span class="pre">TABLE_NO_KEY</span></code> doesn't
 support key.</p>
 <p>Here is an example to create <code class="docutils literal"><span class="pre">TABLE_HASH_KEY</span></code> table:</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>table_create Tags TABLE_HASH_KEY ShortText
+<div class="highlight-none"><div class="highlight"><pre><span></span>table_create Tags TABLE_HASH_KEY ShortText
 # [[0, 1337566253.89858, 0.000355720520019531], true]
 </pre></div>
 </div>
@@ -186,13 +205,13 @@ suitable. It is the common case.</p>
 the number of tags will not be large.</p>
 </div>
 <div class="section" id="create-range-index-table">
-<h3>7.3.55.3.4. Create range index table<a class="headerlink" href="#create-range-index-table" title="Permalink to this headline">¶</a></h3>
+<h3>7.3.55.3.5. Create range index table<a class="headerlink" href="#create-range-index-table" title="Permalink to this headline">¶</a></h3>
 <p>You can use <code class="docutils literal"><span class="pre">TABLE_PAT_KEY</span></code> and <code class="docutils literal"><span class="pre">TABLE_DAT_KEY</span></code> table types for
 range index table. Range index table needs range search support but
 <code class="docutils literal"><span class="pre">TABLE_NO_KEY</span></code> and <code class="docutils literal"><span class="pre">TABLE_HASH_KEY</span></code> don't support it.</p>
 <p>Here is an example to create <code class="docutils literal"><span class="pre">TABLE_DAT_KEY</span></code> table:</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre>table_create Ages TABLE_DAT_KEY UInt32
+<div class="highlight-none"><div class="highlight"><pre><span></span>table_create Ages TABLE_DAT_KEY UInt32
 # [[0, 1337566253.89858, 0.000355720520019531], true]
 </pre></div>
 </div>
@@ -234,28 +253,33 @@ that you cannot use <code class="docutils literal"><span class="pre">_</span></c
 <p>Here are available flags:</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="40%" />
-<col width="60%" />
+<col width="50%" />
+<col width="50%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td>flags</td>
-<td>description</td>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Flag</th>
+<th class="head">Description</th>
 </tr>
+</thead>
+<tbody valign="top">
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">TABLE_NO_KEY</span></code></td>
-<td>Array table.</td>
+<td>Array table. See also <a class="reference internal" href="../tables.html#table-no-key"><span>TABLE_NO_KEY</span></a>.</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal"><span class="pre">TABLE_HASH_KEY</span></code></td>
-<td>Hash table.</td>
+<td>Hash table. See also <a class="reference internal" href="../tables.html#table-hash-key"><span>TABLE_HASH_KEY</span></a>.</td>
 </tr>
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">TABLE_PAT_KEY</span></code></td>
-<td>Patricia trie.</td>
+<td>Patricia trie. See also <a class="reference internal" href="../tables.html#table-pat-key"><span>TABLE_PAT_KEY</span></a>.</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal"><span class="pre">TABLE_DAT_KEY</span></code></td>
-<td>Double Array trie.</td>
+<td>Double array trie. See also <a class="reference internal" href="../tables.html#table-dat-key"><span>TABLE_DAT_KEY</span></a>.</td>
 </tr>
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">KEY_WITH_SIS</span></code></td>
-<td>Enable Semi Infinite String.
-Require <code class="docutils literal"><span class="pre">TABLE_PAT_KEY</span></code>.</td>
+<td>Enable Semi Infinite String. Require <code class="docutils literal"><span class="pre">TABLE_PAT_KEY</span></code>.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">KEY_LARGE</span></code></td>
+<td>Expand the maximum total key size to 1TiB from 4GiB. Require
+<code class="docutils literal"><span class="pre">TABLE_HASH_KEY</span></code>.</td>
 </tr>
 </tbody>
 </table>
@@ -342,7 +366,7 @@ the table as a lexicon.</p>
 <div class="section" id="return-value">
 <h2>7.3.55.5. Return value<a class="headerlink" href="#return-value" title="Permalink to this headline">¶</a></h2>
 <p><code class="docutils literal"><span class="pre">table_create</span></code> returns <code class="docutils literal"><span class="pre">true</span></code> as body on success such as:</p>
-<div class="highlight-none"><div class="highlight"><pre>[HEADER, true]
+<div class="highlight-none"><div class="highlight"><pre><span></span>[HEADER, true]
 </pre></div>
 </div>
 <p>If <code class="docutils literal"><span class="pre">table_create</span></code> fails, error details are in <code class="docutils literal"><span class="pre">HEADER</span></code>.</p>
@@ -373,9 +397,10 @@ the table as a lexicon.</p>
 <li><a class="reference internal" href="#syntax">7.3.55.2. Syntax</a></li>
 <li><a class="reference internal" href="#usage">7.3.55.3. Usage</a><ul>
 <li><a class="reference internal" href="#create-data-store-table">7.3.55.3.1. Create data store table</a></li>
-<li><a class="reference internal" href="#create-lexicon-table">7.3.55.3.2. Create lexicon table</a></li>
-<li><a class="reference internal" href="#create-tag-index-table">7.3.55.3.3. Create tag index table</a></li>
-<li><a class="reference internal" href="#create-range-index-table">7.3.55.3.4. Create range index table</a></li>
+<li><a class="reference internal" href="#create-large-data-store-table">7.3.55.3.2. Create large data store table</a></li>
+<li><a class="reference internal" href="#create-lexicon-table">7.3.55.3.3. Create lexicon table</a></li>
+<li><a class="reference internal" href="#create-tag-index-table">7.3.55.3.4. Create tag index table</a></li>
+<li><a class="reference internal" href="#create-range-index-table">7.3.55.3.5. Create range index table</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#parameters">7.3.55.4. Parameters</a><ul>

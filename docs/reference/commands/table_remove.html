@@ -94,8 +94,9 @@ removed.</p>
 </div>
 <div class="section" id="syntax">
 <h2>7.3.57.2. Syntax<a class="headerlink" href="#syntax" title="Permalink to this headline">¶</a></h2>
-<p>This command takes only one required parameter:</p>
+<p>This command takes two parameters:</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>table_remove name
+             [dependent=no]
 </pre></div>
 </div>
 </div>
@@ -110,6 +111,7 @@ removed.</p>
 <div><ul class="simple">
 <li>Basic usage</li>
 <li>Unremovable cases</li>
+<li>Removes a table with tables and columns that reference the target table</li>
 <li>Decreases used resources</li>
 </ul>
 </div></blockquote>
@@ -238,7 +240,7 @@ table_create ReferenceTable TABLE_HASH_KEY ReferencedByTable
 #       [
 #         &quot;is_removable_table&quot;,
 #         &quot;db.c&quot;,
-#         8480
+#         8831
 #       ]
 #     ]
 #   ],
@@ -280,7 +282,7 @@ column_create Table reference_column COLUMN_SCALAR ReferencedByColumn
 #       [
 #         &quot;is_removable_table&quot;,
 #         &quot;db.c&quot;,
-#         8500
+#         8851
 #       ]
 #     ]
 #   ],
@@ -298,8 +300,60 @@ table_remove ReferencedByColumn
 </pre></div>
 </div>
 </div>
+<div class="section" id="removes-a-table-with-tables-and-columns-that-reference-the-target-table">
+<h3>7.3.57.3.3. Removes a table with tables and columns that reference the target table<a class="headerlink" href="#removes-a-table-with-tables-and-columns-that-reference-the-target-table" title="Permalink to this headline">¶</a></h3>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 6.0.1.</span></p>
+</div>
+<p>If you understand what you'll do, you can also remove tables and
+columns that reference the target table with one <code class="docutils literal"><span class="pre">table_remove</span></code>
+command by using <code class="docutils literal"><span class="pre">--dependent</span> <span class="pre">yes</span></code> parameter.</p>
+<p><code class="docutils literal"><span class="pre">ReferencedTable</span></code> in the following schema is referenced from a table
+and a column:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>table_create ReferencedTable TABLE_HASH_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create Table1 TABLE_HASH_KEY ReferencedTable
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create Table2 TABLE_NO_KEY
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Table2 reference_column COLUMN_SCALAR ReferencedTable
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>You can't remove <code class="docutils literal"><span class="pre">ReferencedTable</span></code> by default:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>table_remove ReferencedTable
+# [
+#   [
+#     -2,
+#     1337566253.89858,
+#     0.000355720520019531,
+#     &quot;[table][remove] a table that references the table exists: &lt;Table1._key&gt; -&gt; &lt;ReferencedTable&gt;&quot;,
+#     [
+#       [
+#         &quot;is_removable_table&quot;,
+#         &quot;db.c&quot;,
+#         8831
+#       ]
+#     ]
+#   ],
+#   false
+# ]
+</pre></div>
+</div>
+<p>You can remove <code class="docutils literal"><span class="pre">ReferencedTable</span></code>, <code class="docutils literal"><span class="pre">Table1</span></code> and
+<code class="docutils literal"><span class="pre">Table2.reference_column</span></code> by using <code class="docutils literal"><span class="pre">--dependent</span> <span class="pre">yes</span></code>
+parameter. <code class="docutils literal"><span class="pre">Table1</span></code> and <code class="docutils literal"><span class="pre">Table2.reference_column</span></code> reference
+<code class="docutils literal"><span class="pre">ReferencedTable</span></code>:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>table_remove ReferencedTable --dependent yes
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+</div>
 <div class="section" id="decreases-used-resources">
-<h3>7.3.57.3.3. Decreases used resources<a class="headerlink" href="#decreases-used-resources" title="Permalink to this headline">¶</a></h3>
+<h3>7.3.57.3.4. Decreases used resources<a class="headerlink" href="#decreases-used-resources" title="Permalink to this headline">¶</a></h3>
 <p><code class="docutils literal"><span class="pre">table_remove</span></code> opens all tables and columns in database to check
 <a class="reference internal" href="#table-remove-unremovable-cases"><span>Unremovable cases</span></a>.</p>
 <p>If you have many tables and columns, <code class="docutils literal"><span class="pre">table_remove</span></code> may use many
@@ -335,11 +389,30 @@ table_remove Entries
 <p>This section describes all parameters.</p>
 <div class="section" id="required-parameters">
 <h3>7.3.57.4.1. Required parameters<a class="headerlink" href="#required-parameters" title="Permalink to this headline">¶</a></h3>
-<p>There is only one required parameters.</p>
+<p>There is only one required parameter.</p>
 <div class="section" id="name">
 <span id="table-remove-name"></span><h4>7.3.57.4.1.1. <code class="docutils literal"><span class="pre">name</span></code><a class="headerlink" href="#name" title="Permalink to this headline">¶</a></h4>
 <p>Specifies the table name to be removed.</p>
 <p>See <a class="reference internal" href="#table-remove-usage"><span>Usage</span></a> how to use this parameter.</p>
+</div>
+</div>
+<div class="section" id="optional-parameters">
+<h3>7.3.57.4.2. Optional parameters<a class="headerlink" href="#optional-parameters" title="Permalink to this headline">¶</a></h3>
+<p>There is only one optional parameter.</p>
+<div class="section" id="dependent">
+<span id="table-remove-dependent"></span><h4>7.3.57.4.2.1. <code class="docutils literal"><span class="pre">dependent</span></code><a class="headerlink" href="#dependent" title="Permalink to this headline">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 6.0.1.</span></p>
+</div>
+<p>Specifies whether tables and columns that reference the target table
+are also removed or not.</p>
+<p>If this value is <code class="docutils literal"><span class="pre">yes</span></code>, tables and columns that reference the target
+table are also removed. Otherwise, they aren't removed and an error is
+returned.</p>
+<p>In other words, if there are any tables and columns that reference the
+target table, the target table isn't removed by default.</p>
+<p>You should use this parameter carefully. This is a danger parameter.</p>
+<p>See <span class="xref std std-ref">table-remove-remove-dependents</span> how to use this parameter.</p>
 </div>
 </div>
 </div>
@@ -368,12 +441,17 @@ table_remove Entries
 <li><a class="reference internal" href="#usage">7.3.57.3. Usage</a><ul>
 <li><a class="reference internal" href="#basic-usage">7.3.57.3.1. Basic usage</a></li>
 <li><a class="reference internal" href="#unremovable-cases">7.3.57.3.2. Unremovable cases</a></li>
-<li><a class="reference internal" href="#decreases-used-resources">7.3.57.3.3. Decreases used resources</a></li>
+<li><a class="reference internal" href="#removes-a-table-with-tables-and-columns-that-reference-the-target-table">7.3.57.3.3. Removes a table with tables and columns that reference the target table</a></li>
+<li><a class="reference internal" href="#decreases-used-resources">7.3.57.3.4. Decreases used resources</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#parameters">7.3.57.4. Parameters</a><ul>
 <li><a class="reference internal" href="#required-parameters">7.3.57.4.1. Required parameters</a><ul>
 <li><a class="reference internal" href="#name">7.3.57.4.1.1. <code class="docutils literal"><span class="pre">name</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#optional-parameters">7.3.57.4.2. Optional parameters</a><ul>
+<li><a class="reference internal" href="#dependent">7.3.57.4.2.1. <code class="docutils literal"><span class="pre">dependent</span></code></a></li>
 </ul>
 </li>
 </ul>

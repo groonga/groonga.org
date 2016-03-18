@@ -89,14 +89,26 @@
 <h1>7.3.35. <code class="docutils literal"><span class="pre">logical_table_remove</span></code><a class="headerlink" href="#logical-table-remove" title="このヘッドラインへのパーマリンク">¶</a></h1>
 <div class="section" id="summary">
 <h2>7.3.35.1. 概要<a class="headerlink" href="#summary" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="admonition note">
-<p class="first admonition-title">注釈</p>
-<p class="last">このコマンドは実験的な機能です。</p>
-</div>
 <div class="versionadded">
 <p><span class="versionmodified">バージョン 5.0.5 で追加.</span></p>
 </div>
-<p>TODO</p>
+<p><code class="docutils literal"><span class="pre">logical_table_remove</span></code> は指定した論理テーブルのテーブルとそのカラムを削除します。もし、テーブルのキーあるいはそのテーブルのカラムにインデックスが張ってある場合はそれらも削除します。</p>
+<p>シャードの一部を指定すると、そのシャードのテーブルは削除しません。テーブル内のレコードを削除するだけです。</p>
+<p>例えば、テーブル内に以下のレコードがあるとします。</p>
+<blockquote>
+<div><ul class="simple">
+<li><p class="first">レコード1： <code class="docutils literal"><span class="pre">2016-03-18</span> <span class="pre">00:30:00</span></code></p>
+</li>
+<li><p class="first">レコード2： <code class="docutils literal"><span class="pre">2016-03-18</span> <span class="pre">01:00:00</span></code></p>
+</li>
+<li><p class="first">レコード3： <code class="docutils literal"><span class="pre">2016-03-18</span> <span class="pre">02:00:00</span></code></p>
+</li>
+</ul>
+</div></blockquote>
+<p>範囲として <code class="docutils literal"><span class="pre">2016-03-18</span> <span class="pre">00:00:00</span></code> から <code class="docutils literal"><span class="pre">2016-03-18</span> <span class="pre">01:30:00</span></code> までを指定すると、「レコード1」と「レコード2」を削除します。「レコード3」は削除しません。テーブルも削除しません。</p>
+<div class="versionadded">
+<p><span class="versionmodified">バージョン 6.0.1 で追加: </span><code class="docutils literal"><span class="pre">dependent</span></code> パラメーターを使うと、対象テーブルを参照しているテーブル・カラムと対象シャードに関連しているテーブルも一緒に削除できます。</p>
+</div>
 </div>
 <div class="section" id="syntax">
 <h2>7.3.35.2. 構文<a class="headerlink" href="#syntax" title="このヘッドラインへのパーマリンク">¶</a></h2>
@@ -104,59 +116,398 @@
 <p>必須引数は2つあります。 <code class="docutils literal"><span class="pre">logical_table</span></code> と <code class="docutils literal"><span class="pre">shard_key</span></code> です。</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>logical_table_remove logical_table
                      shard_key
-                     [min]
-                     [min_border]
-                     [max]
-                     [max_border]
+                     [min=null]
+                     [min_border=&quot;include&quot;]
+                     [max=null]
+                     [max_border=&quot;include&quot;]
+                     [dependent=no]
 </pre></div>
 </div>
 </div>
 <div class="section" id="usage">
-<h2>7.3.35.3. 使い方<a class="headerlink" href="#usage" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>TODO</p>
+<span id="logical-table-remove-usage"></span><h2>7.3.35.3. 使い方<a class="headerlink" href="#usage" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>削除したい論理テーブル名とシャードキーを指定します。</p>
+<p>このセクションでは次のことについて説明します。</p>
+<blockquote>
+<div><ul class="simple">
+<li><p class="first">基本的な使い方</p>
+</li>
+<li><p class="first">論理テーブルの一部を削除</p>
+</li>
+<li><p class="first">削除できないケース</p>
+</li>
+<li><p class="first">関連するテーブルと一緒に削除</p>
+</li>
+<li><p class="first">利用リソースの削減</p>
+</li>
+</ul>
+</div></blockquote>
+<div class="section" id="basic-usage">
+<span id="logical-table-remove-basic-usage"></span><h3>7.3.35.3.1. 基本的な使い方<a class="headerlink" href="#basic-usage" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>この コマンドを使うには事前に <code class="docutils literal"><span class="pre">sharding</span></code> プラグインを登録します。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>register sharding
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">logical_table</span></code> と <code class="docutils literal"><span class="pre">shard_key</span></code> だけを指定することで対象論理テーブル用のすべてのテーブルを削除できます。</p>
+<p>以下は2つのシャードを作成するコマンドです。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>table_create  Logs_20160318 TABLE_NO_KEY
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Logs_20160318 timestamp COLUMN_SCALAR Time
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create  Logs_20160319 TABLE_NO_KEY
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Logs_20160319 timestamp COLUMN_SCALAR Time
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>存在するシャードは <a class="reference internal" href="logical_shard_list.html"><em>logical_shard_list</em></a> で確認できます。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_shard_list --logical_table Logs
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     {
+#       &quot;name&quot;: &quot;Logs_20160318&quot;
+#     },
+#     {
+#       &quot;name&quot;: &quot;Logs_20160319&quot;
+#     }
+#   ]
+# ]
+</pre></div>
+</div>
+<p>すべてのシャードを削除できます。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_table_remove \
+  --logical_table Logs \
+  --shard_key timestamp
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>すべてのシャードを削除した後はシャードは存在しません。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_shard_list --logical_table Logs
+# [[0, 1337566253.89858, 0.000355720520019531], []]
+</pre></div>
+</div>
+</div>
+<div class="section" id="removes-parts-of-a-logical-table">
+<span id="logical-table-remove-removes-parts"></span><h3>7.3.35.3.2. 論理テーブルの一部を削除<a class="headerlink" href="#removes-parts-of-a-logical-table" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>次のパラメーターでシャードの範囲を指定できます。</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">min</span></code></li>
+<li><code class="docutils literal"><span class="pre">min_border</span></code></li>
+<li><code class="docutils literal"><span class="pre">max</span></code></li>
+<li><code class="docutils literal"><span class="pre">max_border</span></code></li>
+</ul>
+</div></blockquote>
+<p>各パラメーターについては <a class="reference internal" href="logical_select.html"><em>logical_select</em></a> の以下のドキュメントを参照してください。</p>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference internal" href="logical_select.html#logical-select-min"><span>min</span></a></li>
+<li><a class="reference internal" href="logical_select.html#logical-select-min-border"><span>min_border</span></a></li>
+<li><a class="reference internal" href="logical_select.html#logical-select-max"><span>max</span></a></li>
+<li><a class="reference internal" href="logical_select.html#logical-select-max-border"><span>max_border</span></a></li>
+</ul>
+</div></blockquote>
+<p>指定した範囲がシャード内のすべてのレコードを含んでいなかったら、そのシャードのテーブルは削除しません。テーブル内の対象レコードのみ削除します。</p>
+<p>指定した範囲がシャード内のすべてのレコードを含んでいれば、そのシャード用のテーブルを削除します。</p>
+<p>以下はこの挙動を示すための論理テーブルです。この論理テーブルには2つのシャードがあります。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>table_create  Logs_20160318 TABLE_NO_KEY
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Logs_20160318 timestamp COLUMN_SCALAR Time
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+load --table Logs_20160318
+[
+{&quot;timestamp&quot;: &quot;2016-03-18 00:30:00&quot;},
+{&quot;timestamp&quot;: &quot;2016-03-18 01:00:00&quot;},
+{&quot;timestamp&quot;: &quot;2016-03-18 02:00:00&quot;}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 3]
+table_create  Logs_20160319 TABLE_NO_KEY
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Logs_20160319 timestamp COLUMN_SCALAR Time
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+load --table Logs_20160319
+[
+{&quot;timestamp&quot;: &quot;2016-03-19 00:30:00&quot;},
+{&quot;timestamp&quot;: &quot;2016-03-19 01:00:00&quot;}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 2]
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">Logs_20160318</span></code> テーブルには次のレコードがあります。</p>
+<blockquote>
+<div><ul class="simple">
+<li><p class="first">レコード1： <code class="docutils literal"><span class="pre">&quot;2016-03-18</span> <span class="pre">00:30:00&quot;</span></code></p>
+</li>
+<li><p class="first">レコード2： <code class="docutils literal"><span class="pre">&quot;2016-03-18</span> <span class="pre">01:00:00&quot;</span></code></p>
+</li>
+<li><p class="first">レコード3： <code class="docutils literal"><span class="pre">&quot;2016-03-18</span> <span class="pre">02:00:00&quot;</span></code></p>
+</li>
+</ul>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">Logs_20160319</span></code> テーブルには次のレコードがあります。</p>
+<blockquote>
+<div><ul class="simple">
+<li><p class="first">レコード1： <code class="docutils literal"><span class="pre">&quot;2016-03-19</span> <span class="pre">00:30:00&quot;</span></code></p>
+</li>
+<li><p class="first">レコード2： <code class="docutils literal"><span class="pre">&quot;2016-03-19</span> <span class="pre">01:00:00&quot;</span></code></p>
+</li>
+</ul>
+</div></blockquote>
+<p>次の範囲は <code class="docutils literal"><span class="pre">Logs_20160318</span></code> テーブル内の「レコード1」を含んでいませんが、 <code class="docutils literal"><span class="pre">Logs_20160319</span></code> テーブルのすべてのレコードを含んでいます。</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><p class="first last">パラメーター</p>
+</th>
+<th class="head">Value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">min</span></code></td>
+<td><code class="docutils literal"><span class="pre">&quot;2016-03-18</span> <span class="pre">01:00:00&quot;</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">min_border</span></code></td>
+<td><code class="docutils literal"><span class="pre">&quot;include&quot;</span></code></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">max</span></code></td>
+<td><code class="docutils literal"><span class="pre">&quot;2016-03-19</span> <span class="pre">01:30:00&quot;</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">max_border</span></code></td>
+<td><code class="docutils literal"><span class="pre">&quot;include&quot;</span></code></td>
+</tr>
+</tbody>
+</table>
+<p>この範囲を指定した <code class="docutils literal"><span class="pre">logical_table_remove</span></code> は <code class="docutils literal"><span class="pre">Logs_20160318</span></code> テーブルの「レコード2」と「レコード3」を削除します。しかし、 <code class="docutils literal"><span class="pre">Logs_20160318</span></code> テーブルは削除しません。なぜなら、 <code class="docutils literal"><span class="pre">Logs_20160318</span></code> テーブルには「レコード1」があるからです。</p>
+<p>この範囲を指定した <code class="docutils literal"><span class="pre">logical_table_remove</span></code> は <code class="docutils literal"><span class="pre">Logs_20160319</span></code> テーブルを削除します。なぜなら、この範囲は <code class="docutils literal"><span class="pre">Logs_20160319</span></code> テーブルのすべてのレコードを含んでいるからです。</p>
+<p>この範囲を指定した <code class="docutils literal"><span class="pre">logical_table_remove</span></code> を使う例です。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_table_remove \
+  --logical_table Logs \
+  --shard_key timestamp \
+  --min &quot;2016-03-18 01:00:00&quot; \
+  --min_border &quot;include&quot; \
+  --max &quot;2016-03-19 01:30:00&quot; \
+  --max_border &quot;include&quot;
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p><a class="reference internal" href="dump.html"><em>dump</em></a> を使うと <code class="docutils literal"><span class="pre">Logs_20160318</span></code> テーブルに「レコード1」があることを確認できます。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>dump
+# plugin_register sharding
+#
+# table_create Logs_20160318 TABLE_NO_KEY
+# column_create Logs_20160318 timestamp COLUMN_SCALAR Time
+#
+# load --table Logs_20160318
+# [
+# [&quot;_id&quot;,&quot;timestamp&quot;],
+# [1,1458228600.0]
+# ]
+</pre></div>
+</div>
+</div>
+<div class="section" id="unremovable-cases">
+<span id="logical-table-remove-unremovable-cases"></span><h3>7.3.35.3.3. 削除できないケース<a class="headerlink" href="#unremovable-cases" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>いくつか削除できない場合があります。詳細は <a class="reference internal" href="table_remove.html#table-remove-unremovable-cases"><span>削除できないケース</span></a> を参照してください。なぜなら <code class="docutils literal"><span class="pre">logical_table_remove</span></code> も同じようにチェックしているからです。</p>
+</div>
+<div class="section" id="removes-with-related-tables">
+<span id="logical-table-remove-removes-with-related-tables"></span><h3>7.3.35.3.4. 関連するテーブルと一緒に削除<a class="headerlink" href="#removes-with-related-tables" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="versionadded">
+<p><span class="versionmodified">バージョン 6.0.1 で追加.</span></p>
+</div>
+<p>もし、自分がなにをしようとしているかちゃんと理解しているのであれば、 <code class="docutils literal"><span class="pre">--dependent</span> <span class="pre">yes</span></code> パラメーターを使うことで1回の <code class="docutils literal"><span class="pre">logical_table_remove</span></code> で対象シャードに依存しているテーブルとカラムも削除することができます。</p>
+<p>以下が依存していると判断する条件です。もし、テーブル・カラムがこれらの条件のどれか1つでも満たしていてれば、そのテーブル・カラムは対象シャードに依存しています。</p>
+<blockquote>
+<div><ul class="simple">
+<li><p class="first">対象シャードを参照しているテーブル・カラム</p>
+</li>
+<li><p class="first">対象シャード用のテーブル（= 名前の末尾が対象シャードと同じ <code class="docutils literal"><span class="pre">_YYYYMMDD</span></code> で、対象シャードが参照しているテーブル)</p>
+</li>
+</ul>
+</div></blockquote>
+<p>対象シャードを参照しているテーブル・カラムが1つ以上あれば、 <code class="docutils literal"><span class="pre">logical_table_remove</span></code> は失敗します。これは、参照先がなくなることを防ぐためです。</p>
+<p>以下の <code class="docutils literal"><span class="pre">Bookmarks.log_20160320</span></code> カラムは対象シャードを参照しています。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>table_create  Logs_20160320 TABLE_NO_KEY
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Logs_20160320 timestamp COLUMN_SCALAR Time
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create Bookmarks TABLE_HASH_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Bookmarks log_20160320 COLUMN_SCALAR Logs_20160320
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>デフォルトでは <code class="docutils literal"><span class="pre">logical_table_remove</span></code> で <code class="docutils literal"><span class="pre">Logs_20160320</span></code> を削除できません。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_table_remove \
+  --logical_table Logs \
+  --shard_key timestamp
+# [
+#   [
+#     -2,
+#     1337566253.89858,
+#     0.000355720520019531,
+#     &quot;operation not permitted: &lt;[table][remove] a column that references the table exists: &lt;Bookmarks.log_20160320&gt; -&gt; &lt;Logs_20160320&quot;,
+#     [
+#       [
+#         &quot;Groonga::Sharding::LogicalTableRemoveCommand.remove_table&quot;,
+#         &quot;/home/kou/work/c/groonga.clean/plugins/sharding/logical_table_remove.rb&quot;,
+#         80
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">--dependent</span> <span class="pre">yes</span></code> パラメーター付きの <code class="docutils literal"><span class="pre">logical_table_remove</span></code> では <code class="docutils literal"><span class="pre">Logs_20160320</span></code> を削除できます。 <code class="docutils literal"><span class="pre">Bookmarks.log_20160320</span></code> も一緒に削除します。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_table_remove \
+  --logical_table Logs \
+  --shard_key timestamp \
+  --dependent yes
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p><a class="reference internal" href="object_exist.html"><em>object_exist</em></a> で <code class="docutils literal"><span class="pre">Logs_20160320</span></code> テーブルと <code class="docutils literal"><span class="pre">Bookmarks.log_20160320</span></code> カラムが削除されていることを確認できます。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>object_exist Logs_20160320
+# [[0, 1337566253.89858, 0.000355720520019531], false]
+object_exist Bookmarks.log_20160320
+# [[0, 1337566253.89858, 0.000355720520019531], false]
+</pre></div>
+</div>
+<p>対象シャード用のテーブルが1つ以上ある場合、 <code class="docutils literal"><span class="pre">--dependent</span> <span class="pre">yes</span></code> 付きの <code class="docutils literal"><span class="pre">logical_table_remove</span></code> はそれらも一緒に削除します。 対象シャード用のテーブルかどうかは対象シャードと同じ <code class="docutils literal"><span class="pre">_YYYYMMDD</span></code> がテーブル名の末尾にあるかどうかで判断します。</p>
+<p>末尾が <code class="docutils literal"><span class="pre">_20160320</span></code> のテーブルは2つあります。 <code class="docutils literal"><span class="pre">NotRelated_20160320</span></code> テーブルは <code class="docutils literal"><span class="pre">Logs_20160320</span></code> テーブルから使われていません。 <code class="docutils literal"><span class="pre">Users_20160320</span></code> テーブルは <code class="docutils literal"><span class="pre">Logs_20160320</span></code> テーブルが使っています。 <code class="docutils literal"><span class="pre">Servers</span></code> テーブルもあり、これは <code class="docutils literal"><span class="pre">Logs_20160320</span></code> テーブルが使っています。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>table_create  NotRelated_20160320 TABLE_PAT_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create  Users_20160320 TABLE_PAT_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create  Servers TABLE_PAT_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create  Logs_20160320 TABLE_NO_KEY
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Logs_20160320 timestamp COLUMN_SCALAR Time
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Logs_20160320 user COLUMN_SCALAR Users_20160320
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Logs_20160320 server COLUMN_SCALAR Servers
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">--dependent</span> <span class="pre">yes</span></code> パラメーター付きの``logical_table_remove`` は <code class="docutils literal"><span class="pre">Logs_20160320</span></code> テーブルと <code class="docutils literal"><span class="pre">Users_20160320</span></code> テーブルだけ削除します。なぜなら、 <code class="docutils literal"><span class="pre">Users_20160320</span></code> テーブルは名前の末尾が <code class="docutils literal"><span class="pre">_20160320</span></code> で、 <code class="docutils literal"><span class="pre">Logs_20160320</span></code> テーブルが使っているからです。 <code class="docutils literal"><span class="pre">NotRelated_20160320</span></code> テーブルと <code class="docutils literal"><span class="pre">Servers</span></code> テーブルは削除しません。なぜなら、 <code class="docutils literal"><span class="pre">NotRelated_20160320</span></code> は名前の末尾が <code class="docutils literal"><span class="pre">_20160320</span></code> ですが、 <code class="docutils literal"><span class="pre">Logs_20160320</span></code> テーブルは使っていないからです。 <code class="docutils literal"><span class="pre">Servers</span></code> テーブルは <code class="docutils literal"><span class="pre">Logs_20160320</span></code> テーブルが使っていますが、名前の末尾は <code class="docutils literal"><span class="pre">_20160320</span></code> ではありません。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_table_remove \
+  --logical_table Logs \
+  --shard_key timestamp \
+  --dependent yes
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">Logs_20160320</span></code> テーブルと <code class="docutils literal"><span class="pre">Users_20160320</span></code> テーブルは削除されていて、 <code class="docutils literal"><span class="pre">NotRelated_20160320</span></code> テーブルと <code class="docutils literal"><span class="pre">Servers</span></code> テーブルは削除されていないことを確認します。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>object_exist Logs_20160320
+# [[0, 1337566253.89858, 0.000355720520019531], false]
+object_exist Users_20160320
+# [[0, 1337566253.89858, 0.000355720520019531], false]
+object_exist NotRelated_20160320
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+object_exist Servers
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+</div>
+<div class="section" id="decreases-used-resources">
+<span id="logical-table-remove-decreases-used-resources"></span><h3>7.3.35.3.5. 利用リソースの削減<a class="headerlink" href="#decreases-used-resources" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>このコマンドが使うリソースを削減できます。詳細は <a class="reference internal" href="table_remove.html#table-remove-decreases-used-resources"><span>利用リソースの削減</span></a> を参照してください。なぜなら <code class="docutils literal"><span class="pre">logical_table_remove</span></code> は <a class="reference internal" href="table_remove.html"><em>table_remove</em></a> と同じロジックを使っているからです。</p>
+</div>
 </div>
 <div class="section" id="parameters">
 <h2>7.3.35.4. 引数<a class="headerlink" href="#parameters" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <p>このセクションでは <code class="docutils literal"><span class="pre">logical_table_remove</span></code> の引数について説明します。</p>
 <div class="section" id="required-parameters">
 <h3>7.3.35.4.1. 必須引数<a class="headerlink" href="#required-parameters" title="このヘッドラインへのパーマリンク">¶</a></h3>
-<p>必須引数は二つあります。 <code class="docutils literal"><span class="pre">logical_table</span></code> と <code class="docutils literal"><span class="pre">shard_key</span></code> です。</p>
+<p>いくつか必須の引数があります。</p>
 <div class="section" id="logical-table">
-<h4>7.3.35.4.1.1. <code class="docutils literal"><span class="pre">logical_table</span></code><a class="headerlink" href="#logical-table" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<span id="logical-table-remove-logical-table"></span><h4>7.3.35.4.1.1. <code class="docutils literal"><span class="pre">logical_table</span></code><a class="headerlink" href="#logical-table" title="このヘッドラインへのパーマリンク">¶</a></h4>
 <p>論理テーブル名を指定します。これは &quot;_YYYYMMDD&quot; をテーブル名から除いたものです。実際のテーブルが &quot;Logs_20150203&quot; や &quot;Logs_20150203&quot; といったものなら、論理テーブル名は &quot;Logs&quot; です。</p>
+<p><a class="reference internal" href="logical_select.html#logical-select-logical-table"><span>logical_table</span></a> も参照してください。</p>
 </div>
 <div class="section" id="shard-key">
-<h4>7.3.35.4.1.2. <code class="docutils literal"><span class="pre">shard_key</span></code><a class="headerlink" href="#shard-key" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p>個々のテーブルで共通のキーとして扱うカラム名を指定します。</p>
+<span id="logical-table-remove-shard-key"></span><h4>7.3.35.4.1.2. <code class="docutils literal"><span class="pre">shard_key</span></code><a class="headerlink" href="#shard-key" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>シャードキーとして使うカラム名を指定します。</p>
+<p><span class="xref std std-ref">logical-select-logical-shard-key</span> も参照してください。</p>
 </div>
 </div>
 <div class="section" id="optional-parameters">
 <h3>7.3.35.4.2. 省略可能引数<a class="headerlink" href="#optional-parameters" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <p>いくつか省略可能な引数があります。</p>
 <div class="section" id="min">
-<h4>7.3.35.4.2.1. <code class="docutils literal"><span class="pre">min</span></code><a class="headerlink" href="#min" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p><code class="docutils literal"><span class="pre">shard_key</span></code> の最小値を指定します。</p>
+<span id="logical-table-remove-min"></span><h4>7.3.35.4.2.1. <code class="docutils literal"><span class="pre">min</span></code><a class="headerlink" href="#min" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p><code class="docutils literal"><span class="pre">shard_key</span></code> カラムの最小値を指定します。</p>
+<p><a class="reference internal" href="logical_select.html#logical-select-min"><span>min</span></a> も参照してください。</p>
 </div>
 <div class="section" id="min-border">
-<h4>7.3.35.4.2.2. <code class="docutils literal"><span class="pre">min_border</span></code><a class="headerlink" href="#min-border" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p>最小値を境界値として含めるのか否かを指定します。 <code class="docutils literal"><span class="pre">include</span></code> もしくは <code class="docutils literal"><span class="pre">exclude</span></code> を指定します。</p>
+<span id="logical-table-remove-min-border"></span><h4>7.3.35.4.2.2. <code class="docutils literal"><span class="pre">min_border</span></code><a class="headerlink" href="#min-border" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>最小値を含めるかどうかを指定します。 <code class="docutils literal"><span class="pre">include</span></code> か <code class="docutils literal"><span class="pre">exclude</span></code> を指定します。デフォルトは <code class="docutils literal"><span class="pre">include</span></code> です。</p>
+<p><a class="reference internal" href="logical_select.html#logical-select-min-border"><span>min_border</span></a> も参照してください。</p>
 </div>
 <div class="section" id="max">
-<h4>7.3.35.4.2.3. <code class="docutils literal"><span class="pre">max</span></code><a class="headerlink" href="#max" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p><code class="docutils literal"><span class="pre">shard_key</span></code> の最大値を指定します。</p>
+<span id="logical-table-remove-max"></span><h4>7.3.35.4.2.3. <code class="docutils literal"><span class="pre">max</span></code><a class="headerlink" href="#max" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p><code class="docutils literal"><span class="pre">shard_key</span></code> カラムの最大値を指定します。</p>
+<p><a class="reference internal" href="logical_select.html#logical-select-max"><span>max</span></a> も参照してください。</p>
 </div>
 <div class="section" id="max-border">
-<h4>7.3.35.4.2.4. <code class="docutils literal"><span class="pre">max_border</span></code><a class="headerlink" href="#max-border" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p>最大値を境界値として含めるのか否かを指定します。 <code class="docutils literal"><span class="pre">include</span></code> もしくは <code class="docutils literal"><span class="pre">exclude</span></code> を指定します。</p>
+<span id="logical-table-remove-max-border"></span><h4>7.3.35.4.2.4. <code class="docutils literal"><span class="pre">max_border</span></code><a class="headerlink" href="#max-border" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>最大値を含めるかどうかを指定します。 <code class="docutils literal"><span class="pre">include</span></code> か <code class="docutils literal"><span class="pre">exclude</span></code> を指定します。デフォルトは <code class="docutils literal"><span class="pre">include</span></code> です。</p>
+<p><a class="reference internal" href="logical_select.html#logical-select-max-border"><span>max_border</span></a> も参照してください。</p>
+</div>
+<div class="section" id="dependent">
+<span id="logical-table-remove-dependent"></span><h4>7.3.35.4.2.5. <code class="docutils literal"><span class="pre">dependent</span></code><a class="headerlink" href="#dependent" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">バージョン 6.0.1 で追加.</span></p>
+</div>
+<p>対象シャードに依存しているテーブル・カラムも一緒に削除するかどうかを指定します。</p>
+<p>以下が依存していると判断する条件です。もし、テーブル・カラムがこれらの条件のどれか1つでも満たしていてれば、そのテーブル・カラムは対象シャードに依存しています。</p>
+<blockquote>
+<div><ul class="simple">
+<li><p class="first">対象シャードを参照しているテーブル・カラム</p>
+</li>
+<li><p class="first">対象シャード用のテーブル（= 名前の末尾が対象シャードと同じ <code class="docutils literal"><span class="pre">_YYYYMMDD</span></code> で、対象シャードが参照しているテーブル)</p>
+</li>
+</ul>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">yes</span></code> を指定した場合は、対象シャードに依存しているテーブル・カラムも削除します。 <code class="docutils literal"><span class="pre">yes</span></code> を指定しなければ削除しません。もし、対象シャードを参照しているテーブル・カラムが1つ以上あればエラーになります。もし、対象シャード用のテーブルがあっても、それらを削除しません。</p>
+<p>このパラメーターは注意して使ってください。危険なパラメーターです。</p>
+<p>このパラメーターの使い方は <a class="reference internal" href="#logical-table-remove-removes-with-related-tables"><span>関連するテーブルと一緒に削除</span></a> を参照してください。</p>
 </div>
 </div>
 </div>
 <div class="section" id="return-value">
 <h2>7.3.35.5. 戻り値<a class="headerlink" href="#return-value" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>TODO</p>
+<p>このコマンドが成功したときは以下のようにボディは <code class="docutils literal"><span class="pre">true</span></code> になります:</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>[HEADER, true]
 </pre></div>
 </div>
+<p>このコマンドが失敗すると、 <code class="docutils literal"><span class="pre">HEADER</span></code> にエラーの詳細が含まれます。</p>
+<p><code class="docutils literal"><span class="pre">HEADER</span></code> については <a class="reference internal" href="../command/output_format.html"><em>出力形式</em></a> を参照してください。</p>
 </div>
 </div>
 
@@ -171,7 +522,14 @@
 <li><a class="reference internal" href="#">7.3.35. <code class="docutils literal"><span class="pre">logical_table_remove</span></code></a><ul>
 <li><a class="reference internal" href="#summary">7.3.35.1. 概要</a></li>
 <li><a class="reference internal" href="#syntax">7.3.35.2. 構文</a></li>
-<li><a class="reference internal" href="#usage">7.3.35.3. 使い方</a></li>
+<li><a class="reference internal" href="#usage">7.3.35.3. 使い方</a><ul>
+<li><a class="reference internal" href="#basic-usage">7.3.35.3.1. 基本的な使い方</a></li>
+<li><a class="reference internal" href="#removes-parts-of-a-logical-table">7.3.35.3.2. 論理テーブルの一部を削除</a></li>
+<li><a class="reference internal" href="#unremovable-cases">7.3.35.3.3. 削除できないケース</a></li>
+<li><a class="reference internal" href="#removes-with-related-tables">7.3.35.3.4. 関連するテーブルと一緒に削除</a></li>
+<li><a class="reference internal" href="#decreases-used-resources">7.3.35.3.5. 利用リソースの削減</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#parameters">7.3.35.4. 引数</a><ul>
 <li><a class="reference internal" href="#required-parameters">7.3.35.4.1. 必須引数</a><ul>
 <li><a class="reference internal" href="#logical-table">7.3.35.4.1.1. <code class="docutils literal"><span class="pre">logical_table</span></code></a></li>
@@ -183,6 +541,7 @@
 <li><a class="reference internal" href="#min-border">7.3.35.4.2.2. <code class="docutils literal"><span class="pre">min_border</span></code></a></li>
 <li><a class="reference internal" href="#max">7.3.35.4.2.3. <code class="docutils literal"><span class="pre">max</span></code></a></li>
 <li><a class="reference internal" href="#max-border">7.3.35.4.2.4. <code class="docutils literal"><span class="pre">max_border</span></code></a></li>
+<li><a class="reference internal" href="#dependent">7.3.35.4.2.5. <code class="docutils literal"><span class="pre">dependent</span></code></a></li>
 </ul>
 </li>
 </ul>

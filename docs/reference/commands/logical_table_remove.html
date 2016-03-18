@@ -88,14 +88,31 @@
 <h1>7.3.35. <code class="docutils literal"><span class="pre">logical_table_remove</span></code><a class="headerlink" href="#logical-table-remove" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="summary">
 <h2>7.3.35.1. Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">This command is an experimental feature.</p>
-</div>
 <div class="versionadded">
 <p><span class="versionmodified">New in version 5.0.5.</span></p>
 </div>
-<p>TODO</p>
+<p><code class="docutils literal"><span class="pre">logical_table_remove</span></code> removes tables and their columns for the
+specified logical table. If there are one or more indexes against key
+of the tables and their columns, they are also removed.</p>
+<p>If you specify the part of a shard, table of the shard isn't
+removed. <code class="docutils literal"><span class="pre">logical_table_remove</span></code> just deletes records in the table.</p>
+<p>For example, there are the following records in a table:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Record1: <code class="docutils literal"><span class="pre">2016-03-18</span> <span class="pre">00:30:00</span></code></li>
+<li>Record2: <code class="docutils literal"><span class="pre">2016-03-18</span> <span class="pre">01:00:00</span></code></li>
+<li>Record3: <code class="docutils literal"><span class="pre">2016-03-18</span> <span class="pre">02:00:00</span></code></li>
+</ul>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">logical_table_remove</span></code> deletes &quot;Record1&quot; and &quot;Record2&quot; when you
+specify range as between <code class="docutils literal"><span class="pre">2016-03-18</span> <span class="pre">00:00:00</span></code> and <code class="docutils literal"><span class="pre">2016-03-18</span>
+<span class="pre">01:30:00</span></code>. <code class="docutils literal"><span class="pre">logical_table_remove</span></code> doesn't delete
+&quot;Record3&quot;. <code class="docutils literal"><span class="pre">logical_table_remove</span></code> doesn't remove the table.</p>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 6.0.1: </span>You can also remove tables and columns that reference the target
+table and tables related with the target shard by using
+<code class="docutils literal"><span class="pre">dependent</span></code> parameter.</p>
+</div>
 </div>
 <div class="section" id="syntax">
 <h2>7.3.35.2. Syntax<a class="headerlink" href="#syntax" title="Permalink to this headline">¶</a></h2>
@@ -103,62 +120,438 @@
 <p>The required parameters are <code class="docutils literal"><span class="pre">logical_table</span></code> and <code class="docutils literal"><span class="pre">shard_key</span></code>:</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>logical_table_remove logical_table
                      shard_key
-                     [min]
-                     [min_border]
-                     [max]
-                     [max_border]
+                     [min=null]
+                     [min_border=&quot;include&quot;]
+                     [max=null]
+                     [max_border=&quot;include&quot;]
+                     [dependent=no]
 </pre></div>
 </div>
 </div>
 <div class="section" id="usage">
-<h2>7.3.35.3. Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
-<p>TODO</p>
+<span id="logical-table-remove-usage"></span><h2>7.3.35.3. Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>You specify logical table name and shard key what you want to remove.</p>
+<p>This section describes about the followings:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Basic usage</li>
+<li>Removes parts of a logical table</li>
+<li>Unremovable cases</li>
+<li>Removes with related tables</li>
+<li>Decreases used resources</li>
+</ul>
+</div></blockquote>
+<div class="section" id="basic-usage">
+<span id="logical-table-remove-basic-usage"></span><h3>7.3.35.3.1. Basic usage<a class="headerlink" href="#basic-usage" title="Permalink to this headline">¶</a></h3>
+<p>Register <code class="docutils literal"><span class="pre">sharding</span></code> plugin to use this command in advance.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>register sharding
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>You can remove all tables for the logical table by specifying only
+<code class="docutils literal"><span class="pre">logical_table</span></code> and <code class="docutils literal"><span class="pre">shard_key</span></code>.</p>
+<p>Here are commands to create 2 shards:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>table_create  Logs_20160318 TABLE_NO_KEY
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Logs_20160318 timestamp COLUMN_SCALAR Time
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create  Logs_20160319 TABLE_NO_KEY
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Logs_20160319 timestamp COLUMN_SCALAR Time
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>You can confirm existing shards by <a class="reference internal" href="logical_shard_list.html"><em>logical_shard_list</em></a>:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_shard_list --logical_table Logs
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     {
+#       &quot;name&quot;: &quot;Logs_20160318&quot;
+#     },
+#     {
+#       &quot;name&quot;: &quot;Logs_20160319&quot;
+#     }
+#   ]
+# ]
+</pre></div>
+</div>
+<p>You can remove all shards:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_table_remove \
+  --logical_table Logs \
+  --shard_key timestamp
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>There are no shards after you remove all shards:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_shard_list --logical_table Logs
+# [[0, 1337566253.89858, 0.000355720520019531], []]
+</pre></div>
+</div>
+</div>
+<div class="section" id="removes-parts-of-a-logical-table">
+<span id="logical-table-remove-removes-parts"></span><h3>7.3.35.3.2. Removes parts of a logical table<a class="headerlink" href="#removes-parts-of-a-logical-table" title="Permalink to this headline">¶</a></h3>
+<p>You can specify range of shards by the following parameters:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">min</span></code></li>
+<li><code class="docutils literal"><span class="pre">min_border</span></code></li>
+<li><code class="docutils literal"><span class="pre">max</span></code></li>
+<li><code class="docutils literal"><span class="pre">max_border</span></code></li>
+</ul>
+</div></blockquote>
+<p>See the following documents of <a class="reference internal" href="logical_select.html"><em>logical_select</em></a> for each
+parameter:</p>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference internal" href="logical_select.html#logical-select-min"><span>min</span></a></li>
+<li><a class="reference internal" href="logical_select.html#logical-select-min-border"><span>min_border</span></a></li>
+<li><a class="reference internal" href="logical_select.html#logical-select-max"><span>max</span></a></li>
+<li><a class="reference internal" href="logical_select.html#logical-select-max-border"><span>max_border</span></a></li>
+</ul>
+</div></blockquote>
+<p>If the specified range doesn't cover all records in a shard, table for
+the shard isn't removed. Target records in the table are only deleted.</p>
+<p>If the specified range covers all records in a shard, table for the
+shard is removed.</p>
+<p>Here is a logical table to show the behavior. The logical table has two
+shards:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>table_create  Logs_20160318 TABLE_NO_KEY
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Logs_20160318 timestamp COLUMN_SCALAR Time
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+load --table Logs_20160318
+[
+{&quot;timestamp&quot;: &quot;2016-03-18 00:30:00&quot;},
+{&quot;timestamp&quot;: &quot;2016-03-18 01:00:00&quot;},
+{&quot;timestamp&quot;: &quot;2016-03-18 02:00:00&quot;}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 3]
+table_create  Logs_20160319 TABLE_NO_KEY
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Logs_20160319 timestamp COLUMN_SCALAR Time
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+load --table Logs_20160319
+[
+{&quot;timestamp&quot;: &quot;2016-03-19 00:30:00&quot;},
+{&quot;timestamp&quot;: &quot;2016-03-19 01:00:00&quot;}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 2]
+</pre></div>
+</div>
+<p>There are the following records in <code class="docutils literal"><span class="pre">Logs_20160318</span></code> table:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Record1: <code class="docutils literal"><span class="pre">&quot;2016-03-18</span> <span class="pre">00:30:00&quot;</span></code></li>
+<li>Record2: <code class="docutils literal"><span class="pre">&quot;2016-03-18</span> <span class="pre">01:00:00&quot;</span></code></li>
+<li>Record3: <code class="docutils literal"><span class="pre">&quot;2016-03-18</span> <span class="pre">02:00:00&quot;</span></code></li>
+</ul>
+</div></blockquote>
+<p>There are the following records in <code class="docutils literal"><span class="pre">Logs_20160319</span></code> table:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Record1: <code class="docutils literal"><span class="pre">&quot;2016-03-19</span> <span class="pre">00:30:00&quot;</span></code></li>
+<li>Record2: <code class="docutils literal"><span class="pre">&quot;2016-03-19</span> <span class="pre">01:00:00&quot;</span></code></li>
+</ul>
+</div></blockquote>
+<p>The following range doesn't cover &quot;Record1&quot; in <code class="docutils literal"><span class="pre">Logs_20160318</span></code> table
+but covers all records in <code class="docutils literal"><span class="pre">Logs_20160319</span></code> table:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Parameter</th>
+<th class="head">Value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">min</span></code></td>
+<td><code class="docutils literal"><span class="pre">&quot;2016-03-18</span> <span class="pre">01:00:00&quot;</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">min_border</span></code></td>
+<td><code class="docutils literal"><span class="pre">&quot;include&quot;</span></code></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">max</span></code></td>
+<td><code class="docutils literal"><span class="pre">&quot;2016-03-19</span> <span class="pre">01:30:00&quot;</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">max_border</span></code></td>
+<td><code class="docutils literal"><span class="pre">&quot;include&quot;</span></code></td>
+</tr>
+</tbody>
+</table>
+<p><code class="docutils literal"><span class="pre">logical_table_remove</span></code> with the range deletes &quot;Record2&quot; and
+&quot;Record3&quot; in <code class="docutils literal"><span class="pre">Logs_20160318</span></code> table but doesn't remove
+<code class="docutils literal"><span class="pre">Logs_20160318</span></code> table. Because there is &quot;Record1&quot; in
+<code class="docutils literal"><span class="pre">Logs_20160318</span></code> table.</p>
+<p><code class="docutils literal"><span class="pre">logical_table_remove</span></code> with the range removes <code class="docutils literal"><span class="pre">Logs_20160319</span></code>
+table because the range covers all records in <code class="docutils literal"><span class="pre">Logs_20160319</span></code> table.</p>
+<p>Here is an example to use <code class="docutils literal"><span class="pre">logical_table_remove</span></code> with the range:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_table_remove \
+  --logical_table Logs \
+  --shard_key timestamp \
+  --min &quot;2016-03-18 01:00:00&quot; \
+  --min_border &quot;include&quot; \
+  --max &quot;2016-03-19 01:30:00&quot; \
+  --max_border &quot;include&quot;
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p><a class="reference internal" href="dump.html"><em>dump</em></a> shows that there is &quot;Record1&quot; in <code class="docutils literal"><span class="pre">Logs_20160318</span></code> table:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>dump
+# plugin_register sharding
+#
+# table_create Logs_20160318 TABLE_NO_KEY
+# column_create Logs_20160318 timestamp COLUMN_SCALAR Time
+#
+# load --table Logs_20160318
+# [
+# [&quot;_id&quot;,&quot;timestamp&quot;],
+# [1,1458228600.0]
+# ]
+</pre></div>
+</div>
+</div>
+<div class="section" id="unremovable-cases">
+<span id="logical-table-remove-unremovable-cases"></span><h3>7.3.35.3.3. Unremovable cases<a class="headerlink" href="#unremovable-cases" title="Permalink to this headline">¶</a></h3>
+<p>There are some unremovable cases. See
+<a class="reference internal" href="table_remove.html#table-remove-unremovable-cases"><span>Unremovable cases</span></a> for details. Because
+<code class="docutils literal"><span class="pre">logical_table_remove</span></code> uses the same checks.</p>
+</div>
+<div class="section" id="removes-with-related-tables">
+<span id="logical-table-remove-removes-with-related-tables"></span><h3>7.3.35.3.4. Removes with related tables<a class="headerlink" href="#removes-with-related-tables" title="Permalink to this headline">¶</a></h3>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 6.0.1.</span></p>
+</div>
+<p>If you understand what you'll do, you can also remove tables and
+columns that depend on the target shard with one
+<code class="docutils literal"><span class="pre">logical_table_remove</span></code> command by using <code class="docutils literal"><span class="pre">--dependent</span> <span class="pre">yes</span></code>
+parameter.</p>
+<p>Here are conditions for dependent. If table or column satisfies one of
+the conditions, the table or column depends on the target shard:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Tables and columns that reference the target shard</li>
+<li>Tables for the shard (= The table has the same <code class="docutils literal"><span class="pre">_YYYYMMDD</span></code>
+postfix as the target shard and is referenced from the target
+shard)</li>
+</ul>
+</div></blockquote>
+<p>If there are one or more tables and columns that reference the target
+shard, <code class="docutils literal"><span class="pre">logical_table_remove</span></code> is failed. It's for avoiding dangling
+references.</p>
+<p><code class="docutils literal"><span class="pre">Bookmarks.log_20160320</span></code> column in the following is the column that
+references the target shard:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>table_create  Logs_20160320 TABLE_NO_KEY
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Logs_20160320 timestamp COLUMN_SCALAR Time
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create Bookmarks TABLE_HASH_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Bookmarks log_20160320 COLUMN_SCALAR Logs_20160320
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>You can't remove <code class="docutils literal"><span class="pre">Logs_20160320</span></code> by <code class="docutils literal"><span class="pre">logical_table_remove</span></code> by
+default:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_table_remove \
+  --logical_table Logs \
+  --shard_key timestamp
+# [
+#   [
+#     -2,
+#     1337566253.89858,
+#     0.000355720520019531,
+#     &quot;operation not permitted: &lt;[table][remove] a column that references the table exists: &lt;Bookmarks.log_20160320&gt; -&gt; &lt;Logs_20160320&quot;,
+#     [
+#       [
+#         &quot;Groonga::Sharding::LogicalTableRemoveCommand.remove_table&quot;,
+#         &quot;/home/kou/work/c/groonga.clean/plugins/sharding/logical_table_remove.rb&quot;,
+#         80
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>You can remove <code class="docutils literal"><span class="pre">Logs_20160320</span></code> by <code class="docutils literal"><span class="pre">logical_table_remove</span></code> with
+<code class="docutils literal"><span class="pre">--dependent</span> <span class="pre">yes</span></code> parameter. <code class="docutils literal"><span class="pre">Bookmarks.log_20160320</span></code> is also
+removed:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_table_remove \
+  --logical_table Logs \
+  --shard_key timestamp \
+  --dependent yes
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p><a class="reference internal" href="object_exist.html"><em>object_exist</em></a> shows that <code class="docutils literal"><span class="pre">Logs_20160320</span></code> table and
+<code class="docutils literal"><span class="pre">Bookmarks.log_20160320</span></code> column are removed:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>object_exist Logs_20160320
+# [[0, 1337566253.89858, 0.000355720520019531], false]
+object_exist Bookmarks.log_20160320
+# [[0, 1337566253.89858, 0.000355720520019531], false]
+</pre></div>
+</div>
+<p>If there is one or more tables for the target shard,
+<code class="docutils literal"><span class="pre">logical_table_remove</span></code> with <code class="docutils literal"><span class="pre">--dependent</span> <span class="pre">yes</span></code> also removes
+them. Tables that have the same <code class="docutils literal"><span class="pre">_YYYYMMDD</span></code> postfix as the target
+shard are treated as tables for the target shard.</p>
+<p>Here are two tables that have <code class="docutils literal"><span class="pre">_20160320</span></code>
+postfix. <code class="docutils literal"><span class="pre">NotRelated_20160320</span></code> table isn't used by <code class="docutils literal"><span class="pre">Logs_20160320</span></code>
+table. <code class="docutils literal"><span class="pre">Users_20160320</span></code> table is used by <code class="docutils literal"><span class="pre">Logs_20160320</span></code>
+table. <code class="docutils literal"><span class="pre">Servers</span></code> table exists and used by <code class="docutils literal"><span class="pre">Logs_20160320</span></code> table:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>table_create  NotRelated_20160320 TABLE_PAT_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create  Users_20160320 TABLE_PAT_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create  Servers TABLE_PAT_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create  Logs_20160320 TABLE_NO_KEY
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Logs_20160320 timestamp COLUMN_SCALAR Time
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Logs_20160320 user COLUMN_SCALAR Users_20160320
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Logs_20160320 server COLUMN_SCALAR Servers
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">logical_table_remove</span></code> with <code class="docutils literal"><span class="pre">--dependent</span> <span class="pre">yes</span></code> parameter removes
+only <code class="docutils literal"><span class="pre">Logs_20160320</span></code> table and <code class="docutils literal"><span class="pre">Users_20160320</span></code> table. Because
+<code class="docutils literal"><span class="pre">Users_20160320</span></code> table has <code class="docutils literal"><span class="pre">_20160320</span></code> postfix and used by
+<code class="docutils literal"><span class="pre">Logs_20160320</span></code>. <code class="docutils literal"><span class="pre">NotRelated_20160320</span></code> table and <code class="docutils literal"><span class="pre">Servers</span></code> table
+aren't removed. Because <code class="docutils literal"><span class="pre">NotRelated_20160320</span></code> table has
+<code class="docutils literal"><span class="pre">_20160320</span></code> postfix but isn't used by <code class="docutils literal"><span class="pre">Logs_20160320</span></code>. <code class="docutils literal"><span class="pre">Servers</span></code>
+table is used by <code class="docutils literal"><span class="pre">Logs_20160320</span></code> but doesn't have <code class="docutils literal"><span class="pre">_20160320</span></code>
+postfix:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_table_remove \
+  --logical_table Logs \
+  --shard_key timestamp \
+  --dependent yes
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>You can confirm that <code class="docutils literal"><span class="pre">Logs_20160320</span></code> table and <code class="docutils literal"><span class="pre">Users_20160320</span></code>
+table are removed but <code class="docutils literal"><span class="pre">NotRelated_20160320</span></code> table and <code class="docutils literal"><span class="pre">Servers</span></code>
+table aren't removed:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>object_exist Logs_20160320
+# [[0, 1337566253.89858, 0.000355720520019531], false]
+object_exist Users_20160320
+# [[0, 1337566253.89858, 0.000355720520019531], false]
+object_exist NotRelated_20160320
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+object_exist Servers
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+</div>
+<div class="section" id="decreases-used-resources">
+<span id="logical-table-remove-decreases-used-resources"></span><h3>7.3.35.3.5. Decreases used resources<a class="headerlink" href="#decreases-used-resources" title="Permalink to this headline">¶</a></h3>
+<p>You can decrease resources for this command. See
+<a class="reference internal" href="table_remove.html#table-remove-decreases-used-resources"><span>Decreases used resources</span></a> for details. Because
+<code class="docutils literal"><span class="pre">logical_table_remove</span></code> uses the same logic as <a class="reference internal" href="table_remove.html"><em>table_remove</em></a>.</p>
+</div>
 </div>
 <div class="section" id="parameters">
 <h2>7.3.35.4. Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
 <p>This section describes parameters of <code class="docutils literal"><span class="pre">logical_table_remove</span></code>.</p>
 <div class="section" id="required-parameters">
 <h3>7.3.35.4.1. Required parameters<a class="headerlink" href="#required-parameters" title="Permalink to this headline">¶</a></h3>
-<p>There are required parameters, <code class="docutils literal"><span class="pre">logical_table</span></code> and <code class="docutils literal"><span class="pre">shard_key</span></code>.</p>
+<p>There are required parameters.</p>
 <div class="section" id="logical-table">
-<h4>7.3.35.4.1.1. <code class="docutils literal"><span class="pre">logical_table</span></code><a class="headerlink" href="#logical-table" title="Permalink to this headline">¶</a></h4>
-<p>Specifies logical table name. It means table name without &quot;_YYYYMMDD&quot; postfix.
-If you use actual table such as &quot;Logs_20150203&quot;, &quot;Logs_20150203&quot; and so on, logical table name is &quot;Logs&quot;.</p>
+<span id="logical-table-remove-logical-table"></span><h4>7.3.35.4.1.1. <code class="docutils literal"><span class="pre">logical_table</span></code><a class="headerlink" href="#logical-table" title="Permalink to this headline">¶</a></h4>
+<p>Specifies logical table name. It means table name without
+<code class="docutils literal"><span class="pre">_YYYYMMDD</span></code> postfix.  If you use actual table such as
+<code class="docutils literal"><span class="pre">Logs_20150203</span></code>, <code class="docutils literal"><span class="pre">Logs_20150203</span></code> and so on, logical table name is
+<code class="docutils literal"><span class="pre">Logs</span></code>.</p>
+<p>See also <a class="reference internal" href="logical_select.html#logical-select-logical-table"><span>logical_table</span></a>.</p>
 </div>
 <div class="section" id="shard-key">
-<h4>7.3.35.4.1.2. <code class="docutils literal"><span class="pre">shard_key</span></code><a class="headerlink" href="#shard-key" title="Permalink to this headline">¶</a></h4>
-<p>Specifies column name which is treated as shared key in each parted table.</p>
+<span id="logical-table-remove-shard-key"></span><h4>7.3.35.4.1.2. <code class="docutils literal"><span class="pre">shard_key</span></code><a class="headerlink" href="#shard-key" title="Permalink to this headline">¶</a></h4>
+<p>Specifies column name which is treated as shared key.</p>
+<p>See also <span class="xref std std-ref">logical-select-logical-shard-key</span>.</p>
 </div>
 </div>
 <div class="section" id="optional-parameters">
 <h3>7.3.35.4.2. Optional parameters<a class="headerlink" href="#optional-parameters" title="Permalink to this headline">¶</a></h3>
 <p>There are optional parameters.</p>
 <div class="section" id="min">
-<h4>7.3.35.4.2.1. <code class="docutils literal"><span class="pre">min</span></code><a class="headerlink" href="#min" title="Permalink to this headline">¶</a></h4>
-<p>Specifies the min value of <code class="docutils literal"><span class="pre">shard_key</span></code></p>
+<span id="logical-table-remove-min"></span><h4>7.3.35.4.2.1. <code class="docutils literal"><span class="pre">min</span></code><a class="headerlink" href="#min" title="Permalink to this headline">¶</a></h4>
+<p>Specifies the minimum value of <code class="docutils literal"><span class="pre">shard_key</span></code> column.</p>
+<p>See also <a class="reference internal" href="logical_select.html#logical-select-min"><span>min</span></a>.</p>
 </div>
 <div class="section" id="min-border">
-<h4>7.3.35.4.2.2. <code class="docutils literal"><span class="pre">min_border</span></code><a class="headerlink" href="#min-border" title="Permalink to this headline">¶</a></h4>
-<p>Specifies whether the min value of borderline must be include or not.
-Specify <code class="docutils literal"><span class="pre">include</span></code> or <code class="docutils literal"><span class="pre">exclude</span></code> as the value of this parameter.</p>
+<span id="logical-table-remove-min-border"></span><h4>7.3.35.4.2.2. <code class="docutils literal"><span class="pre">min_border</span></code><a class="headerlink" href="#min-border" title="Permalink to this headline">¶</a></h4>
+<p>Specifies whether the minimum value is included or not. <code class="docutils literal"><span class="pre">include</span></code>
+and <code class="docutils literal"><span class="pre">exclude</span></code> are available. The default is <code class="docutils literal"><span class="pre">include</span></code>.</p>
+<p>See also <a class="reference internal" href="logical_select.html#logical-select-min-border"><span>min_border</span></a>.</p>
 </div>
 <div class="section" id="max">
-<h4>7.3.35.4.2.3. <code class="docutils literal"><span class="pre">max</span></code><a class="headerlink" href="#max" title="Permalink to this headline">¶</a></h4>
-<p>Specifies the max value of <code class="docutils literal"><span class="pre">shard_key</span></code>.</p>
+<span id="logical-table-remove-max"></span><h4>7.3.35.4.2.3. <code class="docutils literal"><span class="pre">max</span></code><a class="headerlink" href="#max" title="Permalink to this headline">¶</a></h4>
+<p>Specifies the maximum value of <code class="docutils literal"><span class="pre">shard_key</span></code> column.</p>
+<p>See also <a class="reference internal" href="logical_select.html#logical-select-max"><span>max</span></a>.</p>
 </div>
 <div class="section" id="max-border">
-<h4>7.3.35.4.2.4. <code class="docutils literal"><span class="pre">max_border</span></code><a class="headerlink" href="#max-border" title="Permalink to this headline">¶</a></h4>
-<p>Specifies whether the max value of borderline must be include or not.
-Specify <code class="docutils literal"><span class="pre">include</span></code> or <code class="docutils literal"><span class="pre">exclude</span></code> as the value of this parameter.</p>
+<span id="logical-table-remove-max-border"></span><h4>7.3.35.4.2.4. <code class="docutils literal"><span class="pre">max_border</span></code><a class="headerlink" href="#max-border" title="Permalink to this headline">¶</a></h4>
+<p>Specifies whether the maximum value is included or not. <code class="docutils literal"><span class="pre">include</span></code>
+and <code class="docutils literal"><span class="pre">exclude</span></code> are available. The default is <code class="docutils literal"><span class="pre">include</span></code>.</p>
+<p>See also <a class="reference internal" href="logical_select.html#logical-select-max-border"><span>max_border</span></a>.</p>
+</div>
+<div class="section" id="dependent">
+<span id="logical-table-remove-dependent"></span><h4>7.3.35.4.2.5. <code class="docutils literal"><span class="pre">dependent</span></code><a class="headerlink" href="#dependent" title="Permalink to this headline">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 6.0.1.</span></p>
+</div>
+<p>Specifies whether tables and columns that depend on the target shard
+are also removed or not.</p>
+<p>Here are conditions for dependent. If table or column satisfies one of
+the conditions, the table or column depends on the target shard:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Tables and columns that reference the target shard</li>
+<li>Tables for the shard (= The table has the same <code class="docutils literal"><span class="pre">_YYYYMMDD</span></code>
+postfix as the target shard and is referenced from the target
+shard)</li>
+</ul>
+</div></blockquote>
+<p>If this value is <code class="docutils literal"><span class="pre">yes</span></code>, tables and columns that depend on the target
+shard are also removed. Otherwise, they aren't removed. If there are
+one or more tables that reference the target shard, an error is
+returned. If there are tables for the shared, they are not touched.</p>
+<p>You should use this parameter carefully. This is a danger parameter.</p>
+<p>See <a class="reference internal" href="#logical-table-remove-removes-with-related-tables"><span>Removes with related tables</span></a> how to use
+this parameter.</p>
 </div>
 </div>
 </div>
 <div class="section" id="return-value">
 <h2>7.3.35.5. Return value<a class="headerlink" href="#return-value" title="Permalink to this headline">¶</a></h2>
-<p>TODO</p>
+<p>The command returns <code class="docutils literal"><span class="pre">true</span></code> as body on success such as:</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>[HEADER, true]
 </pre></div>
 </div>
+<p>If the command fails, error details are in <code class="docutils literal"><span class="pre">HEADER</span></code>.</p>
+<p>See <a class="reference internal" href="../command/output_format.html"><em>Output format</em></a> for <code class="docutils literal"><span class="pre">HEADER</span></code>.</p>
 </div>
 </div>
 
@@ -173,7 +566,14 @@ Specify <code class="docutils literal"><span class="pre">include</span></code> o
 <li><a class="reference internal" href="#">7.3.35. <code class="docutils literal"><span class="pre">logical_table_remove</span></code></a><ul>
 <li><a class="reference internal" href="#summary">7.3.35.1. Summary</a></li>
 <li><a class="reference internal" href="#syntax">7.3.35.2. Syntax</a></li>
-<li><a class="reference internal" href="#usage">7.3.35.3. Usage</a></li>
+<li><a class="reference internal" href="#usage">7.3.35.3. Usage</a><ul>
+<li><a class="reference internal" href="#basic-usage">7.3.35.3.1. Basic usage</a></li>
+<li><a class="reference internal" href="#removes-parts-of-a-logical-table">7.3.35.3.2. Removes parts of a logical table</a></li>
+<li><a class="reference internal" href="#unremovable-cases">7.3.35.3.3. Unremovable cases</a></li>
+<li><a class="reference internal" href="#removes-with-related-tables">7.3.35.3.4. Removes with related tables</a></li>
+<li><a class="reference internal" href="#decreases-used-resources">7.3.35.3.5. Decreases used resources</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#parameters">7.3.35.4. Parameters</a><ul>
 <li><a class="reference internal" href="#required-parameters">7.3.35.4.1. Required parameters</a><ul>
 <li><a class="reference internal" href="#logical-table">7.3.35.4.1.1. <code class="docutils literal"><span class="pre">logical_table</span></code></a></li>
@@ -185,6 +585,7 @@ Specify <code class="docutils literal"><span class="pre">include</span></code> o
 <li><a class="reference internal" href="#min-border">7.3.35.4.2.2. <code class="docutils literal"><span class="pre">min_border</span></code></a></li>
 <li><a class="reference internal" href="#max">7.3.35.4.2.3. <code class="docutils literal"><span class="pre">max</span></code></a></li>
 <li><a class="reference internal" href="#max-border">7.3.35.4.2.4. <code class="docutils literal"><span class="pre">max_border</span></code></a></li>
+<li><a class="reference internal" href="#dependent">7.3.35.4.2.5. <code class="docutils literal"><span class="pre">dependent</span></code></a></li>
 </ul>
 </li>
 </ul>

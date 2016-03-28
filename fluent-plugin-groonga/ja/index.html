@@ -69,32 +69,25 @@
 
 <h2>説明</h2>
 
-<p>Fluent-plugin-groonga is a Fluentd plugin collection to use
-<a href="http://groonga.org/">Groonga</a> with Fluentd. Fluent-plugin-groonga
-supports the following two usages:</p>
+<p>fluent-plugin-groongaは<a href="http://groonga.org/ja/">Groonga</a>ユーザー用のFluentdプラグイン集です。Groongaユーザーはfluent-plugin-groongaを使ってレプリケーションを実現することができます。</p>
 
 <ul>
-<li>Store logs collected by Fluentd to Groonga.</li>
-<li>Implement replication system for Groonga.</li>
+<li><p>Fluentdで収集したログをGroongaに保存。</p></li>
+<li><p>Groonga用のレプリケーションシステムの実装。</p></li>
 </ul>
 
-<p>The first usage is normal usage. You can store logs to Groonga and
-find logs by full-text search.</p>
+<p>最初の使い方は普通の使い方です。Groongaにログを保存して、全文検索で目的のログを見つけられます。</p>
 
-<p>The second usage is for Groonga users. Groonga itself doesn&#39;t support
-replication. But Groonga users can replicate their data by
-fluent-plugin-groonga.</p>
+<p>ふたつ目の使い方はGroongaユーザー向けの使い方です。Groonga自身はレプリケーションをサポートしていません。しかし、fluent-plugin-groongaを使えばレプリケーションできます。</p>
 
-<p>fluent-plugin-groongaはinputプラグインとoutputプラグインを提供しています。どちらも <code>groonga</code> という名前です。</p>
+<p>fluent-plugin-groongaはinputプラグインとoutputプラグインを提供しています。どちらも<code>groonga</code>という名前です。</p>
 
-<p>If you want to use fluent-plugin-groonga to store logs to Groonga, you
-need to use only <code>groonga</code> output plugin.</p>
+<p>ログをGroongaに保存するためにfluent-plugin-groongaを使う場合は、<code>groonga</code> outputプラグインだけを使います。</p>
 
-<p>The following configuration stores all data in <code>/var/log/messages</code>
-into Groonga:</p>
+<p>以下は<code>/var/log/messages</code>のすべてのデータをGroongaに保存する設定です。</p>
 
 <pre class="code ruby"><code class="ruby">&lt;source&gt;
-  type tail
+  @type tail
   format syslog
   path /var/log/syslog.1
   pos_file /tmp/messages.pos
@@ -103,8 +96,8 @@ into Groonga:</p>
 &lt;/source&gt;
 
 &lt;match log.**&gt;
-  type groonga
-  table logs
+  @type groonga
+  store_table logs
 
   protocol http
   host 127.0.0.1
@@ -115,19 +108,13 @@ into Groonga:</p>
 &lt;/match&gt;
 </code></pre>
 
-<p>If you want to use fluent-plugin-groonga to implement Groonga
-replication system, you need to use both plugins.</p>
+<p>Groongaのレプリケーションシステムを実現するためにfluent-plugin-groongaを使う場合は、どちらのプラグインも使う必要があります。</p>
 
-<p>The input plugin provides Groonga compatible interface. It means that
-HTTP and GQTP interface. You can use the input plugin as Groonga
-server. The input plugin receives Groonga commands and sends them to
-the output plugin through zero or more Fluentds.</p>
+<p>inputプラグインはGroongaと互換性のあるインターフェイスを提供します。つまり、HTTPインターフェイスとGQTPインターフェイスがあるということです。inputプラグインをGroongaサーバーと同じように使うことができます。inputプラグインはGroongaのコマンドを受け取って、受け取ったGroongaのコマンドを0個以上のFluentdを経由してoutputプラグインに送ります。</p>
 
-<p>The output plugin sends received Groonga commands to Groonga. The
-output plugin supports all interfaces, HTTP, GQTP and command
-interface.</p>
+<p>outputプラグインは受け取ったGroongaコマンドをGroongaに送ります。outputプラグインはHTTP、GQTP、コマンドとすべてのインターフェイスをサポートしています。</p>
 
-<p>データは <code>copy</code> outputプラグインで複製することができます。</p>
+<p>データは<code>copy</code> outputプラグインで複製することができます。</p>
 
 <h2>インストール</h2>
 
@@ -136,66 +123,64 @@ interface.</p>
 
 <h2>使い方</h2>
 
-<p>There are two usages:</p>
+<p>2つの使い方があります。</p>
 
 <ul>
-<li>Store logs collected by Fluentd to Groonga.</li>
-<li>Implement replication system for Groonga.</li>
+<li><p>Fluentdで収集したログをGroongaに保存。</p></li>
+<li><p>Groonga用のレプリケーションシステムの実装。</p></li>
 </ul>
 
-<p>They are described in other sections.</p>
+<p>これらは他のセクションで説明します。</p>
 
-<h3>Store logs into Groonga</h3>
+<h3>ログをGroongaに保存</h3>
 
-<p>You need to use <code>groonga</code> output plugin to store logs into Groonga.</p>
+<p>ログをGroongaに保存するには<code>groonga</code> outputプラグインを使います。</p>
 
-<p>The output plugin has auto schema define feature. So you don&#39;t need to
-define schema in Groonga before running Fluentd. You just run Groonga.</p>
+<p>このoutputプラグインは自動でスキーマを定義する機能があります。そのため、Fluentdを動かす前にGroongaにスキーマを定義する必要はありません。そのままGroongaを起動してください。</p>
 
-<p>There is one required parameter:</p>
+<p>1つの必須引数があります。</p>
 
 <ul>
-<li><code>table</code>: It specifies table name for storing logs.</li>
+<li><code>store_table</code>: ログを保存するテーブル名を指定します。</li>
 </ul>
 
-<p>Here is a minimum configuration:</p>
+<p>以下は最初の設定例です。</p>
 
 <pre class="code ruby"><code class="ruby">&lt;match log.**&gt;
-  type groonga
-  table logs
+  @type groonga
+  store_table logs
 &lt;/match&gt;
 </code></pre>
 
-<p>The configuration stores logs into <code>logs</code> table in Groonga that runs
-on <code>localhost</code>.</p>
+<p>この設定は<code>localhost</code>で動いているGroongaの<code>logs</code>テーブルにログを保存する設定です。</p>
 
-<p>There are optional parameters:</p>
-
-<ul>
-<li><code>protocol</code>: It specifies protocol to communicate Groonga server.
+<p>省略可能なパラメーターは以下の通りです。</p>
 
 <ul>
-<li>Available values: <code>http</code>, <code>gqtp</code>, <code>command</code></li>
-<li>Default: <code>http</code></li>
+<li><p><code>protocol</code>: Groongaサーバーとの接続で使うプロトコルを指定します。</p>
+
+<ul>
+<li>利用可能な値：<code>http</code>, <code>gqtp</code>, <code>command</code></li>
+<li>デフォルト：<code>http</code></li>
 </ul></li>
-<li><code>host</code>: It specifies host name or IP address of Groonga server.
+<li><p><code>host</code>：Groongaサーバーのホスト名またはIPアドレスを指定します。</p>
 
 <ul>
-<li>Default: <code>127.0.0.1</code></li>
+<li>デフォルト：<code>127.0.0.1</code></li>
 </ul></li>
-<li><code>port</code>: It specifies port number of Groonga server.
+<li><p><code>port</code>：Groongaサーバーのポート番号を指定します。</p>
 
 <ul>
-<li>Default for <code>http</code> protocol: <code>10041</code></li>
-<li>Default for <code>gqtp</code> protocol: <code>10043</code></li>
+<li><code>http</code>プロトコルのときのデフォルト：<code>10041</code></li>
+<li><code>gqtp</code>プロトコルのときのデフォルト：<code>10043</code></li>
 </ul></li>
 </ul>
 
-<p>Here is a configuration that specifies optional parameters explicitly:</p>
+<p>以下は省略可能なパラメーターを明示的に指定した設定です。</p>
 
 <pre class="code ruby"><code class="ruby">&lt;match log.**&gt;
-  type groonga
-  table logs
+  @type groonga
+  store_table logs
 
   protocol http
   host 127.0.0.1
@@ -203,34 +188,25 @@ on <code>localhost</code>.</p>
 &lt;/match&gt;
 </code></pre>
 
-<p><code>groonga</code> output plugin supports buffer. So you can use buffer related
-parameters. See
-<a href="http://docs.fluentd.org/articles/buffer-plugin-overview">Buffer Plugin Overview | Fluentd</a>
-for details.</p>
+<p><code>groonga</code> outputプラグインはバッファーをサポートしています。そのため、バッファー関連のパラメーターを指定できます。詳細は<a href="http://docs.fluentd.org/articles/buffer-plugin-overview">Buffer Plugin Overview | Fluentd</a>を参照してください。</p>
 
-<p>Note that there is special tag name. You can&#39;t use
-<code>groonga.command.XXX</code> tag name for this usage. It means that you can&#39;t
-use the following configuration:</p>
+<p>特別なタグ名があることに注意してください。この使い方のとき、<code>groonga.command.XXX</code>というタグ名を使うことはできません。つまり、次のような設定を使えないということです。</p>
 
 <pre class="code ruby"><code class="ruby">&lt;match groonga.command.*&gt;
-  type groonga
+  @type groonga
   # ...
 &lt;/match&gt;
 </code></pre>
 
-<p><code>groonga.command.XXX</code> tag name is reserved for implementing
-replication system for Groonga.</p>
+<p><code>groonga.command.XXX</code>はGroongaのレプリケーションシステムを実現するために予約されています。</p>
 
-<h3>Implement replication system for Groonga</h3>
+<h3>Groongaのレプリケーションシステムを実装</h3>
 
-<p>See the following documents how to implement replication system for
-Groonga:</p>
+<p>Groongaのレプリケーションシステムを実装する方法は次のドキュメントを参照してください。</p>
 
 <ul>
-<li><a href="doc/text/configuration.md">設定</a>
-(<a href="http://groonga.org/fluent-plugin-groonga/ja/file.configuration.html">Web</a>)</li>
-<li><a href="doc/text/constitution.md">構成</a>
-(<a href="http://groonga.org/fluent-plugin-groonga/ja/file.constitution.html">Web</a>)</li>
+<li><p><a href="doc/text/configuration.md">設定</a>（<a href="http://groonga.org/fluent-plugin-groonga/ja/file.configuration.html">Web</a>）</p></li>
+<li><p><a href="doc/text/constitution.md">構成</a>（<a href="http://groonga.org/fluent-plugin-groonga/ja/file.constitution.html">Web</a>）</p></li>
 </ul>
 
 <h2>作者</h2>
@@ -248,14 +224,13 @@ Groonga:</p>
 <h2>メーリングリスト</h2>
 
 <ul>
-<li>英語: <a href="https://lists.sourceforge.net/lists/listinfo/groonga-talk">groonga-talk</a></li>
-<li>日本語: <a href="http://lists.sourceforge.jp/mailman/listinfo/groonga-dev">groonga-dev</a></li>
+<li><p>英語：<a href="https://lists.sourceforge.net/lists/listinfo/groonga-talk">groonga-talk</a></p></li>
+<li><p>日本語：<a href="http://lists.sourceforge.jp/mailman/listinfo/groonga-dev">groonga-dev</a></p></li>
 </ul>
 
-<h2>Source</h2>
+<h2>ソース</h2>
 
-<p>The repository for fluent-plugin-groonga is on
-<a href="https://github.com/groonga/fluent-plugin-groonga/">GitHub</a>.</p>
+<p>fluent-plugin-groongaのリポジトリーは<a href="https://github.com/groonga/fluent-plugin-groonga/">GitHub</a>上にあります。</p>
 
 <h2>感謝</h2>
 
@@ -265,9 +240,9 @@ Groonga:</p>
 </div></div>
 
     <div id="footer">
-  Generated on Tue Oct 21 15:38:15 2014 by
+  Generated on Mon Mar 28 18:23:59 2016 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.8.7.4 (ruby-2.1.3).
+  0.8.7.6 (ruby-2.3.0).
 </div>
 
   </body>

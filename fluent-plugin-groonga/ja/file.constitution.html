@@ -63,7 +63,7 @@
 
     <div id="content"><div id='filecontents'><h1>構成</h1>
 
-<p>レプリケーション対応のgroongaシステムを実装するには、いくつかのシステム構成を選ぶことができます。このドキュメントではいくつかのパターンを説明します。</p>
+<p>レプリケーション対応のGroongaシステムを実装するには、いくつかのシステム構成を選ぶことができます。このドキュメントではいくつかのパターンを説明します。</p>
 
 <p>利用可能なパターンは以下の通りです。</p>
 
@@ -88,7 +88,7 @@
 
 <h3>小さいシステム</h3>
 
-<p>小さいシステムでは、2つのサーバーだけがあるとします。1つがマスターgroongaサーバーで、もうひとつがスレーブgroongaサーバーです。（ <code>table_create</code> 、 <code>column_create</code> や <code>load</code> のような）すべての更新系のコマンドをfluentdに送ります。fluentdでは、クライアントから <code>groonga</code> inputプラグインを使ってgroongaのコマンドを受け取ります。受け取ったコマンドはそのままマスターgroongaサーバーへ素通しし、マスターgroongaサーバーからのレスポンスをクライアントへ返します。 <code>groonga</code> inputプラグインは、groongaのコマンドとそのレスポンスを素通しするときに、更新系のコマンドをfluentのメッセージに変換します。fluentのメッセージは <code>groonga</code> outputプラグインでスレーブgroongaサーバーへ送られます。</p>
+<p>小さいシステムでは、2つのサーバーだけがあるとします。1つがマスターGroongaサーバーで、もうひとつがスレーブGroongaサーバーです。（ <code>table_create</code> 、 <code>column_create</code> や <code>load</code> のような）すべての更新系のコマンドをfluentdに送ります。fluentdでは、クライアントから <code>groonga</code> inputプラグインを使ってGroongaのコマンドを受け取ります。受け取ったコマンドはそのままマスターGroongaサーバーへ素通しし、マスターGroongaサーバーからのレスポンスをクライアントへ返します。 <code>groonga</code> inputプラグインは、Groongaのコマンドとそのレスポンスを素通しするときに、更新系のコマンドをfluentのメッセージに変換します。fluentのメッセージは <code>groonga</code> outputプラグインでスレーブGroongaサーバーへ送られます。</p>
 
 <p>この構成のときの構成図です。</p>
 
@@ -96,50 +96,50 @@
              and                  and
             search  +---------+  search  +---------+
 +--------+ &lt;------&gt; | fluentd | &lt;------&gt; | master  |
-|        |          +---------+          | groonga |
+|        |          +---------+          | Groonga |
 | client |        update |               +---------+
 |        |              \_/
 |        |  search  +---------+
 +--------+ &lt;------&gt; |  slave  |
-                    | groonga |
+                    | Groonga |
                     +---------+
 </code></pre>
 
-<p>fluentdはクライアント側かマスターgroongaサーバー側に置きます。データを更新するクライアントが1つの場合は、クライアント側に置くのがよいでしょう。データを更新するクライアントが複数いる場合は、マスターgroongaサーバー側に置くのがよいでしょう。</p>
+<p>Fluentdはクライアント側かマスターGroongaサーバー側に置きます。データを更新するクライアントが1つの場合は、クライアント側に置くのがよいでしょう。データを更新するクライアントが複数いる場合は、マスターGroongaサーバー側に置くのがよいでしょう。</p>
 
-<p>レプリケーションを使えば、複数のサーバーで検索サービスを提供することができるため、パフォーマンスを向上できます。可用性を上げるためにレプリケーションを使うことはできません。もし、マスターgroongaサーバーかfluentdがダウンしたら、このシステムはデータを更新できません。（スレーブgroongaサーバーは稼働しているため、検索機能は利用可能です。）</p>
+<p>レプリケーションを使えば、複数のサーバーで検索サービスを提供することができるため、パフォーマンスを向上できます。可用性を上げるためにレプリケーションを使うことはできません。もし、マスターGroongaサーバーかFluentdがダウンしたら、このシステムはデータを更新できません。（スレーブGroongaサーバーは稼働しているため、検索機能は利用可能です。）</p>
 
 <p>以下は設定例です。</p>
 
-<pre class="code ruby"><code class="ruby"># マスターgroongaサーバー用設定
+<pre class="code ruby"><code class="ruby"># マスターGroongaサーバー用設定
 &lt;source&gt;
-  type groonga
+  @type groonga
   protocol gqtp          # あるいは下の行を使う
   # protocol http
-  bind 127.0.0.1         # クライアント側にfluentdを置く場合
-  # bind 192.168.0.1     # マスターgroongaサーバー側にfluentdを置く場合
+  bind 127.0.0.1         # クライアント側にFluentdを置く場合
+  # bind 192.168.0.1     # マスターGroongaサーバー側にFluentdを置く場合
   port 10041
-  real_host 192.168.29.1 # マスターgroongaサーバーのIPアドレス
-  real_port 10041        # マスターgroongaサーバーのポート番号
-  # real_port 20041      # マスターgroongaサーバー側にfluentdを置く場合は
+  real_host 192.168.29.1 # マスターGroongaサーバーのIPアドレス
+  real_port 10041        # マスターGroongaサーバーのポート番号
+  # real_port 20041      # マスターGroongaサーバー側にFluentdを置く場合は
                          # 違うポート番号を使うこと
 &lt;/source&gt;
 
-# スレーブgroongaサーバー
+# スレーブGroongaサーバー
 &lt;match groonga.command.*&gt;
-  type groonga
+  @type groonga
   protocol gqtp            # あるいは下の行を使う
-  # protocol http          # マスターgroongaサーバーとスレーブgroongaサーバーで
+  # protocol http          # マスターGroongaサーバーとスレーブGroongaサーバーで
                            # 違うプロトコルを使うこともできる
-  host 192.168.29.29       # スレーブgroongaサーバーのIPアドレス
-  port 10041               # スレーブgroongaサーバーのポート番号
+  host 192.168.29.29       # スレーブGroongaサーバーのIPアドレス
+  port 10041               # スレーブGroongaサーバーのポート番号
 
   # buffer
   flush_interval 1s        # レプリケーションの遅延を小さくするため小さな値を使う
 
-  ## 復帰したスレーブgroongaサーバーへデータ再送をサポートするために以下の
+  ## 復帰したスレーブGroongaサーバーへデータ再送をサポートするために以下の
   ## 設定をする。
-  ## もし、スレーブgroongaサーバーがダウンするケースを考慮しなくてもよいなら、
+  ## もし、スレーブGroongaサーバーがダウンするケースを考慮しなくてもよいなら、
   ## 以下の設定は必要ありません。
 
   ## fluentdが再起動したときのデータ再送をサポートする設定
@@ -148,7 +148,7 @@
   ## loadコマンドの1つのレコードが大きいときは大きな値を使います。
   ## loadコマンドの1つのレコードが1つのチャンクになります。
   # buffer_chunk_limit 256m
-  ## スレーブgroongaサーバーが長い間ダウンした後のデータ再送をサポートするには
+  ## スレーブGroongaサーバーが長い間ダウンした後のデータ再送をサポートするには
   ## 大きい値を指定してください。
   ## 17: 約1.5日 =
   ##       ((2 ** 0) + (2 ** 1) + ... + (2 ** 17)) / 60.0 / 60.0 / 24.0
@@ -168,40 +168,40 @@
 
 <p>fluentdが復旧するまでデータを更新することはできません。</p>
 
-<h4>ダウンしたマスターgroongaサーバーを復旧する方法</h4>
+<h4>ダウンしたマスターGroongaサーバーを復旧する方法</h4>
 
-<p>以下は、ダウンしたマスターgroongaサーバーを復旧する手順です。</p>
+<p>以下は、ダウンしたマスターGroongaサーバーを復旧する手順です。</p>
 
 <ol>
 <li>fluentdを止めます。</li>
-<li>スレーブgroongaサーバーがあるホストで <code>grndump /スレーブ/groonga/サーバー/の/データベース/のパス &gt; SLAVE_GROONGA_DUMP.grn</code> を実行します。</li>
-<li>マスターgroongaサーバーがあるホストで <code>groonga -n /マスター/groonga/サーバー/の/データベース/の/パス &lt;
+<li>スレーブGroongaサーバーがあるホストで <code>grndump /スレーブ/Groonga/サーバー/の/データベース/のパス &gt; SLAVE_GROONGA_DUMP.grn</code> を実行します。</li>
+<li>マスターGroongaサーバーがあるホストで <code>groonga -n /マスター/Groonga/サーバー/の/データベース/の/パス &lt;
  SLAVE_GROONGA_DUMP.grn</code> を実行します。</li>
-<li>マスターgroongaサーバーを起動します。</li>
+<li>マスターGroongaサーバーを起動します。</li>
 <li>fluentdを起動します。</li>
 </ol>
 
 <p>復旧が完了するまでデータを更新することはできません。</p>
 
-<h4>ダウンしたスレーブgroongaサーバーを復旧する方法</h4>
+<h4>ダウンしたスレーブGroongaサーバーを復旧する方法</h4>
 
-<p>以下はダウンしたスレーブgroongaサーバーを復旧する手順です。</p>
+<p>以下はダウンしたスレーブGroongaサーバーを復旧する手順です。</p>
 
 <ol>
-<li>マスターgroongaサーバーがあるホストで <code>grndump /マスター/groonga/サーバー/の/データベース/の/パス &gt; MASTER_GROONGA_DUMP.grn</code> を実行します。</li>
-<li>スレーブgroongaサーバーがあるホストで <code>groonga -n /スレーブ/groonga/サーバー/の/データベース/の/パス &lt; MASTER_GROONGA_DUMP.grn</code> を実行します。</li>
-<li>スレーブgroongaサーバーを起動します。</li>
+<li>マスターGroongaサーバーがあるホストで <code>grndump /マスター/Groonga/サーバー/の/データベース/の/パス &gt; MASTER_GROONGA_DUMP.grn</code> を実行します。</li>
+<li>スレーブGroongaサーバーがあるホストで <code>groonga -n /スレーブ/Groonga/サーバー/の/データベース/の/パス &lt; MASTER_GROONGA_DUMP.grn</code> を実行します。</li>
+<li>スレーブGroongaサーバーを起動します。</li>
 </ol>
 
-<p>復旧中もデータを更新することができます。もし、システムが1つのマスターgroongaサーバーだけですべての検索リクエストを処理できない場合は、そのシステムはダウンします。</p>
+<p>復旧中もデータを更新することができます。もし、システムが1つのマスターGroongaサーバーだけですべての検索リクエストを処理できない場合は、そのシステムはダウンします。</p>
 
-<p>fluentdのバッファキューが溢れる（ <code>buffer_queue_limit</code> 参照）前、かつ、fluentdが再送を諦める（ <code>retry_limit</code> 参照）前にスレーブgroongaサーバーを復旧する必要があります。以下は復旧が間に合わなかった時に復旧する手順です。</p>
+<p>fluentdのバッファキューが溢れる（ <code>buffer_queue_limit</code> 参照）前、かつ、fluentdが再送を諦める（ <code>retry_limit</code> 参照）前にスレーブGroongaサーバーを復旧する必要があります。以下は復旧が間に合わなかった時に復旧する手順です。</p>
 
 <ol>
 <li>fluentdを止めます。</li>
-<li>マスターgroongaサーバーがあるホストで <code>grndump /マスター/groonga/サーバー/の/データベース/の/パス &gt; MASTER_GROONGA_DUMP.grn</code> を実行します。</li>
-<li>スレーブgroongaサーバーがあるホストで <code>groonga -n /スレーブ/groonga/サーバー/の/データベース/の/パス &lt; MASTER_GROONGA_DUMP.grn</code> を実行します。</li>
-<li>スレーブgroongaサーバーを起動します。</li>
+<li>マスターGroongaサーバーがあるホストで <code>grndump /マスター/Groonga/サーバー/の/データベース/の/パス &gt; MASTER_GROONGA_DUMP.grn</code> を実行します。</li>
+<li>スレーブGroongaサーバーがあるホストで <code>groonga -n /スレーブ/Groonga/サーバー/の/データベース/の/パス &lt; MASTER_GROONGA_DUMP.grn</code> を実行します。</li>
+<li>スレーブGroongaサーバーを起動します。</li>
 <li>fluetndを起動します。</li>
 </ol>
 
@@ -209,7 +209,7 @@
 
 <h3>中規模のシステム</h3>
 
-<p>中規模のシステムでは3つ以上のgroongaサーバーがいます。fluentdは2つ以上のスレーブgroongaサーバーを <code>copy</code> outputプラグインと <code>groonga</code> outputプラグインで更新します。</p>
+<p>中規模のシステムでは3つ以上のGroongaサーバーがいます。fluentdは2つ以上のスレーブGroongaサーバーを <code>copy</code> outputプラグインと <code>groonga</code> outputプラグインで更新します。</p>
 
 <p>この構成のときの構成図です。</p>
 
@@ -217,64 +217,64 @@
              and                  and
             search  +---------+  search  +---------+
 +--------+ &lt;------&gt; | fluentd | &lt;------&gt; | master  |
-|        |          +---------+          | groonga |
+|        |          +---------+          | Groonga |
 | client |               +--------+      +---------+
 |        |                        |
 +--------+  search  +---------+   |
 |        | &lt;------&gt; |  slave  | &lt;-+ update
-| client |          | groonga |   |
+| client |          | Groonga |   |
 |        |          +---------+   |
 +--------+  search  +---------+   |
 |        | &lt;------&gt; |  slave  | &lt;-+ update
-| client |          | groonga |   |
+| client |          | Groonga |   |
 |        |          +---------+   |
 +- ...  -+   ...        ...      ...
 </code></pre>
 
 <p>以下は設定例です。</p>
 
-<pre class="code ruby"><code class="ruby"># マスターgroongaサーバー用設定
+<pre class="code ruby"><code class="ruby"># マスターGroongaサーバー用設定
 &lt;source&gt;
-  type groonga
+  @type groonga
   protocol gqtp          # あるいは下の行を使う
   # protocol http
-  bind 127.0.0.1         # クライアント側にfluentdを置く場合
-  # bind 192.168.0.1     # マスターgroongaサーバー側にfluentdを置く場合
+  bind 127.0.0.1         # クライアント側にFluentdを置く場合
+  # bind 192.168.0.1     # マスターGroongaサーバー側にFluentdを置く場合
   port 10041
-  real_host 192.168.29.1 # マスターgroongaサーバーのIPアドレス
-  real_port 10041        # マスターgroongaサーバーのポート番号
-  # real_port 20041      # マスターgroongaサーバー側にfluentdを置く場合は
+  real_host 192.168.29.1 # マスターGroongaサーバーのIPアドレス
+  real_port 10041        # マスターGroongaサーバーのポート番号
+  # real_port 20041      # マスターGroongaサーバー側にFluentdを置く場合は
                          # 違うポート番号を使うこと
 &lt;/source&gt;
 
-# スレーブgroongaサーバー用
+# スレーブGroongaサーバー用
 &lt;match groonga.command.*&gt;
-  type copy
+  @type copy
 
-  # 最初のスレーブgroongaサーバー
+  # 最初のスレーブGroongaサーバー
   &lt;store&gt;
-    type groonga
+    @type groonga
     protocol gqtp            # あるいは下の行を使う
-    # protocol http          # マスターgroongaサーバーとスレーブgroongaサーバーで
+    # protocol http          # マスターGroongaサーバーとスレーブGroongaサーバーで
                              # 違うプロトコルを使うこともできる
-    host 192.168.29.2        # スレーブgroongaサーバーのIPアドレス
-    port 10041               # スレーブgroongaサーバーのポート番号
+    host 192.168.29.2        # スレーブGroongaサーバーのIPアドレス
+    port 10041               # スレーブGroongaサーバーのポート番号
 
     # buffer
     flush_interval 1s        # レプリケーションの遅延を小さくするため小さな値を使う&quot;
 
-    ## 復帰したスレーブgroongaサーバーへデータ再送をサポートするために以下の
+    ## 復帰したスレーブGroongaサーバーへデータ再送をサポートするために以下の
     ## 設定をする。
-    ## もし、スレーブgroongaサーバーがダウンするケースを考慮しなくてもよいなら、
+    ## もし、スレーブGroongaサーバーがダウンするケースを考慮しなくてもよいなら、
     ## 以下の設定は必要ありません。
 
     ## fluentdが再起動したときのデータ再送をサポートする設定
     # buffer_type file
-    # buffer_path /var/log/fluent/groonga.*.buffer
+    # buffer_path /var/log/fluent/groonga1.*.buffer
     ## loadコマンドの1つのレコードが大きいときは大きな値を使います。
     ## loadコマンドの1つのレコードが1つのチャンクになります。
     # buffer_chunk_limit 256m
-    ## スレーブgroongaサーバーが長い間ダウンした後のデータ再送をサポートするには
+    ## スレーブGroongaサーバーが長い間ダウンした後のデータ再送をサポートするには
     ## 大きい値を指定してください。
     ## 17: 約1.5日 =
     ##       ((2 ** 0) + (2 ** 1) + ... + (2 ** 17)) / 60.0 / 60.0 / 24.0
@@ -285,24 +285,24 @@
     ## たくさんのレコードをロードするときは大きな値にします。
     ## loadコマンドの中の1つのレコードが1つのチャンクに対応します。
     # buffer_queue_limit 10000
-  &lt;/match&gt;
+  &lt;/store&gt;
 
-  # 2番目のスレーブgroongaサーバー
+  # 2番目のスレーブGroongaサーバー
   &lt;store&gt;
-    type groonga
+    @type groonga
     protocol gqtp            # あるいは下の行を使う
-    # protocol http          # マスターgroongaサーバーとスレーブgroongaサーバーで
+    # protocol http          # マスターGroongaサーバーとスレーブGroongaサーバーで
                              # 違うプロトコルを使うこともできる
-    host 192.168.29.3        # スレーブgroongaサーバーのIPアドレス
-    port 10041               # スレーブgroongaサーバーのポート番号
+    host 192.168.29.3        # スレーブGroongaサーバーのIPアドレス
+    port 10041               # スレーブGroongaサーバーのポート番号
 
     # buffer
     # ...
   &lt;/store&gt;
 
-  # さらに追加のスレーブgroongaサーバー
+  # さらに追加のスレーブGroongaサーバー
   # &lt;store&gt;
-  #   type groonga
+  #   @type groonga
   #   ...
   # &lt;/store&gt;
 &lt;/match&gt;
@@ -312,7 +312,7 @@
 
 <h3>大規模システム</h3>
 
-<p>大規模なシステムでは2つ以上のスレーブgroongaサーバークラスターがあります。マスターgroongaサーバーと通信するfluentdは、スレーブgroongaサーバークラスターの中にあるfluetnd（2つ以上）を使って更新します。そのために <code>copy</code> outputプラグインと <code>forward</code> outputプラグインを使います。スレーブクラスターはfluentdを1つ持ちます。スレーブgroongaサーバークラスターのfluentdは同じクラスター内にあるスレーブgroongaサーバーを <code>copy</code> outputプラグインと <code>groonga</code> outputプラグインで更新します。</p>
+<p>大規模なシステムでは2つ以上のスレーブGroongaサーバークラスターがあります。マスターGroongaサーバーと通信するfluentdは、スレーブGroongaサーバークラスターの中にあるfluetnd（2つ以上）を使って更新します。そのために <code>copy</code> outputプラグインと <code>forward</code> outputプラグインを使います。スレーブクラスターはfluentdを1つ持ちます。スレーブGroongaサーバークラスターのfluentdは同じクラスター内にあるスレーブGroongaサーバーを <code>copy</code> outputプラグインと <code>groonga</code> outputプラグインで更新します。</p>
 
 <p>この構成のときの構成図です。</p>
 
@@ -320,18 +320,18 @@
              and                    and
             search    +---------+  search  +---------+
 +--------+ &lt;--------&gt; | fluentd | &lt;------&gt; | master  |
-|        |            +---------+          | groonga |
+|        |            +---------+          | Groonga |
 | client |                |                +---------+
 |        |                +------------------------------+
 +--------+          +----------------------------------+ |
 |        |          |        slave cluster             | |
 | client |  search  | +---------+  update  +---------+ | |
 |        | &lt;------&gt; | |  slave  | &lt;------- | fluentd | &lt;-+ update
-+--------|          | | groonga |          +---------+ | |
++--------|          | | Groonga |          +---------+ | |
 |        |          | +---------+   +-----------+      | |
 | client |  search  | +---------+   |                  | |
 |        | &lt;------&gt; | |  slave  | &lt;-+ update           | |
-+--------|          | | groonga |   |                  | |
++--------|          | | Groonga |   |                  | |
 |        |          | +---------+   |                  | |
 |  ...   |   ...    |     ...      ...                 | |
                     +----------------------------------+ |
@@ -339,11 +339,11 @@
 |        |          |        slave cluster             | |
 | client |  search  | +---------+  update  +---------+ | |
 |        | &lt;------&gt; | |  slave  | &lt;------- | fluentd | &lt;-+ update
-+--------|          | | groonga |          +---------+ | |
++--------|          | | Groonga |          +---------+ | |
 |        |          | +---------+   +-----------+      | |
 | client |  search  | +---------+   |                  | |
 |        | &lt;------&gt; | |  slave  | &lt;-+ update           | |
-+--------|          | | groonga |   |                  | |
++--------|          | | Groonga |   |                  | |
 |        |          | +---------+   |                  | |
 |  ...   |   ...    |     ...      ...                 | |
                     +----------------------------------+ |
@@ -354,9 +354,9 @@
 </div></div>
 
     <div id="footer">
-  Generated on Tue Oct 21 15:38:15 2014 by
+  Generated on Mon Mar 28 18:23:59 2016 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.8.7.4 (ruby-2.1.3).
+  0.8.7.6 (ruby-2.3.0).
 </div>
 
   </body>

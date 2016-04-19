@@ -1,0 +1,217 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ja">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>7.3.5. リクエストタイムアウト &mdash; Groonga v6.0.1ドキュメント</title>
+    
+    <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
+    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '6.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../static/doctools.js"></script>
+    <script type="text/javascript" src="../../static/translations.js"></script>
+    <link rel="shortcut icon" href="../../static/favicon.ico"/>
+    <link rel="top" title="Groonga v6.0.1ドキュメント" href="../../index.html" />
+    <link rel="up" title="7.3. コマンド" href="../command.html" />
+    <link rel="next" title="7.3.6. リターンコード" href="return_code.html" />
+    <link rel="prev" title="7.3.4. リクエストID" href="request_id.html" /> 
+      <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
+    <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
+    <meta property="og:type" content="product" />
+    <meta property="og:image" content="http://groonga.org/images/logos/groonga-icon-full-size.png" />
+    <meta property="og:site_name" content="groonga" />
+
+    <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
+  </head>
+
+  <body role="document">
+<div class="header">
+  <h1 class="title">
+    <a id="top-link" href="../../../">
+      <span class="project">groonga</span>
+      <span class="separator">-</span>
+      <span class="description">オープンソースのカラムストア機能付き全文検索エンジン</span>
+    </a>
+  </h1>
+
+      <div class="facebook-buttons">
+      <fb:like href="http://www.facebook.com/pages/groonga/201193596592346"
+               layout="standard"
+               width="290"></fb:like>
+    </div>
+    <div class="other-language-links">
+
+    <ul>
+      <li><a href="../../../../docs/reference/command/request_timeout.html">English</a></li>
+    </ul>
+  </div>
+</div>
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="return_code.html" title="7.3.6. リターンコード"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="request_id.html" title="7.3.4. リクエストID"
+             accesskey="P">前へ</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v6.0.1ドキュメント</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../reference.html" >7. リファレンスマニュアル</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="../command.html" accesskey="U">7.3. コマンド</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="request-timeout">
+<h1>7.3.5. リクエストタイムアウト<a class="headerlink" href="#request-timeout" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<div class="section" id="summary">
+<h2>7.3.5.1. 概要<a class="headerlink" href="#summary" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified">バージョン 6.0.2 で追加.</span></p>
+</div>
+<p>各リクエストにタイムアウトを設定できます。</p>
+<p>指定したタイムアウトまでにリクエストが完了しなかった場合、そのリクエストはキャンセルされます。タイムアウトを設定しない場合、そのリクエストが完了するまで処理をします。</p>
+<p>リクエストタイムアウト機能はクライアントサイドでタイムアウトを実装しているときに有用です。もし、クライアントサイドだけでタイムアウトを実装していると、クライアントがレスポンスを待つことをやめたあともリクエストを処理し続けます。これは不必要にリソースを消費しています。このリクエストにタイムアウトを設定していれば、じきにこのリクエストはキャンセルされます。</p>
+</div>
+<div class="section" id="how-to-set-timeout-to-request">
+<h2>7.3.5.2. リクエストにタイムアウトを設定する方法<a class="headerlink" href="#how-to-set-timeout-to-request" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>すべてのコマンドは <code class="docutils literal"><span class="pre">request_timeout</span></code> パラメーターを受け付けます。 <code class="docutils literal"><span class="pre">request_timeout</span></code> パラメーターを追加することでリクエストにタイムアウトを設定できます。</p>
+<p>タイムアウト値の単位は秒です。 <code class="docutils literal"><span class="pre">0.1</span></code> のように小数で指定することで1秒未満のタイムアウトを設定できます。 <code class="docutils literal"><span class="pre">0.1</span></code> は100ミリ秒のタイムアウトという意味です。</p>
+<p>以下はリクエストに <code class="docutils literal"><span class="pre">5.5</span></code> 秒のタイムアウトを設定する例です。:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>select Users --request_timeout 5.5
+</pre></div>
+</div>
+</div>
+<div class="section" id="return-code-on-timeout">
+<h2>7.3.5.3. タイムアウト時のリターンコード<a class="headerlink" href="#return-code-on-timeout" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>リクエストがタイムアウトすると、レスポンスヘッダーの <a class="reference internal" href="return_code.html"><span class="doc">リターンコード</span></a> は <code class="docutils literal"><span class="pre">GRN_CANCEL</span></code> （ <code class="docutils literal"><span class="pre">-77</span></code> ）になります。</p>
+<p>以下はタイムアウト時にレスポンス例です。:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>[
+  [
+    -77,
+    1459846102.63304,
+    0.000220775604248047,
+    &quot;[request-canceler] a request is canceled: &lt;0x7fa0d5d7ed00&gt;&quot;
+  ]
+]
+</pre></div>
+</div>
+<p>レスポンスヘッダーについては <a class="reference internal" href="output_format.html"><span class="doc">出力形式</span></a> を参照してください。</p>
+</div>
+<div class="section" id="enable-request-timeout-by-default">
+<h2>7.3.5.4. デフォルトでリクエストタイムアウトを有効にする<a class="headerlink" href="#enable-request-timeout-by-default" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><a class="reference internal" href="../executables/groonga.html"><span class="doc">groonga executable file</span></a> はデフォルトのリクエストタイムアウトを設定する機能があります。デフォルトのリクエストタイムアウトは <a class="reference internal" href="../executables/groonga.html#cmdoption--default-request-timeout"><code class="xref std std-option docutils literal"><span class="pre">--default-request-timeout</span></code></a> で指定します。</p>
+<p>デフォルトのリクエストタイムアウトが0より大きい場合、すべてのリクエストはその値をリクエストタイムアウトに使います。</p>
+<p>リクエストに <code class="docutils literal"><span class="pre">request_timeout</span></code> パラメーターを指定するとデフォルトのリクエストタイムアウトを上書きできます。もし、デフォルトのリクエストタイムアウトが3秒で <code class="docutils literal"><span class="pre">request_timeout</span></code> パラメーターが1秒なら、そのリクエストは1秒後にキャンセルされます。</p>
+</div>
+<div class="section" id="see-also">
+<h2>7.3.5.5. 参考<a class="headerlink" href="#see-also" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<ul class="simple">
+<li><a class="reference internal" href="return_code.html"><span class="doc">リターンコード</span></a></li>
+<li><a class="reference internal" href="output_format.html"><span class="doc">出力形式</span></a></li>
+<li><a class="reference internal" href="../commands/request_cancel.html"><span class="doc">request_cancel</span></a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">7.3.5. リクエストタイムアウト</a><ul>
+<li><a class="reference internal" href="#summary">7.3.5.1. 概要</a></li>
+<li><a class="reference internal" href="#how-to-set-timeout-to-request">7.3.5.2. リクエストにタイムアウトを設定する方法</a></li>
+<li><a class="reference internal" href="#return-code-on-timeout">7.3.5.3. タイムアウト時のリターンコード</a></li>
+<li><a class="reference internal" href="#enable-request-timeout-by-default">7.3.5.4. デフォルトでリクエストタイムアウトを有効にする</a></li>
+<li><a class="reference internal" href="#see-also">7.3.5.5. 参考</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="request_id.html"
+                        title="前の章へ">7.3.4. リクエストID</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="return_code.html"
+                        title="次の章へ">7.3.6. リターンコード</a></p>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../sources/reference/command/request_timeout.txt"
+            rel="nofollow">ソースコードを表示（英語）</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>クイック検索</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="return_code.html" title="7.3.6. リターンコード"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="request_id.html" title="7.3.4. リクエストID"
+             >前へ</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v6.0.1ドキュメント</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../reference.html" >7. リファレンスマニュアル</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="../command.html" >7.3. コマンド</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2009-2016, Brazil, Inc.
+    </div>
+      <script src="http://connect.facebook.net/ja_JP/all.js"></script>
+
+    <script>
+      FB.init({
+         appId  : null,
+         status : true, // check login status
+         cookie : true, // enable cookies to allow the server to access the session
+         xfbml  : true  // parse XFBML
+      });
+    </script>
+  </body>
+
+</html>

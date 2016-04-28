@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>7.1.8. groonga-suggest-httpd &mdash; Groonga v6.0.1 documentation</title>
+    <title>7.1.8. groonga-suggest-httpd &mdash; Groonga v6.0.2 documentation</title>
     
     <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '6.0.1',
+        VERSION:     '6.0.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../../static/underscore.js"></script>
     <script type="text/javascript" src="../../static/doctools.js"></script>
     <link rel="shortcut icon" href="../../static/favicon.ico"/>
-    <link rel="top" title="Groonga v6.0.1 documentation" href="../../index.html" />
+    <link rel="top" title="Groonga v6.0.2 documentation" href="../../index.html" />
     <link rel="up" title="7.1. Executables" href="../executables.html" />
     <link rel="next" title="7.1.9. groonga-suggest-learner" href="groonga-suggest-learner.html" />
     <link rel="prev" title="7.1.7. groonga-suggest-create-dataset" href="groonga-suggest-create-dataset.html" /> 
@@ -73,7 +73,7 @@
         <li class="right" >
           <a href="groonga-suggest-create-dataset.html" title="7.1.7. groonga-suggest-create-dataset"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v6.0.1 documentation</a> &raquo;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v6.0.2 documentation</a> &raquo;</li>
           <li class="nav-item nav-item-1"><a href="../../reference.html" >7. Reference manual</a> &raquo;</li>
           <li class="nav-item nav-item-2"><a href="../executables.html" accesskey="U">7.1. Executables</a> &raquo;</li> 
       </ul>
@@ -263,7 +263,6 @@ communicates <a class="reference internal" href="groonga-suggest-learner.html"><
 <div class="highlight-none"><div class="highlight"><pre><span></span>% groonga-suggest-httpd --send-endpoint &#39;tcp://127.0.0.1:1234&#39; --receive-endpoint &#39;tcp://127.0.0.1:1235&#39; --daemon ${DB_PATH}
 </pre></div>
 </div>
-<p>TODO: httpd and learner communication doesn't work...</p>
 <p>The <code class="docutils literal"><span class="pre">groonga-suggest-httpd</span></code> process accepts HTTP requests on
 <code class="docutils literal"><span class="pre">8080</span></code> port.</p>
 <p>If you want to save requests into log file, use
@@ -273,30 +272,62 @@ communicates <a class="reference internal" href="groonga-suggest-learner.html"><
 <div class="highlight-none"><div class="highlight"><pre><span></span>% groonga-suggest-httpd --log-base-path logs/log ${DB_PATH}
 </pre></div>
 </div>
-<p><code class="docutils literal"><span class="pre">groonga-suggest-httpd</span></code> create log files such as
+<p><code class="docutils literal"><span class="pre">groonga-suggest-httpd</span></code> creates log files such as
 <code class="docutils literal"><span class="pre">logYYYYmmddHHMMSS-00</span></code> under <code class="docutils literal"><span class="pre">logs</span></code> directory.</p>
 </div>
 <div class="section" id="learn-from-user-inputs">
 <h3>7.1.8.3.4. Learn from user inputs<a class="headerlink" href="#learn-from-user-inputs" title="Permalink to this headline">¶</a></h3>
+<p>You can learn suggestion data from user inputs.</p>
+<p>You need to specify the following parameters to learn suggestion data:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">i</span></code>: The ID of the user (You may use IP address of client)</li>
+<li><code class="docutils literal"><span class="pre">l</span></code>: The dataset name</li>
+<li><code class="docutils literal"><span class="pre">s</span></code>: The timestamp of the input in seconds</li>
+<li><code class="docutils literal"><span class="pre">t</span></code>: The query type (It's optional. You must specify <code class="docutils literal"><span class="pre">submit</span></code> only when the user input is submitted.)</li>
+<li><code class="docutils literal"><span class="pre">q</span></code>: The user input</li>
+</ul>
+</div></blockquote>
 <p>Here are example requests to learn user input &quot;Groonga&quot; in <code class="docutils literal"><span class="pre">query</span></code>
 dataset:</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>.. groonga-command
-.. include:: ../../example/reference/executables/groonga-suggest-httpd-learn.log
-.. % curl &#39;http://localhost:8080/?i=127.0.0.1&amp;l=query&amp;s=92619&amp;t=complete&amp;q=G&#39;
-.. % curl &#39;http://localhost:8080/?i=127.0.0.1&amp;l=query&amp;s=93850&amp;t=complete&amp;q=Gr&#39;
-.. % curl &#39;http://localhost:8080/?i=127.0.0.1&amp;l=query&amp;s=94293&amp;t=complete&amp;q=Gro&#39;
-.. % curl &#39;http://localhost:8080/?i=127.0.0.1&amp;l=query&amp;s=94734&amp;t=complete&amp;q=Groo&#39;
-.. % curl &#39;http://localhost:8080/?i=127.0.0.1&amp;l=query&amp;s=95147&amp;t=complete&amp;q=Grooon&#39;
-.. % curl &#39;http://localhost:8080/?i=127.0.0.1&amp;l=query&amp;s=95553&amp;t=complete&amp;q=Groonga&#39;
+.. include:: ../../example/reference/executables/groonga-suggest-httpd/learn.log
+.. % curl &#39;http://localhost:8080/?i=127.0.0.1&amp;l=query&amp;s=92619&amp;q=G&#39;
+.. % curl &#39;http://localhost:8080/?i=127.0.0.1&amp;l=query&amp;s=93850&amp;q=Gr&#39;
+.. % curl &#39;http://localhost:8080/?i=127.0.0.1&amp;l=query&amp;s=94293&amp;q=Gro&#39;
+.. % curl &#39;http://localhost:8080/?i=127.0.0.1&amp;l=query&amp;s=94734&amp;q=Groo&#39;
+.. % curl &#39;http://localhost:8080/?i=127.0.0.1&amp;l=query&amp;s=95147&amp;q=Grooon&#39;
+.. % curl &#39;http://localhost:8080/?i=127.0.0.1&amp;l=query&amp;s=95553&amp;q=Groonga&#39;
 .. % curl &#39;http://localhost:8080/?i=127.0.0.1&amp;l=query&amp;s=95959&amp;t=submit&amp;q=Groonga&#39;
 </pre></div>
 </div>
-<p>Inputting data must use <code class="docutils literal"><span class="pre">t=complete</span></code> parameter.</p>
+<p>Inputting data must not use <code class="docutils literal"><span class="pre">t=submit</span></code> parameter. In the above example, you just learn user inputs but you can learn and get complete candidates at once. It's described at the next section.</p>
 <p>Submitted data must use <code class="docutils literal"><span class="pre">t=submit</span></code> parameter.</p>
 </div>
 <div class="section" id="use-suggested-response">
 <h3>7.1.8.3.5. Use suggested response<a class="headerlink" href="#use-suggested-response" title="Permalink to this headline">¶</a></h3>
-<p>TODO</p>
+<p>You can get suggested result from <code class="docutils literal"><span class="pre">groonga-suggest-httpd</span></code>.</p>
+<p>You need to specify the following parameters to get suggested result:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">n</span></code>: The dataset name</li>
+<li><code class="docutils literal"><span class="pre">t</span></code>: The query type (<code class="docutils literal"><span class="pre">complete</span></code>, <code class="docutils literal"><span class="pre">correct</span></code> and/or <code class="docutils literal"><span class="pre">suggest</span></code>)</li>
+<li><code class="docutils literal"><span class="pre">q</span></code>: The user input</li>
+</ul>
+</div></blockquote>
+<p>You can also specify parameters for <a class="reference internal" href="../commands/suggest.html"><span class="doc">suggest</span></a> as option.</p>
+<p>Here is an example that gets <a class="reference internal" href="../suggest/completion.html"><span class="doc">Completion</span></a> result. The result is computed by using learned data at the previous section. <code class="docutils literal"><span class="pre">frequency_threshold=1</span></code> parameter is used because this is an example. The parameter enables input data that are occurred one or more times. Normally, you should not use the parameter for production. The parameter will increase noises:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>% curl &#39;http://localhost:8080/?n=query&amp;t=complete&amp;q=G&amp;frequency_threshold=1&#39;
+{&quot;complete&quot;:[[6],[[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;_score&quot;,&quot;Int32&quot;]],[&quot;groonga&quot;,3],[&quot;g&quot;,2],[&quot;grooon&quot;,2],[&quot;gro&quot;,2],[&quot;groo&quot;,2],[&quot;gr&quot;,2]]}
+</pre></div>
+</div>
+<p>You can combine completion and learning by specifying parameters for both:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>% curl &#39;http://localhost:8080/?i=127.0.0.1&amp;l=query&amp;s=93000&amp;q=G&amp;n=query&amp;t=complete&amp;frequency_threshold=1&#39;
+{&quot;complete&quot;:[[6],[[&quot;_key&quot;,&quot;ShortText&quot;],[&quot;_score&quot;,&quot;Int32&quot;]],[&quot;groonga&quot;,3],[&quot;g&quot;,2],[&quot;grooon&quot;,2],[&quot;gro&quot;,2],[&quot;groo&quot;,2],[&quot;gr&quot;,2]]}
+</pre></div>
+</div>
 </div>
 </div>
 <div class="section" id="command-line-parameters">
@@ -332,7 +363,8 @@ CPU cores for performance.</p>
 <dl class="option">
 <dt id="cmdoption-s">
 <span id="cmdoption--send-endpoint"></span><code class="descname">-s</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">--send-endpoint</code><code class="descclassname"></code><a class="headerlink" href="#cmdoption-s" title="Permalink to this definition">¶</a></dt>
-<dd><p>Specify endpoint URI of learner for sending learning data.</p>
+<dd><p>Specify endpoint URI of <a class="reference internal" href="groonga-suggest-learner.html"><span class="doc">groonga-suggest-learner</span></a> for sending
+user inputs.</p>
 <p>The format is <code class="docutils literal"><span class="pre">tcp://${HOST}:${PORT}</span></code> such as
 <code class="docutils literal"><span class="pre">tcp://192.168.0.1:2929</span></code>.</p>
 <p>The default value is none.</p>
@@ -341,7 +373,8 @@ CPU cores for performance.</p>
 <dl class="option">
 <dt id="cmdoption-r">
 <span id="cmdoption--receive-endpoint"></span><code class="descname">-r</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">--receive-endpoint</code><code class="descclassname"></code><a class="headerlink" href="#cmdoption-r" title="Permalink to this definition">¶</a></dt>
-<dd><p>Specify endpoint URI of learner for receiving learning data.</p>
+<dd><p>Specify endpoint URI of <a class="reference internal" href="groonga-suggest-learner.html"><span class="doc">groonga-suggest-learner</span></a> for
+receiving learned suggestion data.</p>
 <p>The format is <code class="docutils literal"><span class="pre">tcp://${HOST}:${PORT}</span></code> such as
 <code class="docutils literal"><span class="pre">tcp://192.168.0.1:2929</span></code>.</p>
 <p>The default value is none.</p>
@@ -386,8 +419,8 @@ descriptors on start.</p>
 parameters are passed through <a class="reference internal" href="../commands/suggest.html"><span class="doc">suggest</span></a>. It
 means that you can use parameters of
 <a class="reference internal" href="../commands/suggest.html"><span class="doc">suggest</span></a>.</p>
-<div class="section" id="id1">
-<h3>7.1.8.5.1. Required parameters<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="groonga-suggest-httpd-required-parameters">
+<span id="id1"></span><h3>7.1.8.5.1. Required parameters<a class="headerlink" href="#groonga-suggest-httpd-required-parameters" title="Permalink to this headline">¶</a></h3>
 <p>You must specify the following parameters.</p>
 <table border="1" class="docutils">
 <colgroup>
@@ -406,20 +439,11 @@ means that you can use parameters of
 <td>Input by user. It must be UTF-8 encoded string.</td>
 <td>&nbsp;</td>
 </tr>
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">t</span></code></td>
-<td><p class="first">The query type.</p>
-<p class="last">Available values are <code class="docutils literal"><span class="pre">complete</span></code>, <code class="docutils literal"><span class="pre">correct</span></code>, <code class="docutils literal"><span class="pre">suggest</span></code> and
-<code class="docutils literal"><span class="pre">submit</span></code>.</p>
-</td>
-<td>You can specify multiple types except <code class="docutils literal"><span class="pre">submit</span></code>. You need to
-use <code class="docutils literal"><span class="pre">|</span></code> as separator such as <code class="docutils literal"><span class="pre">complete|correct</span></code>. <code class="docutils literal"><span class="pre">submit</span></code>
-is a valid value but <code class="docutils literal"><span class="pre">complete|submit</span></code> is invalid value.</td>
-</tr>
 </tbody>
 </table>
 </div>
 <div class="section" id="required-parameters-for-learning">
-<h3>7.1.8.5.2. Required parameters for learning<a class="headerlink" href="#required-parameters-for-learning" title="Permalink to this headline">¶</a></h3>
+<span id="groonga-suggest-httpd-required-parameters-learning"></span><h3>7.1.8.5.2. Required parameters for learning<a class="headerlink" href="#required-parameters-for-learning" title="Permalink to this headline">¶</a></h3>
 <p>You must specify the following parameters when you specify
 <a class="reference internal" href="groonga-suggest-learner.html#cmdoption--send-endpoint"><code class="xref std std-option docutils literal"><span class="pre">--send-endpoint</span></code></a>.</p>
 <table border="1" class="docutils">
@@ -454,7 +478,7 @@ as separator such as <code class="docutils literal"><span class="pre">dataset1|d
 </table>
 </div>
 <div class="section" id="required-parameters-for-suggestion">
-<h3>7.1.8.5.3. Required parameters for suggestion<a class="headerlink" href="#required-parameters-for-suggestion" title="Permalink to this headline">¶</a></h3>
+<span id="groonga-suggest-httpd-required-parameters-suggestion"></span><h3>7.1.8.5.3. Required parameters for suggestion<a class="headerlink" href="#required-parameters-for-suggestion" title="Permalink to this headline">¶</a></h3>
 <p>You must specify the following parameters when you specify one of
 <code class="docutils literal"><span class="pre">complete</span></code>, <code class="docutils literal"><span class="pre">correct</span></code> and <code class="docutils literal"><span class="pre">suggest</span></code> to <code class="docutils literal"><span class="pre">t</span></code> parameter.</p>
 <table border="1" class="docutils">
@@ -471,15 +495,22 @@ as separator such as <code class="docutils literal"><span class="pre">dataset1|d
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">n</span></code></td>
-<td>The dataset name to use computing suggestion result</td>
+<td>The dataset name to use computing suggestion result.</td>
 <td>Dataset name is the name that you specify to
 <a class="reference internal" href="groonga-suggest-create-dataset.html"><span class="doc">groonga-suggest-create-dataset</span></a>.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">t</span></code></td>
+<td><p class="first">The query type.</p>
+<p class="last">Available values are <code class="docutils literal"><span class="pre">complete</span></code>, <code class="docutils literal"><span class="pre">correct</span></code>, <code class="docutils literal"><span class="pre">suggest</span></code>.</p>
+</td>
+<td>You can specify multiple types. You need to use <code class="docutils literal"><span class="pre">|</span></code> as
+separator such as <code class="docutils literal"><span class="pre">complete|correct</span></code>.</td>
 </tr>
 </tbody>
 </table>
 </div>
-<div class="section" id="id2">
-<h3>7.1.8.5.4. Optional parameters<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="groonga-suggest-httpd-optional-parameters">
+<span id="id2"></span><h3>7.1.8.5.4. Optional parameters<a class="headerlink" href="#groonga-suggest-httpd-optional-parameters" title="Permalink to this headline">¶</a></h3>
 <p>Here are optional parameters.</p>
 <table border="1" class="docutils">
 <colgroup>
@@ -497,6 +528,40 @@ as separator such as <code class="docutils literal"><span class="pre">dataset1|d
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">callback</span></code></td>
 <td>Function name for JSONP</td>
 <td>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="optional-parameters-for-learning">
+<span id="groonga-suggest-httpd-optional-parameters-learning"></span><h3>7.1.8.5.5. Optional parameters for learning<a class="headerlink" href="#optional-parameters-for-learning" title="Permalink to this headline">¶</a></h3>
+<p>Here are optional parameters when you specify
+<a class="reference internal" href="groonga-suggest-learner.html#cmdoption--send-endpoint"><code class="xref std std-option docutils literal"><span class="pre">--send-endpoint</span></code></a>.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key</th>
+<th class="head">Description</th>
+<th class="head">Note</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">t</span></code></td>
+<td><p class="first">The query type.</p>
+<p class="last">Available value is only <code class="docutils literal"><span class="pre">submit</span></code>.</p>
+</td>
+<td><p class="first">You must specify <code class="docutils literal"><span class="pre">submit</span></code> when user submits the input
+specified as <code class="docutils literal"><span class="pre">q</span></code>.</p>
+<p class="last">You must not specify <code class="docutils literal"><span class="pre">submit</span></code> for user inputs that aren't
+submitted yet. You can use suggestion by specifying
+<code class="docutils literal"><span class="pre">complete</span></code>, <code class="docutils literal"><span class="pre">correct</span></code> and/or <code class="docutils literal"><span class="pre">suggest</span></code> to <code class="docutils literal"><span class="pre">t</span></code> when you
+doesn't specify <code class="docutils literal"><span class="pre">submit</span></code>. See
+<a class="reference internal" href="#groonga-suggest-httpd-required-parameters-suggestion"><span class="std std-ref">Required parameters for suggestion</span></a> for
+details about these values.</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -579,10 +644,11 @@ the same format as body of <a class="reference internal" href="../commands/sugge
 </ul>
 </li>
 <li><a class="reference internal" href="#get-parameters">7.1.8.5. GET parameters</a><ul>
-<li><a class="reference internal" href="#id1">7.1.8.5.1. Required parameters</a></li>
+<li><a class="reference internal" href="#groonga-suggest-httpd-required-parameters">7.1.8.5.1. Required parameters</a></li>
 <li><a class="reference internal" href="#required-parameters-for-learning">7.1.8.5.2. Required parameters for learning</a></li>
 <li><a class="reference internal" href="#required-parameters-for-suggestion">7.1.8.5.3. Required parameters for suggestion</a></li>
-<li><a class="reference internal" href="#id2">7.1.8.5.4. Optional parameters</a></li>
+<li><a class="reference internal" href="#groonga-suggest-httpd-optional-parameters">7.1.8.5.4. Optional parameters</a></li>
+<li><a class="reference internal" href="#optional-parameters-for-learning">7.1.8.5.5. Optional parameters for learning</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#return-value">7.1.8.6. Return value</a><ul>
@@ -635,7 +701,7 @@ the same format as body of <a class="reference internal" href="../commands/sugge
         <li class="right" >
           <a href="groonga-suggest-create-dataset.html" title="7.1.7. groonga-suggest-create-dataset"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v6.0.1 documentation</a> &raquo;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v6.0.2 documentation</a> &raquo;</li>
           <li class="nav-item nav-item-1"><a href="../../reference.html" >7. Reference manual</a> &raquo;</li>
           <li class="nav-item nav-item-2"><a href="../executables.html" >7.1. Executables</a> &raquo;</li> 
       </ul>

@@ -23,7 +23,7 @@ description: Groonga Meatup 2015を開催しました！
 
 ![会場提供のぐるなびの砂原さんと当日手伝ってくれた玉野さん](/images/blog/ja/2015-11-29-groonga-meatup-2015/staffs-with-groonga-meatup-2015-t-shirt.jpg)
 
-撮影：[@mine_take](https://twitter.com/mine_take)さん
+撮影：[小峯](https://twitter.com/s977043)さん
 
 参加者のみなさんもありがとうございます。充実した時間になったでしょうか？
 

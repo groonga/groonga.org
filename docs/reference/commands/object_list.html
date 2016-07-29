@@ -1,0 +1,1015 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>7.3.41. object_list &mdash; Groonga v6.0.7 documentation</title>
+    
+    <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
+    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '6.0.7',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../static/favicon.ico"/>
+    <link rel="top" title="Groonga v6.0.7 documentation" href="../../index.html" />
+    <link rel="up" title="7.3. Command" href="../command.html" />
+    <link rel="next" title="7.3.42. object_remove" href="object_remove.html" />
+    <link rel="prev" title="7.3.40. object_inspect" href="object_inspect.html" /> 
+      <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
+    <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
+    <meta property="og:type" content="product" />
+    <meta property="og:image" content="http://groonga.org/images/logos/groonga-icon-full-size.png" />
+    <meta property="og:site_name" content="groonga" />
+
+    <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
+  </head>
+
+  <body role="document">
+<div class="header">
+  <h1 class="title">
+    <a id="top-link" href="../../../">
+      <span class="project">groonga</span>
+      <span class="separator">-</span>
+      <span class="description">An open-source fulltext search engine and column store.</span>
+    </a>
+  </h1>
+
+      <div class="facebook-buttons">
+      <fb:like href="http://www.facebook.com/pages/groonga/201193596592346"
+               layout="standard"
+               width="290"></fb:like>
+    </div>
+    <div class="other-language-links">
+
+    <ul>
+      <li><a href="../../../ja/docs/reference/commands/object_list.html">日本語</a></li>
+    </ul>
+  </div>
+</div>
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="object_remove.html" title="7.3.42. object_remove"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="object_inspect.html" title="7.3.40. object_inspect"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v6.0.7 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../reference.html" >7. Reference manual</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="../command.html" accesskey="U">7.3. Command</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="object-list">
+<h1>7.3.41. <code class="docutils literal"><span class="pre">object_list</span></code><a class="headerlink" href="#object-list" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="summary">
+<h2>7.3.41.1. Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 6.0.7.</span></p>
+</div>
+<p><code class="docutils literal"><span class="pre">object_list</span></code> lists objects in database. Object information is taken
+from metadata in database. <code class="docutils literal"><span class="pre">object_list</span></code> doesn't open any
+objects. So <code class="docutils literal"><span class="pre">object_list</span></code> is a light command for database that has
+many tables and/or columns.</p>
+<p>Normally, <a class="reference internal" href="schema.html"><span class="doc">schema</span></a> is a useful command than
+<code class="docutils literal"><span class="pre">object_list</span></code>. Because <a class="reference internal" href="schema.html"><span class="doc">schema</span></a> returns more information than
+<code class="docutils literal"><span class="pre">object_list</span></code>.</p>
+</div>
+<div class="section" id="syntax">
+<h2>7.3.41.2. Syntax<a class="headerlink" href="#syntax" title="Permalink to this headline">¶</a></h2>
+<p>This command takes no parameters:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>object_list
+</pre></div>
+</div>
+</div>
+<div class="section" id="usage">
+<h2>7.3.41.3. Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>Here is an example schema to show example output:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>table_create Memos TABLE_HASH_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Memos content COLUMN_SCALAR Text
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create Terms TABLE_PAT_KEY ShortText \
+  --default_tokenizer TokenBigram \
+  --normalizer NormalizerAuto
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Terms memos_content_index \
+  COLUMN_INDEX|WITH_POSITION \
+  Memos content
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>Here is an output of <code class="docutils literal"><span class="pre">object_list</span></code> command against this database:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>object_list
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   {
+#     &quot;TokyoGeoPoint&quot;: {
+#       &quot;opened&quot;: true,
+#       &quot;flags&quot;: {
+#         &quot;names&quot;: &quot;KEY_GEO_POINT&quot;,
+#         &quot;value&quot;: 24
+#       },
+#       &quot;path&quot;: null,
+#       &quot;size&quot;: 8,
+#       &quot;type&quot;: {
+#         &quot;id&quot;: 32,
+#         &quot;name&quot;: &quot;type&quot;
+#       },
+#       &quot;id&quot;: 17,
+#       &quot;name&quot;: &quot;TokyoGeoPoint&quot;
+#     },
+#     &quot;Bool&quot;: {
+#       &quot;opened&quot;: true,
+#       &quot;flags&quot;: {
+#         &quot;names&quot;: &quot;KEY_UINT&quot;,
+#         &quot;value&quot;: 0
+#       },
+#       &quot;path&quot;: null,
+#       &quot;size&quot;: 1,
+#       &quot;type&quot;: {
+#         &quot;id&quot;: 32,
+#         &quot;name&quot;: &quot;type&quot;
+#       },
+#       &quot;id&quot;: 3,
+#       &quot;name&quot;: &quot;Bool&quot;
+#     },
+#     &quot;WGS84GeoPoint&quot;: {
+#       &quot;opened&quot;: true,
+#       &quot;flags&quot;: {
+#         &quot;names&quot;: &quot;KEY_GEO_POINT&quot;,
+#         &quot;value&quot;: 24
+#       },
+#       &quot;path&quot;: null,
+#       &quot;size&quot;: 8,
+#       &quot;type&quot;: {
+#         &quot;id&quot;: 32,
+#         &quot;name&quot;: &quot;type&quot;
+#       },
+#       &quot;id&quot;: 18,
+#       &quot;name&quot;: &quot;WGS84GeoPoint&quot;
+#     },
+#     &quot;Int32&quot;: {
+#       &quot;opened&quot;: true,
+#       &quot;flags&quot;: {
+#         &quot;names&quot;: &quot;KEY_INT&quot;,
+#         &quot;value&quot;: 8
+#       },
+#       &quot;path&quot;: null,
+#       &quot;size&quot;: 4,
+#       &quot;type&quot;: {
+#         &quot;id&quot;: 32,
+#         &quot;name&quot;: &quot;type&quot;
+#       },
+#       &quot;id&quot;: 8,
+#       &quot;name&quot;: &quot;Int32&quot;
+#     },
+#     &quot;Int16&quot;: {
+#       &quot;opened&quot;: true,
+#       &quot;flags&quot;: {
+#         &quot;names&quot;: &quot;KEY_INT&quot;,
+#         &quot;value&quot;: 8
+#       },
+#       &quot;path&quot;: null,
+#       &quot;size&quot;: 2,
+#       &quot;type&quot;: {
+#         &quot;id&quot;: 32,
+#         &quot;name&quot;: &quot;type&quot;
+#       },
+#       &quot;id&quot;: 6,
+#       &quot;name&quot;: &quot;Int16&quot;
+#     },
+#     &quot;Terms&quot;: {
+#       &quot;opened&quot;: true,
+#       &quot;token_filters&quot;: [],
+#       &quot;range&quot;: {
+#         &quot;id&quot;: 0,
+#         &quot;name&quot;: null
+#       },
+#       &quot;flags&quot;: {
+#         &quot;names&quot;: &quot;TABLE_PAT_KEY|PERSISTENT&quot;,
+#         &quot;value&quot;: 49153
+#       },
+#       &quot;path&quot;: &quot;/tmp/groonga-databases/commands_object_list.0000102&quot;,
+#       &quot;type&quot;: {
+#         &quot;id&quot;: 49,
+#         &quot;name&quot;: &quot;table:pat_key&quot;
+#       },
+#       &quot;id&quot;: 258,
+#       &quot;name&quot;: &quot;Terms&quot;
+#     },
+#     &quot;LongText&quot;: {
+#       &quot;opened&quot;: true,
+#       &quot;flags&quot;: {
+#         &quot;names&quot;: &quot;KEY_VAR_SIZE&quot;,
+#         &quot;value&quot;: 16384
+#       },
+#       &quot;path&quot;: null,
+#       &quot;size&quot;: 2147483648,
+#       &quot;type&quot;: {
+#         &quot;id&quot;: 32,
+#         &quot;name&quot;: &quot;type&quot;
+#       },
+#       &quot;id&quot;: 16,
+#       &quot;name&quot;: &quot;LongText&quot;
+#     },
+#     &quot;ShortText&quot;: {
+#       &quot;opened&quot;: true,
+#       &quot;flags&quot;: {
+#         &quot;names&quot;: &quot;KEY_VAR_SIZE&quot;,
+#         &quot;value&quot;: 16384
+#       },
+#       &quot;path&quot;: null,
+#       &quot;size&quot;: 4096,
+#       &quot;type&quot;: {
+#         &quot;id&quot;: 32,
+#         &quot;name&quot;: &quot;type&quot;
+#       },
+#       &quot;id&quot;: 14,
+#       &quot;name&quot;: &quot;ShortText&quot;
+#     },
+#     &quot;Object&quot;: {
+#       &quot;opened&quot;: true,
+#       &quot;flags&quot;: {
+#         &quot;names&quot;: &quot;KEY_UINT&quot;,
+#         &quot;value&quot;: 0
+#       },
+#       &quot;path&quot;: null,
+#       &quot;size&quot;: 8,
+#       &quot;type&quot;: {
+#         &quot;id&quot;: 32,
+#         &quot;name&quot;: &quot;type&quot;
+#       },
+#       &quot;id&quot;: 2,
+#       &quot;name&quot;: &quot;Object&quot;
+#     },
+#     &quot;UInt16&quot;: {
+#       &quot;opened&quot;: true,
+#       &quot;flags&quot;: {
+#         &quot;names&quot;: &quot;KEY_UINT&quot;,
+#         &quot;value&quot;: 0
+#       },
+#       &quot;path&quot;: null,
+#       &quot;size&quot;: 2,
+#       &quot;type&quot;: {
+#         &quot;id&quot;: 32,
+#         &quot;name&quot;: &quot;type&quot;
+#       },
+#       &quot;id&quot;: 7,
+#       &quot;name&quot;: &quot;UInt16&quot;
+#     },
+#     &quot;UInt32&quot;: {
+#       &quot;opened&quot;: true,
+#       &quot;flags&quot;: {
+#         &quot;names&quot;: &quot;KEY_UINT&quot;,
+#         &quot;value&quot;: 0
+#       },
+#       &quot;path&quot;: null,
+#       &quot;size&quot;: 4,
+#       &quot;type&quot;: {
+#         &quot;id&quot;: 32,
+#         &quot;name&quot;: &quot;type&quot;
+#       },
+#       &quot;id&quot;: 9,
+#       &quot;name&quot;: &quot;UInt32&quot;
+#     },
+#     &quot;Terms.memos_content_index&quot;: {
+#       &quot;opened&quot;: true,
+#       &quot;sources&quot;: [
+#         {
+#           &quot;id&quot;: 257,
+#           &quot;name&quot;: &quot;Memos.content&quot;
+#         }
+#       ],
+#       &quot;range&quot;: {
+#         &quot;id&quot;: 256,
+#         &quot;name&quot;: &quot;Memos&quot;
+#       },
+#       &quot;flags&quot;: {
+#         &quot;names&quot;: &quot;COLUMN_INDEX|WITH_POSITION|PERSISTENT&quot;,
+#         &quot;value&quot;: 33282
+#       },
+#       &quot;path&quot;: &quot;/tmp/groonga-databases/commands_object_list.0000103&quot;,
+#       &quot;type&quot;: {
+#         &quot;id&quot;: 72,
+#         &quot;name&quot;: &quot;column:index&quot;
+#       },
+#       &quot;id&quot;: 259,
+#       &quot;name&quot;: &quot;Terms.memos_content_index&quot;
+#     },
+#     &quot;UInt8&quot;: {
+#       &quot;opened&quot;: true,
+#       &quot;flags&quot;: {
+#         &quot;names&quot;: &quot;KEY_UINT&quot;,
+#         &quot;value&quot;: 0
+#       },
+#       &quot;path&quot;: null,
+#       &quot;size&quot;: 1,
+#       &quot;type&quot;: {
+#         &quot;id&quot;: 32,
+#         &quot;name&quot;: &quot;type&quot;
+#       },
+#       &quot;id&quot;: 5,
+#       &quot;name&quot;: &quot;UInt8&quot;
+#     },
+#     &quot;Int64&quot;: {
+#       &quot;opened&quot;: true,
+#       &quot;flags&quot;: {
+#         &quot;names&quot;: &quot;KEY_INT&quot;,
+#         &quot;value&quot;: 8
+#       },
+#       &quot;path&quot;: null,
+#       &quot;size&quot;: 8,
+#       &quot;type&quot;: {
+#         &quot;id&quot;: 32,
+#         &quot;name&quot;: &quot;type&quot;
+#       },
+#       &quot;id&quot;: 10,
+#       &quot;name&quot;: &quot;Int64&quot;
+#     },
+#     &quot;Time&quot;: {
+#       &quot;opened&quot;: true,
+#       &quot;flags&quot;: {
+#         &quot;names&quot;: &quot;KEY_INT&quot;,
+#         &quot;value&quot;: 8
+#       },
+#       &quot;path&quot;: null,
+#       &quot;size&quot;: 8,
+#       &quot;type&quot;: {
+#         &quot;id&quot;: 32,
+#         &quot;name&quot;: &quot;type&quot;
+#       },
+#       &quot;id&quot;: 13,
+#       &quot;name&quot;: &quot;Time&quot;
+#     },
+#     &quot;UInt64&quot;: {
+#       &quot;opened&quot;: true,
+#       &quot;flags&quot;: {
+#         &quot;names&quot;: &quot;KEY_UINT&quot;,
+#         &quot;value&quot;: 0
+#       },
+#       &quot;path&quot;: null,
+#       &quot;size&quot;: 8,
+#       &quot;type&quot;: {
+#         &quot;id&quot;: 32,
+#         &quot;name&quot;: &quot;type&quot;
+#       },
+#       &quot;id&quot;: 11,
+#       &quot;name&quot;: &quot;UInt64&quot;
+#     },
+#     &quot;Text&quot;: {
+#       &quot;opened&quot;: true,
+#       &quot;flags&quot;: {
+#         &quot;names&quot;: &quot;KEY_VAR_SIZE&quot;,
+#         &quot;value&quot;: 16384
+#       },
+#       &quot;path&quot;: null,
+#       &quot;size&quot;: 65536,
+#       &quot;type&quot;: {
+#         &quot;id&quot;: 32,
+#         &quot;name&quot;: &quot;type&quot;
+#       },
+#       &quot;id&quot;: 15,
+#       &quot;name&quot;: &quot;Text&quot;
+#     },
+#     &quot;Float&quot;: {
+#       &quot;opened&quot;: true,
+#       &quot;flags&quot;: {
+#         &quot;names&quot;: &quot;KEY_FLOAT&quot;,
+#         &quot;value&quot;: 16
+#       },
+#       &quot;path&quot;: null,
+#       &quot;size&quot;: 8,
+#       &quot;type&quot;: {
+#         &quot;id&quot;: 32,
+#         &quot;name&quot;: &quot;type&quot;
+#       },
+#       &quot;id&quot;: 12,
+#       &quot;name&quot;: &quot;Float&quot;
+#     },
+#     &quot;Int8&quot;: {
+#       &quot;opened&quot;: true,
+#       &quot;flags&quot;: {
+#         &quot;names&quot;: &quot;KEY_INT&quot;,
+#         &quot;value&quot;: 8
+#       },
+#       &quot;path&quot;: null,
+#       &quot;size&quot;: 1,
+#       &quot;type&quot;: {
+#         &quot;id&quot;: 32,
+#         &quot;name&quot;: &quot;type&quot;
+#       },
+#       &quot;id&quot;: 4,
+#       &quot;name&quot;: &quot;Int8&quot;
+#     },
+#     &quot;Memos.content&quot;: {
+#       &quot;opened&quot;: true,
+#       &quot;range&quot;: {
+#         &quot;id&quot;: 15,
+#         &quot;name&quot;: &quot;Text&quot;
+#       },
+#       &quot;flags&quot;: {
+#         &quot;names&quot;: &quot;COLUMN_SCALAR|PERSISTENT&quot;,
+#         &quot;value&quot;: 49152
+#       },
+#       &quot;path&quot;: &quot;/tmp/groonga-databases/commands_object_list.0000101&quot;,
+#       &quot;type&quot;: {
+#         &quot;id&quot;: 65,
+#         &quot;name&quot;: &quot;column:var_size&quot;
+#       },
+#       &quot;id&quot;: 257,
+#       &quot;name&quot;: &quot;Memos.content&quot;
+#     },
+#     &quot;Memos&quot;: {
+#       &quot;opened&quot;: true,
+#       &quot;token_filters&quot;: [],
+#       &quot;range&quot;: {
+#         &quot;id&quot;: 0,
+#         &quot;name&quot;: null
+#       },
+#       &quot;flags&quot;: {
+#         &quot;names&quot;: &quot;TABLE_HASH_KEY|PERSISTENT&quot;,
+#         &quot;value&quot;: 49152
+#       },
+#       &quot;path&quot;: &quot;/tmp/groonga-databases/commands_object_list.0000100&quot;,
+#       &quot;type&quot;: {
+#         &quot;id&quot;: 48,
+#         &quot;name&quot;: &quot;table:hash_key&quot;
+#       },
+#       &quot;id&quot;: 256,
+#       &quot;name&quot;: &quot;Memos&quot;
+#     },
+#     &quot;TokenMecab&quot;: {
+#       &quot;opened&quot;: true,
+#       &quot;flags&quot;: {
+#         &quot;names&quot;: &quot;CUSTOM_NAME&quot;,
+#         &quot;value&quot;: 4096
+#       },
+#       &quot;path&quot;: &quot;tokenizers/.libs/mecab.so&quot;,
+#       &quot;plugin_id&quot;: 1,
+#       &quot;type&quot;: {
+#         &quot;id&quot;: 33,
+#         &quot;name&quot;: &quot;proc&quot;
+#       },
+#       &quot;id&quot;: 64,
+#       &quot;name&quot;: &quot;TokenMecab&quot;
+#     }
+#   }
+# ]
+</pre></div>
+</div>
+</div>
+<div class="section" id="parameters">
+<h2>7.3.41.4. Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+<p>This section describes all parameters.</p>
+<div class="section" id="required-parameters">
+<h3>7.3.41.4.1. Required parameters<a class="headerlink" href="#required-parameters" title="Permalink to this headline">¶</a></h3>
+<p>There is no required parameter.</p>
+</div>
+<div class="section" id="optional-parameters">
+<h3>7.3.41.4.2. Optional parameters<a class="headerlink" href="#optional-parameters" title="Permalink to this headline">¶</a></h3>
+<p>There is no optional parameter.</p>
+</div>
+</div>
+<div class="section" id="return-value">
+<h2>7.3.41.5. Return value<a class="headerlink" href="#return-value" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal"><span class="pre">object_list</span></code> command returns a list of object information in the
+database:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>[HEADER, OBJECTS]
+</pre></div>
+</div>
+<div class="section" id="header">
+<h3>7.3.41.5.1. <code class="docutils literal"><span class="pre">HEADER</span></code><a class="headerlink" href="#header" title="Permalink to this headline">¶</a></h3>
+<p>See <a class="reference internal" href="../command/output_format.html"><span class="doc">Output format</span></a> about <code class="docutils literal"><span class="pre">HEADER</span></code>.</p>
+</div>
+<div class="section" id="objects">
+<h3>7.3.41.5.2. <code class="docutils literal"><span class="pre">OBJECTS</span></code><a class="headerlink" href="#objects" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">OBJECTS</span></code> are pairs of object name and object details:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>{
+  &quot;OBJECT_1&quot;: OBJECT_1,
+  &quot;OBJECT_2&quot;: OBJECT_2,
+  ...,
+  &quot;OBJECT_n&quot;: OBJECT_n,
+}
+</pre></div>
+</div>
+<p>Each <code class="docutils literal"><span class="pre">OBJECT</span></code> consists of common properties and object type specific
+properties.</p>
+</div>
+<div class="section" id="object-common-properties">
+<h3>7.3.41.5.3. <code class="docutils literal"><span class="pre">OBJECT</span></code> (common properties)<a class="headerlink" href="#object-common-properties" title="Permalink to this headline">¶</a></h3>
+<p>Here are common properties:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>{
+  &quot;id&quot;:     ID,
+  &quot;name&quot;:   NAME,
+  &quot;opened&quot;: OPENED,
+  &quot;type&quot;:   OBJECT_TYPE,
+  &quot;flags&quot;:  FLAGS,
+  &quot;path&quot;:   PATH
+}
+</pre></div>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">id</span></code></td>
+<td>The ID of the object.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">name</span></code></td>
+<td>The name of the object.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">opened</span></code></td>
+<td>Whether the object is opened or not. It's <code class="docutils literal"><span class="pre">true</span></code> or
+<code class="docutils literal"><span class="pre">false</span></code>.  If the object is opened, this value is
+<code class="docutils literal"><span class="pre">true</span></code>. Otherwise, this value is <code class="docutils literal"><span class="pre">false</span></code>.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">type</span></code></td>
+<td>The type of the object. See
+<a class="reference internal" href="#object-list-return-value-object-type"><span class="std std-ref">OBJECT_TYPE</span></a> for details.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">flags</span></code></td>
+<td>The flags of the object. See
+<a class="reference internal" href="#object-list-return-value-flags"><span class="std std-ref">FLAGS</span></a> for details.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">path</span></code></td>
+<td>The path that contains data of the object. It's <code class="docutils literal"><span class="pre">null</span></code> for
+objects that doesn't have data. For example, command object
+doesn't have data.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="object-type">
+<span id="object-list-return-value-object-type"></span><h3>7.3.41.5.4. <code class="docutils literal"><span class="pre">OBJECT_TYPE</span></code><a class="headerlink" href="#object-type" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">OBJECT_TYPE</span></code> represents the type of object. For example, patricia
+trie table, hash table and index column are object types.</p>
+<p><code class="docutils literal"><span class="pre">OBJECT_TYPE</span></code> has the following properties:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>{
+  &quot;id&quot;:   ID,
+  &quot;name&quot;: NAME
+}
+</pre></div>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">id</span></code></td>
+<td>The ID of the type.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">name</span></code></td>
+<td>The name of the type. For example, <a class="reference internal" href="../tables.html#table-hash-key"><span class="std std-ref">TABLE_HASH_KEY</span></a> is
+<code class="docutils literal"><span class="pre">&quot;table:hash_key&quot;</span></code>, <a class="reference internal" href="../columns/vector.html"><span class="doc">Vector column</span></a> is
+<code class="docutils literal"><span class="pre">&quot;column:var_size&quot;</span></code> and <a class="reference internal" href="../columns/index.html"><span class="doc">Index column</span></a> is
+<code class="docutils literal"><span class="pre">&quot;column:index&quot;</span></code>.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="flags">
+<span id="object-list-return-value-flags"></span><h3>7.3.41.5.5. <code class="docutils literal"><span class="pre">FLAGS</span></code><a class="headerlink" href="#flags" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">FLAGS</span></code> represents the flags of object. The most flags are the
+specified flags in <a class="reference internal" href="table_create.html"><span class="doc">table_create</span></a> or <a class="reference internal" href="column_create.html"><span class="doc">column_create</span></a>. Some
+flags are added internally.</p>
+<p><code class="docutils literal"><span class="pre">FLAGS</span></code> has the following properties:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>{
+  &quot;value&quot;: VALUE,
+  &quot;names&quot;: NAMES
+}
+</pre></div>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">value</span></code></td>
+<td>The value of the flags. It's an integer.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">names</span></code></td>
+<td>The names of each flag. It's a string. Each name is separated
+by <code class="docutils literal"><span class="pre">|</span></code> such as <code class="docutils literal"><span class="pre">TABLE_HASH_KEY|PERSISTENT</span></code>.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="object-type-object-type-specific-properties">
+<h3>7.3.41.5.6. <code class="docutils literal"><span class="pre">OBJECT</span></code> (<code class="docutils literal"><span class="pre">&quot;type&quot;</span></code> object type specific properties)<a class="headerlink" href="#object-type-object-type-specific-properties" title="Permalink to this headline">¶</a></h3>
+<p>Here are <code class="docutils literal"><span class="pre">&quot;type&quot;</span></code> object type specific properties in <code class="docutils literal"><span class="pre">OBJECT</span></code>:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>{
+  &quot;size&quot;: SIZE
+}
+</pre></div>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">size</span></code></td>
+<td>The size of the type. If the type is fixed size type, the size
+is the size of each value. If the type is variable size type,
+the size is the maximum size of each value.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="object-proc-object-type-specific-properties">
+<h3>7.3.41.5.7. <code class="docutils literal"><span class="pre">OBJECT</span></code> (<code class="docutils literal"><span class="pre">&quot;proc&quot;</span></code> object type specific properties)<a class="headerlink" href="#object-proc-object-type-specific-properties" title="Permalink to this headline">¶</a></h3>
+<p>Here is a list of object that is <code class="docutils literal"><span class="pre">&quot;proc&quot;</span></code> object type:</p>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference internal" href="../command.html"><span class="doc">Command</span></a></li>
+<li><a class="reference internal" href="../function.html"><span class="doc">Function</span></a></li>
+<li><a class="reference internal" href="../normalizers.html"><span class="doc">Normalizers</span></a></li>
+<li><a class="reference internal" href="../tokenizers.html"><span class="doc">Tokenizers</span></a></li>
+<li><a class="reference internal" href="../token_filters.html"><span class="doc">Token filters</span></a></li>
+</ul>
+</div></blockquote>
+<p>Here are <code class="docutils literal"><span class="pre">&quot;proc&quot;</span></code> object type specific properties in <code class="docutils literal"><span class="pre">OBJECT</span></code>:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>{
+  &quot;plugin_id&quot;: PLUGIN_ID
+}
+</pre></div>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">plugin_id</span></code></td>
+<td>The plugin ID of the <code class="docutils literal"><span class="pre">&quot;proc&quot;</span></code> object. If the <code class="docutils literal"><span class="pre">&quot;proc&quot;</span></code>
+object is defined by plugin, the value is <code class="docutils literal"><span class="pre">1</span></code> or more larger
+integer. Plugin ID is <code class="docutils literal"><span class="pre">0</span></code> for builtin <code class="docutils literal"><span class="pre">&quot;proc&quot;</span></code> object.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="object-table-object-types-specific-properties">
+<h3>7.3.41.5.8. <code class="docutils literal"><span class="pre">OBJECT</span></code> (<code class="docutils literal"><span class="pre">&quot;table:\*&quot;</span></code> object types specific properties)<a class="headerlink" href="#object-table-object-types-specific-properties" title="Permalink to this headline">¶</a></h3>
+<p>Here are <code class="docutils literal"><span class="pre">&quot;table:\*&quot;</span></code> object types specific properties in
+<code class="docutils literal"><span class="pre">OBJECT</span></code>:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>{
+  &quot;range&quot;:         RANGE,
+  &quot;token_filters&quot;: TOKEN_FILTERS
+}
+</pre></div>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">range</span></code></td>
+<td>The type of the table's value. See
+<a class="reference internal" href="#object-list-return-value-range"><span class="std std-ref">RANGE</span></a> for details.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">token_filters</span></code></td>
+<td>The token filters of the table.See
+<a class="reference internal" href="#object-list-return-value-token-filters"><span class="std std-ref">TOKEN_FILTERS</span></a> for details.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="range">
+<span id="object-list-return-value-range"></span><h3>7.3.41.5.9. <code class="docutils literal"><span class="pre">RANGE</span></code><a class="headerlink" href="#range" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">RANGE</span></code> represents the type of the range.</p>
+<p><code class="docutils literal"><span class="pre">RANGE</span></code> has the following properties:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>{
+  &quot;id&quot;:   ID,
+  &quot;name&quot;: NAME
+}
+</pre></div>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">id</span></code></td>
+<td>The ID of the type of the range. It's an integer. If the object
+doesn't have range, ID is <code class="docutils literal"><span class="pre">0</span></code>.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">name</span></code></td>
+<td>The name of the type of the range. It's a string or <code class="docutils literal"><span class="pre">null</span></code>.
+If the object doesn't have range, name is <code class="docutils literal"><span class="pre">null</span></code>.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="token-filters">
+<span id="object-list-return-value-token-filters"></span><h3>7.3.41.5.10. <code class="docutils literal"><span class="pre">TOKEN_FILTERS</span></code><a class="headerlink" href="#token-filters" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">TOKEN_FILTERS</span></code> represents the token filters of the table.</p>
+<p><code class="docutils literal"><span class="pre">TOKEN_FILTERS</span></code> is an array of <code class="docutils literal"><span class="pre">TOKEN_FILTER</span></code>:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>[
+  TOKEN_FILTER_1,
+  TOKEN_FILTER_2,
+  ...,
+  TOKEN_FILTER_n
+]
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">TOKEN_FILTER</span></code> has the following properties:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>{
+  &quot;id&quot;:   ID,
+  &quot;NAME&quot;: NAME
+}
+</pre></div>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">id</span></code></td>
+<td>The ID of the token filter. It's an integer.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">name</span></code></td>
+<td>The name of the token filter. It's a string.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="object-column-object-types-specific-properties">
+<h3>7.3.41.5.11. <code class="docutils literal"><span class="pre">OBJECT</span></code> (<code class="docutils literal"><span class="pre">&quot;column:\*&quot;</span></code> object types specific properties)<a class="headerlink" href="#object-column-object-types-specific-properties" title="Permalink to this headline">¶</a></h3>
+<p>Here are <code class="docutils literal"><span class="pre">&quot;column:\*&quot;</span></code> object types specific properties in
+<code class="docutils literal"><span class="pre">OBJECT</span></code>:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>{
+  &quot;range&quot;: RANGE
+}
+</pre></div>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">range</span></code></td>
+<td>The type of the column's value. See
+<a class="reference internal" href="#object-list-return-value-range"><span class="std std-ref">RANGE</span></a> for details.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="object-column-index-object-type-specific-properties">
+<h3>7.3.41.5.12. <code class="docutils literal"><span class="pre">OBJECT</span></code> (<code class="docutils literal"><span class="pre">&quot;column:index&quot;</span></code> object type specific properties)<a class="headerlink" href="#object-column-index-object-type-specific-properties" title="Permalink to this headline">¶</a></h3>
+<p>Here are <code class="docutils literal"><span class="pre">&quot;column:index&quot;</span></code> object type specific properties in
+<code class="docutils literal"><span class="pre">OBJECT</span></code>:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>{
+  &quot;sources&quot;: SOURCES
+}
+</pre></div>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">sources</span></code></td>
+<td>The sources of the index column. See
+<a class="reference internal" href="#object-list-return-value-sources"><span class="std std-ref">SOURCES</span></a> for details.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="sources">
+<span id="object-list-return-value-sources"></span><h3>7.3.41.5.13. <code class="docutils literal"><span class="pre">SOURCES</span></code><a class="headerlink" href="#sources" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">SOURCES</span></code> represents the sources of the index column.</p>
+<p><code class="docutils literal"><span class="pre">SOURCES</span></code> is an array of <code class="docutils literal"><span class="pre">SOURCE</span></code>:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>[
+  SOURCE_1,
+  SOURCE_2,
+  ...,
+  SOURCE_n
+]
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">SOURCE</span></code> has the following properties:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>{
+  &quot;id&quot;:   ID,
+  &quot;NAME&quot;: NAME
+}
+</pre></div>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">id</span></code></td>
+<td>The ID of the source table or column. It's an integer.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">name</span></code></td>
+<td>The name of the source table or column. It's a string.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="see-also">
+<h2>7.3.41.6. See also<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference internal" href="schema.html"><span class="doc">schema</span></a></li>
+</ul>
+</div></blockquote>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">7.3.41. <code class="docutils literal"><span class="pre">object_list</span></code></a><ul>
+<li><a class="reference internal" href="#summary">7.3.41.1. Summary</a></li>
+<li><a class="reference internal" href="#syntax">7.3.41.2. Syntax</a></li>
+<li><a class="reference internal" href="#usage">7.3.41.3. Usage</a></li>
+<li><a class="reference internal" href="#parameters">7.3.41.4. Parameters</a><ul>
+<li><a class="reference internal" href="#required-parameters">7.3.41.4.1. Required parameters</a></li>
+<li><a class="reference internal" href="#optional-parameters">7.3.41.4.2. Optional parameters</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#return-value">7.3.41.5. Return value</a><ul>
+<li><a class="reference internal" href="#header">7.3.41.5.1. <code class="docutils literal"><span class="pre">HEADER</span></code></a></li>
+<li><a class="reference internal" href="#objects">7.3.41.5.2. <code class="docutils literal"><span class="pre">OBJECTS</span></code></a></li>
+<li><a class="reference internal" href="#object-common-properties">7.3.41.5.3. <code class="docutils literal"><span class="pre">OBJECT</span></code> (common properties)</a></li>
+<li><a class="reference internal" href="#object-type">7.3.41.5.4. <code class="docutils literal"><span class="pre">OBJECT_TYPE</span></code></a></li>
+<li><a class="reference internal" href="#flags">7.3.41.5.5. <code class="docutils literal"><span class="pre">FLAGS</span></code></a></li>
+<li><a class="reference internal" href="#object-type-object-type-specific-properties">7.3.41.5.6. <code class="docutils literal"><span class="pre">OBJECT</span></code> (<code class="docutils literal"><span class="pre">&quot;type&quot;</span></code> object type specific properties)</a></li>
+<li><a class="reference internal" href="#object-proc-object-type-specific-properties">7.3.41.5.7. <code class="docutils literal"><span class="pre">OBJECT</span></code> (<code class="docutils literal"><span class="pre">&quot;proc&quot;</span></code> object type specific properties)</a></li>
+<li><a class="reference internal" href="#object-table-object-types-specific-properties">7.3.41.5.8. <code class="docutils literal"><span class="pre">OBJECT</span></code> (<code class="docutils literal"><span class="pre">&quot;table:\*&quot;</span></code> object types specific properties)</a></li>
+<li><a class="reference internal" href="#range">7.3.41.5.9. <code class="docutils literal"><span class="pre">RANGE</span></code></a></li>
+<li><a class="reference internal" href="#token-filters">7.3.41.5.10. <code class="docutils literal"><span class="pre">TOKEN_FILTERS</span></code></a></li>
+<li><a class="reference internal" href="#object-column-object-types-specific-properties">7.3.41.5.11. <code class="docutils literal"><span class="pre">OBJECT</span></code> (<code class="docutils literal"><span class="pre">&quot;column:\*&quot;</span></code> object types specific properties)</a></li>
+<li><a class="reference internal" href="#object-column-index-object-type-specific-properties">7.3.41.5.12. <code class="docutils literal"><span class="pre">OBJECT</span></code> (<code class="docutils literal"><span class="pre">&quot;column:index&quot;</span></code> object type specific properties)</a></li>
+<li><a class="reference internal" href="#sources">7.3.41.5.13. <code class="docutils literal"><span class="pre">SOURCES</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#see-also">7.3.41.6. See also</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="object_inspect.html"
+                        title="previous chapter">7.3.40. <code class="docutils literal"><span class="pre">object_inspect</span></code></a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="object_remove.html"
+                        title="next chapter">7.3.42. <code class="docutils literal"><span class="pre">object_remove</span></code></a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../sources/reference/commands/object_list.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="object_remove.html" title="7.3.42. object_remove"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="object_inspect.html" title="7.3.40. object_inspect"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v6.0.7 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../reference.html" >7. Reference manual</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="../command.html" >7.3. Command</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2009-2016, Brazil, Inc.
+    </div>
+      <script src="http://connect.facebook.net/en_US/all.js"></script>
+
+    <script>
+      FB.init({
+         appId  : null,
+         status : true, // check login status
+         cookie : true, // enable cookies to allow the server to access the session
+         xfbml  : true  // parse XFBML
+      });
+    </script>
+  </body>
+
+</html>

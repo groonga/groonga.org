@@ -109,6 +109,9 @@
 <div class="versionadded">
 <p><span class="versionmodified">バージョン 6.0.1 で追加: </span><code class="docutils literal"><span class="pre">dependent</span></code> パラメーターを使うと、対象テーブルを参照しているテーブル・カラムと対象シャードに関連しているテーブルも一緒に削除できます。</p>
 </div>
+<div class="versionadded">
+<p><span class="versionmodified">バージョン 6.0.9 で追加: </span><code class="docutils literal"><span class="pre">force</span></code> パラメーターを使うと壊れているテーブル・カラムでもできるだけ削除することができます。</p>
+</div>
 </div>
 <div class="section" id="syntax">
 <h2>7.3.36.2. 構文<a class="headerlink" href="#syntax" title="このヘッドラインへのパーマリンク">¶</a></h2>
@@ -121,6 +124,7 @@
                      [max=null]
                      [max_border=&quot;include&quot;]
                      [dependent=no]
+                     [force=no]
 </pre></div>
 </div>
 </div>
@@ -137,6 +141,8 @@
 <li><p class="first">削除できないケース</p>
 </li>
 <li><p class="first">関連するテーブルと一緒に削除</p>
+</li>
+<li><p class="first">可能な限り壊れているテーブルを削除</p>
 </li>
 <li><p class="first">利用リソースの削減</p>
 </li>
@@ -369,7 +375,7 @@ column_create Bookmarks log_20160320 COLUMN_SCALAR Logs_20160320
 #       [
 #         &quot;Groonga::Sharding::LogicalTableRemoveCommand.remove_table&quot;,
 #         &quot;/home/kou/work/c/groonga.clean/plugins/sharding/logical_table_remove.rb&quot;,
-#         80
+#         139
 #       ]
 #     ]
 #   ]
@@ -434,8 +440,71 @@ object_exist Servers
 </pre></div>
 </div>
 </div>
+<div class="section" id="removes-broken-tables-as-much-as-possible">
+<span id="logical-table-removes-broken-tables-as-much-as-possible"></span><h3>7.3.36.3.5. 可能な限り壊れているテーブルを削除<a class="headerlink" href="#removes-broken-tables-as-much-as-possible" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="versionadded">
+<p><span class="versionmodified">バージョン 6.0.9 で追加.</span></p>
+</div>
+<p>対象のテーブルが壊れていた場合は削除できません。しかし、 <code class="docutils literal"><span class="pre">force</span></code> パラメーターを指定することで可能な限り削除することができます。</p>
+<p><code class="docutils literal"><span class="pre">--force</span> <span class="pre">yes</span></code> を指定すると、対象テーブルを可能な限り削除します。いくつかのケースでは削除できないテーブル・カラムがあります。たとえば、インデックスカラムが壊れている場合はそのインデックスカラムを削除できません。</p>
+<p>以下はこのケースを示すサンプルスキーマです。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>table_create  Logs_20160320 TABLE_NO_KEY
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Logs_20160320 timestamp COLUMN_SCALAR Time
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create  Timestamps TABLE_PAT_KEY Time
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Timestamps logs_20160320_timestamp \
+  COLUMN_INDEX Logs_20160320 timestamp
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">Timestamps.logs_20160320_timestamp</span></code> が壊れていると <code class="docutils literal"><span class="pre">Logs_20160320</span></code> を削除できません。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_table_remove \
+  --logical_table Logs \
+  --shard_key timestamp
+# [
+#   [
+#     -55,
+#     1337566253.89858,
+#     0.000355720520019531,
+#     &quot;object corrupt: &lt;[column][remove][index] hook has a dangling reference: &lt;Logs_20160320.timestamp&gt; -&gt; &lt;Timestamps.logs_20160320_&quot;,
+#     [
+#       [
+#         &quot;Groonga::Sharding::LogicalTableRemoveCommand.remove_table&quot;,
+#         &quot;/home/kou/work/c/groonga.clean/plugins/sharding/logical_table_remove.rb&quot;,
+#         139
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">--force</span> <span class="pre">yes</span></code> パラメーターを使うと、たとえ <code class="docutils literal"><span class="pre">Timestamps.logs_20160320_timestamp</span></code> が壊れていても <code class="docutils literal"><span class="pre">Logs_20160320</span></code> とこのテーブルのカラムを削除できます。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_table_remove \
+  --logical_table Logs \
+  --shard_key timestamp \
+  --force yes
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">Logs_20160320</span></code> とそのテーブルのカラムは削除されますが <code class="docutils literal"><span class="pre">Timestamps.logs_20160320_timestamp</span></code> は削除されません。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>object_exist Logs_20160320
+# [[0, 1337566253.89858, 0.000355720520019531], false]
+object_exist Logs_20160320.timestamp
+# [[0, 1337566253.89858, 0.000355720520019531], false]
+object_exist Timestamps.logs_20160320_timestamp
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">--force</span> <span class="pre">yes</span></code> パラメーターは危険なパラメーターです。通常これを使う必要はありません。</p>
+</div>
 <div class="section" id="decreases-used-resources">
-<span id="logical-table-remove-decreases-used-resources"></span><h3>7.3.36.3.5. 利用リソースの削減<a class="headerlink" href="#decreases-used-resources" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<span id="logical-table-remove-decreases-used-resources"></span><h3>7.3.36.3.6. 利用リソースの削減<a class="headerlink" href="#decreases-used-resources" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <p>このコマンドが使うリソースを削減できます。詳細は <a class="reference internal" href="table_remove.html#table-remove-decreases-used-resources"><span class="std std-ref">利用リソースの削減</span></a> を参照してください。なぜなら <code class="docutils literal"><span class="pre">logical_table_remove</span></code> は <a class="reference internal" href="table_remove.html"><span class="doc">table_remove</span></a> と同じロジックを使っているからです。</p>
 </div>
 </div>
@@ -498,6 +567,15 @@ object_exist Servers
 <p>このパラメーターは注意して使ってください。危険なパラメーターです。</p>
 <p>このパラメーターの使い方は <a class="reference internal" href="#logical-table-remove-removes-with-related-tables"><span class="std std-ref">関連するテーブルと一緒に削除</span></a> を参照してください。</p>
 </div>
+<div class="section" id="force">
+<h4>7.3.36.4.2.6. <code class="docutils literal"><span class="pre">force</span></code><a class="headerlink" href="#force" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">バージョン 6.0.9 で追加.</span></p>
+</div>
+<p>もし問題があったとしても対象テーブル・カラムを削除したいかどうかを指定します。</p>
+<p>このパラメーターは注意して使ってください。危険なパラメーターです。</p>
+<p>このパラメーターの使い方は <a class="reference internal" href="#logical-table-removes-broken-tables-as-much-as-possible"><span class="std std-ref">可能な限り壊れているテーブルを削除</span></a> を参照してください。</p>
+</div>
 </div>
 </div>
 <div class="section" id="return-value">
@@ -527,7 +605,8 @@ object_exist Servers
 <li><a class="reference internal" href="#removes-parts-of-a-logical-table">7.3.36.3.2. 論理テーブルの一部を削除</a></li>
 <li><a class="reference internal" href="#unremovable-cases">7.3.36.3.3. 削除できないケース</a></li>
 <li><a class="reference internal" href="#removes-with-related-tables">7.3.36.3.4. 関連するテーブルと一緒に削除</a></li>
-<li><a class="reference internal" href="#decreases-used-resources">7.3.36.3.5. 利用リソースの削減</a></li>
+<li><a class="reference internal" href="#removes-broken-tables-as-much-as-possible">7.3.36.3.5. 可能な限り壊れているテーブルを削除</a></li>
+<li><a class="reference internal" href="#decreases-used-resources">7.3.36.3.6. 利用リソースの削減</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#parameters">7.3.36.4. 引数</a><ul>
@@ -542,6 +621,7 @@ object_exist Servers
 <li><a class="reference internal" href="#max">7.3.36.4.2.3. <code class="docutils literal"><span class="pre">max</span></code></a></li>
 <li><a class="reference internal" href="#max-border">7.3.36.4.2.4. <code class="docutils literal"><span class="pre">max_border</span></code></a></li>
 <li><a class="reference internal" href="#dependent">7.3.36.4.2.5. <code class="docutils literal"><span class="pre">dependent</span></code></a></li>
+<li><a class="reference internal" href="#force">7.3.36.4.2.6. <code class="docutils literal"><span class="pre">force</span></code></a></li>
 </ul>
 </li>
 </ul>

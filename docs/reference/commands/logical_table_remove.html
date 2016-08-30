@@ -113,6 +113,10 @@ specify range as between <code class="docutils literal"><span class="pre">2016-0
 table and tables related with the target shard by using
 <code class="docutils literal"><span class="pre">dependent</span></code> parameter.</p>
 </div>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 6.0.9: </span>You can remove broken tables and columns as much as possible by
+using <code class="docutils literal"><span class="pre">force</span></code> parameter.</p>
+</div>
 </div>
 <div class="section" id="syntax">
 <h2>7.3.36.2. Syntax<a class="headerlink" href="#syntax" title="Permalink to this headline">¶</a></h2>
@@ -125,6 +129,7 @@ table and tables related with the target shard by using
                      [max=null]
                      [max_border=&quot;include&quot;]
                      [dependent=no]
+                     [force=no]
 </pre></div>
 </div>
 </div>
@@ -138,6 +143,7 @@ table and tables related with the target shard by using
 <li>Removes parts of a logical table</li>
 <li>Unremovable cases</li>
 <li>Removes with related tables</li>
+<li>Removes broken tables as much as possible</li>
 <li>Decreases used resources</li>
 </ul>
 </div></blockquote>
@@ -382,7 +388,7 @@ default:</p>
 #       [
 #         &quot;Groonga::Sharding::LogicalTableRemoveCommand.remove_table&quot;,
 #         &quot;/home/kou/work/c/groonga.clean/plugins/sharding/logical_table_remove.rb&quot;,
-#         80
+#         139
 #       ]
 #     ]
 #   ]
@@ -465,8 +471,79 @@ object_exist Servers
 </pre></div>
 </div>
 </div>
+<div class="section" id="removes-broken-tables-as-much-as-possible">
+<span id="logical-table-removes-broken-tables-as-much-as-possible"></span><h3>7.3.36.3.5. Removes broken tables as much as possible<a class="headerlink" href="#removes-broken-tables-as-much-as-possible" title="Permalink to this headline">¶</a></h3>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 6.0.9.</span></p>
+</div>
+<p>If the target tables are broken, you can't remove them. But you can
+remove them as much as possible by using <code class="docutils literal"><span class="pre">force</span></code> parameter.</p>
+<p>If you specify <code class="docutils literal"><span class="pre">--force</span> <span class="pre">yes</span></code>, they are removed as much as
+possible. In some cases, some tables and/or columns may not be
+removed. For example, broken index column can't be removed.</p>
+<p>Here is a sample schema to show this case:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>table_create  Logs_20160320 TABLE_NO_KEY
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Logs_20160320 timestamp COLUMN_SCALAR Time
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create  Timestamps TABLE_PAT_KEY Time
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Timestamps logs_20160320_timestamp \
+  COLUMN_INDEX Logs_20160320 timestamp
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>You can't remove <code class="docutils literal"><span class="pre">Logs_20160320</span></code> when
+<code class="docutils literal"><span class="pre">Timestamps.logs_20160320_timestamp</span></code> is broken:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_table_remove \
+  --logical_table Logs \
+  --shard_key timestamp
+# [
+#   [
+#     -55,
+#     1337566253.89858,
+#     0.000355720520019531,
+#     &quot;object corrupt: &lt;[column][remove][index] hook has a dangling reference: &lt;Logs_20160320.timestamp&gt; -&gt; &lt;Timestamps.logs_20160320_&quot;,
+#     [
+#       [
+#         &quot;Groonga::Sharding::LogicalTableRemoveCommand.remove_table&quot;,
+#         &quot;/home/kou/work/c/groonga.clean/plugins/sharding/logical_table_remove.rb&quot;,
+#         139
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>You can remove <code class="docutils literal"><span class="pre">Logs_20160320</span></code> and its columns by using <code class="docutils literal"><span class="pre">--force</span>
+<span class="pre">yes</span></code> parameter even when <code class="docutils literal"><span class="pre">Timestamps.logs_20160320_timestamp</span></code> is
+broken:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_table_remove \
+  --logical_table Logs \
+  --shard_key timestamp \
+  --force yes
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">Logs_20160320</span></code> and its columns are removed but
+<code class="docutils literal"><span class="pre">Timestamps.logs_20160320_timestamp</span></code> isn't removed:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>object_exist Logs_20160320
+# [[0, 1337566253.89858, 0.000355720520019531], false]
+object_exist Logs_20160320.timestamp
+# [[0, 1337566253.89858, 0.000355720520019531], false]
+object_exist Timestamps.logs_20160320_timestamp
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">--force</span> <span class="pre">yes</span></code> parameter is a dangerous parameter. Normally, you
+don't need to use it.</p>
+</div>
 <div class="section" id="decreases-used-resources">
-<span id="logical-table-remove-decreases-used-resources"></span><h3>7.3.36.3.5. Decreases used resources<a class="headerlink" href="#decreases-used-resources" title="Permalink to this headline">¶</a></h3>
+<span id="logical-table-remove-decreases-used-resources"></span><h3>7.3.36.3.6. Decreases used resources<a class="headerlink" href="#decreases-used-resources" title="Permalink to this headline">¶</a></h3>
 <p>You can decrease resources for this command. See
 <a class="reference internal" href="table_remove.html#table-remove-decreases-used-resources"><span class="std std-ref">Decreases used resources</span></a> for details. Because
 <code class="docutils literal"><span class="pre">logical_table_remove</span></code> uses the same logic as <a class="reference internal" href="table_remove.html"><span class="doc">table_remove</span></a>.</p>
@@ -542,6 +619,17 @@ returned. If there are tables for the shared, they are not touched.</p>
 <p>See <a class="reference internal" href="#logical-table-remove-removes-with-related-tables"><span class="std std-ref">Removes with related tables</span></a> how to use
 this parameter.</p>
 </div>
+<div class="section" id="force">
+<h4>7.3.36.4.2.6. <code class="docutils literal"><span class="pre">force</span></code><a class="headerlink" href="#force" title="Permalink to this headline">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 6.0.9.</span></p>
+</div>
+<p>Specifies whether you want to remove target tables and columns even if
+some problems exist.</p>
+<p>You should use this parameter carefully. This is a danger parameter.</p>
+<p>See <a class="reference internal" href="#logical-table-removes-broken-tables-as-much-as-possible"><span class="std std-ref">Removes broken tables as much as possible</span></a> how
+to use this parameter.</p>
+</div>
 </div>
 </div>
 <div class="section" id="return-value">
@@ -571,7 +659,8 @@ this parameter.</p>
 <li><a class="reference internal" href="#removes-parts-of-a-logical-table">7.3.36.3.2. Removes parts of a logical table</a></li>
 <li><a class="reference internal" href="#unremovable-cases">7.3.36.3.3. Unremovable cases</a></li>
 <li><a class="reference internal" href="#removes-with-related-tables">7.3.36.3.4. Removes with related tables</a></li>
-<li><a class="reference internal" href="#decreases-used-resources">7.3.36.3.5. Decreases used resources</a></li>
+<li><a class="reference internal" href="#removes-broken-tables-as-much-as-possible">7.3.36.3.5. Removes broken tables as much as possible</a></li>
+<li><a class="reference internal" href="#decreases-used-resources">7.3.36.3.6. Decreases used resources</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#parameters">7.3.36.4. Parameters</a><ul>
@@ -586,6 +675,7 @@ this parameter.</p>
 <li><a class="reference internal" href="#max">7.3.36.4.2.3. <code class="docutils literal"><span class="pre">max</span></code></a></li>
 <li><a class="reference internal" href="#max-border">7.3.36.4.2.4. <code class="docutils literal"><span class="pre">max_border</span></code></a></li>
 <li><a class="reference internal" href="#dependent">7.3.36.4.2.5. <code class="docutils literal"><span class="pre">dependent</span></code></a></li>
+<li><a class="reference internal" href="#force">7.3.36.4.2.6. <code class="docutils literal"><span class="pre">force</span></code></a></li>
 </ul>
 </li>
 </ul>

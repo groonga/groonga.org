@@ -388,7 +388,7 @@ default:</p>
 #       [
 #         &quot;Groonga::Sharding::LogicalTableRemoveCommand.remove_table&quot;,
 #         &quot;/home/kou/work/c/groonga.clean/plugins/sharding/logical_table_remove.rb&quot;,
-#         139
+#         156
 #       ]
 #     ]
 #   ]
@@ -479,9 +479,8 @@ object_exist Servers
 <p>If the target tables are broken, you can't remove them. But you can
 remove them as much as possible by using <code class="docutils literal"><span class="pre">force</span></code> parameter.</p>
 <p>If you specify <code class="docutils literal"><span class="pre">--force</span> <span class="pre">yes</span></code>, they are removed as much as
-possible. In some cases, some tables and/or columns may not be
-removed. For example, broken index column can't be removed.</p>
-<p>Here is a sample schema to show this case:</p>
+possible. You can also use <code class="docutils literal"><span class="pre">--dependent</span> <span class="pre">yes</span></code> with <code class="docutils literal"><span class="pre">--force</span> <span class="pre">yes</span></code>.</p>
+<p>Here is a sample schema to show how <code class="docutils literal"><span class="pre">--force</span> <span class="pre">yes</span></code> behavior:</p>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>table_create  Logs_20160320 TABLE_NO_KEY
 # [[0, 1337566253.89858, 0.000355720520019531], true]
@@ -510,7 +509,7 @@ column_create Timestamps logs_20160320_timestamp \
 #       [
 #         &quot;Groonga::Sharding::LogicalTableRemoveCommand.remove_table&quot;,
 #         &quot;/home/kou/work/c/groonga.clean/plugins/sharding/logical_table_remove.rb&quot;,
-#         139
+#         156
 #       ]
 #     ]
 #   ]
@@ -528,15 +527,15 @@ broken:</p>
 # [[0, 1337566253.89858, 0.000355720520019531], true]
 </pre></div>
 </div>
-<p><code class="docutils literal"><span class="pre">Logs_20160320</span></code> and its columns are removed but
-<code class="docutils literal"><span class="pre">Timestamps.logs_20160320_timestamp</span></code> isn't removed:</p>
+<p><code class="docutils literal"><span class="pre">Logs_20160320</span></code>, its columns and
+<code class="docutils literal"><span class="pre">Timestamps.logs_20160320_timestamp</span></code> are removed:</p>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>object_exist Logs_20160320
 # [[0, 1337566253.89858, 0.000355720520019531], false]
 object_exist Logs_20160320.timestamp
 # [[0, 1337566253.89858, 0.000355720520019531], false]
 object_exist Timestamps.logs_20160320_timestamp
-# [[0, 1337566253.89858, 0.000355720520019531], true]
+# [[0, 1337566253.89858, 0.000355720520019531], false]
 </pre></div>
 </div>
 <p><code class="docutils literal"><span class="pre">--force</span> <span class="pre">yes</span></code> parameter is a dangerous parameter. Normally, you

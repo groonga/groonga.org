@@ -1,10 +1,10 @@
 ---
 layout: post.ja
-title: MySQLとPostgreSQLと日本語全文検索3開催
+title: MySQLとPostgreSQLと日本語全文検索3開催 #mypgft
 description: MySQLとPostgreSQLと日本語全文検索3を開催しました！
 ---
 
-## MySQLとPostgreSQLと日本語全文検索3開催
+## MySQLとPostgreSQLと日本語全文検索3開催 #mygpft
 
 2016年9月29日（肉の日！）に[MySQLとPostgreSQLと日本語全文検索3](https://groonga.doorkeeper.jp/events/50541)を開催しました！
 

@@ -10,11 +10,10 @@ description: MySQLとPostgreSQLと日本語全文検索2を開催しました！
 
 会場は今回も[DMM.comラボ](http://labo.dmm.com/about/access/)さんに提供してもらいました。
 
-資料はほぼ公開されています。
+資料は公開されています。
 
   * [MySQL 5.7 InnoDB 日本語全文検索（その２）](http://www.slideshare.net/yoyamasaki/mysql-57-innodb) by [@yyamasaki1](https://twitter.com/yyamasaki1)
-  * pg\_bigmをさわり始めた人に教えたいこと（仮） by [@sawada_masahiko](https://twitter.com/sawada_masahiko)
-    * （しばらくしたら公開されるはず）
+  * [pg\_bigmを触り始めた人に伝えたいこと](http://www.slideshare.net/masahikosawada98/pgbigm-66639454) by [@sawada_masahiko](https://twitter.com/sawada_masahiko)
   * [初心者向けMroonga・PGroonga情報](http://slide.rabbit-shocker.org/authors/kou/mysql-and-postgresql-and-japanese-full-text-search-2/) by [@ktou](https://twitter.com/ktou)
     * 解説記事：[MySQLとPostgreSQLと日本語全文検索2：初心者向けMroonga・PGroonga情報 #mypgft - ククログ(2016-06-09)](http://www.clear-code.com/blog/2016/6/9.html)
   * [VVAULT AUDITにおけるPGROONGAの利用](http://www.slideshare.net/NaokiTakami/vvault-audit-pgroonga) by 高見さん

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>7.3.11. column_create &mdash; Groonga v6.0.9 documentation</title>
+    <title>7.3.11. column_create &#8212; Groonga v6.0.9 documentation</title>
     
     <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
@@ -24,6 +24,8 @@
     <script type="text/javascript" src="../../static/underscore.js"></script>
     <script type="text/javascript" src="../../static/doctools.js"></script>
     <link rel="shortcut icon" href="../../static/favicon.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
     <link rel="top" title="Groonga v6.0.9 documentation" href="../../index.html" />
     <link rel="up" title="7.3. Command" href="../command.html" />
     <link rel="next" title="7.3.12. column_list" href="column_list.html" />
@@ -73,9 +75,9 @@
         <li class="right" >
           <a href="column_copy.html" title="7.3.10. column_copy"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v6.0.9 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../../reference.html" >7. Reference manual</a> &raquo;</li>
-          <li class="nav-item nav-item-2"><a href="../command.html" accesskey="U">7.3. Command</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v6.0.9 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../reference.html" >7. Reference manual</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../command.html" accesskey="U">7.3. Command</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -88,86 +90,976 @@
 <h1>7.3.11. <code class="docutils literal"><span class="pre">column_create</span></code><a class="headerlink" href="#column-create" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="summary">
 <h2>7.3.11.1. Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
-<p>column_create - カラムの追加</p>
-<p>Groonga組込コマンドの一つであるcolumn_createについて説明します。組込コマンドは、groonga実行ファイルの引数、標準入力、またはソケット経由でgroongaサーバにリクエストを送信することによって実行します。</p>
-<p>column_createは、使用しているデータベースのテーブルに対してカラムを追加します。</p>
+<p><code class="docutils literal"><span class="pre">column_create</span></code> creates a new column in a table.</p>
+<p>You need to create one or more columns to store multiple data in one
+record.</p>
+<p>Groonga provides an index as a column. It's different from other
+systems. An index is just an index in other systems. Implementing an
+index as a column provides flexibility. For example, you can add
+metadata to each token.</p>
+<p>See <a class="reference internal" href="../column.html"><span class="doc">Column</span></a> for column details.</p>
 </div>
 <div class="section" id="syntax">
 <h2>7.3.11.2. Syntax<a class="headerlink" href="#syntax" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-none"><div class="highlight"><pre><span></span>column_create table name flags type [source]
+<p>This command takes many parameters.</p>
+<p>Most parameters are required:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>column_create table
+              name
+              flags
+              type
+              [source=null]
 </pre></div>
 </div>
 </div>
 <div class="section" id="usage">
 <h2>7.3.11.3. Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
-<p>テーブルEntryに、ShortText型の値を格納するカラム、bodyを作成します。:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>column_create Entry body --type ShortText
-[true]
+<p>This section describes about the followings:</p>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference internal" href="#column-create-scalar"><span class="std std-ref">Create a scalar column</span></a></li>
+<li><a class="reference internal" href="#column-create-vector"><span class="std std-ref">Create a vector column</span></a></li>
+<li><a class="reference internal" href="#column-create-vector-weight"><span class="std std-ref">Create a weight vector column</span></a></li>
+<li><a class="reference internal" href="#column-create-reference"><span class="std std-ref">Create a column that refers a table's record</span></a></li>
+<li><a class="reference internal" href="#column-create-index"><span class="std std-ref">Create an index column</span></a></li>
+<li><a class="reference internal" href="#column-create-index-full-text-search"><span class="std std-ref">Create an index column for full text search</span></a></li>
+<li><a class="reference internal" href="#column-create-index-multiple-columns"><span class="std std-ref">Create a multiple columns index column</span></a></li>
+<li><a class="reference internal" href="#column-create-index-small"><span class="std std-ref">Create a small index column</span></a></li>
+<li><a class="reference internal" href="#column-create-index-medium"><span class="std std-ref">Create a medium index column</span></a></li>
+</ul>
+</div></blockquote>
+<p>Here is the <code class="docutils literal"><span class="pre">People</span></code> table definition. The <code class="docutils literal"><span class="pre">People</span></code> table is used
+in examples:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>table_create \
+  --name People \
+  --flags TABLE_HASH_KEY \
+  --key_type ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
 </pre></div>
 </div>
-<p>テーブルTermに、Entryテーブルのbodyカラムの値を対象とする完全転置インデックス型カラム、entry_bodyを作成します。:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>column_create Term entry_body COLUMN_INDEX|WITH_POSITION Entry body
-[true]
+<div class="section" id="create-a-scalar-column">
+<span id="column-create-scalar"></span><h3>7.3.11.3.1. Create a scalar column<a class="headerlink" href="#create-a-scalar-column" title="Permalink to this headline">¶</a></h3>
+<p>Groonga provides scalar column to store one value. For example, scalar
+column should be used for storing age into a person record. Because a
+person record must have only one age.</p>
+<p>If you want to store multiple values into a record, scalar column
+isn't suitable. Use <a class="reference internal" href="#column-create-vector"><span class="std std-ref">Create a vector column</span></a> instead.</p>
+<p>You must specify <code class="docutils literal"><span class="pre">COLUMN_SCALAR</span></code> to the <code class="docutils literal"><span class="pre">flags</span></code> parameter to
+create a scalar column.</p>
+<p>Here is an example to create the <code class="docutils literal"><span class="pre">age</span></code> column to the <code class="docutils literal"><span class="pre">People</span></code>
+table. <code class="docutils literal"><span class="pre">age</span></code> column is a scalar column. It can store one <code class="docutils literal"><span class="pre">UInt8</span></code>
+(<code class="docutils literal"><span class="pre">0-255</span></code>) value as its value:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>column_create \
+  --table People \
+  --name age \
+  --flags COLUMN_SCALAR \
+  --type UInt8
+# [[0, 1337566253.89858, 0.000355720520019531], true]
 </pre></div>
+</div>
+<p>You can store one value (<code class="docutils literal"><span class="pre">7</span></code>) by the following <a class="reference internal" href="load.html"><span class="doc">load</span></a> command:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>load --table People
+[
+{&quot;_key&quot;: &quot;alice&quot;, &quot;roles&quot;: [&quot;adventurer&quot;, &quot;younger-sister&quot;]}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 1]
+</pre></div>
+</div>
+<p>You can confirm the stored one value (<code class="docutils literal"><span class="pre">7</span></code>) by the following
+<a class="reference internal" href="select.html"><span class="doc">select</span></a> command:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>select --table People
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;age&quot;,
+#           &quot;UInt8&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;alice&quot;,
+#         7
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
+<div class="section" id="create-a-vector-column">
+<span id="column-create-vector"></span><h3>7.3.11.3.2. Create a vector column<a class="headerlink" href="#create-a-vector-column" title="Permalink to this headline">¶</a></h3>
+<p>Groonga provides vector column to store multiple values. For example,
+vector column may be used for storing roles into a person
+record. Because a person record may have multiple roles.</p>
+<p>If you want to store only one value into a record, vector column isn't
+suitable. Use <a class="reference internal" href="#column-create-scalar"><span class="std std-ref">Create a scalar column</span></a> instead.</p>
+<p>You must specify <code class="docutils literal"><span class="pre">COLUMN_VECTOR</span></code> to the <code class="docutils literal"><span class="pre">flags</span></code> parameter to
+create a vector column.</p>
+<p>Here is an example to create the <code class="docutils literal"><span class="pre">roles</span></code> column to the <code class="docutils literal"><span class="pre">People</span></code>
+table. <code class="docutils literal"><span class="pre">roles</span></code> column is a vector column. It can store zero or more
+<code class="docutils literal"><span class="pre">ShortText</span></code> values as its value:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>column_create \
+  --table People \
+  --name roles \
+  --flags COLUMN_VECTOR \
+  --type ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>You can store multiple values (<code class="docutils literal"><span class="pre">[&quot;adventurer&quot;,</span> <span class="pre">&quot;younger-sister&quot;]</span></code>)
+by the following <a class="reference internal" href="load.html"><span class="doc">load</span></a> command:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>load --table People
+[
+{&quot;_key&quot;: &quot;alice&quot;, &quot;roles&quot;: [&quot;adventurer&quot;, &quot;younger-sister&quot;]}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 1]
+</pre></div>
+</div>
+<p>You can confirm the stored multiple values (<code class="docutils literal"><span class="pre">[&quot;adventurer&quot;,</span>
+<span class="pre">&quot;younger-sister&quot;]</span></code>) by the following <a class="reference internal" href="select.html"><span class="doc">select</span></a> command:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>select --table People
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;age&quot;,
+#           &quot;UInt8&quot;
+#         ],
+#         [
+#           &quot;roles&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;alice&quot;,
+#         7,
+#         [
+#           &quot;adventurer&quot;,
+#           &quot;younger-sister&quot;
+#         ]
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
+<div class="section" id="create-a-weight-vector-column">
+<span id="column-create-vector-weight"></span><h3>7.3.11.3.3. Create a weight vector column<a class="headerlink" href="#create-a-weight-vector-column" title="Permalink to this headline">¶</a></h3>
+<p>TODO: See also <a class="reference internal" href="../columns/vector.html#weight-vector-column"><span class="std std-ref">Weight vector column</span></a> and <a class="reference internal" href="select.html#select-adjuster"><span class="std std-ref">adjuster</span></a>.</p>
+</div>
+<div class="section" id="create-a-column-that-refers-a-table-s-record">
+<span id="column-create-reference"></span><h3>7.3.11.3.4. Create a column that refers a table's record<a class="headerlink" href="#create-a-column-that-refers-a-table-s-record" title="Permalink to this headline">¶</a></h3>
+<p>Both scalar column and vector column can store reference to record of
+an existing table as column value. It's useful to store relationship
+between records.</p>
+<p>For example, using a column that refers a person record is better for
+storing a character into a book record. Because one person may be
+appeared in some books.</p>
+<p>You must specify table name to be referenced to the <code class="docutils literal"><span class="pre">type</span></code> parameter
+to create a column that refers a table's record.</p>
+<p>Here is an example to create the <code class="docutils literal"><span class="pre">character</span></code> column to the <code class="docutils literal"><span class="pre">Books</span></code>
+table. The <code class="docutils literal"><span class="pre">character</span></code> column refers the <code class="docutils literal"><span class="pre">People</span></code> table. It can
+store one <code class="docutils literal"><span class="pre">People</span></code> table's record.</p>
+<p>Here is the <code class="docutils literal"><span class="pre">Books</span></code> table definition:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>table_create \
+  --name Books \
+  --flags TABLE_HASH_KEY \
+  --key_type ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>Here is the <code class="docutils literal"><span class="pre">character</span></code> column definition in the <code class="docutils literal"><span class="pre">Books</span></code>
+table. <code class="docutils literal"><span class="pre">--type</span> <span class="pre">People</span></code> is important:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>column_create \
+  --table Books \
+  --name character \
+  --flags COLUMN_SCALAR \
+  --type People
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>You can store one reference (<code class="docutils literal"><span class="pre">&quot;alice&quot;</span></code>) by the following <a class="reference internal" href="load.html"><span class="doc">load</span></a>
+command. You can use key value (<code class="docutils literal"><span class="pre">People._key</span></code> value) for referring a
+record:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>load --table Books
+[
+{&quot;_key&quot;: &quot;Alice&#39;s Adventure in Wonderland&quot;, &quot;character&quot;: &quot;alice&quot;}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 1]
+</pre></div>
+</div>
+<p>You can confirm the stored reference (<code class="docutils literal"><span class="pre">&quot;alice&quot;</span></code> record) by the
+following <a class="reference internal" href="select.html"><span class="doc">select</span></a> command. It retrieves the <code class="docutils literal"><span class="pre">age</span></code> column and
+the <code class="docutils literal"><span class="pre">roles</span></code> column values:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>select \
+ --table Books \
+ --output_columns _key,character._key,character.age,character.roles
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;character._key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;character.age&quot;,
+#           &quot;UInt8&quot;
+#         ],
+#         [
+#           &quot;character.roles&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Alice&#39;s Adventure in Wonderland&quot;,
+#         &quot;alice&quot;,
+#         7,
+#         [
+#           &quot;adventurer&quot;,
+#           &quot;younger-sister&quot;
+#         ]
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
+<div class="section" id="create-an-index-column">
+<span id="column-create-index"></span><h3>7.3.11.3.5. Create an index column<a class="headerlink" href="#create-an-index-column" title="Permalink to this headline">¶</a></h3>
+<p>Groonga provides index column for fast search. It doesn't store your
+data. It stores data for fast search.</p>
+<p>You don't need to update index column by yourself. Index column is
+updated automatically when you store data into a data column (scalar
+column or vector column) that is marked as index target column. You
+can set multiple columns as index target columns to one index column.</p>
+<p>If Groonga has an index column for the <code class="docutils literal"><span class="pre">age</span></code> column of the
+<code class="docutils literal"><span class="pre">People</span></code> table, Groonga can do fast equal search, fast comparison
+search and fast range search against <code class="docutils literal"><span class="pre">age</span></code> column values.</p>
+<p>You must specify the following parameters to create an index column:</p>
+<blockquote>
+<div><ul class="simple">
+<li>The <code class="docutils literal"><span class="pre">flags</span></code> parameter: <code class="docutils literal"><span class="pre">COLUMN_INDEX</span></code></li>
+<li>The <code class="docutils literal"><span class="pre">type</span></code> parameter: The table name of index target column such
+as <code class="docutils literal"><span class="pre">People</span></code></li>
+<li>The <code class="docutils literal"><span class="pre">source</span></code> parameter: The index target column name such as
+<code class="docutils literal"><span class="pre">age</span></code></li>
+</ul>
+</div></blockquote>
+<p>You don't need additional flags to the <code class="docutils literal"><span class="pre">flags</span></code> parameter for equal
+search, comparison search and range search index column. You need
+additional flags to the <code class="docutils literal"><span class="pre">flags</span></code> parameter for full text search index
+column or multiple column index column. See
+<a class="reference internal" href="#column-create-index-full-text-search"><span class="std std-ref">Create an index column for full text search</span></a> and
+<a class="reference internal" href="#column-create-index-multiple-columns"><span class="std std-ref">Create a multiple columns index column</span></a> for details.</p>
+<p>Here is an example to create an index column for the <code class="docutils literal"><span class="pre">age</span></code> column of
+the <code class="docutils literal"><span class="pre">People</span></code> table.</p>
+<p>First, you need to create a table for range index column. See
+<a class="reference internal" href="table_create.html#table-create-range-index-table"><span class="std std-ref">Create range index table</span></a> for details. This example
+creates the <code class="docutils literal"><span class="pre">Ages</span></code> table as <a class="reference internal" href="../tables.html#table-pat-key"><span class="std std-ref">TABLE_PAT_KEY</span></a>:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>table_create \
+  --name Ages \
+  --flags TABLE_PAT_KEY \
+  --key_type UInt8
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>Now, you can create an index column for the <code class="docutils literal"><span class="pre">age</span></code> column of the
+<code class="docutils literal"><span class="pre">People</span></code> table. <code class="docutils literal"><span class="pre">COLUMN_INDEX</span></code> in the <code class="docutils literal"><span class="pre">flags</span></code> parameter,
+<code class="docutils literal"><span class="pre">People</span></code> in the <code class="docutils literal"><span class="pre">type</span></code> parameter and <code class="docutils literal"><span class="pre">age</span></code> in the <code class="docutils literal"><span class="pre">source</span></code>
+parameter are important:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>column_create \
+  --table Ages \
+  --name people_age_index \
+  --flags COLUMN_INDEX \
+  --type People \
+  --source age
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>You can confirm that <code class="docutils literal"><span class="pre">age</span> <span class="pre">&gt;</span> <span class="pre">5</span></code> is evaluated by the
+<code class="docutils literal"><span class="pre">Ages.people_age_index</span></code> newly created index column from log. Groonga
+reports used index columns in <code class="docutils literal"><span class="pre">info</span></code> log level. You can change log
+level dynamically by <a class="reference internal" href="log_level.html"><span class="doc">log_level</span></a> command.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>log_level --level info
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+select \
+  --table People \
+  --filter &#39;age &gt; 5&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;age&quot;,
+#           &quot;UInt8&quot;
+#         ],
+#         [
+#           &quot;roles&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;alice&quot;,
+#         7,
+#         [
+#           &quot;adventurer&quot;,
+#           &quot;younger-sister&quot;
+#         ]
+#       ]
+#     ]
+#   ]
+# ]
+# log: 2016-10-13 19:10:02.292711|i| [table][select][index][range] &lt;Ages.people_age_index&gt;
+log_level --level notice
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>You can confirm that the <code class="docutils literal"><span class="pre">Ages.people_age_index</span></code> is used from the
+following log:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>[table][select][index][range] &lt;Ages.people_age_index&gt;
+</pre></div>
+</div>
+<p>The log says <code class="docutils literal"><span class="pre">Ages.people_age_index</span></code> index column is used for range
+search.</p>
+</div>
+<div class="section" id="create-an-index-column-for-full-text-search">
+<span id="column-create-index-full-text-search"></span><h3>7.3.11.3.6. Create an index column for full text search<a class="headerlink" href="#create-an-index-column-for-full-text-search" title="Permalink to this headline">¶</a></h3>
+<p>There is a difference between for non full text search (equal search,
+comparison search or range search) index column and for full text
+search index column. You need to add <code class="docutils literal"><span class="pre">WITH_POSITION</span></code> to the
+<code class="docutils literal"><span class="pre">flags</span></code> parameter. It means that you need to specify
+<code class="docutils literal"><span class="pre">COLUMN_INDEX|WITH_POSITION</span></code> to the <code class="docutils literal"><span class="pre">flags</span></code> parameter. It's the
+difference.</p>
+<p>Here is an example to create a full text search index column for the
+<code class="docutils literal"><span class="pre">roles</span></code> column of the <code class="docutils literal"><span class="pre">People</span></code> table.</p>
+<p>First, you need to create a table for full text search index
+column. See <a class="reference internal" href="table_create.html#table-create-lexicon"><span class="std std-ref">Create lexicon</span></a> for details. This example
+creates the <code class="docutils literal"><span class="pre">Terms</span></code> table as <a class="reference internal" href="../tables.html#table-pat-key"><span class="std std-ref">TABLE_PAT_KEY</span></a> with
+<a class="reference internal" href="../tokenizers.html#token-bigram"><span class="std std-ref">TokenBigram</span></a> tokenizer and <a class="reference internal" href="../normalizers.html#normalizer-auto"><span class="std std-ref">NormalizerAuto</span></a> normalizer:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>table_create \
+  --name Terms \
+  --flags TABLE_PAT_KEY \
+  --key_type ShortText \
+  --default_tokenizer TokenBigram \
+  --normalizer NormalizerAuto
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>Now, you can create a full text search index column for the <code class="docutils literal"><span class="pre">roles</span></code>
+column of the <code class="docutils literal"><span class="pre">People</span></code> table. <code class="docutils literal"><span class="pre">COLUMN_INDEX|WITH_POSITION</span></code> in the
+<code class="docutils literal"><span class="pre">flags</span></code> parameter, <code class="docutils literal"><span class="pre">People</span></code> in the <code class="docutils literal"><span class="pre">type</span></code> parameter and
+<code class="docutils literal"><span class="pre">roles</span></code> in the <code class="docutils literal"><span class="pre">source</span></code> parameter are important:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>column_create \
+  --table Terms \
+  --name people_roles_index \
+  --flags COLUMN_INDEX|WITH_POSITION \
+  --type People \
+  --source roles
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>You can confirm that <code class="docutils literal"><span class="pre">--match_columns</span> <span class="pre">roles</span></code> and <code class="docutils literal"><span class="pre">--query</span> <span class="pre">Sister</span></code>
+are evaluated by the <code class="docutils literal"><span class="pre">Terms.people_roles_index</span></code> newly created full
+text search index column from log. Groonga reports used index columns
+in <code class="docutils literal"><span class="pre">info</span></code> log level. You can change log level dynamically by
+<a class="reference internal" href="log_level.html"><span class="doc">log_level</span></a> command.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>log_level --level info
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+select \
+  --table People \
+  --match_columns roles \
+  --query Sister
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;age&quot;,
+#           &quot;UInt8&quot;
+#         ],
+#         [
+#           &quot;roles&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;alice&quot;,
+#         7,
+#         [
+#           &quot;adventurer&quot;,
+#           &quot;younger-sister&quot;
+#         ]
+#       ]
+#     ]
+#   ]
+# ]
+# log: 2016-10-13 19:10:02.953279|i| [object][search][index][key][exact] &lt;Terms.people_roles_index&gt;
+# log: 2016-10-13 19:10:02.953301|i| grn_ii_sel &gt; (Sister)
+# log: 2016-10-13 19:10:02.953331|i| n=1 (Sister)
+# log: 2016-10-13 19:10:02.953358|i| exact: 1
+# log: 2016-10-13 19:10:02.953362|i| hits=1
+log_level --level notice
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>You can confirm that the <code class="docutils literal"><span class="pre">Terms.people_roles_index</span></code> is used from the
+following log:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>[object][search][index][key][exact] &lt;Terms.people_roles_index&gt;
+</pre></div>
+</div>
+<p>The log says <code class="docutils literal"><span class="pre">Terms.people_roles_index</span></code> index column is used for
+full text search. (To be precise, the index column is used for exact
+term search by inverted index.)</p>
+</div>
+<div class="section" id="create-a-multiple-columns-index-column">
+<span id="column-create-index-multiple-columns"></span><h3>7.3.11.3.7. Create a multiple columns index column<a class="headerlink" href="#create-a-multiple-columns-index-column" title="Permalink to this headline">¶</a></h3>
+<p>You can create an index column for multiple columns. It means that you
+can do fast search for multiple columns with one index
+column. Multiple columns index column has better space efficiency than
+single column index column only when multiple columns have many same
+tokens. Multiple columns index column may be slower than single column
+index column. Because multiple columns index column will be a bigger
+index column.</p>
+<p>You can't use multiples columns in different tables as index target
+columns in the same multiple columns index column. You must specify
+columns in the same tables as index target columns to one multiple
+columns index column. For example, you can't create a multiple columns
+index for <code class="docutils literal"><span class="pre">People._key</span></code> and <code class="docutils literal"><span class="pre">Books._key</span></code> because they are columns
+of different tables. You can create a multiple columns index column
+for <code class="docutils literal"><span class="pre">People._key</span></code> and <code class="docutils literal"><span class="pre">People.roles</span></code> because they are columns of
+the same table.</p>
+<p>There is a difference between for single column index column and for
+multiple columns index column. You need to add <code class="docutils literal"><span class="pre">WITH_SECTION</span></code> to the
+<code class="docutils literal"><span class="pre">flags</span></code> parameter. It means that you need to specify
+<code class="docutils literal"><span class="pre">COLUMN_INDEX|WITH_SECTION</span></code> to the <code class="docutils literal"><span class="pre">flags</span></code> parameter. It's the
+difference.</p>
+<p>If you want to create a multiple columns index column for full text
+search, you need to specify
+<code class="docutils literal"><span class="pre">COLUMN_INDEX|WITH_POSITION|WITH_SECTION</span></code> to the <code class="docutils literal"><span class="pre">flags</span></code>
+parameter. See <a class="reference internal" href="#column-create-index-full-text-search"><span class="std std-ref">Create an index column for full text search</span></a> for full
+text search index column details.</p>
+<p>Here is an example to create a multiple columns full text search index
+column for the key of the <code class="docutils literal"><span class="pre">People</span></code> table and the <code class="docutils literal"><span class="pre">roles</span></code> column of
+the <code class="docutils literal"><span class="pre">People</span></code> table.</p>
+<p>There is no difference between index table for single column index
+column and multiple columns index column. In this example, the
+<code class="docutils literal"><span class="pre">Terms</span></code> table created at <a class="reference internal" href="#column-create-index-full-text-search"><span class="std std-ref">Create an index column for full text search</span></a>
+is used.</p>
+<p>You can create a multiple columns full text search index column for
+the key of the <code class="docutils literal"><span class="pre">People</span></code> table and <code class="docutils literal"><span class="pre">roles</span></code> column of the <code class="docutils literal"><span class="pre">People</span></code>
+table. <code class="docutils literal"><span class="pre">COLUMN_INDEX|WITH_POSITION|WITH_SECTION</span></code> in the <code class="docutils literal"><span class="pre">flags</span></code>
+parameter, <code class="docutils literal"><span class="pre">People</span></code> in the <code class="docutils literal"><span class="pre">type</span></code> parameter and <code class="docutils literal"><span class="pre">_key,roles</span></code> in
+the <code class="docutils literal"><span class="pre">source</span></code> parameter are important:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>column_create \
+  --table Terms \
+  --name people_key_roles_index \
+  --flags COLUMN_INDEX|WITH_POSITION|WITH_SECTION \
+  --type People \
+  --source _key,roles
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>You can confirm that <code class="docutils literal"><span class="pre">--match_columns</span> <span class="pre">_key</span></code> and <code class="docutils literal"><span class="pre">--query</span>
+<span class="pre">Alice</span></code> are evaluated by the <code class="docutils literal"><span class="pre">Terms.people_key_roles_index</span></code> newly
+created multiple columns full text search index column from log. Groonga
+reports used index columns in <code class="docutils literal"><span class="pre">info</span></code> log level. You can change log level
+dynamically by <a class="reference internal" href="log_level.html"><span class="doc">log_level</span></a> command.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>log_level --level info
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+select \
+  --table People \
+  --match_columns _key,roles \
+  --query Alice
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;age&quot;,
+#           &quot;UInt8&quot;
+#         ],
+#         [
+#           &quot;roles&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;alice&quot;,
+#         7,
+#         [
+#           &quot;adventurer&quot;,
+#           &quot;younger-sister&quot;
+#         ]
+#       ]
+#     ]
+#   ]
+# ]
+# log: 2016-10-13 19:10:03.513171|i| [object][search][index][key][exact] &lt;Terms.people_key_roles_index&gt;
+# log: 2016-10-13 19:10:03.513194|i| grn_ii_sel &gt; (Alice)
+# log: 2016-10-13 19:10:03.513219|i| n=1 (Alice)
+# log: 2016-10-13 19:10:03.513247|i| exact: 1
+# log: 2016-10-13 19:10:03.513251|i| hits=1
+log_level --level notice
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>You can confirm that the <code class="docutils literal"><span class="pre">Terms.people_roles_index</span></code> is used from the
+following log:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>[object][search][index][key][exact] &lt;Terms.people_key_roles_index&gt;
+</pre></div>
+</div>
+<p>The log says <code class="docutils literal"><span class="pre">Terms.people_roles_index</span></code> index column is used for
+full text search. (To be precise, the index column is used for exact
+term search by inverted index.)</p>
+</div>
+<div class="section" id="create-a-small-index-column">
+<span id="column-create-index-small"></span><h3>7.3.11.3.8. Create a small index column<a class="headerlink" href="#create-a-small-index-column" title="Permalink to this headline">¶</a></h3>
+<p>If you know index target data are small, you can reduce memory usage
+for the index column. Memory usage is <code class="docutils literal"><span class="pre">1/256</span></code> of the default index
+column.</p>
+<p>How many data are small? It depends on data. Small index column can't
+handle 1 billion records at least. If index target is only one
+scalar column with no text family type (<code class="docutils literal"><span class="pre">ShortText</span></code>, <code class="docutils literal"><span class="pre">Text</span></code> or
+<code class="docutils literal"><span class="pre">LongText</span></code>), the maximum handleable records are depends of the
+number of kinds of index target data. If index target column has
+<code class="docutils literal"><span class="pre">1</span></code>, <code class="docutils literal"><span class="pre">1</span></code>, <code class="docutils literal"><span class="pre">2</span></code> and <code class="docutils literal"><span class="pre">3</span></code>, the number of kinds of them are <code class="docutils literal"><span class="pre">3</span></code>
+(<code class="docutils literal"><span class="pre">1</span></code> and <code class="docutils literal"><span class="pre">2</span></code> and <code class="docutils literal"><span class="pre">3</span></code>). The following table shows the
+relationship between the number of kinds of index target data and the
+number of handleable records:</p>
+<table border="1" class="docutils" id="id1">
+<caption><span class="caption-text">The number of kinds of index target data and the number of handleable records in a small index column</span><a class="headerlink" href="#id1" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">The number of kinds of index target data</th>
+<th class="head">The number of hanleable records</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>1</td>
+<td>16779234</td>
+</tr>
+<tr class="row-odd"><td>2</td>
+<td>4648070</td>
+</tr>
+<tr class="row-even"><td>4</td>
+<td>7238996</td>
+</tr>
+<tr class="row-odd"><td>8</td>
+<td>8308622</td>
+</tr>
+<tr class="row-even"><td>16</td>
+<td>11068624</td>
+</tr>
+<tr class="row-odd"><td>32</td>
+<td>12670817</td>
+</tr>
+<tr class="row-even"><td>64</td>
+<td>18524211</td>
+</tr>
+<tr class="row-odd"><td>128</td>
+<td>38095511</td>
+</tr>
+<tr class="row-even"><td>256</td>
+<td>51265384</td>
+</tr>
+</tbody>
+</table>
+<p>You need to add <code class="docutils literal"><span class="pre">INDEX_SMALL</span></code> to the <code class="docutils literal"><span class="pre">flags</span></code> parameter such as
+<code class="docutils literal"><span class="pre">COLUMN_INDEX|INDEX_SMALL</span></code> to create a small index column.</p>
+<p>If the <code class="docutils literal"><span class="pre">People</span></code> table has only 1 million records, you can use a
+small index column for the <code class="docutils literal"><span class="pre">age</span></code> column:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>column_create \
+  --table Ages \
+  --name people_age_small_index \
+  --flags COLUMN_INDEX|INDEX_SMALL \
+  --type People \
+  --source age
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+</div>
+<div class="section" id="create-a-medium-index-column">
+<span id="column-create-index-medium"></span><h3>7.3.11.3.9. Create a medium index column<a class="headerlink" href="#create-a-medium-index-column" title="Permalink to this headline">¶</a></h3>
+<p>If you know index target data are medium, you can reduce memory usage
+for the index column. Memory usage is <code class="docutils literal"><span class="pre">5/24</span></code> of the default index
+column.</p>
+<p>How many data are medium? It depends on data.</p>
+<p>If index target is only one scalar column, a medium index column
+can handle all records.</p>
+<p>A medium index column may not handle all records at the following
+cases:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Index target is one text family (<code class="docutils literal"><span class="pre">ShortText</span></code>, <code class="docutils literal"><span class="pre">Text</span></code> or
+<code class="docutils literal"><span class="pre">LongText</span></code>) scalar column</li>
+<li>Index target is one vector column</li>
+<li>Index targets are multiple columns</li>
+<li>Index table has tokenizer</li>
+</ul>
+</div></blockquote>
+<p>You need to add <code class="docutils literal"><span class="pre">INDEX_MEDIUM</span></code> to the <code class="docutils literal"><span class="pre">flags</span></code> parameter such as
+<code class="docutils literal"><span class="pre">COLUMN_INDEX|INDEX_MEDIUM</span></code> to create a medium index column.</p>
+<p>You can use a medium index column for an index column of the <code class="docutils literal"><span class="pre">age</span></code>
+column of the <code class="docutils literal"><span class="pre">People</span></code> table safely. Because it's one scalar column
+with <code class="docutils literal"><span class="pre">UInt8</span></code> type.</p>
+<p>Here is an example to create a medium index column:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>column_create \
+  --table Ages \
+  --name people_age_medium_index \
+  --flags COLUMN_INDEX|INDEX_MEDIUM \
+  --type People \
+  --source age
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
 </div>
 </div>
 <div class="section" id="parameters">
 <h2>7.3.11.4. Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
-<p><code class="docutils literal"><span class="pre">table</span></code></p>
+<p>This section describes all parameters.</p>
+<div class="section" id="required-parameters">
+<h3>7.3.11.4.1. Required parameters<a class="headerlink" href="#required-parameters" title="Permalink to this headline">¶</a></h3>
+<p>There are some required parameters.</p>
+<div class="section" id="table">
+<span id="column-create-table"></span><h4>7.3.11.4.1.1. <code class="docutils literal"><span class="pre">table</span></code><a class="headerlink" href="#table" title="Permalink to this headline">¶</a></h4>
+<p>Specifies an existing table name for the new column.</p>
+</div>
+<div class="section" id="name">
+<span id="column-create-name"></span><h4>7.3.11.4.1.2. <code class="docutils literal"><span class="pre">name</span></code><a class="headerlink" href="#name" title="Permalink to this headline">¶</a></h4>
+<p>Specifies the column name to be created.</p>
+<p>The column name must be unique in the same table.</p>
+<p>Here are available characters:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">0</span></code> .. <code class="docutils literal"><span class="pre">9</span></code> (digit)</li>
+<li><code class="docutils literal"><span class="pre">a</span></code> .. <code class="docutils literal"><span class="pre">z</span></code> (alphabet, lower case)</li>
+<li><code class="docutils literal"><span class="pre">A</span></code> .. <code class="docutils literal"><span class="pre">Z</span></code> (alphabet, upper case)</li>
+<li><code class="docutils literal"><span class="pre">#</span></code> (hash)</li>
+<li><code class="docutils literal"><span class="pre">&#64;</span></code> (at mark)</li>
+<li><code class="docutils literal"><span class="pre">-</span></code> (hyphen)</li>
+<li><code class="docutils literal"><span class="pre">_</span></code> (underscore) (NOTE: Underscore can't be used as the first
+character.)</li>
+</ul>
+<p>You need to create a name with one or more the above characters. Note
+that you can't use <code class="docutils literal"><span class="pre">_</span></code> as the first character such as <code class="docutils literal"><span class="pre">_name</span></code>.</p>
+</div>
+<div class="section" id="flags">
+<span id="column-create-flags"></span><h4>7.3.11.4.1.3. <code class="docutils literal"><span class="pre">flags</span></code><a class="headerlink" href="#flags" title="Permalink to this headline">¶</a></h4>
+<p>Specifies the column type and column customize options.</p>
+<p>Here are available flags:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Flag</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">COLUMN_SCALAR</span></code></td>
+<td>Scalar column. It can store one value. See also
+<a class="reference internal" href="../columns/scalar.html"><span class="doc">Scalar column</span></a> or
+<a class="reference internal" href="#column-create-scalar"><span class="std std-ref">Create a scalar column</span></a>.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">COLUMN_VECTOR</span></code></td>
+<td>Vector column. It can store multiple values. See also
+<a class="reference internal" href="../columns/vector.html"><span class="doc">Vector column</span></a> or
+<a class="reference internal" href="#column-create-vector"><span class="std std-ref">Create a vector column</span></a>.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">COLUMN_INDEX</span></code></td>
+<td>Index column. It stores data for fast search. See also
+<a class="reference internal" href="../columns/index.html"><span class="doc">Index column</span></a> or
+<a class="reference internal" href="#column-create-index"><span class="std std-ref">Create an index column</span></a>.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">COMPRESS_ZLIB</span></code></td>
+<td><p class="first">It enables column value compression by zlib. You need Groonga
+that enables zlib support.</p>
+<p>Compression by zlib is higher space efficiency than compression
+by LZ4. But compression by zlib is slower than compression by
+LZ4.</p>
+<p class="last">This flag is available only for <code class="docutils literal"><span class="pre">COLUMN_SCALAR</span></code> and
+<code class="docutils literal"><span class="pre">COLUMN_VECTOR</span></code>.</p>
+</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">COMPRESS_LZ4</span></code></td>
+<td><p class="first">It enables column value compression by LZ4. You need Groonga
+that enables LZ4 support.</p>
+<p>Compression by LZ4 is faster than compression by zlib. But
+compression by LZ4 is lower space efficiency than compression
+by zlib.</p>
+<p class="last">This flag is available only for <code class="docutils literal"><span class="pre">COLUMN_SCALAR</span></code> and
+<code class="docutils literal"><span class="pre">COLUMN_VECTOR</span></code>.</p>
+</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">WITH_SECTION</span></code></td>
+<td><p class="first">It enables section support to index column.</p>
+<p>If section support is enabled, you can support multiple
+documents in the same index column.</p>
+<p>You must specify this flag to create a multiple columns index
+column. See also <a class="reference internal" href="#column-create-index-multiple-columns"><span class="std std-ref">Create a multiple columns index column</span></a> for
+details.</p>
+<p>Section support requires additional spaces. If you don't need
+section support, you should not enable section support.</p>
+<p class="last">This flag is available only for <code class="docutils literal"><span class="pre">COLUMN_INDEX</span></code>.</p>
+</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">WITH_WEIGHT</span></code></td>
+<td><p class="first">It enables weight support to vector column or index column.</p>
+<p>If weight support is enabled for vector column, you can add
+weight for each element. If weight support is enabled for index
+column, you can add weight for each posting. They are useful to
+compute suitable search score.</p>
+<p>You must specify this flag to use <a class="reference internal" href="select.html#select-adjuster"><span class="std std-ref">adjuster</span></a>. See
+also <a class="reference internal" href="#column-create-vector-weight"><span class="std std-ref">Create a weight vector column</span></a> for details.</p>
+<p>Weight support requires additional spaces. If you don't need
+weight support, you should not enable weight support.</p>
+<p class="last">This flag is available only for <code class="docutils literal"><span class="pre">COLUMN_VECTOR</span></code> or
+<code class="docutils literal"><span class="pre">COLUMN_INDEX</span></code>.</p>
+</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">WITH_POSITION</span></code></td>
+<td><p class="first">It enables position support to index column. It means that the
+index column is full inverted index. (Index column is
+implemented as inverted index.)</p>
+<p>If position support is enabled, you can add position in the
+document for each posting. It's required for phrase search. It
+means that index column for full text search must enable
+position support because most full text search uses phrase
+search.</p>
+<p>You must specify this flag to create a full text search index
+column. See also <a class="reference internal" href="#column-create-index-full-text-search"><span class="std std-ref">Create an index column for full text search</span></a> for
+details.</p>
+<p>Position support requires additional spaces. If you don't need
+position support, you should not enable position support.</p>
+<p class="last">This flag is available only for <code class="docutils literal"><span class="pre">COLUMN_INDEX</span></code>.</p>
+</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">INDEX_SMALL</span></code></td>
+<td><div class="first versionadded">
+<p><span class="versionmodified">New in version 6.0.8.</span></p>
+</div>
+<p>It requires to create a small index column.</p>
+<p>If index target data are small, small index column is enough.
+Small index column uses fewer memory than a normal index column
+or a medium index column. See also
+<a class="reference internal" href="#column-create-index-small"><span class="std std-ref">Create a small index column</span></a> for knowing what are &quot;small
+data&quot; and how to use this flag.</p>
+<p class="last">This flag is available only for <code class="docutils literal"><span class="pre">COLUMN_INDEX</span></code>.</p>
+</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">INDEX_MEDIUM</span></code></td>
+<td><div class="first versionadded">
+<p><span class="versionmodified">New in version 6.0.8.</span></p>
+</div>
+<p>It requires to create a medium index column.</p>
+<p>If index target data are medium, medium index column is enough.
+Medium index column uses fewer memory than a normal index
+column. See also <a class="reference internal" href="#column-create-index-medium"><span class="std std-ref">Create a medium index column</span></a> for knowing
+what are &quot;medium data&quot; and how to use this flag.</p>
+<p class="last">This flag is available only for <code class="docutils literal"><span class="pre">COLUMN_INDEX</span></code>.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>You must specify one of <code class="docutils literal"><span class="pre">COLUMN_${TYPE}</span></code> flags. You can't specify
+two or more <code class="docutils literal"><span class="pre">COLUMN_${TYPE}</span></code> flags. For example,
+<code class="docutils literal"><span class="pre">COLUMN_SCALAR|COLUMN_VECTOR</span></code> is invalid.</p>
+<p>You can combine flags with <code class="docutils literal"><span class="pre">|</span></code> (vertical bar) such as
+<code class="docutils literal"><span class="pre">COLUMN_INDEX|WITH_SECTION|WITH_POSITION</span></code>.</p>
+</div>
+<div class="section" id="type">
+<span id="column-create-type"></span><h4>7.3.11.4.1.4. <code class="docutils literal"><span class="pre">type</span></code><a class="headerlink" href="#type" title="Permalink to this headline">¶</a></h4>
+<p>Specifies type of the column value.</p>
+<p>If the column is scalar column or vector column, here are available
+types:</p>
 <blockquote>
-<div>カラムを追加するテーブルの名前を指定します。</div></blockquote>
-<p><code class="docutils literal"><span class="pre">name</span></code></p>
-<blockquote>
-<div><p>作成するカラムの名前を指定します。カラム名は、テーブルの中で一意でなければなりません。</p>
-<p>ピリオド('.'), コロン(':')を含む名前のカラムは作成できません。また、アンダースコア('_')で始まる名前は予約済みであり、使用できません。</p>
+<div><ul class="simple">
+<li>Builtin types described in <a class="reference internal" href="../types.html"><span class="doc">Data types</span></a></li>
+<li>Tables defined by users</li>
+</ul>
 </div></blockquote>
-<p><code class="docutils literal"><span class="pre">flags</span></code></p>
+<p>If the column is index column, here are available types:</p>
 <blockquote>
-<div><p>カラムの属性を表す以下の数値か、パイプ('|')で組み合わせたシンボル名を指定します。</p>
-<dl class="docutils">
-<dt>0, <code class="docutils literal"><span class="pre">COLUMN_SCALAR</span></code></dt>
-<dd>単一の値が格納できるカラムを作成します。</dd>
-<dt>1, <code class="docutils literal"><span class="pre">COLUMN_VECTOR</span></code></dt>
-<dd>複数の値の配列を格納できるカラムを作成します。</dd>
-<dt>2, <code class="docutils literal"><span class="pre">COLUMN_INDEX</span></code></dt>
-<dd>インデックス型のカラムを作成します。</dd>
-</dl>
-<p>There are two flags to compress the value of column, but you can't specify these flags for now because there are memory leaks issue <a class="reference external" href="https://github.com/groonga/groonga/issues/6">GitHub#6</a> when refers the value of column. This issue occurs both of them (zlib and lzo).</p>
-<dl class="docutils">
-<dt>16, <code class="docutils literal"><span class="pre">COMPRESS_ZLIB</span></code></dt>
-<dd>Compress the value of column by using zlib. This flag is enabled when you build Groonga with <code class="docutils literal"><span class="pre">--with-zlib</span></code>.</dd>
-<dt>32, <code class="docutils literal"><span class="pre">COMPRESS_LZO</span></code></dt>
-<dd>Compress the value of column by using lzo. This flag is enabled when you build Groonga with <code class="docutils literal"><span class="pre">--with-lzo</span></code>.</dd>
-</dl>
-<p>インデックス型のカラムについては、flagsの値に以下の値を加えることによって、追加の属
-性を指定することができます。</p>
-<dl class="docutils">
-<dt>128, <code class="docutils literal"><span class="pre">WITH_SECTION</span></code></dt>
-<dd>段落情報を格納するインデックスを作成します。</dd>
-<dt>256, <code class="docutils literal"><span class="pre">WITH_WEIGHT</span></code></dt>
-<dd>ウェイト情報を格納するインデックスを作成します。</dd>
-<dt>512, <code class="docutils literal"><span class="pre">WITH_POSITION</span></code></dt>
-<dd>位置情報を格納するインデックス(完全転置インデックス)を作成します。</dd>
-</dl>
+<div><ul class="simple">
+<li>Tables defined by users</li>
+</ul>
 </div></blockquote>
-<p><code class="docutils literal"><span class="pre">type</span></code></p>
+<p>See also the followings:</p>
 <blockquote>
-<div>値の型を指定します。Groongaの組込型か、同一データベースに定義済みのユーザ定義型、定義済みのテーブルを指定することができます。</div></blockquote>
-<p><code class="docutils literal"><span class="pre">source</span></code></p>
-<blockquote>
-<div>インデックス型のカラムを作成した場合は、インデックス対象となるカラムをsource引数に指定します。</div></blockquote>
+<div><ul class="simple">
+<li><a class="reference internal" href="#column-create-scalar"><span class="std std-ref">Create a scalar column</span></a></li>
+<li><a class="reference internal" href="#column-create-vector"><span class="std std-ref">Create a vector column</span></a></li>
+<li><a class="reference internal" href="#column-create-reference"><span class="std std-ref">Create a column that refers a table's record</span></a></li>
+<li><a class="reference internal" href="#column-create-index"><span class="std std-ref">Create an index column</span></a></li>
+</ul>
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="optional-parameters">
+<h3>7.3.11.4.2. Optional parameters<a class="headerlink" href="#optional-parameters" title="Permalink to this headline">¶</a></h3>
+<p>There is an optional parameter.</p>
+<div class="section" id="source">
+<span id="column-create-source"></span><h4>7.3.11.4.2.1. <code class="docutils literal"><span class="pre">source</span></code><a class="headerlink" href="#source" title="Permalink to this headline">¶</a></h4>
+<p>Specifies index target columns. You can specify one or more columns to
+the <code class="docutils literal"><span class="pre">source</span></code> parameter.</p>
+<p>This parameter is only available for index column.</p>
+<p>You can only specify columns of the table specified as
+<a class="reference internal" href="#column-create-type"><span class="std std-ref">type</span></a>. You can also use the <code class="docutils literal"><span class="pre">_key</span></code> pseudo column
+for specifying the table key as index target.</p>
+<p>If you specify multiple columns to the <code class="docutils literal"><span class="pre">source</span></code> parameter, separate
+columns with <code class="docutils literal"><span class="pre">,</span></code> (comma) such as <code class="docutils literal"><span class="pre">_key,roles</span></code>.</p>
+</div>
+</div>
 </div>
 <div class="section" id="return-value">
 <h2>7.3.11.5. Return value<a class="headerlink" href="#return-value" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-none"><div class="highlight"><pre><span></span>[HEADER, SUCCEEDED]
+<p><code class="docutils literal"><span class="pre">column_create</span></code> returns <code class="docutils literal"><span class="pre">true</span></code> as body on success such as:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>[HEADER, true]
 </pre></div>
 </div>
-<p><code class="docutils literal"><span class="pre">HEADER</span></code></p>
+<p>If <code class="docutils literal"><span class="pre">column_create</span></code> fails, <code class="docutils literal"><span class="pre">column_create</span></code> returns <code class="docutils literal"><span class="pre">false</span></code> as
+body:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>[HEADER, false]
+</pre></div>
+</div>
+<p>Error details are in <code class="docutils literal"><span class="pre">HEADER</span></code>.</p>
+<p>See <a class="reference internal" href="../command/output_format.html"><span class="doc">Output format</span></a> for <code class="docutils literal"><span class="pre">HEADER</span></code>.</p>
+</div>
+<div class="section" id="see-also">
+<h2>7.3.11.6. See also<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
 <blockquote>
-<div>See <a class="reference internal" href="../command/output_format.html"><span class="doc">Output format</span></a> about <code class="docutils literal"><span class="pre">HEADER</span></code>.</div></blockquote>
-<p><code class="docutils literal"><span class="pre">SUCCEEDED</span></code></p>
-<blockquote>
-<div>If command is succeeded, it returns true on success, false otherwise.</div></blockquote>
+<div><ul class="simple">
+<li><a class="reference internal" href="../column.html"><span class="doc">Column</span></a></li>
+<li><a class="reference internal" href="table_create.html"><span class="doc">table_create</span></a></li>
+<li><a class="reference internal" href="../command/output_format.html"><span class="doc">Output format</span></a></li>
+</ul>
+</div></blockquote>
 </div>
 </div>
 
@@ -182,9 +1074,34 @@
 <li><a class="reference internal" href="#">7.3.11. <code class="docutils literal"><span class="pre">column_create</span></code></a><ul>
 <li><a class="reference internal" href="#summary">7.3.11.1. Summary</a></li>
 <li><a class="reference internal" href="#syntax">7.3.11.2. Syntax</a></li>
-<li><a class="reference internal" href="#usage">7.3.11.3. Usage</a></li>
-<li><a class="reference internal" href="#parameters">7.3.11.4. Parameters</a></li>
+<li><a class="reference internal" href="#usage">7.3.11.3. Usage</a><ul>
+<li><a class="reference internal" href="#create-a-scalar-column">7.3.11.3.1. Create a scalar column</a></li>
+<li><a class="reference internal" href="#create-a-vector-column">7.3.11.3.2. Create a vector column</a></li>
+<li><a class="reference internal" href="#create-a-weight-vector-column">7.3.11.3.3. Create a weight vector column</a></li>
+<li><a class="reference internal" href="#create-a-column-that-refers-a-table-s-record">7.3.11.3.4. Create a column that refers a table's record</a></li>
+<li><a class="reference internal" href="#create-an-index-column">7.3.11.3.5. Create an index column</a></li>
+<li><a class="reference internal" href="#create-an-index-column-for-full-text-search">7.3.11.3.6. Create an index column for full text search</a></li>
+<li><a class="reference internal" href="#create-a-multiple-columns-index-column">7.3.11.3.7. Create a multiple columns index column</a></li>
+<li><a class="reference internal" href="#create-a-small-index-column">7.3.11.3.8. Create a small index column</a></li>
+<li><a class="reference internal" href="#create-a-medium-index-column">7.3.11.3.9. Create a medium index column</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#parameters">7.3.11.4. Parameters</a><ul>
+<li><a class="reference internal" href="#required-parameters">7.3.11.4.1. Required parameters</a><ul>
+<li><a class="reference internal" href="#table">7.3.11.4.1.1. <code class="docutils literal"><span class="pre">table</span></code></a></li>
+<li><a class="reference internal" href="#name">7.3.11.4.1.2. <code class="docutils literal"><span class="pre">name</span></code></a></li>
+<li><a class="reference internal" href="#flags">7.3.11.4.1.3. <code class="docutils literal"><span class="pre">flags</span></code></a></li>
+<li><a class="reference internal" href="#type">7.3.11.4.1.4. <code class="docutils literal"><span class="pre">type</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#optional-parameters">7.3.11.4.2. Optional parameters</a><ul>
+<li><a class="reference internal" href="#source">7.3.11.4.2.1. <code class="docutils literal"><span class="pre">source</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li><a class="reference internal" href="#return-value">7.3.11.5. Return value</a></li>
+<li><a class="reference internal" href="#see-also">7.3.11.6. See also</a></li>
 </ul>
 </li>
 </ul>
@@ -205,8 +1122,8 @@
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
@@ -228,13 +1145,13 @@
         <li class="right" >
           <a href="column_copy.html" title="7.3.10. column_copy"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v6.0.9 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../../reference.html" >7. Reference manual</a> &raquo;</li>
-          <li class="nav-item nav-item-2"><a href="../command.html" >7.3. Command</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v6.0.9 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../reference.html" >7. Reference manual</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../command.html" >7.3. Command</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2009-2016, Brazil, Inc.
+        &#169; Copyright 2009-2016, Brazil, Inc.
     </div>
       <script src="http://connect.facebook.net/en_US/all.js"></script>
 

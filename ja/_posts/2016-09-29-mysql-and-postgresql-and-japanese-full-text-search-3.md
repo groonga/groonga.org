@@ -16,8 +16,7 @@ description: MySQLとPostgreSQLと日本語全文検索3を開催しました！
   * [pg\_bigmと類似度検索](http://www.slideshare.net/masahikosawada98/pgbigm-66639588) by [@sawada_masahiko](https://twitter.com/sawada_masahiko)
   * [Mroonga・PGroongaの導入方法](https://slide.rabbit-shocker.org/authors/kou/mysql-and-postgresql-and-japanese-full-text-search-3/) by [@ktou](https://twitter.com/ktou)
     * 解説記事：[MySQLとPostgreSQLと日本語全文検索3：MroongaとPGroongaの導入方法例 #mypgft - ククログ(2016-09-29)](http://www.clear-code.com/blog/2016/9/29.html)
-  * InnoDBの全文検索を使ってみた。 by 中村範夫さん
-    * （公開されるかも）
+  * [InnoDBの全文検索を使ってみた。](http://www.slideshare.net/InsightTechnology/20160915-3moku-norio-nakamura) by 中村範夫さん
 
 今回も前回同様に参加登録時に質問を書けるようにしました。質問がたくさん集まり、イベントの最後の質疑応答の時間が有意義なものになりました。これは他のイベントでも真似する予定です。
 

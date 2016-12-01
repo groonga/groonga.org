@@ -15,4 +15,4 @@ description: 2015-07-02（木）19:30より南青山でGroongaソースコード
     * C言語でプログラムを書いたことがある人
     * C言語でプログラムを書いたことはないけど他の言語ではプログラムを書いた経験はあり、C言語の文法は知っている人
 
-今回は第2回目ですが、[第1回目]({% post_url 2015-04-17-groonga-source-code-read-report %})に参加していない方でも大丈夫です。詳細は[イベントページ](https://groonga.doorkeeper.jp/events/26764)を確認してください。
+今回は第2回目ですが、[第1回目]({% post_url ja/2015-04-17-groonga-source-code-read-report %})に参加していない方でも大丈夫です。詳細は[イベントページ](https://groonga.doorkeeper.jp/events/26764)を確認してください。

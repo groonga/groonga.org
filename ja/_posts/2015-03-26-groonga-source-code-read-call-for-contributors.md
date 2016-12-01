@@ -6,7 +6,7 @@ description: Groongaソースコード読書会（仮）の開催に協力して
 
 ## Groongaソースコード読書会（仮）の協力者を募集
 
-[先日開催したGroonga "Tokenizer" Talks]({% post_url 2015-03-20-groonga-tokenizer-talks %})に参加していた[@noranuk0](https://twitter.com/noranuk0)さんから次のようなアイディアがでました。
+[先日開催したGroonga "Tokenizer" Talks]({% post_url ja/2015-03-20-groonga-tokenizer-talks %})に参加していた[@noranuk0](https://twitter.com/noranuk0)さんから次のようなアイディアがでました。
 
 <blockquote class="twitter-tweet" lang="ja">
 <p>そういえば、先週末のgroonga talknizer talk でのgroonga内部のデータ構造の話を聞いて、groongaソースコード読書会的なものがあったらちょっと行ってみたいなーと思いました。</p>

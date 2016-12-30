@@ -6,7 +6,7 @@
 ============
 
 前提条件
---------
+*********
 
 リリース手順の前提条件は以下の通りです。
 
@@ -20,6 +20,11 @@
 * GROONGA_ORG_PATH=$HOME/work/groonga/groonga.org
 * CUTTER_DIR=$HOME/work/cutter
 * CUTTER_SOURCE_PATH=$HOME/work/cutter/cutter
+
+
+最初の1回だけ行う手順
+**********************
+
 
 ビルド環境の準備
 ----------------
@@ -51,7 +56,7 @@ Vagrantで使用する仮想化ソフトウェア（VirtualBox、VMwareなど）
 リリース作業ではRPMパッケージに対する署名を行います。
 その際、パッケージ署名用の鍵が必要です。
 
-Groongaプロジェクトでは署名用の鍵をリリース担当者の公開鍵で暗号化してリポジトリのpackages/ディレクトリ以下へと登録しています。
+Groongaプロジェクトでは署名用の鍵をリリース担当者の公開鍵で暗号化してリポジトリのpackages/ディレクトリ以下へと登録しています。新しいリリース担当者に任命されたばかりで、まだ自分用に暗号化された鍵が無い場合には、他のリリース担当者に依頼して署名用の鍵を暗号化してもらって下さい。
 
 リリース担当者はリポジトリに登録された秘密鍵を復号した後に鍵のインポートを以下のコマンドにて行います。::
 
@@ -79,6 +84,14 @@ Groongaプロジェクトでは署名用の鍵をリリース担当者の公開�
 
 この作業は、新規にリリースを行うことになった担当者やパッケージに署名する鍵に変更があった場合などに行います。
 
+PPA用の鍵の登録
+---------------
+
+この作業は、新規にリリースを行うことになった担当者のみ行います。
+
+[Launchpad](https://launchpad.net/)にアカウントを作成し、自分の普段使いの秘密鍵を登録した上で、他のリリース担当者に依頼して[Groongaチーム](https://launchpad.net/~groonga)に追加してもらって下さい。
+
+
 リリース作業用ディレクトリの作成
 --------------------------------
 
@@ -88,33 +101,20 @@ Groongaのリリース作業ではリリース専用の環境下(コンパイル
 
 そのため、以降の説明では$GROONGA_DIR以下のディレクトリにリリース用の作業ディレクトリ(groonga.clean)としてソースコードをcloneしたものとして説明します。
 
+
+
+
+毎回のリリースで行う手順
+************************
+
+Groongaのソースコード取得
+-------------------------
+
 リリース用のクリーンな状態でソースコードを取得するために$GROONGA_DIRにて以下のコマンドを実行します。::
 
-    % git clone --recursive git@github.com:groonga/groonga.git groonga.clean
+    % git clone --recursive git@github.com:groonga/groonga.git groonga.clean---------------------------
 
 この作業はリリース作業ごとに行います。
-
-変更点のまとめ
---------------
-
-前回リリース時からの変更点を$GROONGA_CLONE_DIR/doc/source/news.txtにまとめます。
-ここでまとめた内容についてはリリースアナウンスにも使用します。
-
-前回リリースからの変更履歴を参照するには以下のコマンドを実行します。::
-
-   % git log -p --reverse $(git tag | tail -1)..
-
-ログを^commitで検索しながら、以下の基準を目安として変更点を追記していきます。
-
-含めるもの
-
-* ユーザへ影響するような変更
-* 互換性がなくなるような変更
-
-含めないもの
-
-* 内部的な変更(変数名の変更やらリファクタリング)
-
 
 Groongaのウェブサイトの取得
 ---------------------------
@@ -139,6 +139,29 @@ Groongaのリリース作業では、cutterに含まれるスクリプトを使�
     % git clone git@github.com:clear-code/cutter.git
 
 これで、$CUTTER_SOURCE_PATHディレクトリにcutterのソースを取得できます。
+
+変更点のまとめ
+--------------
+
+前回リリース時からの変更点を$GROONGA_CLONE_DIR/doc/source/news.rst（英語）にまとめます。
+ここでまとめた内容についてはリリースアナウンスにも使用します。
+
+前回リリースからの変更履歴を参照するには以下のコマンドを実行します。::
+
+   % git log -p --reverse $(git tag | tail -1)..
+
+ログを^commitで検索しながら、以下の基準を目安として変更点を追記していきます。
+
+含めるもの
+
+* ユーザへ影響するような変更
+* 互換性がなくなるような変更
+
+含めないもの
+
+* 内部的な変更(変数名の変更やらリファクタリング)
+
+具体的な変更点の記述方法は後述します。
 
 configureスクリプトの生成
 -------------------------
@@ -188,11 +211,25 @@ configureオプションである--with-cutter-source-pathにはcutterのソー�
 
     % ssh packages@packages.groonga.org
 
+デバッグ用や開発用のパッケージをテスト用に公開する時は、`--with-launchpad-ppa=groonga-nightly`を指定して不安定版のリポジトリにアップロードするように指定します。::
+
+    % ./configure \
+          --with-launchpad-ppa=groonga-nightly \
+          --prefix=/tmp/local \
+          --with-launchpad-uploader-pgp-key=(Launchpadに登録したkeyID) \
+          --with-groonga-org-path=$HOME/work/groonga/groonga.org \
+          --enable-document \
+          --with-ruby \
+          --enable-mruby \
+          --with-cutter-source-path=$HOME/work/cutter/cutter
+
+新任のリリース担当者は必ず、この方法でPPAのリポジトリにパッケージをアップロードできる事を確認しておいてください。
+
 
 make update-latest-releaseの実行
 --------------------------------
 
-make update-latest-releaseコマンドでは、OLD_RELEASE_DATEに前回のリリースの日付を、NEW_RELEASE_DATEに次回リリースの日付を指定します。
+make update-latest-releaseコマンドでは、OLD_RELEASE_DATEに前回のリリースの日付を、NEW_RELEASE_DATEに次回リリースの日付（未来の日付）を指定します。
 
 2.0.2のリリースを行った際は以下のコマンドを実行しました。::
 ::
@@ -231,7 +268,19 @@ make update-poコマンドの実行により更新した各種.poファイルを
     % make -C doc/locale/ja html
     % make -C doc/locale/en html
 
+修正が必要な箇所を調べて、`***.edit`というファイルを適宜修正します。
+
+    % cd groonga/doc/locale
+    % gir diff
+
+ファイルを編集したら、再度poファイルとHTMLを更新するために以下のコマンドを実行します。::
+
+    % make update-po
+    % make -C doc/locale/ja html
+    % make -C doc/locale/en html
+
 確認が完了したら、翻訳済みpoファイルをコミットします。
+
 
 リリースタグの設定
 ------------------
@@ -309,9 +358,9 @@ Debian系パッケージのビルド
 Groongaのpackages/aptサブディレクトリに移動して、以下のコマンドを実行します。::
 
     % cd packages/apt
-    % make build PALALLEL=yes
+    % make build PARALLEL=yes
 
-make build PALALLEL=yesコマンドを実行すると、ディストリビューションのリリースとアーキテクチャの組み合わせでビルドを平行して行うことができます。
+make build PARALLEL=yesコマンドを実行すると、ディストリビューションのリリースとアーキテクチャの組み合わせでビルドを平行して行うことができます。ホストマシンの性能に複数台のVMを動作させるだけの余裕がない場合は、PARALLEL=yesは指定しないで下さい。その場合、各アーキテクチャ向けのビルドが順番に行われます。
 
 現在サポートされているのは以下の通りです。
 
@@ -343,9 +392,9 @@ Red Hat系パッケージのビルド
 Groongaのpackages/yumサブディレクトリに移動して、以下のコマンドを実行します。::
 
     % cd packages/yum
-    % make build PALALLEL=yes
+    % make build PARALLEL=yes
 
-make build PALALLEL=yesコマンドを実行すると、ディストリビューションのリリースとアーキテクチャの組み合わせでビルドを平行して行うことができます。
+make build PARALLEL=yesコマンドを実行すると、ディストリビューションのリリースとアーキテクチャの組み合わせでビルドを平行して行うことができます。
 
 現在サポートされているのは以下の通りです。
 
@@ -397,14 +446,24 @@ make installerが正常に終了するとWindowsインストーラをfilesディ
 
 Debian系もしくはRed Hat系の場合には本番環境へとアップロードする前にローカルのaptないしyumのリポジトリを参照して正常に更新できることを確認します。
 
-ここでは以下のようにrubyを利用してリポジトリをwebサーバ経由で参照できるようにします。::
+ここでは以下のようにrubyを利用してリポジトリをwebサーバ経由で参照できるようにします。
 
-    % ruby -run -e httpd -- packages/yum/repositories (yumの場合)
-    % ruby -run -e httpd -- packages/apt/repositories (aptの場合)
+yumの場合::
+
+    % ruby -run -e httpd -- packages/yum/repositories
+    % yum update
+    ...
+
+aptの場合::
+
+    % ruby -run -e httpd -- packages/apt/repositories
+    % sudo apt update
+    ...
 
 grntestの準備
 ~~~~~~~~~~~~~
 
+TravisCIの結果が正常であれば、この手順はスキップして構いません。
 grntestを実行するためにはGroongaのテストデータとgrntestのソースが必要です。
 
 まずGroongaのソースを任意のディレクトリへと展開します。::
@@ -438,8 +497,8 @@ Debian系の場合
 
 Debian系の場合の動作確認手順は以下の通りとなります。
 
-* 旧バージョンをchroot環境へとインストールする
-* chroot環境の/etc/hostsを書き換えてpackages.groonga.orgがホストを
+* 旧バージョンをテスト環境へとインストールする
+* テスト環境の/etc/hostsを書き換えてpackages.groonga.orgがホストを
   参照するように変更する
 * ホストでwebサーバを起動してドキュメントルートをビルド環境のもの
   (repositories/apt/packages)に設定する
@@ -454,8 +513,8 @@ Red Hat系の場合
 
 Red Hat系の場合の動作確認手順は以下の通りとなります。
 
-* 旧バージョンをchroot環境へとインストール
-* chroot環境の/etc/hostsを書き換えてpackages.groonga.orgがホストを参照するように変更する
+* 旧バージョンをテスト環境へとインストール
+* テスト環境の/etc/hostsを書き換えてpackages.groonga.orgがホストを参照するように変更する
 * ホストでwebサーバを起動してドキュメントルートをビルド環境のもの(packages/yum/repositories)に設定する
 * アップグレード手順を実行する
 * grntestのアーカイブを展開してインストールしたバージョンでテストを実行する
@@ -465,7 +524,7 @@ Red Hat系の場合の動作確認手順は以下の通りとなります。
 Windows向けの場合
 ~~~~~~~~~~~~~~~~~
 
-* 新規インストール/上書きインストールを行う
+* テスト環境で新規インストール/上書きインストールを行う
 * grntestのアーカイブを展開してインストールしたバージョンでテストを実行する
 * grntestの正常終了を確認する
 
@@ -476,14 +535,14 @@ zipアーカイブも同様にしてgrntestを実行し動作確認を行いま�
 
 リリースの際にはリリースアナウンスを流して、Groongaを広く通知します。
 
-news.txtに変更点をまとめましたが、それを元にリリースアナウンスを作成します。
+news.rstに変更点をまとめましたが、それを元にリリースアナウンスを作成します。
 
 リリースアナウンスには以下を含めます。
 
 * インストール方法へのリンク
 * リリースのトピック紹介
 * リリース変更点へのリンク
-* リリース変更点(news.txtの内容)
+* リリース変更点(news.rstの内容)
 
 リリースのトピック紹介では、これからGroongaを使う人へアピールする点や既存のバージョンを利用している人がアップグレードする際に必要な情報を提供します。
 
@@ -498,6 +557,8 @@ news.txtに変更点をまとめましたが、それを元にリリースアナ
 * [groonga-dev,00794] [ANN] Groonga 2.0.2
 
     * http://osdn.jp/projects/groonga/lists/archive/dev/2012-April/000794.html
+
+後述しますが、Twitter等でのリリースアナウンスの際はここで用意したアナウンス文の要約を使用します。
 
 
 パッケージのアップロード
@@ -530,6 +591,10 @@ Windows向けのパッケージのアップロードには以下のコマンド�
 Ubuntu用パッケージのアップロード
 --------------------------------
 
+Ubuntu向けパッケージの作成には、作業マシン上にGroongaのビルドに必要な依存ソフトウェア一式がインストールされている必要があります。以下のようにしてインストールしておいて下さい。::
+
+    % sudo apt build-dep groonga
+
 Ubuntu向けのパッケージのアップロードには以下のコマンドを実行します。::
 
     % cd packages/ubuntu
@@ -544,6 +609,13 @@ Ubuntu向けのパッケージのアップロードには以下のコマンド�
 アップロードが正常終了すると、launchpad.net上でビルドが実行され、ビルド結果がメールで通知されます。ビルドに成功すると、リリース対象のパッケージがlaunchpad.netのGroongaチームのPPAへと反映されます。公開されているパッケージは以下のURLで確認できます。
 
   https://launchpad.net/~groonga/+archive/ubuntu/ppa
+
+Ubuntu用パッケージの公開の取り消し
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+LaunchpadのGroongaチームのページで対象のPPAを選択し、バージョン一覧の上にある「View package details」リンクの先で「Delete packages」リンクを辿ると、アップロード済みパッケージを削除できる。
+例；[不安定版リポジトリのパッケージの削除用のページ](https://launchpad.net/~groonga/+archive/ubuntu/nightly/+delete-packages)。
+
 
 blogroonga(ブログ)の更新
 ------------------------
@@ -561,7 +633,7 @@ cloneしたWebサイトのソースに対して以下のファイルを新規追
 編集した内容をpushする前に確認したい場合にはJekyllおよびRedCloth（Textileパーサー）、RDiscount（Markdownパーサー）、JavaScript interpreter（therubyracer、Node.jsなど）が必要です。
 インストールするには以下のコマンドを実行します。::
 
-    % sudo gem install jekyll RedCloth rdiscount therubyracer
+    % sudo gem install jekyll jekyll-paginate RedCloth rdiscount therubyracer
 
 jekyllのインストールを行ったら、以下のコマンドでローカルにwebサーバを起動します。::
 
@@ -595,11 +667,13 @@ doc/source以下のドキュメントを更新、翻訳まで完了している�
 Homebrewの更新
 --------------
 
+この手順は省略可能です（Homebrewの更新はGroongaプロジェクト本体のリリース要件には含まれません）。
+
 OS Xでのパッケージ管理方法として `Homebrew <http://brew.sh/>`_ があります。
 
 Groongaを簡単にインストールできるようにするために、Homebrewへpull requestを送ります。
 
-  https://github.com/mxcl/homebrew
+  https://github.com/Homebrew/homebrew-core
 
 すでにGroongaのFormulaは取り込まれているので、リリースのたびにFormulaの内容を更新する作業を実施します。
 
@@ -643,13 +717,7 @@ Groongaグループのメンバーになると、個人のアカウントでは�
 
 リリースアナウンスを流し終えたら、次期バージョンの開発が始まります。
 
-* Groonga プロジェクトの新規バージョン追加
 * Groonga のbase_versionの更新
-
-Groonga プロジェクトの新規バージョン追加
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-`Groonga プロジェクトの設定ページ <http://redmine.groonga.org/projects/groonga/settings>`_ にて新規バージョンを追加します。(例: release-2.0.6)
 
 Groonga バージョン更新
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -670,7 +738,7 @@ $GROONGA_CLONE_DIRにて以下のコマンドを実行します。::
 ビルドを並列化したい
 ~~~~~~~~~~~~~~~~~~~~
 
-make build PALALLEL=yesを指定するとchroot環境で並列にビルドを
+make build PARALLEL=yesを指定するとchroot環境で並列にビルドを
 実行できます。
 
 

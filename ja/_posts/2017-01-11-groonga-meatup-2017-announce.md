@@ -11,7 +11,7 @@ published: false
 
 Groonga/Mroonga/PGroonga/Rroonga/...を使っている・興味のある方はぜひご参加ください！[イベントページ](https://groonga.doorkeeper.jp/events/55616)で参加登録できます。
 
-* 開催日時：2017年2月9日（日） 19:00-21:00（18:30開場）
+* 開催日時：2017年2月9日（木） 19:00-21:00（18:30開場）
 * 開催場所：[株式会社クラウドワークス](https://crowdworks.jp/)セミナールーム（[恵比寿駅（JR・東京メトロ各線）から徒歩約10分](https://crowdworks.co.jp/company#access_map)です。）
 * 定員：70名
 * 参加費：無料

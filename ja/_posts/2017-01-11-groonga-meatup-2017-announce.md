@@ -2,7 +2,6 @@
 layout: post.ja
 title: Groonga Meatup 2017開催のおしらせ
 description: Groonga Meatup 2017を開催します！
-published: false
 ---
 
 ## Groonga Meatup 2017開催のおしらせ

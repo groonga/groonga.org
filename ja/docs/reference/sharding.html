@@ -2,11 +2,11 @@
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml" lang="ja">
+<html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>7.20. シャーディング &#8212; Groonga v6.1.3ドキュメント</title>
+    <title>7.20. シャーディング &mdash; Groonga v6.1.3ドキュメント</title>
     
     <link rel="stylesheet" href="../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
@@ -25,11 +25,9 @@
     <script type="text/javascript" src="../static/doctools.js"></script>
     <script type="text/javascript" src="../static/translations.js"></script>
     <link rel="shortcut icon" href="../static/favicon.ico"/>
-    <link rel="index" title="索引" href="../genindex.html" />
-    <link rel="search" title="検索" href="../search.html" />
     <link rel="top" title="Groonga v6.1.3ドキュメント" href="../index.html" />
     <link rel="up" title="7. リファレンスマニュアル" href="../reference.html" />
-    <link rel="next" title="7.21. ログ" href="log.html" />
+    <link rel="next" title="7.3.31. logical_count" href="commands/logical_count.html" />
     <link rel="prev" title="7.19. インデックス構築" href="indexing.html" /> 
       <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
     <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
@@ -71,13 +69,13 @@
           <a href="../genindex.html" title="総合索引"
              accesskey="I">索引</a></li>
         <li class="right" >
-          <a href="log.html" title="7.21. ログ"
+          <a href="commands/logical_count.html" title="7.3.31. logical_count"
              accesskey="N">次へ</a> |</li>
         <li class="right" >
           <a href="indexing.html" title="7.19. インデックス構築"
              accesskey="P">前へ</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Groonga v6.1.3ドキュメント</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../reference.html" accesskey="U">7. リファレンスマニュアル</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Groonga v6.1.3ドキュメント</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../reference.html" accesskey="U">7. リファレンスマニュアル</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -91,23 +89,23 @@
 <div class="versionadded">
 <p><span class="versionmodified">バージョン 5.0.0 で追加.</span></p>
 </div>
-<p>Groongaにはテーブルに格納できるレコード数に <a class="reference internal" href="../limitations.html"><span class="doc">制限事項</span></a> があります。1つのテーブルに268,435,455以上のレコードを追加できません。</p>
+<p>Groongaにはテーブルに格納できるレコード数に <a class="reference internal" href="../limitations.html"><em>制限事項</em></a> があります。1つのテーブルに268,435,455以上のレコードを追加できません。</p>
 <p>この制限を解決するために、Groongaは時間ベースのシャーディング機能をサポートしています。</p>
 <p>この機能は同一データベース内で動きます。複数のデータベースをまたいでは動きません。これは、このシャーディング機能はデータを複数のマシンに分散する用途では使えないということです。</p>
 <p>もし、分散対応のシャーディング機能が欲しい場合は、 <a class="reference external" href="http://mroonga.org/">Mroonga</a> または <a class="reference external" href="http://pgroonga.github.io/">PGroonga</a> を使ってください。MySQLまたはPostgreSQLが提供しているシャーディング機能を使うことができます。近い将来、 <a class="reference external" href="http://droonga.org/">Droonga</a> でも分散対応のシャーディング機能を使えるようになる予定です。</p>
 <div class="section" id="summary">
 <h2>7.20.1. 概要<a class="headerlink" href="#summary" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <p>シャーディングは <code class="docutils literal"><span class="pre">sharding</span></code> プラグインとして実装されています。このプラグインはmrubyで書かれています。そのため、Groongaをビルドするときにmrubyを有効にする必要があります。</p>
-<p>Groongaがmrubyをサポートしているかは <a class="reference internal" href="executables/groonga.html"><span class="doc">groonga 実行ファイル</span></a> の <code class="docutils literal"><span class="pre">--version</span></code> 引数を使うとわかります:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>% groonga --version
+<p>Groongaがmrubyをサポートしているかは <a class="reference internal" href="executables/groonga.html"><em>groonga 実行ファイル</em></a> の <code class="docutils literal"><span class="pre">--version</span></code> 引数を使うとわかります:</p>
+<div class="highlight-none"><div class="highlight"><pre>% groonga --version
 groonga 5.0.5 [...,mruby,...]
 
 configure options: &lt;...&gt;
 </pre></div>
 </div>
 <p><code class="docutils literal"><span class="pre">mruby</span></code> があればあなたのGroongaはmrubyをサポートしています。</p>
-<p><code class="docutils literal"><span class="pre">sharding</span></code> プラグインは検索系のコマンドだけを提供しています。これらのコマンドは <a class="reference internal" href="commands/logical_select.html"><span class="doc">logical_select</span></a> や <a class="reference internal" href="commands/logical_range_filter.html"><span class="doc">logical_range_filter</span></a> というように、コマンド名に <code class="docutils literal"><span class="pre">logical_</span></code> プレフィックスがついています。</p>
-<p><code class="docutils literal"><span class="pre">sharding</span></code> プラグインはスキーマ定義コマンドとデータロードコマンドをまだ提供していません。そのため、既存の <a class="reference internal" href="commands/table_create.html"><span class="doc">table_create</span></a> 、 <a class="reference internal" href="commands/column_create.html"><span class="doc">column_create</span></a> 、 <a class="reference internal" href="commands/load.html"><span class="doc">load</span></a> コマンドを使う必要があります。</p>
+<p><code class="docutils literal"><span class="pre">sharding</span></code> プラグインは検索系のコマンドだけを提供しています。これらのコマンドは <a class="reference internal" href="commands/logical_select.html"><em>logical_select</em></a> や <a class="reference internal" href="commands/logical_range_filter.html"><em>logical_range_filter</em></a> というように、コマンド名に <code class="docutils literal"><span class="pre">logical_</span></code> プレフィックスがついています。</p>
+<p><code class="docutils literal"><span class="pre">sharding</span></code> プラグインはスキーマ定義コマンドとデータロードコマンドをまだ提供していません。そのため、既存の <a class="reference internal" href="commands/table_create.html"><em>table_create</em></a> 、 <a class="reference internal" href="commands/column_create.html"><em>column_create</em></a> 、 <a class="reference internal" href="commands/load.html"><em>load</em></a> コマンドを使う必要があります。</p>
 <p><code class="docutils literal"><span class="pre">sharding</span></code> プラグインを使うにはいくつかのルールに則ってテーブルとカラムを作る必要があります。これについては後述します。</p>
 </div>
 <div class="section" id="glossary">
@@ -185,8 +183,8 @@ configure options: &lt;...&gt;
   <p class="topless"><a href="indexing.html"
                         title="前の章へ">7.19. インデックス構築</a></p>
   <h4>次のトピックへ</h4>
-  <p class="topless"><a href="log.html"
-                        title="次の章へ">7.21. ログ</a></p>
+  <p class="topless"><a href="commands/logical_count.html"
+                        title="次の章へ">7.3.31. <code class="docutils literal"><span class="pre">logical_count</span></code></a></p>
   <div role="note" aria-label="source link">
     <h3>このページ</h3>
     <ul class="this-page-menu">
@@ -197,11 +195,14 @@ configure options: &lt;...&gt;
 <div id="searchbox" style="display: none" role="search">
   <h3>クイック検索</h3>
     <form class="search" action="../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="検索" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -215,17 +216,17 @@ configure options: &lt;...&gt;
           <a href="../genindex.html" title="総合索引"
              >索引</a></li>
         <li class="right" >
-          <a href="log.html" title="7.21. ログ"
+          <a href="commands/logical_count.html" title="7.3.31. logical_count"
              >次へ</a> |</li>
         <li class="right" >
           <a href="indexing.html" title="7.19. インデックス構築"
              >前へ</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Groonga v6.1.3ドキュメント</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../reference.html" >7. リファレンスマニュアル</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Groonga v6.1.3ドキュメント</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../reference.html" >7. リファレンスマニュアル</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2009-2017, Brazil, Inc.
+        &copy; Copyright 2009-2017, Brazil, Inc.
     </div>
       <script src="http://connect.facebook.net/ja_JP/all.js"></script>
 

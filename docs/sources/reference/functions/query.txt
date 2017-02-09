@@ -163,13 +163,14 @@ See :ref:`select-query-expander` about details.
 ``default_mode``
 """"""""""""""""
 
-Specifies the default search operation. The search operation can
-customize like ``column:@keyword`` syntax. The default search
-operation is used when you just specify ``keyword`` instead of
+Specifies the default search mode. You can custom the default search
+mode by ``column:@keyword`` like syntax. The default search mode is
+used when you just specify ``keyword`` instead of
 ``column:@keyword``. See :doc:`/reference/grn_expr/query_syntax` for
 more syntax details.
 
-Here are available modes. The default is ``MATCH`` mode.
+Here are available modes. The default is ``MATCH`` mode. It does full
+text search.
 
 .. list-table::
    :header-rows: 1
@@ -177,14 +178,66 @@ Here are available modes. The default is ``MATCH`` mode.
    * - Mode
      - Aliases
      - Description
-   * - TODO
-     - TODO
-     - TDOO
+   * - ``EQUAL``
+     - ``==``
+     - It uses :ref:`query-syntax-equal-condition` as the default mode.
+   * - ``NOT_EQUAL``
+     - ``!=``
+     - It uses :ref:`query-syntax-not-equal-condition` as the default mode.
+   * - ``LESS``
+     - ``<``
+     - It uses :ref:`query-syntax-less-than-condition` as the default mode.
+   * - ``GREATER``
+     - ``>``
+     - It uses :ref:`query-syntax-greater-than-condition` as the default mode.
+   * - ``LESS_EQUAL``
+     - ``<=``
+     - It uses :ref:`query-syntax-less-than-or-equal-condition` as the
+       default mode.
+   * - ``GREATER_EQUAL``
+     - ``>=``
+     - It uses :ref:`query-syntax-greater-than-or-equal-condition` as the
+       default mode.
+   * - ``MATCH``
+     - ``@``
+     - It uses :ref:`query-syntax-full-text-search-condition` as the
+       default mode.
+
+       It's the default.
+   * - ``NEAR``
+     - ``*N``
+     - It uses :ref:`query-syntax-near-search-condition` as the default
+       mode.
+   * - ``SIMILAR``
+     - ``*S``
+     - It uses :ref:`query-syntax-similar-search-condition` as the default
+       mode.
+   * - ``PREFIX``
+     - ``^``, ``@^``
+     - It uses :ref:`query-syntax-prefix-search-condition` as the default
+       mode.
+   * - ``SUFFIX``
+     - ``$``, ``@$``
+     - It uses :ref:`query-syntax-suffix-search-condition` as the default
+       mode.
+   * - ``REGEXP``
+     - ``~``, ``@~``
+     - It uses :ref:`query-syntax-regular-expression-condition` as the default
+       mode.
 
 ``flags``
 """""""""
 
-TODO
+Specifies the flags that customizes how to parse query.
+
+You can specify multiple flags by separating each flags by ``|``. Here
+is the example to specify multiple flags::
+
+  query("title * 10 || content",
+        "keyword",
+        {"flags": "ALLOW_COLUMN|ALLOW_LEADING_NOT"})
+
+See :ref:`select-query-flags` for available flags.
 
 Return value
 ------------
@@ -192,7 +245,6 @@ Return value
 ``query`` returns whether any record is matched or not. If one or more
 records are matched, it returns ``true``. Otherwise, it returns
 ``false``.
-
 
 See also
 --------

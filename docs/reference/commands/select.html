@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>7.3.54. select &#8212; Groonga v7.0.0 documentation</title>
+    <title>7.3.54. select &#8212; Groonga v7.0.1 documentation</title>
     
     <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '7.0.0',
+        VERSION:     '7.0.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,7 +26,7 @@
     <link rel="shortcut icon" href="../../static/favicon.ico"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="top" title="Groonga v7.0.0 documentation" href="../../index.html" />
+    <link rel="top" title="Groonga v7.0.1 documentation" href="../../index.html" />
     <link rel="up" title="7.3. Command" href="../command.html" />
     <link rel="next" title="7.3.55. shutdown" href="shutdown.html" />
     <link rel="prev" title="7.3.53. schema" href="schema.html" /> 
@@ -75,7 +75,7 @@
         <li class="right" >
           <a href="schema.html" title="7.3.53. schema"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v7.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v7.0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../reference.html" >7. Reference manual</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../command.html" accesskey="U">7.3. Command</a> &#187;</li> 
       </ul>
@@ -122,11 +122,46 @@ optional:</p>
        [adjuster=null]
        [drilldown_calc_types=NONE]
        [drilldown_calc_target=null]
+       [drilldown_filter=null]
        [sort_keys=null]
        [drilldown_sort_keys=null]
 </pre></div>
 </div>
-<p><code class="docutils literal"><span class="pre">select</span></code> has the following named parameters for advanced drilldown:</p>
+<p>This command has the following named parameters for dynamic columns:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">columns[${NAME}].stage=null</span></code></li>
+<li><code class="docutils literal"><span class="pre">columns[${NAME}].flags=COLUMN_SCALAR</span></code></li>
+<li><code class="docutils literal"><span class="pre">columns[${NAME}].type=null</span></code></li>
+<li><code class="docutils literal"><span class="pre">columns[${NAME}].value=null</span></code></li>
+<li><code class="docutils literal"><span class="pre">columns[${NAME}].window.sort_keys=null</span></code></li>
+<li><code class="docutils literal"><span class="pre">columns[${NAME}].window.group_keys=null</span></code></li>
+</ul>
+</div></blockquote>
+<p>You can use one or more alphabets, digits, <code class="docutils literal"><span class="pre">_</span></code> for <code class="docutils literal"><span class="pre">${NAME}</span></code>. For
+example, <code class="docutils literal"><span class="pre">column1</span></code> is a valid <code class="docutils literal"><span class="pre">${NAME}</span></code>. This is the same rule as
+normal column. See also <a class="reference internal" href="column_create.html#column-create-name"><span class="std std-ref">name</span></a>.</p>
+<p>Parameters that have the same <code class="docutils literal"><span class="pre">${NAME}</span></code> are grouped.</p>
+<p>For example, the following parameters specify one dynamic column:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">--columns[name].stage</span> <span class="pre">initial</span></code></li>
+<li><code class="docutils literal"><span class="pre">--columns[name].type</span> <span class="pre">UInt32</span></code></li>
+<li><code class="docutils literal"><span class="pre">--columns[name].value</span> <span class="pre">29</span></code></li>
+</ul>
+</div></blockquote>
+<p>The following parameters specify two dynamic columns:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">--columns[name1].stage</span> <span class="pre">initial</span></code></li>
+<li><code class="docutils literal"><span class="pre">--columns[name1].type</span> <span class="pre">UInt32</span></code></li>
+<li><code class="docutils literal"><span class="pre">--columns[name1].value</span> <span class="pre">29</span></code></li>
+<li><code class="docutils literal"><span class="pre">--columns[name2].stage</span> <span class="pre">filtered</span></code></li>
+<li><code class="docutils literal"><span class="pre">--columns[name2].type</span> <span class="pre">Float</span></code></li>
+<li><code class="docutils literal"><span class="pre">--columns[name2].value</span> <span class="pre">'_score</span> <span class="pre">*</span> <span class="pre">0.1'</span></code></li>
+</ul>
+</div></blockquote>
+<p>This command has the following named parameters for advanced drilldown:</p>
 <blockquote>
 <div><ul class="simple">
 <li><code class="docutils literal"><span class="pre">drilldowns[${LABEL}].keys=null</span></code></li>
@@ -136,10 +171,18 @@ optional:</p>
 <li><code class="docutils literal"><span class="pre">drilldowns[${LABEL}].limit=10</span></code></li>
 <li><code class="docutils literal"><span class="pre">drilldowns[${LABEL}].calc_types=NONE</span></code></li>
 <li><code class="docutils literal"><span class="pre">drilldowns[${LABEL}].calc_target=null</span></code></li>
+<li><code class="docutils literal"><span class="pre">drilldowns[${LABEL}].filter=null</span></code></li>
+<li><code class="docutils literal"><span class="pre">drilldowns[${LABEL}].columns[${NAME}].stage=null</span></code></li>
+<li><code class="docutils literal"><span class="pre">drilldowns[${LABEL}].columns[${NAME}].flags=COLUMN_SCALAR</span></code></li>
+<li><code class="docutils literal"><span class="pre">drilldowns[${LABEL}].columns[${NAME}].type=null</span></code></li>
+<li><code class="docutils literal"><span class="pre">drilldowns[${LABEL}].columns[${NAME}].value=null</span></code></li>
+<li><code class="docutils literal"><span class="pre">drilldowns[${LABEL}].columns[${NAME}].window.sort_keys=null</span></code></li>
+<li><code class="docutils literal"><span class="pre">drilldowns[${LABEL}].columns[${NAME}].window.group_keys=null</span></code></li>
 </ul>
 </div></blockquote>
 <div class="deprecated">
-<p><span class="versionmodified">Deprecated since version 6.0.3: </span><code class="docutils literal"><span class="pre">drilldown[...]</span></code> syntax is deprecated, Use <code class="docutils literal"><span class="pre">drilldowns[...]</span></code> instead.</p>
+<p><span class="versionmodified">Deprecated since version 6.0.3: </span><code class="docutils literal"><span class="pre">drilldown[...]</span></code> syntax is deprecated, Use <code class="docutils literal"><span class="pre">drilldowns[...]</span></code>
+instead.</p>
 </div>
 <p>You can use one or more alphabets, digits, <code class="docutils literal"><span class="pre">_</span></code> and <code class="docutils literal"><span class="pre">.</span></code> for
 <code class="docutils literal"><span class="pre">${LABEL}</span></code>. For example, <code class="docutils literal"><span class="pre">parent.sub1</span></code> is a valid <code class="docutils literal"><span class="pre">${LABEL}</span></code>.</p>
@@ -550,8 +593,8 @@ records.</p>
 <div class="section" id="drilldown">
 <h3>7.3.54.3.5. Drilldown<a class="headerlink" href="#drilldown" title="Permalink to this headline">¶</a></h3>
 <p>You can get additional grouped results against the search result in
-one <code class="docutils literal"><span class="pre">select</span></code>. You need to use two or more <code class="docutils literal"><span class="pre">SELECT``s</span> <span class="pre">in</span> <span class="pre">SQL</span> <span class="pre">but</span>
-<span class="pre">``select</span></code> in Groonga can do it in one <code class="docutils literal"><span class="pre">select</span></code>.</p>
+one <code class="docutils literal"><span class="pre">select</span></code>. You need to use two or more <code class="docutils literal"><span class="pre">SELECT</span></code> s in SQL but
+<code class="docutils literal"><span class="pre">select</span></code> in Groonga can do it in one <code class="docutils literal"><span class="pre">select</span></code>.</p>
 <p>This feature is called as <a class="reference external" href="http://en.wikipedia.org/wiki/Drill_down">drilldown</a> in Groonga. It's also
 called as <a class="reference external" href="http://en.wikipedia.org/wiki/Faceted_search">faceted search</a> in other search
 engine.</p>
@@ -707,6 +750,249 @@ the maximum and/or minimum value from grouped records, summing values
 in grouped records and so on. See
 <a class="reference internal" href="#select-drilldown-related-parameters"><span class="std std-ref">Drilldown related parameters</span></a> for details.</p>
 </div>
+<div class="section" id="dynamic-column">
+<h3>7.3.54.3.6. Dynamic column<a class="headerlink" href="#dynamic-column" title="Permalink to this headline">¶</a></h3>
+<p>You can create zero or more columns dynamically while a <code class="docutils literal"><span class="pre">select</span></code>
+execution. You can use them for drilldown by computed value, window
+function and so on.</p>
+<p>Here is an example that uses dynamic column for drilldown by computed
+value. This example creates a new column named
+<code class="docutils literal"><span class="pre">n_likes_class</span></code>. <code class="docutils literal"><span class="pre">n_likes_class</span></code> column has classified value of
+<code class="docutils literal"><span class="pre">Entry.n_likes</span></code> value. This example classifies <code class="docutils literal"><span class="pre">Entry.n_likes</span></code>
+column value <code class="docutils literal"><span class="pre">10</span></code> step and the lowest number in the class is the
+classified value. If a <code class="docutils literal"><span class="pre">Entry.n_likes</span></code> value is between <code class="docutils literal"><span class="pre">0</span></code> and
+<code class="docutils literal"><span class="pre">9</span></code> such as <code class="docutils literal"><span class="pre">3</span></code> and <code class="docutils literal"><span class="pre">5</span></code>, <code class="docutils literal"><span class="pre">n_likes_class</span></code> value (classified
+value) is <code class="docutils literal"><span class="pre">0</span></code>. If <code class="docutils literal"><span class="pre">Entry.n_likes</span></code> value is between <code class="docutils literal"><span class="pre">10</span></code> and
+<code class="docutils literal"><span class="pre">19</span></code> such as <code class="docutils literal"><span class="pre">10</span></code> and <code class="docutils literal"><span class="pre">15</span></code>, <code class="docutils literal"><span class="pre">n_likes_class</span></code> value (classified
+value) is <code class="docutils literal"><span class="pre">10</span></code>.</p>
+<p>You can use doc:<cite>/reference/functions/number_classify</cite> function for
+the classification. You need to register <code class="docutils literal"><span class="pre">functions/number</span></code> plugin
+by <a class="reference internal" href="plugin_register.html"><span class="doc">plugin_register</span></a> command to use
+doc:<cite>/reference/functions/number_classify</cite> function.</p>
+<p>This example does drilldown by <code class="docutils literal"><span class="pre">n_likes_class</span></code> value. The drilldown
+result will help you to know data trend.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>plugin_register functions/number
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+select \
+  --table Entries \
+  --columns[n_likes_class].stage initial \
+  --columns[n_likes_class].type UInt32 \
+  --columns[n_likes_class].value &#39;number_classify(n_likes, 10)&#39; \
+  --drilldown n_likes_class \
+  --drilldown_sort_keys _nsubrecs \
+  --output_columns n_likes,n_likes_class
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;n_likes_class&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         5,
+#         0
+#       ],
+#       [
+#         10,
+#         10
+#       ],
+#       [
+#         15,
+#         10
+#       ],
+#       [
+#         3,
+#         0
+#       ],
+#       [
+#         3,
+#         0
+#       ]
+#     ],
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_nsubrecs&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         10,
+#         2
+#       ],
+#       [
+#         0,
+#         3
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>See <a class="reference internal" href="#select-dynamic-column-related-parameters"><span class="std std-ref">Dynamic column related parameters</span></a> for details.</p>
+</div>
+<div class="section" id="window-function">
+<h3>7.3.54.3.7. Window function<a class="headerlink" href="#window-function" title="Permalink to this headline">¶</a></h3>
+<p>You can compute each record value from values of grouped records. For
+example, you can compute sums of each group and puts sums to each
+record. The difference against drilldown is drilldown can compute sums
+of each group but it puts sums to each group not record.</p>
+<p>Here is the result with window function. Each record has sum:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Group No.</th>
+<th class="head">Target value</th>
+<th class="head">Sum result</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>1</td>
+<td>5</td>
+<td>5</td>
+</tr>
+<tr class="row-odd"><td>2</td>
+<td>10</td>
+<td>25</td>
+</tr>
+<tr class="row-even"><td>2</td>
+<td>15</td>
+<td>25</td>
+</tr>
+<tr class="row-odd"><td>3</td>
+<td>3</td>
+<td>8</td>
+</tr>
+<tr class="row-even"><td>3</td>
+<td>5</td>
+<td>8</td>
+</tr>
+</tbody>
+</table>
+<p>Here is the result with drilldown. Each group has sum:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Group No.</th>
+<th class="head">Target values</th>
+<th class="head">Sum result</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>1</td>
+<td>5</td>
+<td>5</td>
+</tr>
+<tr class="row-odd"><td>2</td>
+<td>10, 15</td>
+<td>25</td>
+</tr>
+<tr class="row-even"><td>3</td>
+<td>3, 5</td>
+<td>8</td>
+</tr>
+</tbody>
+</table>
+<p>Window function is useful for data analysis.</p>
+<p>Here is an example that sums <code class="docutils literal"><span class="pre">Entries.n_likes</span></code> per
+<code class="docutils literal"><span class="pre">Entries.tag</span></code>:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>plugin_register functions/number
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+select \
+  --table Entries \
+  --columns[n_likes_sum_per_tag].stage initial \
+  --columns[n_likes_sum_per_tag].type UInt32 \
+  --columns[n_likes_sum_per_tag].value &#39;window_sum(n_likes)&#39; \
+  --columns[n_likes_sum_per_tag].window.group_keys tag \
+  --output_columns tag,n_likes,n_likes_sum_per_tag
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;n_likes_sum_per_tag&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Hello&quot;,
+#         5,
+#         5
+#       ],
+#       [
+#         &quot;Groonga&quot;,
+#         10,
+#         25
+#       ],
+#       [
+#         &quot;Groonga&quot;,
+#         15,
+#         25
+#       ],
+#       [
+#         &quot;Senna&quot;,
+#         3,
+#         6
+#       ],
+#       [
+#         &quot;Senna&quot;,
+#         3,
+#         6
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>See <a class="reference internal" href="#select-window-function-related-parameters"><span class="std std-ref">Window function related parameters</span></a> for details.</p>
+</div>
 </div>
 <div class="section" id="parameters">
 <h2>7.3.54.4. Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
@@ -730,7 +1016,7 @@ in grouped records and so on. See
 #       [
 #         &quot;grn_select&quot;,
 #         &quot;proc_select.c&quot;,
-#         2973
+#         3006
 #       ]
 #     ]
 #   ]
@@ -2503,12 +2789,842 @@ records. It's very useful value to show all records.</p>
 <p>scorerは、検索処理が完了し、ソート処理が実行される前に呼び出されます。従って、各レコードのスコアを操作する式を指定しておけば、検索結果のソート順序をカスタマイズできるようになります。</p>
 </div>
 </div>
+<div class="section" id="dynamic-column-related-parameters">
+<span id="select-dynamic-column-related-parameters"></span><h3>7.3.54.4.5. Dynamic column related parameters<a class="headerlink" href="#dynamic-column-related-parameters" title="Permalink to this headline">¶</a></h3>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 6.0.6.</span></p>
+</div>
+<p>This section describes dynamic column related parameters. You can use
+dynamic column for window function but this section doesn't describe
+window function. See <a class="reference internal" href="#select-window-function-related-parameters"><span class="std std-ref">Window function related parameters</span></a>
+for window function.</p>
+<p>You can create zero or more columns and fill values into these columns
+while a <code class="docutils literal"><span class="pre">select</span></code> execution. These columns are called as &quot;dynamic
+columns&quot;. You can use dynamic columns as same as normal columns after
+dynamic columns are created.</p>
+<p>Dynamic column has performance merit because its values are computed
+at once and reused computed values.</p>
+<p>Dynamic column increases memory usage because its values are kept
+while the <code class="docutils literal"><span class="pre">select</span></code> execution.</p>
+<p>You need to use dynamic column in the following cases:</p>
+<blockquote>
+<div><ul class="simple">
+<li>You want to name values like <code class="docutils literal"><span class="pre">AS</span></code> in SQL.</li>
+<li>You want to use computed values for drilldown. Groonga doesn't
+support drilldown target value computation in drilldown.</li>
+<li>You want to use window function.</li>
+</ul>
+</div></blockquote>
+<p>There are some points to create dynamic columns. You must specify
+<code class="docutils literal"><span class="pre">stage</span></code> to each dynamic column to control dynamic columns creation
+points. It's important that you choose proper point to get better
+performance.</p>
+<p>For example, it's not a good idea that you create a dynamic column
+that is only used for output for all records. The number of output
+records will be a little even if there are many records in a
+table. Because you will filter, sort and limit all records and output
+only the limited records in many cases.</p>
+<p>See <a class="reference internal" href="#select-columns-name-stage"><span class="std std-ref">columns[${NAME}].stage</span></a> for <code class="docutils literal"><span class="pre">stage</span></code> detail.</p>
+<p>Here are parameters for dynamic column. They don't include window
+function related parameters. See
+<a class="reference internal" href="#select-window-function-related-parameters"><span class="std std-ref">Window function related parameters</span></a> for window function
+related parameters:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Default value</th>
+<th class="head">Required or optional</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">columns[${NAME}].stage</span></code></td>
+<td><code class="docutils literal"><span class="pre">null</span></code></td>
+<td>Required</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">columns[${NAME}].flags</span></code></td>
+<td><code class="docutils literal"><span class="pre">COLUMN_SCALAR</span></code></td>
+<td>Optional</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">columns[${NAME}].type</span></code></td>
+<td><code class="docutils literal"><span class="pre">null</span></code></td>
+<td>Required</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">columns[${NAME}].value</span></code></td>
+<td><code class="docutils literal"><span class="pre">null</span></code></td>
+<td>Required</td>
+</tr>
+</tbody>
+</table>
+<p>You need to specify multiple parameters for a dynamic
+column. <code class="docutils literal"><span class="pre">${NAME}</span></code> is the name for each dynamic column. Parameters
+that use the same <code class="docutils literal"><span class="pre">${NAME}</span></code> are treated as parameters for the same
+dynamic column. Here is an example to specify parameters for 2 dynamic
+columns (<code class="docutils literal"><span class="pre">name1</span></code> and <code class="docutils literal"><span class="pre">name2</span></code>):</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>--columns[name1].stage initial
+--columns[name1].type UInt32
+--columns[name1].value 29
+
+--columns[name2].stage filtered
+--columns[name2].type ShortText
+--columns[name2].value &quot;29&quot;
+</pre></div>
+</div>
+<div class="section" id="columns-name-stage">
+<span id="select-columns-name-stage"></span><h4>7.3.54.4.5.1. <code class="docutils literal"><span class="pre">columns[${NAME}].stage</span></code><a class="headerlink" href="#columns-name-stage" title="Permalink to this headline">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 6.0.6.</span></p>
+</div>
+<p>Specifies when the dynamic column is created. This is a required
+parameter to create a dynamic column.</p>
+<p>Here are available stages:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">initial</span></code></td>
+<td>Dynamic column is created at first.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">filtered</span></code></td>
+<td>Dynamic column is created after <a class="reference internal" href="#select-query"><span class="std std-ref">query</span></a> and
+<a class="reference internal" href="#select-filter"><span class="std std-ref">filter</span></a> are evaluated.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">output</span></code></td>
+<td>Dynamic column is created before <a class="reference internal" href="#select-output-columns"><span class="std std-ref">output_columns</span></a>
+is evaluated.</td>
+</tr>
+</tbody>
+</table>
+<p>Here is the <code class="docutils literal"><span class="pre">select</span></code> process flow with dynamic column creation
+points. You should choose stage as late as possible:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>Creates dynamic columns for <code class="docutils literal"><span class="pre">initial</span></code> stage. All records have
+these dynamic columns.</li>
+<li>Evaluates <a class="reference internal" href="#select-query"><span class="std std-ref">query</span></a> and <a class="reference internal" href="#select-filter"><span class="std std-ref">filter</span></a>. You can
+use dynamic columns created in <code class="docutils literal"><span class="pre">initial</span></code> stage.</li>
+<li>Creates dynamic columns for <code class="docutils literal"><span class="pre">filtered</span></code> stage. Only filtered
+records have these dynamic columns.</li>
+<li>Evaluates <a class="reference internal" href="#select-adjuster"><span class="std std-ref">adjuster</span></a>. You can use dynamic columns
+created in <code class="docutils literal"><span class="pre">initial</span></code> stage and <code class="docutils literal"><span class="pre">filtered</span></code> stage.</li>
+<li>Evaluates <a class="reference internal" href="#select-scorer"><span class="std std-ref">scorer</span></a>. You can use dynamic columns
+created in <code class="docutils literal"><span class="pre">initial</span></code> stage and <code class="docutils literal"><span class="pre">filtered</span></code> stage.</li>
+<li>Evaluates <a class="reference internal" href="#select-sort-keys"><span class="std std-ref">sort_keys</span></a>, <a class="reference internal" href="#select-offset"><span class="std std-ref">offset</span></a> and
+<a class="reference internal" href="#select-limit"><span class="std std-ref">limit</span></a>. You can use dynamic columns created in
+<code class="docutils literal"><span class="pre">initial</span></code> stage and <code class="docutils literal"><span class="pre">filtered</span></code> stage.</li>
+<li>Creates dynamic columns for <code class="docutils literal"><span class="pre">output</span></code> stage. Only
+<a class="reference internal" href="#select-limit"><span class="std std-ref">limit</span></a> records have these dynamic columns.</li>
+<li>Evaluates <a class="reference internal" href="#select-slice-related-parameters"><span class="std std-ref">Slice related parameters</span></a>. You can use
+dynamic columns created in <code class="docutils literal"><span class="pre">initial</span></code> stage, <code class="docutils literal"><span class="pre">filtered</span></code> stage
+and <code class="docutils literal"><span class="pre">output</span></code> stage.</li>
+<li>Evaluates <a class="reference internal" href="#select-drilldown-related-parameters"><span class="std std-ref">Drilldown related parameters</span></a> and
+<a class="reference internal" href="#select-advanced-drilldown-related-parameters"><span class="std std-ref">Advanced drilldown related parameters</span></a>. You can use
+dynamic columns created in <code class="docutils literal"><span class="pre">initial</span></code> stage, <code class="docutils literal"><span class="pre">filtered</span></code> stage
+and <code class="docutils literal"><span class="pre">output</span></code> stage. Note that you can use dynamic columns in
+each drilldown.</li>
+<li>Evaluates <a class="reference internal" href="#select-output-columns"><span class="std std-ref">output_columns</span></a>. You can use dynamic
+columns created in <code class="docutils literal"><span class="pre">initial</span></code> stage, <code class="docutils literal"><span class="pre">filtered</span></code> stage and
+<code class="docutils literal"><span class="pre">output</span></code> stage.</li>
+</ol>
+</div></blockquote>
+<p>Here is a <code class="docutils literal"><span class="pre">columns[${NAME}].stage</span></code> example. It creates
+<code class="docutils literal"><span class="pre">is_popular</span></code> column at <code class="docutils literal"><span class="pre">initial</span></code> stage. You can use <code class="docutils literal"><span class="pre">is_popular</span></code>
+in all parameters such as <code class="docutils literal"><span class="pre">filter</span></code> and <code class="docutils literal"><span class="pre">output_columns</span></code>:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>select Entries \
+  --columns[is_popular].stage initial \
+  --columns[is_popular].type Bool \
+  --columns[is_popular].value &#39;n_likes &gt;= 10&#39; \
+  --filter is_popular \
+  --output_columns _id,is_popular,n_likes
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;is_popular&quot;,
+#           &quot;Bool&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         2,
+#         true,
+#         10
+#       ],
+#       [
+#         3,
+#         true,
+#         15
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
+<div class="section" id="columns-name-flags">
+<span id="select-columns-name-flags"></span><h4>7.3.54.4.5.2. <code class="docutils literal"><span class="pre">columns[${NAME}].flags</span></code><a class="headerlink" href="#columns-name-flags" title="Permalink to this headline">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 6.0.6.</span></p>
+</div>
+<p>Specifies flags for the dynamic column. It's the same as <code class="docutils literal"><span class="pre">flags</span></code>
+parameter for <a class="reference internal" href="column_create.html"><span class="doc">column_create</span></a>. See <a class="reference internal" href="column_create.html#column-create-flags"><span class="std std-ref">flags</span></a> for
+available flags.</p>
+<p>The default value is <code class="docutils literal"><span class="pre">COLUMN_SCALAR</span></code>.</p>
+<p>Here is a <code class="docutils literal"><span class="pre">columns[${NAME}].flags</span></code> example. It creates a vector
+column by <code class="docutils literal"><span class="pre">COLUMN_VECTOR</span></code> flags. <code class="docutils literal"><span class="pre">plugin_register</span>
+<span class="pre">functions/vector</span></code> is for using <a class="reference internal" href="../functions/vector_new.html"><span class="doc">vector_new</span></a>
+function:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>plugin_register functions/vector
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+select Entries \
+  --columns[vector].stage initial \
+  --columns[vector].flags COLUMN_VECTOR \
+  --columns[vector].type UInt32 \
+  --columns[vector].value &#39;vector_new(1, 2, 3)&#39; \
+  --output_columns _id,vector
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;vector&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         [
+#           1,
+#           2,
+#           3
+#         ]
+#       ],
+#       [
+#         2,
+#         [
+#           1,
+#           2,
+#           3
+#         ]
+#       ],
+#       [
+#         3,
+#         [
+#           1,
+#           2,
+#           3
+#         ]
+#       ],
+#       [
+#         4,
+#         [
+#           1,
+#           2,
+#           3
+#         ]
+#       ],
+#       [
+#         5,
+#         [
+#           1,
+#           2,
+#           3
+#         ]
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
+<div class="section" id="columns-name-type">
+<span id="select-columns-name-type"></span><h4>7.3.54.4.5.3. <code class="docutils literal"><span class="pre">columns[${NAME}].type</span></code><a class="headerlink" href="#columns-name-type" title="Permalink to this headline">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 6.0.6.</span></p>
+</div>
+<p>Specifies value type for the dynamic column. It's the same as <code class="docutils literal"><span class="pre">type</span></code>
+parameter for <a class="reference internal" href="column_create.html"><span class="doc">column_create</span></a>. See <a class="reference internal" href="column_create.html#column-create-type"><span class="std std-ref">type</span></a> for
+available flags.</p>
+<p>This is required parameter.</p>
+<p>Here is a <code class="docutils literal"><span class="pre">columns[${NAME}].type</span></code> example. It creates a
+<code class="docutils literal"><span class="pre">ShortText</span></code> value column. Stored value is casted to <code class="docutils literal"><span class="pre">ShortText</span></code>
+automatically. In this example, number is casted to <code class="docutils literal"><span class="pre">ShortText</span></code>:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>select Entries \
+  --columns[n_likes_string].stage initial \
+  --columns[n_likes_string].type ShortText \
+  --columns[n_likes_string].value n_likes \
+  --output_columns _id,n_likes,n_likes_string
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;n_likes_string&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         5,
+#         &quot;5&quot;
+#       ],
+#       [
+#         2,
+#         10,
+#         &quot;10&quot;
+#       ],
+#       [
+#         3,
+#         15,
+#         &quot;15&quot;
+#       ],
+#       [
+#         4,
+#         3,
+#         &quot;3&quot;
+#       ],
+#       [
+#         5,
+#         3,
+#         &quot;3&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
+<div class="section" id="columns-name-value">
+<span id="select-columns-name-value"></span><h4>7.3.54.4.5.4. <code class="docutils literal"><span class="pre">columns[${NAME}].value</span></code><a class="headerlink" href="#columns-name-value" title="Permalink to this headline">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 6.0.6.</span></p>
+</div>
+<p>Specifies expression that generates values for the dynamic column. The
+expression uses <a class="reference internal" href="../grn_expr/script_syntax.html"><span class="doc">Script syntax</span></a>. It's the
+same syntax in <a class="reference internal" href="#select-filter"><span class="std std-ref">filter</span></a>. For example, <code class="docutils literal"><span class="pre">1</span> <span class="pre">+</span> <span class="pre">1</span></code>,
+<code class="docutils literal"><span class="pre">string_length(&quot;Hello&quot;)</span></code>, <code class="docutils literal"><span class="pre">column</span> <span class="pre">*</span> <span class="pre">1.08</span></code> and so on are valid
+expressions.</p>
+<p>You need to specify <a class="reference internal" href="../window_function.html"><span class="doc">Window function</span></a> as <code class="docutils literal"><span class="pre">value</span></code>
+value and other window function related parameters when you use window
+function. See <a class="reference internal" href="#select-window-function-related-parameters"><span class="std std-ref">Window function related parameters</span></a> for
+details.</p>
+<p>This is required parameter.</p>
+<p>Here is a <code class="docutils literal"><span class="pre">columns[${NAME}].value</span></code> example. It creates a new dynamic
+column that stores the number of characters of content. This example
+uses <a class="reference internal" href="../functions/string_length.html"><span class="doc">string_length</span></a> function in
+<code class="docutils literal"><span class="pre">functions/string</span></code> plugin to compute string
+length. <a class="reference internal" href="plugin_register.html"><span class="doc">plugin_register</span></a> is used to register
+<code class="docutils literal"><span class="pre">functions/string</span></code> plugin:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>plugin_register functions/string
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+select Entries \
+  --columns[content_length].stage initial \
+  --columns[content_length].type UInt32 \
+  --columns[content_length].value &#39;string_length(content)&#39; \
+  --output_columns _id,content,content_length
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;content_length&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;Welcome! This is my first post!&quot;,
+#         31
+#       ],
+#       [
+#         2,
+#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+#         41
+#       ],
+#       [
+#         3,
+#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         64
+#       ],
+#       [
+#         4,
+#         &quot;I migrated all Senna system!&quot;,
+#         28
+#       ],
+#       [
+#         5,
+#         &quot;I also migrated all Tritonn system!&quot;,
+#         35
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="window-function-related-parameters">
+<span id="select-window-function-related-parameters"></span><h3>7.3.54.4.6. Window function related parameters<a class="headerlink" href="#window-function-related-parameters" title="Permalink to this headline">¶</a></h3>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 6.0.6.</span></p>
+</div>
+<p>This section describes window function column related parameters. You
+need to use dynamic column for using window function. See
+<a class="reference internal" href="#select-dynamic-column-related-parameters"><span class="std std-ref">Dynamic column related parameters</span></a> for dynamic column.</p>
+<p>Window function in Groonga is similar to window function in
+SQL. Normal function computes its result with only the current
+record. On the other hand, window function computes its result with
+multiple records. Window function is useful to data analysis because
+it can process multiple records.</p>
+<p>You can find supported window functions at
+<a class="reference internal" href="../window_function.html"><span class="doc">Window function</span></a>. For example,
+<a class="reference internal" href="../window_functions/window_sum.html"><span class="doc">window_sum</span></a> is a window function. It
+sums numbers in the target records.</p>
+<p>Window function processes records that are grouped by the specified
+group keys. For example, window function processes three groups
+(<code class="docutils literal"><span class="pre">Hello</span></code> group, <code class="docutils literal"><span class="pre">Groonga</span></code> group and <code class="docutils literal"><span class="pre">Senna</span></code> group) in the
+following case. <a class="reference internal" href="../window_functions/window_sum.html"><span class="doc">window_sum</span></a> sums
+<code class="docutils literal"><span class="pre">n_likes</span></code> values in each group:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="25%" />
+<col width="25%" />
+<col width="25%" />
+<col width="25%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Group No.</th>
+<th class="head">Group key value</th>
+<th class="head"><code class="docutils literal"><span class="pre">n_likes</span></code> value</th>
+<th class="head"><a class="reference internal" href="../window_functions/window_sum.html"><span class="doc">window_sum</span></a> result</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>1</td>
+<td><code class="docutils literal"><span class="pre">Hello</span></code></td>
+<td>5</td>
+<td>5</td>
+</tr>
+<tr class="row-odd"><td>2</td>
+<td><code class="docutils literal"><span class="pre">Groonga</span></code></td>
+<td>10</td>
+<td>25</td>
+</tr>
+<tr class="row-even"><td>2</td>
+<td><code class="docutils literal"><span class="pre">Groonga</span></code></td>
+<td>15</td>
+<td>25</td>
+</tr>
+<tr class="row-odd"><td>3</td>
+<td><code class="docutils literal"><span class="pre">Senna</span></code></td>
+<td>3</td>
+<td>6</td>
+</tr>
+<tr class="row-even"><td>3</td>
+<td><code class="docutils literal"><span class="pre">Senna</span></code></td>
+<td>3</td>
+<td>6</td>
+</tr>
+</tbody>
+</table>
+<p>You can specify no group keys. In the case, window function processes
+only one group that includes all
+records. <a class="reference internal" href="../window_functions/window_sum.html"><span class="doc">window_sum</span></a> sums all
+<code class="docutils literal"><span class="pre">n_likes</span></code> values in the following case:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Group No.</th>
+<th class="head"><code class="docutils literal"><span class="pre">n_likes</span></code> value</th>
+<th class="head"><a class="reference internal" href="../window_functions/window_sum.html"><span class="doc">window_sum</span></a> result</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>1</td>
+<td>5</td>
+<td>36</td>
+</tr>
+<tr class="row-odd"><td>1</td>
+<td>10</td>
+<td>36</td>
+</tr>
+<tr class="row-even"><td>1</td>
+<td>15</td>
+<td>36</td>
+</tr>
+<tr class="row-odd"><td>1</td>
+<td>3</td>
+<td>36</td>
+</tr>
+<tr class="row-even"><td>1</td>
+<td>3</td>
+<td>36</td>
+</tr>
+</tbody>
+</table>
+<p>Window function processes records in each group in the specified
+order. You can specify no sort keys like the above group keys
+example.</p>
+<p>The behavior when you specify no sort keys depends on each window
+function specification. For example,
+<a class="reference internal" href="../window_functions/window_sum.html"><span class="doc">window_sum</span></a> uses different behavior
+whether sort keys are specified or not. If you specify not sort keys,
+<a class="reference internal" href="../window_functions/window_sum.html"><span class="doc">window_sum</span></a> sums values of all
+records in the group and puts it to all target records like the above
+group keys example. If you specify sort keys,
+<a class="reference internal" href="../window_functions/window_sum.html"><span class="doc">window_sum</span></a> behaves as cumulative
+sum. <a class="reference internal" href="../window_functions/window_sum.html"><span class="doc">window_sum</span></a> sums values of all
+records in the group in sequence and puts the current sum to the
+current record like the following:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="17%" />
+<col width="17%" />
+<col width="17%" />
+<col width="17%" />
+<col width="17%" />
+<col width="17%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Group No.</th>
+<th class="head">Group key value</th>
+<th class="head">Sort key value</th>
+<th class="head"><code class="docutils literal"><span class="pre">n_likes</span></code> value</th>
+<th class="head"><a class="reference internal" href="../window_functions/window_sum.html"><span class="doc">window_sum</span></a> result</th>
+<th class="head">Note</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>1</td>
+<td><code class="docutils literal"><span class="pre">Hello</span></code></td>
+<td>1</td>
+<td>5</td>
+<td>5</td>
+<td>The first record in group No. 1. (<code class="docutils literal"><span class="pre">5</span> <span class="pre">=</span> <span class="pre">5</span></code>)</td>
+</tr>
+<tr class="row-odd"><td>2</td>
+<td><code class="docutils literal"><span class="pre">Groonga</span></code></td>
+<td>90</td>
+<td>10</td>
+<td>10</td>
+<td>The first record in group No. 2. (<code class="docutils literal"><span class="pre">10</span> <span class="pre">=</span> <span class="pre">10</span></code>)</td>
+</tr>
+<tr class="row-even"><td>2</td>
+<td><code class="docutils literal"><span class="pre">Groonga</span></code></td>
+<td>91</td>
+<td>15</td>
+<td>25</td>
+<td>The second record in group No. 2. (<code class="docutils literal"><span class="pre">10</span> <span class="pre">+</span> <span class="pre">15</span> <span class="pre">=</span> <span class="pre">25</span></code>)</td>
+</tr>
+<tr class="row-odd"><td>3</td>
+<td><code class="docutils literal"><span class="pre">Senna</span></code></td>
+<td>200</td>
+<td>3</td>
+<td>8</td>
+<td>The second record in group No. 3. (<code class="docutils literal"><span class="pre">5</span> <span class="pre">+</span> <span class="pre">3</span> <span class="pre">=</span> <span class="pre">8</span></code>)</td>
+</tr>
+<tr class="row-even"><td>3</td>
+<td><code class="docutils literal"><span class="pre">Senna</span></code></td>
+<td>100</td>
+<td>5</td>
+<td>5</td>
+<td>The first record in group No. 3. (<code class="docutils literal"><span class="pre">5</span> <span class="pre">=</span> <span class="pre">5</span></code>)</td>
+</tr>
+</tbody>
+</table>
+<p>Here are parameters for window function. You need to specify both
+window function related parameters and required dynamic columns
+parameters. Because window function is implemented based on dynamic
+column. See <a class="reference internal" href="#select-dynamic-column-related-parameters"><span class="std std-ref">Dynamic column related parameters</span></a> for
+dynamic column related parameters:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Required or optional</th>
+<th class="head">Note</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">columns[${NAME}].value</span></code></td>
+<td>Required</td>
+<td>Use <a class="reference internal" href="../window_function.html"><span class="doc">Window function</span></a>.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">columns[${NAME}].window.sort_keys</span></code></td>
+<td>Required if <code class="docutils literal"><span class="pre">columns[${NAME}].window.group_keys</span></code> isn't specified.</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">columns[${NAME}].window.group_keys</span></code></td>
+<td>Required if <code class="docutils literal"><span class="pre">columns[${NAME}].window.sort_keys</span></code> isn't specified.</td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="columns-name-window-sort-keys">
+<span id="select-columns-name-window-sort-keys"></span><h4>7.3.54.4.6.1. <code class="docutils literal"><span class="pre">columns[${NAME}].window.sort_keys</span></code><a class="headerlink" href="#columns-name-window-sort-keys" title="Permalink to this headline">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 6.0.6.</span></p>
+</div>
+<p>Specifies sort keys in each group. Window function processes records
+in each group in the specified order.</p>
+<p>Sort keys are separated by <code class="docutils literal"><span class="pre">.</span></code>. Each sort key is column name. It's
+the same as <a class="reference internal" href="#select-sort-keys"><span class="std std-ref">sort_keys</span></a>.</p>
+<p>You must specify <a class="reference internal" href="#select-columns-name-window-sort-keys"><span class="std std-ref">columns[${NAME}].window.sort_keys</span></a> or
+<a class="reference internal" href="#select-columns-name-window-group-keys"><span class="std std-ref">columns[${NAME}].window.group_keys</span></a> to use window function.</p>
+<p>Here is an example that computes cumulative sum per
+<code class="docutils literal"><span class="pre">Entries.tag</span></code>. Each group is sorted by <code class="docutils literal"><span class="pre">Entries._key</span></code>:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>select \
+  --table Entries \
+  --columns[n_likes_cumulative_sum_per_tag].stage initial \
+  --columns[n_likes_cumulative_sum_per_tag].type UInt32 \
+  --columns[n_likes_cumulative_sum_per_tag].value &#39;window_sum(n_likes)&#39; \
+  --columns[n_likes_cumulative_sum_per_tag].window.sort_keys _key \
+  --columns[n_likes_cumulative_sum_per_tag].window.group_keys tag \
+  --sort_keys _key \
+  --output_columns tag,_key,n_likes,n_likes_cumulative_sum_per_tag
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;n_likes_cumulative_sum_per_tag&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Senna&quot;,
+#         &quot;Good-bye Senna&quot;,
+#         3,
+#         3
+#       ],
+#       [
+#         &quot;Senna&quot;,
+#         &quot;Good-bye Tritonn&quot;,
+#         3,
+#         6
+#       ],
+#       [
+#         &quot;Groonga&quot;,
+#         &quot;Groonga&quot;,
+#         10,
+#         10
+#       ],
+#       [
+#         &quot;Groonga&quot;,
+#         &quot;Mroonga&quot;,
+#         15,
+#         25
+#       ],
+#       [
+#         &quot;Hello&quot;,
+#         &quot;The first post!&quot;,
+#         5,
+#         5
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
+<div class="section" id="columns-name-window-group-keys">
+<span id="select-columns-name-window-group-keys"></span><h4>7.3.54.4.6.2. <code class="docutils literal"><span class="pre">columns[${NAME}].window.group_keys</span></code><a class="headerlink" href="#columns-name-window-group-keys" title="Permalink to this headline">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 7.0.0.</span></p>
+</div>
+<p>Specifies group keys. Window function processes records in each
+group. If you specify no group keys, window function processes one
+group that includes all records.</p>
+<p>Sort keys are separated by <code class="docutils literal"><span class="pre">.</span></code>. Each sort key is column name. It's
+the same as <a class="reference internal" href="#select-drilldown"><span class="std std-ref">drilldown</span></a>.</p>
+<p>You must specify <a class="reference internal" href="#select-columns-name-window-sort-keys"><span class="std std-ref">columns[${NAME}].window.sort_keys</span></a> or
+<a class="reference internal" href="#select-columns-name-window-group-keys"><span class="std std-ref">columns[${NAME}].window.group_keys</span></a> to use window function.</p>
+<p>Here is an example that computes sum per <code class="docutils literal"><span class="pre">Entries.tag</span></code>:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>select \
+  --table Entries \
+  --columns[n_likes_sum_per_tag].stage initial \
+  --columns[n_likes_sum_per_tag].type UInt32 \
+  --columns[n_likes_sum_per_tag].value &#39;window_sum(n_likes)&#39; \
+  --columns[n_likes_sum_per_tag].window.group_keys tag \
+  --sort_keys _key \
+  --output_columns tag,_key,n_likes,n_likes_sum_per_tag
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;n_likes_sum_per_tag&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Senna&quot;,
+#         &quot;Good-bye Senna&quot;,
+#         3,
+#         6
+#       ],
+#       [
+#         &quot;Senna&quot;,
+#         &quot;Good-bye Tritonn&quot;,
+#         3,
+#         6
+#       ],
+#       [
+#         &quot;Groonga&quot;,
+#         &quot;Groonga&quot;,
+#         10,
+#         25
+#       ],
+#       [
+#         &quot;Groonga&quot;,
+#         &quot;Mroonga&quot;,
+#         15,
+#         25
+#       ],
+#       [
+#         &quot;Hello&quot;,
+#         &quot;The first post!&quot;,
+#         5,
+#         5
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
+</div>
 <div class="section" id="drilldown-related-parameters">
-<span id="select-drilldown-related-parameters"></span><h3>7.3.54.4.5. Drilldown related parameters<a class="headerlink" href="#drilldown-related-parameters" title="Permalink to this headline">¶</a></h3>
+<span id="select-drilldown-related-parameters"></span><h3>7.3.54.4.7. Drilldown related parameters<a class="headerlink" href="#drilldown-related-parameters" title="Permalink to this headline">¶</a></h3>
 <p>This section describes basic drilldown related parameters. Advanced
 drilldown related parameters are described in another section.</p>
 <div class="section" id="select-drilldown">
-<span id="id2"></span><h4>7.3.54.4.5.1. <code class="docutils literal"><span class="pre">drilldown</span></code><a class="headerlink" href="#select-drilldown" title="Permalink to this headline">¶</a></h4>
+<span id="id2"></span><h4>7.3.54.4.7.1. <code class="docutils literal"><span class="pre">drilldown</span></code><a class="headerlink" href="#select-drilldown" title="Permalink to this headline">¶</a></h4>
 <p>Specifies keys for grouping separated by <code class="docutils literal"><span class="pre">,</span></code>.</p>
 <p>Matched records by specified search conditions are grouped by each
 key. If you specify no search condition, all records are grouped by
@@ -2680,7 +3796,7 @@ each key.</p>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>select Entries \
   --limit 0 \
-  --output_column _id \
+  --output_columns _id \
   --drilldown tag,n_likes
 # [
 #   [
@@ -2697,22 +3813,6 @@ each key.</p>
 #         [
 #           &quot;_id&quot;,
 #           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;tag&quot;,
-#           &quot;ShortText&quot;
 #         ]
 #       ]
 #     ],
@@ -2797,13 +3897,13 @@ each key.</p>
 </div></blockquote>
 </div>
 <div class="section" id="drilldown-sortby">
-<span id="select-drilldown-sortby"></span><h4>7.3.54.4.5.2. <code class="docutils literal"><span class="pre">drilldown_sortby</span></code><a class="headerlink" href="#drilldown-sortby" title="Permalink to this headline">¶</a></h4>
+<span id="select-drilldown-sortby"></span><h4>7.3.54.4.7.2. <code class="docutils literal"><span class="pre">drilldown_sortby</span></code><a class="headerlink" href="#drilldown-sortby" title="Permalink to this headline">¶</a></h4>
 <div class="deprecated">
 <p><span class="versionmodified">Deprecated since version 6.0.3: </span>Use <a class="reference internal" href="#select-drilldown-sort-keys"><span class="std std-ref">drilldown_sort_keys</span></a> instead.</p>
 </div>
 </div>
 <div class="section" id="drilldown-sort-keys">
-<span id="select-drilldown-sort-keys"></span><h4>7.3.54.4.5.3. <code class="docutils literal"><span class="pre">drilldown_sort_keys</span></code><a class="headerlink" href="#drilldown-sort-keys" title="Permalink to this headline">¶</a></h4>
+<span id="select-drilldown-sort-keys"></span><h4>7.3.54.4.7.3. <code class="docutils literal"><span class="pre">drilldown_sort_keys</span></code><a class="headerlink" href="#drilldown-sort-keys" title="Permalink to this headline">¶</a></h4>
 <p>Specifies sort keys for drilldown outputs separated by <code class="docutils literal"><span class="pre">,</span></code>. Each
 sort key is column name.</p>
 <p>You can refer the number of grouped records by <code class="docutils literal"><span class="pre">_nsubrecs</span></code>
@@ -2812,7 +3912,7 @@ sort key is column name.</p>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>select Entries \
   --limit 0 \
-  --output_column _id \
+  --output_columns _id \
   --drilldown &#39;tag, n_likes&#39; \
   --drilldown_sort_keys &#39;-_nsubrecs, _key&#39;
 # [
@@ -2830,22 +3930,6 @@ sort key is column name.</p>
 #         [
 #           &quot;_id&quot;,
 #           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;tag&quot;,
-#           &quot;ShortText&quot;
 #         ]
 #       ]
 #     ],
@@ -2919,7 +4003,7 @@ are sorted by grouped key (= <code class="docutils literal"><span class="pre">_k
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>select Entries \
   --limit 0 \
-  --output_column _id \
+  --output_columns _id \
   --drilldown &#39;tag, n_likes&#39; \
   --drilldown_sort_keys &#39;-_nsubrecs, _key&#39;
 # [
@@ -2937,22 +4021,6 @@ are sorted by grouped key (= <code class="docutils literal"><span class="pre">_k
 #         [
 #           &quot;_id&quot;,
 #           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;tag&quot;,
-#           &quot;ShortText&quot;
 #         ]
 #       ]
 #     ],
@@ -3024,13 +4092,13 @@ drilldown.</p>
 <a class="reference internal" href="#select-advanced-drilldown-related-parameters"><span class="std std-ref">Advanced drilldown related parameters</span></a>.</p>
 </div>
 <div class="section" id="drilldown-output-columns">
-<span id="select-drilldown-output-columns"></span><h4>7.3.54.4.5.4. <code class="docutils literal"><span class="pre">drilldown_output_columns</span></code><a class="headerlink" href="#drilldown-output-columns" title="Permalink to this headline">¶</a></h4>
+<span id="select-drilldown-output-columns"></span><h4>7.3.54.4.7.4. <code class="docutils literal"><span class="pre">drilldown_output_columns</span></code><a class="headerlink" href="#drilldown-output-columns" title="Permalink to this headline">¶</a></h4>
 <p>Specifies output columns for drilldown separated by <code class="docutils literal"><span class="pre">,</span></code>.</p>
 <p>Here is a <code class="docutils literal"><span class="pre">drilldown_output_columns</span></code> example:</p>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>select Entries \
   --limit 0 \
-  --output_column _id \
+  --output_columns _id \
   --drilldown tag \
   --drilldown_output_columns _key
 # [
@@ -3048,22 +4116,6 @@ drilldown.</p>
 #         [
 #           &quot;_id&quot;,
 #           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;tag&quot;,
-#           &quot;ShortText&quot;
 #         ]
 #       ]
 #     ],
@@ -3130,7 +4182,7 @@ type column.</p>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>select Items \
   --limit 0 \
-  --output_column _id \
+  --output_columns _id \
   --drilldown tag \
   --drilldown_output_columns &#39;_key, label&#39;
 # [
@@ -3148,14 +4200,6 @@ type column.</p>
 #         [
 #           &quot;_id&quot;,
 #           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;tag&quot;,
-#           &quot;Tags&quot;
 #         ]
 #       ]
 #     ],
@@ -3190,7 +4234,7 @@ type column.</p>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>select Items \
   --limit 0 \
-  --output_column _id \
+  --output_columns _id \
   --drilldown tag \
   --drilldown_output_columns &#39;_key, *&#39;
 # [
@@ -3208,14 +4252,6 @@ type column.</p>
 #         [
 #           &quot;_id&quot;,
 #           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;tag&quot;,
-#           &quot;Tags&quot;
 #         ]
 #       ]
 #     ],
@@ -3262,7 +4298,7 @@ the group are output.</p>
 <code class="docutils literal"><span class="pre">drilldown_calc_types</span></code> document for details.</p>
 </div>
 <div class="section" id="drilldown-offset">
-<span id="select-drilldown-offset"></span><h4>7.3.54.4.5.5. <code class="docutils literal"><span class="pre">drilldown_offset</span></code><a class="headerlink" href="#drilldown-offset" title="Permalink to this headline">¶</a></h4>
+<span id="select-drilldown-offset"></span><h4>7.3.54.4.7.5. <code class="docutils literal"><span class="pre">drilldown_offset</span></code><a class="headerlink" href="#drilldown-offset" title="Permalink to this headline">¶</a></h4>
 <p>Specifies offset to determine range of drilldown output
 records. Offset is zero-based. <code class="docutils literal"><span class="pre">--drilldown_offset</span> <span class="pre">1</span></code> means output
 range is started from the 2nd record.</p>
@@ -3270,7 +4306,7 @@ range is started from the 2nd record.</p>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>select Entries \
   --limit 0 \
-  --output_column _id \
+  --output_columns _id \
   --drilldown tag \
   --drilldown_sort_keys _key \
   --drilldown_offset 1
@@ -3289,22 +4325,6 @@ range is started from the 2nd record.</p>
 #         [
 #           &quot;_id&quot;,
 #           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;tag&quot;,
-#           &quot;ShortText&quot;
 #         ]
 #       ]
 #     ],
@@ -3344,7 +4364,7 @@ grouped result to the 3rd grouped result.</p>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>select Entries \
   --limit 0 \
-  --output_column _id \
+  --output_columns _id \
   --drilldown tag \
   --drilldown_sort_keys _key \
   --drilldown_offset -2
@@ -3363,22 +4383,6 @@ grouped result to the 3rd grouped result.</p>
 #         [
 #           &quot;_id&quot;,
 #           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;tag&quot;,
-#           &quot;ShortText&quot;
 #         ]
 #       ]
 #     ],
@@ -3414,14 +4418,14 @@ total number of grouped results is <code class="docutils literal"><span class="p
 <p>The default value of <code class="docutils literal"><span class="pre">drilldown_offset</span></code> is <code class="docutils literal"><span class="pre">0</span></code>.</p>
 </div>
 <div class="section" id="drilldown-limit">
-<span id="select-drilldown-limit"></span><h4>7.3.54.4.5.6. <code class="docutils literal"><span class="pre">drilldown_limit</span></code><a class="headerlink" href="#drilldown-limit" title="Permalink to this headline">¶</a></h4>
+<span id="select-drilldown-limit"></span><h4>7.3.54.4.7.6. <code class="docutils literal"><span class="pre">drilldown_limit</span></code><a class="headerlink" href="#drilldown-limit" title="Permalink to this headline">¶</a></h4>
 <p>Specifies the max number of groups in a drilldown. If the number of
 groups is less than <code class="docutils literal"><span class="pre">drilldown_limit</span></code>, all groups are outputted.</p>
 <p>Here is a <code class="docutils literal"><span class="pre">drilldown_limit</span></code> example:</p>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>select Entries \
   --limit 0 \
-  --output_column _id \
+  --output_columns _id \
   --drilldown tag \
   --drilldown_sort_keys _key \
   --drilldown_offset 1 \
@@ -3441,22 +4445,6 @@ groups is less than <code class="docutils literal"><span class="pre">drilldown_l
 #         [
 #           &quot;_id&quot;,
 #           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;tag&quot;,
-#           &quot;ShortText&quot;
 #         ]
 #       ]
 #     ],
@@ -3495,7 +4483,7 @@ all groups. It's very useful value to show all groups.</p>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>select Entries \
   --limit 0 \
-  --output_column _id \
+  --output_columns _id \
   --drilldown tag \
   --drilldown_sort_keys _key \
   --drilldown_limit -1
@@ -3514,22 +4502,6 @@ all groups. It's very useful value to show all groups.</p>
 #         [
 #           &quot;_id&quot;,
 #           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;tag&quot;,
-#           &quot;ShortText&quot;
 #         ]
 #       ]
 #     ],
@@ -3568,7 +4540,7 @@ all groups. It's very useful value to show all groups.</p>
 <p>The default value of <code class="docutils literal"><span class="pre">drilldown_limit</span></code> is <code class="docutils literal"><span class="pre">10</span></code>.</p>
 </div>
 <div class="section" id="drilldown-calc-types">
-<span id="select-drilldown-calc-types"></span><h4>7.3.54.4.5.7. <code class="docutils literal"><span class="pre">drilldown_calc_types</span></code><a class="headerlink" href="#drilldown-calc-types" title="Permalink to this headline">¶</a></h4>
+<span id="select-drilldown-calc-types"></span><h4>7.3.54.4.7.7. <code class="docutils literal"><span class="pre">drilldown_calc_types</span></code><a class="headerlink" href="#drilldown-calc-types" title="Permalink to this headline">¶</a></h4>
 <p>Specifies how to calculate (aggregate) values in grouped records by
 a drilldown. You can specify multiple calculation types separated by
 &quot;<code class="docutils literal"><span class="pre">,</span></code>&quot;. For example, <code class="docutils literal"><span class="pre">MAX,MIN</span></code>.</p>
@@ -3632,7 +4604,7 @@ grouped records.</td>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>select Entries \
   --limit -1 \
-  --output_column _id,n_likes \
+  --output_columns _id,n_likes \
   --drilldown tag \
   --drilldown_calc_types MAX \
   --drilldown_calc_target n_likes \
@@ -3654,56 +4626,29 @@ grouped records.</td>
 #           &quot;UInt32&quot;
 #         ],
 #         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
 #           &quot;n_likes&quot;,
 #           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;tag&quot;,
-#           &quot;ShortText&quot;
 #         ]
 #       ],
 #       [
 #         1,
-#         &quot;The first post!&quot;,
-#         &quot;Welcome! This is my first post!&quot;,
-#         5,
-#         &quot;Hello&quot;
+#         5
 #       ],
 #       [
 #         2,
-#         &quot;Groonga&quot;,
-#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
-#         10,
-#         &quot;Groonga&quot;
+#         10
 #       ],
 #       [
 #         3,
-#         &quot;Mroonga&quot;,
-#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
-#         15,
-#         &quot;Groonga&quot;
+#         15
 #       ],
 #       [
 #         4,
-#         &quot;Good-bye Senna&quot;,
-#         &quot;I migrated all Senna system!&quot;,
-#         3,
-#         &quot;Senna&quot;
+#         3
 #       ],
 #       [
 #         5,
-#         &quot;Good-bye Tritonn&quot;,
-#         &quot;I also migrated all Tritonn system!&quot;,
-#         3,
-#         &quot;Senna&quot;
+#         3
 #       ]
 #     ],
 #     [
@@ -3746,7 +4691,7 @@ read the maximum <code class="docutils literal"><span class="pre">n_likes</span>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>select Entries \
   --limit -1 \
-  --output_column _id,n_likes \
+  --output_columns _id,n_likes \
   --drilldown tag \
   --drilldown_calc_types MIN \
   --drilldown_calc_target n_likes \
@@ -3768,56 +4713,29 @@ read the maximum <code class="docutils literal"><span class="pre">n_likes</span>
 #           &quot;UInt32&quot;
 #         ],
 #         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
 #           &quot;n_likes&quot;,
 #           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;tag&quot;,
-#           &quot;ShortText&quot;
 #         ]
 #       ],
 #       [
 #         1,
-#         &quot;The first post!&quot;,
-#         &quot;Welcome! This is my first post!&quot;,
-#         5,
-#         &quot;Hello&quot;
+#         5
 #       ],
 #       [
 #         2,
-#         &quot;Groonga&quot;,
-#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
-#         10,
-#         &quot;Groonga&quot;
+#         10
 #       ],
 #       [
 #         3,
-#         &quot;Mroonga&quot;,
-#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
-#         15,
-#         &quot;Groonga&quot;
+#         15
 #       ],
 #       [
 #         4,
-#         &quot;Good-bye Senna&quot;,
-#         &quot;I migrated all Senna system!&quot;,
-#         3,
-#         &quot;Senna&quot;
+#         3
 #       ],
 #       [
 #         5,
-#         &quot;Good-bye Tritonn&quot;,
-#         &quot;I also migrated all Tritonn system!&quot;,
-#         3,
-#         &quot;Senna&quot;
+#         3
 #       ]
 #     ],
 #     [
@@ -3860,7 +4778,7 @@ read the minimum <code class="docutils literal"><span class="pre">n_likes</span>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>select Entries \
   --limit -1 \
-  --output_column _id,n_likes \
+  --output_columns _id,n_likes \
   --drilldown tag \
   --drilldown_calc_types SUM \
   --drilldown_calc_target n_likes \
@@ -3882,56 +4800,29 @@ read the minimum <code class="docutils literal"><span class="pre">n_likes</span>
 #           &quot;UInt32&quot;
 #         ],
 #         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
 #           &quot;n_likes&quot;,
 #           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;tag&quot;,
-#           &quot;ShortText&quot;
 #         ]
 #       ],
 #       [
 #         1,
-#         &quot;The first post!&quot;,
-#         &quot;Welcome! This is my first post!&quot;,
-#         5,
-#         &quot;Hello&quot;
+#         5
 #       ],
 #       [
 #         2,
-#         &quot;Groonga&quot;,
-#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
-#         10,
-#         &quot;Groonga&quot;
+#         10
 #       ],
 #       [
 #         3,
-#         &quot;Mroonga&quot;,
-#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
-#         15,
-#         &quot;Groonga&quot;
+#         15
 #       ],
 #       [
 #         4,
-#         &quot;Good-bye Senna&quot;,
-#         &quot;I migrated all Senna system!&quot;,
-#         3,
-#         &quot;Senna&quot;
+#         3
 #       ],
 #       [
 #         5,
-#         &quot;Good-bye Tritonn&quot;,
-#         &quot;I also migrated all Tritonn system!&quot;,
-#         3,
-#         &quot;Senna&quot;
+#         3
 #       ]
 #     ],
 #     [
@@ -3974,7 +4865,7 @@ summed <code class="docutils literal"><span class="pre">n_likes</span></code> co
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>select Entries \
   --limit -1 \
-  --output_column _id,n_likes \
+  --output_columns _id,n_likes \
   --drilldown tag \
   --drilldown_calc_types AVG \
   --drilldown_calc_target n_likes \
@@ -3996,56 +4887,29 @@ summed <code class="docutils literal"><span class="pre">n_likes</span></code> co
 #           &quot;UInt32&quot;
 #         ],
 #         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
 #           &quot;n_likes&quot;,
 #           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;tag&quot;,
-#           &quot;ShortText&quot;
 #         ]
 #       ],
 #       [
 #         1,
-#         &quot;The first post!&quot;,
-#         &quot;Welcome! This is my first post!&quot;,
-#         5,
-#         &quot;Hello&quot;
+#         5
 #       ],
 #       [
 #         2,
-#         &quot;Groonga&quot;,
-#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
-#         10,
-#         &quot;Groonga&quot;
+#         10
 #       ],
 #       [
 #         3,
-#         &quot;Mroonga&quot;,
-#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
-#         15,
-#         &quot;Groonga&quot;
+#         15
 #       ],
 #       [
 #         4,
-#         &quot;Good-bye Senna&quot;,
-#         &quot;I migrated all Senna system!&quot;,
-#         3,
-#         &quot;Senna&quot;
+#         3
 #       ],
 #       [
 #         5,
-#         &quot;Good-bye Tritonn&quot;,
-#         &quot;I also migrated all Tritonn system!&quot;,
-#         3,
-#         &quot;Senna&quot;
+#         3
 #       ]
 #     ],
 #     [
@@ -4088,7 +4952,7 @@ the averaged <code class="docutils literal"><span class="pre">n_likes</span></co
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>select Entries \
   --limit -1 \
-  --output_column _id,n_likes \
+  --output_columns _id,n_likes \
   --drilldown tag \
   --drilldown_calc_types MAX,MIN,SUM,AVG \
   --drilldown_calc_target n_likes \
@@ -4110,56 +4974,29 @@ the averaged <code class="docutils literal"><span class="pre">n_likes</span></co
 #           &quot;UInt32&quot;
 #         ],
 #         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
 #           &quot;n_likes&quot;,
 #           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;tag&quot;,
-#           &quot;ShortText&quot;
 #         ]
 #       ],
 #       [
 #         1,
-#         &quot;The first post!&quot;,
-#         &quot;Welcome! This is my first post!&quot;,
-#         5,
-#         &quot;Hello&quot;
+#         5
 #       ],
 #       [
 #         2,
-#         &quot;Groonga&quot;,
-#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
-#         10,
-#         &quot;Groonga&quot;
+#         10
 #       ],
 #       [
 #         3,
-#         &quot;Mroonga&quot;,
-#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
-#         15,
-#         &quot;Groonga&quot;
+#         15
 #       ],
 #       [
 #         4,
-#         &quot;Good-bye Senna&quot;,
-#         &quot;I migrated all Senna system!&quot;,
-#         3,
-#         &quot;Senna&quot;
+#         3
 #       ],
 #       [
 #         5,
-#         &quot;Good-bye Tritonn&quot;,
-#         &quot;I also migrated all Tritonn system!&quot;,
-#         3,
-#         &quot;Senna&quot;
+#         3
 #       ]
 #     ],
 #     [
@@ -4231,7 +5068,10 @@ that only <code class="docutils literal"><span class="pre">COUNT</span></code> i
 <code class="docutils literal"><span class="pre">COUNT</span></code> is always enabled.</p>
 </div>
 <div class="section" id="drilldown-calc-target">
-<span id="select-drilldown-calc-target"></span><h4>7.3.54.4.5.8. <code class="docutils literal"><span class="pre">drilldown_calc_target</span></code><a class="headerlink" href="#drilldown-calc-target" title="Permalink to this headline">¶</a></h4>
+<span id="select-drilldown-calc-target"></span><h4>7.3.54.4.7.8. <code class="docutils literal"><span class="pre">drilldown_calc_target</span></code><a class="headerlink" href="#drilldown-calc-target" title="Permalink to this headline">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 6.0.3.</span></p>
+</div>
 <p>Specifies the target column for <a class="reference internal" href="#select-drilldown-calc-types"><span class="std std-ref">drilldown_calc_types</span></a>.</p>
 <p>If you specify a calculation type that needs a target column such as
 <code class="docutils literal"><span class="pre">MAX</span></code> in <a class="reference internal" href="#select-drilldown-calc-types"><span class="std std-ref">drilldown_calc_types</span></a> but you omit
@@ -4247,9 +5087,98 @@ that only <code class="docutils literal"><span class="pre">COUNT</span></code> i
 <p>The default value of <code class="docutils literal"><span class="pre">drilldown_calc_target</span></code> is <code class="docutils literal"><span class="pre">null</span></code>. It means
 that no calculation target column is specified.</p>
 </div>
+<div class="section" id="drilldown-filter">
+<span id="select-drilldown-filter"></span><h4>7.3.54.4.7.9. <code class="docutils literal"><span class="pre">drilldown_filter</span></code><a class="headerlink" href="#drilldown-filter" title="Permalink to this headline">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 6.0.3.</span></p>
+</div>
+<p>Specifies the filter condition against the drilled down result.</p>
+<p>The syntax is <a class="reference internal" href="../grn_expr/script_syntax.html"><span class="doc">Script syntax</span></a>. It's the same
+as <a class="reference internal" href="#select-filter"><span class="std std-ref">filter</span></a>.</p>
+<p>Here is an example to suppress tags that are occurred only once:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>select Entries \
+  --limit -1 \
+  --output_columns _id,tag \
+  --drilldown tag \
+  --drilldown_filter &#39;_nsubrecs &gt; 1&#39; \
+  --drilldown_output_columns _key,_nsubrecs
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;Hello&quot;
+#       ],
+#       [
+#         2,
+#         &quot;Groonga&quot;
+#       ],
+#       [
+#         3,
+#         &quot;Groonga&quot;
+#       ],
+#       [
+#         4,
+#         &quot;Senna&quot;
+#       ],
+#       [
+#         5,
+#         &quot;Senna&quot;
+#       ]
+#     ],
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;_nsubrecs&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Groonga&quot;,
+#         2
+#       ],
+#       [
+#         &quot;Senna&quot;,
+#         2
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
 </div>
 <div class="section" id="advanced-drilldown-related-parameters">
-<span id="select-advanced-drilldown-related-parameters"></span><h3>7.3.54.4.6. Advanced drilldown related parameters<a class="headerlink" href="#advanced-drilldown-related-parameters" title="Permalink to this headline">¶</a></h3>
+<span id="select-advanced-drilldown-related-parameters"></span><h3>7.3.54.4.8. Advanced drilldown related parameters<a class="headerlink" href="#advanced-drilldown-related-parameters" title="Permalink to this headline">¶</a></h3>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 4.0.8.</span></p>
+</div>
 <p>You can get multiple drilldown results by specifying multiple group
 keys by <a class="reference internal" href="#select-drilldown"><span class="std std-ref">drilldown</span></a>. But you need to use the same
 configuration for all drilldowns. For example,
@@ -4265,6 +5194,7 @@ parameters:</p>
 <li><code class="docutils literal"><span class="pre">drilldowns[${LABEL}].limit</span></code></li>
 <li><code class="docutils literal"><span class="pre">drilldowns[${LABEL}].calc_types</span></code></li>
 <li><code class="docutils literal"><span class="pre">drilldowns[${LABEL}].calc_target</span></code></li>
+<li><code class="docutils literal"><span class="pre">drilldowns[${LABEL}].filter</span></code></li>
 </ul>
 </div></blockquote>
 <p><code class="docutils literal"><span class="pre">${LABEL}</span></code> is a variable. You can use the following characters for
@@ -4309,6 +5239,7 @@ to use it for the following parameters:</p>
 <li><code class="docutils literal"><span class="pre">drilldowns[${LABEL}].limit</span></code>: <a class="reference internal" href="#select-drilldown-limit"><span class="std std-ref">drilldown_limit</span></a></li>
 <li><code class="docutils literal"><span class="pre">drilldowns[${LABEL}].calc_types</span></code>: <a class="reference internal" href="#select-drilldown-calc-types"><span class="std std-ref">drilldown_calc_types</span></a></li>
 <li><code class="docutils literal"><span class="pre">drilldowns[${LABEL}].calc_target</span></code>: <a class="reference internal" href="#select-drilldown-calc-target"><span class="std std-ref">drilldown_calc_target</span></a></li>
+<li><code class="docutils literal"><span class="pre">drilldowns[${LABEL}].filter</span></code>: <a class="reference internal" href="#select-drilldown-filter"><span class="std std-ref">drilldown_filter</span></a></li>
 </ul>
 </div></blockquote>
 <p>The following parameters are needed more description:</p>
@@ -4320,7 +5251,10 @@ to use it for the following parameters:</p>
 </div></blockquote>
 <p>Output format is different a bit. It's also needed more description.</p>
 <div class="section" id="drilldowns-label-keys">
-<span id="select-drilldowns-label-keys"></span><h4>7.3.54.4.6.1. <code class="docutils literal"><span class="pre">drilldowns[${LABEL}].keys</span></code><a class="headerlink" href="#drilldowns-label-keys" title="Permalink to this headline">¶</a></h4>
+<span id="select-drilldowns-label-keys"></span><h4>7.3.54.4.8.1. <code class="docutils literal"><span class="pre">drilldowns[${LABEL}].keys</span></code><a class="headerlink" href="#drilldowns-label-keys" title="Permalink to this headline">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 4.0.8.</span></p>
+</div>
 <p><a class="reference internal" href="#select-drilldown"><span class="std std-ref">drilldown</span></a> can specify multiple keys for multiple
 drilldowns. But it can't specify multiple keys for one drilldown.</p>
 <p><code class="docutils literal"><span class="pre">drilldowns[${LABEL}].keys</span></code> can't specify multiple keys for multiple
@@ -4331,7 +5265,7 @@ column values:</p>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>select Entries \
   --limit -1 \
-  --output_column tag,n_likes \
+  --output_columns tag,n_likes \
   --drilldowns[tag.n_likes].keys tag,n_likes \
   --drilldowns[tag.n_likes].output_columns _value.tag,_value.n_likes,_nsubrecs
 # [
@@ -4347,60 +5281,33 @@ column values:</p>
 #       ],
 #       [
 #         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
+#           &quot;tag&quot;,
 #           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
 #         ],
 #         [
 #           &quot;n_likes&quot;,
 #           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;tag&quot;,
-#           &quot;ShortText&quot;
 #         ]
 #       ],
 #       [
-#         1,
-#         &quot;The first post!&quot;,
-#         &quot;Welcome! This is my first post!&quot;,
-#         5,
-#         &quot;Hello&quot;
+#         &quot;Hello&quot;,
+#         5
 #       ],
 #       [
-#         2,
 #         &quot;Groonga&quot;,
-#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
-#         10,
-#         &quot;Groonga&quot;
+#         10
 #       ],
 #       [
-#         3,
-#         &quot;Mroonga&quot;,
-#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
-#         15,
-#         &quot;Groonga&quot;
+#         &quot;Groonga&quot;,
+#         15
 #       ],
 #       [
-#         4,
-#         &quot;Good-bye Senna&quot;,
-#         &quot;I migrated all Senna system!&quot;,
-#         3,
-#         &quot;Senna&quot;
+#         &quot;Senna&quot;,
+#         3
 #       ],
 #       [
-#         5,
-#         &quot;Good-bye Tritonn&quot;,
-#         &quot;I also migrated all Tritonn system!&quot;,
-#         3,
-#         &quot;Senna&quot;
+#         &quot;Senna&quot;,
+#         3
 #       ]
 #     ],
 #     {
@@ -4459,7 +5366,10 @@ specify one key as <code class="docutils literal"><span class="pre">drilldowns[$
 <a class="reference internal" href="#select-drilldown-output-columns"><span class="std std-ref">drilldown_output_columns</span></a>.</p>
 </div>
 <div class="section" id="drilldowns-label-output-columns">
-<span id="select-drilldowns-label-output-columns"></span><h4>7.3.54.4.6.2. <code class="docutils literal"><span class="pre">drilldowns[${LABEL}].output_columns</span></code><a class="headerlink" href="#drilldowns-label-output-columns" title="Permalink to this headline">¶</a></h4>
+<span id="select-drilldowns-label-output-columns"></span><h4>7.3.54.4.8.2. <code class="docutils literal"><span class="pre">drilldowns[${LABEL}].output_columns</span></code><a class="headerlink" href="#drilldowns-label-output-columns" title="Permalink to this headline">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 4.0.8.</span></p>
+</div>
 <p>It's almost same as <a class="reference internal" href="#select-drilldown-output-columns"><span class="std std-ref">drilldown_output_columns</span></a>. The
 difference between <a class="reference internal" href="#select-drilldown-output-columns"><span class="std std-ref">drilldown_output_columns</span></a> and
 <code class="docutils literal"><span class="pre">drilldowns[${LABEL}].output_columns</span></code> is how to refer group keys.</p>
@@ -4473,7 +5383,7 @@ only one group key by <a class="reference internal" href="#select-drilldowns-lab
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>select Entries \
   --limit 0 \
-  --output_column _id \
+  --output_columns _id \
   --drilldowns[tag.n_likes].keys tag,n_likes \
   --drilldowns[tag.n_likes].output_columns _value.tag,_value.n_likes
 # [
@@ -4491,22 +5401,6 @@ only one group key by <a class="reference internal" href="#select-drilldowns-lab
 #         [
 #           &quot;_id&quot;,
 #           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;tag&quot;,
-#           &quot;ShortText&quot;
 #         ]
 #       ]
 #     ],
@@ -4557,7 +5451,7 @@ used for group key in <a class="reference internal" href="#select-drilldowns-lab
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>select Entries \
   --limit 0 \
-  --output_column _id \
+  --output_columns _id \
   --drilldowns[tag.n_likes].keys tag,n_likes \
   --drilldowns[tag.n_likes].output_columns _value.tag,_value.n_likes
 # [
@@ -4575,22 +5469,6 @@ used for group key in <a class="reference internal" href="#select-drilldowns-lab
 #         [
 #           &quot;_id&quot;,
 #           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;tag&quot;,
-#           &quot;ShortText&quot;
 #         ]
 #       ]
 #     ],
@@ -4649,7 +5527,7 @@ you specify only one group key to
 </div>
 </div>
 <div class="section" id="output-format-for-drilldowns-label-style">
-<span id="select-drilldowns-label-output-format"></span><h4>7.3.54.4.6.3. Output format for <code class="docutils literal"><span class="pre">drilldowns[${LABEL}]</span></code> style<a class="headerlink" href="#output-format-for-drilldowns-label-style" title="Permalink to this headline">¶</a></h4>
+<span id="select-drilldowns-label-output-format"></span><h4>7.3.54.4.8.3. Output format for <code class="docutils literal"><span class="pre">drilldowns[${LABEL}]</span></code> style<a class="headerlink" href="#output-format-for-drilldowns-label-style" title="Permalink to this headline">¶</a></h4>
 <p>There is a difference in output format between <a class="reference internal" href="#select-drilldown"><span class="std std-ref">drilldown</span></a>
 and <a class="reference internal" href="#select-drilldowns-label-keys"><span class="std std-ref">drilldowns[${LABEL}].keys</span></a>. <a class="reference internal" href="#select-drilldown"><span class="std std-ref">drilldown</span></a> uses
 array to output multiple drilldown results.
@@ -4683,10 +5561,102 @@ result.</p>
 </div>
 </div>
 </div>
+<div class="section" id="slice-related-parameters">
+<span id="select-slice-related-parameters"></span><h3>7.3.54.4.9. Slice related parameters<a class="headerlink" href="#slice-related-parameters" title="Permalink to this headline">¶</a></h3>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 6.0.3.</span></p>
+</div>
+<p>This section describes slice related parameters.</p>
+<p>TODO</p>
+<p>Here are parameters for slice:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Required</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">--slices[${LABEL}].match_columns</span></code></td>
+<td>Optional</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">--slices[${LABEL}].query</span></code></td>
+<td>Required if <code class="docutils literal"><span class="pre">--slices[${LABEL}].filter</span></code> isn't specified.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">--slices[${LABEL}].filter</span></code></td>
+<td>Required if <code class="docutils literal"><span class="pre">--slices[${LABEL}].query</span></code> isn't specified.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">--slices[${LABEL}].query_expander</span></code></td>
+<td>Optional</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">--slices[${LABEL}].query_flags</span></code></td>
+<td>Optional</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">--slices[${LABEL}].sort_keys</span></code></td>
+<td>Optional</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">--slices[${LABEL}].output_columns</span></code></td>
+<td>Optional</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">--slices[${LABEL}].offset</span></code></td>
+<td>Optional</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">--slices[${LABEL}].limit</span></code></td>
+<td>Optional</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">--slices[${LABEL}].table</span></code></td>
+<td>Optional</td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="slices-label-match-columns">
+<span id="select-slices-label-match-columns"></span><h4>7.3.54.4.9.1. <code class="docutils literal"><span class="pre">slices[${LABEL}].match_columns</span></code><a class="headerlink" href="#slices-label-match-columns" title="Permalink to this headline">¶</a></h4>
+<p>TODO</p>
+</div>
+<div class="section" id="slices-label-query">
+<span id="select-slices-label-query"></span><h4>7.3.54.4.9.2. <code class="docutils literal"><span class="pre">slices[${LABEL}].query</span></code><a class="headerlink" href="#slices-label-query" title="Permalink to this headline">¶</a></h4>
+<p>TODO</p>
+</div>
+<div class="section" id="slices-label-filter">
+<span id="select-slices-label-filter"></span><h4>7.3.54.4.9.3. <code class="docutils literal"><span class="pre">slices[${LABEL}].filter</span></code><a class="headerlink" href="#slices-label-filter" title="Permalink to this headline">¶</a></h4>
+<p>TODO</p>
+</div>
+<div class="section" id="slices-label-query-expander">
+<span id="select-slices-label-query-expander"></span><h4>7.3.54.4.9.4. <code class="docutils literal"><span class="pre">slices[${LABEL}].query_expander</span></code><a class="headerlink" href="#slices-label-query-expander" title="Permalink to this headline">¶</a></h4>
+<p>TODO</p>
+</div>
+<div class="section" id="slices-label-query-flags">
+<span id="select-slices-label-query-flags"></span><h4>7.3.54.4.9.5. <code class="docutils literal"><span class="pre">slices[${LABEL}].query_flags</span></code><a class="headerlink" href="#slices-label-query-flags" title="Permalink to this headline">¶</a></h4>
+<p>TODO</p>
+</div>
+<div class="section" id="slices-label-sort-keys">
+<span id="select-slices-label-sort-keys"></span><h4>7.3.54.4.9.6. <code class="docutils literal"><span class="pre">slices[${LABEL}].sort_keys</span></code><a class="headerlink" href="#slices-label-sort-keys" title="Permalink to this headline">¶</a></h4>
+<p>TODO</p>
+</div>
+<div class="section" id="slices-label-output-columns">
+<span id="select-slices-label-output-columns"></span><h4>7.3.54.4.9.7. <code class="docutils literal"><span class="pre">slices[${LABEL}].output_columns</span></code><a class="headerlink" href="#slices-label-output-columns" title="Permalink to this headline">¶</a></h4>
+<p>TODO</p>
+</div>
+<div class="section" id="slices-label-offset">
+<span id="select-slices-label-offset"></span><h4>7.3.54.4.9.8. <code class="docutils literal"><span class="pre">slices[${LABEL}].offset</span></code><a class="headerlink" href="#slices-label-offset" title="Permalink to this headline">¶</a></h4>
+<p>TODO</p>
+</div>
+<div class="section" id="slices-label-limit">
+<span id="select-slices-label-limit"></span><h4>7.3.54.4.9.9. <code class="docutils literal"><span class="pre">slices[${LABEL}].limit</span></code><a class="headerlink" href="#slices-label-limit" title="Permalink to this headline">¶</a></h4>
+<p>TODO</p>
+</div>
+<div class="section" id="slices-label-table">
+<span id="select-slices-label-table"></span><h4>7.3.54.4.9.10. <code class="docutils literal"><span class="pre">slices[${LABEL}].table</span></code><a class="headerlink" href="#slices-label-table" title="Permalink to this headline">¶</a></h4>
+<p>TODO</p>
+</div>
+</div>
 <div class="section" id="cache-related-parameter">
-<h3>7.3.54.4.7. Cache related parameter<a class="headerlink" href="#cache-related-parameter" title="Permalink to this headline">¶</a></h3>
+<h3>7.3.54.4.10. Cache related parameter<a class="headerlink" href="#cache-related-parameter" title="Permalink to this headline">¶</a></h3>
 <div class="section" id="cache">
-<span id="select-cache"></span><h4>7.3.54.4.7.1. <code class="docutils literal"><span class="pre">cache</span></code><a class="headerlink" href="#cache" title="Permalink to this headline">¶</a></h4>
+<span id="select-cache"></span><h4>7.3.54.4.10.1. <code class="docutils literal"><span class="pre">cache</span></code><a class="headerlink" href="#cache" title="Permalink to this headline">¶</a></h4>
 <p>Specifies whether caching the result of this query or not.</p>
 <p>If the result of this query is cached, the next same query returns
 response quickly by using the cache.</p>
@@ -4792,10 +5762,10 @@ It's the default value.</td>
 </div>
 </div>
 <div class="section" id="score-related-parameters">
-<h3>7.3.54.4.8. Score related parameters<a class="headerlink" href="#score-related-parameters" title="Permalink to this headline">¶</a></h3>
+<h3>7.3.54.4.11. Score related parameters<a class="headerlink" href="#score-related-parameters" title="Permalink to this headline">¶</a></h3>
 <p>There is a score related parameter, <code class="docutils literal"><span class="pre">adjuster</span></code>.</p>
 <div class="section" id="adjuster">
-<span id="select-adjuster"></span><h4>7.3.54.4.8.1. <code class="docutils literal"><span class="pre">adjuster</span></code><a class="headerlink" href="#adjuster" title="Permalink to this headline">¶</a></h4>
+<span id="select-adjuster"></span><h4>7.3.54.4.11.1. <code class="docutils literal"><span class="pre">adjuster</span></code><a class="headerlink" href="#adjuster" title="Permalink to this headline">¶</a></h4>
 <p>Specifies one or more score adjust expressions. You need to use
 <code class="docutils literal"><span class="pre">adjuster</span></code> with <code class="docutils literal"><span class="pre">query</span></code> or <code class="docutils literal"><span class="pre">filter</span></code>. <code class="docutils literal"><span class="pre">adjuster</span></code> doesn't work
 with not searched request.</p>
@@ -5265,6 +6235,8 @@ pairs):</p>
 <li><a class="reference internal" href="#paging">7.3.54.3.3. Paging</a></li>
 <li><a class="reference internal" href="#the-total-number-of-records">7.3.54.3.4. The total number of records</a></li>
 <li><a class="reference internal" href="#drilldown">7.3.54.3.5. Drilldown</a></li>
+<li><a class="reference internal" href="#dynamic-column">7.3.54.3.6. Dynamic column</a></li>
+<li><a class="reference internal" href="#window-function">7.3.54.3.7. Window function</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#parameters">7.3.54.4. Parameters</a><ul>
@@ -5294,29 +6266,55 @@ pairs):</p>
 <li><a class="reference internal" href="#scorer">7.3.54.4.4.6. <code class="docutils literal"><span class="pre">scorer</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#drilldown-related-parameters">7.3.54.4.5. Drilldown related parameters</a><ul>
-<li><a class="reference internal" href="#select-drilldown">7.3.54.4.5.1. <code class="docutils literal"><span class="pre">drilldown</span></code></a></li>
-<li><a class="reference internal" href="#drilldown-sortby">7.3.54.4.5.2. <code class="docutils literal"><span class="pre">drilldown_sortby</span></code></a></li>
-<li><a class="reference internal" href="#drilldown-sort-keys">7.3.54.4.5.3. <code class="docutils literal"><span class="pre">drilldown_sort_keys</span></code></a></li>
-<li><a class="reference internal" href="#drilldown-output-columns">7.3.54.4.5.4. <code class="docutils literal"><span class="pre">drilldown_output_columns</span></code></a></li>
-<li><a class="reference internal" href="#drilldown-offset">7.3.54.4.5.5. <code class="docutils literal"><span class="pre">drilldown_offset</span></code></a></li>
-<li><a class="reference internal" href="#drilldown-limit">7.3.54.4.5.6. <code class="docutils literal"><span class="pre">drilldown_limit</span></code></a></li>
-<li><a class="reference internal" href="#drilldown-calc-types">7.3.54.4.5.7. <code class="docutils literal"><span class="pre">drilldown_calc_types</span></code></a></li>
-<li><a class="reference internal" href="#drilldown-calc-target">7.3.54.4.5.8. <code class="docutils literal"><span class="pre">drilldown_calc_target</span></code></a></li>
+<li><a class="reference internal" href="#dynamic-column-related-parameters">7.3.54.4.5. Dynamic column related parameters</a><ul>
+<li><a class="reference internal" href="#columns-name-stage">7.3.54.4.5.1. <code class="docutils literal"><span class="pre">columns[${NAME}].stage</span></code></a></li>
+<li><a class="reference internal" href="#columns-name-flags">7.3.54.4.5.2. <code class="docutils literal"><span class="pre">columns[${NAME}].flags</span></code></a></li>
+<li><a class="reference internal" href="#columns-name-type">7.3.54.4.5.3. <code class="docutils literal"><span class="pre">columns[${NAME}].type</span></code></a></li>
+<li><a class="reference internal" href="#columns-name-value">7.3.54.4.5.4. <code class="docutils literal"><span class="pre">columns[${NAME}].value</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#advanced-drilldown-related-parameters">7.3.54.4.6. Advanced drilldown related parameters</a><ul>
-<li><a class="reference internal" href="#drilldowns-label-keys">7.3.54.4.6.1. <code class="docutils literal"><span class="pre">drilldowns[${LABEL}].keys</span></code></a></li>
-<li><a class="reference internal" href="#drilldowns-label-output-columns">7.3.54.4.6.2. <code class="docutils literal"><span class="pre">drilldowns[${LABEL}].output_columns</span></code></a></li>
-<li><a class="reference internal" href="#output-format-for-drilldowns-label-style">7.3.54.4.6.3. Output format for <code class="docutils literal"><span class="pre">drilldowns[${LABEL}]</span></code> style</a></li>
+<li><a class="reference internal" href="#window-function-related-parameters">7.3.54.4.6. Window function related parameters</a><ul>
+<li><a class="reference internal" href="#columns-name-window-sort-keys">7.3.54.4.6.1. <code class="docutils literal"><span class="pre">columns[${NAME}].window.sort_keys</span></code></a></li>
+<li><a class="reference internal" href="#columns-name-window-group-keys">7.3.54.4.6.2. <code class="docutils literal"><span class="pre">columns[${NAME}].window.group_keys</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#cache-related-parameter">7.3.54.4.7. Cache related parameter</a><ul>
-<li><a class="reference internal" href="#cache">7.3.54.4.7.1. <code class="docutils literal"><span class="pre">cache</span></code></a></li>
+<li><a class="reference internal" href="#drilldown-related-parameters">7.3.54.4.7. Drilldown related parameters</a><ul>
+<li><a class="reference internal" href="#select-drilldown">7.3.54.4.7.1. <code class="docutils literal"><span class="pre">drilldown</span></code></a></li>
+<li><a class="reference internal" href="#drilldown-sortby">7.3.54.4.7.2. <code class="docutils literal"><span class="pre">drilldown_sortby</span></code></a></li>
+<li><a class="reference internal" href="#drilldown-sort-keys">7.3.54.4.7.3. <code class="docutils literal"><span class="pre">drilldown_sort_keys</span></code></a></li>
+<li><a class="reference internal" href="#drilldown-output-columns">7.3.54.4.7.4. <code class="docutils literal"><span class="pre">drilldown_output_columns</span></code></a></li>
+<li><a class="reference internal" href="#drilldown-offset">7.3.54.4.7.5. <code class="docutils literal"><span class="pre">drilldown_offset</span></code></a></li>
+<li><a class="reference internal" href="#drilldown-limit">7.3.54.4.7.6. <code class="docutils literal"><span class="pre">drilldown_limit</span></code></a></li>
+<li><a class="reference internal" href="#drilldown-calc-types">7.3.54.4.7.7. <code class="docutils literal"><span class="pre">drilldown_calc_types</span></code></a></li>
+<li><a class="reference internal" href="#drilldown-calc-target">7.3.54.4.7.8. <code class="docutils literal"><span class="pre">drilldown_calc_target</span></code></a></li>
+<li><a class="reference internal" href="#drilldown-filter">7.3.54.4.7.9. <code class="docutils literal"><span class="pre">drilldown_filter</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#score-related-parameters">7.3.54.4.8. Score related parameters</a><ul>
-<li><a class="reference internal" href="#adjuster">7.3.54.4.8.1. <code class="docutils literal"><span class="pre">adjuster</span></code></a></li>
+<li><a class="reference internal" href="#advanced-drilldown-related-parameters">7.3.54.4.8. Advanced drilldown related parameters</a><ul>
+<li><a class="reference internal" href="#drilldowns-label-keys">7.3.54.4.8.1. <code class="docutils literal"><span class="pre">drilldowns[${LABEL}].keys</span></code></a></li>
+<li><a class="reference internal" href="#drilldowns-label-output-columns">7.3.54.4.8.2. <code class="docutils literal"><span class="pre">drilldowns[${LABEL}].output_columns</span></code></a></li>
+<li><a class="reference internal" href="#output-format-for-drilldowns-label-style">7.3.54.4.8.3. Output format for <code class="docutils literal"><span class="pre">drilldowns[${LABEL}]</span></code> style</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#slice-related-parameters">7.3.54.4.9. Slice related parameters</a><ul>
+<li><a class="reference internal" href="#slices-label-match-columns">7.3.54.4.9.1. <code class="docutils literal"><span class="pre">slices[${LABEL}].match_columns</span></code></a></li>
+<li><a class="reference internal" href="#slices-label-query">7.3.54.4.9.2. <code class="docutils literal"><span class="pre">slices[${LABEL}].query</span></code></a></li>
+<li><a class="reference internal" href="#slices-label-filter">7.3.54.4.9.3. <code class="docutils literal"><span class="pre">slices[${LABEL}].filter</span></code></a></li>
+<li><a class="reference internal" href="#slices-label-query-expander">7.3.54.4.9.4. <code class="docutils literal"><span class="pre">slices[${LABEL}].query_expander</span></code></a></li>
+<li><a class="reference internal" href="#slices-label-query-flags">7.3.54.4.9.5. <code class="docutils literal"><span class="pre">slices[${LABEL}].query_flags</span></code></a></li>
+<li><a class="reference internal" href="#slices-label-sort-keys">7.3.54.4.9.6. <code class="docutils literal"><span class="pre">slices[${LABEL}].sort_keys</span></code></a></li>
+<li><a class="reference internal" href="#slices-label-output-columns">7.3.54.4.9.7. <code class="docutils literal"><span class="pre">slices[${LABEL}].output_columns</span></code></a></li>
+<li><a class="reference internal" href="#slices-label-offset">7.3.54.4.9.8. <code class="docutils literal"><span class="pre">slices[${LABEL}].offset</span></code></a></li>
+<li><a class="reference internal" href="#slices-label-limit">7.3.54.4.9.9. <code class="docutils literal"><span class="pre">slices[${LABEL}].limit</span></code></a></li>
+<li><a class="reference internal" href="#slices-label-table">7.3.54.4.9.10. <code class="docutils literal"><span class="pre">slices[${LABEL}].table</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cache-related-parameter">7.3.54.4.10. Cache related parameter</a><ul>
+<li><a class="reference internal" href="#cache">7.3.54.4.10.1. <code class="docutils literal"><span class="pre">cache</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#score-related-parameters">7.3.54.4.11. Score related parameters</a><ul>
+<li><a class="reference internal" href="#adjuster">7.3.54.4.11.1. <code class="docutils literal"><span class="pre">adjuster</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -5366,7 +6364,7 @@ pairs):</p>
         <li class="right" >
           <a href="schema.html" title="7.3.53. schema"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v7.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v7.0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../reference.html" >7. Reference manual</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../command.html" >7.3. Command</a> &#187;</li> 
       </ul>

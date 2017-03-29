@@ -2936,9 +2936,9 @@ columns created in <code class="docutils literal"><span class="pre">initial</spa
 <code class="docutils literal"><span class="pre">output</span></code> stage.</li>
 </ol>
 </div></blockquote>
-<p>Here is a <code class="docutils literal"><span class="pre">columns[${NAME}].stage</span></code> example. It creates
-<code class="docutils literal"><span class="pre">is_popular</span></code> column at <code class="docutils literal"><span class="pre">initial</span></code> stage. You can use <code class="docutils literal"><span class="pre">is_popular</span></code>
-in all parameters such as <code class="docutils literal"><span class="pre">filter</span></code> and <code class="docutils literal"><span class="pre">output_columns</span></code>:</p>
+<p>Here is an example that creates <code class="docutils literal"><span class="pre">is_popular</span></code> column at <code class="docutils literal"><span class="pre">initial</span></code>
+stage. You can use <code class="docutils literal"><span class="pre">is_popular</span></code> in all parameters such as <code class="docutils literal"><span class="pre">filter</span></code>
+and <code class="docutils literal"><span class="pre">output_columns</span></code>:</p>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>select Entries \
   --columns[is_popular].stage initial \
@@ -3085,9 +3085,9 @@ select Entries \
 parameter for <a class="reference internal" href="column_create.html"><span class="doc">column_create</span></a>. See <a class="reference internal" href="column_create.html#column-create-type"><span class="std std-ref">type</span></a> for
 available types.</p>
 <p>This is a required parameter.</p>
-<p>Here is a <code class="docutils literal"><span class="pre">columns[${NAME}].type</span></code> example. It creates a
-<code class="docutils literal"><span class="pre">ShortText</span></code> type column. Stored value is casted to <code class="docutils literal"><span class="pre">ShortText</span></code>
-automatically. In this example, number is casted to <code class="docutils literal"><span class="pre">ShortText</span></code>:</p>
+<p>Here is an example that creates a <code class="docutils literal"><span class="pre">ShortText</span></code> type column. Stored
+value is casted to <code class="docutils literal"><span class="pre">ShortText</span></code> automatically. In this example,
+number is casted to <code class="docutils literal"><span class="pre">ShortText</span></code>:</p>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>select Entries \
   --columns[n_likes_string].stage initial \
@@ -3165,9 +3165,9 @@ value and other window function related parameters when you use window
 function. See <a class="reference internal" href="#select-window-function-related-parameters"><span class="std std-ref">Window function related parameters</span></a> for
 details.</p>
 <p>This is a required parameter.</p>
-<p>Here is a <code class="docutils literal"><span class="pre">columns[${NAME}].value</span></code> example. It creates a new dynamic
-column that stores the number of characters of content. This example
-uses <a class="reference internal" href="../functions/string_length.html"><span class="doc">string_length</span></a> function in
+<p>Here is an example that creates a new dynamic column that stores the
+number of characters of content. This example uses
+<a class="reference internal" href="../functions/string_length.html"><span class="doc">string_length</span></a> function in
 <code class="docutils literal"><span class="pre">functions/string</span></code> plugin to compute the number of characters in a
 string. <a class="reference internal" href="plugin_register.html"><span class="doc">plugin_register</span></a> is used to register
 <code class="docutils literal"><span class="pre">functions/string</span></code> plugin:</p>
@@ -5193,6 +5193,12 @@ parameters:</p>
 <li><code class="docutils literal"><span class="pre">drilldowns[${LABEL}].calc_types</span></code></li>
 <li><code class="docutils literal"><span class="pre">drilldowns[${LABEL}].calc_target</span></code></li>
 <li><code class="docutils literal"><span class="pre">drilldowns[${LABEL}].filter</span></code></li>
+<li><code class="docutils literal"><span class="pre">drilldowns[${LABEL}].columns[${NAME}].stage=null</span></code></li>
+<li><code class="docutils literal"><span class="pre">drilldowns[${LABEL}].columns[${NAME}].flags=COLUMN_SCALAR</span></code></li>
+<li><code class="docutils literal"><span class="pre">drilldowns[${LABEL}].columns[${NAME}].type=null</span></code></li>
+<li><code class="docutils literal"><span class="pre">drilldowns[${LABEL}].columns[${NAME}].value=null</span></code></li>
+<li><code class="docutils literal"><span class="pre">drilldowns[${LABEL}].columns[${NAME}].window.sort_keys=null</span></code></li>
+<li><code class="docutils literal"><span class="pre">drilldowns[${LABEL}].columns[${NAME}].window.group_keys=null</span></code></li>
 </ul>
 </div></blockquote>
 <p><code class="docutils literal"><span class="pre">${LABEL}</span></code> is a variable. You can use the following characters for
@@ -5202,6 +5208,15 @@ parameters:</p>
 <li>Alphabets</li>
 <li>Digits</li>
 <li><code class="docutils literal"><span class="pre">.</span></code></li>
+<li><code class="docutils literal"><span class="pre">_</span></code></li>
+</ul>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">${NAME}</span></code> is a variable. You can use the following characters for
+<code class="docutils literal"><span class="pre">${NAME}</span></code>:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Alphabets</li>
+<li>Digits</li>
 <li><code class="docutils literal"><span class="pre">_</span></code></li>
 </ul>
 </div></blockquote>
@@ -5240,11 +5255,28 @@ to use it for the following parameters:</p>
 <li><code class="docutils literal"><span class="pre">drilldowns[${LABEL}].filter</span></code>: <a class="reference internal" href="#select-drilldown-filter"><span class="std std-ref">drilldown_filter</span></a></li>
 </ul>
 </div></blockquote>
+<p>See document for corresponding <code class="docutils literal"><span class="pre">columns[${NAME}].XXX</span></code> parameter to
+know how to use it for the following parameters:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">drilldowns[${LABEL}].columns[${NAME}].flags=COLUMN_SCALAR</span></code>:
+<a class="reference internal" href="#select-columns-name-flags"><span class="std std-ref">columns[${NAME}].flags</span></a></li>
+<li><code class="docutils literal"><span class="pre">drilldowns[${LABEL}].columns[${NAME}].type=null</span></code>:
+<a class="reference internal" href="#select-columns-name-type"><span class="std std-ref">columns[${NAME}].type</span></a></li>
+<li><code class="docutils literal"><span class="pre">drilldowns[${LABEL}].columns[${NAME}].value=null</span></code>:
+<a class="reference internal" href="#select-columns-name-value"><span class="std std-ref">columns[${NAME}].value</span></a></li>
+<li><code class="docutils literal"><span class="pre">drilldowns[${LABEL}].columns[${NAME}].window.sort_keys=null</span></code>:
+<a class="reference internal" href="#select-columns-name-window-sort-keys"><span class="std std-ref">columns[${NAME}].window.sort_keys</span></a></li>
+<li><code class="docutils literal"><span class="pre">drilldowns[${LABEL}].columns[${NAME}].window.group_keys=null</span></code>:
+<a class="reference internal" href="#select-columns-name-window-group-keys"><span class="std std-ref">columns[${NAME}].window.group_keys</span></a></li>
+</ul>
+</div></blockquote>
 <p>The following parameters are needed more description:</p>
 <blockquote>
 <div><ul class="simple">
 <li><code class="docutils literal"><span class="pre">drilldowns[${LABEL}].keys</span></code></li>
 <li><code class="docutils literal"><span class="pre">drilldowns[${LABEL}].output_columns</span></code></li>
+<li><code class="docutils literal"><span class="pre">drilldowns[${LABEL}].columns[${NAME}].stage=null</span></code></li>
 </ul>
 </div></blockquote>
 <p>Output format is different a bit. It's also needed more description.</p>
@@ -5524,8 +5556,172 @@ you specify only one group key to
 <code class="docutils literal"><span class="pre">_value.${KEY_NAME}</span></code> syntax.</p>
 </div>
 </div>
+<div class="section" id="drilldowns-label-columns-name-stage">
+<span id="select-drilldowns-label-columns-name-stage"></span><h4>7.3.54.4.8.3. <code class="docutils literal"><span class="pre">drilldowns[${LABEL}].columns[${NAME}].stage</span></code><a class="headerlink" href="#drilldowns-label-columns-name-stage" title="Permalink to this headline">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 6.0.5.</span></p>
+</div>
+<p>Specifies when the dynamic column is created. This is a required
+parameter to create a dynamic column.</p>
+<p>Here are available stages:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">initial</span></code></td>
+<td>Dynamic column is created at first.</td>
+</tr>
+</tbody>
+</table>
+<p>Here is one drilldown process flow with dynamic column creation
+points. You should choose stage as late as possible:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>Evaluates <a class="reference internal" href="#select-drilldowns-label-keys"><span class="std std-ref">drilldowns[${LABEL}].keys</span></a>,
+<code class="docutils literal"><span class="pre">drilldowns[${LABEL}].calc_types</span></code> and
+<code class="docutils literal"><span class="pre">drilldowns[${LABEL}].calc_target</span></code>.</li>
+<li>Creates dynamic columns for <code class="docutils literal"><span class="pre">initial</span></code> stage. All drilldown
+result records have these dynamic columns.</li>
+<li>Evaluates <code class="docutils literal"><span class="pre">drilldowns[${LABEL}].filter</span></code>. You can use dynamic
+columns created in <code class="docutils literal"><span class="pre">initial</span></code> stage.</li>
+<li>Evaluates <code class="docutils literal"><span class="pre">drilldowns[${LABEL}].sort_keys</span></code>,
+<code class="docutils literal"><span class="pre">drilldowns[${LABEL}].offset</span></code> and
+<code class="docutils literal"><span class="pre">drilldowns[${LABEL}].limit</span></code>. You can use dynamic columns
+created in <code class="docutils literal"><span class="pre">initial</span></code> stage.</li>
+<li>Evaluates <a class="reference internal" href="#select-drilldowns-label-output-columns"><span class="std std-ref">drilldowns[${LABEL}].output_columns</span></a>. You can
+use dynamic columns created in <code class="docutils literal"><span class="pre">initial</span></code> stage.</li>
+</ol>
+</div></blockquote>
+<p>Here is a <code class="docutils literal"><span class="pre">drilldowns[${LABEL}].columns[${NAME}].stage</span></code> example. It
+creates <code class="docutils literal"><span class="pre">is_popular</span></code> column at <code class="docutils literal"><span class="pre">initial</span></code> stage. You can use
+<code class="docutils literal"><span class="pre">is_popular</span></code> in all parameters such as
+<code class="docutils literal"><span class="pre">drilldowns[${LABEL}].filter</span></code> and
+<code class="docutils literal"><span class="pre">drilldowns[${LABEL}].output_columns</span></code>:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>select Entries \
+  --drilldowns[tag].keys tag \
+  --drilldowns[tag].columns[is_popular].stage initial \
+  --drilldowns[tag].columns[is_popular].type Bool \
+  --drilldowns[tag].columns[is_popular].value &#39;_nsubrecs &gt; 1&#39; \
+  --drilldowns[tag].filter is_popular \
+  --drilldowns[tag].output_columns _key,is_popular,_nsubrecs
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;The first post!&quot;,
+#         &quot;Welcome! This is my first post!&quot;,
+#         5,
+#         &quot;Hello&quot;
+#       ],
+#       [
+#         2,
+#         &quot;Groonga&quot;,
+#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+#         10,
+#         &quot;Groonga&quot;
+#       ],
+#       [
+#         3,
+#         &quot;Mroonga&quot;,
+#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         15,
+#         &quot;Groonga&quot;
+#       ],
+#       [
+#         4,
+#         &quot;Good-bye Senna&quot;,
+#         &quot;I migrated all Senna system!&quot;,
+#         3,
+#         &quot;Senna&quot;
+#       ],
+#       [
+#         5,
+#         &quot;Good-bye Tritonn&quot;,
+#         &quot;I also migrated all Tritonn system!&quot;,
+#         3,
+#         &quot;Senna&quot;
+#       ]
+#     ],
+#     {
+#       &quot;tag&quot;: [
+#         [
+#           2
+#         ],
+#         [
+#           [
+#             &quot;_key&quot;,
+#             &quot;ShortText&quot;
+#           ],
+#           [
+#             &quot;is_popular&quot;,
+#             &quot;Bool&quot;
+#           ],
+#           [
+#             &quot;_nsubrecs&quot;,
+#             &quot;Int32&quot;
+#           ]
+#         ],
+#         [
+#           &quot;Groonga&quot;,
+#           true,
+#           2
+#         ],
+#         [
+#           &quot;Senna&quot;,
+#           true,
+#           2
+#         ]
+#       ]
+#     }
+#   ]
+# ]
+</pre></div>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 4.0.8.</span></p>
+</div>
+</div>
 <div class="section" id="output-format-for-drilldowns-label-style">
-<span id="select-drilldowns-label-output-format"></span><h4>7.3.54.4.8.3. Output format for <code class="docutils literal"><span class="pre">drilldowns[${LABEL}]</span></code> style<a class="headerlink" href="#output-format-for-drilldowns-label-style" title="Permalink to this headline">¶</a></h4>
+<span id="select-drilldowns-label-output-format"></span><h4>7.3.54.4.8.4. Output format for <code class="docutils literal"><span class="pre">drilldowns[${LABEL}]</span></code> style<a class="headerlink" href="#output-format-for-drilldowns-label-style" title="Permalink to this headline">¶</a></h4>
 <p>There is a difference in output format between <a class="reference internal" href="#select-drilldown"><span class="std std-ref">drilldown</span></a>
 and <a class="reference internal" href="#select-drilldowns-label-keys"><span class="std std-ref">drilldowns[${LABEL}].keys</span></a>. <a class="reference internal" href="#select-drilldown"><span class="std std-ref">drilldown</span></a> uses
 array to output multiple drilldown results.
@@ -6291,7 +6487,8 @@ pairs):</p>
 <li><a class="reference internal" href="#advanced-drilldown-related-parameters">7.3.54.4.8. Advanced drilldown related parameters</a><ul>
 <li><a class="reference internal" href="#drilldowns-label-keys">7.3.54.4.8.1. <code class="docutils literal"><span class="pre">drilldowns[${LABEL}].keys</span></code></a></li>
 <li><a class="reference internal" href="#drilldowns-label-output-columns">7.3.54.4.8.2. <code class="docutils literal"><span class="pre">drilldowns[${LABEL}].output_columns</span></code></a></li>
-<li><a class="reference internal" href="#output-format-for-drilldowns-label-style">7.3.54.4.8.3. Output format for <code class="docutils literal"><span class="pre">drilldowns[${LABEL}]</span></code> style</a></li>
+<li><a class="reference internal" href="#drilldowns-label-columns-name-stage">7.3.54.4.8.3. <code class="docutils literal"><span class="pre">drilldowns[${LABEL}].columns[${NAME}].stage</span></code></a></li>
+<li><a class="reference internal" href="#output-format-for-drilldowns-label-style">7.3.54.4.8.4. Output format for <code class="docutils literal"><span class="pre">drilldowns[${LABEL}]</span></code> style</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#slice-related-parameters">7.3.54.4.9. Slice related parameters</a><ul>

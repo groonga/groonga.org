@@ -1,0 +1,394 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ja">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>7.14.10. in_records &#8212; Groonga v7.0.2ドキュメント</title>
+    
+    <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
+    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '7.0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../static/doctools.js"></script>
+    <script type="text/javascript" src="../../static/translations.js"></script>
+    <link rel="shortcut icon" href="../../static/favicon.ico"/>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="検索" href="../../search.html" />
+    <link rel="top" title="Groonga v7.0.2ドキュメント" href="../../index.html" />
+    <link rel="up" title="7.14. 関数" href="../function.html" />
+    <link rel="next" title="7.14.11. in_values" href="in_values.html" />
+    <link rel="prev" title="7.14.9. html_untag" href="html_untag.html" /> 
+      <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
+    <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
+    <meta property="og:type" content="product" />
+    <meta property="og:image" content="http://groonga.org/images/logos/groonga-icon-full-size.png" />
+    <meta property="og:site_name" content="groonga" />
+
+    <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
+  </head>
+
+  <body role="document">
+<div class="header">
+  <h1 class="title">
+    <a id="top-link" href="../../../">
+      <span class="project">groonga</span>
+      <span class="separator">-</span>
+      <span class="description">オープンソースのカラムストア機能付き全文検索エンジン</span>
+    </a>
+  </h1>
+
+      <div class="facebook-buttons">
+      <fb:like href="http://www.facebook.com/pages/groonga/201193596592346"
+               layout="standard"
+               width="290"></fb:like>
+    </div>
+    <div class="other-language-links">
+
+    <ul>
+      <li><a href="../../../../docs/reference/functions/in_records.html">English</a></li>
+    </ul>
+  </div>
+</div>
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="in_values.html" title="7.14.11. in_values"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="html_untag.html" title="7.14.9. html_untag"
+             accesskey="P">前へ</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v7.0.2ドキュメント</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../reference.html" >7. リファレンスマニュアル</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../function.html" accesskey="U">7.14. 関数</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="in-records">
+<h1>7.14.10. <code class="docutils literal"><span class="pre">in_records</span></code><a class="headerlink" href="#in-records" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<div class="section" id="summary">
+<h2>7.14.10.1. 概要<a class="headerlink" href="#summary" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified">バージョン 7.0.2 で追加.</span></p>
+</div>
+<p><code class="docutils literal"><span class="pre">in_records</span></code> を使うと既存のテーブルを条件のパターンとして使うことができます。テーブル内の各レコードがそれぞれ条件のパターンになります。</p>
+<p><code class="docutils literal"><span class="pre">in_records</span></code> を使うと複数のクエリーを1つのクエリーにできるかもしれません。</p>
+<p><code class="docutils literal"><span class="pre">in_records</span></code> は <a class="reference internal" href="sub_filter.html"><span class="doc">sub_filter</span></a> に似ています。2つの違いは次の通りです。</p>
+<blockquote>
+<div><ul class="simple">
+<li><p class="first"><code class="docutils literal"><span class="pre">sub_filter</span></code> では条件テーブルを参照するカラムが必須ですが、 <code class="docutils literal"><span class="pre">in_records</span></code> では必要ありません。</p>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">sub_filter</span></code> では上述の参照カラム用のインデックスカラムが必須ですが、 <code class="docutils literal"><span class="pre">in_records</span></code> ではインデックスカラムは必要ありません。</p>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">sub_filter</span></code> ではすべての論理演算を使えますが、 <code class="docutils literal"><span class="pre">in_records</span></code> では1つのパターン内でAND論理演算しか使えません。</p>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">sub_filter</span></code> では条件に1つの参照カラムの値しか使えませんが、 <code class="docutils literal"><span class="pre">in_records</span></code> では条件に1つ以上の値を使えます。複数の値を指定するために複数のカラムや関数などを使えます。</p>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">sub_filter</span></code> ではインデックスサーチを使いますが、 <code class="docutils literal"><span class="pre">in_records</span></code> ではシーケンシャルサーチを使います。</p>
+</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="syntax">
+<span id="in-records-syntax"></span><h2>7.14.10.2. 構文<a class="headerlink" href="#syntax" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><code class="docutils literal"><span class="pre">in_records</span></code> には4つ以上のパラメーターがあります。:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>in_records(condition_table,
+           value1, mode1, condition_column_name1,
+           ...,
+           valueN, modeN, condition_column_nameN)
+</pre></div>
+</div>
+</div>
+<div class="section" id="usage">
+<span id="in-records-usage"></span><h2>7.14.10.3. 使い方<a class="headerlink" href="#usage" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>使い方を示すために使うスキーマ定義とサンプルデータは以下の通りです。</p>
+<p>サンプルスキーマ:</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>table_create Tags TABLE_PAT_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create Conditions TABLE_PAT_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Conditions user_pattern COLUMN_SCALAR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Conditions tag COLUMN_SCALAR Tags
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Conditions max_length COLUMN_SCALAR UInt32
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create Memos TABLE_HASH_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Memos user COLUMN_SCALAR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Memos tag COLUMN_SCALAR Tags
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>サンプルデータ:</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>load --table Memos
+[
+{&quot;_key&quot;: &quot;Groonga is fast&quot;,          &quot;user&quot;: &quot;alice&quot;, &quot;tag&quot;: &quot;groonga&quot;},
+{&quot;_key&quot;: &quot;Mroonga is fast&quot;,          &quot;user&quot;: &quot;alice&quot;, &quot;tag&quot;: &quot;mroonga&quot;},
+{&quot;_key&quot;: &quot;Groonga is very good!&quot;,    &quot;user&quot;: &quot;alice&quot;, &quot;tag&quot;: &quot;groonga&quot;},
+{&quot;_key&quot;: &quot;Droonga is fast&quot;,          &quot;user&quot;: &quot;david&quot;, &quot;tag&quot;: &quot;droonga&quot;},
+{&quot;_key&quot;: &quot;Groonga is a HTTP server&quot;, &quot;user&quot;: &quot;david&quot;, &quot;tag&quot;: &quot;groonga&quot;}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 5]
+</pre></div>
+</div>
+<p>サンプル条件：</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>load --table Conditions
+[
+{&quot;_key&quot;: &quot;lic + groonga&quot;, &quot;user_pattern&quot;: &quot;lic&quot;, &quot;tag&quot;: &quot;groonga&quot;, max_length: 20},
+{&quot;_key&quot;: &quot;dav + droonga&quot;, &quot;user_pattern&quot;: &quot;dav&quot;, &quot;tag&quot;: &quot;droonga&quot;, max_length: 50}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 2]
+</pre></div>
+</div>
+<p>以下は <code class="docutils literal"><span class="pre">Conditions</span></code> テーブル内のレコードで検索をする <code class="docutils literal"><span class="pre">in_records</span></code> の使用例です。各レコードを条件として使います。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>plugin_register functions/string
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+select \
+  --table Memos \
+  --filter &#39;in_records(Conditions, \
+                       user,                 &quot;@&quot;, &quot;user_pattern&quot;, \
+                       tag,                 &quot;==&quot;, &quot;tag&quot;, \
+                       string_length(_key), &quot;&lt;=&quot;, &quot;max_length&quot;)&#39; \
+  --sort_by _id \
+  --output_columns _key,user,tag
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;user&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;Tags&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Groonga is fast&quot;,
+#         &quot;alice&quot;,
+#         &quot;groonga&quot;
+#       ],
+#       [
+#         &quot;Droonga is fast&quot;,
+#         &quot;david&quot;,
+#         &quot;droonga&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>この <code class="docutils literal"><span class="pre">filter</span></code> は各レコードに対して次の3つの条件で絞り込みます。</p>
+<blockquote>
+<div><ul class="simple">
+<li><p class="first"><code class="docutils literal"><span class="pre">Memos.user</span></code> が <code class="docutils literal"><span class="pre">Conditions.user_pattern</span></code> にマッチ（ <code class="docutils literal"><span class="pre">&#64;</span></code> ）するか。</p>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">Memos.tag</span></code> は <code class="docutils literal"><span class="pre">Conditions.tag</span></code> と等しい（ <code class="docutils literal"><span class="pre">==</span></code> ）か。</p>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">Memos._key</span></code> の文字数が <code class="docutils literal"><span class="pre">Conditions.max_length</span></code> 以下か。</p>
+</li>
+</ul>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">Conditions</span></code> テーブル内の少なくとも1つのレコードがこれら3つの条件すべてで真を返せば <code class="docutils literal"><span class="pre">Memos</span></code> テーブルのそのレコードはマッチします。</p>
+<p><code class="docutils literal"><span class="pre">Conditions</span></code> テーブルの最初のレコードは次の条件を使います。</p>
+<blockquote>
+<div><ul class="simple">
+<li><p class="first"><code class="docutils literal"><span class="pre">Memos.user</span></code> には部分文字列として <code class="docutils literal"><span class="pre">&quot;lic&quot;</span></code> がある。</p>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">Memos.tag</span></code> は <code class="docutils literal"><span class="pre">&quot;groonga&quot;</span></code> である。</p>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">Memos._key</span></code> の文字数が <code class="docutils literal"><span class="pre">20</span></code> 以下である。</p>
+</li>
+</ul>
+</div></blockquote>
+<p>この条件は次のレコードにマッチします。</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">{&quot;_key&quot;:</span> <span class="pre">&quot;Groonga</span> <span class="pre">is</span> <span class="pre">fast&quot;,</span> <span class="pre">&quot;user&quot;:</span> <span class="pre">&quot;alice&quot;,</span> <span class="pre">&quot;tag&quot;:</span> <span class="pre">&quot;groonga&quot;}</span></code></li>
+</ul>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">Conditions</span></code> テーブルの2つめのレコードは次の条件を使います。</p>
+<blockquote>
+<div><ul class="simple">
+<li><p class="first"><code class="docutils literal"><span class="pre">Memos.user</span></code> には部分文字列として <code class="docutils literal"><span class="pre">&quot;dav&quot;</span></code> がある。</p>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">Memos.tag</span></code> は <code class="docutils literal"><span class="pre">&quot;droonga&quot;</span></code> である。</p>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">Memos._key</span></code> の文字数が <code class="docutils literal"><span class="pre">50</span></code> 以下である。</p>
+</li>
+</ul>
+</div></blockquote>
+<p>この条件は次のレコードにマッチします。</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">{&quot;_key&quot;:</span> <span class="pre">&quot;Droonga</span> <span class="pre">is</span> <span class="pre">fast&quot;,</span> <span class="pre">&quot;user&quot;:</span> <span class="pre">&quot;david&quot;,</span> <span class="pre">&quot;tag&quot;:</span> <span class="pre">&quot;droonga&quot;}</span></code></li>
+</ul>
+</div></blockquote>
+<p>検索結果には前述のすべてのレコードが含まれます。</p>
+</div>
+<div class="section" id="parameters">
+<span id="in-records-parameters"></span><h2>7.14.10.4. 引数<a class="headerlink" href="#parameters" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><code class="docutils literal"><span class="pre">in_records</span></code> には4つ以上のパラメーターが必須です。</p>
+<div class="section" id="required-parameters">
+<span id="in-records-required-parameters"></span><h3>7.14.10.4.1. 必須引数<a class="headerlink" href="#required-parameters" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">condition_table</span></code> と「 <code class="docutils literal"><span class="pre">value</span></code> 、 <code class="docutils literal"><span class="pre">mode_name</span></code> 、 <code class="docutils literal"><span class="pre">condition_column_name</span></code> 」のセットです。「 <code class="docutils literal"><span class="pre">value</span></code> 、 <code class="docutils literal"><span class="pre">mode_name</span></code> 、 <code class="docutils literal"><span class="pre">condition_column_name</span></code> 」のセットは複数回指定できます。</p>
+<div class="section" id="condition-table">
+<span id="in-records-condition-table"></span><h4>7.14.10.4.1.1. <code class="docutils literal"><span class="pre">condition_table</span></code><a class="headerlink" href="#condition-table" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>レコードとして条件が入っているテーブルを指定します。</p>
+</div>
+</div>
+<div class="section" id="value">
+<span id="in-records-value"></span><h3>7.14.10.4.2. <code class="docutils literal"><span class="pre">value</span></code><a class="headerlink" href="#value" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>比較対象の値を指定します。</p>
+</div>
+<div class="section" id="mode-name">
+<span id="in-records-mode-name"></span><h3>7.14.10.4.3. <code class="docutils literal"><span class="pre">mode_name</span></code><a class="headerlink" href="#mode-name" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p><a class="reference internal" href="#in-records-value"><span class="std std-ref">value</span></a> と <a class="reference internal" href="#in-records-condition-column-name"><span class="std std-ref">condition_column_name</span></a> の値の比較方法（モード名）を指定します。</p>
+<p>利用可能なモード名は <a class="reference internal" href="query.html#query-default-mode"><span class="std std-ref">default_mode</span></a> を見てください。 <code class="docutils literal"><span class="pre">NEAR</span></code> 、 <code class="docutils literal"><span class="pre">SIMILAR</span></code> と <code class="docutils literal"><span class="pre">SUFFIX</span></code> 以外のすべてのモード名をサポートしています。</p>
+</div>
+<div class="section" id="condition-column-name">
+<span id="in-records-condition-column-name"></span><h3>7.14.10.4.4. <code class="docutils literal"><span class="pre">condition_column_name</span></code><a class="headerlink" href="#condition-column-name" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>条件として使う <a class="reference internal" href="#in-records-condition-table"><span class="std std-ref">condition_table</span></a> のカラム名を指定します。</p>
+</div>
+<div class="section" id="optional-parameter">
+<span id="in-records-optional-parameters"></span><h3>7.14.10.4.5. 省略可能引数<a class="headerlink" href="#optional-parameter" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>省略可能な引数はありません。</p>
+</div>
+</div>
+<div class="section" id="return-value">
+<h2>7.14.10.5. 戻り値<a class="headerlink" href="#return-value" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><code class="docutils literal"><span class="pre">in_records</span></code> は対象レコードが指定した条件テーブル内の1つ以上のレコード（パターン）にマッチするかどうかを返します。</p>
+<p>もし該当レコードがマッチすれば、 <code class="docutils literal"><span class="pre">true</span></code> を返します。そうでなければ <code class="docutils literal"><span class="pre">false</span></code> を返します。</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">7.14.10. <code class="docutils literal"><span class="pre">in_records</span></code></a><ul>
+<li><a class="reference internal" href="#summary">7.14.10.1. 概要</a></li>
+<li><a class="reference internal" href="#syntax">7.14.10.2. 構文</a></li>
+<li><a class="reference internal" href="#usage">7.14.10.3. 使い方</a></li>
+<li><a class="reference internal" href="#parameters">7.14.10.4. 引数</a><ul>
+<li><a class="reference internal" href="#required-parameters">7.14.10.4.1. 必須引数</a><ul>
+<li><a class="reference internal" href="#condition-table">7.14.10.4.1.1. <code class="docutils literal"><span class="pre">condition_table</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#value">7.14.10.4.2. <code class="docutils literal"><span class="pre">value</span></code></a></li>
+<li><a class="reference internal" href="#mode-name">7.14.10.4.3. <code class="docutils literal"><span class="pre">mode_name</span></code></a></li>
+<li><a class="reference internal" href="#condition-column-name">7.14.10.4.4. <code class="docutils literal"><span class="pre">condition_column_name</span></code></a></li>
+<li><a class="reference internal" href="#optional-parameter">7.14.10.4.5. 省略可能引数</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#return-value">7.14.10.5. 戻り値</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="html_untag.html"
+                        title="前の章へ">7.14.9. <code class="docutils literal"><span class="pre">html_untag</span></code></a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="in_values.html"
+                        title="次の章へ">7.14.11. <code class="docutils literal"><span class="pre">in_values</span></code></a></p>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../sources/reference/functions/in_records.txt"
+            rel="nofollow">ソースコードを表示（英語）</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>クイック検索</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="検索" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="in_values.html" title="7.14.11. in_values"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="html_untag.html" title="7.14.9. html_untag"
+             >前へ</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v7.0.2ドキュメント</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../reference.html" >7. リファレンスマニュアル</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../function.html" >7.14. 関数</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2009-2017, Brazil, Inc.
+    </div>
+      <script src="http://connect.facebook.net/ja_JP/all.js"></script>
+
+    <script>
+      FB.init({
+         appId  : null,
+         status : true, // check login status
+         cookie : true, // enable cookies to allow the server to access the session
+         xfbml  : true  // parse XFBML
+      });
+    </script>
+  </body>
+
+</html>

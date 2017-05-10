@@ -437,8 +437,173 @@ select --table Blog2 --match_columns title --query message
 </div>
 </div>
 <div class="section" id="full-text-search-with-specific-index-name">
-<h2>4.7.2. インデックス名を指定した全文検索<a class="headerlink" href="#full-text-search-with-specific-index-name" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>執筆中です。</p>
+<span id="id1"></span><h2>4.7.2. インデックス名を指定した全文検索<a class="headerlink" href="#full-text-search-with-specific-index-name" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>Groongaは、インデックス名を指定した全文検索もサポートしています。</p>
+<p>このセクションでは、インデックス名を指定した全文検索の方法を学びます。</p>
+<p>インデックス名の指定について具体的な例を示します。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>table_create Entries TABLE_HASH_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries title COLUMN_SCALAR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries body COLUMN_SCALAR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+load --table Entries
+[
+{&quot;_key&quot;: &quot;http://example.com/entry1&quot;, &quot;title&quot;:&quot;Hello Groonga.&quot;, &quot;body&quot;:&quot;This is my first entry.&quot;},
+{&quot;_key&quot;: &quot;http://example.com/entry2&quot;, &quot;title&quot;:&quot;Hello world.&quot;, &quot;body&quot;:&quot;I love Groonga!&quot;},
+{&quot;_key&quot;: &quot;http://example.com/entry3&quot;, &quot;title&quot;:&quot;Hello Mroonga, bye Groonga.&quot;, &quot;body&quot;:&quot;I use Mroonga.&quot;},
+{&quot;_key&quot;: &quot;http://example.com/entry4&quot;, &quot;title&quot;:&quot;Say, Hello Groonga!&quot;, &quot;body&quot;:&quot;I&#39;m back.&quot;}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 4]
+table_create Terms TABLE_PAT_KEY ShortText --default_tokenizer TokenBigram --normalizer NormalizerAuto
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Terms entries_title COLUMN_INDEX|WITH_POSITION Entries title
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Terms entries_body COLUMN_INDEX|WITH_POSITION Entries body
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Terms entries_whole COLUMN_INDEX|WITH_POSITION|WITH_SECTION Entries title,body
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">title</span></code> と <code class="docutils literal"><span class="pre">body</span></code> カラムを持つテーブルがあります。また、語彙表は <code class="docutils literal"><span class="pre">title</span></code> と <code class="docutils literal"><span class="pre">body</span></code> のカラムのインデックスを持っています。</p>
+<p>語彙表には、3つのインデックスカラムがあります。</p>
+<ul class="simple">
+<li><p class="first">entries_title: <code class="docutils literal"><span class="pre">title</span></code> のインデックスカラム</p>
+</li>
+<li><p class="first">entries_body: <code class="docutils literal"><span class="pre">body</span></code> のインデックスカラム</p>
+</li>
+<li><p class="first">entries_whole: <code class="docutils literal"><span class="pre">title</span></code> と <code class="docutils literal"><span class="pre">body</span></code> のインデックスカラム</p>
+</li>
+</ul>
+<p>特定のデータカラムと結びついたインデックスカラムを指定した場合は、暗黙的にそのデータカラムだけを検索します。</p>
+<p>例えば、 <code class="docutils literal"><span class="pre">title</span></code> または <code class="docutils literal"><span class="pre">body</span></code> だけを検索したい場合は、 <code class="docutils literal"><span class="pre">Terms.entries_title</span></code> または <code class="docutils literal"><span class="pre">Terms.entries_body</span></code> をインデックスカラムに指定します。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>select --table Entries --output_columns title --match_columns Terms.entries_title --query &quot;Groonga&quot;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         3
+#       ],
+#       [
+#         [
+#           &quot;title&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Hello Groonga.&quot;
+#       ],
+#       [
+#         &quot;Hello Mroonga, bye Groonga.&quot;
+#       ],
+#       [
+#         &quot;Say, Hello Groonga!&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>この例では、<code class="docutils literal"><span class="pre">Terms.entries_title</span></code> をインデックスとして <code class="docutils literal"><span class="pre">title</span></code> カラムを対象に&quot;Groonga&quot;を検索します。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>select --table Entries --output_columns body --match_columns Terms.entries_body --query &quot;Groonga&quot;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;body&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         &quot;I love Groonga!&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>この例では、 <code class="docutils literal"><span class="pre">Terms.entries_whole</span></code> をインデックスとして、 <code class="docutils literal"><span class="pre">body</span></code> カラムを対象に&quot;Groonga&quot;を検索します。</p>
+<p>複数カラムにまたがるインデックスは、インデックスカラムの後にデータカラム名を指定することができます。これは、どのインデックスを使ってどのデータカラムを検索するかを明示しています。</p>
+<p>例えば、 <code class="docutils literal"><span class="pre">entries_whole</span></code> インデックスが付いた <code class="docutils literal"><span class="pre">title</span></code> または <code class="docutils literal"><span class="pre">body</span></code> を検索する場合、 <code class="docutils literal"><span class="pre">Terms.entries_whole.title</span></code> または <code class="docutils literal"><span class="pre">Terms.entries_whole.body</span></code> を指定します。 <code class="docutils literal"><span class="pre">Terms.entries_whole</span></code> をインデックスとして使い、 <code class="docutils literal"><span class="pre">title</span></code> カラムまたは、 <code class="docutils literal"><span class="pre">body</span></code> カラムを対象に検索します。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>select --table Entries --output_columns title --match_columns Terms.entries_whole.title --query &quot;Groonga&quot;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         3
+#       ],
+#       [
+#         [
+#           &quot;title&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Hello Groonga.&quot;
+#       ],
+#       [
+#         &quot;Hello Mroonga, bye Groonga.&quot;
+#       ],
+#       [
+#         &quot;Say, Hello Groonga!&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>この例では、 <code class="docutils literal"><span class="pre">Terms.entries_whole</span></code> をインデックスとして、 <code class="docutils literal"><span class="pre">title</span></code> カラムを対象に&quot;Groonga&quot;を検索します。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>select --table Entries --output_columns body --match_columns Terms.entries_whole.body --query &quot;Groonga&quot;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;body&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         &quot;I love Groonga!&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>この例では、 <code class="docutils literal"><span class="pre">Terms.entries_whole</span></code> をインデックスとして、 <code class="docutils literal"><span class="pre">body</span></code> カラムを対象に&quot;Groonga&quot;を検索します。</p>
 </div>
 <div class="section" id="nested-index-search-among-related-table-by-column-index">
 <span id="nested-index-search"></span><h2>4.7.3. カラムインデックスによる関連テーブルをまたぐ検索<a class="headerlink" href="#nested-index-search-among-related-table-by-column-index" title="このヘッドラインへのパーマリンク">¶</a></h2>
@@ -693,7 +858,7 @@ select Articles2 --match_columns comment.comment.content --query mroonga --outpu
 </div>
 <div class="section" id="indexes-with-weight">
 <h2>4.7.4. インデックスの重み<a class="headerlink" href="#indexes-with-weight" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>執筆中です。</p>
+<p>TODO</p>
 </div>
 </div>
 

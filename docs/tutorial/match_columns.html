@@ -436,8 +436,171 @@ It depends on the case.</p>
 </div>
 </div>
 <div class="section" id="full-text-search-with-specific-index-name">
-<h2>4.7.2. Full text search with specific index name<a class="headerlink" href="#full-text-search-with-specific-index-name" title="Permalink to this headline">¶</a></h2>
-<p>TODO</p>
+<span id="id1"></span><h2>4.7.2. Full text search with specific index name<a class="headerlink" href="#full-text-search-with-specific-index-name" title="Permalink to this headline">¶</a></h2>
+<p>Groonga also supports full text search with specific index name.</p>
+<p>In this section, you learn how to use specific index column efficiently.</p>
+<p>Here is the concrete example about specific index name.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>table_create Entries TABLE_HASH_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries title COLUMN_SCALAR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries body COLUMN_SCALAR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+load --table Entries
+[
+{&quot;_key&quot;: &quot;http://example.com/entry1&quot;, &quot;title&quot;:&quot;Hello Groonga.&quot;, &quot;body&quot;:&quot;This is my first entry.&quot;},
+{&quot;_key&quot;: &quot;http://example.com/entry2&quot;, &quot;title&quot;:&quot;Hello world.&quot;, &quot;body&quot;:&quot;I love Groonga!&quot;},
+{&quot;_key&quot;: &quot;http://example.com/entry3&quot;, &quot;title&quot;:&quot;Hello Mroonga, bye Groonga.&quot;, &quot;body&quot;:&quot;I use Mroonga.&quot;},
+{&quot;_key&quot;: &quot;http://example.com/entry4&quot;, &quot;title&quot;:&quot;Say, Hello Groonga!&quot;, &quot;body&quot;:&quot;I&#39;m back.&quot;}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 4]
+table_create Terms TABLE_PAT_KEY ShortText --default_tokenizer TokenBigram --normalizer NormalizerAuto
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Terms entries_title COLUMN_INDEX|WITH_POSITION Entries title
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Terms entries_body COLUMN_INDEX|WITH_POSITION Entries body
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Terms entries_whole COLUMN_INDEX|WITH_POSITION|WITH_SECTION Entries title,body
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>The table which stores entries has columns for title and body.
+And the terms table has index columns for title and body to entries table.</p>
+<p>There are three index columns in terms table.</p>
+<ul class="simple">
+<li>entries_title: index column for title</li>
+<li>entries_body: index column for body</li>
+<li>entries_whole: index column for title and body</li>
+</ul>
+<p>If you specify index column which is related to specific data column, related data column is searched with that index implicitly.</p>
+<p>For example, if you want to search title or body only, specify <code class="docutils literal"><span class="pre">Terms.entries_title</span></code> or <code class="docutils literal"><span class="pre">Terms.entries_body</span></code> index column.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>select --table Entries --output_columns title --match_columns Terms.entries_title --query &quot;Groonga&quot;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         3
+#       ],
+#       [
+#         [
+#           &quot;title&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Hello Groonga.&quot;
+#       ],
+#       [
+#         &quot;Hello Mroonga, bye Groonga.&quot;
+#       ],
+#       [
+#         &quot;Say, Hello Groonga!&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>This example uses <code class="docutils literal"><span class="pre">Terms.entries_title</span></code> as index, then search &quot;Groonga&quot; against title data column.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>select --table Entries --output_columns body --match_columns Terms.entries_body --query &quot;Groonga&quot;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;body&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         &quot;I love Groonga!&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>This example uses <code class="docutils literal"><span class="pre">Terms.entries_body</span></code> as index, then search &quot;Groonga&quot; against body data column.</p>
+<p>If you specify multiple index column which is related to specific data columns, you can also specify data column name as suffix. It means that &quot;Use specific index and search specific data column explicitly&quot;.</p>
+<p>For example, if you want to search title or body only with <code class="docutils literal"><span class="pre">entries_whole</span></code> index, specify <code class="docutils literal"><span class="pre">Terms.entries_whole.title</span></code> or <code class="docutils literal"><span class="pre">Terms.entries_whole.body</span></code>. It uses <code class="docutils literal"><span class="pre">Terms.entries_whole</span></code> index and search <code class="docutils literal"><span class="pre">title</span></code> column or <code class="docutils literal"><span class="pre">body</span></code> column explicitly.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>select --table Entries --output_columns title --match_columns Terms.entries_whole.title --query &quot;Groonga&quot;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         3
+#       ],
+#       [
+#         [
+#           &quot;title&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Hello Groonga.&quot;
+#       ],
+#       [
+#         &quot;Hello Mroonga, bye Groonga.&quot;
+#       ],
+#       [
+#         &quot;Say, Hello Groonga!&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>This example uses <code class="docutils literal"><span class="pre">Terms.entries_whole</span></code> as index, then search &quot;Groonga&quot; against title data column.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>select --table Entries --output_columns body --match_columns Terms.entries_whole.body --query &quot;Groonga&quot;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;body&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         &quot;I love Groonga!&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>This example uses <code class="docutils literal"><span class="pre">Terms.entries_whole</span></code> as index, then search &quot;Groonga&quot; against body data column.</p>
 </div>
 <div class="section" id="nested-index-search-among-related-table-by-column-index">
 <span id="nested-index-search"></span><h2>4.7.3. Nested index search among related table by column index<a class="headerlink" href="#nested-index-search-among-related-table-by-column-index" title="Permalink to this headline">¶</a></h2>

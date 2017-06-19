@@ -127,11 +127,15 @@ changes in memory, flushing them to disk is a heavy process.</p>
 </div>
 <div class="section" id="syntax">
 <h2>7.3.23.2. Syntax<a class="headerlink" href="#syntax" title="Permalink to this headline">¶</a></h2>
-<p>This command takes two parameters.</p>
+<p>This command takes three parameters.</p>
 <p>All parameters are optional:</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>io_flush [target_name=null]
          [recursive=yes]
+         [only_opened=no]
 </pre></div>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 7.0.4: </span><a class="reference internal" href="#io-flush-only-opened"><span class="std std-ref">only_opened</span></a> is added.</p>
 </div>
 </div>
 <div class="section" id="usage">
@@ -309,6 +313,8 @@ flush target objects.</p>
 <p>Child objects of database is all tables and all columns.</p>
 <p>Child objects of table is all its columns.</p>
 <p>Child objects of column is nothing.</p>
+<p>If you specify <code class="docutils literal"><span class="pre">yes</span></code> to <a class="reference internal" href="#io-flush-only-opened"><span class="std std-ref">only_opened</span></a>, <code class="docutils literal"><span class="pre">recursive</span></code>
+is ignored.</p>
 <p><code class="docutils literal"><span class="pre">recursive</span></code> value must be <code class="docutils literal"><span class="pre">yes</span></code> or <code class="docutils literal"><span class="pre">no</span></code>. <code class="docutils literal"><span class="pre">yes</span></code> means that all
 of the specified flush target object and child objects are flush
 target objects. <code class="docutils literal"><span class="pre">no</span></code> means that only the specified flush target
@@ -343,6 +349,31 @@ isn't specified:</p>
 </pre></div>
 </div>
 </div>
+<div class="section" id="only-opened">
+<span id="io-flush-only-opened"></span><h4>7.3.23.4.2.3. <code class="docutils literal"><span class="pre">only_opened</span></code><a class="headerlink" href="#only-opened" title="Permalink to this headline">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 7.0.4.</span></p>
+</div>
+<p>Specifies whether opened objects are only flushed.</p>
+<p>If there is only one process that changes the target database, flush
+performance will be improved by specifying <code class="docutils literal"><span class="pre">yes</span></code> to
+<code class="docutils literal"><span class="pre">only_opened</span></code>. It skips needless flushes.</p>
+<p>You can't specify <a class="reference internal" href="#io-flush-target-name"><span class="std std-ref">target_name</span></a> with <code class="docutils literal"><span class="pre">only_opened</span></code>
+option. If you specify <a class="reference internal" href="#io-flush-target-name"><span class="std std-ref">target_name</span></a>, <code class="docutils literal"><span class="pre">only_opened</span></code> is
+ignored.</p>
+<p>If you specify <code class="docutils literal"><span class="pre">yes</span></code> to <code class="docutils literal"><span class="pre">only_opened</span></code>, <a class="reference internal" href="#io-flush-recursive"><span class="std std-ref">recursive</span></a>
+is ignored.</p>
+<p><code class="docutils literal"><span class="pre">only_opened</span></code> value must be <code class="docutils literal"><span class="pre">yes</span></code> or <code class="docutils literal"><span class="pre">no</span></code>. <code class="docutils literal"><span class="pre">yes</span></code> means that
+opened objects are only flushed. <code class="docutils literal"><span class="pre">no</span></code> means that all target objects
+are flushed even they aren't opened.</p>
+<p>The following <code class="docutils literal"><span class="pre">io_flush</span></code> flushes all changes in database, all tables
+and all columns:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>io_flush --only_opened yes
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+</div>
 </div>
 </div>
 <div class="section" id="return-value">
@@ -373,6 +404,7 @@ isn't specified:</p>
 <li><a class="reference internal" href="#optional-parameters">7.3.23.4.2. Optional parameters</a><ul>
 <li><a class="reference internal" href="#target-name">7.3.23.4.2.1. <code class="docutils literal"><span class="pre">target_name</span></code></a></li>
 <li><a class="reference internal" href="#recursive">7.3.23.4.2.2. <code class="docutils literal"><span class="pre">recursive</span></code></a></li>
+<li><a class="reference internal" href="#only-opened">7.3.23.4.2.3. <code class="docutils literal"><span class="pre">only_opened</span></code></a></li>
 </ul>
 </li>
 </ul>

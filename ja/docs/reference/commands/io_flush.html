@@ -117,11 +117,15 @@
 </div>
 <div class="section" id="syntax">
 <h2>7.3.23.2. 構文<a class="headerlink" href="#syntax" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>このコマンドには2つの引数があります。</p>
+<p>このコマンドの引数は3つです。</p>
 <p>すべての引数は省略可能です:</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>io_flush [target_name=null]
          [recursive=yes]
+         [only_opened=no]
 </pre></div>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified">バージョン 7.0.4 で追加: </span><a class="reference internal" href="#io-flush-only-opened"><span class="std std-ref">only_opened</span></a> が追加されました。</p>
 </div>
 </div>
 <div class="section" id="usage">
@@ -302,6 +306,7 @@ io_flush --target_name Users.age
 <p>データベースの子オブジェクトはすべてのテーブルとすべてのカラムです。</p>
 <p>テーブルの子オブジェクトはそのテーブルのすべてのカラムです。</p>
 <p>カラムの子オブジェクトはありません。</p>
+<p><a class="reference internal" href="#io-flush-only-opened"><span class="std std-ref">only_opened</span></a> に <code class="docutils literal"><span class="pre">yes</span></code> を指定すると <code class="docutils literal"><span class="pre">recursive</span></code> は無視されます。</p>
 <p><code class="docutils literal"><span class="pre">recursive</span></code> の値は <code class="docutils literal"><span class="pre">yes</span></code> または <code class="docutils literal"><span class="pre">no</span></code> でなければいけません。 <code class="docutils literal"><span class="pre">yes</span></code> は指定した書き出し対象オブジェクトとその子オブジェクトすべてを書き出し対象オブジェクトにするという意味です。 <code class="docutils literal"><span class="pre">no</span></code> は指定した書き出し対象オブジェクトのみを書き出し対象オブジェクトにするという意味です。</p>
 <p>次の <code class="docutils literal"><span class="pre">io_flush</span></code> はデータベースとすべてのテーブルとすべてのカラムのすべての変更を書き出します。</p>
 <p>実行例:</p>
@@ -325,6 +330,23 @@ io_flush --target_name Users.age
 <p><code class="docutils literal"><span class="pre">recursive</span></code> パラメーターが指定されていないので、次のケースでは <code class="docutils literal"><span class="pre">yes</span></code> が使われます。</p>
 <p>実行例:</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>io_flush
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+</div>
+<div class="section" id="only-opened">
+<span id="io-flush-only-opened"></span><h4>7.3.23.4.2.3. <code class="docutils literal"><span class="pre">only_opened</span></code><a class="headerlink" href="#only-opened" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">バージョン 7.0.4 で追加.</span></p>
+</div>
+<p>すでに開かれているオブジェクトだけフラッシュするかどうかを指定します。</p>
+<p>対象のデータベースを変更するプロセスが1つだけの場合、 <code class="docutils literal"><span class="pre">only_opened</span></code> に <code class="docutils literal"><span class="pre">yes</span></code> を指定することでフラッシュの性能が改善する可能性があります。これは、不要なフラッシュを省略するからです。</p>
+<p><a class="reference internal" href="#io-flush-target-name"><span class="std std-ref">target_name</span></a> と <code class="docutils literal"><span class="pre">only_opened</span></code> オプションを一緒に指定することはできません。もし、 <a class="reference internal" href="#io-flush-target-name"><span class="std std-ref">target_name</span></a> を指定した場合は <code class="docutils literal"><span class="pre">only_opened</span></code> は無視されます。</p>
+<p><code class="docutils literal"><span class="pre">only_opened</span></code> に <code class="docutils literal"><span class="pre">yes</span></code> を指定した場合、 <a class="reference internal" href="#io-flush-recursive"><span class="std std-ref">recursive</span></a> は無視されます。</p>
+<p><code class="docutils literal"><span class="pre">only_opened</span></code> の値は <code class="docutils literal"><span class="pre">yes</span></code> または <code class="docutils literal"><span class="pre">no</span></code> でなければいけません。 <code class="docutils literal"><span class="pre">yes</span></code> の場合はすでに開かれているオブジェクトだけフラッシュします。 <code class="docutils literal"><span class="pre">no</span></code> の場合は開いているかどうかに関わらず、対象のオブジェクトをフラッシュします。</p>
+<p>次の <code class="docutils literal"><span class="pre">io_flush</span></code> はデータベースとすべてのテーブルとすべてのカラムのすべての変更を書き出します。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>io_flush --only_opened yes
 # [[0, 1337566253.89858, 0.000355720520019531], true]
 </pre></div>
 </div>
@@ -359,6 +381,7 @@ io_flush --target_name Users.age
 <li><a class="reference internal" href="#optional-parameters">7.3.23.4.2. 省略可能引数</a><ul>
 <li><a class="reference internal" href="#target-name">7.3.23.4.2.1. <code class="docutils literal"><span class="pre">target_name</span></code></a></li>
 <li><a class="reference internal" href="#recursive">7.3.23.4.2.2. <code class="docutils literal"><span class="pre">recursive</span></code></a></li>
+<li><a class="reference internal" href="#only-opened">7.3.23.4.2.3. <code class="docutils literal"><span class="pre">only_opened</span></code></a></li>
 </ul>
 </li>
 </ul>

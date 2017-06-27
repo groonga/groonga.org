@@ -6,7 +6,7 @@ description: 【感謝】ConoHa支援プログラム終了に伴うサーバー�
 
 ## ConoHa支援プログラム終了に伴うサーバー移行について
 
-気づいた人は少ないかもしれませんが、最近GroongaやMroongaのソースコードやパッケージを提供するのに使っている ``https://packages.groonga.org`` をConoHaから別のサービスへと移行しました。
+気づいた人は少ないかもしれませんが、最近GroongaやMroongaのソースコードやパッケージを提供するのに使っている `https://packages.groonga.org` をConoHaから別のサービスへと移行しました。
 
 ### ConoHa支援プログラムとは
 

@@ -212,8 +212,32 @@ status. You can know whether the database is recoverable or not by
 is opened, this command may break the database.</p>
 </div>
 <p><code class="docutils literal"><span class="pre">recover</span></code> has some options.</p>
+<div class="section" id="force-truncate">
+<h4>7.1.1.4.2.1. <code class="docutils literal"><span class="pre">--force-truncate</span></code><a class="headerlink" href="#force-truncate" title="Permalink to this headline">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 7.0.4.</span></p>
+</div>
+<p>It forces to truncate a corrupted database object.</p>
+<p>Here is an example that specifies <code class="docutils literal"><span class="pre">--force-truncate</span></code> option:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>% grndb recover --force-truncate --log-level info --log-path /var/log/groonga/grndb.log /var/lib/groonga/db/db
+</pre></div>
+</div>
+<p>When this option is specified, <code class="docutils literal"><span class="pre">grndb</span></code> does the following:</p>
+<ul class="simple">
+<li>check whether there is a corrupted database object (table, column, indexes)</li>
+<li>truncate a corrupted database object (table, column, indexes)</li>
+<li>remove incremental files with .00N suffix which is created when large amount of data is loaded</li>
+</ul>
+<p><code class="docutils literal"><span class="pre">--force-truncate</span></code> option is destructive one. Even though lock is still remained, <code class="docutils literal"><span class="pre">grndb</span></code> truncates a targeted corrupted database object.</p>
+<p>After <code class="docutils literal"><span class="pre">grndb</span> <span class="pre">recover</span></code> command has finished, you need to load data
+against truncated tables or columns to recreate database.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">You must use this option only when necessary. It means that you use it when there is a mismatch between database meta information and database object files which exists actually. This options should be used when there is no other way to recover database.</p>
+</div>
+</div>
 <div class="section" id="id1">
-<h4>7.1.1.4.2.1. <code class="docutils literal"><span class="pre">--log-level</span></code><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h4>
+<h4>7.1.1.4.2.2. <code class="docutils literal"><span class="pre">--log-level</span></code><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h4>
 <div class="versionadded">
 <p><span class="versionmodified">New in version 7.0.4.</span></p>
 </div>
@@ -225,7 +249,7 @@ is opened, this command may break the database.</p>
 <p>See <a class="reference internal" href="../commands/log_level.html"><span class="doc">log_level</span></a> to know about supported log level.</p>
 </div>
 <div class="section" id="id2">
-<h4>7.1.1.4.2.2. <code class="docutils literal"><span class="pre">--log-path</span></code><a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h4>
+<h4>7.1.1.4.2.3. <code class="docutils literal"><span class="pre">--log-path</span></code><a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h4>
 <div class="versionadded">
 <p><span class="versionmodified">New in version 7.0.4.</span></p>
 </div>
@@ -259,8 +283,9 @@ is opened, this command may break the database.</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#recover">7.1.1.4.2. <code class="docutils literal"><span class="pre">recover</span></code></a><ul>
-<li><a class="reference internal" href="#id1">7.1.1.4.2.1. <code class="docutils literal"><span class="pre">--log-level</span></code></a></li>
-<li><a class="reference internal" href="#id2">7.1.1.4.2.2. <code class="docutils literal"><span class="pre">--log-path</span></code></a></li>
+<li><a class="reference internal" href="#force-truncate">7.1.1.4.2.1. <code class="docutils literal"><span class="pre">--force-truncate</span></code></a></li>
+<li><a class="reference internal" href="#id1">7.1.1.4.2.2. <code class="docutils literal"><span class="pre">--log-level</span></code></a></li>
+<li><a class="reference internal" href="#id2">7.1.1.4.2.3. <code class="docutils literal"><span class="pre">--log-path</span></code></a></li>
 </ul>
 </li>
 </ul>

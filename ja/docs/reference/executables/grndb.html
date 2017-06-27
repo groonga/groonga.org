@@ -199,8 +199,34 @@
 <p class="last">このコマンドを他のプロセスが開いているデータベースに対しては使ってはいけません。もし、データベースが他のプロセスから開かれていると、このコマンドはデータベースを壊してしまう可能性があります。</p>
 </div>
 <p><code class="docutils literal"><span class="pre">recover</span></code> にはいくつかオプションがあります。</p>
+<div class="section" id="force-truncate">
+<h4>7.1.1.4.2.1. <code class="docutils literal"><span class="pre">--force-truncate</span></code><a class="headerlink" href="#force-truncate" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">バージョン 7.0.4 で追加.</span></p>
+</div>
+<p>壊れたデータベースオブジェクトを強制的に初期化します。</p>
+<p>以下は <code class="docutils literal"><span class="pre">--force-truncate</span></code> オプションを指定する例です。</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>% grndb recover --force-truncate --log-level info --log-path /var/log/groonga/grndb.log /var/lib/groonga/db/db
+</pre></div>
+</div>
+<p>このオプションが指定されたとき、 <code class="docutils literal"><span class="pre">grndb</span></code> は次のことを実行します。:</p>
+<ul class="simple">
+<li><p class="first">壊れたデータベースオブジェクト(テーブル、カラム、インデックス)がないかチェックします</p>
+</li>
+<li><p class="first">壊れたデータベースオブジェクト(テーブル、カラム、インデックス)を初期化します</p>
+</li>
+<li><p class="first">大量のデータをロードしたときに作られる増分ファイル(末尾に.00Nがつきます)を削除します</p>
+</li>
+</ul>
+<p><code class="docutils literal"><span class="pre">--force-truncate</span></code> は破壊的なオプションです。ロックが残留していても、 <code class="docutils literal"><span class="pre">grndb</span></code> は構わず対象となる壊れたデータベースオブジェクトを初期化します。</p>
+<p><code class="docutils literal"><span class="pre">grndb</span> <span class="pre">recover</span></code> の処理が終わったら、データベースを再構築するために初期化されたテーブルやカラムに対して再びデータをロードする必要があります。</p>
+<div class="admonition note">
+<p class="first admonition-title">注釈</p>
+<p class="last">このオプションは必要なときのみ使用します。つまりデータベースのメタ情報と実際に存在するデータベースのオブジェクトファイルの情報が食い違っているときです。 他にデータベースを復旧する方法がないときのみ使うべきです。</p>
+</div>
+</div>
 <div class="section" id="id1">
-<h4>7.1.1.4.2.1. <code class="docutils literal"><span class="pre">--log-level</span></code><a class="headerlink" href="#id1" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<h4>7.1.1.4.2.2. <code class="docutils literal"><span class="pre">--log-level</span></code><a class="headerlink" href="#id1" title="このヘッドラインへのパーマリンク">¶</a></h4>
 <div class="versionadded">
 <p><span class="versionmodified">バージョン 7.0.4 で追加.</span></p>
 </div>
@@ -212,7 +238,7 @@
 <p>サポートされているログレベルについては <a class="reference internal" href="../commands/log_level.html"><span class="doc">log_level</span></a> を参照してください。</p>
 </div>
 <div class="section" id="id2">
-<h4>7.1.1.4.2.2. <code class="docutils literal"><span class="pre">--log-path</span></code><a class="headerlink" href="#id2" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<h4>7.1.1.4.2.3. <code class="docutils literal"><span class="pre">--log-path</span></code><a class="headerlink" href="#id2" title="このヘッドラインへのパーマリンク">¶</a></h4>
 <div class="versionadded">
 <p><span class="versionmodified">バージョン 7.0.4 で追加.</span></p>
 </div>
@@ -246,8 +272,9 @@
 </ul>
 </li>
 <li><a class="reference internal" href="#recover">7.1.1.4.2. <code class="docutils literal"><span class="pre">recover</span></code></a><ul>
-<li><a class="reference internal" href="#id1">7.1.1.4.2.1. <code class="docutils literal"><span class="pre">--log-level</span></code></a></li>
-<li><a class="reference internal" href="#id2">7.1.1.4.2.2. <code class="docutils literal"><span class="pre">--log-path</span></code></a></li>
+<li><a class="reference internal" href="#force-truncate">7.1.1.4.2.1. <code class="docutils literal"><span class="pre">--force-truncate</span></code></a></li>
+<li><a class="reference internal" href="#id1">7.1.1.4.2.2. <code class="docutils literal"><span class="pre">--log-level</span></code></a></li>
+<li><a class="reference internal" href="#id2">7.1.1.4.2.3. <code class="docutils literal"><span class="pre">--log-path</span></code></a></li>
 </ul>
 </li>
 </ul>

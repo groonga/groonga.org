@@ -1,0 +1,226 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>10.2. エラーメッセージの解析方法 &#8212; Groonga v7.0.5 documentation</title>
+    
+    <link rel="stylesheet" href="../static/groonga.css" type="text/css" />
+    <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '7.0.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../static/jquery.js"></script>
+    <script type="text/javascript" src="../static/underscore.js"></script>
+    <script type="text/javascript" src="../static/doctools.js"></script>
+    <link rel="shortcut icon" href="../static/favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="top" title="Groonga v7.0.5 documentation" href="../index.html" />
+    <link rel="up" title="10. トラブルシューティング" href="../troubleshooting.html" />
+    <link rel="next" title="10.3. How to avoid mmap Cannot allocate memory error" href="mmap_cannot_allocate_memory.html" />
+    <link rel="prev" title="10.1. 同じ検索キーワードなのに全文検索結果が異なる" href="different_results_with_the_same_keyword.html" /> 
+      <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
+    <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
+    <meta property="og:type" content="product" />
+    <meta property="og:image" content="http://groonga.org/images/logos/groonga-icon-full-size.png" />
+    <meta property="og:site_name" content="groonga" />
+
+    <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
+  </head>
+
+  <body role="document">
+<div class="header">
+  <h1 class="title">
+    <a id="top-link" href="../../">
+      <span class="project">groonga</span>
+      <span class="separator">-</span>
+      <span class="description">An open-source fulltext search engine and column store.</span>
+    </a>
+  </h1>
+
+      <div class="facebook-buttons">
+      <fb:like href="http://www.facebook.com/pages/groonga/201193596592346"
+               layout="standard"
+               width="290"></fb:like>
+    </div>
+    <div class="other-language-links">
+
+    <ul>
+      <li><a href="../../ja/docs/troubleshooting/how_to_analyze_error_message.html">日本語</a></li>
+    </ul>
+  </div>
+</div>
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="mmap_cannot_allocate_memory.html" title="10.3. How to avoid mmap Cannot allocate memory error"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="different_results_with_the_same_keyword.html" title="10.1. 同じ検索キーワードなのに全文検索結果が異なる"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Groonga v7.0.5 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../troubleshooting.html" accesskey="U">10. トラブルシューティング</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="id1">
+<h1>10.2. エラーメッセージの解析方法<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<p>Groongaは様々なエラーメッセージを出力しますが、出力されたエラーメッセージ
+をもとに、原因を解析する方法はいままで、明文化していませんでした。
+ここでは、エラーメッセージごとの解析方法を記載します。</p>
+<div class="section" id="id2">
+<h2>10.2.1. ソケットエラーの解析方法<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p>ここでは、Groongaで発生するソケットエラーの解析方法について説明します。</p>
+<div class="section" id="id3">
+<h3>10.2.1.1. 例<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>Groongaのエラーログで以下のようなエラーログがあります。(xxxxxには任意の数字が入ります。):</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>socket error[xxxxx]: no buffer: accept
+</pre></div>
+</div>
+</div>
+<div class="section" id="id4">
+<h3>10.2.1.2. 解析方法<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<p>まず、ソケットエラーを扱うマクロである、SOERR というキーワードでGroongaのソースコードをgrepします。</p>
+<p>次に見つかったSOERRの引数にacceptが入っているSOERRをさがします。
+すると次のSOERRが見つかります。ログに出ているのはacceptのみなので、下記の最後の行が例で出力されたエラーメッセージに該当するとわかります。:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>lib/com.c:      SOERR(&quot;listen - start accept&quot;);
+lib/com.c:      SOERR(&quot;listen - disable accept&quot;);
+lib/com.c:        SOERR(&quot;accept&quot;);
+</pre></div>
+</div>
+<p>該当するエラー出力の周辺のコードを見ると以下のようになっています。:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>grn_sock fd = accept(com-&gt;fd, NULL, NULL);
+if (fd == -1) {
+  if (errno == EMFILE) {
+    grn_com_event_stop_accept(ctx, ev);
+  } else {
+    SOERR(&quot;accept&quot;);
+  }
+return;
+}
+</pre></div>
+</div>
+<p>上記のコードから、acceptを実行してエラーが発生したことが確認できます。
+次は、acceptが失敗した原因を追っていきます。</p>
+<p>acceptが失敗した理由は、:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>[10055]: no buffer
+</pre></div>
+</div>
+<p>から追うことができます。
+10055はWindowsのソケットエラーコードを表しています。また、no bufferはSOERRマクロ内でGroongaが用意しているメッセージです。
+Windowsのシステムエラーコードから調査しても良いですし、Groongaが出力しているエラーメッセージから調査しても良いです。</p>
+<p>Windowsのシステムエラーコードは以下のページに一覧があります。:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>https://msdn.microsoft.com/ja-jp/library/windows/desktop/ms740668(v=vs.85).aspx
+</pre></div>
+</div>
+<p>システムエラーコードまたは、エラーメッセージから調査すると、acceptが失敗した理由は、WSAENOBUFSであることがわかります。さらに、WSAENOBUFSが発生する原因を調査するとWSAENOBUFSが発生する原因は以下であることがわかります。:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>No buffer space available.
+
+An operation on a socket could not be performed because the system lacked sufficient buffer space or because a queue was full.
+</pre></div>
+</div>
+<p>上記のメッセージから、acceptが失敗する原因は、メモリー不足または、接続数が多すぎる場合であることがわかりました。
+あとは、エラーメッセージが出た際の状況から、接続数が多かったのか、メモリ不足だったのかを判断します。</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">10.2. エラーメッセージの解析方法</a><ul>
+<li><a class="reference internal" href="#id2">10.2.1. ソケットエラーの解析方法</a><ul>
+<li><a class="reference internal" href="#id3">10.2.1.1. 例</a></li>
+<li><a class="reference internal" href="#id4">10.2.1.2. 解析方法</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="different_results_with_the_same_keyword.html"
+                        title="previous chapter">10.1. 同じ検索キーワードなのに全文検索結果が異なる</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="mmap_cannot_allocate_memory.html"
+                        title="next chapter">10.3. How to avoid mmap Cannot allocate memory error</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../sources/troubleshooting/how_to_analyze_error_message.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="mmap_cannot_allocate_memory.html" title="10.3. How to avoid mmap Cannot allocate memory error"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="different_results_with_the_same_keyword.html" title="10.1. 同じ検索キーワードなのに全文検索結果が異なる"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Groonga v7.0.5 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../troubleshooting.html" >10. トラブルシューティング</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2009-2017, Brazil, Inc.
+    </div>
+      <script src="http://connect.facebook.net/en_US/all.js"></script>
+
+    <script>
+      FB.init({
+         appId  : null,
+         status : true, // check login status
+         cookie : true, // enable cookies to allow the server to access the session
+         xfbml  : true  // parse XFBML
+      });
+    </script>
+  </body>
+
+</html>

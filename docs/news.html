@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>News &#8212; Groonga v7.0.6 documentation</title>
+    <title>News &#8212; Groonga v7.0.7 documentation</title>
     
     <link rel="stylesheet" href="static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '7.0.6',
+        VERSION:     '7.0.7',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,7 +26,7 @@
     <link rel="shortcut icon" href="static/favicon.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="top" title="Groonga v7.0.6 documentation" href="index.html" /> 
+    <link rel="top" title="Groonga v7.0.7 documentation" href="index.html" /> 
       <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
     <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
     <meta property="og:type" content="product" />
@@ -66,7 +66,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="nav-item nav-item-0"><a href="index.html">Groonga v7.0.6 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Groonga v7.0.7 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -77,10 +77,78 @@
             
   <div class="section" id="news">
 <h1>News<a class="headerlink" href="#news" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="release-7-0-6-2017-08-29">
-<span id="release-7-0-6"></span><h2>Release 7.0.6 - 2017-08-29<a class="headerlink" href="#release-7-0-6-2017-08-29" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="release-7-0-7-2017-09-29">
+<span id="release-7-0-7"></span><h2>Release 7.0.7 - 2017-09-29<a class="headerlink" href="#release-7-0-7-2017-09-29" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="improvements">
 <h3>Improvements<a class="headerlink" href="#improvements" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p class="first">Supported <code class="docutils literal"><span class="pre">+</span></code> only query (<code class="docutils literal"><span class="pre">--query</span> <span class="pre">&quot;+&quot;</span></code>) for
+<code class="docutils literal"><span class="pre">QUERY_NO_SYNTAX_ERROR</span></code>. In the previous version, it caused an
+error.</p>
+</li>
+<li><p class="first">[httpd] Updated bundled nginx to 1.13.5.</p>
+</li>
+<li><p class="first">[<a class="reference internal" href="reference/commands/dump.html"><span class="doc">dump</span></a>] Added the default argument values
+to the syntax section.</p>
+</li>
+<li><p class="first">[<a class="reference internal" href="reference/command/command_version.html"><span class="doc">Command version</span></a>] Supported <code class="docutils literal"><span class="pre">--default-command-version</span> <span class="pre">3</span></code>.</p>
+</li>
+<li><p class="first">Supported caching select result with function call. Now, most of
+existing functions supports this feature. There are two exception,
+when <code class="docutils literal"><span class="pre">now()</span></code> and <code class="docutils literal"><span class="pre">rand()</span></code> are used in query, select result will
+not cached. Because of this default behavior change, new APIs are
+introduced.</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">grn_proc_set_is_stable()</span></code></li>
+<li><code class="docutils literal"><span class="pre">grn_proc_is_stable()</span></code></li>
+</ul>
+<p>Note that if you add a new function that may return different result
+with the same argument, you must call <code class="docutils literal"><span class="pre">grn_proc_is_stable(ctx,</span>
+<span class="pre">proc,</span> <span class="pre">GRN_FALSE)</span></code>.  If you don't call it, select result with the
+function call is cached and is wrong result for multiple requests.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="fixes">
+<h3>Fixes<a class="headerlink" href="#fixes" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p class="first">[windows] Fixed to clean up file handle correctly on failure when
+<code class="docutils literal"><span class="pre">database_unmap</span></code> is executed. There is a case that critical
+section is not initialized when request is canceled before executing
+<code class="docutils literal"><span class="pre">database_unmap</span></code>. In such a case, it caused a crach bug.</p>
+</li>
+<li><p class="first">[<a class="reference internal" href="reference/tokenizers.html"><span class="doc">Tokenizers</span></a>] Fixed document for wrong tokenizer
+names. It should be <code class="docutils literal"><span class="pre">TokenBigramIgnoreBlankSplitSymbolAlpha</span></code> and
+<code class="docutils literal"><span class="pre">TokenBigramIgnoreBlankSplitSymbolAlphaDigit</span></code>.</p>
+</li>
+<li><p class="first">Changed not to keep created empty file on error.</p>
+<p>In the previous versions, there is a case that empty file keeps
+remain on error.</p>
+<p>Here is the senario to reproduce:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>creating new file by grn_fileinfo_open succeeds</li>
+<li>mapping file by DO_MAP() is failed</li>
+</ol>
+</div></blockquote>
+<p>In such a case, it causes an another error such as
+&quot;already file exists&quot; because of the file which
+isn't under control. so these file should be removed during
+cleanup process.</p>
+</li>
+<li><p class="first">Fixed a bug that Groonga may be crashed when search process is
+executed during executing many updates in a short time.</p>
+</li>
+<li><p class="first">[<a class="reference internal" href="reference/commands/table_create.html"><span class="doc">table_create</span></a>] Fixed a bug that
+<code class="docutils literal"><span class="pre">table_create</span></code> failed when there are many deleted keys.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="release-7-0-6-2017-08-29">
+<span id="release-7-0-6"></span><h2>Release 7.0.6 - 2017-08-29<a class="headerlink" href="#release-7-0-6-2017-08-29" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>Improvements<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Supported prefix match search using multiple
 indexes. (e.g. <code class="docutils literal"><span class="pre">--query</span> <span class="pre">&quot;Foo*&quot;</span> <span class="pre">--match_columns</span>
@@ -116,8 +184,8 @@ improved.</li>
 <li>[httpd] Updated bundled nginx to 1.13.4.</li>
 </ul>
 </div>
-<div class="section" id="fixes">
-<h3>Fixes<a class="headerlink" href="#fixes" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id2">
+<h3>Fixes<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>[<a class="reference internal" href="reference/commands/dump.html"><span class="doc">dump</span></a>] Fixed a bug that the 7-th unnamed
 parameter for <cite>--sort_hash_table</cite> option is ignored.</li>
@@ -138,8 +206,8 @@ returned syntax error. [GitHub#751] [Patch by ryo-pinus]</li>
 </div>
 <div class="section" id="release-7-0-5-2017-07-29">
 <span id="release-7-0-5"></span><h2>Release 7.0.5 - 2017-07-29<a class="headerlink" href="#release-7-0-5-2017-07-29" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id1">
-<h3>Improvements<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id3">
+<h3>Improvements<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>[httpd] Updated bundled nginx to 1.13.3. Note that this version
 contains security fix for CVE-2017-7529.</li>
@@ -181,8 +249,8 @@ build from source.</li>
 Yak) support. It has reached EOL at July 20, 2017.</li>
 </ul>
 </div>
-<div class="section" id="id2">
-<h3>Fixes<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id4">
+<h3>Fixes<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Fixed to construct correct fulltext indexes against vector column
 which type belongs to text family (<code class="docutils literal"><span class="pre">`ShortText</span></code> and so on). This
@@ -196,8 +264,8 @@ mismatch blocked restarting groonga-httpd. [GitHub#743] [Reported by
 sozaki]</li>
 </ul>
 </div>
-<div class="section" id="id3">
-<h3>Thanks<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id5">
+<h3>Thanks<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Naoya Murakami</li>
 </ul>
@@ -205,8 +273,8 @@ sozaki]</li>
 </div>
 <div class="section" id="release-7-0-4-2017-06-29">
 <span id="release-7-0-4"></span><h2>Release 7.0.4 - 2017-06-29<a class="headerlink" href="#release-7-0-4-2017-06-29" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id4">
-<h3>Improvements<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id6">
+<h3>Improvements<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Added physical create/delete operation logs to identify problem for
 troubleshooting. [GitHub#700,#701]</li>
@@ -233,8 +301,8 @@ orphan &quot;inspect&quot; object. The orphaned &quot;inspect&quot; object is cr
 renamed command name from <code class="docutils literal"><span class="pre">inspect</span></code> to <code class="docutils literal"><span class="pre">object_inspect</span></code>.</li>
 </ul>
 </div>
-<div class="section" id="id5">
-<h3>Fixes<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id7">
+<h3>Fixes<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>[rpm][centos] Fixed unexpected macro expansion problem with
 customized build. This bug only affects when rebuilding Groonga SRPM
@@ -244,17 +312,14 @@ file.</li>
 possibility of crash bug when indexes are broken. [GitHub#699]</li>
 </ul>
 </div>
-<div class="section" id="id6">
-<h3>Thanks<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id8">
+<h3>Thanks<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
 </div>
 </div>
 <div class="section" id="release-7-0-3-2017-05-29">
 <span id="release-7-0-3"></span><h2>Release 7.0.3 - 2017-05-29<a class="headerlink" href="#release-7-0-3-2017-05-29" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id7">
-<h3>Improvements<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
-</div>
-<div class="section" id="id8">
-<h3>Fixes<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id9">
+<h3>Improvements<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>[<a class="reference internal" href="reference/commands/select.html"><span class="doc">select</span></a>] Add document about
 <a class="reference internal" href="tutorial/match_columns.html#full-text-search-with-specific-index-name"><span class="std std-ref">Full text search with specific index name</span></a>.</li>
@@ -277,8 +342,8 @@ Supported Apache Arrow. [GitHub#691]</li>
 </li>
 </ul>
 </div>
-<div class="section" id="id9">
-<h3>Fixes<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id10">
+<h3>Fixes<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>[<a class="reference internal" href="reference/commands/delete.html"><span class="doc">delete</span></a>] Fixed a bug that error isn't
 cleared correctly. It affects to following deletions so that it
@@ -296,8 +361,8 @@ Murakami]</li>
 min. [GitHub#698]</li>
 </ul>
 </div>
-<div class="section" id="id10">
-<h3>Thanks<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id11">
+<h3>Thanks<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Sergei Golubchik</li>
 <li>Naoya Murakami</li>
@@ -306,8 +371,8 @@ min. [GitHub#698]</li>
 </div>
 <div class="section" id="release-7-0-2-2017-04-29">
 <span id="release-7-0-2"></span><h2>Release 7.0.2 - 2017-04-29<a class="headerlink" href="#release-7-0-2-2017-04-29" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id11">
-<h3>Improvements<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id12">
+<h3>Improvements<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>[<a class="reference internal" href="reference/commands/logical_select.html"><span class="doc">logical_select</span></a>] Supported multiple
 <a class="reference internal" href="reference/commands/logical_select.html#logical-select-drilldowns-label-columns-name-window-sort-keys"><span class="std std-ref">drilldowns[${LABEL}].columns[${NAME}].window.sort_keys</span></a>
@@ -341,8 +406,8 @@ existing table as condition patterns.</li>
 support because of EOL.</li>
 </ul>
 </div>
-<div class="section" id="id12">
-<h3>Fixes<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id13">
+<h3>Fixes<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>[<a class="reference internal" href="reference/commands/logical_select.html"><span class="doc">logical_select</span></a>] Fixed a bug that wrong
 cache is used. This bug was occurred when dynamic column parameter
@@ -359,8 +424,8 @@ running as another user. [GitHub ranguba/groonga-client#12]</li>
 </div>
 <div class="section" id="release-7-0-1-2017-03-29">
 <span id="release-7-0-1"></span><h2>Release 7.0.1 - 2017-03-29<a class="headerlink" href="#release-7-0-1-2017-03-29" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id13">
-<h3>Improvements<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id14">
+<h3>Improvements<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Exported the following API<ul>
 <li>grn_ii_cursor_next_pos()</li>
@@ -438,8 +503,8 @@ create a new vector.</li>
 <code class="docutils literal"><span class="pre">drilldown_filter</span></code>.</li>
 </ul>
 </div>
-<div class="section" id="id14">
-<h3>Fixes<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id15">
+<h3>Fixes<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>[<a class="reference internal" href="reference/commands/lock_clear.html"><span class="doc">lock_clear</span></a>] Fixed a crash bug against
 temporary database.</li>
@@ -455,8 +520,8 @@ crash bug by access violation.</li>
 when the max number of threads is 1.</li>
 </ul>
 </div>
-<div class="section" id="id15">
-<h3>Thanks<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id16">
+<h3>Thanks<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Gurunavi, Inc.</li>
 </ul>
@@ -464,8 +529,8 @@ when the max number of threads is 1.</li>
 </div>
 <div class="section" id="release-7-0-0-2017-02-09">
 <span id="release-7-0-0"></span><h2>Release 7.0.0 - 2017-02-09<a class="headerlink" href="#release-7-0-0-2017-02-09" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id16">
-<h3>Improvements<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id17">
+<h3>Improvements<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>[<a class="reference internal" href="reference/functions/in_values.html"><span class="doc">in_values</span></a>] Supported sequential search
 for reference vector column. [Patch by Naoya Murakami] [GitHub#629]</li>
@@ -509,8 +574,8 @@ type of table key are also contained in error message.</li>
 <li>[httpd] Updated bundled nginx to 1.11.9.</li>
 </ul>
 </div>
-<div class="section" id="id17">
-<h3>Fixes<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id18">
+<h3>Fixes<a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Fixed a bug that nonexistent sort keys for <code class="docutils literal"><span class="pre">drilldowns[LABEL]</span></code> or
 <code class="docutils literal"><span class="pre">slices[LABEL]</span></code> causes invalid JSON parse error. [Patch by Naoya
@@ -527,8 +592,8 @@ bug that arguments for window function is not correctly
 passed. [GitHub#634][Patch by Naoya Murakami]</li>
 </ul>
 </div>
-<div class="section" id="id18">
-<h3>Thanks<a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id19">
+<h3>Thanks<a class="headerlink" href="#id19" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Naoya Murakami</li>
 <li>aomi-n</li>
@@ -688,46 +753,50 @@ passed. [GitHub#634][Patch by Naoya Murakami]</li>
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">News</a><ul>
-<li><a class="reference internal" href="#release-7-0-6-2017-08-29">Release 7.0.6 - 2017-08-29</a><ul>
+<li><a class="reference internal" href="#release-7-0-7-2017-09-29">Release 7.0.7 - 2017-09-29</a><ul>
 <li><a class="reference internal" href="#improvements">Improvements</a></li>
 <li><a class="reference internal" href="#fixes">Fixes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#release-7-0-6-2017-08-29">Release 7.0.6 - 2017-08-29</a><ul>
+<li><a class="reference internal" href="#id1">Improvements</a></li>
+<li><a class="reference internal" href="#id2">Fixes</a></li>
 <li><a class="reference internal" href="#thanks">Thanks</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#release-7-0-5-2017-07-29">Release 7.0.5 - 2017-07-29</a><ul>
-<li><a class="reference internal" href="#id1">Improvements</a></li>
-<li><a class="reference internal" href="#id2">Fixes</a></li>
-<li><a class="reference internal" href="#id3">Thanks</a></li>
+<li><a class="reference internal" href="#id3">Improvements</a></li>
+<li><a class="reference internal" href="#id4">Fixes</a></li>
+<li><a class="reference internal" href="#id5">Thanks</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#release-7-0-4-2017-06-29">Release 7.0.4 - 2017-06-29</a><ul>
-<li><a class="reference internal" href="#id4">Improvements</a></li>
-<li><a class="reference internal" href="#id5">Fixes</a></li>
-<li><a class="reference internal" href="#id6">Thanks</a></li>
+<li><a class="reference internal" href="#id6">Improvements</a></li>
+<li><a class="reference internal" href="#id7">Fixes</a></li>
+<li><a class="reference internal" href="#id8">Thanks</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#release-7-0-3-2017-05-29">Release 7.0.3 - 2017-05-29</a><ul>
-<li><a class="reference internal" href="#id7">Improvements</a></li>
-<li><a class="reference internal" href="#id8">Fixes</a></li>
-<li><a class="reference internal" href="#id9">Fixes</a></li>
-<li><a class="reference internal" href="#id10">Thanks</a></li>
+<li><a class="reference internal" href="#id9">Improvements</a></li>
+<li><a class="reference internal" href="#id10">Fixes</a></li>
+<li><a class="reference internal" href="#id11">Thanks</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#release-7-0-2-2017-04-29">Release 7.0.2 - 2017-04-29</a><ul>
-<li><a class="reference internal" href="#id11">Improvements</a></li>
-<li><a class="reference internal" href="#id12">Fixes</a></li>
+<li><a class="reference internal" href="#id12">Improvements</a></li>
+<li><a class="reference internal" href="#id13">Fixes</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#release-7-0-1-2017-03-29">Release 7.0.1 - 2017-03-29</a><ul>
-<li><a class="reference internal" href="#id13">Improvements</a></li>
-<li><a class="reference internal" href="#id14">Fixes</a></li>
-<li><a class="reference internal" href="#id15">Thanks</a></li>
+<li><a class="reference internal" href="#id14">Improvements</a></li>
+<li><a class="reference internal" href="#id15">Fixes</a></li>
+<li><a class="reference internal" href="#id16">Thanks</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#release-7-0-0-2017-02-09">Release 7.0.0 - 2017-02-09</a><ul>
-<li><a class="reference internal" href="#id16">Improvements</a></li>
-<li><a class="reference internal" href="#id17">Fixes</a></li>
-<li><a class="reference internal" href="#id18">Thanks</a></li>
+<li><a class="reference internal" href="#id17">Improvements</a></li>
+<li><a class="reference internal" href="#id18">Fixes</a></li>
+<li><a class="reference internal" href="#id19">Thanks</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#the-old-releases">The old releases</a></li>
@@ -762,7 +831,7 @@ passed. [GitHub#634][Patch by Naoya Murakami]</li>
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
-        <li class="nav-item nav-item-0"><a href="index.html">Groonga v7.0.6 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Groonga v7.0.7 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

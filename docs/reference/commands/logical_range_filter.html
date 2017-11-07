@@ -93,7 +93,27 @@
 <div class="versionadded">
 <p><span class="versionmodified">New in version 5.0.0.</span></p>
 </div>
-<p>TODO: Write summary</p>
+<p><code class="docutils literal"><span class="pre">logical_range_filter</span></code> is a sharding version of
+<a class="reference internal" href="range_filter.html"><span class="doc">range_filter</span></a>. <code class="docutils literal"><span class="pre">logical_range_filter</span></code> searches records from
+multiple tables and outputs them.</p>
+<p><code class="docutils literal"><span class="pre">logical_range_filter</span></code> is similar to <a class="reference internal" href="logical_select.html"><span class="doc">logical_select</span></a>. Both of
+them searches records from multiples tables and outputs
+them. <code class="docutils literal"><span class="pre">logical_range_filter</span></code> stops searching when the number of
+matched records is requested the number of
+records. <a class="reference internal" href="logical_select.html"><span class="doc">logical_select</span></a> searches all records and outputs only
+needed records.</p>
+<p><code class="docutils literal"><span class="pre">logical_range_filter</span></code> has performance merit but some restrictions.</p>
+<p>If many records are matched and requested records are small,
+<code class="docutils literal"><span class="pre">logical_range_filter</span></code> will be faster than <a class="reference internal" href="logical_select.html"><span class="doc">logical_select</span></a>.</p>
+<p><code class="docutils literal"><span class="pre">logical_range_filter</span></code> doesn't support drilldown because drilldown
+requires all matched records. <code class="docutils literal"><span class="pre">logical_range_filter</span></code> may not find
+all matched records. So <code class="docutils literal"><span class="pre">logical_range_filter</span></code> doesn't support
+drilldown.</p>
+<p><code class="docutils literal"><span class="pre">logical_range_filter</span></code> doesn't return the number of all matched
+records. Because <code class="docutils literal"><span class="pre">logical_range_filter</span></code> may not search all matched
+records.</p>
+<p>You need to <a class="reference internal" href="plugin_register.html"><span class="doc">plugin_register</span></a> <code class="docutils literal"><span class="pre">sharding</span></code> plugin because
+this command is included in <code class="docutils literal"><span class="pre">sharding</span></code> plugin.</p>
 </div>
 <div class="section" id="syntax">
 <h2>7.3.33.2. Syntax<a class="headerlink" href="#syntax" title="Permalink to this headline">¶</a></h2>
@@ -123,11 +143,150 @@ must specify parameter name.</p>
 <li><code class="docutils literal"><span class="pre">cache=no</span></code></li>
 </ul>
 </div></blockquote>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 7.0.9: </span>This command has the following named parameters for dynamic columns:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">columns[${NAME}].stage=null</span></code></li>
+<li><code class="docutils literal"><span class="pre">columns[${NAME}].flags=COLUMN_SCALAR</span></code></li>
+<li><code class="docutils literal"><span class="pre">columns[${NAME}].type=null</span></code></li>
+<li><code class="docutils literal"><span class="pre">columns[${NAME}].value=null</span></code></li>
+<li><code class="docutils literal"><span class="pre">columns[${NAME}].window.sort_keys=null</span></code></li>
+<li><code class="docutils literal"><span class="pre">columns[${NAME}].window.group_keys=null</span></code></li>
+</ul>
+</div></blockquote>
+<p>You can use one or more alphabets, digits, <code class="docutils literal"><span class="pre">_</span></code> for <code class="docutils literal"><span class="pre">${NAME}</span></code>. For
+example, <code class="docutils literal"><span class="pre">column1</span></code> is a valid <code class="docutils literal"><span class="pre">${NAME}</span></code>. This is the same rule as
+normal column. See also <a class="reference internal" href="column_create.html#column-create-name"><span class="std std-ref">name</span></a>.</p>
+<p>Parameters that have the same <code class="docutils literal"><span class="pre">${NAME}</span></code> are grouped.</p>
+<p>For example, the following parameters specify one dynamic column:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">--columns[name].stage</span> <span class="pre">initial</span></code></li>
+<li><code class="docutils literal"><span class="pre">--columns[name].type</span> <span class="pre">UInt32</span></code></li>
+<li><code class="docutils literal"><span class="pre">--columns[name].value</span> <span class="pre">29</span></code></li>
+</ul>
+</div></blockquote>
+<p>The following parameters specify two dynamic columns:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">--columns[name1].stage</span> <span class="pre">initial</span></code></li>
+<li><code class="docutils literal"><span class="pre">--columns[name1].type</span> <span class="pre">UInt32</span></code></li>
+<li><code class="docutils literal"><span class="pre">--columns[name1].value</span> <span class="pre">29</span></code></li>
+<li><code class="docutils literal"><span class="pre">--columns[name2].stage</span> <span class="pre">filtered</span></code></li>
+<li><code class="docutils literal"><span class="pre">--columns[name2].type</span> <span class="pre">Float</span></code></li>
+<li><code class="docutils literal"><span class="pre">--columns[name2].value</span> <span class="pre">'_score</span> <span class="pre">*</span> <span class="pre">0.1'</span></code></li>
+</ul>
+</div></blockquote>
+</div>
 </div>
 <div class="section" id="usage">
 <h2>7.3.33.3. Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
-<p>Register <code class="docutils literal"><span class="pre">sharding</span></code> plugin to use <code class="docutils literal"><span class="pre">logical_range_filter</span></code> command in advance.</p>
-<p>TODO: Add examples</p>
+<p>Let's learn about usage with examples. This section shows many popular
+usages.</p>
+<p>You need to register <code class="docutils literal"><span class="pre">sharding</span></code> plugin because this command is
+included in <code class="docutils literal"><span class="pre">sharding</span></code> plugin.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>plugin_register sharding
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>Here are a schema definition and sample data to show usage.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>table_create Entries_20150708 TABLE_HASH_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries_20150708 created_at COLUMN_SCALAR Time
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries_20150708 content COLUMN_SCALAR Text
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries_20150708 n_likes COLUMN_SCALAR UInt32
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries_20150708 tag COLUMN_SCALAR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create Entries_20150709 TABLE_HASH_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries_20150709 created_at COLUMN_SCALAR Time
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries_20150709 content COLUMN_SCALAR Text
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries_20150709 n_likes COLUMN_SCALAR UInt32
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries_20150709 tag COLUMN_SCALAR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create Terms TABLE_PAT_KEY ShortText \
+  --default_tokenizer TokenBigram \
+  --normalizer NormalizerAuto
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Terms entries_key_index_20150708 \
+  COLUMN_INDEX|WITH_POSITION Entries_20150708 _key
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Terms entries_content_index_20150708 \
+  COLUMN_INDEX|WITH_POSITION Entries_20150708 content
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Terms entries_key_index_20150709 \
+  COLUMN_INDEX|WITH_POSITION Entries_20150709 _key
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Terms entries_content_index_20150709 \
+  COLUMN_INDEX|WITH_POSITION Entries_20150709 content
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+load --table Entries_20150708
+[
+{&quot;_key&quot;:       &quot;The first post!&quot;,
+ &quot;created_at&quot;: &quot;2015/07/08 00:00:00&quot;,
+ &quot;content&quot;:    &quot;Welcome! This is my first post!&quot;,
+ &quot;n_likes&quot;:    5,
+ &quot;tag&quot;:        &quot;Hello&quot;},
+{&quot;_key&quot;:       &quot;Groonga&quot;,
+ &quot;created_at&quot;: &quot;2015/07/08 01:00:00&quot;,
+ &quot;content&quot;:    &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+ &quot;n_likes&quot;:    10,
+ &quot;tag&quot;:        &quot;Groonga&quot;},
+{&quot;_key&quot;:       &quot;Mroonga&quot;,
+ &quot;created_at&quot;: &quot;2015/07/08 02:00:00&quot;,
+ &quot;content&quot;:    &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
+ &quot;n_likes&quot;:    15,
+ &quot;tag&quot;:        &quot;Groonga&quot;}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 3]
+load --table Entries_20150709
+[
+{&quot;_key&quot;:       &quot;Good-bye Senna&quot;,
+ &quot;created_at&quot;: &quot;2015/07/09 00:00:00&quot;,
+ &quot;content&quot;:    &quot;I migrated all Senna system!&quot;,
+ &quot;n_likes&quot;:    3,
+ &quot;tag&quot;:        &quot;Senna&quot;},
+{&quot;_key&quot;:       &quot;Good-bye Tritonn&quot;,
+ &quot;created_at&quot;: &quot;2015/07/09 01:00:00&quot;,
+ &quot;content&quot;:    &quot;I also migrated all Tritonn system!&quot;,
+ &quot;n_likes&quot;:    3,
+ &quot;tag&quot;:        &quot;Senna&quot;}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 2]
+</pre></div>
+</div>
+<p>There are two tables, <code class="docutils literal"><span class="pre">Entries_20150708</span></code> and <code class="docutils literal"><span class="pre">Entries_20150709</span></code>,
+for blog entries.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">You need to use <code class="docutils literal"><span class="pre">${LOGICAL_TABLE_NAME}_${YYYYMMDD}</span></code> naming rule
+for table names. In this example, <code class="docutils literal"><span class="pre">LOGICAL_TABLE_NAME</span></code> is
+<code class="docutils literal"><span class="pre">Entries</span></code> and <code class="docutils literal"><span class="pre">YYYYMMDD</span></code> is <code class="docutils literal"><span class="pre">20150708</span></code> or <code class="docutils literal"><span class="pre">20150709</span></code>.</p>
+</div>
+<p>An entry has title, created time, content, the number of likes for the
+entry and tag. Title is key of <code class="docutils literal"><span class="pre">Entries_YYYYMMDD</span></code>. Created time is
+value of <code class="docutils literal"><span class="pre">Entries_YYYYMMDD.created_at</span></code> column. Content is value of
+<code class="docutils literal"><span class="pre">Entries_YYYYMMDD.content</span></code> column. The number of likes is value of
+<code class="docutils literal"><span class="pre">Entries_YYYYMMDD.n_likes</span></code> column. Tag is value of
+<code class="docutils literal"><span class="pre">Entries_YYYYMMDD.tag</span></code> column.</p>
+<p><code class="docutils literal"><span class="pre">Entries_YYYYMMDD._key</span></code> column and <code class="docutils literal"><span class="pre">Entries_YYYYMMDD.content</span></code>
+column are indexed using <code class="docutils literal"><span class="pre">TokenBigram</span></code> tokenizer. So both
+<code class="docutils literal"><span class="pre">Entries_YYYYMMDD._key</span></code> and <code class="docutils literal"><span class="pre">Entries_YYYYMMDD.content</span></code> are
+fulltext search ready.</p>
+<p>OK. The schema and data for examples are ready.</p>
+<div class="section" id="simple-usage">
+<h3>7.3.33.3.1. Simple usage<a class="headerlink" href="#simple-usage" title="Permalink to this headline">¶</a></h3>
+<p>TODO</p>
+</div>
 </div>
 <div class="section" id="parameters">
 <h2>7.3.33.4. Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
@@ -137,8 +296,10 @@ must specify parameter name.</p>
 <p>There are required parameters, <code class="docutils literal"><span class="pre">logical_table</span></code> and <code class="docutils literal"><span class="pre">shard_key</span></code>.</p>
 <div class="section" id="logical-table">
 <h4>7.3.33.4.1.1. <code class="docutils literal"><span class="pre">logical_table</span></code><a class="headerlink" href="#logical-table" title="Permalink to this headline">¶</a></h4>
-<p>Specifies logical table name. It means table name without &quot;_YYYYMMDD&quot; postfix.
-If you use actual table such as &quot;Logs_20150203&quot;, &quot;Logs_20150203&quot; and so on, logical table name is &quot;Logs&quot;.</p>
+<p>Specifies logical table name. It means table name without
+<code class="docutils literal"><span class="pre">_YYYYMMDD</span></code> postfix.  If you use actual table such as
+<code class="docutils literal"><span class="pre">Logs_20150203</span></code>, <code class="docutils literal"><span class="pre">Logs_20150203</span></code> and so on, logical table name is
+<code class="docutils literal"><span class="pre">Logs</span></code>.</p>
 <p>TODO: Add examples</p>
 </div>
 <div class="section" id="shard-key">
@@ -180,29 +341,713 @@ Specify <code class="docutils literal"><span class="pre">include</span></code> o
 <h4>7.3.33.4.2.6. <code class="docutils literal"><span class="pre">filter</span></code><a class="headerlink" href="#filter" title="Permalink to this headline">¶</a></h4>
 <p>TODO</p>
 </div>
+</div>
+<div class="section" id="output-related-parameters">
+<h3>7.3.33.4.3. Output related parameters<a class="headerlink" href="#output-related-parameters" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="output-columns">
+<span id="logical-range-filter-output-columns"></span><h4>7.3.33.4.3.1. <code class="docutils literal"><span class="pre">output_columns</span></code><a class="headerlink" href="#output-columns" title="Permalink to this headline">¶</a></h4>
+<p>Corresponds to <a class="reference internal" href="select.html#select-output-columns"><span class="std std-ref">output_columns</span></a> in <a class="reference internal" href="select.html"><span class="doc">select</span></a>. See
+<a class="reference internal" href="select.html#select-output-columns"><span class="std std-ref">output_columns</span></a> for details.</p>
+<p>Here is an example:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_range_filter \
+  --logical_table Entries \
+  --shard_key created_at \
+  --output_columns &#39;_key, *&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         &quot;_key&quot;,
+#         &quot;ShortText&quot;
+#       ],
+#       [
+#         &quot;content&quot;,
+#         &quot;Text&quot;
+#       ],
+#       [
+#         &quot;created_at&quot;,
+#         &quot;Time&quot;
+#       ],
+#       [
+#         &quot;n_likes&quot;,
+#         &quot;UInt32&quot;
+#       ],
+#       [
+#         &quot;tag&quot;,
+#         &quot;ShortText&quot;
+#       ]
+#     ],
+#     [
+#       &quot;The first post!&quot;,
+#       &quot;Welcome! This is my first post!&quot;,
+#       1436281200.0,
+#       5,
+#       &quot;Hello&quot;
+#     ],
+#     [
+#       &quot;Groonga&quot;,
+#       &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+#       1436284800.0,
+#       10,
+#       &quot;Groonga&quot;
+#     ],
+#     [
+#       &quot;Mroonga&quot;,
+#       &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
+#       1436288400.0,
+#       15,
+#       &quot;Groonga&quot;
+#     ],
+#     [
+#       &quot;Good-bye Senna&quot;,
+#       &quot;I migrated all Senna system!&quot;,
+#       1436367600.0,
+#       3,
+#       &quot;Senna&quot;
+#     ],
+#     [
+#       &quot;Good-bye Tritonn&quot;,
+#       &quot;I also migrated all Tritonn system!&quot;,
+#       1436371200.0,
+#       3,
+#       &quot;Senna&quot;
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
 <div class="section" id="offset">
-<h4>7.3.33.4.2.7. <code class="docutils literal"><span class="pre">offset</span></code><a class="headerlink" href="#offset" title="Permalink to this headline">¶</a></h4>
-<p>TODO</p>
+<span id="logical-range-filter-offset"></span><h4>7.3.33.4.3.2. <code class="docutils literal"><span class="pre">offset</span></code><a class="headerlink" href="#offset" title="Permalink to this headline">¶</a></h4>
+<p>Corresponds to <a class="reference internal" href="select.html#select-offset"><span class="std std-ref">offset</span></a> in <a class="reference internal" href="select.html"><span class="doc">select</span></a>. See
+<a class="reference internal" href="select.html#select-offset"><span class="std std-ref">offset</span></a> for details.</p>
+<p>Here is an example:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_range_filter \
+  --logical_table Entries \
+  --shard_key created_at \
+  --offset 2
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         &quot;_key&quot;,
+#         &quot;ShortText&quot;
+#       ],
+#       [
+#         &quot;content&quot;,
+#         &quot;Text&quot;
+#       ],
+#       [
+#         &quot;created_at&quot;,
+#         &quot;Time&quot;
+#       ],
+#       [
+#         &quot;n_likes&quot;,
+#         &quot;UInt32&quot;
+#       ],
+#       [
+#         &quot;tag&quot;,
+#         &quot;ShortText&quot;
+#       ]
+#     ],
+#     [
+#       &quot;Mroonga&quot;,
+#       &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
+#       1436288400.0,
+#       15,
+#       &quot;Groonga&quot;
+#     ],
+#     [
+#       &quot;Good-bye Senna&quot;,
+#       &quot;I migrated all Senna system!&quot;,
+#       1436367600.0,
+#       3,
+#       &quot;Senna&quot;
+#     ],
+#     [
+#       &quot;Good-bye Tritonn&quot;,
+#       &quot;I also migrated all Tritonn system!&quot;,
+#       1436371200.0,
+#       3,
+#       &quot;Senna&quot;
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
 </div>
 <div class="section" id="limit">
-<h4>7.3.33.4.2.8. <code class="docutils literal"><span class="pre">limit</span></code><a class="headerlink" href="#limit" title="Permalink to this headline">¶</a></h4>
-<p>TODO</p>
+<span id="logical-range-filter-limit"></span><h4>7.3.33.4.3.3. <code class="docutils literal"><span class="pre">limit</span></code><a class="headerlink" href="#limit" title="Permalink to this headline">¶</a></h4>
+<p>Corresponds to <a class="reference internal" href="select.html#select-limit"><span class="std std-ref">limit</span></a> in <a class="reference internal" href="select.html"><span class="doc">select</span></a>. See
+<a class="reference internal" href="select.html#select-limit"><span class="std std-ref">limit</span></a> for details.</p>
+<p>The difference from <a class="reference internal" href="select.html"><span class="doc">select</span></a> is that this command stops searching
+when all requested records specified by
+<a class="reference internal" href="#logical-range-filter-offset"><span class="std std-ref">offset</span></a> and
+<a class="reference internal" href="#logical-range-filter-limit"><span class="std std-ref">limit</span></a> are found.</p>
+<p>Here is an example:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_range_filter \
+  --logical_table Entries \
+  --shard_key created_at \
+  --limit 2
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         &quot;_key&quot;,
+#         &quot;ShortText&quot;
+#       ],
+#       [
+#         &quot;content&quot;,
+#         &quot;Text&quot;
+#       ],
+#       [
+#         &quot;created_at&quot;,
+#         &quot;Time&quot;
+#       ],
+#       [
+#         &quot;n_likes&quot;,
+#         &quot;UInt32&quot;
+#       ],
+#       [
+#         &quot;tag&quot;,
+#         &quot;ShortText&quot;
+#       ]
+#     ],
+#     [
+#       &quot;The first post!&quot;,
+#       &quot;Welcome! This is my first post!&quot;,
+#       1436281200.0,
+#       5,
+#       &quot;Hello&quot;
+#     ],
+#     [
+#       &quot;Groonga&quot;,
+#       &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+#       1436284800.0,
+#       10,
+#       &quot;Groonga&quot;
+#     ]
+#   ]
+# ]
+</pre></div>
 </div>
-<div class="section" id="output-columns">
-<h4>7.3.33.4.2.9. <code class="docutils literal"><span class="pre">output_columns</span></code><a class="headerlink" href="#output-columns" title="Permalink to this headline">¶</a></h4>
-<p>TODO</p>
 </div>
+</div>
+<div class="section" id="test-related-parameters">
+<h3>7.3.33.4.4. Test related parameters<a class="headerlink" href="#test-related-parameters" title="Permalink to this headline">¶</a></h3>
 <div class="section" id="use-range-index">
-<h4>7.3.33.4.2.10. <code class="docutils literal"><span class="pre">use_range_index</span></code><a class="headerlink" href="#use-range-index" title="Permalink to this headline">¶</a></h4>
+<h4>7.3.33.4.4.1. <code class="docutils literal"><span class="pre">use_range_index</span></code><a class="headerlink" href="#use-range-index" title="Permalink to this headline">¶</a></h4>
 <p>Specifies whether range_index is used or not.
 Note that it's a parameter for test. It should not be used for production.</p>
 <p>TODO: Add examples</p>
 </div>
 </div>
+<div class="section" id="dynamic-column-related-parameters">
+<span id="logical-range-filter-dynamic-column-related-parameters"></span><h3>7.3.33.4.5. Dynamic column related parameters<a class="headerlink" href="#dynamic-column-related-parameters" title="Permalink to this headline">¶</a></h3>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 7.0.9.</span></p>
+</div>
+<p>All dynamic column related parameters in <a class="reference internal" href="select.html"><span class="doc">select</span></a> are
+supported. See <a class="reference internal" href="select.html#select-dynamic-column-related-parameters"><span class="std std-ref">Dynamic column related parameters</span></a> for
+details.</p>
+<p>If you use one or more dynamic columns, &quot;stop searching when enough
+records are matched in a table&quot; feature is disabled. (&quot;Stop searching
+against rest tables when enough records are matched&quot; is still
+enabled.)  <code class="docutils literal"><span class="pre">logical_range_filter</span></code> searches all matched records in a
+table even when requested the number of matched records is small. It's
+for supporting window function. Running window function requires all
+target records in a table.</p>
+<div class="section" id="columns-name-stage">
+<span id="logical-range-filter-columns-name-stage"></span><h4>7.3.33.4.5.1. <code class="docutils literal"><span class="pre">columns[${NAME}].stage</span></code><a class="headerlink" href="#columns-name-stage" title="Permalink to this headline">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 7.0.9.</span></p>
+</div>
+<p>Corresponds to <a class="reference internal" href="select.html#select-columns-name-stage"><span class="std std-ref">columns[${NAME}].stage</span></a> in <a class="reference internal" href="select.html"><span class="doc">select</span></a>. See
+<a class="reference internal" href="select.html#select-columns-name-stage"><span class="std std-ref">columns[${NAME}].stage</span></a> for details.</p>
+<p>This is a required parameter.</p>
+<p>Here is an example that creates <code class="docutils literal"><span class="pre">is_popular</span></code> column at <code class="docutils literal"><span class="pre">initial</span></code>
+stage. You can use <code class="docutils literal"><span class="pre">is_popular</span></code> in all parameters such as <code class="docutils literal"><span class="pre">filter</span></code>
+and <code class="docutils literal"><span class="pre">output_columns</span></code>:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_range_filter \
+  --logical_table Entries \
+  --shard_key created_at \
+  --columns[is_popular].stage initial \
+  --columns[is_popular].type Bool \
+  --columns[is_popular].value &#39;n_likes &gt;= 10&#39; \
+  --filter is_popular \
+  --output_columns _id,is_popular,n_likes
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         &quot;_id&quot;,
+#         &quot;UInt32&quot;
+#       ],
+#       [
+#         &quot;is_popular&quot;,
+#         &quot;Bool&quot;
+#       ],
+#       [
+#         &quot;n_likes&quot;,
+#         &quot;UInt32&quot;
+#       ]
+#     ],
+#     [
+#       2,
+#       true,
+#       10
+#     ],
+#     [
+#       3,
+#       true,
+#       15
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
+<div class="section" id="columns-name-flags">
+<span id="logical-range-filter-columns-name-flags"></span><h4>7.3.33.4.5.2. <code class="docutils literal"><span class="pre">columns[${NAME}].flags</span></code><a class="headerlink" href="#columns-name-flags" title="Permalink to this headline">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 7.0.9.</span></p>
+</div>
+<p>Corresponds to <a class="reference internal" href="select.html#select-columns-name-flags"><span class="std std-ref">columns[${NAME}].flags</span></a> in <a class="reference internal" href="select.html"><span class="doc">select</span></a>. See
+<a class="reference internal" href="select.html#select-columns-name-flags"><span class="std std-ref">columns[${NAME}].flags</span></a> for details.</p>
+<p>The default value is <code class="docutils literal"><span class="pre">COLUMN_SCALAR</span></code>.</p>
+<p>Here is an example that creates a vector column by <code class="docutils literal"><span class="pre">COLUMN_VECTOR</span></code>
+flags. <code class="docutils literal"><span class="pre">plugin_register</span> <span class="pre">functions/vector</span></code> is for using
+<a class="reference internal" href="../functions/vector_new.html"><span class="doc">vector_new</span></a> function:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>plugin_register functions/vector
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+logical_range_filter \
+  --logical_table Entries \
+  --shard_key created_at \
+  --columns[vector].stage initial \
+  --columns[vector].flags COLUMN_VECTOR \
+  --columns[vector].type UInt32 \
+  --columns[vector].value &#39;vector_new(1, 2, 3)&#39; \
+  --output_columns _id,vector
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         &quot;_id&quot;,
+#         &quot;UInt32&quot;
+#       ],
+#       [
+#         &quot;vector&quot;,
+#         &quot;UInt32&quot;
+#       ]
+#     ],
+#     [
+#       1,
+#       [
+#         1,
+#         2,
+#         3
+#       ]
+#     ],
+#     [
+#       2,
+#       [
+#         1,
+#         2,
+#         3
+#       ]
+#     ],
+#     [
+#       3,
+#       [
+#         1,
+#         2,
+#         3
+#       ]
+#     ],
+#     [
+#       1,
+#       [
+#         1,
+#         2,
+#         3
+#       ]
+#     ],
+#     [
+#       2,
+#       [
+#         1,
+#         2,
+#         3
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
+<div class="section" id="columns-name-type">
+<span id="logical-range-filter-columns-name-type"></span><h4>7.3.33.4.5.3. <code class="docutils literal"><span class="pre">columns[${NAME}].type</span></code><a class="headerlink" href="#columns-name-type" title="Permalink to this headline">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 7.0.9.</span></p>
+</div>
+<p>Corresponds to <a class="reference internal" href="select.html#select-columns-name-type"><span class="std std-ref">columns[${NAME}].type</span></a> in <a class="reference internal" href="select.html"><span class="doc">select</span></a>. See
+<a class="reference internal" href="select.html#select-columns-name-type"><span class="std std-ref">columns[${NAME}].type</span></a> for details.</p>
+<p>This is a required parameter.</p>
+<p>Here is an example that creates a <code class="docutils literal"><span class="pre">ShortText</span></code> type column. Stored
+value is casted to <code class="docutils literal"><span class="pre">ShortText</span></code> automatically. In this example,
+number is casted to <code class="docutils literal"><span class="pre">ShortText</span></code>:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_range_filter \
+  --logical_table Entries \
+  --shard_key created_at \
+  --columns[n_likes_string].stage initial \
+  --columns[n_likes_string].type ShortText \
+  --columns[n_likes_string].value n_likes \
+  --output_columns _id,n_likes,n_likes_string
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         &quot;_id&quot;,
+#         &quot;UInt32&quot;
+#       ],
+#       [
+#         &quot;n_likes&quot;,
+#         &quot;UInt32&quot;
+#       ],
+#       [
+#         &quot;n_likes_string&quot;,
+#         &quot;ShortText&quot;
+#       ]
+#     ],
+#     [
+#       1,
+#       5,
+#       &quot;5&quot;
+#     ],
+#     [
+#       2,
+#       10,
+#       &quot;10&quot;
+#     ],
+#     [
+#       3,
+#       15,
+#       &quot;15&quot;
+#     ],
+#     [
+#       1,
+#       3,
+#       &quot;3&quot;
+#     ],
+#     [
+#       2,
+#       3,
+#       &quot;3&quot;
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
+<div class="section" id="columns-name-value">
+<span id="logical-range-filter-columns-name-value"></span><h4>7.3.33.4.5.4. <code class="docutils literal"><span class="pre">columns[${NAME}].value</span></code><a class="headerlink" href="#columns-name-value" title="Permalink to this headline">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 7.0.9.</span></p>
+</div>
+<p>Corresponds to <a class="reference internal" href="select.html#select-columns-name-value"><span class="std std-ref">columns[${NAME}].value</span></a> in <a class="reference internal" href="select.html"><span class="doc">select</span></a>. See
+<a class="reference internal" href="select.html#select-columns-name-value"><span class="std std-ref">columns[${NAME}].value</span></a> for details.</p>
+<p>You need to specify <a class="reference internal" href="../window_function.html"><span class="doc">Window function</span></a> as <code class="docutils literal"><span class="pre">value</span></code>
+value and other window function related parameters when you use window
+function. See <a class="reference internal" href="#logical-range-filter-window-function-related-parameters"><span class="std std-ref">Window function related parameters</span></a>
+for details.</p>
+<p>This is a required parameter.</p>
+<p>Here is an example that creates a new dynamic column that stores the
+number of characters of content. This example uses
+<a class="reference internal" href="../functions/string_length.html"><span class="doc">string_length</span></a> function in
+<code class="docutils literal"><span class="pre">functions/string</span></code> plugin to compute the number of characters in a
+string. <a class="reference internal" href="plugin_register.html"><span class="doc">plugin_register</span></a> is used to register
+<code class="docutils literal"><span class="pre">functions/string</span></code> plugin:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>plugin_register functions/string
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+logical_range_filter \
+  --logical_table Entries \
+  --shard_key created_at \
+  --columns[content_length].stage initial \
+  --columns[content_length].type UInt32 \
+  --columns[content_length].value &#39;string_length(content)&#39; \
+  --output_columns _id,content,content_length
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         &quot;_id&quot;,
+#         &quot;UInt32&quot;
+#       ],
+#       [
+#         &quot;content&quot;,
+#         &quot;Text&quot;
+#       ],
+#       [
+#         &quot;content_length&quot;,
+#         &quot;UInt32&quot;
+#       ]
+#     ],
+#     [
+#       1,
+#       &quot;Welcome! This is my first post!&quot;,
+#       31
+#     ],
+#     [
+#       2,
+#       &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+#       41
+#     ],
+#     [
+#       3,
+#       &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
+#       64
+#     ],
+#     [
+#       1,
+#       &quot;I migrated all Senna system!&quot;,
+#       28
+#     ],
+#     [
+#       2,
+#       &quot;I also migrated all Tritonn system!&quot;,
+#       35
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="window-function-related-parameters">
+<span id="logical-range-filter-window-function-related-parameters"></span><h3>7.3.33.4.6. Window function related parameters<a class="headerlink" href="#window-function-related-parameters" title="Permalink to this headline">¶</a></h3>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 7.0.9.</span></p>
+</div>
+<p>All window function related parameters in <a class="reference internal" href="select.html"><span class="doc">select</span></a> are
+supported. See <a class="reference internal" href="select.html#select-window-function-related-parameters"><span class="std std-ref">Window function related parameters</span></a> for
+details.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Window function over multiple tables aren't supported yet.</p>
+</div>
+<div class="section" id="columns-name-window-sort-keys">
+<span id="logical-range-filter-columns-name-window-sort-keys"></span><h4>7.3.33.4.6.1. <code class="docutils literal"><span class="pre">columns[${NAME}].window.sort_keys</span></code><a class="headerlink" href="#columns-name-window-sort-keys" title="Permalink to this headline">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 7.0.9.</span></p>
+</div>
+<p>Corresponds to <a class="reference internal" href="select.html#select-columns-name-window-sort-keys"><span class="std std-ref">columns[${NAME}].window.sort_keys</span></a> in
+<a class="reference internal" href="select.html"><span class="doc">select</span></a>. See <a class="reference internal" href="select.html#select-columns-name-window-sort-keys"><span class="std std-ref">columns[${NAME}].window.sort_keys</span></a> for
+details.</p>
+<p>You must specify <a class="reference internal" href="#logical-range-filter-columns-name-window-sort-keys"><span class="std std-ref">columns[${NAME}].window.sort_keys</span></a>
+or <a class="reference internal" href="#logical-range-filter-columns-name-window-group-keys"><span class="std std-ref">columns[${NAME}].window.group_keys</span></a> to use window
+function.</p>
+<p>Here is an example that computes cumulative sum per
+<code class="docutils literal"><span class="pre">Entries.tag</span></code>. Each group is sorted by <code class="docutils literal"><span class="pre">Entries._key</span></code>:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_range_filter \
+  --logical_table Entries \
+  --shard_key created_at \
+  --columns[n_likes_cumulative_sum_per_tag].stage initial \
+  --columns[n_likes_cumulative_sum_per_tag].type UInt32 \
+  --columns[n_likes_cumulative_sum_per_tag].value &#39;window_sum(n_likes)&#39; \
+  --columns[n_likes_cumulative_sum_per_tag].window.sort_keys _key \
+  --columns[n_likes_cumulative_sum_per_tag].window.group_keys tag \
+  --sort_keys _key \
+  --output_columns tag,_key,n_likes,n_likes_cumulative_sum_per_tag
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         &quot;tag&quot;,
+#         &quot;ShortText&quot;
+#       ],
+#       [
+#         &quot;_key&quot;,
+#         &quot;ShortText&quot;
+#       ],
+#       [
+#         &quot;n_likes&quot;,
+#         &quot;UInt32&quot;
+#       ],
+#       [
+#         &quot;n_likes_cumulative_sum_per_tag&quot;,
+#         &quot;UInt32&quot;
+#       ]
+#     ],
+#     [
+#       &quot;Hello&quot;,
+#       &quot;The first post!&quot;,
+#       5,
+#       5
+#     ],
+#     [
+#       &quot;Groonga&quot;,
+#       &quot;Groonga&quot;,
+#       10,
+#       10
+#     ],
+#     [
+#       &quot;Groonga&quot;,
+#       &quot;Mroonga&quot;,
+#       15,
+#       25
+#     ],
+#     [
+#       &quot;Senna&quot;,
+#       &quot;Good-bye Senna&quot;,
+#       3,
+#       3
+#     ],
+#     [
+#       &quot;Senna&quot;,
+#       &quot;Good-bye Tritonn&quot;,
+#       3,
+#       6
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
+<div class="section" id="columns-name-window-group-keys">
+<span id="logical-range-filter-columns-name-window-group-keys"></span><h4>7.3.33.4.6.2. <code class="docutils literal"><span class="pre">columns[${NAME}].window.group_keys</span></code><a class="headerlink" href="#columns-name-window-group-keys" title="Permalink to this headline">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 7.0.9.</span></p>
+</div>
+<p>Corresponds to <a class="reference internal" href="select.html#select-columns-name-window-group-keys"><span class="std std-ref">columns[${NAME}].window.group_keys</span></a> in
+<a class="reference internal" href="select.html"><span class="doc">select</span></a>. See <a class="reference internal" href="select.html#select-columns-name-window-group-keys"><span class="std std-ref">columns[${NAME}].window.group_keys</span></a> for
+details.</p>
+<p>You must specify <a class="reference internal" href="#logical-range-filter-columns-name-window-sort-keys"><span class="std std-ref">columns[${NAME}].window.sort_keys</span></a>
+or <a class="reference internal" href="#logical-range-filter-columns-name-window-group-keys"><span class="std std-ref">columns[${NAME}].window.group_keys</span></a> to use window
+function.</p>
+<p>Here is an example that computes sum per <code class="docutils literal"><span class="pre">Entries.tag</span></code>:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_range_filter \
+  --logical_table Entries \
+  --shard_key created_at \
+  --columns[n_likes_sum_per_tag].stage initial \
+  --columns[n_likes_sum_per_tag].type UInt32 \
+  --columns[n_likes_sum_per_tag].value &#39;window_sum(n_likes)&#39; \
+  --columns[n_likes_sum_per_tag].window.group_keys tag \
+  --sort_keys _key \
+  --output_columns tag,_key,n_likes,n_likes_sum_per_tag
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         &quot;tag&quot;,
+#         &quot;ShortText&quot;
+#       ],
+#       [
+#         &quot;_key&quot;,
+#         &quot;ShortText&quot;
+#       ],
+#       [
+#         &quot;n_likes&quot;,
+#         &quot;UInt32&quot;
+#       ],
+#       [
+#         &quot;n_likes_sum_per_tag&quot;,
+#         &quot;UInt32&quot;
+#       ]
+#     ],
+#     [
+#       &quot;Hello&quot;,
+#       &quot;The first post!&quot;,
+#       5,
+#       5
+#     ],
+#     [
+#       &quot;Groonga&quot;,
+#       &quot;Groonga&quot;,
+#       10,
+#       25
+#     ],
+#     [
+#       &quot;Groonga&quot;,
+#       &quot;Mroonga&quot;,
+#       15,
+#       25
+#     ],
+#     [
+#       &quot;Senna&quot;,
+#       &quot;Good-bye Senna&quot;,
+#       3,
+#       6
+#     ],
+#     [
+#       &quot;Senna&quot;,
+#       &quot;Good-bye Tritonn&quot;,
+#       3,
+#       6
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
+</div>
 <div class="section" id="cache-related-parameter">
-<h3>7.3.33.4.3. Cache related parameter<a class="headerlink" href="#cache-related-parameter" title="Permalink to this headline">¶</a></h3>
+<h3>7.3.33.4.7. Cache related parameter<a class="headerlink" href="#cache-related-parameter" title="Permalink to this headline">¶</a></h3>
 <div class="section" id="cache">
-<span id="logical-range-filter-cache"></span><h4>7.3.33.4.3.1. <code class="docutils literal"><span class="pre">cache</span></code><a class="headerlink" href="#cache" title="Permalink to this headline">¶</a></h4>
+<span id="logical-range-filter-cache"></span><h4>7.3.33.4.7.1. <code class="docutils literal"><span class="pre">cache</span></code><a class="headerlink" href="#cache" title="Permalink to this headline">¶</a></h4>
 <p>Specifies whether caching the result of this query or not.</p>
 <p>If the result of this query is cached, the next same query returns
 response quickly by using the cache.</p>
@@ -228,15 +1073,178 @@ It's the default value.</td>
 </tr>
 </tbody>
 </table>
-<p>TODO: Add examples</p>
+<p>Here is an example to disable caching the result of this query:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_range_filter \
+  --logical_table Entries \
+  --shard_key created_at \
+  --cache no
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         &quot;_key&quot;,
+#         &quot;ShortText&quot;
+#       ],
+#       [
+#         &quot;content&quot;,
+#         &quot;Text&quot;
+#       ],
+#       [
+#         &quot;created_at&quot;,
+#         &quot;Time&quot;
+#       ],
+#       [
+#         &quot;n_likes&quot;,
+#         &quot;UInt32&quot;
+#       ],
+#       [
+#         &quot;tag&quot;,
+#         &quot;ShortText&quot;
+#       ]
+#     ],
+#     [
+#       &quot;The first post!&quot;,
+#       &quot;Welcome! This is my first post!&quot;,
+#       1436281200.0,
+#       5,
+#       &quot;Hello&quot;
+#     ],
+#     [
+#       &quot;Groonga&quot;,
+#       &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+#       1436284800.0,
+#       10,
+#       &quot;Groonga&quot;
+#     ],
+#     [
+#       &quot;Mroonga&quot;,
+#       &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
+#       1436288400.0,
+#       15,
+#       &quot;Groonga&quot;
+#     ],
+#     [
+#       &quot;Good-bye Senna&quot;,
+#       &quot;I migrated all Senna system!&quot;,
+#       1436367600.0,
+#       3,
+#       &quot;Senna&quot;
+#     ],
+#     [
+#       &quot;Good-bye Tritonn&quot;,
+#       &quot;I also migrated all Tritonn system!&quot;,
+#       1436371200.0,
+#       3,
+#       &quot;Senna&quot;
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
 <p>The default value is <code class="docutils literal"><span class="pre">yes</span></code>.</p>
 </div>
 </div>
 </div>
 <div class="section" id="return-value">
 <h2>7.3.33.5. Return value<a class="headerlink" href="#return-value" title="Permalink to this headline">¶</a></h2>
-<p>TODO</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>[HEADER, LOGICAL_FILTERED]
+<p>The command returns a response with the following format:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>[
+  HEADER,
+  [
+    COLUMNS,
+    RECORDS
+  ]
+]
+</pre></div>
+</div>
+<p>If the command fails, error details are in <code class="docutils literal"><span class="pre">HEADER</span></code>.</p>
+<p>See <a class="reference internal" href="../command/output_format.html"><span class="doc">Output format</span></a> for <code class="docutils literal"><span class="pre">HEADER</span></code>.</p>
+<p><code class="docutils literal"><span class="pre">COLUMNS</span></code> describes about output columns specified by
+<a class="reference internal" href="#logical-range-filter-output-columns"><span class="std std-ref">output_columns</span></a>. It uses the following
+format:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>[
+  [COLUMN_NAME_1, COLUMN_TYPE_1],
+  [COLUMN_NAME_2, COLUMN_TYPE_2],
+  ...,
+  [COLUMN_NAME_N, COLUMN_TYPE_N]
+]
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">COLUMNS</span></code> includes one or more output column information. Each
+output column information includes the followings:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Column name as string</li>
+<li>Column type as string or <code class="docutils literal"><span class="pre">null</span></code></li>
+</ul>
+</div></blockquote>
+<p>Column name is extracted from value specified as
+<a class="reference internal" href="#logical-range-filter-output-columns"><span class="std std-ref">output_columns</span></a>.</p>
+<p>Column type is Groonga's type name or <code class="docutils literal"><span class="pre">null</span></code>. It doesn't describe
+whether the column value is vector or scalar. You need to determine it
+by whether real column value is array or not.</p>
+<p>See <a class="reference internal" href="../types.html"><span class="doc">Data types</span></a> for type details.</p>
+<p><code class="docutils literal"><span class="pre">null</span></code> is used when column value type isn't determined. For example,
+function call in <a class="reference internal" href="#logical-range-filter-output-columns"><span class="std std-ref">output_columns</span></a> such as
+<code class="docutils literal"><span class="pre">--output_columns</span> <span class="pre">&quot;snippet_html(content)&quot;</span></code> uses <code class="docutils literal"><span class="pre">null</span></code>.</p>
+<p>Here is an example of <code class="docutils literal"><span class="pre">COLUMNS</span></code>:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>[
+  [&quot;_id&quot;,     &quot;UInt32&quot;],
+  [&quot;_key&quot;,    &quot;ShortText&quot;],
+  [&quot;n_likes&quot;, &quot;UInt32&quot;],
+]
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">RECORDS</span></code> includes column values for each matched record. Included
+records are selected by <a class="reference internal" href="#logical-range-filter-offset"><span class="std std-ref">offset</span></a> and
+<a class="reference internal" href="#logical-range-filter-limit"><span class="std std-ref">limit</span></a>. It uses the following format:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>[
+  [
+    RECORD_1_COLUMN_1,
+    RECORD_1_COLUMN_2,
+    ...,
+    RECORD_1_COLUMN_N
+  ],
+  [
+    RECORD_2_COLUMN_1,
+    RECORD_2_COLUMN_2,
+    ...,
+    RECORD_2_COLUMN_N
+  ],
+  ...
+  [
+    RECORD_N_COLUMN_1,
+    RECORD_N_COLUMN_2,
+    ...,
+    RECORD_N_COLUMN_N
+  ]
+]
+</pre></div>
+</div>
+<p>Here is an example <code class="docutils literal"><span class="pre">RECORDS</span></code>:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>[
+  [
+    1,
+    &quot;The first post!&quot;,
+    5
+  ],
+  [
+    2,
+    &quot;Groonga&quot;,
+    10
+  ],
+  [
+    3,
+    &quot;Mroonga&quot;,
+    15
+  ]
+]
 </pre></div>
 </div>
 </div>
@@ -253,7 +1261,10 @@ It's the default value.</td>
 <li><a class="reference internal" href="#">7.3.33. <code class="docutils literal"><span class="pre">logical_range_filter</span></code></a><ul>
 <li><a class="reference internal" href="#summary">7.3.33.1. Summary</a></li>
 <li><a class="reference internal" href="#syntax">7.3.33.2. Syntax</a></li>
-<li><a class="reference internal" href="#usage">7.3.33.3. Usage</a></li>
+<li><a class="reference internal" href="#usage">7.3.33.3. Usage</a><ul>
+<li><a class="reference internal" href="#simple-usage">7.3.33.3.1. Simple usage</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#parameters">7.3.33.4. Parameters</a><ul>
 <li><a class="reference internal" href="#required-parameters">7.3.33.4.1. Required parameters</a><ul>
 <li><a class="reference internal" href="#logical-table">7.3.33.4.1.1. <code class="docutils literal"><span class="pre">logical_table</span></code></a></li>
@@ -267,14 +1278,32 @@ It's the default value.</td>
 <li><a class="reference internal" href="#max-border">7.3.33.4.2.4. <code class="docutils literal"><span class="pre">max_border</span></code></a></li>
 <li><a class="reference internal" href="#order">7.3.33.4.2.5. <code class="docutils literal"><span class="pre">order</span></code></a></li>
 <li><a class="reference internal" href="#filter">7.3.33.4.2.6. <code class="docutils literal"><span class="pre">filter</span></code></a></li>
-<li><a class="reference internal" href="#offset">7.3.33.4.2.7. <code class="docutils literal"><span class="pre">offset</span></code></a></li>
-<li><a class="reference internal" href="#limit">7.3.33.4.2.8. <code class="docutils literal"><span class="pre">limit</span></code></a></li>
-<li><a class="reference internal" href="#output-columns">7.3.33.4.2.9. <code class="docutils literal"><span class="pre">output_columns</span></code></a></li>
-<li><a class="reference internal" href="#use-range-index">7.3.33.4.2.10. <code class="docutils literal"><span class="pre">use_range_index</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#cache-related-parameter">7.3.33.4.3. Cache related parameter</a><ul>
-<li><a class="reference internal" href="#cache">7.3.33.4.3.1. <code class="docutils literal"><span class="pre">cache</span></code></a></li>
+<li><a class="reference internal" href="#output-related-parameters">7.3.33.4.3. Output related parameters</a><ul>
+<li><a class="reference internal" href="#output-columns">7.3.33.4.3.1. <code class="docutils literal"><span class="pre">output_columns</span></code></a></li>
+<li><a class="reference internal" href="#offset">7.3.33.4.3.2. <code class="docutils literal"><span class="pre">offset</span></code></a></li>
+<li><a class="reference internal" href="#limit">7.3.33.4.3.3. <code class="docutils literal"><span class="pre">limit</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#test-related-parameters">7.3.33.4.4. Test related parameters</a><ul>
+<li><a class="reference internal" href="#use-range-index">7.3.33.4.4.1. <code class="docutils literal"><span class="pre">use_range_index</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#dynamic-column-related-parameters">7.3.33.4.5. Dynamic column related parameters</a><ul>
+<li><a class="reference internal" href="#columns-name-stage">7.3.33.4.5.1. <code class="docutils literal"><span class="pre">columns[${NAME}].stage</span></code></a></li>
+<li><a class="reference internal" href="#columns-name-flags">7.3.33.4.5.2. <code class="docutils literal"><span class="pre">columns[${NAME}].flags</span></code></a></li>
+<li><a class="reference internal" href="#columns-name-type">7.3.33.4.5.3. <code class="docutils literal"><span class="pre">columns[${NAME}].type</span></code></a></li>
+<li><a class="reference internal" href="#columns-name-value">7.3.33.4.5.4. <code class="docutils literal"><span class="pre">columns[${NAME}].value</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#window-function-related-parameters">7.3.33.4.6. Window function related parameters</a><ul>
+<li><a class="reference internal" href="#columns-name-window-sort-keys">7.3.33.4.6.1. <code class="docutils literal"><span class="pre">columns[${NAME}].window.sort_keys</span></code></a></li>
+<li><a class="reference internal" href="#columns-name-window-group-keys">7.3.33.4.6.2. <code class="docutils literal"><span class="pre">columns[${NAME}].window.group_keys</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cache-related-parameter">7.3.33.4.7. Cache related parameter</a><ul>
+<li><a class="reference internal" href="#cache">7.3.33.4.7.1. <code class="docutils literal"><span class="pre">cache</span></code></a></li>
 </ul>
 </li>
 </ul>

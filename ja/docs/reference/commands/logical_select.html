@@ -95,7 +95,7 @@
 <p><span class="versionmodified">バージョン 5.0.5 で追加.</span></p>
 </div>
 <p><code class="docutils literal"><span class="pre">logical_select</span></code> は <a class="reference internal" href="select.html"><span class="doc">select</span></a> のシャーディングバージョンです。 <code class="docutils literal"><span class="pre">logical_select</span></code> は複数のテーブルからレコードを検索し、マッチしたレコードを出力します。</p>
-<p><code class="docutils literal"><span class="pre">logical_select</span></code> は <code class="docutils literal"><span class="pre">sharding</span></code> プラグインに含まれているので、 <code class="docutils literal"><span class="pre">sharding</span></code> プラグインを <a class="reference internal" href="plugin_register.html"><span class="doc">plugin_register</span></a> する必要があります。</p>
+<p>このコマンド は <code class="docutils literal"><span class="pre">sharding</span></code> プラグインに含まれているので、 <code class="docutils literal"><span class="pre">sharding</span></code> プラグインを <a class="reference internal" href="plugin_register.html"><span class="doc">plugin_register</span></a> する必要があります。</p>
 </div>
 <div class="section" id="syntax">
 <h2>7.3.34.2. 構文<a class="headerlink" href="#syntax" title="このヘッドラインへのパーマリンク">¶</a></h2>
@@ -126,6 +126,13 @@
                [drilldown_filter=null]
 </pre></div>
 </div>
+<p>いくつか名前付き引数としてしか使えない引数があります。これらの引数を「○番目の引数」として使うことはできません。必ず名前を指定する必要があります。</p>
+<p>名前付き引数としてしか使えない引数は次の通りです。</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">cache=no</span></code></li>
+</ul>
+</div></blockquote>
 <p>以下の名前付き引数で動的カラム機能を使うことができます。</p>
 <blockquote>
 <div><ul class="simple">
@@ -214,8 +221,6 @@
 </li>
 <li><p class="first">複数のシャードを使った場合、 <code class="docutils literal"><span class="pre">drilldowns[${LABEL}].sort_keys</span></code> の中で <code class="docutils literal"><span class="pre">_value.${KEY_NAME}</span></code> を使えません。1つのシャードのみを使った場合は使えます。</p>
 </li>
-<li><p class="first"><code class="docutils literal"><span class="pre">cache</span></code> はまだサポートしていません。</p>
-</li>
 <li><p class="first"><code class="docutils literal"><span class="pre">match_escalation_threshold</span></code> はまだサポートしていません。</p>
 </li>
 <li><p class="first"><code class="docutils literal"><span class="pre">query_flags</span></code> はまだサポートしていません。</p>
@@ -229,8 +234,8 @@
 </div>
 <div class="section" id="usage">
 <h2>7.3.34.4. 使い方<a class="headerlink" href="#usage" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>例を使いながら <code class="docutils literal"><span class="pre">logical_select</span></code> の使い方を学びましょう。このセクションではよく使われる使い方を紹介します。</p>
-<p><code class="docutils literal"><span class="pre">logical_select</span></code> は <code class="docutils literal"><span class="pre">sharding</span></code> プラグインに含まれているので <code class="docutils literal"><span class="pre">sharding</span></code> プラグインを登録する必要があります。</p>
+<p>例を使いながら使い方を学びましょう。このセクションではよく使われる使い方を紹介します。</p>
+<p>このコマンドは <code class="docutils literal"><span class="pre">sharding</span></code> プラグインに含まれているので <code class="docutils literal"><span class="pre">sharding</span></code> プラグインを登録する必要があります。</p>
 <p>実行例:</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>plugin_register sharding
 # [[0, 1337566253.89858, 0.000355720520019531], true]
@@ -429,7 +434,7 @@ load --table Entries_20150709
 #       [
 #         &quot;Groonga::Sharding::LogicalSelectCommand::Executor.execute_search&quot;,
 #         &quot;/home/kou/work/c/groonga.clean/plugins/sharding/logical_select.rb&quot;,
-#         728
+#         548
 #       ]
 #     ]
 #   ]
@@ -1645,6 +1650,10 @@ logical_select \
 <p><span class="versionmodified">バージョン 7.0.1 で追加.</span></p>
 </div>
 <p><a class="reference internal" href="select.html"><span class="doc">select</span></a> のすべてのウィンドウ関数関連パラメーターをサポートしています。詳細は <a class="reference internal" href="select.html#select-window-function-related-parameters"><span class="std std-ref">ウィンドウ関数関連の引数</span></a> を見てください。</p>
+<div class="admonition note">
+<p class="first admonition-title">注釈</p>
+<p class="last">複数のテーブルをまたがったウィンドウ関数はまだサポートしていません。</p>
+</div>
 <div class="section" id="columns-name-window-sort-keys">
 <span id="logical-select-columns-name-window-sort-keys"></span><h4>7.3.34.5.7.1. <code class="docutils literal"><span class="pre">columns[${NAME}].window.sort_keys</span></code><a class="headerlink" href="#columns-name-window-sort-keys" title="このヘッドラインへのパーマリンク">¶</a></h4>
 <div class="versionadded">
@@ -3265,6 +3274,127 @@ logical_select \
 </div>
 </div>
 </div>
+<div class="section" id="cache-related-parameter">
+<h3>7.3.34.5.10. キャッシュ関連の引数<a class="headerlink" href="#cache-related-parameter" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="cache">
+<span id="logical-select-cache"></span><h4>7.3.34.5.10.1. <code class="docutils literal"><span class="pre">cache</span></code><a class="headerlink" href="#cache" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>このクエリーの結果をキャッシュするかどうかを指定します。</p>
+<p>このクエリーの結果がキャッシュしてあると、次に同じクエリーを実行するときはキャッシュを使って高速にレスポンスを返すことができます。</p>
+<p>これは既存のキャッシュされた結果を使うかどうかを指定するものではありません。</p>
+<p>指定可能な値は以下の通りです。</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Value</th>
+<th class="head"><p class="first last">説明</p>
+</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">no</span></code></td>
+<td><p class="first last">このクエリーの出力をキャッシュしない。</p>
+</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">yes</span></code></td>
+<td><p class="first last">このクエリーの出力をキャッシュする。デフォルト値。</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>このクエリーの結果をキャッシュしないようにする例です。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_select \
+  --logical_table Entries \
+  --shard_key created_at \
+  --cache no
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;created_at&quot;,
+#           &quot;Time&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;The first post!&quot;,
+#         &quot;Welcome! This is my first post!&quot;,
+#         1436281200.0,
+#         5,
+#         &quot;Hello&quot;
+#       ],
+#       [
+#         2,
+#         &quot;Groonga&quot;,
+#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+#         1436284800.0,
+#         10,
+#         &quot;Groonga&quot;
+#       ],
+#       [
+#         3,
+#         &quot;Mroonga&quot;,
+#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         1436288400.0,
+#         15,
+#         &quot;Groonga&quot;
+#       ],
+#       [
+#         1,
+#         &quot;Good-bye Senna&quot;,
+#         &quot;I migrated all Senna system!&quot;,
+#         1436367600.0,
+#         3,
+#         &quot;Senna&quot;
+#       ],
+#       [
+#         2,
+#         &quot;Good-bye Tritonn&quot;,
+#         &quot;I also migrated all Tritonn system!&quot;,
+#         1436371200.0,
+#         3,
+#         &quot;Senna&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>デフォルト値は <code class="docutils literal"><span class="pre">yes</span></code> です。</p>
+</div>
+</div>
 </div>
 <div class="section" id="return-value">
 <h2>7.3.34.6. 戻り値<a class="headerlink" href="#return-value" title="このヘッドラインへのパーマリンク">¶</a></h2>
@@ -3362,6 +3492,10 @@ logical_select \
 <li><a class="reference internal" href="#drilldowns-label-columns-name-value">7.3.34.5.9.13. <code class="docutils literal"><span class="pre">drilldowns[${LABEL}].columns[${NAME}].value</span></code></a></li>
 <li><a class="reference internal" href="#drilldowns-label-columns-name-window-sort-keys">7.3.34.5.9.14. <code class="docutils literal"><span class="pre">drilldowns[${LABEL}].columns[${NAME}].window.sort_keys</span></code></a></li>
 <li><a class="reference internal" href="#drilldowns-label-columns-name-window-group-keys">7.3.34.5.9.15. <code class="docutils literal"><span class="pre">drilldowns[${LABEL}].columns[${NAME}].window.group_keys</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cache-related-parameter">7.3.34.5.10. キャッシュ関連の引数</a><ul>
+<li><a class="reference internal" href="#cache">7.3.34.5.10.1. <code class="docutils literal"><span class="pre">cache</span></code></a></li>
 </ul>
 </li>
 </ul>

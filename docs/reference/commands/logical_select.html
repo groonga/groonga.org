@@ -97,7 +97,7 @@
 <a class="reference internal" href="select.html"><span class="doc">select</span></a>. <code class="docutils literal"><span class="pre">logical_select</span></code> searches records from multiple
 tables and outputs them.</p>
 <p>You need to <a class="reference internal" href="plugin_register.html"><span class="doc">plugin_register</span></a> <code class="docutils literal"><span class="pre">sharding</span></code> plugin because
-<code class="docutils literal"><span class="pre">logical_select</span></code> is included in <code class="docutils literal"><span class="pre">sharding</span></code> plugin.</p>
+this command is included in <code class="docutils literal"><span class="pre">sharding</span></code> plugin.</p>
 </div>
 <div class="section" id="syntax">
 <h2>7.3.34.2. Syntax<a class="headerlink" href="#syntax" title="Permalink to this headline">¶</a></h2>
@@ -129,6 +129,15 @@ parameters are optional:</p>
                [drilldown_filter=null]
 </pre></div>
 </div>
+<p>There are some parameters that can be only used as named
+parameters. You can't use these parameters as ordered parameters. You
+must specify parameter name.</p>
+<p>Here are parameters that can be only used as named parameters:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">cache=no</span></code></li>
+</ul>
+</div></blockquote>
 <p>This command has the following named parameters for dynamic columns:</p>
 <blockquote>
 <div><ul class="simple">
@@ -230,7 +239,6 @@ about <code class="docutils literal"><span class="pre">sort_keys</span></code> f
 doesn't work with multiple shards. It works with one
 shard. <code class="docutils literal"><span class="pre">_key</span></code> in <code class="docutils literal"><span class="pre">drilldowns[${LABEL}].sort_keys</span></code> work with
 multiple shards.</li>
-<li><code class="docutils literal"><span class="pre">cache</span></code> isn't supported yet.</li>
 <li><code class="docutils literal"><span class="pre">match_escalation_threshold</span></code> isn't supported yet.</li>
 <li><code class="docutils literal"><span class="pre">query_flags</span></code> isn't supported yet.</li>
 <li><code class="docutils literal"><span class="pre">query_expander</span></code> isn't supported yet.</li>
@@ -240,9 +248,9 @@ multiple shards.</li>
 </div>
 <div class="section" id="usage">
 <h2>7.3.34.4. Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
-<p>Let's learn about <code class="docutils literal"><span class="pre">logical_select</span></code> usage with examples. This section
-shows many popular usages.</p>
-<p>You need to register <code class="docutils literal"><span class="pre">sharding</span></code> plugin because <code class="docutils literal"><span class="pre">logical_select</span></code> is
+<p>Let's learn about usage with examples. This section shows many popular
+usages.</p>
+<p>You need to register <code class="docutils literal"><span class="pre">sharding</span></code> plugin because this command is
 included in <code class="docutils literal"><span class="pre">sharding</span></code> plugin.</p>
 <p>Execution example:</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>plugin_register sharding
@@ -457,7 +465,7 @@ name is <code class="docutils literal"><span class="pre">Entries</span></code>.<
 #       [
 #         &quot;Groonga::Sharding::LogicalSelectCommand::Executor.execute_search&quot;,
 #         &quot;/home/kou/work/c/groonga.clean/plugins/sharding/logical_select.rb&quot;,
-#         728
+#         548
 #       ]
 #     ]
 #   ]
@@ -1722,6 +1730,10 @@ logical_select \
 <p>All window function related parameters in <a class="reference internal" href="select.html"><span class="doc">select</span></a> are
 supported. See <a class="reference internal" href="select.html#select-window-function-related-parameters"><span class="std std-ref">Window function related parameters</span></a> for
 details.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Window function over multiple tables aren't supported yet.</p>
+</div>
 <div class="section" id="columns-name-window-sort-keys">
 <span id="logical-select-columns-name-window-sort-keys"></span><h4>7.3.34.5.7.1. <code class="docutils literal"><span class="pre">columns[${NAME}].window.sort_keys</span></code><a class="headerlink" href="#columns-name-window-sort-keys" title="Permalink to this headline">¶</a></h4>
 <div class="versionadded">
@@ -3407,6 +3419,126 @@ for each the same number of sub records:</p>
 </div>
 </div>
 </div>
+<div class="section" id="cache-related-parameter">
+<h3>7.3.34.5.10. Cache related parameter<a class="headerlink" href="#cache-related-parameter" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="cache">
+<span id="logical-select-cache"></span><h4>7.3.34.5.10.1. <code class="docutils literal"><span class="pre">cache</span></code><a class="headerlink" href="#cache" title="Permalink to this headline">¶</a></h4>
+<p>Specifies whether caching the result of this query or not.</p>
+<p>If the result of this query is cached, the next same query returns
+response quickly by using the cache.</p>
+<p>It doesn't control whether existing cached result is used or not.</p>
+<p>Here are available values:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Value</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">no</span></code></td>
+<td>Don't cache the output of this query.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">yes</span></code></td>
+<td>Cache the output of this query.
+It's the default value.</td>
+</tr>
+</tbody>
+</table>
+<p>Here is an example to disable caching the result of this query:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_select \
+  --logical_table Entries \
+  --shard_key created_at \
+  --cache no
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         5
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;created_at&quot;,
+#           &quot;Time&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;The first post!&quot;,
+#         &quot;Welcome! This is my first post!&quot;,
+#         1436281200.0,
+#         5,
+#         &quot;Hello&quot;
+#       ],
+#       [
+#         2,
+#         &quot;Groonga&quot;,
+#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+#         1436284800.0,
+#         10,
+#         &quot;Groonga&quot;
+#       ],
+#       [
+#         3,
+#         &quot;Mroonga&quot;,
+#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
+#         1436288400.0,
+#         15,
+#         &quot;Groonga&quot;
+#       ],
+#       [
+#         1,
+#         &quot;Good-bye Senna&quot;,
+#         &quot;I migrated all Senna system!&quot;,
+#         1436367600.0,
+#         3,
+#         &quot;Senna&quot;
+#       ],
+#       [
+#         2,
+#         &quot;Good-bye Tritonn&quot;,
+#         &quot;I also migrated all Tritonn system!&quot;,
+#         1436371200.0,
+#         3,
+#         &quot;Senna&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The default value is <code class="docutils literal"><span class="pre">yes</span></code>.</p>
+</div>
+</div>
 </div>
 <div class="section" id="return-value">
 <h2>7.3.34.6. Return value<a class="headerlink" href="#return-value" title="Permalink to this headline">¶</a></h2>
@@ -3505,6 +3637,10 @@ for each the same number of sub records:</p>
 <li><a class="reference internal" href="#drilldowns-label-columns-name-value">7.3.34.5.9.13. <code class="docutils literal"><span class="pre">drilldowns[${LABEL}].columns[${NAME}].value</span></code></a></li>
 <li><a class="reference internal" href="#drilldowns-label-columns-name-window-sort-keys">7.3.34.5.9.14. <code class="docutils literal"><span class="pre">drilldowns[${LABEL}].columns[${NAME}].window.sort_keys</span></code></a></li>
 <li><a class="reference internal" href="#drilldowns-label-columns-name-window-group-keys">7.3.34.5.9.15. <code class="docutils literal"><span class="pre">drilldowns[${LABEL}].columns[${NAME}].window.group_keys</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cache-related-parameter">7.3.34.5.10. Cache related parameter</a><ul>
+<li><a class="reference internal" href="#cache">7.3.34.5.10.1. <code class="docutils literal"><span class="pre">cache</span></code></a></li>
 </ul>
 </li>
 </ul>

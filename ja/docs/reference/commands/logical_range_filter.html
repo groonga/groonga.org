@@ -94,7 +94,13 @@
 <div class="versionadded">
 <p><span class="versionmodified">バージョン 5.0.0 で追加.</span></p>
 </div>
-<p>TODO: Write summary</p>
+<p><code class="docutils literal"><span class="pre">logical_range_filter</span></code> は <a class="reference internal" href="range_filter.html"><span class="doc">range_filter</span></a> のシャーディングバージョンです。 <code class="docutils literal"><span class="pre">logical_range_filter</span></code> は複数のテーブルからレコードを検索し、マッチしたレコードを出力します。</p>
+<p><code class="docutils literal"><span class="pre">logical_range_filter</span></code> は <a class="reference internal" href="logical_select.html"><span class="doc">logical_select</span></a> に似ています。どちらも複数のテーブルからレコードを検索し、見つかったレコードを出力します。 <code class="docutils literal"><span class="pre">logical_range_filter</span></code> は要求されたレコード数分のレコードが見つかったらそこで検索を終了します。 <a class="reference internal" href="logical_select.html"><span class="doc">logical_select</span></a> はすべてのレコードを検索し、必要なレコードだけ出力します。</p>
+<p><code class="docutils literal"><span class="pre">logical_range_filter</span></code> の方が性能面で有利ですがいくつか制約があります。</p>
+<p>大量のレコードがマッチし、要求されているレコード数が小さい場合、 <code class="docutils literal"><span class="pre">logical_range_filter</span></code> の方が <a class="reference internal" href="logical_select.html"><span class="doc">logical_select</span></a> よりも速いです。</p>
+<p><code class="docutils literal"><span class="pre">logical_range_filter</span></code> はドリルダウンをサポートしていません。なぜなら、ドリルダウンをするためにはマッチしたレコードがすべて必要だからです。 <code class="docutils literal"><span class="pre">logical_range_filter</span></code> はマッチするレコードをすべて検索しないかもしれません。そのため、 <code class="docutils literal"><span class="pre">logical_range_filter</span></code> はドリルダウンをサポートしていません。</p>
+<p><code class="docutils literal"><span class="pre">logical_range_filter</span></code> はマッチしたレコードの総数を返しません。なぜなら、 <code class="docutils literal"><span class="pre">logical_range_filter</span></code> はマッチするレコードをすべて検索しないかもしれないからです。</p>
+<p>このコマンド は <code class="docutils literal"><span class="pre">sharding</span></code> プラグインに含まれているので、 <code class="docutils literal"><span class="pre">sharding</span></code> プラグインを <a class="reference internal" href="plugin_register.html"><span class="doc">plugin_register</span></a> する必要があります。</p>
 </div>
 <div class="section" id="syntax">
 <h2>7.3.33.2. 構文<a class="headerlink" href="#syntax" title="このヘッドラインへのパーマリンク">¶</a></h2>
@@ -122,11 +128,135 @@
 <li><code class="docutils literal"><span class="pre">cache=no</span></code></li>
 </ul>
 </div></blockquote>
+<div class="versionadded">
+<p><span class="versionmodified">バージョン 7.0.9 で追加: </span>以下の名前付き引数で動的カラム機能を使うことができます。</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">columns[${NAME}].stage=null</span></code></li>
+<li><code class="docutils literal"><span class="pre">columns[${NAME}].flags=COLUMN_SCALAR</span></code></li>
+<li><code class="docutils literal"><span class="pre">columns[${NAME}].type=null</span></code></li>
+<li><code class="docutils literal"><span class="pre">columns[${NAME}].value=null</span></code></li>
+<li><code class="docutils literal"><span class="pre">columns[${NAME}].window.sort_keys=null</span></code></li>
+<li><code class="docutils literal"><span class="pre">columns[${NAME}].window.group_keys=null</span></code></li>
+</ul>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">${NAME}</span></code> には1つ以上のアルファベット、数字、 <code class="docutils literal"><span class="pre">_</span></code>  を使うことができます。たとえば、 <code class="docutils literal"><span class="pre">column1</span></code> は有効な <code class="docutils literal"><span class="pre">${NAME}</span></code> です。これは通常のカラムと同じルールです。 <a class="reference internal" href="column_create.html#column-create-name"><span class="std std-ref">name</span></a> も見てください。</p>
+<p>同じ <code class="docutils literal"><span class="pre">${NAME}</span></code> も持つ引数は同じグループになります。</p>
+<p>たとえば、以下の引数は1つの動的カラムを指定しています。</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">--columns[name].stage</span> <span class="pre">initial</span></code></li>
+<li><code class="docutils literal"><span class="pre">--columns[name].type</span> <span class="pre">UInt32</span></code></li>
+<li><code class="docutils literal"><span class="pre">--columns[name].value</span> <span class="pre">29</span></code></li>
+</ul>
+</div></blockquote>
+<p>以下の引数は2つの動的カラムを指定しています。</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">--columns[name1].stage</span> <span class="pre">initial</span></code></li>
+<li><code class="docutils literal"><span class="pre">--columns[name1].type</span> <span class="pre">UInt32</span></code></li>
+<li><code class="docutils literal"><span class="pre">--columns[name1].value</span> <span class="pre">29</span></code></li>
+<li><code class="docutils literal"><span class="pre">--columns[name2].stage</span> <span class="pre">filtered</span></code></li>
+<li><code class="docutils literal"><span class="pre">--columns[name2].type</span> <span class="pre">Float</span></code></li>
+<li><code class="docutils literal"><span class="pre">--columns[name2].value</span> <span class="pre">'_score</span> <span class="pre">*</span> <span class="pre">0.1'</span></code></li>
+</ul>
+</div></blockquote>
+</div>
 </div>
 <div class="section" id="usage">
 <h2>7.3.33.3. 使い方<a class="headerlink" href="#usage" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p><code class="docutils literal"><span class="pre">logical_range_filter</span></code> コマンドを使うには事前に <code class="docutils literal"><span class="pre">sharding</span></code> プラグインを登録します。</p>
-<p>TODO: Add examples</p>
+<p>例を使いながら使い方を学びましょう。このセクションではよく使われる使い方を紹介します。</p>
+<p>このコマンドは <code class="docutils literal"><span class="pre">sharding</span></code> プラグインに含まれているので <code class="docutils literal"><span class="pre">sharding</span></code> プラグインを登録する必要があります。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>plugin_register sharding
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>使い方を示すために使うスキーマ定義とサンプルデータは以下の通りです。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>table_create Entries_20150708 TABLE_HASH_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries_20150708 created_at COLUMN_SCALAR Time
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries_20150708 content COLUMN_SCALAR Text
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries_20150708 n_likes COLUMN_SCALAR UInt32
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries_20150708 tag COLUMN_SCALAR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create Entries_20150709 TABLE_HASH_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries_20150709 created_at COLUMN_SCALAR Time
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries_20150709 content COLUMN_SCALAR Text
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries_20150709 n_likes COLUMN_SCALAR UInt32
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries_20150709 tag COLUMN_SCALAR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create Terms TABLE_PAT_KEY ShortText \
+  --default_tokenizer TokenBigram \
+  --normalizer NormalizerAuto
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Terms entries_key_index_20150708 \
+  COLUMN_INDEX|WITH_POSITION Entries_20150708 _key
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Terms entries_content_index_20150708 \
+  COLUMN_INDEX|WITH_POSITION Entries_20150708 content
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Terms entries_key_index_20150709 \
+  COLUMN_INDEX|WITH_POSITION Entries_20150709 _key
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Terms entries_content_index_20150709 \
+  COLUMN_INDEX|WITH_POSITION Entries_20150709 content
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+load --table Entries_20150708
+[
+{&quot;_key&quot;:       &quot;The first post!&quot;,
+ &quot;created_at&quot;: &quot;2015/07/08 00:00:00&quot;,
+ &quot;content&quot;:    &quot;Welcome! This is my first post!&quot;,
+ &quot;n_likes&quot;:    5,
+ &quot;tag&quot;:        &quot;Hello&quot;},
+{&quot;_key&quot;:       &quot;Groonga&quot;,
+ &quot;created_at&quot;: &quot;2015/07/08 01:00:00&quot;,
+ &quot;content&quot;:    &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+ &quot;n_likes&quot;:    10,
+ &quot;tag&quot;:        &quot;Groonga&quot;},
+{&quot;_key&quot;:       &quot;Mroonga&quot;,
+ &quot;created_at&quot;: &quot;2015/07/08 02:00:00&quot;,
+ &quot;content&quot;:    &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
+ &quot;n_likes&quot;:    15,
+ &quot;tag&quot;:        &quot;Groonga&quot;}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 3]
+load --table Entries_20150709
+[
+{&quot;_key&quot;:       &quot;Good-bye Senna&quot;,
+ &quot;created_at&quot;: &quot;2015/07/09 00:00:00&quot;,
+ &quot;content&quot;:    &quot;I migrated all Senna system!&quot;,
+ &quot;n_likes&quot;:    3,
+ &quot;tag&quot;:        &quot;Senna&quot;},
+{&quot;_key&quot;:       &quot;Good-bye Tritonn&quot;,
+ &quot;created_at&quot;: &quot;2015/07/09 01:00:00&quot;,
+ &quot;content&quot;:    &quot;I also migrated all Tritonn system!&quot;,
+ &quot;n_likes&quot;:    3,
+ &quot;tag&quot;:        &quot;Senna&quot;}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 2]
+</pre></div>
+</div>
+<p>ブログエントリー用に <code class="docutils literal"><span class="pre">Entries_20150708</span></code> と <code class="docutils literal"><span class="pre">Entries_20150709</span></code> の2つのテーブルがあります。</p>
+<div class="admonition note">
+<p class="first admonition-title">注釈</p>
+<p class="last">テーブル名には <code class="docutils literal"><span class="pre">${論理テーブル名}_${YYYYMMDD}</span></code> という命名規則を使う必要があります。この例では、 <code class="docutils literal"><span class="pre">論理テーブル名</span></code> は <code class="docutils literal"><span class="pre">Entries</span></code> で <code class="docutils literal"><span class="pre">YYYYMMDD</span></code> は <code class="docutils literal"><span class="pre">20150708</span></code> または <code class="docutils literal"><span class="pre">20150709</span></code> です。</p>
+</div>
+<p>各エントリはタイトルと作成日時と内容と「いいね！」数、タグを持っています。タイトルは <code class="docutils literal"><span class="pre">Entries_YYYYMMDD</span></code> のキーとします。作成日時は <code class="docutils literal"><span class="pre">Entries_YYYYMMDD.created_at</span></code> カラムの値とします。内容は <code class="docutils literal"><span class="pre">Entries_YYYYMMDD.content</span></code> カラムの値とします。「いいね！」数は <code class="docutils literal"><span class="pre">Entries_YYYYMMDD.n_likes</span></code> カラムの値とします。タグは <code class="docutils literal"><span class="pre">Entries_YYYYMMDD.tag</span></code> カラムの値とします。</p>
+<p><code class="docutils literal"><span class="pre">Entries_YYYYMMDD._key</span></code> カラムと <code class="docutils literal"><span class="pre">Entries_YYYYMMDD.content</span></code> カラムには <code class="docutils literal"><span class="pre">TokenBigram</span></code> トークナイザーを使ったインデックスを作成します。そのため、 <code class="docutils literal"><span class="pre">Entries_YYYYMMDD._key</span></code> と <code class="docutils literal"><span class="pre">Entries_YYYYMMDD.content</span></code> は両方とも全文検索できます。</p>
+<p>これで例を示すためのスキーマとデータの準備ができました。</p>
+<div class="section" id="simple-usage">
+<h3>7.3.33.3.1. 簡単な使い方<a class="headerlink" href="#simple-usage" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>TODO</p>
+</div>
 </div>
 <div class="section" id="parameters">
 <h2>7.3.33.4. 引数<a class="headerlink" href="#parameters" title="このヘッドラインへのパーマリンク">¶</a></h2>
@@ -136,7 +266,7 @@
 <p>必須引数は二つあります。 <code class="docutils literal"><span class="pre">logical_table</span></code> と <code class="docutils literal"><span class="pre">shard_key</span></code> です。</p>
 <div class="section" id="logical-table">
 <h4>7.3.33.4.1.1. <code class="docutils literal"><span class="pre">logical_table</span></code><a class="headerlink" href="#logical-table" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p>論理テーブル名を指定します。これは &quot;_YYYYMMDD&quot; をテーブル名から除いたものです。実際のテーブルが &quot;Logs_20150203&quot; や &quot;Logs_20150203&quot; といったものなら、論理テーブル名は &quot;Logs&quot; です。</p>
+<p>論理テーブル名を指定します。これは <code class="docutils literal"><span class="pre">_YYYYMMDD</span></code> をテーブル名から除いたものです。実際のテーブルが <code class="docutils literal"><span class="pre">Logs_20150203</span></code> や <code class="docutils literal"><span class="pre">Logs_20150203</span></code> といったものなら、論理テーブル名は <code class="docutils literal"><span class="pre">Logs</span></code> です。</p>
 <p>TODO: Add examples</p>
 </div>
 <div class="section" id="shard-key">
@@ -176,28 +306,669 @@
 <h4>7.3.33.4.2.6. <code class="docutils literal"><span class="pre">filter</span></code><a class="headerlink" href="#filter" title="このヘッドラインへのパーマリンク">¶</a></h4>
 <p>TODO</p>
 </div>
+</div>
+<div class="section" id="output-related-parameters">
+<h3>7.3.33.4.3. 出力関連の引数<a class="headerlink" href="#output-related-parameters" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="output-columns">
+<span id="logical-range-filter-output-columns"></span><h4>7.3.33.4.3.1. <code class="docutils literal"><span class="pre">output_columns</span></code><a class="headerlink" href="#output-columns" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p><a class="reference internal" href="select.html"><span class="doc">select</span></a> の <a class="reference internal" href="select.html#select-output-columns"><span class="std std-ref">output_columns</span></a> に対応しています。詳細は <a class="reference internal" href="select.html#select-output-columns"><span class="std std-ref">output_columns</span></a> を見てください。</p>
+<p>以下は例です。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_range_filter \
+  --logical_table Entries \
+  --shard_key created_at \
+  --output_columns &#39;_key, *&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         &quot;_key&quot;,
+#         &quot;ShortText&quot;
+#       ],
+#       [
+#         &quot;content&quot;,
+#         &quot;Text&quot;
+#       ],
+#       [
+#         &quot;created_at&quot;,
+#         &quot;Time&quot;
+#       ],
+#       [
+#         &quot;n_likes&quot;,
+#         &quot;UInt32&quot;
+#       ],
+#       [
+#         &quot;tag&quot;,
+#         &quot;ShortText&quot;
+#       ]
+#     ],
+#     [
+#       &quot;The first post!&quot;,
+#       &quot;Welcome! This is my first post!&quot;,
+#       1436281200.0,
+#       5,
+#       &quot;Hello&quot;
+#     ],
+#     [
+#       &quot;Groonga&quot;,
+#       &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+#       1436284800.0,
+#       10,
+#       &quot;Groonga&quot;
+#     ],
+#     [
+#       &quot;Mroonga&quot;,
+#       &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
+#       1436288400.0,
+#       15,
+#       &quot;Groonga&quot;
+#     ],
+#     [
+#       &quot;Good-bye Senna&quot;,
+#       &quot;I migrated all Senna system!&quot;,
+#       1436367600.0,
+#       3,
+#       &quot;Senna&quot;
+#     ],
+#     [
+#       &quot;Good-bye Tritonn&quot;,
+#       &quot;I also migrated all Tritonn system!&quot;,
+#       1436371200.0,
+#       3,
+#       &quot;Senna&quot;
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
 <div class="section" id="offset">
-<h4>7.3.33.4.2.7. <code class="docutils literal"><span class="pre">offset</span></code><a class="headerlink" href="#offset" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p>TODO</p>
+<span id="logical-range-filter-offset"></span><h4>7.3.33.4.3.2. <code class="docutils literal"><span class="pre">offset</span></code><a class="headerlink" href="#offset" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p><a class="reference internal" href="select.html"><span class="doc">select</span></a> の <a class="reference internal" href="select.html#select-offset"><span class="std std-ref">offset</span></a> に対応しています。詳細は <a class="reference internal" href="select.html#select-offset"><span class="std std-ref">offset</span></a> を見てください。</p>
+<p>以下は例です。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_range_filter \
+  --logical_table Entries \
+  --shard_key created_at \
+  --offset 2
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         &quot;_key&quot;,
+#         &quot;ShortText&quot;
+#       ],
+#       [
+#         &quot;content&quot;,
+#         &quot;Text&quot;
+#       ],
+#       [
+#         &quot;created_at&quot;,
+#         &quot;Time&quot;
+#       ],
+#       [
+#         &quot;n_likes&quot;,
+#         &quot;UInt32&quot;
+#       ],
+#       [
+#         &quot;tag&quot;,
+#         &quot;ShortText&quot;
+#       ]
+#     ],
+#     [
+#       &quot;Mroonga&quot;,
+#       &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
+#       1436288400.0,
+#       15,
+#       &quot;Groonga&quot;
+#     ],
+#     [
+#       &quot;Good-bye Senna&quot;,
+#       &quot;I migrated all Senna system!&quot;,
+#       1436367600.0,
+#       3,
+#       &quot;Senna&quot;
+#     ],
+#     [
+#       &quot;Good-bye Tritonn&quot;,
+#       &quot;I also migrated all Tritonn system!&quot;,
+#       1436371200.0,
+#       3,
+#       &quot;Senna&quot;
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
 </div>
 <div class="section" id="limit">
-<h4>7.3.33.4.2.8. <code class="docutils literal"><span class="pre">limit</span></code><a class="headerlink" href="#limit" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p>TODO</p>
+<span id="logical-range-filter-limit"></span><h4>7.3.33.4.3.3. <code class="docutils literal"><span class="pre">limit</span></code><a class="headerlink" href="#limit" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p><a class="reference internal" href="select.html"><span class="doc">select</span></a> の <a class="reference internal" href="select.html#select-limit"><span class="std std-ref">limit</span></a> に対応しています。詳細は <a class="reference internal" href="select.html#select-limit"><span class="std std-ref">limit</span></a> を見てください。</p>
+<p><a class="reference internal" href="select.html"><span class="doc">select</span></a> との違いは、このコマンドは <a class="reference internal" href="#logical-range-filter-offset"><span class="std std-ref">offset</span></a> と <a class="reference internal" href="#logical-range-filter-limit"><span class="std std-ref">limit</span></a> で指定したレコードを見つけたら検索を終了することです。</p>
+<p>以下は例です。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_range_filter \
+  --logical_table Entries \
+  --shard_key created_at \
+  --limit 2
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         &quot;_key&quot;,
+#         &quot;ShortText&quot;
+#       ],
+#       [
+#         &quot;content&quot;,
+#         &quot;Text&quot;
+#       ],
+#       [
+#         &quot;created_at&quot;,
+#         &quot;Time&quot;
+#       ],
+#       [
+#         &quot;n_likes&quot;,
+#         &quot;UInt32&quot;
+#       ],
+#       [
+#         &quot;tag&quot;,
+#         &quot;ShortText&quot;
+#       ]
+#     ],
+#     [
+#       &quot;The first post!&quot;,
+#       &quot;Welcome! This is my first post!&quot;,
+#       1436281200.0,
+#       5,
+#       &quot;Hello&quot;
+#     ],
+#     [
+#       &quot;Groonga&quot;,
+#       &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+#       1436284800.0,
+#       10,
+#       &quot;Groonga&quot;
+#     ]
+#   ]
+# ]
+</pre></div>
 </div>
-<div class="section" id="output-columns">
-<h4>7.3.33.4.2.9. <code class="docutils literal"><span class="pre">output_columns</span></code><a class="headerlink" href="#output-columns" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p>TODO</p>
 </div>
+</div>
+<div class="section" id="test-related-parameters">
+<h3>7.3.33.4.4. テスト関連の引数<a class="headerlink" href="#test-related-parameters" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <div class="section" id="use-range-index">
-<h4>7.3.33.4.2.10. <code class="docutils literal"><span class="pre">use_range_index</span></code><a class="headerlink" href="#use-range-index" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<h4>7.3.33.4.4.1. <code class="docutils literal"><span class="pre">use_range_index</span></code><a class="headerlink" href="#use-range-index" title="このヘッドラインへのパーマリンク">¶</a></h4>
 <p>range_indexを使うかどうかを指定します。ただし、この引数はテスト用なので、本番で使うべきではありません。</p>
 <p>TODO: Add examples</p>
 </div>
 </div>
+<div class="section" id="dynamic-column-related-parameters">
+<span id="logical-range-filter-dynamic-column-related-parameters"></span><h3>7.3.33.4.5. 動的カラム関連の引数<a class="headerlink" href="#dynamic-column-related-parameters" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="versionadded">
+<p><span class="versionmodified">バージョン 7.0.9 で追加.</span></p>
+</div>
+<p><a class="reference internal" href="select.html"><span class="doc">select</span></a> のすべての動的カラム関連パラメーターをサポートしています。詳細は <a class="reference internal" href="select.html#select-dynamic-column-related-parameters"><span class="std std-ref">動的カラム関連の引数</span></a> を見てください。</p>
+<p>動的カラムを1つ以上使うと、「十分なレコードがマッチしたらそのテーブルの検索を切り上げる」機能が無効になります。（「十分なレコードがマッチしたら残りのテーブルの検索を切り上げる」機能は有効です。） <code class="docutils literal"><span class="pre">logical_range_filter</span></code> は要求されているマッチレコード数が小さくても各テーブルですべてのマッチするレコードを検索します。これはウィンドウ関数をサポートするためです。ウィンドウ関数を実行するには同一テーブル内のすべての対象レコードが必要です。</p>
+<div class="section" id="columns-name-stage">
+<span id="logical-range-filter-columns-name-stage"></span><h4>7.3.33.4.5.1. <code class="docutils literal"><span class="pre">columns[${NAME}].stage</span></code><a class="headerlink" href="#columns-name-stage" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">バージョン 7.0.9 で追加.</span></p>
+</div>
+<p><a class="reference internal" href="select.html"><span class="doc">select</span></a> の <a class="reference internal" href="select.html#select-columns-name-stage"><span class="std std-ref">columns[${NAME}].stage</span></a> に対応しています。詳細は <a class="reference internal" href="select.html#select-columns-name-stage"><span class="std std-ref">columns[${NAME}].stage</span></a> を見てください。</p>
+<p>必須の引数です。</p>
+<p>以下は <code class="docutils literal"><span class="pre">initial</span></code> ステージで <code class="docutils literal"><span class="pre">is_popular</span></code> カラムを作る例です。作成した <code class="docutils literal"><span class="pre">is_popular</span></code> カラムは <code class="docutils literal"><span class="pre">filter</span></code> や <code class="docutils literal"><span class="pre">output_columns</span></code> を含むすべてのパラメーターで使えます。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_range_filter \
+  --logical_table Entries \
+  --shard_key created_at \
+  --columns[is_popular].stage initial \
+  --columns[is_popular].type Bool \
+  --columns[is_popular].value &#39;n_likes &gt;= 10&#39; \
+  --filter is_popular \
+  --output_columns _id,is_popular,n_likes
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         &quot;_id&quot;,
+#         &quot;UInt32&quot;
+#       ],
+#       [
+#         &quot;is_popular&quot;,
+#         &quot;Bool&quot;
+#       ],
+#       [
+#         &quot;n_likes&quot;,
+#         &quot;UInt32&quot;
+#       ]
+#     ],
+#     [
+#       2,
+#       true,
+#       10
+#     ],
+#     [
+#       3,
+#       true,
+#       15
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
+<div class="section" id="columns-name-flags">
+<span id="logical-range-filter-columns-name-flags"></span><h4>7.3.33.4.5.2. <code class="docutils literal"><span class="pre">columns[${NAME}].flags</span></code><a class="headerlink" href="#columns-name-flags" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">バージョン 7.0.9 で追加.</span></p>
+</div>
+<p><a class="reference internal" href="select.html"><span class="doc">select</span></a> の <a class="reference internal" href="select.html#select-columns-name-flags"><span class="std std-ref">columns[${NAME}].flags</span></a> に対応しています。詳細は <a class="reference internal" href="select.html#select-columns-name-flags"><span class="std std-ref">columns[${NAME}].flags</span></a> を見てください。</p>
+<p>デフォルト値は <code class="docutils literal"><span class="pre">COLUMN_SCALAR</span></code> です。</p>
+<p>以下は <code class="docutils literal"><span class="pre">COLUMN_VECTOR</span></code> フラグを指定してベクターカラムを作る例です。 <code class="docutils literal"><span class="pre">plugin_register</span> <span class="pre">functions/vector</span></code> は <a class="reference internal" href="../functions/vector_new.html"><span class="doc">vector_new</span></a> 関数を使うために実行しています。:</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>plugin_register functions/vector
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+logical_range_filter \
+  --logical_table Entries \
+  --shard_key created_at \
+  --columns[vector].stage initial \
+  --columns[vector].flags COLUMN_VECTOR \
+  --columns[vector].type UInt32 \
+  --columns[vector].value &#39;vector_new(1, 2, 3)&#39; \
+  --output_columns _id,vector
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         &quot;_id&quot;,
+#         &quot;UInt32&quot;
+#       ],
+#       [
+#         &quot;vector&quot;,
+#         &quot;UInt32&quot;
+#       ]
+#     ],
+#     [
+#       1,
+#       [
+#         1,
+#         2,
+#         3
+#       ]
+#     ],
+#     [
+#       2,
+#       [
+#         1,
+#         2,
+#         3
+#       ]
+#     ],
+#     [
+#       3,
+#       [
+#         1,
+#         2,
+#         3
+#       ]
+#     ],
+#     [
+#       1,
+#       [
+#         1,
+#         2,
+#         3
+#       ]
+#     ],
+#     [
+#       2,
+#       [
+#         1,
+#         2,
+#         3
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
+<div class="section" id="columns-name-type">
+<span id="logical-range-filter-columns-name-type"></span><h4>7.3.33.4.5.3. <code class="docutils literal"><span class="pre">columns[${NAME}].type</span></code><a class="headerlink" href="#columns-name-type" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">バージョン 7.0.9 で追加.</span></p>
+</div>
+<p><a class="reference internal" href="select.html"><span class="doc">select</span></a> の <a class="reference internal" href="select.html#select-columns-name-type"><span class="std std-ref">columns[${NAME}].type</span></a> に対応しています。詳細は <a class="reference internal" href="select.html#select-columns-name-type"><span class="std std-ref">columns[${NAME}].type</span></a> を見てください。</p>
+<p>必須の引数です。</p>
+<p>以下は <code class="docutils literal"><span class="pre">ShortText</span></code> 型のカラムを作る例です。保存された値は自動的に <code class="docutils literal"><span class="pre">ShortText</span></code> にキャストされます。この例では数値が <code class="docutils literal"><span class="pre">ShortText</span></code> にキャストされています。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_range_filter \
+  --logical_table Entries \
+  --shard_key created_at \
+  --columns[n_likes_string].stage initial \
+  --columns[n_likes_string].type ShortText \
+  --columns[n_likes_string].value n_likes \
+  --output_columns _id,n_likes,n_likes_string
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         &quot;_id&quot;,
+#         &quot;UInt32&quot;
+#       ],
+#       [
+#         &quot;n_likes&quot;,
+#         &quot;UInt32&quot;
+#       ],
+#       [
+#         &quot;n_likes_string&quot;,
+#         &quot;ShortText&quot;
+#       ]
+#     ],
+#     [
+#       1,
+#       5,
+#       &quot;5&quot;
+#     ],
+#     [
+#       2,
+#       10,
+#       &quot;10&quot;
+#     ],
+#     [
+#       3,
+#       15,
+#       &quot;15&quot;
+#     ],
+#     [
+#       1,
+#       3,
+#       &quot;3&quot;
+#     ],
+#     [
+#       2,
+#       3,
+#       &quot;3&quot;
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
+<div class="section" id="columns-name-value">
+<span id="logical-range-filter-columns-name-value"></span><h4>7.3.33.4.5.4. <code class="docutils literal"><span class="pre">columns[${NAME}].value</span></code><a class="headerlink" href="#columns-name-value" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">バージョン 7.0.9 で追加.</span></p>
+</div>
+<p><a class="reference internal" href="select.html"><span class="doc">select</span></a> の <a class="reference internal" href="select.html#select-columns-name-value"><span class="std std-ref">columns[${NAME}].value</span></a> に対応しています。詳細は <a class="reference internal" href="select.html#select-columns-name-value"><span class="std std-ref">columns[${NAME}].value</span></a> を見てください。</p>
+<p>ウィンドウ関数を使う場合は、 <code class="docutils literal"><span class="pre">value</span></code> の値に <a class="reference internal" href="../window_function.html"><span class="doc">ウィンドウ関数</span></a> を指定し、さらに他のウィンドウ関数関連のパラメーターも指定する必要があります。詳細は <a class="reference internal" href="#logical-range-filter-window-function-related-parameters"><span class="std std-ref">ウィンドウ関数関連の引数</span></a> を見てください。</p>
+<p>必須の引数です。</p>
+<p>以下は内容の文字数を格納するための動的カラムを1つ作る例です。この例では文字数を数えるために <code class="docutils literal"><span class="pre">functions/string</span></code> プラグイン内の <a class="reference internal" href="../functions/string_length.html"><span class="doc">string_length</span></a> 関数を使っています。 <code class="docutils literal"><span class="pre">functions/string</span></code> プラグインを登録するために <a class="reference internal" href="plugin_register.html"><span class="doc">plugin_register</span></a> を使っています。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>plugin_register functions/string
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+logical_range_filter \
+  --logical_table Entries \
+  --shard_key created_at \
+  --columns[content_length].stage initial \
+  --columns[content_length].type UInt32 \
+  --columns[content_length].value &#39;string_length(content)&#39; \
+  --output_columns _id,content,content_length
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         &quot;_id&quot;,
+#         &quot;UInt32&quot;
+#       ],
+#       [
+#         &quot;content&quot;,
+#         &quot;Text&quot;
+#       ],
+#       [
+#         &quot;content_length&quot;,
+#         &quot;UInt32&quot;
+#       ]
+#     ],
+#     [
+#       1,
+#       &quot;Welcome! This is my first post!&quot;,
+#       31
+#     ],
+#     [
+#       2,
+#       &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+#       41
+#     ],
+#     [
+#       3,
+#       &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
+#       64
+#     ],
+#     [
+#       1,
+#       &quot;I migrated all Senna system!&quot;,
+#       28
+#     ],
+#     [
+#       2,
+#       &quot;I also migrated all Tritonn system!&quot;,
+#       35
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="window-function-related-parameters">
+<span id="logical-range-filter-window-function-related-parameters"></span><h3>7.3.33.4.6. ウィンドウ関数関連の引数<a class="headerlink" href="#window-function-related-parameters" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="versionadded">
+<p><span class="versionmodified">バージョン 7.0.9 で追加.</span></p>
+</div>
+<p><a class="reference internal" href="select.html"><span class="doc">select</span></a> のすべてのウィンドウ関数関連パラメーターをサポートしています。詳細は <a class="reference internal" href="select.html#select-window-function-related-parameters"><span class="std std-ref">ウィンドウ関数関連の引数</span></a> を見てください。</p>
+<div class="admonition note">
+<p class="first admonition-title">注釈</p>
+<p class="last">複数のテーブルをまたがったウィンドウ関数はまだサポートしていません。</p>
+</div>
+<div class="section" id="columns-name-window-sort-keys">
+<span id="logical-range-filter-columns-name-window-sort-keys"></span><h4>7.3.33.4.6.1. <code class="docutils literal"><span class="pre">columns[${NAME}].window.sort_keys</span></code><a class="headerlink" href="#columns-name-window-sort-keys" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">バージョン 7.0.9 で追加.</span></p>
+</div>
+<p><a class="reference internal" href="select.html"><span class="doc">select</span></a> の <a class="reference internal" href="select.html#select-columns-name-window-sort-keys"><span class="std std-ref">columns[${NAME}].window.sort_keys</span></a> に対応しています。詳細は <a class="reference internal" href="select.html#select-columns-name-window-sort-keys"><span class="std std-ref">columns[${NAME}].window.sort_keys</span></a> を見てください。</p>
+<p>ウィンドウ関数を使うには <a class="reference internal" href="#logical-range-filter-columns-name-window-sort-keys"><span class="std std-ref">columns[${NAME}].window.sort_keys</span></a> または <a class="reference internal" href="#logical-range-filter-columns-name-window-group-keys"><span class="std std-ref">columns[${NAME}].window.group_keys</span></a> を指定しなければいけません。</p>
+<p>以下は <code class="docutils literal"><span class="pre">Entries.tag</span></code> 毎に累積和を計算する例です。各グループ内のレコードは <code class="docutils literal"><span class="pre">Entries._key</span></code> でソートします。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_range_filter \
+  --logical_table Entries \
+  --shard_key created_at \
+  --columns[n_likes_cumulative_sum_per_tag].stage initial \
+  --columns[n_likes_cumulative_sum_per_tag].type UInt32 \
+  --columns[n_likes_cumulative_sum_per_tag].value &#39;window_sum(n_likes)&#39; \
+  --columns[n_likes_cumulative_sum_per_tag].window.sort_keys _key \
+  --columns[n_likes_cumulative_sum_per_tag].window.group_keys tag \
+  --sort_keys _key \
+  --output_columns tag,_key,n_likes,n_likes_cumulative_sum_per_tag
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         &quot;tag&quot;,
+#         &quot;ShortText&quot;
+#       ],
+#       [
+#         &quot;_key&quot;,
+#         &quot;ShortText&quot;
+#       ],
+#       [
+#         &quot;n_likes&quot;,
+#         &quot;UInt32&quot;
+#       ],
+#       [
+#         &quot;n_likes_cumulative_sum_per_tag&quot;,
+#         &quot;UInt32&quot;
+#       ]
+#     ],
+#     [
+#       &quot;Hello&quot;,
+#       &quot;The first post!&quot;,
+#       5,
+#       5
+#     ],
+#     [
+#       &quot;Groonga&quot;,
+#       &quot;Groonga&quot;,
+#       10,
+#       10
+#     ],
+#     [
+#       &quot;Groonga&quot;,
+#       &quot;Mroonga&quot;,
+#       15,
+#       25
+#     ],
+#     [
+#       &quot;Senna&quot;,
+#       &quot;Good-bye Senna&quot;,
+#       3,
+#       3
+#     ],
+#     [
+#       &quot;Senna&quot;,
+#       &quot;Good-bye Tritonn&quot;,
+#       3,
+#       6
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
+<div class="section" id="columns-name-window-group-keys">
+<span id="logical-range-filter-columns-name-window-group-keys"></span><h4>7.3.33.4.6.2. <code class="docutils literal"><span class="pre">columns[${NAME}].window.group_keys</span></code><a class="headerlink" href="#columns-name-window-group-keys" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">バージョン 7.0.9 で追加.</span></p>
+</div>
+<p><a class="reference internal" href="select.html"><span class="doc">select</span></a> の <a class="reference internal" href="select.html#select-columns-name-window-group-keys"><span class="std std-ref">columns[${NAME}].window.group_keys</span></a> に対応しています。詳細は <a class="reference internal" href="select.html#select-columns-name-window-group-keys"><span class="std std-ref">columns[${NAME}].window.group_keys</span></a> を見てください。</p>
+<p>ウィンドウ関数を使うには <a class="reference internal" href="#logical-range-filter-columns-name-window-sort-keys"><span class="std std-ref">columns[${NAME}].window.sort_keys</span></a> または <a class="reference internal" href="#logical-range-filter-columns-name-window-group-keys"><span class="std std-ref">columns[${NAME}].window.group_keys</span></a> を指定しなければいけません。</p>
+<p>以下は <code class="docutils literal"><span class="pre">Entries.tag</span></code> 毎に合計を計算する例です。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_range_filter \
+  --logical_table Entries \
+  --shard_key created_at \
+  --columns[n_likes_sum_per_tag].stage initial \
+  --columns[n_likes_sum_per_tag].type UInt32 \
+  --columns[n_likes_sum_per_tag].value &#39;window_sum(n_likes)&#39; \
+  --columns[n_likes_sum_per_tag].window.group_keys tag \
+  --sort_keys _key \
+  --output_columns tag,_key,n_likes,n_likes_sum_per_tag
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         &quot;tag&quot;,
+#         &quot;ShortText&quot;
+#       ],
+#       [
+#         &quot;_key&quot;,
+#         &quot;ShortText&quot;
+#       ],
+#       [
+#         &quot;n_likes&quot;,
+#         &quot;UInt32&quot;
+#       ],
+#       [
+#         &quot;n_likes_sum_per_tag&quot;,
+#         &quot;UInt32&quot;
+#       ]
+#     ],
+#     [
+#       &quot;Hello&quot;,
+#       &quot;The first post!&quot;,
+#       5,
+#       5
+#     ],
+#     [
+#       &quot;Groonga&quot;,
+#       &quot;Groonga&quot;,
+#       10,
+#       25
+#     ],
+#     [
+#       &quot;Groonga&quot;,
+#       &quot;Mroonga&quot;,
+#       15,
+#       25
+#     ],
+#     [
+#       &quot;Senna&quot;,
+#       &quot;Good-bye Senna&quot;,
+#       3,
+#       6
+#     ],
+#     [
+#       &quot;Senna&quot;,
+#       &quot;Good-bye Tritonn&quot;,
+#       3,
+#       6
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
+</div>
 <div class="section" id="cache-related-parameter">
-<h3>7.3.33.4.3. キャッシュ関連の引数<a class="headerlink" href="#cache-related-parameter" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<h3>7.3.33.4.7. キャッシュ関連の引数<a class="headerlink" href="#cache-related-parameter" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <div class="section" id="cache">
-<span id="logical-range-filter-cache"></span><h4>7.3.33.4.3.1. <code class="docutils literal"><span class="pre">cache</span></code><a class="headerlink" href="#cache" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<span id="logical-range-filter-cache"></span><h4>7.3.33.4.7.1. <code class="docutils literal"><span class="pre">cache</span></code><a class="headerlink" href="#cache" title="このヘッドラインへのパーマリンク">¶</a></h4>
 <p>このクエリーの結果をキャッシュするかどうかを指定します。</p>
 <p>このクエリーの結果がキャッシュしてあると、次に同じクエリーを実行するときはキャッシュを使って高速にレスポンスを返すことができます。</p>
 <p>これは既存のキャッシュされた結果を使うかどうかを指定するものではありません。</p>
@@ -224,15 +995,170 @@
 </tr>
 </tbody>
 </table>
-<p>TODO: Add examples</p>
+<p>このクエリーの結果をキャッシュしないようにする例です。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_range_filter \
+  --logical_table Entries \
+  --shard_key created_at \
+  --cache no
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         &quot;_key&quot;,
+#         &quot;ShortText&quot;
+#       ],
+#       [
+#         &quot;content&quot;,
+#         &quot;Text&quot;
+#       ],
+#       [
+#         &quot;created_at&quot;,
+#         &quot;Time&quot;
+#       ],
+#       [
+#         &quot;n_likes&quot;,
+#         &quot;UInt32&quot;
+#       ],
+#       [
+#         &quot;tag&quot;,
+#         &quot;ShortText&quot;
+#       ]
+#     ],
+#     [
+#       &quot;The first post!&quot;,
+#       &quot;Welcome! This is my first post!&quot;,
+#       1436281200.0,
+#       5,
+#       &quot;Hello&quot;
+#     ],
+#     [
+#       &quot;Groonga&quot;,
+#       &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+#       1436284800.0,
+#       10,
+#       &quot;Groonga&quot;
+#     ],
+#     [
+#       &quot;Mroonga&quot;,
+#       &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
+#       1436288400.0,
+#       15,
+#       &quot;Groonga&quot;
+#     ],
+#     [
+#       &quot;Good-bye Senna&quot;,
+#       &quot;I migrated all Senna system!&quot;,
+#       1436367600.0,
+#       3,
+#       &quot;Senna&quot;
+#     ],
+#     [
+#       &quot;Good-bye Tritonn&quot;,
+#       &quot;I also migrated all Tritonn system!&quot;,
+#       1436371200.0,
+#       3,
+#       &quot;Senna&quot;
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
 <p>デフォルト値は <code class="docutils literal"><span class="pre">yes</span></code> です。</p>
 </div>
 </div>
 </div>
 <div class="section" id="return-value">
 <h2>7.3.33.5. 戻り値<a class="headerlink" href="#return-value" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>TODO</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>[HEADER, LOGICAL_FILTERED]
+<p>このコマンドは以下のフォーマットのレスポンスを返します:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>[
+  HEADER,
+  [
+    COLUMNS,
+    RECORDS
+  ]
+]
+</pre></div>
+</div>
+<p>このコマンドが失敗すると、 <code class="docutils literal"><span class="pre">HEADER</span></code> にエラーの詳細が含まれます。</p>
+<p><code class="docutils literal"><span class="pre">HEADER</span></code> については <a class="reference internal" href="../command/output_format.html"><span class="doc">出力形式</span></a> を参照してください。</p>
+<p><code class="docutils literal"><span class="pre">COLUMNS</span></code> は <a class="reference internal" href="#logical-range-filter-output-columns"><span class="std std-ref">output_columns</span></a> で指定した出力カラムの情報を表しています。これは次のフォーマットになっています:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>[
+  [COLUMN_NAME_1, COLUMN_TYPE_1],
+  [COLUMN_NAME_2, COLUMN_TYPE_2],
+  ...,
+  [COLUMN_NAME_N, COLUMN_TYPE_N]
+]
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">COLUMNS</span></code> は1つ以上の出力カラムの情報を含んでいます。各出力カラムの情報は次の情報を含んでいます。</p>
+<blockquote>
+<div><ul class="simple">
+<li><p class="first">カラム名（文字列）</p>
+</li>
+<li><p class="first">カラムの型（文字列または <code class="docutils literal"><span class="pre">null</span></code> ）</p>
+</li>
+</ul>
+</div></blockquote>
+<p>カラム名は <a class="reference internal" href="#logical-range-filter-output-columns"><span class="std std-ref">output_columns</span></a> で指定された値から抽出しています。</p>
+<p>カラムの方はGroongaでの型名または <code class="docutils literal"><span class="pre">null</span></code> です。カラムがベクターかスカラーかの情報は持っていません。実際のカラムの値が配列かどうかで判断する必要があります。</p>
+<p>型の詳細は <a class="reference internal" href="../types.html"><span class="doc">データ型</span></a> を見てください。</p>
+<p><code class="docutils literal"><span class="pre">null</span></code> になるときはカラムの値の型を決められないときです。たとえば、 <code class="docutils literal"><span class="pre">--output_columns</span> <span class="pre">&quot;snippet_html(content)&quot;</span></code> というように <a class="reference internal" href="#logical-range-filter-output-columns"><span class="std std-ref">output_columns</span></a> の中で関数呼び出しを使ったときは <code class="docutils literal"><span class="pre">null</span></code> になります。</p>
+<p>以下は <code class="docutils literal"><span class="pre">COLUMNS</span></code> の使用例です:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>[
+  [&quot;_id&quot;,     &quot;UInt32&quot;],
+  [&quot;_key&quot;,    &quot;ShortText&quot;],
+  [&quot;n_likes&quot;, &quot;UInt32&quot;],
+]
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">RECORDS</span></code> はマッチした各レコードのカラムの値を含んでいます。 <code class="docutils literal"><span class="pre">RECORDS</span></code> に含まれるレコードは <a class="reference internal" href="#logical-range-filter-offset"><span class="std std-ref">offset</span></a> と <a class="reference internal" href="#logical-range-filter-limit"><span class="std std-ref">limit</span></a> で選択されたレコードです。 <code class="docutils literal"><span class="pre">RECORDS</span></code> は次のフォーマットです:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>[
+  [
+    RECORD_1_COLUMN_1,
+    RECORD_1_COLUMN_2,
+    ...,
+    RECORD_1_COLUMN_N
+  ],
+  [
+    RECORD_2_COLUMN_1,
+    RECORD_2_COLUMN_2,
+    ...,
+    RECORD_2_COLUMN_N
+  ],
+  ...
+  [
+    RECORD_N_COLUMN_1,
+    RECORD_N_COLUMN_2,
+    ...,
+    RECORD_N_COLUMN_N
+  ]
+]
+</pre></div>
+</div>
+<p>以下は <code class="docutils literal"><span class="pre">RECORDS</span></code> の例です:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>[
+  [
+    1,
+    &quot;The first post!&quot;,
+    5
+  ],
+  [
+    2,
+    &quot;Groonga&quot;,
+    10
+  ],
+  [
+    3,
+    &quot;Mroonga&quot;,
+    15
+  ]
+]
 </pre></div>
 </div>
 </div>
@@ -249,7 +1175,10 @@
 <li><a class="reference internal" href="#">7.3.33. <code class="docutils literal"><span class="pre">logical_range_filter</span></code></a><ul>
 <li><a class="reference internal" href="#summary">7.3.33.1. 概要</a></li>
 <li><a class="reference internal" href="#syntax">7.3.33.2. 構文</a></li>
-<li><a class="reference internal" href="#usage">7.3.33.3. 使い方</a></li>
+<li><a class="reference internal" href="#usage">7.3.33.3. 使い方</a><ul>
+<li><a class="reference internal" href="#simple-usage">7.3.33.3.1. 簡単な使い方</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#parameters">7.3.33.4. 引数</a><ul>
 <li><a class="reference internal" href="#required-parameters">7.3.33.4.1. 必須引数</a><ul>
 <li><a class="reference internal" href="#logical-table">7.3.33.4.1.1. <code class="docutils literal"><span class="pre">logical_table</span></code></a></li>
@@ -263,14 +1192,32 @@
 <li><a class="reference internal" href="#max-border">7.3.33.4.2.4. <code class="docutils literal"><span class="pre">max_border</span></code></a></li>
 <li><a class="reference internal" href="#order">7.3.33.4.2.5. <code class="docutils literal"><span class="pre">order</span></code></a></li>
 <li><a class="reference internal" href="#filter">7.3.33.4.2.6. <code class="docutils literal"><span class="pre">filter</span></code></a></li>
-<li><a class="reference internal" href="#offset">7.3.33.4.2.7. <code class="docutils literal"><span class="pre">offset</span></code></a></li>
-<li><a class="reference internal" href="#limit">7.3.33.4.2.8. <code class="docutils literal"><span class="pre">limit</span></code></a></li>
-<li><a class="reference internal" href="#output-columns">7.3.33.4.2.9. <code class="docutils literal"><span class="pre">output_columns</span></code></a></li>
-<li><a class="reference internal" href="#use-range-index">7.3.33.4.2.10. <code class="docutils literal"><span class="pre">use_range_index</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#cache-related-parameter">7.3.33.4.3. キャッシュ関連の引数</a><ul>
-<li><a class="reference internal" href="#cache">7.3.33.4.3.1. <code class="docutils literal"><span class="pre">cache</span></code></a></li>
+<li><a class="reference internal" href="#output-related-parameters">7.3.33.4.3. 出力関連の引数</a><ul>
+<li><a class="reference internal" href="#output-columns">7.3.33.4.3.1. <code class="docutils literal"><span class="pre">output_columns</span></code></a></li>
+<li><a class="reference internal" href="#offset">7.3.33.4.3.2. <code class="docutils literal"><span class="pre">offset</span></code></a></li>
+<li><a class="reference internal" href="#limit">7.3.33.4.3.3. <code class="docutils literal"><span class="pre">limit</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#test-related-parameters">7.3.33.4.4. テスト関連の引数</a><ul>
+<li><a class="reference internal" href="#use-range-index">7.3.33.4.4.1. <code class="docutils literal"><span class="pre">use_range_index</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#dynamic-column-related-parameters">7.3.33.4.5. 動的カラム関連の引数</a><ul>
+<li><a class="reference internal" href="#columns-name-stage">7.3.33.4.5.1. <code class="docutils literal"><span class="pre">columns[${NAME}].stage</span></code></a></li>
+<li><a class="reference internal" href="#columns-name-flags">7.3.33.4.5.2. <code class="docutils literal"><span class="pre">columns[${NAME}].flags</span></code></a></li>
+<li><a class="reference internal" href="#columns-name-type">7.3.33.4.5.3. <code class="docutils literal"><span class="pre">columns[${NAME}].type</span></code></a></li>
+<li><a class="reference internal" href="#columns-name-value">7.3.33.4.5.4. <code class="docutils literal"><span class="pre">columns[${NAME}].value</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#window-function-related-parameters">7.3.33.4.6. ウィンドウ関数関連の引数</a><ul>
+<li><a class="reference internal" href="#columns-name-window-sort-keys">7.3.33.4.6.1. <code class="docutils literal"><span class="pre">columns[${NAME}].window.sort_keys</span></code></a></li>
+<li><a class="reference internal" href="#columns-name-window-group-keys">7.3.33.4.6.2. <code class="docutils literal"><span class="pre">columns[${NAME}].window.group_keys</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cache-related-parameter">7.3.33.4.7. キャッシュ関連の引数</a><ul>
+<li><a class="reference internal" href="#cache">7.3.33.4.7.1. <code class="docutils literal"><span class="pre">cache</span></code></a></li>
 </ul>
 </li>
 </ul>

@@ -93,153 +93,574 @@
 <div class="versionadded">
 <p><span class="versionmodified">New in version 5.0.0.</span></p>
 </div>
-<p><code class="docutils literal"><span class="pre">logical_count</span></code> is a command to count matched records even though actual records are stored into parted tables. It is useful for users because there is less need to care about maximum records of table <a class="reference internal" href="../../limitations.html"><span class="doc">Limitations</span></a>.</p>
-<p>Note that this feature is not matured yet, so there are some limitations.</p>
-<ul class="simple">
-<li>Create parted tables which contains &quot;_YYYYMMDD&quot; postfix. It is hardcoded, so you must create tables by each day.</li>
-<li>Load proper data into parted tables on your own.</li>
-</ul>
+<p><code class="docutils literal"><span class="pre">logical_count</span></code> is a command that has only count feature in
+<a class="reference internal" href="logical_select.html"><span class="doc">logical_select</span></a>. <a class="reference internal" href="logical_select.html"><span class="doc">logical_select</span></a> searches records from
+multiple tables, outputs the number of matched records, outputs
+columns of the matched records and so on. <code class="docutils literal"><span class="pre">logical_count</span></code> only
+searches records from multiple tables and output the number of matched
+records.</p>
+<p><code class="docutils literal"><span class="pre">logical_count</span></code> is useful when you just want the number of matched
+records. You can use <code class="docutils literal"><span class="pre">logical_count</span></code> and <a class="reference internal" href="logical_range_filter.html"><span class="doc">logical_range_filter</span></a>
+at once. You can show the first N matched records before you get the
+number of matched records. If you use only <a class="reference internal" href="logical_select.html"><span class="doc">logical_select</span></a>, you
+need to wait finishing all search.</p>
+<p>You need to <a class="reference internal" href="plugin_register.html"><span class="doc">plugin_register</span></a> <code class="docutils literal"><span class="pre">sharding</span></code> plugin because
+this command is included in <code class="docutils literal"><span class="pre">sharding</span></code> plugin.</p>
 </div>
 <div class="section" id="syntax">
 <h2>7.3.31.2. Syntax<a class="headerlink" href="#syntax" title="Permalink to this headline">¶</a></h2>
 <p>This command takes many parameters.</p>
-<p>The required parameters are <code class="docutils literal"><span class="pre">logical_table</span></code> and <code class="docutils literal"><span class="pre">shard_key</span></code>:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>logical_count logical_table
-              shard_key
-              [min]
-              [min_border]
-              [max]
-              [max_border]
-              [filter]
+<p>The required parameters are <code class="docutils literal"><span class="pre">logical_table</span></code> and <code class="docutils literal"><span class="pre">shard_key</span></code>. Other
+parameters are optional:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_count
+  logical_table
+  shard_key
+  [min=null]
+  [min_border=&quot;include&quot;]
+  [max=null]
+  [max_border=&quot;include&quot;]
+  [filter=null]
 </pre></div>
 </div>
 </div>
 <div class="section" id="usage">
-<h2>7.3.31.3. Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
-<p>Register <code class="docutils literal"><span class="pre">sharding</span></code> plugin to use <code class="docutils literal"><span class="pre">logical_count</span></code> command in advance.</p>
+<span id="logical-count-usage"></span><h2>7.3.31.3. Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>Let's learn about usage with examples. This section shows many popular
+usages.</p>
+<p>You need to register <code class="docutils literal"><span class="pre">sharding</span></code> plugin because this command is
+included in <code class="docutils literal"><span class="pre">sharding</span></code> plugin.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>plugin_register sharding
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
 <p>Note that <code class="docutils literal"><span class="pre">logical_count</span></code> is implemented as an experimental plugin, and the specification may be changed in the future.</p>
 <p>Here is the simple example which shows how to use this feature. Let's consider to count specified logs which are stored into multiple tables.</p>
-<p>Here is the schema and data.</p>
+<p>Here are a schema definition and sample data to show usage.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>table_create Logs_20150203 TABLE_NO_KEY
+<div class="highlight-none"><div class="highlight"><pre><span></span>table_create Entries_20150708 TABLE_HASH_KEY ShortText
 # [[0, 1337566253.89858, 0.000355720520019531], true]
-column_create Logs_20150203 timestamp COLUMN_SCALAR Time
+column_create Entries_20150708 created_at COLUMN_SCALAR Time
 # [[0, 1337566253.89858, 0.000355720520019531], true]
-column_create Logs_20150203 message COLUMN_SCALAR Text
+column_create Entries_20150708 content COLUMN_SCALAR Text
 # [[0, 1337566253.89858, 0.000355720520019531], true]
-table_create Logs_20150204 TABLE_NO_KEY
+column_create Entries_20150708 n_likes COLUMN_SCALAR UInt32
 # [[0, 1337566253.89858, 0.000355720520019531], true]
-column_create Logs_20150204 timestamp COLUMN_SCALAR Time
+column_create Entries_20150708 tag COLUMN_SCALAR ShortText
 # [[0, 1337566253.89858, 0.000355720520019531], true]
-column_create Logs_20150204 message COLUMN_SCALAR Text
+table_create Entries_20150709 TABLE_HASH_KEY ShortText
 # [[0, 1337566253.89858, 0.000355720520019531], true]
-table_create Logs_20150205 TABLE_NO_KEY
+column_create Entries_20150709 created_at COLUMN_SCALAR Time
 # [[0, 1337566253.89858, 0.000355720520019531], true]
-column_create Logs_20150205 timestamp COLUMN_SCALAR Time
+column_create Entries_20150709 content COLUMN_SCALAR Text
 # [[0, 1337566253.89858, 0.000355720520019531], true]
-column_create Logs_20150205 message COLUMN_SCALAR Text
+column_create Entries_20150709 n_likes COLUMN_SCALAR UInt32
 # [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries_20150709 tag COLUMN_SCALAR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create Terms TABLE_PAT_KEY ShortText \
+  --default_tokenizer TokenBigram \
+  --normalizer NormalizerAuto
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Terms entries_key_index_20150708 \
+  COLUMN_INDEX|WITH_POSITION Entries_20150708 _key
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Terms entries_content_index_20150708 \
+  COLUMN_INDEX|WITH_POSITION Entries_20150708 content
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Terms entries_key_index_20150709 \
+  COLUMN_INDEX|WITH_POSITION Entries_20150709 _key
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Terms entries_content_index_20150709 \
+  COLUMN_INDEX|WITH_POSITION Entries_20150709 content
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+load --table Entries_20150708
+[
+{&quot;_key&quot;:       &quot;The first post!&quot;,
+ &quot;created_at&quot;: &quot;2015/07/08 00:00:00&quot;,
+ &quot;content&quot;:    &quot;Welcome! This is my first post!&quot;,
+ &quot;n_likes&quot;:    5,
+ &quot;tag&quot;:        &quot;Hello&quot;},
+{&quot;_key&quot;:       &quot;Groonga&quot;,
+ &quot;created_at&quot;: &quot;2015/07/08 01:00:00&quot;,
+ &quot;content&quot;:    &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+ &quot;n_likes&quot;:    10,
+ &quot;tag&quot;:        &quot;Groonga&quot;},
+{&quot;_key&quot;:       &quot;Mroonga&quot;,
+ &quot;created_at&quot;: &quot;2015/07/08 02:00:00&quot;,
+ &quot;content&quot;:    &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
+ &quot;n_likes&quot;:    15,
+ &quot;tag&quot;:        &quot;Groonga&quot;}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 3]
+load --table Entries_20150709
+[
+{&quot;_key&quot;:       &quot;Good-bye Senna&quot;,
+ &quot;created_at&quot;: &quot;2015/07/09 00:00:00&quot;,
+ &quot;content&quot;:    &quot;I migrated all Senna system!&quot;,
+ &quot;n_likes&quot;:    3,
+ &quot;tag&quot;:        &quot;Senna&quot;},
+{&quot;_key&quot;:       &quot;Good-bye Tritonn&quot;,
+ &quot;created_at&quot;: &quot;2015/07/09 01:00:00&quot;,
+ &quot;content&quot;:    &quot;I also migrated all Tritonn system!&quot;,
+ &quot;n_likes&quot;:    3,
+ &quot;tag&quot;:        &quot;Senna&quot;}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 2]
 </pre></div>
 </div>
-<p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>load --table Logs_20150203
-[
-{&quot;timestamp&quot;: &quot;2015-02-03 23:59:58&quot;, &quot;message&quot;: &quot;Start&quot;},
-{&quot;timestamp&quot;: &quot;2015-02-03 23:59:58&quot;, &quot;message&quot;: &quot;Shutdown&quot;},
-{&quot;timestamp&quot;: &quot;2015-02-03 23:59:59&quot;, &quot;message&quot;: &quot;Start&quot;},
-{&quot;timestamp&quot;: &quot;2015-02-03 23:59:59&quot;, &quot;message&quot;: &quot;Shutdown&quot;}
-]
-# [[0, 1337566253.89858, 0.000355720520019531], 4]
-load --table Logs_20150204
-[
-{&quot;timestamp&quot;: &quot;2015-02-04 00:00:00&quot;, &quot;message&quot;: &quot;Start&quot;},
-{&quot;timestamp&quot;: &quot;2015-02-04 00:00:00&quot;, &quot;message&quot;: &quot;Shutdown&quot;},
-{&quot;timestamp&quot;: &quot;2015-02-04 00:00:01&quot;, &quot;message&quot;: &quot;Start&quot;},
-{&quot;timestamp&quot;: &quot;2015-02-04 00:00:01&quot;, &quot;message&quot;: &quot;Shutdown&quot;},
-{&quot;timestamp&quot;: &quot;2015-02-04 23:59:59&quot;, &quot;message&quot;: &quot;Start&quot;},
-{&quot;timestamp&quot;: &quot;2015-02-04 23:59:59&quot;, &quot;message&quot;: &quot;Shutdown&quot;}
-]
-# [[0, 1337566253.89858, 0.000355720520019531], 6]
-load --table Logs_20150205
-[
-{&quot;timestamp&quot;: &quot;2015-02-05 00:00:00&quot;, &quot;message&quot;: &quot;Start&quot;},
-{&quot;timestamp&quot;: &quot;2015-02-05 00:00:00&quot;, &quot;message&quot;: &quot;Shutdown&quot;},
-{&quot;timestamp&quot;: &quot;2015-02-05 00:00:01&quot;, &quot;message&quot;: &quot;Start&quot;},
-{&quot;timestamp&quot;: &quot;2015-02-05 00:00:01&quot;, &quot;message&quot;: &quot;Shutdown&quot;}
-]
-# [[0, 1337566253.89858, 0.000355720520019531], 4]
-</pre></div>
-</div>
-<p>There are three tables which are mapped each day from 2015 Feb 03 to 2015 Feb 05.</p>
-<ul class="simple">
-<li>Logs_20150203</li>
-<li>Logs_20150204</li>
-<li>Logs_20150205</li>
-</ul>
-<p>Then, it loads data into each table which correspond to.</p>
-<p>Let's count logs which contains &quot;Shutdown&quot; in <code class="docutils literal"><span class="pre">message</span></code> column and the value of timestamp is &quot;2015-02-04 00:00:00&quot; or later.</p>
-<p>Here is the query to achieve above purpose.</p>
-<p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>logical_count Logs timestamp --filter &#39;message == &quot;Shutdown&quot;&#39; --min &quot;2015-02-04 00:00:00&quot; --min_border &quot;include&quot;
-# [[0, 1337566253.89858, 0.000355720520019531], 5]
-</pre></div>
-</div>
-<p>There is a well known limitation about the number of records. By sharding feature, you can overcome such limitations because such a limitation is applied per table.</p>
+<p>There are two tables, <code class="docutils literal"><span class="pre">Entries_20150708</span></code> and <code class="docutils literal"><span class="pre">Entries_20150709</span></code>,
+for blog entries.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">There is no convenient query such as <code class="docutils literal"><span class="pre">PARTITIONING</span> <span class="pre">BY</span></code> in SQL. Thus, you must create table by <code class="docutils literal"><span class="pre">table_create</span></code> for each tables which contains &quot;_YYYYMMDD&quot; postfix in table name.</p>
+<p class="last">You need to use <code class="docutils literal"><span class="pre">${LOGICAL_TABLE_NAME}_${YYYYMMDD}</span></code> naming rule
+for table names. In this example, <code class="docutils literal"><span class="pre">LOGICAL_TABLE_NAME</span></code> is
+<code class="docutils literal"><span class="pre">Entries</span></code> and <code class="docutils literal"><span class="pre">YYYYMMDD</span></code> is <code class="docutils literal"><span class="pre">20150708</span></code> or <code class="docutils literal"><span class="pre">20150709</span></code>.</p>
 </div>
+<p>An entry has title, created time, content, the number of likes for the
+entry and tag. Title is key of <code class="docutils literal"><span class="pre">Entries_YYYYMMDD</span></code>. Created time is
+value of <code class="docutils literal"><span class="pre">Entries_YYYYMMDD.created_at</span></code> column. Content is value of
+<code class="docutils literal"><span class="pre">Entries_YYYYMMDD.content</span></code> column. The number of likes is value of
+<code class="docutils literal"><span class="pre">Entries_YYYYMMDD.n_likes</span></code> column. Tag is value of
+<code class="docutils literal"><span class="pre">Entries_YYYYMMDD.tag</span></code> column.</p>
+<p><code class="docutils literal"><span class="pre">Entries_YYYYMMDD._key</span></code> column and <code class="docutils literal"><span class="pre">Entries_YYYYMMDD.content</span></code>
+column are indexed using <code class="docutils literal"><span class="pre">TokenBigram</span></code> tokenizer. So both
+<code class="docutils literal"><span class="pre">Entries_YYYYMMDD._key</span></code> and <code class="docutils literal"><span class="pre">Entries_YYYYMMDD.content</span></code> are
+fulltext search ready.</p>
+<p>OK. The schema and data for examples are ready.</p>
+<p>Here is an example to count the number of records which have
+<code class="docutils literal"><span class="pre">Groonga</span></code> or <code class="docutils literal"><span class="pre">Senna</span></code> in <code class="docutils literal"><span class="pre">content</span></code> column. <code class="docutils literal"><span class="pre">logical_count</span></code>
+searches records over all <code class="docutils literal"><span class="pre">Entries_YYYYMMDD</span></code> tables.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_count \
+  --logical_table Entries \
+  --shard_key created_at \
+  --filter &#39;query(&quot;content&quot;, &quot;Groonga OR Senna&quot;)&#39;
+# [[0, 1337566253.89858, 0.000355720520019531], 2]
+</pre></div>
+</div>
+<p>Here are matched records:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">_key:&quot;Groonga&quot;</span></code> in <code class="docutils literal"><span class="pre">Entries_20150708</span></code></li>
+<li><code class="docutils literal"><span class="pre">_key:&quot;Good-bye</span> <span class="pre">Senna&quot;</span></code> in <code class="docutils literal"><span class="pre">Entries_20150709</span></code></li>
+</ul>
+</div></blockquote>
 </div>
 <div class="section" id="parameters">
 <h2>7.3.31.4. Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
-<p>This section describes parameters of <code class="docutils literal"><span class="pre">logical_count</span></code>.</p>
+<p>This section describes parameters of this command.</p>
 <div class="section" id="required-parameters">
 <h3>7.3.31.4.1. Required parameters<a class="headerlink" href="#required-parameters" title="Permalink to this headline">¶</a></h3>
 <p>There are required parameters, <code class="docutils literal"><span class="pre">logical_table</span></code> and <code class="docutils literal"><span class="pre">shard_key</span></code>.</p>
 <div class="section" id="logical-table">
-<h4>7.3.31.4.1.1. <code class="docutils literal"><span class="pre">logical_table</span></code><a class="headerlink" href="#logical-table" title="Permalink to this headline">¶</a></h4>
+<span id="logical-count-logical-table"></span><h4>7.3.31.4.1.1. <code class="docutils literal"><span class="pre">logical_table</span></code><a class="headerlink" href="#logical-table" title="Permalink to this headline">¶</a></h4>
 <p>Specifies logical table name. It means table name without
 <code class="docutils literal"><span class="pre">_YYYYMMDD</span></code> postfix.  If you use actual table such as
 <code class="docutils literal"><span class="pre">Logs_20150203</span></code>, <code class="docutils literal"><span class="pre">Logs_20150203</span></code> and so on, logical table name is
 <code class="docutils literal"><span class="pre">Logs</span></code>.</p>
+<p>You can count all records by specifying only <code class="docutils literal"><span class="pre">logical_table</span></code> and
+<code class="docutils literal"><span class="pre">shard_key</span></code> parameters. They are required parameters.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_count \
+  --logical_table Entries \
+  --shard_key created_at
+# [[0, 1337566253.89858, 0.000355720520019531], 5]
+</pre></div>
+</div>
+<p>If nonexistent table is specified, an error is returned.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_count \
+  --logical_table Nonexistent \
+  --shard_key created_at
+# [
+#   [
+#     -22,
+#     1337566253.89858,
+#     0.000355720520019531,
+#     &quot;[logical_count] no shard exists: logical_table: &lt;Nonexistent&gt;: shard_key: &lt;created_at&gt;&quot;,
+#     [
+#       [
+#         &quot;Groonga::Sharding::LogicalCountCommand.run_body&quot;,
+#         &quot;/home/kou/work/c/groonga.clean/plugins/sharding/logical_count.rb&quot;,
+#         30
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
 </div>
 <div class="section" id="shard-key">
-<h4>7.3.31.4.1.2. <code class="docutils literal"><span class="pre">shard_key</span></code><a class="headerlink" href="#shard-key" title="Permalink to this headline">¶</a></h4>
-<p>Specifies column name which is treated as shared key in each parted table.</p>
+<span id="logical-count-shard-key"></span><h4>7.3.31.4.1.2. <code class="docutils literal"><span class="pre">shard_key</span></code><a class="headerlink" href="#shard-key" title="Permalink to this headline">¶</a></h4>
+<p>Specifies column name which is treated as shared key. Shard key is a
+column that stores data that is used for distributing records to
+suitable shards.</p>
+<p>Shard key must be <code class="docutils literal"><span class="pre">Time</span></code> type for now.</p>
+<p>See <a class="reference internal" href="#logical-count-logical-table"><span class="std std-ref">logical_table</span></a> how to specify <code class="docutils literal"><span class="pre">shard_key</span></code>.</p>
 </div>
 </div>
 <div class="section" id="optional-parameters">
 <h3>7.3.31.4.2. Optional parameters<a class="headerlink" href="#optional-parameters" title="Permalink to this headline">¶</a></h3>
 <p>There are optional parameters.</p>
 <div class="section" id="min">
-<h4>7.3.31.4.2.1. <code class="docutils literal"><span class="pre">min</span></code><a class="headerlink" href="#min" title="Permalink to this headline">¶</a></h4>
-<p>Specifies the min value of <code class="docutils literal"><span class="pre">shard_key</span></code></p>
+<span id="logical-count-min"></span><h4>7.3.31.4.2.1. <code class="docutils literal"><span class="pre">min</span></code><a class="headerlink" href="#min" title="Permalink to this headline">¶</a></h4>
+<p>Specifies the minimum value of <code class="docutils literal"><span class="pre">shard_key</span></code> column. If shard doesn't
+have any matched records, the shard isn't searched.</p>
+<p>For example, <code class="docutils literal"><span class="pre">min</span></code> is <code class="docutils literal"><span class="pre">&quot;2015/07/09</span> <span class="pre">00:00:00&quot;</span></code>, <code class="docutils literal"><span class="pre">Entry_20150708</span></code>
+isn't searched. Because <code class="docutils literal"><span class="pre">Entry_20150708</span></code> has only records for
+<code class="docutils literal"><span class="pre">&quot;2015/07/08&quot;</span></code>.</p>
+<p>The following example only uses <code class="docutils literal"><span class="pre">Entry_20150709</span></code>
+table. <code class="docutils literal"><span class="pre">Entry_20150708</span></code> isn't used.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_count \
+  --logical_table Entries \
+  --shard_key created_at \
+  --min &quot;2015/07/09 00:00:00&quot;
+# [[0, 1337566253.89858, 0.000355720520019531], 2]
+</pre></div>
+</div>
 </div>
 <div class="section" id="min-border">
-<h4>7.3.31.4.2.2. <code class="docutils literal"><span class="pre">min_border</span></code><a class="headerlink" href="#min-border" title="Permalink to this headline">¶</a></h4>
-<p>Specifies whether the min value of borderline must be include or not.
-Specify <code class="docutils literal"><span class="pre">include</span></code> or <code class="docutils literal"><span class="pre">exclude</span></code> as the value of this parameter.</p>
+<span id="logical-count-min-border"></span><h4>7.3.31.4.2.2. <code class="docutils literal"><span class="pre">min_border</span></code><a class="headerlink" href="#min-border" title="Permalink to this headline">¶</a></h4>
+<p>Specifies whether the minimum value is included or not. Here is
+available values.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Value</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">include</span></code></td>
+<td>Includes <code class="docutils literal"><span class="pre">min</span></code> value. This is the default.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">exclude</span></code></td>
+<td>Doesn't include <code class="docutils literal"><span class="pre">min</span></code> value.</td>
+</tr>
+</tbody>
+</table>
+<p>Here is an example for <code class="docutils literal"><span class="pre">exclude</span></code>. The result doesn't include the
+<code class="docutils literal"><span class="pre">&quot;Good-bye</span> <span class="pre">Senna&quot;</span></code> record because its <code class="docutils literal"><span class="pre">created_at</span></code> value is
+<code class="docutils literal"><span class="pre">&quot;2015/07/09</span> <span class="pre">00:00:00&quot;</span></code>.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_count \
+  --logical_table Entries \
+  --shard_key created_at \
+  --min &quot;2015/07/09 00:00:00&quot; \
+  --min_border &quot;exclude&quot;
+# [[0, 1337566253.89858, 0.000355720520019531], 1]
+</pre></div>
+</div>
 </div>
 <div class="section" id="max">
-<h4>7.3.31.4.2.3. <code class="docutils literal"><span class="pre">max</span></code><a class="headerlink" href="#max" title="Permalink to this headline">¶</a></h4>
-<p>Specifies the max value of <code class="docutils literal"><span class="pre">shard_key</span></code>.</p>
+<span id="logical-count-max"></span><h4>7.3.31.4.2.3. <code class="docutils literal"><span class="pre">max</span></code><a class="headerlink" href="#max" title="Permalink to this headline">¶</a></h4>
+<p>Specifies the maximum value of <code class="docutils literal"><span class="pre">shard_key</span></code> column. If shard doesn't
+have any matched records, the shard isn't searched.</p>
+<p>For example, <code class="docutils literal"><span class="pre">max</span></code> is <code class="docutils literal"><span class="pre">&quot;2015/07/08</span> <span class="pre">23:59:59&quot;</span></code>, <code class="docutils literal"><span class="pre">Entry_20150709</span></code>
+isn't searched. Because <code class="docutils literal"><span class="pre">Entry_20150709</span></code> has only records for
+<code class="docutils literal"><span class="pre">&quot;&quot;2015/07/09&quot;</span></code>.</p>
+<p>The following example only uses <code class="docutils literal"><span class="pre">Entry_20150708</span></code>
+table. <code class="docutils literal"><span class="pre">Entry_20150709</span></code> isn't used.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_count \
+  --logical_table Entries \
+  --shard_key created_at \
+  --max &quot;2015/07/08 23:59:59&quot;
+# [[0, 1337566253.89858, 0.000355720520019531], 3]
+</pre></div>
+</div>
 </div>
 <div class="section" id="max-border">
-<h4>7.3.31.4.2.4. <code class="docutils literal"><span class="pre">max_border</span></code><a class="headerlink" href="#max-border" title="Permalink to this headline">¶</a></h4>
-<p>Specifies whether the max value of borderline must be include or not.
-Specify <code class="docutils literal"><span class="pre">include</span></code> or <code class="docutils literal"><span class="pre">exclude</span></code> as the value of this parameter.</p>
+<span id="logical-count-max-border"></span><h4>7.3.31.4.2.4. <code class="docutils literal"><span class="pre">max_border</span></code><a class="headerlink" href="#max-border" title="Permalink to this headline">¶</a></h4>
+<p>Specifies whether the maximum value is included or not. Here is
+available values.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Value</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">include</span></code></td>
+<td>Includes <code class="docutils literal"><span class="pre">max</span></code> value. This is the default.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">exclude</span></code></td>
+<td>Doesn't include <code class="docutils literal"><span class="pre">max</span></code> value.</td>
+</tr>
+</tbody>
+</table>
+<p>Here is an example for <code class="docutils literal"><span class="pre">exclude</span></code>. The result doesn't include the
+<code class="docutils literal"><span class="pre">&quot;Good-bye</span> <span class="pre">Senna&quot;</span></code> record because its <code class="docutils literal"><span class="pre">created_at</span></code> value is
+<code class="docutils literal"><span class="pre">&quot;2015/07/09</span> <span class="pre">00:00:00&quot;</span></code>.</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_count \
+  --logical_table Entries \
+  --shard_key created_at \
+  --max &quot;2015/07/09 00:00:00&quot; \
+  --max_border &quot;exclude&quot;
+# [[0, 1337566253.89858, 0.000355720520019531], 3]
+</pre></div>
 </div>
+</div>
+</div>
+<div class="section" id="search-related-parameters">
+<span id="logical-count-search-related-parameters"></span><h3>7.3.31.4.3. Search related parameters<a class="headerlink" href="#search-related-parameters" title="Permalink to this headline">¶</a></h3>
+<p>This command provides <a class="reference internal" href="select.html"><span class="doc">select</span></a> compatible search related
+parameters.</p>
 <div class="section" id="filter">
-<h4>7.3.31.4.2.5. <code class="docutils literal"><span class="pre">filter</span></code><a class="headerlink" href="#filter" title="Permalink to this headline">¶</a></h4>
+<span id="logical-count-filter"></span><h4>7.3.31.4.3.1. <code class="docutils literal"><span class="pre">filter</span></code><a class="headerlink" href="#filter" title="Permalink to this headline">¶</a></h4>
+<p>Corresponds to <a class="reference internal" href="select.html#select-filter"><span class="std std-ref">filter</span></a> in <a class="reference internal" href="select.html"><span class="doc">select</span></a>. See
+<a class="reference internal" href="select.html#select-filter"><span class="std std-ref">filter</span></a> for details.</p>
+<p>Here is an example:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_count \
+  --logical_table Entries \
+  --shard_key created_at \
+  --filter &quot;n_likes &lt;= 5&quot;
+# [[0, 1337566253.89858, 0.000355720520019531], 3]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="dynamic-column-related-parameters">
+<span id="logical-count-dynamic-column-related-parameters"></span><h3>7.3.31.4.4. Dynamic column related parameters<a class="headerlink" href="#dynamic-column-related-parameters" title="Permalink to this headline">¶</a></h3>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 7.0.9.</span></p>
+</div>
+<p>All dynamic column related parameters in <a class="reference internal" href="select.html"><span class="doc">select</span></a> are
+supported. See <a class="reference internal" href="select.html#select-dynamic-column-related-parameters"><span class="std std-ref">Dynamic column related parameters</span></a> for
+details.</p>
+<div class="section" id="columns-name-stage">
+<span id="logical-count-columns-name-stage"></span><h4>7.3.31.4.4.1. <code class="docutils literal"><span class="pre">columns[${NAME}].stage</span></code><a class="headerlink" href="#columns-name-stage" title="Permalink to this headline">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 7.0.9.</span></p>
+</div>
+<p>Corresponds to <a class="reference internal" href="select.html#select-columns-name-stage"><span class="std std-ref">columns[${NAME}].stage</span></a> in <a class="reference internal" href="select.html"><span class="doc">select</span></a>. See
+<a class="reference internal" href="select.html#select-columns-name-stage"><span class="std std-ref">columns[${NAME}].stage</span></a> for details.</p>
+<p>This is a required parameter.</p>
+<p>Only <code class="docutils literal"><span class="pre">initial</span></code> stage is valid. Because there are no processes after
+<code class="docutils literal"><span class="pre">filtered</span></code> and <code class="docutils literal"><span class="pre">output</span></code> stages.</p>
+<p>Here is an example that creates <code class="docutils literal"><span class="pre">is_popular</span></code> column at <code class="docutils literal"><span class="pre">initial</span></code>
+stage. You can use <code class="docutils literal"><span class="pre">is_popular</span></code> in all parameters such as <code class="docutils literal"><span class="pre">filter</span></code>:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_count \
+  --logical_table Entries \
+  --shard_key created_at \
+  --columns[is_popular].stage initial \
+  --columns[is_popular].type Bool \
+  --columns[is_popular].value &#39;n_likes &gt;= 10&#39; \
+  --filter is_popular
+# [[0, 1337566253.89858, 0.000355720520019531], 2]
+</pre></div>
+</div>
+</div>
+<div class="section" id="columns-name-flags">
+<span id="logical-count-columns-name-flags"></span><h4>7.3.31.4.4.2. <code class="docutils literal"><span class="pre">columns[${NAME}].flags</span></code><a class="headerlink" href="#columns-name-flags" title="Permalink to this headline">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 7.0.9.</span></p>
+</div>
+<p>Corresponds to <a class="reference internal" href="select.html#select-columns-name-flags"><span class="std std-ref">columns[${NAME}].flags</span></a> in <a class="reference internal" href="select.html"><span class="doc">select</span></a>. See
+<a class="reference internal" href="select.html#select-columns-name-flags"><span class="std std-ref">columns[${NAME}].flags</span></a> for details.</p>
+<p>The default value is <code class="docutils literal"><span class="pre">COLUMN_SCALAR</span></code>.</p>
+<p>Here is an example that creates a vector column by <code class="docutils literal"><span class="pre">COLUMN_VECTOR</span></code>
+flags. <code class="docutils literal"><span class="pre">plugin_register</span> <span class="pre">functions/vector</span></code> is for using
+<a class="reference internal" href="../functions/vector_new.html"><span class="doc">vector_new</span></a> function:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>plugin_register functions/vector
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+logical_count \
+  --logical_table Entries \
+  --shard_key created_at \
+  --columns[vector].stage initial \
+  --columns[vector].flags COLUMN_VECTOR \
+  --columns[vector].type UInt32 \
+  --columns[vector].value &#39;vector_new(1, 2, 3)&#39; \
+  --filter &#39;vector_size(vector) &gt; 2&#39;
+# [[0, 1337566253.89858, 0.000355720520019531], 5]
+</pre></div>
+</div>
+</div>
+<div class="section" id="columns-name-type">
+<span id="logical-count-columns-name-type"></span><h4>7.3.31.4.4.3. <code class="docutils literal"><span class="pre">columns[${NAME}].type</span></code><a class="headerlink" href="#columns-name-type" title="Permalink to this headline">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 7.0.9.</span></p>
+</div>
+<p>Corresponds to <a class="reference internal" href="select.html#select-columns-name-type"><span class="std std-ref">columns[${NAME}].type</span></a> in <a class="reference internal" href="select.html"><span class="doc">select</span></a>. See
+<a class="reference internal" href="select.html#select-columns-name-type"><span class="std std-ref">columns[${NAME}].type</span></a> for details.</p>
+<p>This is a required parameter.</p>
+<p>Here is an example that creates a <code class="docutils literal"><span class="pre">ShortText</span></code> type column. Stored
+value is casted to <code class="docutils literal"><span class="pre">ShortText</span></code> automatically. In this example,
+number is casted to <code class="docutils literal"><span class="pre">ShortText</span></code>:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_count \
+  --logical_table Entries \
+  --shard_key created_at \
+  --columns[n_likes_string].stage initial \
+  --columns[n_likes_string].type ShortText \
+  --columns[n_likes_string].value n_likes \
+  --filter &#39;n_likes_string == &quot;3&quot;&#39;
+# [[0, 1337566253.89858, 0.000355720520019531], 2]
+</pre></div>
+</div>
+</div>
+<div class="section" id="columns-name-value">
+<span id="logical-count-columns-name-value"></span><h4>7.3.31.4.4.4. <code class="docutils literal"><span class="pre">columns[${NAME}].value</span></code><a class="headerlink" href="#columns-name-value" title="Permalink to this headline">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 7.0.9.</span></p>
+</div>
+<p>Corresponds to <a class="reference internal" href="select.html#select-columns-name-value"><span class="std std-ref">columns[${NAME}].value</span></a> in <a class="reference internal" href="select.html"><span class="doc">select</span></a>. See
+<a class="reference internal" href="select.html#select-columns-name-value"><span class="std std-ref">columns[${NAME}].value</span></a> for details.</p>
+<p>You need to specify <a class="reference internal" href="../window_function.html"><span class="doc">Window function</span></a> as <code class="docutils literal"><span class="pre">value</span></code>
+value and other window function related parameters when you use window
+function. See <a class="reference internal" href="#logical-count-window-function-related-parameters"><span class="std std-ref">Window function related parameters</span></a>
+for details.</p>
+<p>This is a required parameter.</p>
+<p>Here is an example that creates a new dynamic column that stores the
+number of characters of content. This example uses
+<a class="reference internal" href="../functions/string_length.html"><span class="doc">string_length</span></a> function in
+<code class="docutils literal"><span class="pre">functions/string</span></code> plugin to compute the number of characters in a
+string. <a class="reference internal" href="plugin_register.html"><span class="doc">plugin_register</span></a> is used to register
+<code class="docutils literal"><span class="pre">functions/string</span></code> plugin:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>plugin_register functions/string
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+logical_count \
+  --logical_table Entries \
+  --shard_key created_at \
+  --columns[content_length].stage initial \
+  --columns[content_length].type UInt32 \
+  --columns[content_length].value &#39;string_length(content)&#39; \
+  --filter &#39;content_length &gt;= 40&#39;
+# [[0, 1337566253.89858, 0.000355720520019531], 2]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="window-function-related-parameters">
+<span id="logical-count-window-function-related-parameters"></span><h3>7.3.31.4.5. Window function related parameters<a class="headerlink" href="#window-function-related-parameters" title="Permalink to this headline">¶</a></h3>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 7.0.9.</span></p>
+</div>
+<p>All window function related parameters in <a class="reference internal" href="select.html"><span class="doc">select</span></a> are
+supported. See <a class="reference internal" href="select.html#select-window-function-related-parameters"><span class="std std-ref">Window function related parameters</span></a> for
+details.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Window function over multiple tables aren't supported yet.</p>
+</div>
+<div class="section" id="columns-name-window-sort-keys">
+<span id="logical-count-columns-name-window-sort-keys"></span><h4>7.3.31.4.5.1. <code class="docutils literal"><span class="pre">columns[${NAME}].window.sort_keys</span></code><a class="headerlink" href="#columns-name-window-sort-keys" title="Permalink to this headline">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 7.0.9.</span></p>
+</div>
+<p>Corresponds to <a class="reference internal" href="select.html#select-columns-name-window-sort-keys"><span class="std std-ref">columns[${NAME}].window.sort_keys</span></a> in
+<a class="reference internal" href="select.html"><span class="doc">select</span></a>. See <a class="reference internal" href="select.html#select-columns-name-window-sort-keys"><span class="std std-ref">columns[${NAME}].window.sort_keys</span></a> for
+details.</p>
+<p>You must specify <a class="reference internal" href="#logical-count-columns-name-window-sort-keys"><span class="std std-ref">columns[${NAME}].window.sort_keys</span></a>
+or <a class="reference internal" href="#logical-count-columns-name-window-group-keys"><span class="std std-ref">columns[${NAME}].window.group_keys</span></a> to use window
+function.</p>
+<p>Here is an example that computes cumulative sum per
+<code class="docutils literal"><span class="pre">Entries.tag</span></code>. Each group is sorted by <code class="docutils literal"><span class="pre">Entries._key</span></code>:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_count \
+  --logical_table Entries \
+  --shard_key created_at \
+  --columns[n_likes_cumulative_sum_per_tag].stage initial \
+  --columns[n_likes_cumulative_sum_per_tag].type UInt32 \
+  --columns[n_likes_cumulative_sum_per_tag].value &#39;window_sum(n_likes)&#39; \
+  --columns[n_likes_cumulative_sum_per_tag].window.sort_keys _key \
+  --columns[n_likes_cumulative_sum_per_tag].window.group_keys tag \
+  --filter &#39;n_likes_cumulative_sum_per_tag &gt; 5&#39;
+# [[0, 1337566253.89858, 0.000355720520019531], 3]
+</pre></div>
+</div>
+</div>
+<div class="section" id="columns-name-window-group-keys">
+<span id="logical-count-columns-name-window-group-keys"></span><h4>7.3.31.4.5.2. <code class="docutils literal"><span class="pre">columns[${NAME}].window.group_keys</span></code><a class="headerlink" href="#columns-name-window-group-keys" title="Permalink to this headline">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 7.0.9.</span></p>
+</div>
+<p>Corresponds to <a class="reference internal" href="select.html#select-columns-name-window-group-keys"><span class="std std-ref">columns[${NAME}].window.group_keys</span></a> in
+<a class="reference internal" href="select.html"><span class="doc">select</span></a>. See <a class="reference internal" href="select.html#select-columns-name-window-group-keys"><span class="std std-ref">columns[${NAME}].window.group_keys</span></a> for
+details.</p>
+<p>You must specify <a class="reference internal" href="#logical-count-columns-name-window-sort-keys"><span class="std std-ref">columns[${NAME}].window.sort_keys</span></a>
+or <a class="reference internal" href="#logical-count-columns-name-window-group-keys"><span class="std std-ref">columns[${NAME}].window.group_keys</span></a> to use window
+function.</p>
+<p>Here is an example that computes sum per <code class="docutils literal"><span class="pre">Entries.tag</span></code>:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_count \
+  --logical_table Entries \
+  --shard_key created_at \
+  --columns[n_likes_sum_per_tag].stage initial \
+  --columns[n_likes_sum_per_tag].type UInt32 \
+  --columns[n_likes_sum_per_tag].value &#39;window_sum(n_likes)&#39; \
+  --columns[n_likes_sum_per_tag].window.group_keys tag \
+  --filter &#39;n_likes_sum_per_tag &gt; 5&#39;
+# [[0, 1337566253.89858, 0.000355720520019531], 4]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="cache-related-parameter">
+<h3>7.3.31.4.6. Cache related parameter<a class="headerlink" href="#cache-related-parameter" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="cache">
+<span id="logical-count-cache"></span><h4>7.3.31.4.6.1. <code class="docutils literal"><span class="pre">cache</span></code><a class="headerlink" href="#cache" title="Permalink to this headline">¶</a></h4>
+<p>Specifies whether caching the result of this query or not.</p>
+<p>If the result of this query is cached, the next same query returns
+response quickly by using the cache.</p>
+<p>It doesn't control whether existing cached result is used or not.</p>
+<p>Here are available values:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Value</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">no</span></code></td>
+<td>Don't cache the output of this query.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">yes</span></code></td>
+<td>Cache the output of this query.
+It's the default value.</td>
+</tr>
+</tbody>
+</table>
+<p>Here is an example to disable caching the result of this query:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_count \
+  --logical_table Entries \
+  --shard_key created_at \
+  --cache no
+# [[0, 1337566253.89858, 0.000355720520019531], 5]
+</pre></div>
+</div>
+<p>The default value is <code class="docutils literal"><span class="pre">yes</span></code>.</p>
 </div>
 </div>
 </div>
 <div class="section" id="return-value">
 <h2>7.3.31.5. Return value<a class="headerlink" href="#return-value" title="Permalink to this headline">¶</a></h2>
-<p>TODO</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>[HEADER, LOGICAL_COUNT]
+<p>The command returns a response with the following format:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>[HEADER, N_HITS]
 </pre></div>
 </div>
+<p>If the command fails, error details are in <code class="docutils literal"><span class="pre">HEADER</span></code>.</p>
+<p>See <a class="reference internal" href="../command/output_format.html"><span class="doc">Output format</span></a> for <code class="docutils literal"><span class="pre">HEADER</span></code>.</p>
+<p><code class="docutils literal"><span class="pre">N_HITS</span></code> is the number of matched records.</p>
 </div>
 </div>
 
@@ -266,7 +687,26 @@ Specify <code class="docutils literal"><span class="pre">include</span></code> o
 <li><a class="reference internal" href="#min-border">7.3.31.4.2.2. <code class="docutils literal"><span class="pre">min_border</span></code></a></li>
 <li><a class="reference internal" href="#max">7.3.31.4.2.3. <code class="docutils literal"><span class="pre">max</span></code></a></li>
 <li><a class="reference internal" href="#max-border">7.3.31.4.2.4. <code class="docutils literal"><span class="pre">max_border</span></code></a></li>
-<li><a class="reference internal" href="#filter">7.3.31.4.2.5. <code class="docutils literal"><span class="pre">filter</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#search-related-parameters">7.3.31.4.3. Search related parameters</a><ul>
+<li><a class="reference internal" href="#filter">7.3.31.4.3.1. <code class="docutils literal"><span class="pre">filter</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#dynamic-column-related-parameters">7.3.31.4.4. Dynamic column related parameters</a><ul>
+<li><a class="reference internal" href="#columns-name-stage">7.3.31.4.4.1. <code class="docutils literal"><span class="pre">columns[${NAME}].stage</span></code></a></li>
+<li><a class="reference internal" href="#columns-name-flags">7.3.31.4.4.2. <code class="docutils literal"><span class="pre">columns[${NAME}].flags</span></code></a></li>
+<li><a class="reference internal" href="#columns-name-type">7.3.31.4.4.3. <code class="docutils literal"><span class="pre">columns[${NAME}].type</span></code></a></li>
+<li><a class="reference internal" href="#columns-name-value">7.3.31.4.4.4. <code class="docutils literal"><span class="pre">columns[${NAME}].value</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#window-function-related-parameters">7.3.31.4.5. Window function related parameters</a><ul>
+<li><a class="reference internal" href="#columns-name-window-sort-keys">7.3.31.4.5.1. <code class="docutils literal"><span class="pre">columns[${NAME}].window.sort_keys</span></code></a></li>
+<li><a class="reference internal" href="#columns-name-window-group-keys">7.3.31.4.5.2. <code class="docutils literal"><span class="pre">columns[${NAME}].window.group_keys</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cache-related-parameter">7.3.31.4.6. Cache related parameter</a><ul>
+<li><a class="reference internal" href="#cache">7.3.31.4.6.1. <code class="docutils literal"><span class="pre">cache</span></code></a></li>
 </ul>
 </li>
 </ul>

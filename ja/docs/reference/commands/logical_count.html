@@ -94,150 +94,504 @@
 <div class="versionadded">
 <p><span class="versionmodified">バージョン 5.0.0 で追加.</span></p>
 </div>
-<p><code class="docutils literal"><span class="pre">logical_count</span></code> は別のテーブルに保存されているレコードであっても、マッチするレコードをカウントするためのコマンドです。テーブルの最大レコード数の <a class="reference internal" href="../../limitations.html"><span class="doc">制限事項</span></a> を気にしなくてすむようになります。</p>
-<p>この機能はまだこなれていないので、いくつか制限があります。</p>
-<ul class="simple">
-<li><p class="first">名前の末尾は「_YYYYMMDD」をつけてテーブルを作成します。これは決め打ちになっていて、日ごとにテーブルを作成しないといけない</p>
-</li>
-<li><p class="first">自分で個々のテーブルへ適切なデータをロードしないといけない</p>
-</li>
-</ul>
+<p><code class="docutils literal"><span class="pre">logical_count</span></code> は <a class="reference internal" href="logical_select.html"><span class="doc">logical_select</span></a> の件数カウント機能だけを提供するコマンドです。 <a class="reference internal" href="logical_select.html"><span class="doc">logical_select</span></a> は複数のテーブルからレコードを検索し、マッチしたレコード数を出力し、マッチしたレコードのカラムを出力し、他にもいろいろします。 <code class="docutils literal"><span class="pre">logical_count</span></code> は複数のテーブルからレコードを検索し、マッチしたレコード数を出力するだけです。</p>
+<p><code class="docutils literal"><span class="pre">logical_count</span></code> はマッチしたレコードの数だけを知りたいときに便利です。 <code class="docutils literal"><span class="pre">logical_count</span></code> と <a class="reference internal" href="logical_range_filter.html"><span class="doc">logical_range_filter</span></a> を一緒に使えます。一緒に使うと、マッチしたレコード数を取得する前に、マッチしたレコードのうち先頭のNレコードだけを先に表示できます。 <a class="reference internal" href="logical_select.html"><span class="doc">logical_select</span></a> だけを使っている場合は、すべての検索処理が終わるまで待たなければいけません。</p>
+<p>このコマンド は <code class="docutils literal"><span class="pre">sharding</span></code> プラグインに含まれているので、 <code class="docutils literal"><span class="pre">sharding</span></code> プラグインを <a class="reference internal" href="plugin_register.html"><span class="doc">plugin_register</span></a> する必要があります。</p>
 </div>
 <div class="section" id="syntax">
 <h2>7.3.31.2. 構文<a class="headerlink" href="#syntax" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <p>このコマンドにはたくさんの引数があります。</p>
-<p>必須引数は2つあります。 <code class="docutils literal"><span class="pre">logical_table</span></code> と <code class="docutils literal"><span class="pre">shard_key</span></code> です。</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>logical_count logical_table
-              shard_key
-              [min]
-              [min_border]
-              [max]
-              [max_border]
-              [filter]
+<p>必須の引数は <code class="docutils literal"><span class="pre">logical_table</span></code> と <code class="docutils literal"><span class="pre">shard_key</span></code> です。それ以外の引数は省略可能です:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_count
+  logical_table
+  shard_key
+  [min=null]
+  [min_border=&quot;include&quot;]
+  [max=null]
+  [max_border=&quot;include&quot;]
+  [filter=null]
 </pre></div>
 </div>
 </div>
 <div class="section" id="usage">
-<h2>7.3.31.3. 使い方<a class="headerlink" href="#usage" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p><code class="docutils literal"><span class="pre">logical_count</span></code> コマンドを使うには事前に <code class="docutils literal"><span class="pre">sharding</span></code> プラグインを登録します。</p>
+<span id="logical-count-usage"></span><h2>7.3.31.3. 使い方<a class="headerlink" href="#usage" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>例を使いながら使い方を学びましょう。このセクションではよく使われる使い方を紹介します。</p>
+<p>このコマンドは <code class="docutils literal"><span class="pre">sharding</span></code> プラグインに含まれているので <code class="docutils literal"><span class="pre">sharding</span></code> プラグインを登録する必要があります。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>plugin_register sharding
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
 <p><code class="docutils literal"><span class="pre">logical_count</span></code> コマンドは実験的なプラグインです。このコマンドは将来的に変更されるかもしれません。</p>
 <p>この機能を使う簡単な例を示します。複数のテーブルに保存されている特定のログをカウントしてみましょう。</p>
-<p>スキーマ定義とサンプルデータは以下の通りです。</p>
+<p>使い方を示すために使うスキーマ定義とサンプルデータは以下の通りです。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>table_create Logs_20150203 TABLE_NO_KEY
+<div class="highlight-none"><div class="highlight"><pre><span></span>table_create Entries_20150708 TABLE_HASH_KEY ShortText
 # [[0, 1337566253.89858, 0.000355720520019531], true]
-column_create Logs_20150203 timestamp COLUMN_SCALAR Time
+column_create Entries_20150708 created_at COLUMN_SCALAR Time
 # [[0, 1337566253.89858, 0.000355720520019531], true]
-column_create Logs_20150203 message COLUMN_SCALAR Text
+column_create Entries_20150708 content COLUMN_SCALAR Text
 # [[0, 1337566253.89858, 0.000355720520019531], true]
-table_create Logs_20150204 TABLE_NO_KEY
+column_create Entries_20150708 n_likes COLUMN_SCALAR UInt32
 # [[0, 1337566253.89858, 0.000355720520019531], true]
-column_create Logs_20150204 timestamp COLUMN_SCALAR Time
+column_create Entries_20150708 tag COLUMN_SCALAR ShortText
 # [[0, 1337566253.89858, 0.000355720520019531], true]
-column_create Logs_20150204 message COLUMN_SCALAR Text
+table_create Entries_20150709 TABLE_HASH_KEY ShortText
 # [[0, 1337566253.89858, 0.000355720520019531], true]
-table_create Logs_20150205 TABLE_NO_KEY
+column_create Entries_20150709 created_at COLUMN_SCALAR Time
 # [[0, 1337566253.89858, 0.000355720520019531], true]
-column_create Logs_20150205 timestamp COLUMN_SCALAR Time
+column_create Entries_20150709 content COLUMN_SCALAR Text
 # [[0, 1337566253.89858, 0.000355720520019531], true]
-column_create Logs_20150205 message COLUMN_SCALAR Text
+column_create Entries_20150709 n_likes COLUMN_SCALAR UInt32
 # [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Entries_20150709 tag COLUMN_SCALAR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create Terms TABLE_PAT_KEY ShortText \
+  --default_tokenizer TokenBigram \
+  --normalizer NormalizerAuto
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Terms entries_key_index_20150708 \
+  COLUMN_INDEX|WITH_POSITION Entries_20150708 _key
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Terms entries_content_index_20150708 \
+  COLUMN_INDEX|WITH_POSITION Entries_20150708 content
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Terms entries_key_index_20150709 \
+  COLUMN_INDEX|WITH_POSITION Entries_20150709 _key
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Terms entries_content_index_20150709 \
+  COLUMN_INDEX|WITH_POSITION Entries_20150709 content
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+load --table Entries_20150708
+[
+{&quot;_key&quot;:       &quot;The first post!&quot;,
+ &quot;created_at&quot;: &quot;2015/07/08 00:00:00&quot;,
+ &quot;content&quot;:    &quot;Welcome! This is my first post!&quot;,
+ &quot;n_likes&quot;:    5,
+ &quot;tag&quot;:        &quot;Hello&quot;},
+{&quot;_key&quot;:       &quot;Groonga&quot;,
+ &quot;created_at&quot;: &quot;2015/07/08 01:00:00&quot;,
+ &quot;content&quot;:    &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+ &quot;n_likes&quot;:    10,
+ &quot;tag&quot;:        &quot;Groonga&quot;},
+{&quot;_key&quot;:       &quot;Mroonga&quot;,
+ &quot;created_at&quot;: &quot;2015/07/08 02:00:00&quot;,
+ &quot;content&quot;:    &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
+ &quot;n_likes&quot;:    15,
+ &quot;tag&quot;:        &quot;Groonga&quot;}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 3]
+load --table Entries_20150709
+[
+{&quot;_key&quot;:       &quot;Good-bye Senna&quot;,
+ &quot;created_at&quot;: &quot;2015/07/09 00:00:00&quot;,
+ &quot;content&quot;:    &quot;I migrated all Senna system!&quot;,
+ &quot;n_likes&quot;:    3,
+ &quot;tag&quot;:        &quot;Senna&quot;},
+{&quot;_key&quot;:       &quot;Good-bye Tritonn&quot;,
+ &quot;created_at&quot;: &quot;2015/07/09 01:00:00&quot;,
+ &quot;content&quot;:    &quot;I also migrated all Tritonn system!&quot;,
+ &quot;n_likes&quot;:    3,
+ &quot;tag&quot;:        &quot;Senna&quot;}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 2]
 </pre></div>
 </div>
-<p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>load --table Logs_20150203
-[
-{&quot;timestamp&quot;: &quot;2015-02-03 23:59:58&quot;, &quot;message&quot;: &quot;Start&quot;},
-{&quot;timestamp&quot;: &quot;2015-02-03 23:59:58&quot;, &quot;message&quot;: &quot;Shutdown&quot;},
-{&quot;timestamp&quot;: &quot;2015-02-03 23:59:59&quot;, &quot;message&quot;: &quot;Start&quot;},
-{&quot;timestamp&quot;: &quot;2015-02-03 23:59:59&quot;, &quot;message&quot;: &quot;Shutdown&quot;}
-]
-# [[0, 1337566253.89858, 0.000355720520019531], 4]
-load --table Logs_20150204
-[
-{&quot;timestamp&quot;: &quot;2015-02-04 00:00:00&quot;, &quot;message&quot;: &quot;Start&quot;},
-{&quot;timestamp&quot;: &quot;2015-02-04 00:00:00&quot;, &quot;message&quot;: &quot;Shutdown&quot;},
-{&quot;timestamp&quot;: &quot;2015-02-04 00:00:01&quot;, &quot;message&quot;: &quot;Start&quot;},
-{&quot;timestamp&quot;: &quot;2015-02-04 00:00:01&quot;, &quot;message&quot;: &quot;Shutdown&quot;},
-{&quot;timestamp&quot;: &quot;2015-02-04 23:59:59&quot;, &quot;message&quot;: &quot;Start&quot;},
-{&quot;timestamp&quot;: &quot;2015-02-04 23:59:59&quot;, &quot;message&quot;: &quot;Shutdown&quot;}
-]
-# [[0, 1337566253.89858, 0.000355720520019531], 6]
-load --table Logs_20150205
-[
-{&quot;timestamp&quot;: &quot;2015-02-05 00:00:00&quot;, &quot;message&quot;: &quot;Start&quot;},
-{&quot;timestamp&quot;: &quot;2015-02-05 00:00:00&quot;, &quot;message&quot;: &quot;Shutdown&quot;},
-{&quot;timestamp&quot;: &quot;2015-02-05 00:00:01&quot;, &quot;message&quot;: &quot;Start&quot;},
-{&quot;timestamp&quot;: &quot;2015-02-05 00:00:01&quot;, &quot;message&quot;: &quot;Shutdown&quot;}
-]
-# [[0, 1337566253.89858, 0.000355720520019531], 4]
-</pre></div>
-</div>
-<p>2015年の2月3日から5日までに対応したテーブルが3つあります。</p>
-<ul class="simple">
-<li>Logs_20150203</li>
-<li>Logs_20150204</li>
-<li>Logs_20150205</li>
-</ul>
-<p>対応するテーブルへとデータを投入します。</p>
-<p><code class="docutils literal"><span class="pre">message</span></code> カラムに「Shutdown」が含まれていて、 <code class="docutils literal"><span class="pre">timestamp</span></code> カラムの値が「2015-02-04 00:00:00」以降であるログをカウントしましょう。</p>
-<p>上記目的を達成するためのクエリがこちらです。</p>
-<p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>logical_count Logs timestamp --filter &#39;message == &quot;Shutdown&quot;&#39; --min &quot;2015-02-04 00:00:00&quot; --min_border &quot;include&quot;
-# [[0, 1337566253.89858, 0.000355720520019531], 5]
-</pre></div>
-</div>
-<p>レコード数には既知の制限があります。制限はテーブルごとなので、シャーディング機能によってその制限を乗り越えることができます。</p>
+<p>ブログエントリー用に <code class="docutils literal"><span class="pre">Entries_20150708</span></code> と <code class="docutils literal"><span class="pre">Entries_20150709</span></code> の2つのテーブルがあります。</p>
 <div class="admonition note">
 <p class="first admonition-title">注釈</p>
-<p class="last">SQLの <code class="docutils literal"><span class="pre">PARTITIONING</span> <span class="pre">BY</span></code> のような便利なクエリはありません。つまり、 <code class="docutils literal"><span class="pre">table_create</span></code> で「_YYYYMMDD」を名前の末尾に含むテーブルをそれぞれの作らなければなりません。</p>
+<p class="last">テーブル名には <code class="docutils literal"><span class="pre">${論理テーブル名}_${YYYYMMDD}</span></code> という命名規則を使う必要があります。この例では、 <code class="docutils literal"><span class="pre">論理テーブル名</span></code> は <code class="docutils literal"><span class="pre">Entries</span></code> で <code class="docutils literal"><span class="pre">YYYYMMDD</span></code> は <code class="docutils literal"><span class="pre">20150708</span></code> または <code class="docutils literal"><span class="pre">20150709</span></code> です。</p>
 </div>
+<p>各エントリはタイトルと作成日時と内容と「いいね！」数、タグを持っています。タイトルは <code class="docutils literal"><span class="pre">Entries_YYYYMMDD</span></code> のキーとします。作成日時は <code class="docutils literal"><span class="pre">Entries_YYYYMMDD.created_at</span></code> カラムの値とします。内容は <code class="docutils literal"><span class="pre">Entries_YYYYMMDD.content</span></code> カラムの値とします。「いいね！」数は <code class="docutils literal"><span class="pre">Entries_YYYYMMDD.n_likes</span></code> カラムの値とします。タグは <code class="docutils literal"><span class="pre">Entries_YYYYMMDD.tag</span></code> カラムの値とします。</p>
+<p><code class="docutils literal"><span class="pre">Entries_YYYYMMDD._key</span></code> カラムと <code class="docutils literal"><span class="pre">Entries_YYYYMMDD.content</span></code> カラムには <code class="docutils literal"><span class="pre">TokenBigram</span></code> トークナイザーを使ったインデックスを作成します。そのため、 <code class="docutils literal"><span class="pre">Entries_YYYYMMDD._key</span></code> と <code class="docutils literal"><span class="pre">Entries_YYYYMMDD.content</span></code> は両方とも全文検索できます。</p>
+<p>これで例を示すためのスキーマとデータの準備ができました。</p>
+<p>以下は <code class="docutils literal"><span class="pre">content</span></code> カラムに <code class="docutils literal"><span class="pre">Groonga</span></code> または <code class="docutils literal"><span class="pre">Senna</span></code> を含むレコード数を数える例です。 <code class="docutils literal"><span class="pre">logical_count</span></code> はすべての <code class="docutils literal"><span class="pre">Entries_YYYYMMDD</span></code> テーブルを検索します。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_count \
+  --logical_table Entries \
+  --shard_key created_at \
+  --filter &#39;query(&quot;content&quot;, &quot;Groonga OR Senna&quot;)&#39;
+# [[0, 1337566253.89858, 0.000355720520019531], 2]
+</pre></div>
+</div>
+<p>マッチしたレコードは次の通りです。</p>
+<blockquote>
+<div><ul class="simple">
+<li><p class="first"><code class="docutils literal"><span class="pre">Entries_20150708</span></code> の中の <code class="docutils literal"><span class="pre">_key:&quot;Groonga&quot;</span></code></p>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">Entries_20150709</span></code> の中の <code class="docutils literal"><span class="pre">_key:&quot;Good-bye</span> <span class="pre">Senna&quot;</span></code></p>
+</li>
+</ul>
+</div></blockquote>
 </div>
 <div class="section" id="parameters">
 <h2>7.3.31.4. 引数<a class="headerlink" href="#parameters" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>このセクションでは <code class="docutils literal"><span class="pre">logical_count</span></code> の引数について説明します。</p>
+<p>このセクションではこのコマンドのパラメーターを説明します。</p>
 <div class="section" id="required-parameters">
 <h3>7.3.31.4.1. 必須引数<a class="headerlink" href="#required-parameters" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <p>必須引数は二つあります。 <code class="docutils literal"><span class="pre">logical_table</span></code> と <code class="docutils literal"><span class="pre">shard_key</span></code> です。</p>
 <div class="section" id="logical-table">
-<h4>7.3.31.4.1.1. <code class="docutils literal"><span class="pre">logical_table</span></code><a class="headerlink" href="#logical-table" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<span id="logical-count-logical-table"></span><h4>7.3.31.4.1.1. <code class="docutils literal"><span class="pre">logical_table</span></code><a class="headerlink" href="#logical-table" title="このヘッドラインへのパーマリンク">¶</a></h4>
 <p>論理テーブル名を指定します。これは <code class="docutils literal"><span class="pre">_YYYYMMDD</span></code> をテーブル名から除いたものです。実際のテーブルが <code class="docutils literal"><span class="pre">Logs_20150203</span></code> や <code class="docutils literal"><span class="pre">Logs_20150203</span></code> といったものなら、論理テーブル名は <code class="docutils literal"><span class="pre">Logs</span></code> です。</p>
+<p><code class="docutils literal"><span class="pre">logical_table</span></code> と <code class="docutils literal"><span class="pre">shard_key</span></code> だけを指定すると全レコード数をカウントできます。これらの引数は必須の引数です。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_count \
+  --logical_table Entries \
+  --shard_key created_at
+# [[0, 1337566253.89858, 0.000355720520019531], 5]
+</pre></div>
+</div>
+<p>存在しないテーブルを指定するとエラーが返ります。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_count \
+  --logical_table Nonexistent \
+  --shard_key created_at
+# [
+#   [
+#     -22,
+#     1337566253.89858,
+#     0.000355720520019531,
+#     &quot;[logical_count] no shard exists: logical_table: &lt;Nonexistent&gt;: shard_key: &lt;created_at&gt;&quot;,
+#     [
+#       [
+#         &quot;Groonga::Sharding::LogicalCountCommand.run_body&quot;,
+#         &quot;/home/kou/work/c/groonga.clean/plugins/sharding/logical_count.rb&quot;,
+#         30
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
 </div>
 <div class="section" id="shard-key">
-<h4>7.3.31.4.1.2. <code class="docutils literal"><span class="pre">shard_key</span></code><a class="headerlink" href="#shard-key" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p>個々のテーブルで共通のキーとして扱うカラム名を指定します。</p>
+<span id="logical-count-shard-key"></span><h4>7.3.31.4.1.2. <code class="docutils literal"><span class="pre">shard_key</span></code><a class="headerlink" href="#shard-key" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>シャードキーとして使うカラム名を指定します。シャードキーは適切なシャードへレコードを分配するために使う値を保存しているカラムです。</p>
+<p>今のところ、シャードキーは <code class="docutils literal"><span class="pre">Time</span></code> 型でなければいけません。</p>
+<p><code class="docutils literal"><span class="pre">shard_key</span></code> の指定方法は <a class="reference internal" href="#logical-count-logical-table"><span class="std std-ref">logical_table</span></a> を見てください。</p>
 </div>
 </div>
 <div class="section" id="optional-parameters">
 <h3>7.3.31.4.2. 省略可能引数<a class="headerlink" href="#optional-parameters" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <p>いくつか省略可能な引数があります。</p>
 <div class="section" id="min">
-<h4>7.3.31.4.2.1. <code class="docutils literal"><span class="pre">min</span></code><a class="headerlink" href="#min" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p><code class="docutils literal"><span class="pre">shard_key</span></code> の最小値を指定します。</p>
+<span id="logical-count-min"></span><h4>7.3.31.4.2.1. <code class="docutils literal"><span class="pre">min</span></code><a class="headerlink" href="#min" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p><code class="docutils literal"><span class="pre">shard_key</span></code> カラムの最小値を指定します。シャードにマッチするレコードがない場合は、そのシャードは検索対象外になります。</p>
+<p>たとえば、 <code class="docutils literal"><span class="pre">min</span></code> が <code class="docutils literal"><span class="pre">&quot;2015/07/09</span> <span class="pre">00:00:00&quot;</span></code> なら、 <code class="docutils literal"><span class="pre">Entry_20150708</span></code> は検索対象外です。なぜなら、 <code class="docutils literal"><span class="pre">Entry_20150708</span></code> は <code class="docutils literal"><span class="pre">&quot;2015/07/08&quot;</span></code> のレコードしかないからです。</p>
+<p>以下の例は <code class="docutils literal"><span class="pre">Entry_20150709</span></code> テーブルだけを使う例です。 <code class="docutils literal"><span class="pre">Entry_20150708</span></code> は使われません。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_count \
+  --logical_table Entries \
+  --shard_key created_at \
+  --min &quot;2015/07/09 00:00:00&quot;
+# [[0, 1337566253.89858, 0.000355720520019531], 2]
+</pre></div>
+</div>
 </div>
 <div class="section" id="min-border">
-<h4>7.3.31.4.2.2. <code class="docutils literal"><span class="pre">min_border</span></code><a class="headerlink" href="#min-border" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p>最小値を境界値として含めるのか否かを指定します。 <code class="docutils literal"><span class="pre">include</span></code> もしくは <code class="docutils literal"><span class="pre">exclude</span></code> を指定します。</p>
+<span id="logical-count-min-border"></span><h4>7.3.31.4.2.2. <code class="docutils literal"><span class="pre">min_border</span></code><a class="headerlink" href="#min-border" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>最小値を含めるかどうかを指定します。指定可能な値は次の通りです。</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Value</th>
+<th class="head"><p class="first last">説明</p>
+</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">include</span></code></td>
+<td><p class="first last"><code class="docutils literal"><span class="pre">min</span></code> の値を含みます。これがデフォルト値です。</p>
+</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">exclude</span></code></td>
+<td><p class="first last"><code class="docutils literal"><span class="pre">min</span></code> の値を含みません。</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>次の例は <code class="docutils literal"><span class="pre">exclude</span></code> の使用例です。結果には <code class="docutils literal"><span class="pre">&quot;Good-bye</span> <span class="pre">Senna&quot;</span></code> レコードは含まれません。このレコードの <code class="docutils literal"><span class="pre">created_at</span></code> の値が <code class="docutils literal"><span class="pre">&quot;2015/07/09</span> <span class="pre">00:00:00&quot;</span></code> だからです。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_count \
+  --logical_table Entries \
+  --shard_key created_at \
+  --min &quot;2015/07/09 00:00:00&quot; \
+  --min_border &quot;exclude&quot;
+# [[0, 1337566253.89858, 0.000355720520019531], 1]
+</pre></div>
+</div>
 </div>
 <div class="section" id="max">
-<h4>7.3.31.4.2.3. <code class="docutils literal"><span class="pre">max</span></code><a class="headerlink" href="#max" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p><code class="docutils literal"><span class="pre">shard_key</span></code> の最大値を指定します。</p>
+<span id="logical-count-max"></span><h4>7.3.31.4.2.3. <code class="docutils literal"><span class="pre">max</span></code><a class="headerlink" href="#max" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p><code class="docutils literal"><span class="pre">shard_key</span></code> カラムの最大値を指定します。シャードにマッチするレコードがない場合、そのシャードは検索対象外になります。</p>
+<p>たとえば、 <code class="docutils literal"><span class="pre">max</span></code> が <code class="docutils literal"><span class="pre">&quot;2015/07/08</span> <span class="pre">23:59:59&quot;</span></code> なら <code class="docutils literal"><span class="pre">Entry_20150709</span></code> は検索対象外です。なぜなら <code class="docutils literal"><span class="pre">Entry_20150709</span></code> には <code class="docutils literal"><span class="pre">&quot;&quot;2015/07/09&quot;</span></code> のレコードしかないからです。</p>
+<p>以下の例は <code class="docutils literal"><span class="pre">Entry_20150708</span></code> テーブルだけを使います。 <code class="docutils literal"><span class="pre">Entry_20150709</span></code> は使いません。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_count \
+  --logical_table Entries \
+  --shard_key created_at \
+  --max &quot;2015/07/08 23:59:59&quot;
+# [[0, 1337566253.89858, 0.000355720520019531], 3]
+</pre></div>
+</div>
 </div>
 <div class="section" id="max-border">
-<h4>7.3.31.4.2.4. <code class="docutils literal"><span class="pre">max_border</span></code><a class="headerlink" href="#max-border" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p>最大値を境界値として含めるのか否かを指定します。 <code class="docutils literal"><span class="pre">include</span></code> もしくは <code class="docutils literal"><span class="pre">exclude</span></code> を指定します。</p>
+<span id="logical-count-max-border"></span><h4>7.3.31.4.2.4. <code class="docutils literal"><span class="pre">max_border</span></code><a class="headerlink" href="#max-border" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>最大値を含めるかどうかを指定します。指定可能な値は次の通りです。</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Value</th>
+<th class="head"><p class="first last">説明</p>
+</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">include</span></code></td>
+<td><p class="first last"><code class="docutils literal"><span class="pre">max</span></code> の値を含みます。これがデフォルト値です。</p>
+</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">exclude</span></code></td>
+<td><p class="first last"><code class="docutils literal"><span class="pre">max</span></code> の値を含みません。</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>次の例は <code class="docutils literal"><span class="pre">exclude</span></code> の使用例です。結果には <code class="docutils literal"><span class="pre">&quot;Good-bye</span> <span class="pre">Senna&quot;</span></code> レコードは含まれません。このレコードの <code class="docutils literal"><span class="pre">created_at</span></code> の値が <code class="docutils literal"><span class="pre">&quot;2015/07/09</span> <span class="pre">00:00:00&quot;</span></code> だからです。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_count \
+  --logical_table Entries \
+  --shard_key created_at \
+  --max &quot;2015/07/09 00:00:00&quot; \
+  --max_border &quot;exclude&quot;
+# [[0, 1337566253.89858, 0.000355720520019531], 3]
+</pre></div>
 </div>
+</div>
+</div>
+<div class="section" id="search-related-parameters">
+<span id="logical-count-search-related-parameters"></span><h3>7.3.31.4.3. 検索関係の引数<a class="headerlink" href="#search-related-parameters" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>このコマンドは <a class="reference internal" href="select.html"><span class="doc">select</span></a> 互換の検索関連パラメーターをサポートしています。</p>
 <div class="section" id="filter">
-<h4>7.3.31.4.2.5. <code class="docutils literal"><span class="pre">filter</span></code><a class="headerlink" href="#filter" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<span id="logical-count-filter"></span><h4>7.3.31.4.3.1. <code class="docutils literal"><span class="pre">filter</span></code><a class="headerlink" href="#filter" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p><a class="reference internal" href="select.html"><span class="doc">select</span></a> の <a class="reference internal" href="select.html#select-filter"><span class="std std-ref">filter</span></a> に対応しています。詳細は <a class="reference internal" href="select.html#select-filter"><span class="std std-ref">filter</span></a> を見てください。</p>
+<p>以下は例です。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_count \
+  --logical_table Entries \
+  --shard_key created_at \
+  --filter &quot;n_likes &lt;= 5&quot;
+# [[0, 1337566253.89858, 0.000355720520019531], 3]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="dynamic-column-related-parameters">
+<span id="logical-count-dynamic-column-related-parameters"></span><h3>7.3.31.4.4. 動的カラム関連の引数<a class="headerlink" href="#dynamic-column-related-parameters" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="versionadded">
+<p><span class="versionmodified">バージョン 7.0.9 で追加.</span></p>
+</div>
+<p><a class="reference internal" href="select.html"><span class="doc">select</span></a> のすべての動的カラム関連パラメーターをサポートしています。詳細は <a class="reference internal" href="select.html#select-dynamic-column-related-parameters"><span class="std std-ref">動的カラム関連の引数</span></a> を見てください。</p>
+<div class="section" id="columns-name-stage">
+<span id="logical-count-columns-name-stage"></span><h4>7.3.31.4.4.1. <code class="docutils literal"><span class="pre">columns[${NAME}].stage</span></code><a class="headerlink" href="#columns-name-stage" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">バージョン 7.0.9 で追加.</span></p>
+</div>
+<p><a class="reference internal" href="select.html"><span class="doc">select</span></a> の <a class="reference internal" href="select.html#select-columns-name-stage"><span class="std std-ref">columns[${NAME}].stage</span></a> に対応しています。詳細は <a class="reference internal" href="select.html#select-columns-name-stage"><span class="std std-ref">columns[${NAME}].stage</span></a> を見てください。</p>
+<p>必須の引数です。</p>
+<p><code class="docutils literal"><span class="pre">initial</span></code> ステージだけが有効です。なぜなら <code class="docutils literal"><span class="pre">filtered</span></code> ステージと <code class="docutils literal"><span class="pre">output</span></code> ステージ以降にはなにも処理がないからです。</p>
+<p>以下は <code class="docutils literal"><span class="pre">initial</span></code> ステージで <code class="docutils literal"><span class="pre">is_popular</span></code> カラムを作る例です。作成した <code class="docutils literal"><span class="pre">is_popular</span></code> カラムは <code class="docutils literal"><span class="pre">filter</span></code> を含むすべてのパラメーターで使えます。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_count \
+  --logical_table Entries \
+  --shard_key created_at \
+  --columns[is_popular].stage initial \
+  --columns[is_popular].type Bool \
+  --columns[is_popular].value &#39;n_likes &gt;= 10&#39; \
+  --filter is_popular
+# [[0, 1337566253.89858, 0.000355720520019531], 2]
+</pre></div>
+</div>
+</div>
+<div class="section" id="columns-name-flags">
+<span id="logical-count-columns-name-flags"></span><h4>7.3.31.4.4.2. <code class="docutils literal"><span class="pre">columns[${NAME}].flags</span></code><a class="headerlink" href="#columns-name-flags" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">バージョン 7.0.9 で追加.</span></p>
+</div>
+<p><a class="reference internal" href="select.html"><span class="doc">select</span></a> の <a class="reference internal" href="select.html#select-columns-name-flags"><span class="std std-ref">columns[${NAME}].flags</span></a> に対応しています。詳細は <a class="reference internal" href="select.html#select-columns-name-flags"><span class="std std-ref">columns[${NAME}].flags</span></a> を見てください。</p>
+<p>デフォルト値は <code class="docutils literal"><span class="pre">COLUMN_SCALAR</span></code> です。</p>
+<p>以下は <code class="docutils literal"><span class="pre">COLUMN_VECTOR</span></code> フラグを指定してベクターカラムを作る例です。 <code class="docutils literal"><span class="pre">plugin_register</span> <span class="pre">functions/vector</span></code> は <a class="reference internal" href="../functions/vector_new.html"><span class="doc">vector_new</span></a> 関数を使うために実行しています。:</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>plugin_register functions/vector
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+logical_count \
+  --logical_table Entries \
+  --shard_key created_at \
+  --columns[vector].stage initial \
+  --columns[vector].flags COLUMN_VECTOR \
+  --columns[vector].type UInt32 \
+  --columns[vector].value &#39;vector_new(1, 2, 3)&#39; \
+  --filter &#39;vector_size(vector) &gt; 2&#39;
+# [[0, 1337566253.89858, 0.000355720520019531], 5]
+</pre></div>
+</div>
+</div>
+<div class="section" id="columns-name-type">
+<span id="logical-count-columns-name-type"></span><h4>7.3.31.4.4.3. <code class="docutils literal"><span class="pre">columns[${NAME}].type</span></code><a class="headerlink" href="#columns-name-type" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">バージョン 7.0.9 で追加.</span></p>
+</div>
+<p><a class="reference internal" href="select.html"><span class="doc">select</span></a> の <a class="reference internal" href="select.html#select-columns-name-type"><span class="std std-ref">columns[${NAME}].type</span></a> に対応しています。詳細は <a class="reference internal" href="select.html#select-columns-name-type"><span class="std std-ref">columns[${NAME}].type</span></a> を見てください。</p>
+<p>必須の引数です。</p>
+<p>以下は <code class="docutils literal"><span class="pre">ShortText</span></code> 型のカラムを作る例です。保存された値は自動的に <code class="docutils literal"><span class="pre">ShortText</span></code> にキャストされます。この例では数値が <code class="docutils literal"><span class="pre">ShortText</span></code> にキャストされています。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_count \
+  --logical_table Entries \
+  --shard_key created_at \
+  --columns[n_likes_string].stage initial \
+  --columns[n_likes_string].type ShortText \
+  --columns[n_likes_string].value n_likes \
+  --filter &#39;n_likes_string == &quot;3&quot;&#39;
+# [[0, 1337566253.89858, 0.000355720520019531], 2]
+</pre></div>
+</div>
+</div>
+<div class="section" id="columns-name-value">
+<span id="logical-count-columns-name-value"></span><h4>7.3.31.4.4.4. <code class="docutils literal"><span class="pre">columns[${NAME}].value</span></code><a class="headerlink" href="#columns-name-value" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">バージョン 7.0.9 で追加.</span></p>
+</div>
+<p><a class="reference internal" href="select.html"><span class="doc">select</span></a> の <a class="reference internal" href="select.html#select-columns-name-value"><span class="std std-ref">columns[${NAME}].value</span></a> に対応しています。詳細は <a class="reference internal" href="select.html#select-columns-name-value"><span class="std std-ref">columns[${NAME}].value</span></a> を見てください。</p>
+<p>ウィンドウ関数を使う場合は、 <code class="docutils literal"><span class="pre">value</span></code> の値に <a class="reference internal" href="../window_function.html"><span class="doc">ウィンドウ関数</span></a> を指定し、さらに他のウィンドウ関数関連のパラメーターも指定する必要があります。詳細は <a class="reference internal" href="#logical-count-window-function-related-parameters"><span class="std std-ref">ウィンドウ関数関連の引数</span></a> を見てください。</p>
+<p>必須の引数です。</p>
+<p>以下は内容の文字数を格納するための動的カラムを1つ作る例です。この例では文字数を数えるために <code class="docutils literal"><span class="pre">functions/string</span></code> プラグイン内の <a class="reference internal" href="../functions/string_length.html"><span class="doc">string_length</span></a> 関数を使っています。 <code class="docutils literal"><span class="pre">functions/string</span></code> プラグインを登録するために <a class="reference internal" href="plugin_register.html"><span class="doc">plugin_register</span></a> を使っています。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>plugin_register functions/string
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+logical_count \
+  --logical_table Entries \
+  --shard_key created_at \
+  --columns[content_length].stage initial \
+  --columns[content_length].type UInt32 \
+  --columns[content_length].value &#39;string_length(content)&#39; \
+  --filter &#39;content_length &gt;= 40&#39;
+# [[0, 1337566253.89858, 0.000355720520019531], 2]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="window-function-related-parameters">
+<span id="logical-count-window-function-related-parameters"></span><h3>7.3.31.4.5. ウィンドウ関数関連の引数<a class="headerlink" href="#window-function-related-parameters" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="versionadded">
+<p><span class="versionmodified">バージョン 7.0.9 で追加.</span></p>
+</div>
+<p><a class="reference internal" href="select.html"><span class="doc">select</span></a> のすべてのウィンドウ関数関連パラメーターをサポートしています。詳細は <a class="reference internal" href="select.html#select-window-function-related-parameters"><span class="std std-ref">ウィンドウ関数関連の引数</span></a> を見てください。</p>
+<div class="admonition note">
+<p class="first admonition-title">注釈</p>
+<p class="last">複数のテーブルをまたがったウィンドウ関数はまだサポートしていません。</p>
+</div>
+<div class="section" id="columns-name-window-sort-keys">
+<span id="logical-count-columns-name-window-sort-keys"></span><h4>7.3.31.4.5.1. <code class="docutils literal"><span class="pre">columns[${NAME}].window.sort_keys</span></code><a class="headerlink" href="#columns-name-window-sort-keys" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">バージョン 7.0.9 で追加.</span></p>
+</div>
+<p><a class="reference internal" href="select.html"><span class="doc">select</span></a> の <a class="reference internal" href="select.html#select-columns-name-window-sort-keys"><span class="std std-ref">columns[${NAME}].window.sort_keys</span></a> に対応しています。詳細は <a class="reference internal" href="select.html#select-columns-name-window-sort-keys"><span class="std std-ref">columns[${NAME}].window.sort_keys</span></a> を見てください。</p>
+<p>ウィンドウ関数を使うには <a class="reference internal" href="#logical-count-columns-name-window-sort-keys"><span class="std std-ref">columns[${NAME}].window.sort_keys</span></a> または <a class="reference internal" href="#logical-count-columns-name-window-group-keys"><span class="std std-ref">columns[${NAME}].window.group_keys</span></a> を指定しなければいけません。</p>
+<p>以下は <code class="docutils literal"><span class="pre">Entries.tag</span></code> 毎に累積和を計算する例です。各グループ内のレコードは <code class="docutils literal"><span class="pre">Entries._key</span></code> でソートします。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_count \
+  --logical_table Entries \
+  --shard_key created_at \
+  --columns[n_likes_cumulative_sum_per_tag].stage initial \
+  --columns[n_likes_cumulative_sum_per_tag].type UInt32 \
+  --columns[n_likes_cumulative_sum_per_tag].value &#39;window_sum(n_likes)&#39; \
+  --columns[n_likes_cumulative_sum_per_tag].window.sort_keys _key \
+  --columns[n_likes_cumulative_sum_per_tag].window.group_keys tag \
+  --filter &#39;n_likes_cumulative_sum_per_tag &gt; 5&#39;
+# [[0, 1337566253.89858, 0.000355720520019531], 3]
+</pre></div>
+</div>
+</div>
+<div class="section" id="columns-name-window-group-keys">
+<span id="logical-count-columns-name-window-group-keys"></span><h4>7.3.31.4.5.2. <code class="docutils literal"><span class="pre">columns[${NAME}].window.group_keys</span></code><a class="headerlink" href="#columns-name-window-group-keys" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">バージョン 7.0.9 で追加.</span></p>
+</div>
+<p><a class="reference internal" href="select.html"><span class="doc">select</span></a> の <a class="reference internal" href="select.html#select-columns-name-window-group-keys"><span class="std std-ref">columns[${NAME}].window.group_keys</span></a> に対応しています。詳細は <a class="reference internal" href="select.html#select-columns-name-window-group-keys"><span class="std std-ref">columns[${NAME}].window.group_keys</span></a> を見てください。</p>
+<p>ウィンドウ関数を使うには <a class="reference internal" href="#logical-count-columns-name-window-sort-keys"><span class="std std-ref">columns[${NAME}].window.sort_keys</span></a> または <a class="reference internal" href="#logical-count-columns-name-window-group-keys"><span class="std std-ref">columns[${NAME}].window.group_keys</span></a> を指定しなければいけません。</p>
+<p>以下は <code class="docutils literal"><span class="pre">Entries.tag</span></code> 毎に合計を計算する例です。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_count \
+  --logical_table Entries \
+  --shard_key created_at \
+  --columns[n_likes_sum_per_tag].stage initial \
+  --columns[n_likes_sum_per_tag].type UInt32 \
+  --columns[n_likes_sum_per_tag].value &#39;window_sum(n_likes)&#39; \
+  --columns[n_likes_sum_per_tag].window.group_keys tag \
+  --filter &#39;n_likes_sum_per_tag &gt; 5&#39;
+# [[0, 1337566253.89858, 0.000355720520019531], 4]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="cache-related-parameter">
+<h3>7.3.31.4.6. キャッシュ関連の引数<a class="headerlink" href="#cache-related-parameter" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="cache">
+<span id="logical-count-cache"></span><h4>7.3.31.4.6.1. <code class="docutils literal"><span class="pre">cache</span></code><a class="headerlink" href="#cache" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>このクエリーの結果をキャッシュするかどうかを指定します。</p>
+<p>このクエリーの結果がキャッシュしてあると、次に同じクエリーを実行するときはキャッシュを使って高速にレスポンスを返すことができます。</p>
+<p>これは既存のキャッシュされた結果を使うかどうかを指定するものではありません。</p>
+<p>指定可能な値は以下の通りです。</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Value</th>
+<th class="head"><p class="first last">説明</p>
+</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">no</span></code></td>
+<td><p class="first last">このクエリーの出力をキャッシュしない。</p>
+</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">yes</span></code></td>
+<td><p class="first last">このクエリーの出力をキャッシュする。デフォルト値。</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>このクエリーの結果をキャッシュしないようにする例です。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_count \
+  --logical_table Entries \
+  --shard_key created_at \
+  --cache no
+# [[0, 1337566253.89858, 0.000355720520019531], 5]
+</pre></div>
+</div>
+<p>デフォルト値は <code class="docutils literal"><span class="pre">yes</span></code> です。</p>
 </div>
 </div>
 </div>
 <div class="section" id="return-value">
 <h2>7.3.31.5. 戻り値<a class="headerlink" href="#return-value" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>TODO</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>[HEADER, LOGICAL_COUNT]
+<p>このコマンドは以下のフォーマットのレスポンスを返します:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>[HEADER, N_HITS]
 </pre></div>
 </div>
+<p>このコマンドが失敗すると、 <code class="docutils literal"><span class="pre">HEADER</span></code> にエラーの詳細が含まれます。</p>
+<p><code class="docutils literal"><span class="pre">HEADER</span></code> については <a class="reference internal" href="../command/output_format.html"><span class="doc">出力形式</span></a> を参照してください。</p>
+<p><code class="docutils literal"><span class="pre">N_HITS</span></code> はマッチしたレコード数です。</p>
 </div>
 </div>
 
@@ -264,7 +618,26 @@ load --table Logs_20150205
 <li><a class="reference internal" href="#min-border">7.3.31.4.2.2. <code class="docutils literal"><span class="pre">min_border</span></code></a></li>
 <li><a class="reference internal" href="#max">7.3.31.4.2.3. <code class="docutils literal"><span class="pre">max</span></code></a></li>
 <li><a class="reference internal" href="#max-border">7.3.31.4.2.4. <code class="docutils literal"><span class="pre">max_border</span></code></a></li>
-<li><a class="reference internal" href="#filter">7.3.31.4.2.5. <code class="docutils literal"><span class="pre">filter</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#search-related-parameters">7.3.31.4.3. 検索関係の引数</a><ul>
+<li><a class="reference internal" href="#filter">7.3.31.4.3.1. <code class="docutils literal"><span class="pre">filter</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#dynamic-column-related-parameters">7.3.31.4.4. 動的カラム関連の引数</a><ul>
+<li><a class="reference internal" href="#columns-name-stage">7.3.31.4.4.1. <code class="docutils literal"><span class="pre">columns[${NAME}].stage</span></code></a></li>
+<li><a class="reference internal" href="#columns-name-flags">7.3.31.4.4.2. <code class="docutils literal"><span class="pre">columns[${NAME}].flags</span></code></a></li>
+<li><a class="reference internal" href="#columns-name-type">7.3.31.4.4.3. <code class="docutils literal"><span class="pre">columns[${NAME}].type</span></code></a></li>
+<li><a class="reference internal" href="#columns-name-value">7.3.31.4.4.4. <code class="docutils literal"><span class="pre">columns[${NAME}].value</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#window-function-related-parameters">7.3.31.4.5. ウィンドウ関数関連の引数</a><ul>
+<li><a class="reference internal" href="#columns-name-window-sort-keys">7.3.31.4.5.1. <code class="docutils literal"><span class="pre">columns[${NAME}].window.sort_keys</span></code></a></li>
+<li><a class="reference internal" href="#columns-name-window-group-keys">7.3.31.4.5.2. <code class="docutils literal"><span class="pre">columns[${NAME}].window.group_keys</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cache-related-parameter">7.3.31.4.6. キャッシュ関連の引数</a><ul>
+<li><a class="reference internal" href="#cache">7.3.31.4.6.1. <code class="docutils literal"><span class="pre">cache</span></code></a></li>
 </ul>
 </li>
 </ul>

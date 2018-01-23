@@ -219,7 +219,7 @@ is opened, this command may break the database.</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>% grndb recover --force-truncate --log-level info --log-path /var/log/groonga/grndb.log /var/lib/groonga/db/db
 </pre></div>
 </div>
-<p>When this option is specified, <code class="docutils literal"><span class="pre">grndb</span></code> does the following:</p>
+<p>When this option is specified, <code class="docutils literal"><span class="pre">grndb</span></code> does the followings:</p>
 <ul class="simple">
 <li>check whether there is a corrupted database object (table, column, indexes)</li>
 <li>truncate a corrupted database object (table, column, indexes)</li>
@@ -233,8 +233,37 @@ against truncated tables or columns to recreate database.</p>
 <p class="last">You must use this option only when necessary. It means that you use it when there is a mismatch between database meta information and database object files which exists actually. This options should be used when there is no other way to recover database.</p>
 </div>
 </div>
+<div class="section" id="force-lock-clear">
+<h4>7.1.1.4.2.2. <code class="docutils literal"><span class="pre">--force-lock-clear</span></code><a class="headerlink" href="#force-lock-clear" title="Permalink to this headline">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 7.1.1.</span></p>
+</div>
+<p>It forces to clear lock of database, table and data column. It doesn't
+clear lock of index column. If index column has lock, the index column
+is recreated instead of clearing lock.</p>
+<p>Normally, you should truncate and load data again instead of just
+clearing lock. Because objects that have lock may be broken. This
+option is provided only for users who know the risk that &quot;the database
+may be broken but I want to keep using it&quot;.</p>
+<p>Here is an example that specifies <code class="docutils literal"><span class="pre">--force-lock-clear</span></code> option:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>% grndb recover --force-lock-clear --log-level info --log-path /var/log/groonga/grndb.log /var/lib/groonga/db/db
+</pre></div>
+</div>
+<p>When this option is specified, <code class="docutils literal"><span class="pre">grndb</span></code> does the followings:</p>
+<ul class="simple">
+<li>check whether there are database, table or data column that have lock</li>
+<li>clear lock of these objects</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">You must use this option only when necessary. Because your database
+may not be recovered. The database that has objects that have lock
+may be broken or not be broken. You can keep using the database but
+Groonga may crash if the database is broken.</p>
+</div>
+</div>
 <div class="section" id="id1">
-<h4>7.1.1.4.2.2. <code class="docutils literal"><span class="pre">--log-level</span></code><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h4>
+<h4>7.1.1.4.2.3. <code class="docutils literal"><span class="pre">--log-level</span></code><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h4>
 <div class="versionadded">
 <p><span class="versionmodified">New in version 7.0.4.</span></p>
 </div>
@@ -246,7 +275,7 @@ against truncated tables or columns to recreate database.</p>
 <p>See <a class="reference internal" href="../commands/log_level.html"><span class="doc">log_level</span></a> to know about supported log level.</p>
 </div>
 <div class="section" id="id2">
-<h4>7.1.1.4.2.3. <code class="docutils literal"><span class="pre">--log-path</span></code><a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h4>
+<h4>7.1.1.4.2.4. <code class="docutils literal"><span class="pre">--log-path</span></code><a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h4>
 <div class="versionadded">
 <p><span class="versionmodified">New in version 7.0.4.</span></p>
 </div>
@@ -281,8 +310,9 @@ against truncated tables or columns to recreate database.</p>
 </li>
 <li><a class="reference internal" href="#recover">7.1.1.4.2. <code class="docutils literal"><span class="pre">recover</span></code></a><ul>
 <li><a class="reference internal" href="#force-truncate">7.1.1.4.2.1. <code class="docutils literal"><span class="pre">--force-truncate</span></code></a></li>
-<li><a class="reference internal" href="#id1">7.1.1.4.2.2. <code class="docutils literal"><span class="pre">--log-level</span></code></a></li>
-<li><a class="reference internal" href="#id2">7.1.1.4.2.3. <code class="docutils literal"><span class="pre">--log-path</span></code></a></li>
+<li><a class="reference internal" href="#force-lock-clear">7.1.1.4.2.2. <code class="docutils literal"><span class="pre">--force-lock-clear</span></code></a></li>
+<li><a class="reference internal" href="#id1">7.1.1.4.2.3. <code class="docutils literal"><span class="pre">--log-level</span></code></a></li>
+<li><a class="reference internal" href="#id2">7.1.1.4.2.4. <code class="docutils literal"><span class="pre">--log-path</span></code></a></li>
 </ul>
 </li>
 </ul>

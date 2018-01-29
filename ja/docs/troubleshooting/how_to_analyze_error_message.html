@@ -4,13 +4,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="ja">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>10.2. エラーメッセージの解析方法 &#8212; Groonga v7.1.0ドキュメント</title>
+    <title>10.2. エラーメッセージの解析方法 &#8212; Groonga v7.1.1ドキュメント</title>
     <link rel="stylesheet" href="../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '7.1.0',
+        VERSION:     '7.1.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  false,
@@ -73,7 +73,7 @@
         <li class="right" >
           <a href="different_results_with_the_same_keyword.html" title="10.1. 同じ検索キーワードなのに全文検索結果が異なる"
              accesskey="P">前へ</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Groonga v7.1.0ドキュメント</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Groonga v7.1.1ドキュメント</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../troubleshooting.html" accesskey="U">10. トラブルシューティング</a> &#187;</li> 
       </ul>
     </div>  
@@ -83,31 +83,29 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="id1">
-<h1>10.2. エラーメッセージの解析方法<a class="headerlink" href="#id1" title="このヘッドラインへのパーマリンク">¶</a></h1>
-<p>Groongaは様々なエラーメッセージを出力しますが、出力されたエラーメッセージ
-をもとに、原因を解析する方法はいままで、明文化していませんでした。
-ここでは、エラーメッセージごとの解析方法を記載します。</p>
-<div class="section" id="id2">
-<h2>10.2.1. ソケットエラーの解析方法<a class="headerlink" href="#id2" title="このヘッドラインへのパーマリンク">¶</a></h2>
+  <div class="section" id="how-to-analyze-error-messages">
+<h1>10.2. エラーメッセージの解析方法<a class="headerlink" href="#how-to-analyze-error-messages" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p>Groongaは様々なエラーメッセージを出力しますが、出力されたエラーメッセージ をもとに、原因を解析する方法はいままで、明文化していませんでした。 ここでは、エラーメッセージごとの解析方法を記載します。</p>
+<div class="section" id="how-to-analyze-socket-errors">
+<h2>10.2.1. ソケットエラーの解析方法<a class="headerlink" href="#how-to-analyze-socket-errors" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <p>ここでは、Groongaで発生するソケットエラーの解析方法について説明します。</p>
-<div class="section" id="id3">
-<h3>10.2.1.1. 例<a class="headerlink" href="#id3" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="example">
+<h3>10.2.1.1. 例<a class="headerlink" href="#example" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <p>Groongaのエラーログで以下のようなエラーログがあります。(xxxxxには任意の数字が入ります。):</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>socket error[xxxxx]: no buffer: accept
 </pre></div>
 </div>
 </div>
-<div class="section" id="id4">
-<h3>10.2.1.2. 解析方法<a class="headerlink" href="#id4" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="how-to-analyze">
+<h3>10.2.1.2. 解析方法<a class="headerlink" href="#how-to-analyze" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <p>まず、ソケットエラーを扱うマクロである、SOERR というキーワードでGroongaのソースコードをgrepします。</p>
-<p>次に見つかったSOERRの引数にacceptが入っているSOERRをさがします。
-すると次のSOERRが見つかります。ログに出ているのはacceptのみなので、下記の最後の行が例で出力されたエラーメッセージに該当するとわかります。:</p>
+<p>次に見つかったSOERRの引数にacceptが入っているSOERRをさがします。 すると次のSOERRが見つかります。:</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>lib/com.c:      SOERR(&quot;listen - start accept&quot;);
 lib/com.c:      SOERR(&quot;listen - disable accept&quot;);
 lib/com.c:        SOERR(&quot;accept&quot;);
 </pre></div>
 </div>
+<p>ログに出ているのはacceptのみなので、最後の行が例で出力されたエラーメッセージに該当するとわかります。</p>
 <p>該当するエラー出力の周辺のコードを見ると以下のようになっています。:</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>grn_sock fd = accept(com-&gt;fd, NULL, NULL);
 if (fd == -1) {
@@ -116,19 +114,16 @@ if (fd == -1) {
   } else {
     SOERR(&quot;accept&quot;);
   }
-return;
+  return;
 }
 </pre></div>
 </div>
-<p>上記のコードから、acceptを実行してエラーが発生したことが確認できます。
-次は、acceptが失敗した原因を追っていきます。</p>
+<p>上記のコードから、acceptを実行してエラーが発生したことが確認できます。 次は、acceptが失敗した原因を追っていきます。</p>
 <p>acceptが失敗した理由は、:</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>[10055]: no buffer
 </pre></div>
 </div>
-<p>から追うことができます。
-10055はWindowsのソケットエラーコードを表しています。また、no bufferはSOERRマクロ内でGroongaが用意しているメッセージです。
-Windowsのシステムエラーコードから調査しても良いですし、Groongaが出力しているエラーメッセージから調査しても良いです。</p>
+<p>から追うことができます。 10055はWindowsのソケットエラーコードを表しています。また、no bufferはSOERRマクロ内でGroongaが用意しているメッセージです。 Windowsのシステムエラーコードから調査しても良いですし、Groongaが出力しているエラーメッセージから調査しても良いです。</p>
 <p>Windowsのシステムエラーコードは以下のページに一覧があります。:</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>https://msdn.microsoft.com/ja-jp/library/windows/desktop/ms740668(v=vs.85).aspx
 </pre></div>
@@ -139,8 +134,7 @@ Windowsのシステムエラーコードから調査しても良いですし、G
 An operation on a socket could not be performed because the system lacked sufficient buffer space or because a queue was full.
 </pre></div>
 </div>
-<p>上記のメッセージから、acceptが失敗する原因は、メモリー不足または、接続数が多すぎる場合であることがわかりました。
-あとは、エラーメッセージが出た際の状況から、接続数が多かったのか、メモリ不足だったのかを判断します。</p>
+<p>上記のメッセージから、acceptが失敗する原因は、メモリー不足または、接続数が多すぎる場合であることがわかりました。 あとは、エラーメッセージが出た際の状況から、接続数が多かったのか、メモリ不足だったのかを判断します。</p>
 </div>
 </div>
 </div>
@@ -154,9 +148,9 @@ An operation on a socket could not be performed because the system lacked suffic
   <h3><a href="../index.html">目次</a></h3>
   <ul>
 <li><a class="reference internal" href="#">10.2. エラーメッセージの解析方法</a><ul>
-<li><a class="reference internal" href="#id2">10.2.1. ソケットエラーの解析方法</a><ul>
-<li><a class="reference internal" href="#id3">10.2.1.1. 例</a></li>
-<li><a class="reference internal" href="#id4">10.2.1.2. 解析方法</a></li>
+<li><a class="reference internal" href="#how-to-analyze-socket-errors">10.2.1. ソケットエラーの解析方法</a><ul>
+<li><a class="reference internal" href="#example">10.2.1.1. 例</a></li>
+<li><a class="reference internal" href="#how-to-analyze">10.2.1.2. 解析方法</a></li>
 </ul>
 </li>
 </ul>
@@ -195,7 +189,7 @@ An operation on a socket could not be performed because the system lacked suffic
         <li class="right" >
           <a href="different_results_with_the_same_keyword.html" title="10.1. 同じ検索キーワードなのに全文検索結果が異なる"
              >前へ</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Groonga v7.1.0ドキュメント</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Groonga v7.1.1ドキュメント</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../troubleshooting.html" >10. トラブルシューティング</a> &#187;</li> 
       </ul>
     </div>

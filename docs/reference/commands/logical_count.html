@@ -117,6 +117,7 @@ parameters are optional:</p>
   [max=null]
   [max_border=&quot;include&quot;]
   [filter=null]
+  [post_filter=null]
 </pre></div>
 </div>
 <p>There are some parameters that can be only used as named
@@ -472,9 +473,35 @@ parameters.</p>
 </pre></div>
 </div>
 </div>
+<div class="section" id="post-filter">
+<span id="logical-count-dynamic-column-related-parameters"></span><h4>7.3.31.4.3.2. <code class="docutils literal"><span class="pre">post_filter</span></code><a class="headerlink" href="#post-filter" title="Permalink to this headline">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 8.0.1.</span></p>
+</div>
+<p>Specifies the filter text that is processed after <code class="docutils literal"><span class="pre">filtered</span></code> stage
+dynamic columns are generated. You can use <code class="docutils literal"><span class="pre">post_filter</span></code> to filter
+by <code class="docutils literal"><span class="pre">filtered</span></code> stage dynamic columns. Others are the same as
+<a class="reference internal" href="select.html#select-filter"><span class="std std-ref">filter</span></a>.</p>
+<p>Here is an example that shows entries only in popular tag. All target
+entries have <code class="docutils literal"><span class="pre">system</span></code> or <code class="docutils literal"><span class="pre">use</span></code> words:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_count \
+  --logical_table Entries \
+  --shard_key created_at \
+  --columns[n_likes_sum_per_tag].stage filtered \
+  --columns[n_likes_sum_per_tag].type UInt32 \
+  --columns[n_likes_sum_per_tag].value &#39;window_sum(n_likes)&#39; \
+  --columns[n_likes_sum_per_tag].window.group_keys &#39;tag&#39; \
+  --filter &#39;content @ &quot;system&quot; || content @ &quot;use&quot;&#39; \
+  --post_filter &#39;n_likes_sum_per_tag &gt; 10&#39; \
+  --output_columns _key,n_likes,n_likes_sum_per_tag
+# [[0,1519095081.579662,0.4281206130981445],2]
+</pre></div>
+</div>
+</div>
 </div>
 <div class="section" id="dynamic-column-related-parameters">
-<span id="logical-count-dynamic-column-related-parameters"></span><h3>7.3.31.4.4. Dynamic column related parameters<a class="headerlink" href="#dynamic-column-related-parameters" title="Permalink to this headline">¶</a></h3>
+<h3>7.3.31.4.4. Dynamic column related parameters<a class="headerlink" href="#dynamic-column-related-parameters" title="Permalink to this headline">¶</a></h3>
 <div class="versionadded">
 <p><span class="versionmodified">New in version 7.0.9.</span></p>
 </div>
@@ -489,8 +516,9 @@ details.</p>
 <p>Corresponds to <a class="reference internal" href="select.html#select-columns-name-stage"><span class="std std-ref">columns[${NAME}].stage</span></a> in <a class="reference internal" href="select.html"><span class="doc">select</span></a>. See
 <a class="reference internal" href="select.html#select-columns-name-stage"><span class="std std-ref">columns[${NAME}].stage</span></a> for details.</p>
 <p>This is a required parameter.</p>
-<p>Only <code class="docutils literal"><span class="pre">initial</span></code> stage is valid. Because there are no processes after
-<code class="docutils literal"><span class="pre">filtered</span></code> and <code class="docutils literal"><span class="pre">output</span></code> stages.</p>
+<p><code class="docutils literal"><span class="pre">initial</span></code> stage and <code class="docutils literal"><span class="pre">filtered</span></code> stage are valid. Because there are no processes after
+<code class="docutils literal"><span class="pre">output</span></code> stages.
+But <code class="docutils literal"><span class="pre">filtered</span></code> stage is valid in groonga since version 8.0.1.</p>
 <p>Here is an example that creates <code class="docutils literal"><span class="pre">is_popular</span></code> column at <code class="docutils literal"><span class="pre">initial</span></code>
 stage. You can use <code class="docutils literal"><span class="pre">is_popular</span></code> in all parameters such as <code class="docutils literal"><span class="pre">filter</span></code>:</p>
 <p>Execution example:</p>
@@ -733,6 +761,7 @@ It's the default value.</td>
 </li>
 <li><a class="reference internal" href="#search-related-parameters">7.3.31.4.3. Search related parameters</a><ul>
 <li><a class="reference internal" href="#filter">7.3.31.4.3.1. <code class="docutils literal"><span class="pre">filter</span></code></a></li>
+<li><a class="reference internal" href="#post-filter">7.3.31.4.3.2. <code class="docutils literal"><span class="pre">post_filter</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#dynamic-column-related-parameters">7.3.31.4.4. Dynamic column related parameters</a><ul>

@@ -107,6 +107,7 @@
   [max=null]
   [max_border=&quot;include&quot;]
   [filter=null]
+  [post_filter=null]
 </pre></div>
 </div>
 <p>いくつか名前付き引数としてしか使えない引数があります。これらの引数を「○番目の引数」として使うことはできません。必ず名前を指定する必要があります。</p>
@@ -421,9 +422,31 @@ load --table Entries_20150709
 </pre></div>
 </div>
 </div>
+<div class="section" id="post-filter">
+<span id="logical-count-dynamic-column-related-parameters"></span><h4>7.3.31.4.3.2. <code class="docutils literal"><span class="pre">post_filter</span></code><a class="headerlink" href="#post-filter" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">バージョン 8.0.1 で追加.</span></p>
+</div>
+<p><code class="docutils literal"><span class="pre">filtered</span></code> ステージの動的カラムが生成されてから実行するフィルターを指定します。 <code class="docutils literal"><span class="pre">post_filter</span></code> を使うと <code class="docutils literal"><span class="pre">filtered</span></code> ステージの動的カラムを使って絞り込むことができます。他は <a class="reference internal" href="select.html#select-filter"><span class="std std-ref">filter</span></a> と同じです。</p>
+<p>以下は人気のあるタグのエントリーだけを表示する例です。対象となるすべてのエントリーには <code class="docutils literal"><span class="pre">system</span></code> または <code class="docutils literal"><span class="pre">use</span></code> という単語が含まれています。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_count \
+  --logical_table Entries \
+  --shard_key created_at \
+  --columns[n_likes_sum_per_tag].stage filtered \
+  --columns[n_likes_sum_per_tag].type UInt32 \
+  --columns[n_likes_sum_per_tag].value &#39;window_sum(n_likes)&#39; \
+  --columns[n_likes_sum_per_tag].window.group_keys &#39;tag&#39; \
+  --filter &#39;content @ &quot;system&quot; || content @ &quot;use&quot;&#39; \
+  --post_filter &#39;n_likes_sum_per_tag &gt; 10&#39; \
+  --output_columns _key,n_likes,n_likes_sum_per_tag
+# [[0,1519095081.579662,0.4281206130981445],2]
+</pre></div>
+</div>
+</div>
 </div>
 <div class="section" id="dynamic-column-related-parameters">
-<span id="logical-count-dynamic-column-related-parameters"></span><h3>7.3.31.4.4. 動的カラム関連の引数<a class="headerlink" href="#dynamic-column-related-parameters" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<h3>7.3.31.4.4. 動的カラム関連の引数<a class="headerlink" href="#dynamic-column-related-parameters" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <div class="versionadded">
 <p><span class="versionmodified">バージョン 7.0.9 で追加.</span></p>
 </div>
@@ -435,7 +458,7 @@ load --table Entries_20150709
 </div>
 <p><a class="reference internal" href="select.html"><span class="doc">select</span></a> の <a class="reference internal" href="select.html#select-columns-name-stage"><span class="std std-ref">columns[${NAME}].stage</span></a> に対応しています。詳細は <a class="reference internal" href="select.html#select-columns-name-stage"><span class="std std-ref">columns[${NAME}].stage</span></a> を見てください。</p>
 <p>必須の引数です。</p>
-<p><code class="docutils literal"><span class="pre">initial</span></code> ステージだけが有効です。なぜなら <code class="docutils literal"><span class="pre">filtered</span></code> ステージと <code class="docutils literal"><span class="pre">output</span></code> ステージ以降にはなにも処理がないからです。</p>
+<p><code class="docutils literal"><span class="pre">initial</span></code> ステージと <code class="docutils literal"><span class="pre">filtered</span></code> ステージが有効です。なぜなら <code class="docutils literal"><span class="pre">output</span></code> ステージ以降にはなにも処理がないからです。ただし、<code class="docutils literal"><span class="pre">filtered</span></code> ステージはバージョン8.0.1以降で有効です。</p>
 <p>以下は <code class="docutils literal"><span class="pre">initial</span></code> ステージで <code class="docutils literal"><span class="pre">is_popular</span></code> カラムを作る例です。作成した <code class="docutils literal"><span class="pre">is_popular</span></code> カラムは <code class="docutils literal"><span class="pre">filter</span></code> を含むすべてのパラメーターで使えます。</p>
 <p>実行例:</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>logical_count \
@@ -649,6 +672,7 @@ logical_count \
 </li>
 <li><a class="reference internal" href="#search-related-parameters">7.3.31.4.3. 検索関係の引数</a><ul>
 <li><a class="reference internal" href="#filter">7.3.31.4.3.1. <code class="docutils literal"><span class="pre">filter</span></code></a></li>
+<li><a class="reference internal" href="#post-filter">7.3.31.4.3.2. <code class="docutils literal"><span class="pre">post_filter</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#dynamic-column-related-parameters">7.3.31.4.4. 動的カラム関連の引数</a><ul>

@@ -124,6 +124,7 @@ parameters are optional:</p>
                [match_columns=null]
                [query=null]
                [drilldown_filter=null]
+               [post_filter=null]
 </pre></div>
 </div>
 <p>There are some parameters that can be only used as named
@@ -1048,9 +1049,72 @@ parameters.</p>
 </pre></div>
 </div>
 </div>
+<div class="section" id="post-filter">
+<span id="logical-select-advanced-search-parameters"></span><h4>7.3.34.5.3.4. <code class="docutils literal"><span class="pre">post_filter</span></code><a class="headerlink" href="#post-filter" title="Permalink to this headline">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 8.0.1.</span></p>
+</div>
+<p>Specifies the filter text that is processed after <code class="docutils literal"><span class="pre">filtered</span></code> stage
+dynamic columns are generated. You can use <code class="docutils literal"><span class="pre">post_filter</span></code> to filter
+by <code class="docutils literal"><span class="pre">filtered</span></code> stage dynamic columns. Others are the same as
+<a class="reference internal" href="#logical-select-filter"><span class="std std-ref">filter</span></a>.</p>
+<p>Here is an example that shows entries only in popular tag. All target
+entries have <code class="docutils literal"><span class="pre">system</span></code> or <code class="docutils literal"><span class="pre">use</span></code> words:</p>
+<p>Execution example:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_select \
+  --logical_table Entries \
+  --shard_key created_at \
+  --columns[n_likes_sum_per_tag].stage filtered \
+  --columns[n_likes_sum_per_tag].type UInt32 \
+  --columns[n_likes_sum_per_tag].value &#39;window_sum(n_likes)&#39; \
+  --columns[n_likes_sum_per_tag].window.group_keys &#39;tag&#39; \
+  --filter &#39;content @ &quot;system&quot; || content @ &quot;use&quot;&#39; \
+  --post_filter &#39;n_likes_sum_per_tag &gt; 10&#39; \
+  --output_columns _key,n_likes,n_likes_sum_per_tag
+# [
+#   [
+#     0,
+#     1519030779.410312,
+#     0.04758048057556152
+#   ],
+#   [
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;n_likes_sum_per_tag&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ]
+#       [
+#         &quot;Groonga&quot;,
+#         10,
+#         25
+#       ],
+#       [
+#         &quot;Mroonga&quot;,
+#         15,
+#         25
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
 </div>
 <div class="section" id="advanced-search-parameters">
-<span id="logical-select-advanced-search-parameters"></span><h3>7.3.34.5.4. Advanced search parameters<a class="headerlink" href="#advanced-search-parameters" title="Permalink to this headline">¶</a></h3>
+<h3>7.3.34.5.4. Advanced search parameters<a class="headerlink" href="#advanced-search-parameters" title="Permalink to this headline">¶</a></h3>
 <p><code class="docutils literal"><span class="pre">logical_select</span></code> doesn't implement advanced search parameters yet.</p>
 <div class="section" id="match-escalation-threshold">
 <span id="logical-select-match-escalation-threshold"></span><h4>7.3.34.5.4.1. <code class="docutils literal"><span class="pre">match_escalation_threshold</span></code><a class="headerlink" href="#match-escalation-threshold" title="Permalink to this headline">¶</a></h4>
@@ -3577,6 +3641,7 @@ It's the default value.</td>
 <li><a class="reference internal" href="#match-columns">7.3.34.5.3.1. <code class="docutils literal"><span class="pre">match_columns</span></code></a></li>
 <li><a class="reference internal" href="#query">7.3.34.5.3.2. <code class="docutils literal"><span class="pre">query</span></code></a></li>
 <li><a class="reference internal" href="#filter">7.3.34.5.3.3. <code class="docutils literal"><span class="pre">filter</span></code></a></li>
+<li><a class="reference internal" href="#post-filter">7.3.34.5.3.4. <code class="docutils literal"><span class="pre">post_filter</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#advanced-search-parameters">7.3.34.5.4. Advanced search parameters</a><ul>

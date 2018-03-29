@@ -4,13 +4,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="ja">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>7.3.54. select &#8212; Groonga v8.0.0ドキュメント</title>
+    <title>7.3.54. select &#8212; Groonga v8.0.1ドキュメント</title>
     <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '8.0.0',
+        VERSION:     '8.0.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  false,
@@ -73,7 +73,7 @@
         <li class="right" >
           <a href="schema.html" title="7.3.53. schema"
              accesskey="P">前へ</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v8.0.0ドキュメント</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v8.0.1ドキュメント</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../reference.html" >7. リファレンスマニュアル</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../command.html" accesskey="U">7.3. コマンド</a> &#187;</li> 
       </ul>
@@ -120,6 +120,7 @@
        [drilldown_filter=null]
        [sort_keys=null]
        [drilldown_sort_keys=null]
+       [match_escalation=auto]
 </pre></div>
 </div>
 <p>以下の名前付き引数で動的カラム機能を使うことができます。</p>
@@ -1436,6 +1437,9 @@ select \
 <span id="select-advanced-search-parameters"></span><h3>7.3.54.4.3. 高度な検索のための引数<a class="headerlink" href="#advanced-search-parameters" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <div class="section" id="match-escalation-threshold">
 <span id="select-match-escalation-threshold"></span><h4>7.3.54.4.3.1. <code class="docutils literal"><span class="pre">match_escalation_threshold</span></code><a class="headerlink" href="#match-escalation-threshold" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">バージョン 8.0.1 で追加.</span></p>
+</div>
 <p>検索方法をエスカレーションするかどうかを決定するための閾値を指定します。この閾値はマッチしたレコード数との比較に使われます。マッチしたレコード数がこの閾値以下の場合は検索方法をエスカレーションします。検索方法のエスカレーションについては <a class="reference internal" href="../../spec/search.html"><span class="doc">検索</span></a> を参照してください。</p>
 <p>デフォルトの閾値は0です。これは1つもレコードがマッチしなかったときだけ検索方法をエスカレーションするということです。</p>
 <p>デフォルトの閾値は以下の方法でカスタマイズできます。</p>
@@ -1534,14 +1538,131 @@ select Entries --match_columns content --query groo --match_escalation_threshold
 <p>最初の <code class="docutils literal"><span class="pre">select</span></code> コマンドは <code class="docutils literal"><span class="pre">Entries</span></code> テーブルから <code class="docutils literal"><span class="pre">content</span></code> カラムの値に <code class="docutils literal"><span class="pre">groo</span></code> という単語を含むレコードを検索します。しかし、この検索ではどのレコードにもマッチしません。これは、 <code class="docutils literal"><span class="pre">TokenBigram</span></code> トークナイザーは <code class="docutils literal"><span class="pre">groonga</span></code> を <code class="docutils literal"><span class="pre">gr|ro|oo|on|ng|ga</span></code> ではなく <code class="docutils literal"><span class="pre">groonga</span></code> にトークナイズするからです。（ <code class="docutils literal"><span class="pre">TokenBigramSplitSymbolAlpha</span></code> は <code class="docutils literal"><span class="pre">groonga</span></code> を <code class="docutils literal"><span class="pre">gr|ro|oo|on|ng|ga</span></code> にトークナイズします。詳細は <a class="reference internal" href="../tokenizers.html"><span class="doc">トークナイザー</span></a> を見てください。）つまり、 <code class="docutils literal"><span class="pre">groonga</span></code> はインデックスに登録されていますが、 <code class="docutils literal"><span class="pre">groo</span></code> はインデックスに登録されていないということです。インデックスに登録されていないので完全一致検索では <code class="docutils literal"><span class="pre">groo</span></code> はどのレコードにもマッチしません。このケースでは検索方法のエスカレーションが行われています。なぜならばマッチしたレコード数（0）が <code class="docutils literal"><span class="pre">match_escalation_threshold</span></code> （0）の値と等しいからです。非分かち書き検索では <code class="docutils literal"><span class="pre">groo</span></code> で1つのレコードがマッチします。</p>
 <p>2番目の <code class="docutils literal"><span class="pre">select</span></code> コマンドも <code class="docutils literal"><span class="pre">Entries</span></code> テーブルから <code class="docutils literal"><span class="pre">content</span></code> カラムの値に <code class="docutils literal"><span class="pre">groo</span></code> という単語を含むレコードを検索します。そして、この <code class="docutils literal"><span class="pre">select</span></code> コマンドもマッチしません。この場合、マッチしたレコード数（0）が <code class="docutils literal"><span class="pre">match_escalation_threshold</span></code> （-1）より大きいので、検索方法をエスカレーションしません。そして、1つもレコードがマッチしません。</p>
 </div>
+<div class="section" id="match-escalation">
+<span id="select-match-escalation"></span><h4>7.3.54.4.3.2. <code class="docutils literal"><span class="pre">match_escalation</span></code><a class="headerlink" href="#match-escalation" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>検索方法のエスカレーションをどのように使うかを指定します。検索方法のエスカレーションについては <a class="reference internal" href="#select-match-escalation"><span class="std std-ref">match_escalation</span></a> と <a class="reference internal" href="../../spec/search.html"><span class="doc">検索</span></a> を参照してください。</p>
+<p>指定可能な値は以下の通りです。</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Value</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">auto</span></code></td>
+<td><p class="first">Groongaは <a class="reference internal" href="#select-match-escalation-threshold"><span class="std std-ref">match_escalation_threshold</span></a> を使って検索方法をエスカレーションするかどうかを決めます。</p>
+<p class="last">これがデフォルトです。</p>
+</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">yes</span></code></td>
+<td>Groongaは常に検索方法のエスカレーションします。</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">no</span></code></td>
+<td>Groongaは絶対に検索方法をエスカレーションしません。</td>
+</tr>
+</tbody>
+</table>
+<p><code class="docutils literal"><span class="pre">--match_escalation</span> <span class="pre">yes</span></code> は <code class="docutils literal"><span class="pre">--match_escalation_threshold</span> <span class="pre">9999...999</span></code> よりも強力です。 <code class="docutils literal"><span class="pre">--match_escalation</span> <span class="pre">yes</span></code> を指定した場合は <code class="docutils literal"><span class="pre">--filter</span> <span class="pre">'true</span> <span class="pre">&amp;&amp;</span> <span class="pre">column</span> <span class="pre">&#64;</span> <span class="pre">&quot;query&quot;</span></code> を実行するときに検索方法をエスカレーションします。 <code class="docutils literal"><span class="pre">--match_escalation_threshold</span> <span class="pre">9999...999</span></code> を指定した場合は <code class="docutils literal"><span class="pre">--filter</span> <span class="pre">'true</span> <span class="pre">&amp;&amp;</span> <span class="pre">column</span> <span class="pre">&#64;</span> <span class="pre">&quot;query&quot;</span></code> を実行するときに検索方法をエスカレーションしません。</p>
+<p>以下は簡単な <code class="docutils literal"><span class="pre">match_escalation</span></code> の使用例です。最初の <code class="docutils literal"><span class="pre">select</span></code> は <code class="docutils literal"><span class="pre">match_escalation</span></code> 引数がありません。2番目の <code class="docutils literal"><span class="pre">select</span></code> は <code class="docutils literal"><span class="pre">match_escalation</span></code> 引数があります。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>select Entries --filter &#39;true &amp;&amp; content @ &quot;groo&quot;&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         0
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ]
+#     ]
+#   ]
+# ]
+select Entries --filter &#39;true &amp;&amp; content @ &quot;groo&quot;&#39; --match_escalation yes
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ],
+#         [
+#           &quot;n_likes&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;tag&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         2,
+#         &quot;Groonga&quot;,
+#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+#         10,
+#         &quot;Groonga&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>最初の <code class="docutils literal"><span class="pre">select</span></code> コマンドは <code class="docutils literal"><span class="pre">Entries</span></code> テーブルから <code class="docutils literal"><span class="pre">content</span></code> カラムの値に <code class="docutils literal"><span class="pre">groo</span></code> という単語を含むレコードを検索します。しかし、この検索ではどのレ&quot;コードにもマッチしません。これは、 <code class="docutils literal"><span class="pre">TokenBigram</span></code> トークナイザーは <code class="docutils literal"><span class="pre">groonga</span></code> を <code class="docutils literal"><span class="pre">gr|ro|oo|on|ng|ga</span></code> ではなく <code class="docutils literal"><span class="pre">groonga</span></code> にトークナイズするからです。</p>
+<p>2番目の <code class="docutils literal"><span class="pre">select</span></code> コマンドも <code class="docutils literal"><span class="pre">Entries</span></code> テーブルから <code class="docutils literal"><span class="pre">content</span></code> カラムの値に <code class="docutils literal"><span class="pre">groo</span></code> という単語を含むレコードを検索します。しかし、この <code class="docutils literal"><span class="pre">select</span></code> コマンドは検索方法をエスカレーションします。そのため、この <code class="docutils literal"><span class="pre">select</span></code> コマンドはマッチします。</p>
+</div>
 <div class="section" id="query-expansion">
-<span id="select-query-expansion"></span><h4>7.3.54.4.3.2. <code class="docutils literal"><span class="pre">query_expansion</span></code><a class="headerlink" href="#query-expansion" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<span id="select-query-expansion"></span><h4>7.3.54.4.3.3. <code class="docutils literal"><span class="pre">query_expansion</span></code><a class="headerlink" href="#query-expansion" title="このヘッドラインへのパーマリンク">¶</a></h4>
 <div class="deprecated">
 <p><span class="versionmodified">バージョン 3.0.2 で撤廃: </span>代わりに <a class="reference internal" href="#select-query-expander"><span class="std std-ref">query_expander</span></a> を使ってください。</p>
 </div>
 </div>
 <div class="section" id="query-flags">
-<span id="select-query-flags"></span><h4>7.3.54.4.3.3. <code class="docutils literal"><span class="pre">query_flags</span></code><a class="headerlink" href="#query-flags" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<span id="select-query-flags"></span><h4>7.3.54.4.3.4. <code class="docutils literal"><span class="pre">query_flags</span></code><a class="headerlink" href="#query-flags" title="このヘッドラインへのパーマリンク">¶</a></h4>
 <p><code class="docutils literal"><span class="pre">query</span></code> パラメーターの構文をカスタマイズします。デフォルトでは <code class="docutils literal"><span class="pre">query</span></code> パラメーターでカラムの値を更新することはできません。しかし、 <code class="docutils literal"><span class="pre">query_flags</span></code> に <code class="docutils literal"><span class="pre">ALLOW_COLUMN|ALLOW_UPDATE</span></code> を指定することで <code class="docutils literal"><span class="pre">query</span></code> でカラムの値を更新することができます。</p>
 <p>指定可能な値は以下の通りです。</p>
 <ul class="simple">
@@ -1822,7 +1943,7 @@ select Users
 <p><a class="reference internal" href="../grn_expr/query_syntax.html"><span class="doc">クエリー構文</span></a> も見てください。</p>
 </div>
 <div class="section" id="query-expander">
-<span id="select-query-expander"></span><h4>7.3.54.4.3.4. <code class="docutils literal"><span class="pre">query_expander</span></code><a class="headerlink" href="#query-expander" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<span id="select-query-expander"></span><h4>7.3.54.4.3.5. <code class="docutils literal"><span class="pre">query_expander</span></code><a class="headerlink" href="#query-expander" title="このヘッドラインへのパーマリンク">¶</a></h4>
 <p>クエリー展開用の引数です。クエリー展開はクエリー中の特定の単語を別の単語に置換します。通常は類義語検索に使います。</p>
 <p><code class="docutils literal"><span class="pre">query</span></code> 引数の値を置換するために使うカラムを指定します。この引数の値の書式は「 <code class="docutils literal"><span class="pre">${TABLE}.${COLUMN}</span></code> 」です。例えば、 「 <code class="docutils literal"><span class="pre">Terms.synonym</span></code> 」は <code class="docutils literal"><span class="pre">Terms</span></code> テーブルの <code class="docutils literal"><span class="pre">synonym</span></code> カラムを指定しています。</p>
 <p>クエリー展開用のテーブルを「置換テーブル」と呼びます。置換テーブルのキーは <code class="docutils literal"><span class="pre">ShortText</span></code> にしてください。そのため、配列テーブル（ <code class="docutils literal"><span class="pre">TABLE_NO_KEY</span></code> ）は置換テーブルに使うことはできません。なぜなら、配列テーブルにはキーがないからです。</p>
@@ -5920,9 +6041,10 @@ load --table Items
 </li>
 <li><a class="reference internal" href="#advanced-search-parameters">7.3.54.4.3. 高度な検索のための引数</a><ul>
 <li><a class="reference internal" href="#match-escalation-threshold">7.3.54.4.3.1. <code class="docutils literal"><span class="pre">match_escalation_threshold</span></code></a></li>
-<li><a class="reference internal" href="#query-expansion">7.3.54.4.3.2. <code class="docutils literal"><span class="pre">query_expansion</span></code></a></li>
-<li><a class="reference internal" href="#query-flags">7.3.54.4.3.3. <code class="docutils literal"><span class="pre">query_flags</span></code></a></li>
-<li><a class="reference internal" href="#query-expander">7.3.54.4.3.4. <code class="docutils literal"><span class="pre">query_expander</span></code></a></li>
+<li><a class="reference internal" href="#match-escalation">7.3.54.4.3.2. <code class="docutils literal"><span class="pre">match_escalation</span></code></a></li>
+<li><a class="reference internal" href="#query-expansion">7.3.54.4.3.3. <code class="docutils literal"><span class="pre">query_expansion</span></code></a></li>
+<li><a class="reference internal" href="#query-flags">7.3.54.4.3.4. <code class="docutils literal"><span class="pre">query_flags</span></code></a></li>
+<li><a class="reference internal" href="#query-expander">7.3.54.4.3.5. <code class="docutils literal"><span class="pre">query_expander</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#output-related-parameters">7.3.54.4.4. 出力関連の引数</a><ul>
@@ -6026,7 +6148,7 @@ load --table Items
         <li class="right" >
           <a href="schema.html" title="7.3.53. schema"
              >前へ</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v8.0.0ドキュメント</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v8.0.1ドキュメント</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../reference.html" >7. リファレンスマニュアル</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../command.html" >7.3. コマンド</a> &#187;</li> 
       </ul>

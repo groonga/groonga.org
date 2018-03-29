@@ -4,13 +4,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="ja">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>7.3.33. logical_range_filter &#8212; Groonga v8.0.0ドキュメント</title>
+    <title>7.3.33. logical_range_filter &#8212; Groonga v8.0.1ドキュメント</title>
     <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '8.0.0',
+        VERSION:     '8.0.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  false,
@@ -73,7 +73,7 @@
         <li class="right" >
           <a href="logical_parameters.html" title="7.3.32. logical_parameters"
              accesskey="P">前へ</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v8.0.0ドキュメント</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v8.0.1ドキュメント</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../reference.html" >7. リファレンスマニュアル</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../command.html" accesskey="U">7.3. コマンド</a> &#187;</li> 
       </ul>
@@ -264,8 +264,98 @@ load --table Entries_20150709
 <p>必須引数は二つあります。 <code class="docutils literal"><span class="pre">logical_table</span></code> と <code class="docutils literal"><span class="pre">shard_key</span></code> です。</p>
 <div class="section" id="logical-table">
 <h4>7.3.33.4.1.1. <code class="docutils literal"><span class="pre">logical_table</span></code><a class="headerlink" href="#logical-table" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p>論理テーブル名を指定します。これは <code class="docutils literal"><span class="pre">_YYYYMMDD</span></code> をテーブル名から除いたものです。実際のテーブルが <code class="docutils literal"><span class="pre">Logs_20150203</span></code> や <code class="docutils literal"><span class="pre">Logs_20150203</span></code> といったものなら、論理テーブル名は <code class="docutils literal"><span class="pre">Logs</span></code> です。</p>
-<p>TODO: Add examples</p>
+<p>論理テーブル名を指定します。これは <code class="docutils literal"><span class="pre">_YYYYMMDD</span></code> をテーブル名からのぞいたものです。実際のテーブルが <code class="docutils literal"><span class="pre">Entries_20150708</span></code> や <code class="docutils literal"><span class="pre">Entries_20150709</span></code> といったものなら、論理テーブル名は <code class="docutils literal"><span class="pre">Entries</span></code> です。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_range_filter --logical_table Entries --shard_key created_at
+
+# [
+#   [
+#     0,
+#     1519131606.676006,
+#     0.0006020069122314453
+#   ],
+#   [
+#     [
+#       [
+#         &quot;_key&quot;,
+#         &quot;ShortText&quot;
+#       ],
+#       [
+#         &quot;content&quot;,
+#         &quot;Text&quot;
+#       ],
+#       [
+#         &quot;created_at&quot;,
+#         &quot;Time&quot;
+#       ],
+#       [
+#         &quot;n_likes&quot;,
+#         &quot;UInt32&quot;
+#       ],
+#       [
+#         &quot;tag&quot;,
+#         &quot;ShortText&quot;
+#       ]
+#     ],
+#     [
+#       &quot;The first post!&quot;,
+#       &quot;Welcome! This is my first post!&quot;,
+#       1436281200.0,
+#       5,
+#       &quot;Hello&quot;
+#     ],
+#     [
+#       &quot;Groonga&quot;,
+#       &quot;I started to use Groonga. It&#39;s very fast!&quot;,
+#       1436284800.0,
+#       10,
+#       &quot;Groonga&quot;
+#     ],
+#     [
+#       &quot;Mroonga&quot;,
+#       &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
+#       1436288400.0,
+#       15,
+#       &quot;Groonga&quot;
+#     ],
+#     [
+#       &quot;Good-bye Senna&quot;,
+#       &quot;I migrated all Senna system!&quot;,
+#       1436367600.0,
+#       3,
+#       &quot;Senna&quot;
+#     ],
+#     [
+#       &quot;Good-bye Tritonn&quot;,
+#       &quot;I also migrated all Tritonn system!&quot;,
+#       1436371200.0,
+#       3,
+#       &quot;Senna&quot;
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>存在しないテーブルを指定するとエラーが返ります。</p>
+<p>実行例:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>logical_range_filter --logical_table Nonexistent --shard_key created_at
+# [
+#   [
+#     -22,
+#     1519132441.586192,
+#     0.0005924701690673828,
+#     &quot;[logical_range_filter] no shard exists: logical_table: &lt;Nonexistent&gt;: shard_key: &lt;created_at&gt;&quot;,
+#     [
+#       [
+#         &quot;Groonga::Sharding::LogicalRangeFilterCommand::Executor.execute&quot;,
+#         &quot;/tmp/local/lib/groonga/plugins/sharding/logical_range_filter.rb&quot;,
+#         193
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
 </div>
 <div class="section" id="shard-key">
 <h4>7.3.33.4.1.2. <code class="docutils literal"><span class="pre">shard_key</span></code><a class="headerlink" href="#shard-key" title="このヘッドラインへのパーマリンク">¶</a></h4>
@@ -1315,7 +1405,7 @@ logical_range_filter \
         <li class="right" >
           <a href="logical_parameters.html" title="7.3.32. logical_parameters"
              >前へ</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v8.0.0ドキュメント</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v8.0.1ドキュメント</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../reference.html" >7. リファレンスマニュアル</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../command.html" >7.3. コマンド</a> &#187;</li> 
       </ul>

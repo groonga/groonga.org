@@ -3,20 +3,12 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml" lang="ja">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>7.12.2. スクリプト構文 &#8212; Groonga v8.0.1ドキュメント</title>
     <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../',
-        VERSION:     '8.0.1',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  false,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="../../static/documentation_options.js"></script>
     <script type="text/javascript" src="../../static/jquery.js"></script>
     <script type="text/javascript" src="../../static/underscore.js"></script>
     <script type="text/javascript" src="../../static/doctools.js"></script>
@@ -34,8 +26,7 @@
 
     <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
   </head>
-
-    <body>
+  <body>
     <div id="fb-root"></div>
 
 <div class="header">
@@ -86,14 +77,14 @@
             
   <div class="section" id="script-syntax">
 <h1>7.12.2. スクリプト構文<a class="headerlink" href="#script-syntax" title="このヘッドラインへのパーマリンク">¶</a></h1>
-<p>スクリプト構文は複雑な検索条件を指定するための構文です。この構文はECMAScriptに似ています。例えば、 <code class="docutils literal"><span class="pre">_key</span> <span class="pre">==</span> <span class="pre">&quot;book&quot;</span></code> は <code class="docutils literal"><span class="pre">_key</span></code> の値が <code class="docutils literal"><span class="pre">&quot;book&quot;</span></code> のレコードを検索するという意味です。 <a class="reference internal" href="query_syntax.html"><span class="doc">クエリー構文</span></a> ではすべての値は文字列でしたが、スクリプト構文では値に型があります。例えば、 <code class="docutils literal"><span class="pre">&quot;book&quot;</span></code> は文字列で <code class="docutils literal"><span class="pre">1</span></code> は整数で、 <code class="docutils literal"><span class="pre">TokenBigram</span></code> は <code class="docutils literal"><span class="pre">TokenBigram</span></code> という名前のオブジェクトです。</p>
-<p>スクリプト構文はECMAScriptの構文と完全に互換性があるわけではありません。例えば、 <code class="docutils literal"><span class="pre">if</span></code> 制御文や <code class="docutils literal"><span class="pre">for</span></code> 繰り返し文や変数定義文といった文をサポートしていません。関数定義もサポートしていません。しかし、独自の演算子を追加しています。独自の演算子はECMAScriptの構文を説明した後に説明します。</p>
+<p>スクリプト構文は複雑な検索条件を指定するための構文です。この構文はECMAScriptに似ています。例えば、 <code class="docutils literal notranslate"><span class="pre">_key</span> <span class="pre">==</span> <span class="pre">&quot;book&quot;</span></code> は <code class="docutils literal notranslate"><span class="pre">_key</span></code> の値が <code class="docutils literal notranslate"><span class="pre">&quot;book&quot;</span></code> のレコードを検索するという意味です。 <a class="reference internal" href="query_syntax.html"><span class="doc">クエリー構文</span></a> ではすべての値は文字列でしたが、スクリプト構文では値に型があります。例えば、 <code class="docutils literal notranslate"><span class="pre">&quot;book&quot;</span></code> は文字列で <code class="docutils literal notranslate"><span class="pre">1</span></code> は整数で、 <code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code> は <code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code> という名前のオブジェクトです。</p>
+<p>スクリプト構文はECMAScriptの構文と完全に互換性があるわけではありません。例えば、 <code class="docutils literal notranslate"><span class="pre">if</span></code> 制御文や <code class="docutils literal notranslate"><span class="pre">for</span></code> 繰り返し文や変数定義文といった文をサポートしていません。関数定義もサポートしていません。しかし、独自の演算子を追加しています。独自の演算子はECMAScriptの構文を説明した後に説明します。</p>
 <div class="section" id="security">
 <span id="script-syntax-security"></span><h2>7.12.2.1. セキュリティー<a class="headerlink" href="#security" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <p>セキュリティーの観点からユーザーからの入力をそのままGroongaに渡すべきではありません。悪意のあるユーザーがそのユーザーには参照できてはいけないレコードを取得するクエリーを入力するかもしれないからです。</p>
 <p>例えば、以下の状況を考えてみましょう。</p>
 <p>あるGroongaアプリケーションがGroongaへのリクエストを次のようなプログラムで構築していたとします。:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>filter = &quot;column @ \&quot;#{user_input}\&quot;&quot;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>filter = &quot;column @ \&quot;#{user_input}\&quot;&quot;
 select_options = {
   # ...
   :filter =&gt; filter,
@@ -101,23 +92,23 @@ select_options = {
 groonga_client.select(select_options)
 </pre></div>
 </div>
-<p><code class="docutils literal"><span class="pre">user_input</span></code> はユーザーからの入力です。入力が <code class="docutils literal"><span class="pre">query</span></code> だった場合は構築された <a class="reference internal" href="../commands/select.html#select-filter"><span class="std std-ref">filter</span></a> 引数は次のようになります。:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>column @ &quot;query&quot;
+<p><code class="docutils literal notranslate"><span class="pre">user_input</span></code> はユーザーからの入力です。入力が <code class="docutils literal notranslate"><span class="pre">query</span></code> だった場合は構築された <a class="reference internal" href="../commands/select.html#select-filter"><span class="std std-ref">filter</span></a> 引数は次のようになります。:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>column @ &quot;query&quot;
 </pre></div>
 </div>
-<p>もし、入力が <code class="docutils literal"><span class="pre">x&quot;</span> <span class="pre">||</span> <span class="pre">true</span> <span class="pre">||</span> <span class="pre">&quot;</span></code> だった場合は構築された <a class="reference internal" href="../commands/select.html#select-filter"><span class="std std-ref">filter</span></a> 引数は次のようになります。:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>column @ &quot;x&quot; || true || &quot;&quot;
+<p>もし、入力が <code class="docutils literal notranslate"><span class="pre">x&quot;</span> <span class="pre">||</span> <span class="pre">true</span> <span class="pre">||</span> <span class="pre">&quot;</span></code> だった場合は構築された <a class="reference internal" href="../commands/select.html#select-filter"><span class="std std-ref">filter</span></a> 引数は次のようになります。:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>column @ &quot;x&quot; || true || &quot;&quot;
 </pre></div>
 </div>
 <p>このクエリーはすべてのレコードにマッチします。このユーザーはデータベース中のすべてのレコードを取得するでしょう。このユーザーには悪意があったのかもしれません。</p>
-<p>ユーザーからの入力では値だけを受け取るようにする方がよいです。これは、ユーザーからの入力には <code class="docutils literal"><span class="pre">&#64;</span></code> や <code class="docutils literal"><span class="pre">&amp;&amp;</span></code> のような演算子を受け付けないようにするということです。もし、演算子も受け付けるようにするなら、ユーザーは悪意のあるクエリーを作ることができます。</p>
+<p>ユーザーからの入力では値だけを受け取るようにする方がよいです。これは、ユーザーからの入力には <code class="docutils literal notranslate"><span class="pre">&#64;</span></code> や <code class="docutils literal notranslate"><span class="pre">&amp;&amp;</span></code> のような演算子を受け付けないようにするということです。もし、演算子も受け付けるようにするなら、ユーザーは悪意のあるクエリーを作ることができます。</p>
 <p>ユーザーの入力が値だけなら、入力された値をエスケープすることで悪意のあるクエリーを防ぐことができます。以下はユーザーの入力をどのようにエスケープすればよいかのリストです。</p>
 <blockquote>
 <div><ul class="simple">
-<li>真の値： <code class="docutils literal"><span class="pre">true</span></code> に変換してください。</li>
-<li>負の値： <code class="docutils literal"><span class="pre">false</span></code> に変換してください。</li>
-<li>数値: <a class="reference internal" href="#script-syntax-literal-integer"><span class="std std-ref">整数</span></a> または <a class="reference internal" href="#script-syntax-literal-float"><span class="std std-ref">浮動小数点数</span></a> に変換してください。例えば、 <code class="docutils literal"><span class="pre">1.2</span></code> 、 <code class="docutils literal"><span class="pre">-10</span></code> 、 <code class="docutils literal"><span class="pre">314e-2</span></code> といった具合です。</li>
-<li>文字列：文字列中の <code class="docutils literal"><span class="pre">&quot;</span></code> を <code class="docutils literal"><span class="pre">\&quot;</span></code> で、 <code class="docutils literal"><span class="pre">\</span></code> を <code class="docutils literal"><span class="pre">\\</span></code> で置換してください。その後、置換した文字列を <code class="docutils literal"><span class="pre">&quot;</span></code> で囲んでください。例えば、 <code class="docutils literal"><span class="pre">double</span> <span class="pre">&quot;</span> <span class="pre">quote</span> <span class="pre">and</span> <span class="pre">back</span> <span class="pre">\</span> <span class="pre">slash</span></code> は <code class="docutils literal"><span class="pre">&quot;double</span> <span class="pre">\&quot;</span> <span class="pre">quote</span> <span class="pre">and</span> <span class="pre">back</span> <span class="pre">\\</span> <span class="pre">slash&quot;</span></code> に変換します。</li>
+<li>真の値： <code class="docutils literal notranslate"><span class="pre">true</span></code> に変換してください。</li>
+<li>負の値： <code class="docutils literal notranslate"><span class="pre">false</span></code> に変換してください。</li>
+<li>数値: <a class="reference internal" href="#script-syntax-literal-integer"><span class="std std-ref">整数</span></a> または <a class="reference internal" href="#script-syntax-literal-float"><span class="std std-ref">浮動小数点数</span></a> に変換してください。例えば、 <code class="docutils literal notranslate"><span class="pre">1.2</span></code> 、 <code class="docutils literal notranslate"><span class="pre">-10</span></code> 、 <code class="docutils literal notranslate"><span class="pre">314e-2</span></code> といった具合です。</li>
+<li>文字列：文字列中の <code class="docutils literal notranslate"><span class="pre">&quot;</span></code> を <code class="docutils literal notranslate"><span class="pre">\&quot;</span></code> で、 <code class="docutils literal notranslate"><span class="pre">\</span></code> を <code class="docutils literal notranslate"><span class="pre">\\</span></code> で置換してください。その後、置換した文字列を <code class="docutils literal notranslate"><span class="pre">&quot;</span></code> で囲んでください。例えば、 <code class="docutils literal notranslate"><span class="pre">double</span> <span class="pre">&quot;</span> <span class="pre">quote</span> <span class="pre">and</span> <span class="pre">back</span> <span class="pre">\</span> <span class="pre">slash</span></code> は <code class="docutils literal notranslate"><span class="pre">&quot;double</span> <span class="pre">\&quot;</span> <span class="pre">quote</span> <span class="pre">and</span> <span class="pre">back</span> <span class="pre">\\</span> <span class="pre">slash&quot;</span></code> に変換します。</li>
 </ul>
 </div></blockquote>
 </div>
@@ -125,7 +116,7 @@ groonga_client.select(select_options)
 <h2>7.12.2.2. サンプルデータ<a class="headerlink" href="#sample-data" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <p>使い方を示すために使うスキーマ定義とサンプルデータは以下の通りです。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>table_create Entries TABLE_PAT_KEY ShortText
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>table_create Entries TABLE_PAT_KEY ShortText
 # [[0, 1337566253.89858, 0.000355720520019531], true]
 column_create Entries content COLUMN_SCALAR Text
 # [[0, 1337566253.89858, 0.000355720520019531], true]
@@ -158,33 +149,33 @@ load --table Entries
 # [[0, 1337566253.89858, 0.000355720520019531], 5]
 </pre></div>
 </div>
-<p>ブログエントリ用の <code class="docutils literal"><span class="pre">Entries</span></code> テーブルがあります。各エントリはタイトルと内容と「いいね！」数を持っています。タイトルは <code class="docutils literal"><span class="pre">Entries</span></code> のキーとします。内容は <code class="docutils literal"><span class="pre">Entries.content</span></code> カラムの値とします。「いいね！」数は <code class="docutils literal"><span class="pre">Entries.n_likes</span></code> カラムの値とします。</p>
-<p><code class="docutils literal"><span class="pre">Entries._key</span></code> カラムと <code class="docutils literal"><span class="pre">Entries.content</span></code> カラムには <code class="docutils literal"><span class="pre">TokenBigram</span></code> トークナイザーを使ったインデックスを作成します。そのため、 <code class="docutils literal"><span class="pre">Entries._key</span></code> と <code class="docutils literal"><span class="pre">Entries.content</span></code> は両方とも全文検索できます。</p>
+<p>ブログエントリ用の <code class="docutils literal notranslate"><span class="pre">Entries</span></code> テーブルがあります。各エントリはタイトルと内容と「いいね！」数を持っています。タイトルは <code class="docutils literal notranslate"><span class="pre">Entries</span></code> のキーとします。内容は <code class="docutils literal notranslate"><span class="pre">Entries.content</span></code> カラムの値とします。「いいね！」数は <code class="docutils literal notranslate"><span class="pre">Entries.n_likes</span></code> カラムの値とします。</p>
+<p><code class="docutils literal notranslate"><span class="pre">Entries._key</span></code> カラムと <code class="docutils literal notranslate"><span class="pre">Entries.content</span></code> カラムには <code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code> トークナイザーを使ったインデックスを作成します。そのため、 <code class="docutils literal notranslate"><span class="pre">Entries._key</span></code> と <code class="docutils literal notranslate"><span class="pre">Entries.content</span></code> は両方とも全文検索できます。</p>
 <p>これで例を示すためのスキーマとデータの準備ができました。</p>
 </div>
 <div class="section" id="literals">
 <span id="script-syntax-literals"></span><h2>7.12.2.3. リテラル<a class="headerlink" href="#literals" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <div class="section" id="integer">
 <span id="script-syntax-literal-integer"></span><h3>7.12.2.3.1. 整数<a class="headerlink" href="#integer" title="このヘッドラインへのパーマリンク">¶</a></h3>
-<p>整数リテラルは <code class="docutils literal"><span class="pre">1234567890</span></code> のような <code class="docutils literal"><span class="pre">0</span></code> から <code class="docutils literal"><span class="pre">9</span></code> の並びです。 <code class="docutils literal"><span class="pre">+29</span></code> や <code class="docutils literal"><span class="pre">-29</span></code> のように符号として最初に <code class="docutils literal"><span class="pre">+</span></code> または <code class="docutils literal"><span class="pre">-</span></code> をつけることができます。整数リテラルは10進数です。8進数や16進数などは使えません。</p>
-<p>整数リテラルの最大値は <code class="docutils literal"><span class="pre">9223372036854775807</span></code> （ <code class="docutils literal"><span class="pre">=</span> <span class="pre">2</span> <span class="pre">**</span> <span class="pre">63</span> <span class="pre">-</span> <span class="pre">1</span></code> ）です。最小値は <code class="docutils literal"><span class="pre">-9223372036854775808</span></code> （ <code class="docutils literal"><span class="pre">=</span> <span class="pre">-(2</span> <span class="pre">**</span> <span class="pre">63)</span></code> ）です。</p>
+<p>整数リテラルは <code class="docutils literal notranslate"><span class="pre">1234567890</span></code> のような <code class="docutils literal notranslate"><span class="pre">0</span></code> から <code class="docutils literal notranslate"><span class="pre">9</span></code> の並びです。 <code class="docutils literal notranslate"><span class="pre">+29</span></code> や <code class="docutils literal notranslate"><span class="pre">-29</span></code> のように符号として最初に <code class="docutils literal notranslate"><span class="pre">+</span></code> または <code class="docutils literal notranslate"><span class="pre">-</span></code> をつけることができます。整数リテラルは10進数です。8進数や16進数などは使えません。</p>
+<p>整数リテラルの最大値は <code class="docutils literal notranslate"><span class="pre">9223372036854775807</span></code> （ <code class="docutils literal notranslate"><span class="pre">=</span> <span class="pre">2</span> <span class="pre">**</span> <span class="pre">63</span> <span class="pre">-</span> <span class="pre">1</span></code> ）です。最小値は <code class="docutils literal notranslate"><span class="pre">-9223372036854775808</span></code> （ <code class="docutils literal notranslate"><span class="pre">=</span> <span class="pre">-(2</span> <span class="pre">**</span> <span class="pre">63)</span></code> ）です。</p>
 </div>
 <div class="section" id="float">
 <span id="script-syntax-literal-float"></span><h3>7.12.2.3.2. 浮動小数点数<a class="headerlink" href="#float" title="このヘッドラインへのパーマリンク">¶</a></h3>
-<p>浮動小数点数リテラルは <code class="docutils literal"><span class="pre">3.14</span></code> のように、まず <code class="docutils literal"><span class="pre">0</span></code> から <code class="docutils literal"><span class="pre">9</span></code> 、次に <code class="docutils literal"><span class="pre">.</span></code> 、最後に <code class="docutils literal"><span class="pre">0</span></code> から <code class="docutils literal"><span class="pre">9</span></code> という並びです。 <code class="docutils literal"><span class="pre">+3.14</span></code> や <code class="docutils literal"><span class="pre">-3.14</span></code> のように符号として最初に <code class="docutils literal"><span class="pre">+</span></code> または <code class="docutils literal"><span class="pre">-</span></code> をつけることができます。 <code class="docutils literal"><span class="pre">${基数}e${指数}</span></code> や <code class="docutils literal"><span class="pre">${基数}E${指数}</span></code> というフォーマットもサポートしています。例えば、 <code class="docutils literal"><span class="pre">314e-2</span></code> は <code class="docutils literal"><span class="pre">3.14</span></code> と同じです。</p>
+<p>浮動小数点数リテラルは <code class="docutils literal notranslate"><span class="pre">3.14</span></code> のように、まず <code class="docutils literal notranslate"><span class="pre">0</span></code> から <code class="docutils literal notranslate"><span class="pre">9</span></code> 、次に <code class="docutils literal notranslate"><span class="pre">.</span></code> 、最後に <code class="docutils literal notranslate"><span class="pre">0</span></code> から <code class="docutils literal notranslate"><span class="pre">9</span></code> という並びです。 <code class="docutils literal notranslate"><span class="pre">+3.14</span></code> や <code class="docutils literal notranslate"><span class="pre">-3.14</span></code> のように符号として最初に <code class="docutils literal notranslate"><span class="pre">+</span></code> または <code class="docutils literal notranslate"><span class="pre">-</span></code> をつけることができます。 <code class="docutils literal notranslate"><span class="pre">${基数}e${指数}</span></code> や <code class="docutils literal notranslate"><span class="pre">${基数}E${指数}</span></code> というフォーマットもサポートしています。例えば、 <code class="docutils literal notranslate"><span class="pre">314e-2</span></code> は <code class="docutils literal notranslate"><span class="pre">3.14</span></code> と同じです。</p>
 </div>
 <div class="section" id="string">
 <span id="script-syntax-literal-string"></span><h3>7.12.2.3.3. 文字列<a class="headerlink" href="#string" title="このヘッドラインへのパーマリンク">¶</a></h3>
-<p>文字列リテラルは <code class="docutils literal"><span class="pre">&quot;...&quot;</span></code> です。リテラル中の <code class="docutils literal"><span class="pre">&quot;</span></code> は <code class="docutils literal"><span class="pre">\&quot;</span></code> というように <code class="docutils literal"><span class="pre">\</span></code> を前につけてエスケープします。例えば、 <code class="docutils literal"><span class="pre">&quot;Say</span> <span class="pre">\&quot;Hello!\&quot;.&quot;</span></code> は <code class="docutils literal"><span class="pre">Say</span> <span class="pre">&quot;Hello!&quot;.</span></code> という文字列のリテラルです。</p>
-<p>文字列エンコーディングはデータベースのエンコーディングと合わせなければいけません。デフォルトのエンコーディングはUTF-8です。これは configure の <code class="docutils literal"><span class="pre">--with-default-encoding</span></code> オプションや <a class="reference internal" href="../executables/groonga.html"><span class="doc">groonga 実行ファイル</span></a> の <code class="docutils literal"><span class="pre">--encodiong</span></code> などで変更できます。</p>
+<p>文字列リテラルは <code class="docutils literal notranslate"><span class="pre">&quot;...&quot;</span></code> です。リテラル中の <code class="docutils literal notranslate"><span class="pre">&quot;</span></code> は <code class="docutils literal notranslate"><span class="pre">\&quot;</span></code> というように <code class="docutils literal notranslate"><span class="pre">\</span></code> を前につけてエスケープします。例えば、 <code class="docutils literal notranslate"><span class="pre">&quot;Say</span> <span class="pre">\&quot;Hello!\&quot;.&quot;</span></code> は <code class="docutils literal notranslate"><span class="pre">Say</span> <span class="pre">&quot;Hello!&quot;.</span></code> という文字列のリテラルです。</p>
+<p>文字列エンコーディングはデータベースのエンコーディングと合わせなければいけません。デフォルトのエンコーディングはUTF-8です。これは configure の <code class="docutils literal notranslate"><span class="pre">--with-default-encoding</span></code> オプションや <a class="reference internal" href="../executables/groonga.html"><span class="doc">groonga 実行ファイル</span></a> の <code class="docutils literal notranslate"><span class="pre">--encodiong</span></code> などで変更できます。</p>
 </div>
 <div class="section" id="boolean">
 <span id="script-syntax-literal-boolean"></span><h3>7.12.2.3.4. 真偽値<a class="headerlink" href="#boolean" title="このヘッドラインへのパーマリンク">¶</a></h3>
-<p>真偽値のリテラルは <code class="docutils literal"><span class="pre">true</span></code> と <code class="docutils literal"><span class="pre">false</span></code> です。 <code class="docutils literal"><span class="pre">true</span></code> は真という意味で、 <code class="docutils literal"><span class="pre">false</span></code> は偽という意味です。</p>
+<p>真偽値のリテラルは <code class="docutils literal notranslate"><span class="pre">true</span></code> と <code class="docutils literal notranslate"><span class="pre">false</span></code> です。 <code class="docutils literal notranslate"><span class="pre">true</span></code> は真という意味で、 <code class="docutils literal notranslate"><span class="pre">false</span></code> は偽という意味です。</p>
 </div>
 <div class="section" id="null">
 <span id="script-syntax-literal-null"></span><h3>7.12.2.3.5. NULL<a class="headerlink" href="#null" title="このヘッドラインへのパーマリンク">¶</a></h3>
-<p>NULLのリテラルは <code class="docutils literal"><span class="pre">null</span></code> です。GroongaはNULL値をサポートしてませんが、NULLリテラルをサポートしています。</p>
+<p>NULLのリテラルは <code class="docutils literal notranslate"><span class="pre">null</span></code> です。GroongaはNULL値をサポートしてませんが、NULLリテラルをサポートしています。</p>
 </div>
 <div class="section" id="time">
 <span id="script-syntax-literal-time"></span><h3>7.12.2.3.6. 時間<a class="headerlink" href="#time" title="このヘッドラインへのパーマリンク">¶</a></h3>
@@ -193,9 +184,9 @@ load --table Entries
 <p class="last">これはgroonga独自の記法です。</p>
 </div>
 <p>時間のリテラルはありません。文字列での時間記法、整数での時間記法または浮動小数点数での時間記法を使ってください。</p>
-<p>文字列での時間記法は <code class="docutils literal"><span class="pre">&quot;YYYY/MM/DD</span> <span class="pre">hh:mm:ss.uuuuuu&quot;</span></code> または <code class="docutils literal"><span class="pre">&quot;YYYY-MM-DD</span> <span class="pre">hh:mm:ss.uuuuuu&quot;</span></code> です。 <code class="docutils literal"><span class="pre">YYYY</span></code> は西暦、 <code class="docutils literal"><span class="pre">MM</span></code> は月、 <code class="docutils literal"><span class="pre">DD</span></code> は日、 <code class="docutils literal"><span class="pre">hh</span></code> は時、 <code class="docutils literal"><span class="pre">mm</span></code> は分、 <code class="docutils literal"><span class="pre">ss</span></code> は秒、 <code class="docutils literal"><span class="pre">uuuuuu</span></code> はマイクロ秒です。ローカル時間です。例えば、 <code class="docutils literal"><span class="pre">&quot;2012/07/23</span> <span class="pre">02:41:10.436218&quot;</span></code> はISO 8601形式では <code class="docutils literal"><span class="pre">2012-07-23T02:41:10.436218</span></code> になります。</p>
-<p>整数での時間記法はUTC時間で1970年1月1日0時0分0秒からの経過秒数を使います。この時間はPOSIX時間とも呼ばれています。例えば、 <code class="docutils literal"><span class="pre">1343011270</span></code> はISO 8601形式では <code class="docutils literal"><span class="pre">2012-07-23T02:41:10Z</span></code> になります。</p>
-<p>浮動小数点数での時間記法はUTC時間で1970年1月1日0時0分0秒からの経過秒数と経過マイクロ秒数を使います。例えば、 <code class="docutils literal"><span class="pre">1343011270.436218</span></code> はISO 8601形式では <code class="docutils literal"><span class="pre">2012-07-23T02:41:10.346218Z</span></code> になります。</p>
+<p>文字列での時間記法は <code class="docutils literal notranslate"><span class="pre">&quot;YYYY/MM/DD</span> <span class="pre">hh:mm:ss.uuuuuu&quot;</span></code> または <code class="docutils literal notranslate"><span class="pre">&quot;YYYY-MM-DD</span> <span class="pre">hh:mm:ss.uuuuuu&quot;</span></code> です。 <code class="docutils literal notranslate"><span class="pre">YYYY</span></code> は西暦、 <code class="docutils literal notranslate"><span class="pre">MM</span></code> は月、 <code class="docutils literal notranslate"><span class="pre">DD</span></code> は日、 <code class="docutils literal notranslate"><span class="pre">hh</span></code> は時、 <code class="docutils literal notranslate"><span class="pre">mm</span></code> は分、 <code class="docutils literal notranslate"><span class="pre">ss</span></code> は秒、 <code class="docutils literal notranslate"><span class="pre">uuuuuu</span></code> はマイクロ秒です。ローカル時間です。例えば、 <code class="docutils literal notranslate"><span class="pre">&quot;2012/07/23</span> <span class="pre">02:41:10.436218&quot;</span></code> はISO 8601形式では <code class="docutils literal notranslate"><span class="pre">2012-07-23T02:41:10.436218</span></code> になります。</p>
+<p>整数での時間記法はUTC時間で1970年1月1日0時0分0秒からの経過秒数を使います。この時間はPOSIX時間とも呼ばれています。例えば、 <code class="docutils literal notranslate"><span class="pre">1343011270</span></code> はISO 8601形式では <code class="docutils literal notranslate"><span class="pre">2012-07-23T02:41:10Z</span></code> になります。</p>
+<p>浮動小数点数での時間記法はUTC時間で1970年1月1日0時0分0秒からの経過秒数と経過マイクロ秒数を使います。例えば、 <code class="docutils literal notranslate"><span class="pre">1343011270.436218</span></code> はISO 8601形式では <code class="docutils literal notranslate"><span class="pre">2012-07-23T02:41:10.346218Z</span></code> になります。</p>
 </div>
 <div class="section" id="geo-point">
 <span id="script-syntax-literal-geo-point"></span><h3>7.12.2.3.7. 座標値<a class="headerlink" href="#geo-point" title="このヘッドラインへのパーマリンク">¶</a></h3>
@@ -207,30 +198,30 @@ load --table Entries
 <p>文字列での座標値記法には以下のパターンがあります。</p>
 <blockquote>
 <div><ul class="simple">
-<li><code class="docutils literal"><span class="pre">&quot;ミリ秒表記の緯度xミリ秒表記の経度&quot;</span></code></li>
-<li><code class="docutils literal"><span class="pre">&quot;ミリ秒表記の緯度,ミリ秒表記の経度&quot;</span></code></li>
-<li><code class="docutils literal"><span class="pre">&quot;度数表記の緯度x度数表記の経度&quot;</span></code></li>
-<li><code class="docutils literal"><span class="pre">&quot;度数表記の緯度,度数表記の経度&quot;</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;ミリ秒表記の緯度xミリ秒表記の経度&quot;</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;ミリ秒表記の緯度,ミリ秒表記の経度&quot;</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;度数表記の緯度x度数表記の経度&quot;</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;度数表記の緯度,度数表記の経度&quot;</span></code></li>
 </ul>
 </div></blockquote>
-<p><code class="docutils literal"><span class="pre">x</span></code> と <code class="docutils literal"><span class="pre">,</span></code> のどちらも区切り文字として使えます。緯度と経度はミリ秒または度数で指定します。</p>
+<p><code class="docutils literal notranslate"><span class="pre">x</span></code> と <code class="docutils literal notranslate"><span class="pre">,</span></code> のどちらも区切り文字として使えます。緯度と経度はミリ秒または度数で指定します。</p>
 </div>
 <div class="section" id="array">
 <span id="script-syntax-literal-array"></span><h3>7.12.2.3.8. 配列<a class="headerlink" href="#array" title="このヘッドラインへのパーマリンク">¶</a></h3>
-<p>配列リテラルは <code class="docutils literal"><span class="pre">[element1,</span> <span class="pre">element2,</span> <span class="pre">...]</span></code> です。</p>
+<p>配列リテラルは <code class="docutils literal notranslate"><span class="pre">[element1,</span> <span class="pre">element2,</span> <span class="pre">...]</span></code> です。</p>
 </div>
 <div class="section" id="object-literal">
 <span id="script-syntax-literal-object"></span><h3>7.12.2.3.9. オブジェクトリテラル<a class="headerlink" href="#object-literal" title="このヘッドラインへのパーマリンク">¶</a></h3>
-<p>オブジェクトのリテラルは <code class="docutils literal"><span class="pre">{name1:</span> <span class="pre">value1,</span> <span class="pre">name2:</span> <span class="pre">value2,</span> <span class="pre">...}</span></code> です。groongaはまだオブジェクトリテラルをサポートしていません。</p>
+<p>オブジェクトのリテラルは <code class="docutils literal notranslate"><span class="pre">{name1:</span> <span class="pre">value1,</span> <span class="pre">name2:</span> <span class="pre">value2,</span> <span class="pre">...}</span></code> です。groongaはまだオブジェクトリテラルをサポートしていません。</p>
 </div>
 </div>
 <div class="section" id="control-syntaxes">
 <h2>7.12.2.4. 制御構文<a class="headerlink" href="#control-syntaxes" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>スクリプト構文は文をサポートしていません。そのため、 <code class="docutils literal"><span class="pre">if</span></code> のような制御文を使うことはできません。制御用の構文は <code class="docutils literal"><span class="pre">A</span> <span class="pre">?</span> <span class="pre">B</span> <span class="pre">:</span> <span class="pre">C</span></code> 式だけ使うことができます。</p>
-<p><code class="docutils literal"><span class="pre">A</span> <span class="pre">?</span> <span class="pre">B</span> <span class="pre">:</span> <span class="pre">C</span></code> は <code class="docutils literal"><span class="pre">A</span></code> が真なら <code class="docutils literal"><span class="pre">B</span></code> を返して、そうでなかったら <code class="docutils literal"><span class="pre">C</span></code> を返します。</p>
+<p>スクリプト構文は文をサポートしていません。そのため、 <code class="docutils literal notranslate"><span class="pre">if</span></code> のような制御文を使うことはできません。制御用の構文は <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">?</span> <span class="pre">B</span> <span class="pre">:</span> <span class="pre">C</span></code> 式だけ使うことができます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">?</span> <span class="pre">B</span> <span class="pre">:</span> <span class="pre">C</span></code> は <code class="docutils literal notranslate"><span class="pre">A</span></code> が真なら <code class="docutils literal notranslate"><span class="pre">B</span></code> を返して、そうでなかったら <code class="docutils literal notranslate"><span class="pre">C</span></code> を返します。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == (_id == 1 ? 5 : 3)&#39;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == (_id == 1 ? 5 : 3)&#39;
 # [
 #   [
 #     0,
@@ -283,15 +274,15 @@ load --table Entries
 # ]
 </pre></div>
 </div>
-<p>この式は <code class="docutils literal"><span class="pre">_id</span></code> カラムの値が <code class="docutils literal"><span class="pre">1</span></code> で <code class="docutils literal"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal"><span class="pre">5</span></code> または <code class="docutils literal"><span class="pre">_id</span></code> カラムの値が <code class="docutils literal"><span class="pre">1</span></code> ではなく <code class="docutils literal"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal"><span class="pre">3</span></code> のレコードにマッチします。</p>
+<p>この式は <code class="docutils literal notranslate"><span class="pre">_id</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">1</span></code> で <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">5</span></code> または <code class="docutils literal notranslate"><span class="pre">_id</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">1</span></code> ではなく <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">3</span></code> のレコードにマッチします。</p>
 </div>
 <div class="section" id="grouping">
 <h2>7.12.2.5. グループ化<a class="headerlink" href="#grouping" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>構文は <code class="docutils literal"><span class="pre">(...)</span></code> です。 <code class="docutils literal"><span class="pre">...</span></code> はカンマ区切りの式のリストです。</p>
-<p><code class="docutils literal"><span class="pre">(...)</span></code> は1つ以上の式をグループ化します。グループ化された式は1つの式として処理されます。 <code class="docutils literal"><span class="pre">a</span> <span class="pre">&amp;&amp;</span> <span class="pre">b</span> <span class="pre">||</span> <span class="pre">c</span></code> は <code class="docutils literal"><span class="pre">a</span></code> と <code class="docutils literal"><span class="pre">b</span></code> の両方がマッチするか、 <code class="docutils literal"><span class="pre">c</span></code> がマッチすれば式全体がマッチする、という意味になります。 <code class="docutils literal"><span class="pre">a</span> <span class="pre">&amp;&amp;</span> <span class="pre">(b</span> <span class="pre">||</span> <span class="pre">c)</span></code> は <code class="docutils literal"><span class="pre">a</span></code> がマッチして <code class="docutils literal"><span class="pre">b</span></code> と <code class="docutils literal"><span class="pre">c</span></code> はどちらか一方がマッチすれば式全体がマッチする、という意味になります。</p>
+<p>構文は <code class="docutils literal notranslate"><span class="pre">(...)</span></code> です。 <code class="docutils literal notranslate"><span class="pre">...</span></code> はカンマ区切りの式のリストです。</p>
+<p><code class="docutils literal notranslate"><span class="pre">(...)</span></code> は1つ以上の式をグループ化します。グループ化された式は1つの式として処理されます。 <code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">&amp;&amp;</span> <span class="pre">b</span> <span class="pre">||</span> <span class="pre">c</span></code> は <code class="docutils literal notranslate"><span class="pre">a</span></code> と <code class="docutils literal notranslate"><span class="pre">b</span></code> の両方がマッチするか、 <code class="docutils literal notranslate"><span class="pre">c</span></code> がマッチすれば式全体がマッチする、という意味になります。 <code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">&amp;&amp;</span> <span class="pre">(b</span> <span class="pre">||</span> <span class="pre">c)</span></code> は <code class="docutils literal notranslate"><span class="pre">a</span></code> がマッチして <code class="docutils literal notranslate"><span class="pre">b</span></code> と <code class="docutils literal notranslate"><span class="pre">c</span></code> はどちらか一方がマッチすれば式全体がマッチする、という意味になります。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; content @ &quot;senna&quot; || content @ &quot;fast&quot;&#39;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; content @ &quot;senna&quot; || content @ &quot;fast&quot;&#39;
 # [
 #   [
 #     0,
@@ -383,17 +374,17 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 # ]
 </pre></div>
 </div>
-<p>最初の式はグループ化していません。この式は <code class="docutils literal"><span class="pre">n_likes</span> <span class="pre">&lt;</span> <span class="pre">5</span></code> と <code class="docutils literal"><span class="pre">content</span> <span class="pre">&#64;</span> <span class="pre">&quot;senna&quot;</span></code> の両方がマッチするか <code class="docutils literal"><span class="pre">content</span> <span class="pre">&#64;</span> <span class="pre">&quot;fast&quot;</span></code> がマッチするレコードにマッチします。</p>
-<p>2番目の式はグループ化しています。この式は <code class="docutils literal"><span class="pre">n_likes</span> <span class="pre">&lt;</span> <span class="pre">5</span></code> にマッチして、 <code class="docutils literal"><span class="pre">content</span> <span class="pre">&#64;</span> <span class="pre">&quot;senna&quot;</span></code> と <code class="docutils literal"><span class="pre">content</span> <span class="pre">&#64;</span> <span class="pre">&quot;fast&quot;</span></code> は少なくともどちらか一方にマッチするレコードにマッチします。</p>
+<p>最初の式はグループ化していません。この式は <code class="docutils literal notranslate"><span class="pre">n_likes</span> <span class="pre">&lt;</span> <span class="pre">5</span></code> と <code class="docutils literal notranslate"><span class="pre">content</span> <span class="pre">&#64;</span> <span class="pre">&quot;senna&quot;</span></code> の両方がマッチするか <code class="docutils literal notranslate"><span class="pre">content</span> <span class="pre">&#64;</span> <span class="pre">&quot;fast&quot;</span></code> がマッチするレコードにマッチします。</p>
+<p>2番目の式はグループ化しています。この式は <code class="docutils literal notranslate"><span class="pre">n_likes</span> <span class="pre">&lt;</span> <span class="pre">5</span></code> にマッチして、 <code class="docutils literal notranslate"><span class="pre">content</span> <span class="pre">&#64;</span> <span class="pre">&quot;senna&quot;</span></code> と <code class="docutils literal notranslate"><span class="pre">content</span> <span class="pre">&#64;</span> <span class="pre">&quot;fast&quot;</span></code> は少なくともどちらか一方にマッチするレコードにマッチします。</p>
 </div>
 <div class="section" id="function-call">
 <h2>7.12.2.6. 関数呼び出し<a class="headerlink" href="#function-call" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>構文は <code class="docutils literal"><span class="pre">name(arugment1,</span> <span class="pre">argument2,</span> <span class="pre">...)</span></code> です。</p>
-<p><code class="docutils literal"><span class="pre">name(argument1,</span> <span class="pre">argument2,</span> <span class="pre">...)</span></code> は <code class="docutils literal"><span class="pre">name</span></code> という関数を引数 <code class="docutils literal"><span class="pre">argument1</span></code>, <code class="docutils literal"><span class="pre">argument2</span></code>, <code class="docutils literal"><span class="pre">...</span></code> で呼び出します。</p>
+<p>構文は <code class="docutils literal notranslate"><span class="pre">name(arugment1,</span> <span class="pre">argument2,</span> <span class="pre">...)</span></code> です。</p>
+<p><code class="docutils literal notranslate"><span class="pre">name(argument1,</span> <span class="pre">argument2,</span> <span class="pre">...)</span></code> は <code class="docutils literal notranslate"><span class="pre">name</span></code> という関数を引数 <code class="docutils literal notranslate"><span class="pre">argument1</span></code>, <code class="docutils literal notranslate"><span class="pre">argument2</span></code>, <code class="docutils literal notranslate"><span class="pre">...</span></code> で呼び出します。</p>
 <p>利用可能な関数の一覧は <a class="reference internal" href="../function.html"><span class="doc">関数</span></a> を参照してください。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Entries --filter &#39;edit_distance(_key, &quot;Groonga&quot;) &lt;= 1&#39;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;edit_distance(_key, &quot;Groonga&quot;) &lt;= 1&#39;
 # [
 #   [
 #     0,
@@ -440,7 +431,7 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 # ]
 </pre></div>
 </div>
-<p>この式は <a class="reference internal" href="../functions/edit_distance.html"><span class="doc">edit_distance</span></a> を使っています。この式は <code class="docutils literal"><span class="pre">_key</span></code> カラムの値が <code class="docutils literal"><span class="pre">&quot;Groonga&quot;</span></code> に似ているレコードにマッチします。 <code class="docutils literal"><span class="pre">&quot;Groonga&quot;</span></code> との類似度は編集距離で計算します。編集距離が1文字以下なら似ているとします。この場合は <code class="docutils literal"><span class="pre">&quot;Groonga&quot;</span></code> と <code class="docutils literal"><span class="pre">&quot;Mroonga&quot;</span></code> が似ている値です。</p>
+<p>この式は <a class="reference internal" href="../functions/edit_distance.html"><span class="doc">edit_distance</span></a> を使っています。この式は <code class="docutils literal notranslate"><span class="pre">_key</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">&quot;Groonga&quot;</span></code> に似ているレコードにマッチします。 <code class="docutils literal notranslate"><span class="pre">&quot;Groonga&quot;</span></code> との類似度は編集距離で計算します。編集距離が1文字以下なら似ているとします。この場合は <code class="docutils literal notranslate"><span class="pre">&quot;Groonga&quot;</span></code> と <code class="docutils literal notranslate"><span class="pre">&quot;Mroonga&quot;</span></code> が似ている値です。</p>
 </div>
 <div class="section" id="basic-operators">
 <h2>7.12.2.7. 基本的な演算子<a class="headerlink" href="#basic-operators" title="このヘッドラインへのパーマリンク">¶</a></h2>
@@ -450,11 +441,11 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 <p>以下は算術演算子の説明です。</p>
 <div class="section" id="addition-operator">
 <h4>7.12.2.7.1.1. 加算演算子<a class="headerlink" href="#addition-operator" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p>構文は <code class="docutils literal"><span class="pre">number1</span> <span class="pre">+</span> <span class="pre">number2</span></code> です。</p>
-<p>この演算子は <code class="docutils literal"><span class="pre">number1</span></code> と <code class="docutils literal"><span class="pre">number2</span></code> を足した結果を返します。</p>
+<p>構文は <code class="docutils literal notranslate"><span class="pre">number1</span> <span class="pre">+</span> <span class="pre">number2</span></code> です。</p>
+<p>この演算子は <code class="docutils literal notranslate"><span class="pre">number1</span></code> と <code class="docutils literal notranslate"><span class="pre">number2</span></code> を足した結果を返します。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == 10 + 5&#39;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == 10 + 5&#39;
 # [
 #   [
 #     0,
@@ -495,15 +486,15 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 # ]
 </pre></div>
 </div>
-<p>この式は <code class="docutils literal"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal"><span class="pre">15</span></code> (= <code class="docutils literal"><span class="pre">10</span> <span class="pre">+</span> <span class="pre">5</span></code>) のレコードにマッチします。</p>
+<p>この式は <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">15</span></code> (= <code class="docutils literal notranslate"><span class="pre">10</span> <span class="pre">+</span> <span class="pre">5</span></code>) のレコードにマッチします。</p>
 </div>
 <div class="section" id="subtraction-operator">
 <h4>7.12.2.7.1.2. 減算演算子<a class="headerlink" href="#subtraction-operator" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p>構文は <code class="docutils literal"><span class="pre">number1</span> <span class="pre">-</span> <span class="pre">number2</span></code> です。</p>
-<p>この演算子は <code class="docutils literal"><span class="pre">number2</span></code> から <code class="docutils literal"><span class="pre">number1</span></code> を引いた結果を返します。</p>
+<p>構文は <code class="docutils literal notranslate"><span class="pre">number1</span> <span class="pre">-</span> <span class="pre">number2</span></code> です。</p>
+<p>この演算子は <code class="docutils literal notranslate"><span class="pre">number2</span></code> から <code class="docutils literal notranslate"><span class="pre">number1</span></code> を引いた結果を返します。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == 20 - 5&#39;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == 20 - 5&#39;
 # [
 #   [
 #     0,
@@ -544,15 +535,15 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 # ]
 </pre></div>
 </div>
-<p>この式は <code class="docutils literal"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal"><span class="pre">15</span></code> (= <code class="docutils literal"><span class="pre">20</span> <span class="pre">-</span> <span class="pre">5</span></code>) のレコードにマッチします。</p>
+<p>この式は <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">15</span></code> (= <code class="docutils literal notranslate"><span class="pre">20</span> <span class="pre">-</span> <span class="pre">5</span></code>) のレコードにマッチします。</p>
 </div>
 <div class="section" id="multiplication-operator">
 <h4>7.12.2.7.1.3. 乗算演算子<a class="headerlink" href="#multiplication-operator" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p>構文は <code class="docutils literal"><span class="pre">number1</span> <span class="pre">*</span> <span class="pre">number2</span></code> です。</p>
-<p>この演算子は <code class="docutils literal"><span class="pre">number1</span></code> と <code class="docutils literal"><span class="pre">number2</span></code> を掛けた結果を返します。</p>
+<p>構文は <code class="docutils literal notranslate"><span class="pre">number1</span> <span class="pre">*</span> <span class="pre">number2</span></code> です。</p>
+<p>この演算子は <code class="docutils literal notranslate"><span class="pre">number1</span></code> と <code class="docutils literal notranslate"><span class="pre">number2</span></code> を掛けた結果を返します。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == 3 * 5&#39;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == 3 * 5&#39;
 # [
 #   [
 #     0,
@@ -593,15 +584,15 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 # ]
 </pre></div>
 </div>
-<p>この式は <code class="docutils literal"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal"><span class="pre">15</span></code> (= <code class="docutils literal"><span class="pre">3</span> <span class="pre">*</span> <span class="pre">5</span></code>) のレコードにマッチします。</p>
+<p>この式は <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">15</span></code> (= <code class="docutils literal notranslate"><span class="pre">3</span> <span class="pre">*</span> <span class="pre">5</span></code>) のレコードにマッチします。</p>
 </div>
 <div class="section" id="division-operator">
 <h4>7.12.2.7.1.4. 除算演算子<a class="headerlink" href="#division-operator" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p>構文は <code class="docutils literal"><span class="pre">number1</span> <span class="pre">/</span> <span class="pre">number2</span></code> と <code class="docutils literal"><span class="pre">number1</span> <span class="pre">%</span> <span class="pre">number2</span></code> です。</p>
-<p>この演算子は <code class="docutils literal"><span class="pre">number2</span></code> を <code class="docutils literal"><span class="pre">number1</span></code> で割ります。 <code class="docutils literal"><span class="pre">/</span></code> は商を返します。 <code class="docutils literal"><span class="pre">%</span></code> は余りを返します。</p>
+<p>構文は <code class="docutils literal notranslate"><span class="pre">number1</span> <span class="pre">/</span> <span class="pre">number2</span></code> と <code class="docutils literal notranslate"><span class="pre">number1</span> <span class="pre">%</span> <span class="pre">number2</span></code> です。</p>
+<p>この演算子は <code class="docutils literal notranslate"><span class="pre">number2</span></code> を <code class="docutils literal notranslate"><span class="pre">number1</span></code> で割ります。 <code class="docutils literal notranslate"><span class="pre">/</span></code> は商を返します。 <code class="docutils literal notranslate"><span class="pre">%</span></code> は余りを返します。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == 26 / 7&#39;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == 26 / 7&#39;
 # [
 #   [
 #     0,
@@ -648,9 +639,9 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 # ]
 </pre></div>
 </div>
-<p>この式は <code class="docutils literal"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal"><span class="pre">3</span></code> (= <code class="docutils literal"><span class="pre">26</span> <span class="pre">/</span> <span class="pre">7</span></code>) のレコードにマッチします。</p>
+<p>この式は <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">3</span></code> (= <code class="docutils literal notranslate"><span class="pre">26</span> <span class="pre">/</span> <span class="pre">7</span></code>) のレコードにマッチします。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == 26 % 7&#39;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == 26 % 7&#39;
 # [
 #   [
 #     0,
@@ -691,7 +682,7 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 # ]
 </pre></div>
 </div>
-<p>この式は <code class="docutils literal"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal"><span class="pre">5</span></code> (= <code class="docutils literal"><span class="pre">26</span> <span class="pre">%</span> <span class="pre">7</span></code>) の値にマッチします。</p>
+<p>この式は <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">5</span></code> (= <code class="docutils literal notranslate"><span class="pre">26</span> <span class="pre">%</span> <span class="pre">7</span></code>) の値にマッチします。</p>
 </div>
 </div>
 <div class="section" id="logical-operators">
@@ -699,11 +690,11 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 <p>以下は論理演算子の説明です。</p>
 <div class="section" id="logical-not-operator">
 <h4>7.12.2.7.2.1. 論理否定演算子<a class="headerlink" href="#logical-not-operator" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p>構文は <code class="docutils literal"><span class="pre">!condition</span></code> です。</p>
-<p>この演算子は <code class="docutils literal"><span class="pre">condition</span></code> の真偽値を反転します。</p>
+<p>構文は <code class="docutils literal notranslate"><span class="pre">!condition</span></code> です。</p>
+<p>この演算子は <code class="docutils literal notranslate"><span class="pre">condition</span></code> の真偽値を反転します。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Entries --filter &#39;!(n_likes == 5)&#39;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;!(n_likes == 5)&#39;
 # [
 #   [
 #     0,
@@ -762,15 +753,15 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 # ]
 </pre></div>
 </div>
-<p>この式は <code class="docutils literal"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal"><span class="pre">5</span></code> ではない式にマッチします。</p>
+<p>この式は <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">5</span></code> ではない式にマッチします。</p>
 </div>
 <div class="section" id="logical-and-operator">
 <h4>7.12.2.7.2.2. 論理積演算子<a class="headerlink" href="#logical-and-operator" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p>構文は <code class="docutils literal"><span class="pre">condition1</span> <span class="pre">&amp;&amp;</span> <span class="pre">condition2</span></code> です。</p>
-<p>この演算子は <code class="docutils literal"><span class="pre">condition1</span></code> と <code class="docutils literal"><span class="pre">condition2</span></code> の両方が真のときに真を返し、そうでなければ偽を返します。</p>
+<p>構文は <code class="docutils literal notranslate"><span class="pre">condition1</span> <span class="pre">&amp;&amp;</span> <span class="pre">condition2</span></code> です。</p>
+<p>この演算子は <code class="docutils literal notranslate"><span class="pre">condition1</span></code> と <code class="docutils literal notranslate"><span class="pre">condition2</span></code> の両方が真のときに真を返し、そうでなければ偽を返します。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Entries --filter &#39;content @ &quot;fast&quot; &amp;&amp; n_likes &gt;= 10&#39;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;content @ &quot;fast&quot; &amp;&amp; n_likes &gt;= 10&#39;
 # [
 #   [
 #     0,
@@ -817,15 +808,15 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 # ]
 </pre></div>
 </div>
-<p>この式は <code class="docutils literal"><span class="pre">content</span></code> カラムの値が <code class="docutils literal"><span class="pre">fast</span></code> を含んでいて、 <code class="docutils literal"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal"><span class="pre">10</span></code> 以上のレコードにマッチします。</p>
+<p>この式は <code class="docutils literal notranslate"><span class="pre">content</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">fast</span></code> を含んでいて、 <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">10</span></code> 以上のレコードにマッチします。</p>
 </div>
 <div class="section" id="logical-or-operator">
 <h4>7.12.2.7.2.3. 論理和演算子<a class="headerlink" href="#logical-or-operator" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p>構文は <code class="docutils literal"><span class="pre">condition1</span> <span class="pre">||</span> <span class="pre">condition2</span></code> です。</p>
-<p>この演算子は <code class="docutils literal"><span class="pre">condition1</span></code> と <code class="docutils literal"><span class="pre">condition2</span></code> のどちらか一方が真のときに真を返し、そうでなければ偽を返します。</p>
+<p>構文は <code class="docutils literal notranslate"><span class="pre">condition1</span> <span class="pre">||</span> <span class="pre">condition2</span></code> です。</p>
+<p>この演算子は <code class="docutils literal notranslate"><span class="pre">condition1</span></code> と <code class="docutils literal notranslate"><span class="pre">condition2</span></code> のどちらか一方が真のときに真を返し、そうでなければ偽を返します。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == 5 || n_likes == 10&#39;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == 5 || n_likes == 10&#39;
 # [
 #   [
 #     0,
@@ -872,15 +863,15 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 # ]
 </pre></div>
 </div>
-<p>この式は <code class="docutils literal"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal"><span class="pre">5</span></code> または <code class="docutils literal"><span class="pre">10</span></code> のレコードにマッチします。</p>
+<p>この式は <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">5</span></code> または <code class="docutils literal notranslate"><span class="pre">10</span></code> のレコードにマッチします。</p>
 </div>
 <div class="section" id="logical-and-not-operator">
 <h4>7.12.2.7.2.4. 論理差演算子<a class="headerlink" href="#logical-and-not-operator" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p>構文は <code class="docutils literal"><span class="pre">condition1</span> <span class="pre">&amp;!</span> <span class="pre">condition2</span></code> です。</p>
-<p>この演算子は <code class="docutils literal"><span class="pre">condition1</span></code> が真で <code class="docutils literal"><span class="pre">condition2</span></code> が偽のときに真を返し、そうでなければ偽を返します。差集合を返すということです。</p>
+<p>構文は <code class="docutils literal notranslate"><span class="pre">condition1</span> <span class="pre">&amp;!</span> <span class="pre">condition2</span></code> です。</p>
+<p>この演算子は <code class="docutils literal notranslate"><span class="pre">condition1</span></code> が真で <code class="docutils literal notranslate"><span class="pre">condition2</span></code> が偽のときに真を返し、そうでなければ偽を返します。差集合を返すということです。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Entries --filter &#39;content @ &quot;fast&quot; &amp;! content @ &quot;mroonga&quot;&#39;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;content @ &quot;fast&quot; &amp;! content @ &quot;mroonga&quot;&#39;
 # [
 #   [
 #     0,
@@ -921,7 +912,7 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 # ]
 </pre></div>
 </div>
-<p>この式は <code class="docutils literal"><span class="pre">content</span></code> カラムの値が <code class="docutils literal"><span class="pre">fast</span></code> を含んでいるが <code class="docutils literal"><span class="pre">mroonga</span></code> を含んでいないレコードにマッチします。</p>
+<p>この式は <code class="docutils literal notranslate"><span class="pre">content</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">fast</span></code> を含んでいるが <code class="docutils literal notranslate"><span class="pre">mroonga</span></code> を含んでいないレコードにマッチします。</p>
 </div>
 </div>
 <div class="section" id="bitwise-operators">
@@ -929,11 +920,11 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 <p>以下はビット演算子の説明です。</p>
 <div class="section" id="bitwise-not-operator">
 <span id="script-syntax-bitwise-not"></span><h4>7.12.2.7.3.1. ビット否定演算子<a class="headerlink" href="#bitwise-not-operator" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p>構文は <code class="docutils literal"><span class="pre">~number</span></code> です。</p>
-<p>この演算子は <code class="docutils literal"><span class="pre">number</span></code> の各ビットを反転した結果を返します。</p>
+<p>構文は <code class="docutils literal notranslate"><span class="pre">~number</span></code> です。</p>
+<p>この演算子は <code class="docutils literal notranslate"><span class="pre">number</span></code> の各ビットを反転した結果を返します。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Entries --filter &#39;~n_likes == -6&#39;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;~n_likes == -6&#39;
 # [
 #   [
 #     0,
@@ -974,15 +965,15 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 # ]
 </pre></div>
 </div>
-<p>この式は <code class="docutils literal"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal"><span class="pre">5</span></code> のレコードにマッチします。なぜならば、 <code class="docutils literal"><span class="pre">5</span></code> の各ビットを反転すると <code class="docutils literal"><span class="pre">-6</span></code> になるからです。</p>
+<p>この式は <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">5</span></code> のレコードにマッチします。なぜならば、 <code class="docutils literal notranslate"><span class="pre">5</span></code> の各ビットを反転すると <code class="docutils literal notranslate"><span class="pre">-6</span></code> になるからです。</p>
 </div>
 <div class="section" id="bitwise-and-operator">
 <span id="script-syntax-bitwise-and"></span><h4>7.12.2.7.3.2. ビット論理積演算子<a class="headerlink" href="#bitwise-and-operator" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p>構文は <code class="docutils literal"><span class="pre">number1</span> <span class="pre">&amp;</span> <span class="pre">number2</span></code> です。</p>
-<p>この演算子は <code class="docutils literal"><span class="pre">number1</span></code> と <code class="docutils literal"><span class="pre">number2</span></code> をビット単位で論理積をした結果を返します。</p>
+<p>構文は <code class="docutils literal notranslate"><span class="pre">number1</span> <span class="pre">&amp;</span> <span class="pre">number2</span></code> です。</p>
+<p>この演算子は <code class="docutils literal notranslate"><span class="pre">number1</span></code> と <code class="docutils literal notranslate"><span class="pre">number2</span></code> をビット単位で論理積をした結果を返します。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Entries --filter &#39;(n_likes &amp; 1) == 1&#39;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;(n_likes &amp; 1) == 1&#39;
 # [
 #   [
 #     0,
@@ -1041,16 +1032,16 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 # ]
 </pre></div>
 </div>
-<p>この式は <code class="docutils literal"><span class="pre">n_likes</span></code> カラムの値が偶数のレコードにマッチします。なぜならば、偶数と <code class="docutils literal"><span class="pre">1</span></code> のビット単位の論理積は <code class="docutils literal"><span class="pre">1</span></code> になり、奇数と <code class="docutils literal"><span class="pre">1</span></code> のビット単位の論理積は <code class="docutils literal"><span class="pre">0</span></code> になるからです。</p>
+<p>この式は <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> カラムの値が偶数のレコードにマッチします。なぜならば、偶数と <code class="docutils literal notranslate"><span class="pre">1</span></code> のビット単位の論理積は <code class="docutils literal notranslate"><span class="pre">1</span></code> になり、奇数と <code class="docutils literal notranslate"><span class="pre">1</span></code> のビット単位の論理積は <code class="docutils literal notranslate"><span class="pre">0</span></code> になるからです。</p>
 </div>
 </div>
 <div class="section" id="bitwise-or-operator">
 <span id="script-syntax-bitwise-or"></span><h3>7.12.2.7.4. ビット論理和演算子<a class="headerlink" href="#bitwise-or-operator" title="このヘッドラインへのパーマリンク">¶</a></h3>
-<p>構文は <code class="docutils literal"><span class="pre">number1</span> <span class="pre">|</span> <span class="pre">number2</span></code> です。</p>
-<p>この演算子は <code class="docutils literal"><span class="pre">number1</span></code> と <code class="docutils literal"><span class="pre">number2</span></code> をビット単位で論理和した結果を返します。</p>
+<p>構文は <code class="docutils literal notranslate"><span class="pre">number1</span> <span class="pre">|</span> <span class="pre">number2</span></code> です。</p>
+<p>この演算子は <code class="docutils literal notranslate"><span class="pre">number1</span></code> と <code class="docutils literal notranslate"><span class="pre">number2</span></code> をビット単位で論理和した結果を返します。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == (1 | 4)&#39;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == (1 | 4)&#39;
 # [
 #   [
 #     0,
@@ -1091,15 +1082,15 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 # ]
 </pre></div>
 </div>
-<p>この式は <code class="docutils literal"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal"><span class="pre">5</span></code> (= <code class="docutils literal"><span class="pre">1</span> <span class="pre">|</span> <span class="pre">4</span></code>) のレコードにマッチします。</p>
+<p>この式は <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">5</span></code> (= <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">|</span> <span class="pre">4</span></code>) のレコードにマッチします。</p>
 </div>
 <div class="section" id="bitwise-xor-operator">
 <span id="script-syntax-bitwise-xor"></span><h3>7.12.2.7.5. ビット排他的論理和演算子<a class="headerlink" href="#bitwise-xor-operator" title="このヘッドラインへのパーマリンク">¶</a></h3>
-<p>構文は <code class="docutils literal"><span class="pre">number1</span> <span class="pre">^</span> <span class="pre">number2</span></code> です。</p>
-<p>この演算子は <code class="docutils literal"><span class="pre">number1</span></code> と <code class="docutils literal"><span class="pre">number2</span></code> をビット単位で排他的論理和した結果を返します。</p>
+<p>構文は <code class="docutils literal notranslate"><span class="pre">number1</span> <span class="pre">^</span> <span class="pre">number2</span></code> です。</p>
+<p>この演算子は <code class="docutils literal notranslate"><span class="pre">number1</span></code> と <code class="docutils literal notranslate"><span class="pre">number2</span></code> をビット単位で排他的論理和した結果を返します。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == (10 ^ 15)&#39;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == (10 ^ 15)&#39;
 # [
 #   [
 #     0,
@@ -1140,18 +1131,18 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 # ]
 </pre></div>
 </div>
-<p>この式は <code class="docutils literal"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal"><span class="pre">5</span></code> (= <code class="docutils literal"><span class="pre">10</span> <span class="pre">^</span> <span class="pre">15</span></code>) の値にマッチします。</p>
+<p>この式は <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">5</span></code> (= <code class="docutils literal notranslate"><span class="pre">10</span> <span class="pre">^</span> <span class="pre">15</span></code>) の値にマッチします。</p>
 </div>
 <div class="section" id="shift-operators">
 <span id="script-syntax-shift-operators"></span><h3>7.12.2.7.6. シフト演算子<a class="headerlink" href="#shift-operators" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <p>以下はシフト演算子の説明です。</p>
 <div class="section" id="left-shift-operator">
 <span id="script-syntax-shift-left"></span><h4>7.12.2.7.6.1. 左シフト演算子<a class="headerlink" href="#left-shift-operator" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p>構文は <code class="docutils literal"><span class="pre">number1</span> <span class="pre">&lt;&lt;</span> <span class="pre">number2</span></code> です。</p>
-<p>この演算子は <code class="docutils literal"><span class="pre">number1</span></code> のビットを左に <code class="docutils literal"><span class="pre">number2</span></code> ビットシフトする。</p>
+<p>構文は <code class="docutils literal notranslate"><span class="pre">number1</span> <span class="pre">&lt;&lt;</span> <span class="pre">number2</span></code> です。</p>
+<p>この演算子は <code class="docutils literal notranslate"><span class="pre">number1</span></code> のビットを左に <code class="docutils literal notranslate"><span class="pre">number2</span></code> ビットシフトする。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == (5 &lt;&lt; 1)&#39;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == (5 &lt;&lt; 1)&#39;
 # [
 #   [
 #     0,
@@ -1192,15 +1183,15 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 # ]
 </pre></div>
 </div>
-<p>この式は <code class="docutils literal"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal"><span class="pre">10</span></code> (= <code class="docutils literal"><span class="pre">5</span> <span class="pre">&lt;&lt;</span> <span class="pre">1</span></code>) のレコードにマッチします。</p>
+<p>この式は <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">10</span></code> (= <code class="docutils literal notranslate"><span class="pre">5</span> <span class="pre">&lt;&lt;</span> <span class="pre">1</span></code>) のレコードにマッチします。</p>
 </div>
 <div class="section" id="signed-right-shift-operator">
 <span id="script-syntax-shift-signed-right"></span><h4>7.12.2.7.6.2. 符号付き右シフト演算子<a class="headerlink" href="#signed-right-shift-operator" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p>構文は <code class="docutils literal"><span class="pre">number1</span> <span class="pre">&gt;&gt;</span> <span class="pre">number2</span></code> です。</p>
-<p>この演算子は <code class="docutils literal"><span class="pre">number1</span></code> のビットを右に <code class="docutils literal"><span class="pre">number2</span></code> ビットシフトします。結果の符号は <code class="docutils literal"><span class="pre">number1</span></code> の符号と同じです。</p>
+<p>構文は <code class="docutils literal notranslate"><span class="pre">number1</span> <span class="pre">&gt;&gt;</span> <span class="pre">number2</span></code> です。</p>
+<p>この演算子は <code class="docutils literal notranslate"><span class="pre">number1</span></code> のビットを右に <code class="docutils literal notranslate"><span class="pre">number2</span></code> ビットシフトします。結果の符号は <code class="docutils literal notranslate"><span class="pre">number1</span></code> の符号と同じです。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == -(-10 &gt;&gt; 1)&#39;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == -(-10 &gt;&gt; 1)&#39;
 # [
 #   [
 #     0,
@@ -1241,15 +1232,15 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 # ]
 </pre></div>
 </div>
-<p>この式は <code class="docutils literal"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal"><span class="pre">5</span></code> (= <code class="docutils literal"><span class="pre">-(-10</span> <span class="pre">&gt;&gt;</span> <span class="pre">1)</span></code> = <code class="docutils literal"><span class="pre">-(-5)</span></code>) のレコードにマッチします。</p>
+<p>この式は <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">5</span></code> (= <code class="docutils literal notranslate"><span class="pre">-(-10</span> <span class="pre">&gt;&gt;</span> <span class="pre">1)</span></code> = <code class="docutils literal notranslate"><span class="pre">-(-5)</span></code>) のレコードにマッチします。</p>
 </div>
 <div class="section" id="unsigned-right-shift-operator">
 <span id="script-syntax-shift-unsigned-right"></span><h4>7.12.2.7.6.3. 符号なし右シフト演算子<a class="headerlink" href="#unsigned-right-shift-operator" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p>構文は <code class="docutils literal"><span class="pre">number1</span> <span class="pre">&gt;&gt;&gt;</span> <span class="pre">number2</span></code> です。</p>
-<p>この演算子は <code class="docutils literal"><span class="pre">number1</span></code> のビットを右に <code class="docutils literal"><span class="pre">number2</span></code> ビットシフトします。一番左の <code class="docutils literal"><span class="pre">number2</span></code> ビットには <code class="docutils literal"><span class="pre">0</span></code> が入ります。</p>
+<p>構文は <code class="docutils literal notranslate"><span class="pre">number1</span> <span class="pre">&gt;&gt;&gt;</span> <span class="pre">number2</span></code> です。</p>
+<p>この演算子は <code class="docutils literal notranslate"><span class="pre">number1</span></code> のビットを右に <code class="docutils literal notranslate"><span class="pre">number2</span></code> ビットシフトします。一番左の <code class="docutils literal notranslate"><span class="pre">number2</span></code> ビットには <code class="docutils literal notranslate"><span class="pre">0</span></code> が入ります。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == (2147483648 - (-10 &gt;&gt;&gt; 1))&#39;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == (2147483648 - (-10 &gt;&gt;&gt; 1))&#39;
 # [
 #   [
 #     0,
@@ -1290,7 +1281,7 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 # ]
 </pre></div>
 </div>
-<p>この式は <code class="docutils literal"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal"><span class="pre">5</span></code> (= <code class="docutils literal"><span class="pre">2147483648</span> <span class="pre">-</span> <span class="pre">(-10</span> <span class="pre">&gt;&gt;&gt;</span> <span class="pre">1)</span></code> = <code class="docutils literal"><span class="pre">2147483648</span> <span class="pre">-</span> <span class="pre">2147483643</span></code>) のレコードにマッチします。</p>
+<p>この式は <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">5</span></code> (= <code class="docutils literal notranslate"><span class="pre">2147483648</span> <span class="pre">-</span> <span class="pre">(-10</span> <span class="pre">&gt;&gt;&gt;</span> <span class="pre">1)</span></code> = <code class="docutils literal notranslate"><span class="pre">2147483648</span> <span class="pre">-</span> <span class="pre">2147483643</span></code>) のレコードにマッチします。</p>
 </div>
 </div>
 <div class="section" id="comparison-operators">
@@ -1298,11 +1289,11 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 <p>以下は比較演算子の説明です。</p>
 <div class="section" id="equal-operator">
 <span id="script-syntax-equal-operator"></span><h4>7.12.2.7.7.1. 等価演算子<a class="headerlink" href="#equal-operator" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p>構文は <code class="docutils literal"><span class="pre">object1</span> <span class="pre">==</span> <span class="pre">object2</span></code> です。</p>
-<p>この演算子は <code class="docutils literal"><span class="pre">object1</span></code> が <code class="docutils literal"><span class="pre">object2</span></code> と等しいときは真を返し、そうでなければ偽を返します。</p>
+<p>構文は <code class="docutils literal notranslate"><span class="pre">object1</span> <span class="pre">==</span> <span class="pre">object2</span></code> です。</p>
+<p>この演算子は <code class="docutils literal notranslate"><span class="pre">object1</span></code> が <code class="docutils literal notranslate"><span class="pre">object2</span></code> と等しいときは真を返し、そうでなければ偽を返します。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == 5&#39;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == 5&#39;
 # [
 #   [
 #     0,
@@ -1343,15 +1334,15 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 # ]
 </pre></div>
 </div>
-<p>この式は <code class="docutils literal"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal"><span class="pre">5</span></code> の値にマッチします。</p>
+<p>この式は <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">5</span></code> の値にマッチします。</p>
 </div>
 <div class="section" id="not-equal-operator">
 <h4>7.12.2.7.7.2. 不等価演算子<a class="headerlink" href="#not-equal-operator" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p>構文は <code class="docutils literal"><span class="pre">object1</span> <span class="pre">!=</span> <span class="pre">object2</span></code> です。</p>
-<p>この演算子は <code class="docutils literal"><span class="pre">object1</span></code> が <code class="docutils literal"><span class="pre">object2</span></code> と等しくないときに真を返し、そうでなければ偽を返します。</p>
+<p>構文は <code class="docutils literal notranslate"><span class="pre">object1</span> <span class="pre">!=</span> <span class="pre">object2</span></code> です。</p>
+<p>この演算子は <code class="docutils literal notranslate"><span class="pre">object1</span></code> が <code class="docutils literal notranslate"><span class="pre">object2</span></code> と等しくないときに真を返し、そうでなければ偽を返します。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes != 5&#39;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes != 5&#39;
 # [
 #   [
 #     0,
@@ -1410,7 +1401,7 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 # ]
 </pre></div>
 </div>
-<p>この式は <code class="docutils literal"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal"><span class="pre">5</span></code> ではない式にマッチします。</p>
+<p>この式は <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">5</span></code> ではない式にマッチします。</p>
 </div>
 <div class="section" id="less-than-operator">
 <h4>7.12.2.7.7.3. 小なり演算子<a class="headerlink" href="#less-than-operator" title="このヘッドラインへのパーマリンク">¶</a></h4>
@@ -1434,10 +1425,10 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 <h2>7.12.2.8. 代入演算子<a class="headerlink" href="#assignment-operators" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <div class="section" id="addition-assignment-operator">
 <h3>7.12.2.8.1. 加算代入演算子<a class="headerlink" href="#addition-assignment-operator" title="このヘッドラインへのパーマリンク">¶</a></h3>
-<p>構文は <code class="docutils literal"><span class="pre">column</span> <span class="pre">+=</span> <span class="pre">value</span></code> です。</p>
-<p>この演算子は <code class="docutils literal"><span class="pre">column1</span></code> に <code class="docutils literal"><span class="pre">column2</span></code> を加算代入します。</p>
+<p>構文は <code class="docutils literal notranslate"><span class="pre">column</span> <span class="pre">+=</span> <span class="pre">value</span></code> です。</p>
+<p>この演算子は <code class="docutils literal notranslate"><span class="pre">column1</span></code> に <code class="docutils literal notranslate"><span class="pre">column2</span></code> を加算代入します。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Entries --output_columns _key,n_likes,_score --filter true --scorer &#39;_score += n_likes&#39;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --output_columns _key,n_likes,_score --filter true --scorer &#39;_score += n_likes&#39;
 # [
 #   [
 #     0,
@@ -1493,16 +1484,16 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 # ]
 </pre></div>
 </div>
-<p><code class="docutils literal"><span class="pre">--filter</span></code> による <code class="docutils literal"><span class="pre">_score</span></code> の値はこの場合は常に1です。その後、'_score = _score + n_likes' という加算代入演算をそれぞれのレコードへ適用します。</p>
-<p>例えば、 <code class="docutils literal"><span class="pre">_key</span></code> として&quot;Good-bye Senna&quot;を格納しているレコードの <code class="docutils literal"><span class="pre">_score</span></code> の値は3です。</p>
-<p>そのため、 <code class="docutils literal"><span class="pre">1</span> <span class="pre">+</span> <span class="pre">3</span></code> という式が評価されてから <code class="docutils literal"><span class="pre">_score</span></code> カラムへと演算結果が保存されます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">--filter</span></code> による <code class="docutils literal notranslate"><span class="pre">_score</span></code> の値はこの場合は常に1です。その後、'_score = _score + n_likes' という加算代入演算をそれぞれのレコードへ適用します。</p>
+<p>例えば、 <code class="docutils literal notranslate"><span class="pre">_key</span></code> として&quot;Good-bye Senna&quot;を格納しているレコードの <code class="docutils literal notranslate"><span class="pre">_score</span></code> の値は3です。</p>
+<p>そのため、 <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">+</span> <span class="pre">3</span></code> という式が評価されてから <code class="docutils literal notranslate"><span class="pre">_score</span></code> カラムへと演算結果が保存されます。</p>
 </div>
 <div class="section" id="subtraction-assignment-operator">
 <h3>7.12.2.8.2. 減算代入演算子<a class="headerlink" href="#subtraction-assignment-operator" title="このヘッドラインへのパーマリンク">¶</a></h3>
-<p>構文は <code class="docutils literal"><span class="pre">column1</span> <span class="pre">-=</span> <span class="pre">column2</span></code> です。</p>
-<p>この演算子は <code class="docutils literal"><span class="pre">column1</span></code> から <code class="docutils literal"><span class="pre">column2</span></code> を減算代入します。</p>
+<p>構文は <code class="docutils literal notranslate"><span class="pre">column1</span> <span class="pre">-=</span> <span class="pre">column2</span></code> です。</p>
+<p>この演算子は <code class="docutils literal notranslate"><span class="pre">column1</span></code> から <code class="docutils literal notranslate"><span class="pre">column2</span></code> を減算代入します。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Entries --output_columns _key,n_likes,_score --filter true --scorer &#39;_score -= n_likes&#39;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --output_columns _key,n_likes,_score --filter true --scorer &#39;_score -= n_likes&#39;
 # [
 #   [
 #     0,
@@ -1558,16 +1549,16 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 # ]
 </pre></div>
 </div>
-<p><code class="docutils literal"><span class="pre">--filter</span></code> による <code class="docutils literal"><span class="pre">_score</span></code> の値はこの場合は常に1です。その後、'_score = _score - n_likes' という減算代入演算をそれぞれのレコードへ適用します。</p>
-<p>例えば、 <code class="docutils literal"><span class="pre">_key</span></code> として&quot;Good-bye Senna&quot;を格納しているレコードの <code class="docutils literal"><span class="pre">_score</span></code> の値は3です。</p>
-<p>そのため、 <code class="docutils literal"><span class="pre">1</span> <span class="pre">-</span> <span class="pre">3</span></code> という式が評価されてから <code class="docutils literal"><span class="pre">_score</span></code> カラムへと演算結果が保存されます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">--filter</span></code> による <code class="docutils literal notranslate"><span class="pre">_score</span></code> の値はこの場合は常に1です。その後、'_score = _score - n_likes' という減算代入演算をそれぞれのレコードへ適用します。</p>
+<p>例えば、 <code class="docutils literal notranslate"><span class="pre">_key</span></code> として&quot;Good-bye Senna&quot;を格納しているレコードの <code class="docutils literal notranslate"><span class="pre">_score</span></code> の値は3です。</p>
+<p>そのため、 <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">-</span> <span class="pre">3</span></code> という式が評価されてから <code class="docutils literal notranslate"><span class="pre">_score</span></code> カラムへと演算結果が保存されます。</p>
 </div>
 <div class="section" id="multiplication-assignment-operator">
 <h3>7.12.2.8.3. 乗算代入演算子<a class="headerlink" href="#multiplication-assignment-operator" title="このヘッドラインへのパーマリンク">¶</a></h3>
-<p>構文は <code class="docutils literal"><span class="pre">column1</span> <span class="pre">*=</span> <span class="pre">column2</span></code> です。</p>
-<p>この演算子は <code class="docutils literal"><span class="pre">column1</span></code> に <code class="docutils literal"><span class="pre">column2</span></code> を乗算演算する。</p>
+<p>構文は <code class="docutils literal notranslate"><span class="pre">column1</span> <span class="pre">*=</span> <span class="pre">column2</span></code> です。</p>
+<p>この演算子は <code class="docutils literal notranslate"><span class="pre">column1</span></code> に <code class="docutils literal notranslate"><span class="pre">column2</span></code> を乗算演算する。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Entries --output_columns _key,n_likes,_score --filter true --scorer &#39;_score *= n_likes&#39;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --output_columns _key,n_likes,_score --filter true --scorer &#39;_score *= n_likes&#39;
 # [
 #   [
 #     0,
@@ -1623,16 +1614,16 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 # ]
 </pre></div>
 </div>
-<p><code class="docutils literal"><span class="pre">--filter</span></code> による <code class="docutils literal"><span class="pre">_score</span></code> の値はこの場合は常に1です。その後、'_score = _score * n_likes' という乗算代入演算をそれぞれのレコードへ適用します。</p>
-<p>例えば、 <code class="docutils literal"><span class="pre">_key</span></code> として&quot;Good-bye Senna&quot;を格納しているレコードの <code class="docutils literal"><span class="pre">_score</span></code> の値は3です。</p>
-<p>そのため、 <code class="docutils literal"><span class="pre">1</span> <span class="pre">*</span> <span class="pre">3</span></code> という式が評価されてから <code class="docutils literal"><span class="pre">_score</span></code> カラムへと演算結果が保存されます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">--filter</span></code> による <code class="docutils literal notranslate"><span class="pre">_score</span></code> の値はこの場合は常に1です。その後、'_score = _score * n_likes' という乗算代入演算をそれぞれのレコードへ適用します。</p>
+<p>例えば、 <code class="docutils literal notranslate"><span class="pre">_key</span></code> として&quot;Good-bye Senna&quot;を格納しているレコードの <code class="docutils literal notranslate"><span class="pre">_score</span></code> の値は3です。</p>
+<p>そのため、 <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">*</span> <span class="pre">3</span></code> という式が評価されてから <code class="docutils literal notranslate"><span class="pre">_score</span></code> カラムへと演算結果が保存されます。</p>
 </div>
 <div class="section" id="division-assignment-operator">
 <h3>7.12.2.8.4. 除算代入演算子<a class="headerlink" href="#division-assignment-operator" title="このヘッドラインへのパーマリンク">¶</a></h3>
-<p>構文は <code class="docutils literal"><span class="pre">column1</span> <span class="pre">/=</span> <span class="pre">column2</span></code> です。</p>
-<p>この演算子は <code class="docutils literal"><span class="pre">column1</span></code> に <code class="docutils literal"><span class="pre">column2</span></code> を除算代入します。</p>
+<p>構文は <code class="docutils literal notranslate"><span class="pre">column1</span> <span class="pre">/=</span> <span class="pre">column2</span></code> です。</p>
+<p>この演算子は <code class="docutils literal notranslate"><span class="pre">column1</span></code> に <code class="docutils literal notranslate"><span class="pre">column2</span></code> を除算代入します。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Entries --output_columns _key,n_likes,_score --filter true --scorer &#39;_score /= n_likes&#39;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --output_columns _key,n_likes,_score --filter true --scorer &#39;_score /= n_likes&#39;
 # [
 #   [
 #     0,
@@ -1688,16 +1679,16 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 # ]
 </pre></div>
 </div>
-<p><code class="docutils literal"><span class="pre">--filter</span></code> による <code class="docutils literal"><span class="pre">_score</span></code> の値はこの場合は常に1です。その後、'_score = _score / n_likes' という除算代入演算をそれぞれのレコードへ適用します。</p>
-<p>例えば、 <code class="docutils literal"><span class="pre">_key</span></code> として&quot;Good-bye Senna&quot;を格納しているレコードの <code class="docutils literal"><span class="pre">_score</span></code> の値は3です。</p>
-<p>そのため、 <code class="docutils literal"><span class="pre">1</span> <span class="pre">/</span> <span class="pre">3</span></code> という式が評価されてから <code class="docutils literal"><span class="pre">_score</span></code> カラムへと演算結果が保存されます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">--filter</span></code> による <code class="docutils literal notranslate"><span class="pre">_score</span></code> の値はこの場合は常に1です。その後、'_score = _score / n_likes' という除算代入演算をそれぞれのレコードへ適用します。</p>
+<p>例えば、 <code class="docutils literal notranslate"><span class="pre">_key</span></code> として&quot;Good-bye Senna&quot;を格納しているレコードの <code class="docutils literal notranslate"><span class="pre">_score</span></code> の値は3です。</p>
+<p>そのため、 <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">/</span> <span class="pre">3</span></code> という式が評価されてから <code class="docutils literal notranslate"><span class="pre">_score</span></code> カラムへと演算結果が保存されます。</p>
 </div>
 <div class="section" id="modulo-assignment-operator">
 <h3>7.12.2.8.5. 剰余代入演算子<a class="headerlink" href="#modulo-assignment-operator" title="このヘッドラインへのパーマリンク">¶</a></h3>
-<p>構文は <code class="docutils literal"><span class="pre">column1</span> <span class="pre">%=</span> <span class="pre">column2</span></code> です。</p>
-<p>この演算子は <code class="docutils literal"><span class="pre">column1</span></code> に <code class="docutils literal"><span class="pre">column2</span></code> を剰余代入します。</p>
+<p>構文は <code class="docutils literal notranslate"><span class="pre">column1</span> <span class="pre">%=</span> <span class="pre">column2</span></code> です。</p>
+<p>この演算子は <code class="docutils literal notranslate"><span class="pre">column1</span></code> に <code class="docutils literal notranslate"><span class="pre">column2</span></code> を剰余代入します。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Entries --output_columns _key,n_likes,_score --filter true --scorer &#39;_score %= n_likes&#39;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --output_columns _key,n_likes,_score --filter true --scorer &#39;_score %= n_likes&#39;
 # [
 #   [
 #     0,
@@ -1753,16 +1744,16 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 # ]
 </pre></div>
 </div>
-<p><code class="docutils literal"><span class="pre">--filter</span></code> による <code class="docutils literal"><span class="pre">_score</span></code> の値はこの場合は常に1です。その後、'_score = _score % n_likes' という除算代入演算をそれぞれのレコードへ適用します。</p>
-<p>例えば、 <code class="docutils literal"><span class="pre">_key</span></code> として&quot;Good-bye Senna&quot;を格納しているレコードの <code class="docutils literal"><span class="pre">_score</span></code> の値は3です。</p>
-<p>そのため、 <code class="docutils literal"><span class="pre">1</span> <span class="pre">%</span> <span class="pre">3</span></code> という式が評価されてから <code class="docutils literal"><span class="pre">_score</span></code> カラムへと演算結果が保存されます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">--filter</span></code> による <code class="docutils literal notranslate"><span class="pre">_score</span></code> の値はこの場合は常に1です。その後、'_score = _score % n_likes' という除算代入演算をそれぞれのレコードへ適用します。</p>
+<p>例えば、 <code class="docutils literal notranslate"><span class="pre">_key</span></code> として&quot;Good-bye Senna&quot;を格納しているレコードの <code class="docutils literal notranslate"><span class="pre">_score</span></code> の値は3です。</p>
+<p>そのため、 <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">%</span> <span class="pre">3</span></code> という式が評価されてから <code class="docutils literal notranslate"><span class="pre">_score</span></code> カラムへと演算結果が保存されます。</p>
 </div>
 <div class="section" id="bitwise-left-shift-assignment-operator">
 <h3>7.12.2.8.6. 左シフト代入演算子<a class="headerlink" href="#bitwise-left-shift-assignment-operator" title="このヘッドラインへのパーマリンク">¶</a></h3>
-<p>構文は <code class="docutils literal"><span class="pre">column1</span> <span class="pre">&lt;&lt;</span> <span class="pre">column2</span></code> です。</p>
-<p>この演算子は <code class="docutils literal"><span class="pre">column1</span></code> のビットを左に <code class="docutils literal"><span class="pre">column2</span></code> 左ビットシフト代入演算します。</p>
+<p>構文は <code class="docutils literal notranslate"><span class="pre">column1</span> <span class="pre">&lt;&lt;</span> <span class="pre">column2</span></code> です。</p>
+<p>この演算子は <code class="docutils literal notranslate"><span class="pre">column1</span></code> のビットを左に <code class="docutils literal notranslate"><span class="pre">column2</span></code> 左ビットシフト代入演算します。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Entries --output_columns _key,n_likes,_score --filter true --scorer &#39;_score &lt;&lt;= n_likes&#39;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --output_columns _key,n_likes,_score --filter true --scorer &#39;_score &lt;&lt;= n_likes&#39;
 # [
 #   [
 #     0,
@@ -1818,26 +1809,26 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 # ]
 </pre></div>
 </div>
-<p><code class="docutils literal"><span class="pre">--filter</span></code> による <code class="docutils literal"><span class="pre">_score</span></code> の値はこの場合は常に1です。その後、'_score = _score &lt;&lt; n_likes' という左ビットシフト代入演算をそれぞれのレコードへ適用します。</p>
-<p>例えば、 <code class="docutils literal"><span class="pre">_key</span></code> として&quot;Good-bye Senna&quot;を格納しているレコードの <code class="docutils literal"><span class="pre">_score</span></code> の値は3です。</p>
-<p>そのため、 <code class="docutils literal"><span class="pre">1</span> <span class="pre">&lt;&lt;</span> <span class="pre">3</span></code> という式が評価されてから <code class="docutils literal"><span class="pre">_score</span></code> カラムへと演算結果が保存されます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">--filter</span></code> による <code class="docutils literal notranslate"><span class="pre">_score</span></code> の値はこの場合は常に1です。その後、'_score = _score &lt;&lt; n_likes' という左ビットシフト代入演算をそれぞれのレコードへ適用します。</p>
+<p>例えば、 <code class="docutils literal notranslate"><span class="pre">_key</span></code> として&quot;Good-bye Senna&quot;を格納しているレコードの <code class="docutils literal notranslate"><span class="pre">_score</span></code> の値は3です。</p>
+<p>そのため、 <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">&lt;&lt;</span> <span class="pre">3</span></code> という式が評価されてから <code class="docutils literal notranslate"><span class="pre">_score</span></code> カラムへと演算結果が保存されます。</p>
 </div>
 <div class="section" id="bitwise-signed-right-shift-assignment-operator">
 <h3>7.12.2.8.7. 符号あり右シフト代入演算子<a class="headerlink" href="#bitwise-signed-right-shift-assignment-operator" title="このヘッドラインへのパーマリンク">¶</a></h3>
-<p>構文は <code class="docutils literal"><span class="pre">column1</span> <span class="pre">&gt;&gt;=</span> <span class="pre">column2</span></code> です。</p>
-<p>この演算子は <code class="docutils literal"><span class="pre">column1</span></code> のビットを <code class="docutils literal"><span class="pre">column2</span></code> 右ビットシフト代入演算します。</p>
+<p>構文は <code class="docutils literal notranslate"><span class="pre">column1</span> <span class="pre">&gt;&gt;=</span> <span class="pre">column2</span></code> です。</p>
+<p>この演算子は <code class="docutils literal notranslate"><span class="pre">column1</span></code> のビットを <code class="docutils literal notranslate"><span class="pre">column2</span></code> 右ビットシフト代入演算します。</p>
 </div>
 <div class="section" id="bitwise-unsigned-right-shift-assignment-operator">
 <h3>7.12.2.8.8. 符号なし右シフト代入演算子<a class="headerlink" href="#bitwise-unsigned-right-shift-assignment-operator" title="このヘッドラインへのパーマリンク">¶</a></h3>
-<p>構文は <code class="docutils literal"><span class="pre">column1</span> <span class="pre">&gt;&gt;&gt;=</span> <span class="pre">column2</span></code> です。</p>
-<p>この演算子は <code class="docutils literal"><span class="pre">column1</span></code> のビットを <code class="docutils literal"><span class="pre">column2</span></code> 符号なし右ビットシフト代入演算します。</p>
+<p>構文は <code class="docutils literal notranslate"><span class="pre">column1</span> <span class="pre">&gt;&gt;&gt;=</span> <span class="pre">column2</span></code> です。</p>
+<p>この演算子は <code class="docutils literal notranslate"><span class="pre">column1</span></code> のビットを <code class="docutils literal notranslate"><span class="pre">column2</span></code> 符号なし右ビットシフト代入演算します。</p>
 </div>
 <div class="section" id="bitwise-and-assignment-operator">
 <h3>7.12.2.8.9. ビット論理積代入演算子<a class="headerlink" href="#bitwise-and-assignment-operator" title="このヘッドラインへのパーマリンク">¶</a></h3>
-<p>構文は <code class="docutils literal"><span class="pre">column1</span> <span class="pre">&amp;=</span> <span class="pre">column2</span></code> です。</p>
-<p>この演算子は <code class="docutils literal"><span class="pre">column1</span></code> に <code class="docutils literal"><span class="pre">column2</span></code> をビット論理積代入演算します。</p>
+<p>構文は <code class="docutils literal notranslate"><span class="pre">column1</span> <span class="pre">&amp;=</span> <span class="pre">column2</span></code> です。</p>
+<p>この演算子は <code class="docutils literal notranslate"><span class="pre">column1</span></code> に <code class="docutils literal notranslate"><span class="pre">column2</span></code> をビット論理積代入演算します。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Entries --output_columns _key,n_likes,_score --filter true --scorer &#39;_score &amp;= n_likes&#39;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --output_columns _key,n_likes,_score --filter true --scorer &#39;_score &amp;= n_likes&#39;
 # [
 #   [
 #     0,
@@ -1893,16 +1884,16 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 # ]
 </pre></div>
 </div>
-<p><code class="docutils literal"><span class="pre">--filter</span></code> による <code class="docutils literal"><span class="pre">_score</span></code> の値はこの場合は常に1です。その後、'_score = _score &amp; n_likes' というビット論理積代入演算をそれぞれのレコードへ適用します。</p>
-<p>例えば、 <code class="docutils literal"><span class="pre">_key</span></code> として&quot;Groonga&quot;を格納しているレコードの値は10です。</p>
-<p>そのため、 <code class="docutils literal"><span class="pre">1</span> <span class="pre">&amp;</span> <span class="pre">10</span></code> という式が評価されてから <code class="docutils literal"><span class="pre">_score</span></code> カラムへと演算結果が保存されます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">--filter</span></code> による <code class="docutils literal notranslate"><span class="pre">_score</span></code> の値はこの場合は常に1です。その後、'_score = _score &amp; n_likes' というビット論理積代入演算をそれぞれのレコードへ適用します。</p>
+<p>例えば、 <code class="docutils literal notranslate"><span class="pre">_key</span></code> として&quot;Groonga&quot;を格納しているレコードの値は10です。</p>
+<p>そのため、 <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">&amp;</span> <span class="pre">10</span></code> という式が評価されてから <code class="docutils literal notranslate"><span class="pre">_score</span></code> カラムへと演算結果が保存されます。</p>
 </div>
 <div class="section" id="bitwise-or-assignment-operator">
 <span id="script-syntax-bitwise-or-assign"></span><h3>7.12.2.8.10. ビット論理和代入演算子<a class="headerlink" href="#bitwise-or-assignment-operator" title="このヘッドラインへのパーマリンク">¶</a></h3>
-<p>構文は <code class="docutils literal"><span class="pre">column1</span> <span class="pre">|=</span> <span class="pre">column2</span></code> です。</p>
-<p>この演算子は <code class="docutils literal"><span class="pre">column1</span></code> に <code class="docutils literal"><span class="pre">column2</span></code> をビット論理和代入演算する。</p>
+<p>構文は <code class="docutils literal notranslate"><span class="pre">column1</span> <span class="pre">|=</span> <span class="pre">column2</span></code> です。</p>
+<p>この演算子は <code class="docutils literal notranslate"><span class="pre">column1</span></code> に <code class="docutils literal notranslate"><span class="pre">column2</span></code> をビット論理和代入演算する。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Entries --output_columns _key,n_likes,_score --filter true --scorer &#39;_score |= n_likes&#39;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --output_columns _key,n_likes,_score --filter true --scorer &#39;_score |= n_likes&#39;
 # [
 #   [
 #     0,
@@ -1958,16 +1949,16 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 # ]
 </pre></div>
 </div>
-<p><code class="docutils literal"><span class="pre">--filter</span></code> による <code class="docutils literal"><span class="pre">_score</span></code> の値はこの場合は常に1です。その後、'_score = _score | n_likes' というビット論理和代入演算をそれぞれのレコードへ適用します。</p>
-<p>例えば、 <code class="docutils literal"><span class="pre">_key</span></code> として&quot;Groonga&quot;を格納しているレコードの値は10です。</p>
-<p>そのため、 <code class="docutils literal"><span class="pre">1</span> <span class="pre">|</span> <span class="pre">10</span></code> という式が評価されてから <code class="docutils literal"><span class="pre">_score</span></code> カラムへと演算結果が保存されます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">--filter</span></code> による <code class="docutils literal notranslate"><span class="pre">_score</span></code> の値はこの場合は常に1です。その後、'_score = _score | n_likes' というビット論理和代入演算をそれぞれのレコードへ適用します。</p>
+<p>例えば、 <code class="docutils literal notranslate"><span class="pre">_key</span></code> として&quot;Groonga&quot;を格納しているレコードの値は10です。</p>
+<p>そのため、 <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">|</span> <span class="pre">10</span></code> という式が評価されてから <code class="docutils literal notranslate"><span class="pre">_score</span></code> カラムへと演算結果が保存されます。</p>
 </div>
 <div class="section" id="bitwise-xor-assignment-operator">
 <h3>7.12.2.8.11. ビット排他的論理和代入演算子<a class="headerlink" href="#bitwise-xor-assignment-operator" title="このヘッドラインへのパーマリンク">¶</a></h3>
-<p>構文は <code class="docutils literal"><span class="pre">column1</span> <span class="pre">^=</span> <span class="pre">column2</span></code> です。</p>
-<p>この演算子は <code class="docutils literal"><span class="pre">column1</span></code> に <code class="docutils literal"><span class="pre">column2</span></code> をビット論理和代入演算する。</p>
+<p>構文は <code class="docutils literal notranslate"><span class="pre">column1</span> <span class="pre">^=</span> <span class="pre">column2</span></code> です。</p>
+<p>この演算子は <code class="docutils literal notranslate"><span class="pre">column1</span></code> に <code class="docutils literal notranslate"><span class="pre">column2</span></code> をビット論理和代入演算する。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Entries --output_columns _key,n_likes,_score --filter true --scorer &#39;_score ^= n_likes&#39;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --output_columns _key,n_likes,_score --filter true --scorer &#39;_score ^= n_likes&#39;
 # [
 #   [
 #     0,
@@ -2023,22 +2014,22 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 # ]
 </pre></div>
 </div>
-<p><code class="docutils literal"><span class="pre">--filter</span></code> による <code class="docutils literal"><span class="pre">_score</span></code> の値はこの場合は常に1です。その後、'_score = _score ^ n_likes' という減算代入演算をそれぞれのレコードへ適用します。</p>
-<p>例えば、 <code class="docutils literal"><span class="pre">_key</span></code> として&quot;Good-bye Senna&quot;を格納しているレコードの <code class="docutils literal"><span class="pre">_score</span></code> の値は3です。</p>
-<p>そのため、 <code class="docutils literal"><span class="pre">1</span> <span class="pre">^</span> <span class="pre">3</span></code> という式が評価されてから <code class="docutils literal"><span class="pre">_score</span></code> カラムへと演算結果が保存されます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">--filter</span></code> による <code class="docutils literal notranslate"><span class="pre">_score</span></code> の値はこの場合は常に1です。その後、'_score = _score ^ n_likes' という減算代入演算をそれぞれのレコードへ適用します。</p>
+<p>例えば、 <code class="docutils literal notranslate"><span class="pre">_key</span></code> として&quot;Good-bye Senna&quot;を格納しているレコードの <code class="docutils literal notranslate"><span class="pre">_score</span></code> の値は3です。</p>
+<p>そのため、 <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">^</span> <span class="pre">3</span></code> という式が評価されてから <code class="docutils literal notranslate"><span class="pre">_score</span></code> カラムへと演算結果が保存されます。</p>
 </div>
 </div>
 <div class="section" id="original-operators">
 <h2>7.12.2.9. 独自の演算子<a class="headerlink" href="#original-operators" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>スクリプト構文はECMAScriptの構文に独自の二項演算子を追加しています。これらは検索に特化した操作をします。演算子の最初の文字は <code class="docutils literal"><span class="pre">&#64;</span></code> または <code class="docutils literal"><span class="pre">*</span></code> です。</p>
+<p>スクリプト構文はECMAScriptの構文に独自の二項演算子を追加しています。これらは検索に特化した操作をします。演算子の最初の文字は <code class="docutils literal notranslate"><span class="pre">&#64;</span></code> または <code class="docutils literal notranslate"><span class="pre">*</span></code> です。</p>
 <div class="section" id="match-operator">
 <span id="script-syntax-match-operator"></span><h3>7.12.2.9.1. マッチ演算子<a class="headerlink" href="#match-operator" title="このヘッドラインへのパーマリンク">¶</a></h3>
-<p>構文は <code class="docutils literal"><span class="pre">column</span> <span class="pre">&#64;</span> <span class="pre">value</span></code> です。</p>
-<p>この演算子は <code class="docutils literal"><span class="pre">column</span></code> の転置インデックスを使って <code class="docutils literal"><span class="pre">value</span></code> を検索します。普通は全文検索をしますが、タグ検索もできます。これは、タグ検索も転置インデックスを使って実現しているからです。</p>
+<p>構文は <code class="docutils literal notranslate"><span class="pre">column</span> <span class="pre">&#64;</span> <span class="pre">value</span></code> です。</p>
+<p>この演算子は <code class="docutils literal notranslate"><span class="pre">column</span></code> の転置インデックスを使って <code class="docutils literal notranslate"><span class="pre">value</span></code> を検索します。普通は全文検索をしますが、タグ検索もできます。これは、タグ検索も転置インデックスを使って実現しているからです。</p>
 <p><a class="reference internal" href="query_syntax.html"><span class="doc">クエリー構文</span></a> はデフォルトでこの演算子を使っています。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Entries --filter &#39;content @ &quot;fast&quot;&#39; --output_columns content
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;content @ &quot;fast&quot;&#39; --output_columns content
 # [
 #   [
 #     0,
@@ -2067,17 +2058,17 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 # ]
 </pre></div>
 </div>
-<p>この式は <code class="docutils literal"><span class="pre">content</span></code> カラムの値に <code class="docutils literal"><span class="pre">fast</span></code> という単語を含んでいるレコードにマッチします。</p>
+<p>この式は <code class="docutils literal notranslate"><span class="pre">content</span></code> カラムの値に <code class="docutils literal notranslate"><span class="pre">fast</span></code> という単語を含んでいるレコードにマッチします。</p>
 </div>
 <div class="section" id="prefix-search-operator">
 <span id="script-syntax-prefix-search-operator"></span><h3>7.12.2.9.2. 前方一致検索演算子<a class="headerlink" href="#prefix-search-operator" title="このヘッドラインへのパーマリンク">¶</a></h3>
-<p>構文は <code class="docutils literal"><span class="pre">column</span> <span class="pre">&#64;^</span> <span class="pre">value</span></code> です。</p>
-<p>この条件式は <code class="docutils literal"><span class="pre">value</span></code> で前方一致検索します。前方一致検索は <code class="docutils literal"><span class="pre">value</span></code> で始まる単語を含むレコードを検索します。</p>
-<p>カラムの値を高速に前方一致検索できます。ただし、そのカラムにはインデックスを作成し、そのインデックス用のテーブルをパトリシアトライ（ <code class="docutils literal"><span class="pre">TABLE_PAT_KEY</span></code> ）またはダブル配列トライ（ <code class="docutils literal"><span class="pre">TABLE_DAT_KEY</span></code> ）にしなければいけません。あるいは、パトリシアトライテーブルまたはダブル配列テーブルの <code class="docutils literal"><span class="pre">_key</span></code> も高速に前方一致検索できます。 <code class="docutils literal"><span class="pre">_key</span></code> にインデックスを作成する必要はありません。</p>
+<p>構文は <code class="docutils literal notranslate"><span class="pre">column</span> <span class="pre">&#64;^</span> <span class="pre">value</span></code> です。</p>
+<p>この条件式は <code class="docutils literal notranslate"><span class="pre">value</span></code> で前方一致検索します。前方一致検索は <code class="docutils literal notranslate"><span class="pre">value</span></code> で始まる単語を含むレコードを検索します。</p>
+<p>カラムの値を高速に前方一致検索できます。ただし、そのカラムにはインデックスを作成し、そのインデックス用のテーブルをパトリシアトライ（ <code class="docutils literal notranslate"><span class="pre">TABLE_PAT_KEY</span></code> ）またはダブル配列トライ（ <code class="docutils literal notranslate"><span class="pre">TABLE_DAT_KEY</span></code> ）にしなければいけません。あるいは、パトリシアトライテーブルまたはダブル配列テーブルの <code class="docutils literal notranslate"><span class="pre">_key</span></code> も高速に前方一致検索できます。 <code class="docutils literal notranslate"><span class="pre">_key</span></code> にインデックスを作成する必要はありません。</p>
 <p>他の種類のテーブルでも前方一致検索を使えますがレコード全件を処理します。レコード数が少ない場合には問題ありませんが、レコード数が多いと時間がかかります。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Entries --filter &#39;_key @^ &quot;Goo&quot;&#39; --output_columns _key
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;_key @^ &quot;Goo&quot;&#39; --output_columns _key
 # [
 #   [
 #     0,
@@ -2106,21 +2097,21 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 # ]
 </pre></div>
 </div>
-<p>この式は <code class="docutils literal"><span class="pre">_key</span></code> カラムの値が <code class="docutils literal"><span class="pre">Goo</span></code> で始まる単語を含むレコードにマッチします。この式には <code class="docutils literal"><span class="pre">Good-bye</span> <span class="pre">Senna</span></code> と <code class="docutils literal"><span class="pre">Good-bye</span> <span class="pre">Tritonn</span></code> がマッチします。</p>
+<p>この式は <code class="docutils literal notranslate"><span class="pre">_key</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">Goo</span></code> で始まる単語を含むレコードにマッチします。この式には <code class="docutils literal notranslate"><span class="pre">Good-bye</span> <span class="pre">Senna</span></code> と <code class="docutils literal notranslate"><span class="pre">Good-bye</span> <span class="pre">Tritonn</span></code> がマッチします。</p>
 </div>
 <div class="section" id="suffix-search-operator">
 <span id="script-syntax-suffix-search-operator"></span><h3>7.12.2.9.3. 後方一致検索演算子<a class="headerlink" href="#suffix-search-operator" title="このヘッドラインへのパーマリンク">¶</a></h3>
-<p>構文は <code class="docutils literal"><span class="pre">column</span> <span class="pre">&#64;$</span> <span class="pre">value</span></code> です。</p>
-<p>この演算子は <code class="docutils literal"><span class="pre">value</span></code> で後方一致検索します。後方一致検索は <code class="docutils literal"><span class="pre">value</span></code> で終わる単語を含むレコードを検索します。</p>
-<p>カラムの値を高速に後方一致検索できます。ただし、そのカラムにはインデックスを作成し、そのインデックス用のテーブルを <code class="docutils literal"><span class="pre">KEY_WITH_SIS</span></code> フラグ付きのパトリシアトライテーブル（ <code class="docutils literal"><span class="pre">TABLE_PAT_KEY</span></code> ）にしなければいけません。 <code class="docutils literal"><span class="pre">KEY_WITH_SIS</span></code> フラグ付きのパトリシアトライテーブル（ <code class="docutils literal"><span class="pre">TABLE_PAT_KEY</span></code> ）の <code class="docutils literal"><span class="pre">_key</span></code> 擬似カラムの値も高速に後方一致検索できます。 <code class="docutils literal"><span class="pre">_key</span></code> にはインデックスを作成する必要はありません。 <code class="docutils literal"><span class="pre">_key</span></code> ベースの高速な後方一致検索よりもカラムベースの高速な後方一致検索を使うことをおすすめします。 <code class="docutils literal"><span class="pre">_key</span></code> ベースの高速な後方一致検索は自動的に登録された部分文字列も返ってきます。（TODO: 後方一致検索に関するドキュメントを書いてここからリンクを張る。）</p>
+<p>構文は <code class="docutils literal notranslate"><span class="pre">column</span> <span class="pre">&#64;$</span> <span class="pre">value</span></code> です。</p>
+<p>この演算子は <code class="docutils literal notranslate"><span class="pre">value</span></code> で後方一致検索します。後方一致検索は <code class="docutils literal notranslate"><span class="pre">value</span></code> で終わる単語を含むレコードを検索します。</p>
+<p>カラムの値を高速に後方一致検索できます。ただし、そのカラムにはインデックスを作成し、そのインデックス用のテーブルを <code class="docutils literal notranslate"><span class="pre">KEY_WITH_SIS</span></code> フラグ付きのパトリシアトライテーブル（ <code class="docutils literal notranslate"><span class="pre">TABLE_PAT_KEY</span></code> ）にしなければいけません。 <code class="docutils literal notranslate"><span class="pre">KEY_WITH_SIS</span></code> フラグ付きのパトリシアトライテーブル（ <code class="docutils literal notranslate"><span class="pre">TABLE_PAT_KEY</span></code> ）の <code class="docutils literal notranslate"><span class="pre">_key</span></code> 擬似カラムの値も高速に後方一致検索できます。 <code class="docutils literal notranslate"><span class="pre">_key</span></code> にはインデックスを作成する必要はありません。 <code class="docutils literal notranslate"><span class="pre">_key</span></code> ベースの高速な後方一致検索よりもカラムベースの高速な後方一致検索を使うことをおすすめします。 <code class="docutils literal notranslate"><span class="pre">_key</span></code> ベースの高速な後方一致検索は自動的に登録された部分文字列も返ってきます。（TODO: 後方一致検索に関するドキュメントを書いてここからリンクを張る。）</p>
 <div class="admonition note">
 <p class="first admonition-title">注釈</p>
 <p class="last">高速な後方一致検索は日本語のひらがななど非ASCII文字にしか使えません。ASCII文字には高速な後方一致検索を使えません。</p>
 </div>
-<p>後方一致検索は他の種類のテーブルもしくはパトリシアトライを <code class="docutils literal"><span class="pre">KEY_WITH_SIS</span></code> フラグなしで使用しているテーブルに対しても使えますが、レコード全件を処理します。レコード数が少ない場合には問題ありませんが、レコード数が多いと時間がかかります。</p>
+<p>後方一致検索は他の種類のテーブルもしくはパトリシアトライを <code class="docutils literal notranslate"><span class="pre">KEY_WITH_SIS</span></code> フラグなしで使用しているテーブルに対しても使えますが、レコード全件を処理します。レコード数が少ない場合には問題ありませんが、レコード数が多いと時間がかかります。</p>
 <p>簡単な例です。ASCII文字ではない文字である日本語のひらがなに対して高速な後方一致検索をしています。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>table_create Titles TABLE_NO_KEY
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>table_create Titles TABLE_NO_KEY
 # [[0, 1337566253.89858, 0.000355720520019531], true]
 column_create Titles content COLUMN_SCALAR ShortText
 # [[0, 1337566253.89858, 0.000355720520019531], true]
@@ -2171,29 +2162,29 @@ select Titles --query &#39;content:$んが&#39;
 # ]
 </pre></div>
 </div>
-<p>この式は <code class="docutils literal"><span class="pre">content</span></code> カラムの値が <code class="docutils literal"><span class="pre">んが</span></code> で終わるレコードにマッチします。この場合は <code class="docutils literal"><span class="pre">ぐるんが</span></code> と <code class="docutils literal"><span class="pre">むるんが</span></code> にマッチします。</p>
+<p>この式は <code class="docutils literal notranslate"><span class="pre">content</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">んが</span></code> で終わるレコードにマッチします。この場合は <code class="docutils literal notranslate"><span class="pre">ぐるんが</span></code> と <code class="docutils literal notranslate"><span class="pre">むるんが</span></code> にマッチします。</p>
 </div>
 <div class="section" id="near-search-operator">
 <span id="script-syntax-near-search-operator"></span><h3>7.12.2.9.4. 近傍検索演算子<a class="headerlink" href="#near-search-operator" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <p>構文は以下のどれかです。:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>column *N &quot;word1 word2 ...&quot;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>column *N &quot;word1 word2 ...&quot;
 column *N${MAX_INTERVAL} &quot;word1 word2 ...&quot;
 </pre></div>
 </div>
 <p>2つめの形式の例は次の通りです。</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>column *N29 &quot;word1 word2 ...&quot;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>column *N29 &quot;word1 word2 ...&quot;
 column *N-1 &quot;word1 word2 ...&quot;
 </pre></div>
 </div>
-<p>最初の例は近いと判断する最大距離として <code class="docutils literal"><span class="pre">29</span></code> を使うという意味です。</p>
-<p>2つめの例は近いと判断する最大距離として <code class="docutils literal"><span class="pre">-1</span></code> を使うという意味です。 <code class="docutils literal"><span class="pre">-1</span></code> はどれだけ離れていてもよいという意味です。</p>
-<p>この演算子は <code class="docutils literal"><span class="pre">word1</span> <span class="pre">word2</span> <span class="pre">...</span></code> という単語で近傍検索します。近傍検索はすべての単語が含まれていてかつそれぞれが指定した順番で出現していてかつそれぞれの単語が指定した距離以内にあるレコードを検索します。</p>
-<p>近いと判断する最大距離のでファオルトは <code class="docutils literal"><span class="pre">10</span></code> です。距離の単位はN-gram系のトークナイザーでは文字数で、形態素解析系のトークナイザーでは単語数です。</p>
-<p>（TODO: <code class="docutils literal"><span class="pre">TokenBigram</span></code> はASCIIだけの単語はトークンに分割しないという説明を追加すること。このため、 <code class="docutils literal"><span class="pre">TokenBigram</span></code> はN-gram系のトークナイザーだけどASCIIだけの単語を扱う時の単位は単語数になる。）</p>
-<p><code class="docutils literal"><span class="pre">column</span></code> 用の全文検索用インデックスカラムを定義しておく必要があることに注意してください。</p>
+<p>最初の例は近いと判断する最大距離として <code class="docutils literal notranslate"><span class="pre">29</span></code> を使うという意味です。</p>
+<p>2つめの例は近いと判断する最大距離として <code class="docutils literal notranslate"><span class="pre">-1</span></code> を使うという意味です。 <code class="docutils literal notranslate"><span class="pre">-1</span></code> はどれだけ離れていてもよいという意味です。</p>
+<p>この演算子は <code class="docutils literal notranslate"><span class="pre">word1</span> <span class="pre">word2</span> <span class="pre">...</span></code> という単語で近傍検索します。近傍検索はすべての単語が含まれていてかつそれぞれが指定した順番で出現していてかつそれぞれの単語が指定した距離以内にあるレコードを検索します。</p>
+<p>近いと判断する最大距離のでファオルトは <code class="docutils literal notranslate"><span class="pre">10</span></code> です。距離の単位はN-gram系のトークナイザーでは文字数で、形態素解析系のトークナイザーでは単語数です。</p>
+<p>（TODO: <code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code> はASCIIだけの単語はトークンに分割しないという説明を追加すること。このため、 <code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code> はN-gram系のトークナイザーだけどASCIIだけの単語を扱う時の単位は単語数になる。）</p>
+<p><code class="docutils literal notranslate"><span class="pre">column</span></code> 用の全文検索用インデックスカラムを定義しておく必要があることに注意してください。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Entries --filter &#39;content *N &quot;I fast&quot;&#39;      --output_columns content
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;content *N &quot;I fast&quot;&#39;      --output_columns content
 # [
 #   [
 #     0,
@@ -2245,18 +2236,18 @@ select Entries --filter &#39;content *N &quot;also Really&quot;&#39; --output_co
 # ]
 </pre></div>
 </div>
-<p>最初の式は <code class="docutils literal"><span class="pre">I</span></code> と <code class="docutils literal"><span class="pre">fast</span></code> が含まれていて、かつ、これらの単語が10単語以内近くにあるレコードにマッチします。そのため <code class="docutils literal"><span class="pre">I</span> <span class="pre">also</span> <span class="pre">started</span> <span class="pre">to</span> <span class="pre">use</span> <span class="pre">mroonga.</span> <span class="pre">It's</span> <span class="pre">also</span> <span class="pre">very</span> <span class="pre">fast!</span> <span class="pre">...</span></code> にマッチします。 <code class="docutils literal"><span class="pre">I</span></code> と <code class="docutils literal"><span class="pre">fast</span></code> の間の単語数はちょうど10です。</p>
-<p>二番目の式は <code class="docutils literal"><span class="pre">I</span></code> と <code class="docutils literal"><span class="pre">Really</span></code> が含まれていて、かつ、これらの単語が10単語以内近くにあるレコードにマッチします。そのため、 <code class="docutils literal"><span class="pre">I</span> <span class="pre">also</span> <span class="pre">st</span> <span class="pre">arted</span> <span class="pre">to</span> <span class="pre">use</span> <span class="pre">mroonga.</span> <span class="pre">It's</span> <span class="pre">also</span> <span class="pre">very</span> <span class="pre">fast!</span> <span class="pre">Really</span> <span class="pre">fast!</span></code> はマッチしません。 <code class="docutils literal"><span class="pre">I</span></code> と <code class="docutils literal"><span class="pre">Really</span></code> の間の単語数は11です。</p>
-<p>三番目の式は <code class="docutils literal"><span class="pre">also</span></code> と <code class="docutils literal"><span class="pre">Really</span></code> が含まれていて、かつ、これらの単語が10単語以内近くにあるレコードにマッチします。そのため、 <code class="docutils literal"><span class="pre">I</span> <span class="pre">also</span> <span class="pre">started</span> <span class="pre">to</span> <span class="pre">use</span> <span class="pre">mroonga.</span> <span class="pre">It's</span> <span class="pre">also</span> <span class="pre">very</span> <span class="pre">fast!</span> <span class="pre">Really</span> <span class="pre">fast!</span></code> にマッチします。 <code class="docutils literal"><span class="pre">also</span></code> と <code class="docutils literal"><span class="pre">Really</span></code> の間の単語数は10です。</p>
+<p>最初の式は <code class="docutils literal notranslate"><span class="pre">I</span></code> と <code class="docutils literal notranslate"><span class="pre">fast</span></code> が含まれていて、かつ、これらの単語が10単語以内近くにあるレコードにマッチします。そのため <code class="docutils literal notranslate"><span class="pre">I</span> <span class="pre">also</span> <span class="pre">started</span> <span class="pre">to</span> <span class="pre">use</span> <span class="pre">mroonga.</span> <span class="pre">It's</span> <span class="pre">also</span> <span class="pre">very</span> <span class="pre">fast!</span> <span class="pre">...</span></code> にマッチします。 <code class="docutils literal notranslate"><span class="pre">I</span></code> と <code class="docutils literal notranslate"><span class="pre">fast</span></code> の間の単語数はちょうど10です。</p>
+<p>二番目の式は <code class="docutils literal notranslate"><span class="pre">I</span></code> と <code class="docutils literal notranslate"><span class="pre">Really</span></code> が含まれていて、かつ、これらの単語が10単語以内近くにあるレコードにマッチします。そのため、 <code class="docutils literal notranslate"><span class="pre">I</span> <span class="pre">also</span> <span class="pre">st</span> <span class="pre">arted</span> <span class="pre">to</span> <span class="pre">use</span> <span class="pre">mroonga.</span> <span class="pre">It's</span> <span class="pre">also</span> <span class="pre">very</span> <span class="pre">fast!</span> <span class="pre">Really</span> <span class="pre">fast!</span></code> はマッチしません。 <code class="docutils literal notranslate"><span class="pre">I</span></code> と <code class="docutils literal notranslate"><span class="pre">Really</span></code> の間の単語数は11です。</p>
+<p>三番目の式は <code class="docutils literal notranslate"><span class="pre">also</span></code> と <code class="docutils literal notranslate"><span class="pre">Really</span></code> が含まれていて、かつ、これらの単語が10単語以内近くにあるレコードにマッチします。そのため、 <code class="docutils literal notranslate"><span class="pre">I</span> <span class="pre">also</span> <span class="pre">started</span> <span class="pre">to</span> <span class="pre">use</span> <span class="pre">mroonga.</span> <span class="pre">It's</span> <span class="pre">also</span> <span class="pre">very</span> <span class="pre">fast!</span> <span class="pre">Really</span> <span class="pre">fast!</span></code> にマッチします。 <code class="docutils literal notranslate"><span class="pre">also</span></code> と <code class="docutils literal notranslate"><span class="pre">Really</span></code> の間の単語数は10です。</p>
 </div>
 <div class="section" id="similar-search">
 <span id="script-syntax-similar-search-operator"></span><h3>7.12.2.9.5. 類似文書検索<a class="headerlink" href="#similar-search" title="このヘッドラインへのパーマリンク">¶</a></h3>
-<p>構文は <code class="docutils literal"><span class="pre">column</span> <span class="pre">*S</span> <span class="pre">&quot;document&quot;</span></code> です。</p>
-<p>この演算子は <code class="docutils literal"><span class="pre">document</span></code> という文書で類似文書検索します。類似文書検索は <code class="docutils literal"><span class="pre">document</span></code> と似た内容を持つレコードを検索します。</p>
-<p><code class="docutils literal"><span class="pre">column</span></code> 用の全文検索用インデックスカラムを定義しておく必要があることに注意してください。</p>
+<p>構文は <code class="docutils literal notranslate"><span class="pre">column</span> <span class="pre">*S</span> <span class="pre">&quot;document&quot;</span></code> です。</p>
+<p>この演算子は <code class="docutils literal notranslate"><span class="pre">document</span></code> という文書で類似文書検索します。類似文書検索は <code class="docutils literal notranslate"><span class="pre">document</span></code> と似た内容を持つレコードを検索します。</p>
+<p><code class="docutils literal notranslate"><span class="pre">column</span></code> 用の全文検索用インデックスカラムを定義しておく必要があることに注意してください。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Entries --filter &#39;content *S &quot;I migrated all Solr system!&quot;&#39; --output_columns content
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;content *S &quot;I migrated all Solr system!&quot;&#39; --output_columns content
 # [
 #   [
 #     0,
@@ -2285,16 +2276,16 @@ select Entries --filter &#39;content *N &quot;also Really&quot;&#39; --output_co
 # ]
 </pre></div>
 </div>
-<p>この式は <code class="docutils literal"><span class="pre">I</span> <span class="pre">migrated</span> <span class="pre">all</span> <span class="pre">Solr</span> <span class="pre">system!</span></code> と似た内容を持つレコードを検索します。この場合は、 <code class="docutils literal"><span class="pre">I</span> <span class="pre">migrated</span> <span class="pre">all</span> <span class="pre">XXX</span> <span class="pre">system!</span></code> という内容のレコードがマッチします。</p>
+<p>この式は <code class="docutils literal notranslate"><span class="pre">I</span> <span class="pre">migrated</span> <span class="pre">all</span> <span class="pre">Solr</span> <span class="pre">system!</span></code> と似た内容を持つレコードを検索します。この場合は、 <code class="docutils literal notranslate"><span class="pre">I</span> <span class="pre">migrated</span> <span class="pre">all</span> <span class="pre">XXX</span> <span class="pre">system!</span></code> という内容のレコードがマッチします。</p>
 </div>
 <div class="section" id="term-extract-operator">
 <span id="script-syntax-term-extract-operator"></span><h3>7.12.2.9.6. 単語抽出演算子<a class="headerlink" href="#term-extract-operator" title="このヘッドラインへのパーマリンク">¶</a></h3>
-<p>構文は <code class="docutils literal"><span class="pre">_key</span> <span class="pre">*T</span> <span class="pre">&quot;document&quot;</span></code> です。</p>
-<p>この演算子は <code class="docutils literal"><span class="pre">document</span></code> から単語を抽出します。単語は <code class="docutils literal"><span class="pre">_key</span></code> のテーブルのキーとして登録されていなければいけません。</p>
-<p>テーブルはパトリシアトライ（ <code class="docutils literal"><span class="pre">TABLE_PAT_KEY</span></code> ）またはダブル配列トライ（ <code class="docutils literal"><span class="pre">TABLE_DAT_KEY</span></code> ）でなければいけません。ハッシュテーブル（ <code class="docutils literal"><span class="pre">TABLE_HASH_KEY</span></code> ）や配列（ <code class="docutils literal"><span class="pre">TABLE_NO_KEY</span></code> ）は最長共通接頭辞検索（Longest Common Prefix Search）できないため使えません。この演算子は最長共通接頭辞検索を使っています。</p>
+<p>構文は <code class="docutils literal notranslate"><span class="pre">_key</span> <span class="pre">*T</span> <span class="pre">&quot;document&quot;</span></code> です。</p>
+<p>この演算子は <code class="docutils literal notranslate"><span class="pre">document</span></code> から単語を抽出します。単語は <code class="docutils literal notranslate"><span class="pre">_key</span></code> のテーブルのキーとして登録されていなければいけません。</p>
+<p>テーブルはパトリシアトライ（ <code class="docutils literal notranslate"><span class="pre">TABLE_PAT_KEY</span></code> ）またはダブル配列トライ（ <code class="docutils literal notranslate"><span class="pre">TABLE_DAT_KEY</span></code> ）でなければいけません。ハッシュテーブル（ <code class="docutils literal notranslate"><span class="pre">TABLE_HASH_KEY</span></code> ）や配列（ <code class="docutils literal notranslate"><span class="pre">TABLE_NO_KEY</span></code> ）は最長共通接頭辞検索（Longest Common Prefix Search）できないため使えません。この演算子は最長共通接頭辞検索を使っています。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>table_create Words TABLE_PAT_KEY ShortText --normalizer NormalizerAuto
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>table_create Words TABLE_PAT_KEY ShortText --normalizer NormalizerAuto
 # [[0, 1337566253.89858, 0.000355720520019531], true]
 load --table Words
 [
@@ -2333,19 +2324,19 @@ select Words --filter &#39;_key *T &quot;Groonga is the successor project to Sen
 # ]
 </pre></div>
 </div>
-<p>この式は文書 <code class="docutils literal"><span class="pre">Groonga</span> <span class="pre">is</span> <span class="pre">the</span> <span class="pre">successor</span> <span class="pre">project</span> <span class="pre">to</span> <span class="pre">Senna.</span></code> に含まれている単語を抽出します。今回は <code class="docutils literal"><span class="pre">Words</span></code> に <code class="docutils literal"><span class="pre">NormalizerAuto</span></code> ノーマライザーが指定されています。そのため、 <code class="docutils literal"><span class="pre">Words</span></code> には <code class="docutils literal"><span class="pre">groonga</span></code> とロードしていますが <code class="docutils literal"><span class="pre">Groonga</span></code> も抽出できています。また、すべてての抽出された単語も正規化されています。</p>
+<p>この式は文書 <code class="docutils literal notranslate"><span class="pre">Groonga</span> <span class="pre">is</span> <span class="pre">the</span> <span class="pre">successor</span> <span class="pre">project</span> <span class="pre">to</span> <span class="pre">Senna.</span></code> に含まれている単語を抽出します。今回は <code class="docutils literal notranslate"><span class="pre">Words</span></code> に <code class="docutils literal notranslate"><span class="pre">NormalizerAuto</span></code> ノーマライザーが指定されています。そのため、 <code class="docutils literal notranslate"><span class="pre">Words</span></code> には <code class="docutils literal notranslate"><span class="pre">groonga</span></code> とロードしていますが <code class="docutils literal notranslate"><span class="pre">Groonga</span></code> も抽出できています。また、すべてての抽出された単語も正規化されています。</p>
 </div>
 <div class="section" id="regular-expression-operator">
 <span id="script-syntax-regular-expression-operator"></span><h3>7.12.2.9.7. 正規表現演算子<a class="headerlink" href="#regular-expression-operator" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <div class="versionadded">
 <p><span class="versionmodified">バージョン 5.0.1 で追加.</span></p>
 </div>
-<p>構文は <code class="docutils literal"><span class="pre">column</span> <span class="pre">&#64;~</span> <span class="pre">&quot;pattern&quot;</span></code> です。</p>
-<p>この演算子は正規表現 <code class="docutils literal"><span class="pre">pattern</span></code> でレコードを検索します。もし、レコードの <code class="docutils literal"><span class="pre">column</span></code> の値が <code class="docutils literal"><span class="pre">pattern</span></code> にマッチしたら、そのレコードはマッチしたということです。</p>
-<p><code class="docutils literal"><span class="pre">pattern</span></code> は正規表現の構文になっていなければいけません。正規表現の構文の詳細は <a class="reference internal" href="../regular_expression.html"><span class="doc">正規表現</span></a> を参照してください。</p>
-<p>以下の例はパターンとして <code class="docutils literal"><span class="pre">.roonga</span></code> を使っています。このパターンは <code class="docutils literal"><span class="pre">Groonga</span></code> 、 <code class="docutils literal"><span class="pre">Mroonga</span></code> といった文字列にマッチします。</p>
+<p>構文は <code class="docutils literal notranslate"><span class="pre">column</span> <span class="pre">&#64;~</span> <span class="pre">&quot;pattern&quot;</span></code> です。</p>
+<p>この演算子は正規表現 <code class="docutils literal notranslate"><span class="pre">pattern</span></code> でレコードを検索します。もし、レコードの <code class="docutils literal notranslate"><span class="pre">column</span></code> の値が <code class="docutils literal notranslate"><span class="pre">pattern</span></code> にマッチしたら、そのレコードはマッチしたということです。</p>
+<p><code class="docutils literal notranslate"><span class="pre">pattern</span></code> は正規表現の構文になっていなければいけません。正規表現の構文の詳細は <a class="reference internal" href="../regular_expression.html"><span class="doc">正規表現</span></a> を参照してください。</p>
+<p>以下の例はパターンとして <code class="docutils literal notranslate"><span class="pre">.roonga</span></code> を使っています。このパターンは <code class="docutils literal notranslate"><span class="pre">Groonga</span></code> 、 <code class="docutils literal notranslate"><span class="pre">Mroonga</span></code> といった文字列にマッチします。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Entries --filter &#39;content @~ &quot;.roonga&quot;&#39;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;content @~ &quot;.roonga&quot;&#39;
 # [
 #   [
 #     0,
@@ -2499,12 +2490,14 @@ select Words --filter &#39;_key *T &quot;Groonga is the successor project to Sen
                         title="次の章へ">7.13. 正規表現</a></p>
 <div id="searchbox" style="display: none" role="search">
   <h3>クイック検索</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="検索" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

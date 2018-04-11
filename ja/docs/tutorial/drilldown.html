@@ -3,20 +3,12 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml" lang="ja">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>4.5. ドリルダウン &#8212; Groonga v8.0.1ドキュメント</title>
     <link rel="stylesheet" href="../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '8.0.1',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  false,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="../static/documentation_options.js"></script>
     <script type="text/javascript" src="../static/jquery.js"></script>
     <script type="text/javascript" src="../static/underscore.js"></script>
     <script type="text/javascript" src="../static/doctools.js"></script>
@@ -34,8 +26,7 @@
 
     <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
   </head>
-
-    <body>
+  <body>
     <div id="fb-root"></div>
 
 <div class="header">
@@ -87,14 +78,14 @@
 <h1>4.5. ドリルダウン<a class="headerlink" href="#drilldown" title="このヘッドラインへのパーマリンク">¶</a></h1>
 <p>これまでのセクションで検索方法と検索結果をどのようにソートするかを学びました。思うがままに検索できるようになりましたね。それでは、次のことをするにはどうすればよいでしょか。まず、あるカラムに注目します。そして、そのカラムの値が同じレコードを集め、それぞれの値毎に集まったレコードの数を数えます。</p>
 <p>素朴な実現方法は、カラムのそれぞれの値で検索する方法です。結果として、すべてのカラムの値についてレコード数を求めることができます。シンプルな方法ですが、たくさんのレコードがある場合には現実的ではありません。</p>
-<p>SQLに慣れている人は、「GroongaにはSQLでいう <code class="docutils literal"><span class="pre">GROUP</span> <span class="pre">BY</span></code> 相当の機能はないの？」と思うでしょう。</p>
-<p>もちろん、Groongaはそのような機能を提供しています。それが <code class="docutils literal"><span class="pre">drilldown</span></code> と呼んでいる機能です。</p>
-<p><code class="docutils literal"><span class="pre">drilldown</span></code> はカラムの値ごとにレコード数を数える機能を提供します。値ごとに別々のクエリーになるのではなく、1回のクエリーですべての値に対してレコード数を数えます。</p>
+<p>SQLに慣れている人は、「GroongaにはSQLでいう <code class="docutils literal notranslate"><span class="pre">GROUP</span> <span class="pre">BY</span></code> 相当の機能はないの？」と思うでしょう。</p>
+<p>もちろん、Groongaはそのような機能を提供しています。それが <code class="docutils literal notranslate"><span class="pre">drilldown</span></code> と呼んでいる機能です。</p>
+<p><code class="docutils literal notranslate"><span class="pre">drilldown</span></code> はカラムの値ごとにレコード数を数える機能を提供します。値ごとに別々のクエリーになるのではなく、1回のクエリーですべての値に対してレコード数を数えます。</p>
 <p>この機能を説明するために次のケースを考えます。ドメインで分類し、ドメインが属している国ごとにグループ化する、というケースです。</p>
 <p>この機能を使った具体的な例を示します。</p>
-<p>この例では、 <code class="docutils literal"><span class="pre">Site</span></code> テーブルに2つのカラムを追加しています。 <code class="docutils literal"><span class="pre">domain</span></code> カラムはTLD(トップレベルドメイン)に使います。 <code class="docutils literal"><span class="pre">country</span></code> カラムは国名に使います。これらのカラムの型はドメイン名を主キーとする <code class="docutils literal"><span class="pre">SiteDomain</span></code> テーブルと国名を主キーとする <code class="docutils literal"><span class="pre">SiteCountry</span></code> テーブルです。</p>
+<p>この例では、 <code class="docutils literal notranslate"><span class="pre">Site</span></code> テーブルに2つのカラムを追加しています。 <code class="docutils literal notranslate"><span class="pre">domain</span></code> カラムはTLD(トップレベルドメイン)に使います。 <code class="docutils literal notranslate"><span class="pre">country</span></code> カラムは国名に使います。これらのカラムの型はドメイン名を主キーとする <code class="docutils literal notranslate"><span class="pre">SiteDomain</span></code> テーブルと国名を主キーとする <code class="docutils literal notranslate"><span class="pre">SiteCountry</span></code> テーブルです。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>table_create --name SiteDomain --flags TABLE_HASH_KEY --key_type ShortText
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>table_create --name SiteDomain --flags TABLE_HASH_KEY --key_type ShortText
 # [[0, 1337566253.89858, 0.000355720520019531], true]
 table_create --name SiteCountry --flags TABLE_HASH_KEY --key_type ShortText
 # [[0, 1337566253.89858, 0.000355720520019531], true]
@@ -117,9 +108,9 @@ load --table Site
 # [[0, 1337566253.89858, 0.000355720520019531], 9]
 </pre></div>
 </div>
-<p><code class="docutils literal"><span class="pre">domain</span></code> カラムでドリルダウンする例を示します。 3つの値が <code class="docutils literal"><span class="pre">domain</span></code> カラムでは使われています。&quot;.org&quot;、&quot;.net&quot;そして&quot;.com&quot;です。</p>
+<p><code class="docutils literal notranslate"><span class="pre">domain</span></code> カラムでドリルダウンする例を示します。 3つの値が <code class="docutils literal notranslate"><span class="pre">domain</span></code> カラムでは使われています。&quot;.org&quot;、&quot;.net&quot;そして&quot;.com&quot;です。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select --table Site --limit 0 --drilldown domain
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select --table Site --limit 0 --drilldown domain
 # [
 #   [
 #     0,
@@ -199,7 +190,7 @@ load --table Site
 </div>
 <p>上記のクエリの集計結果です。</p>
 <table border="1" class="docutils" id="domain">
-<caption><span class="caption-text"><code class="docutils literal"><span class="pre">domain</span></code> カラムによるドリルダウン</span><a class="headerlink" href="#domain" title="このテーブルへのパーマリンク">¶</a></caption>
+<caption><span class="caption-text"><code class="docutils literal notranslate"><span class="pre">domain</span></code> カラムによるドリルダウン</span><a class="headerlink" href="#domain" title="このテーブルへのパーマリンク">¶</a></caption>
 <colgroup>
 <col width="33%" />
 <col width="33%" />
@@ -241,11 +232,11 @@ load --table Site
 </tr>
 </tbody>
 </table>
-<p>ドリルダウン結果は <code class="docutils literal"><span class="pre">_nsubrecs</span></code> カラムの値として返ります。この場合は、<code class="docutils literal"><span class="pre">Site</span></code> テーブルは &quot;.org&quot;、&quot;.net&quot;、&quot;.com&quot;ドメインでグループ化されています。 <code class="docutils literal"><span class="pre">_nsubrecs</span></code> はグループ化されたドメインが3つのレコードをそれぞれもつことを意味します。</p>
-<p>テーブル型を持つカラムに対してドリルダウンを行った場合、参照先のテーブルに存在するカラム値を取得することもできます。ドリルダウンを行ったテーブルには、 <code class="docutils literal"><span class="pre">_nsubrecs</span></code> という仮想的なカラムが追加されます。このカラムには、グループ化されたレコード数が入ります。</p>
-<p>では、参照されているテーブルの詳細を調べてみましょう。 <code class="docutils literal"><span class="pre">Site</span></code> テーブルは <code class="docutils literal"><span class="pre">SiteDomain</span></code> テーブルを <code class="docutils literal"><span class="pre">domain</span></code> カラムの型として使っています。 <code class="docutils literal"><span class="pre">--drilldown_output_columns</span></code> を参照されているカラムの詳細を知るのに使えます。</p>
+<p>ドリルダウン結果は <code class="docutils literal notranslate"><span class="pre">_nsubrecs</span></code> カラムの値として返ります。この場合は、<code class="docutils literal notranslate"><span class="pre">Site</span></code> テーブルは &quot;.org&quot;、&quot;.net&quot;、&quot;.com&quot;ドメインでグループ化されています。 <code class="docutils literal notranslate"><span class="pre">_nsubrecs</span></code> はグループ化されたドメインが3つのレコードをそれぞれもつことを意味します。</p>
+<p>テーブル型を持つカラムに対してドリルダウンを行った場合、参照先のテーブルに存在するカラム値を取得することもできます。ドリルダウンを行ったテーブルには、 <code class="docutils literal notranslate"><span class="pre">_nsubrecs</span></code> という仮想的なカラムが追加されます。このカラムには、グループ化されたレコード数が入ります。</p>
+<p>では、参照されているテーブルの詳細を調べてみましょう。 <code class="docutils literal notranslate"><span class="pre">Site</span></code> テーブルは <code class="docutils literal notranslate"><span class="pre">SiteDomain</span></code> テーブルを <code class="docutils literal notranslate"><span class="pre">domain</span></code> カラムの型として使っています。 <code class="docutils literal notranslate"><span class="pre">--drilldown_output_columns</span></code> を参照されているカラムの詳細を知るのに使えます。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select --table Site --limit 0 --drilldown domain --drilldown_output_columns _id,_key,_nsubrecs
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select --table Site --limit 0 --drilldown domain --drilldown_output_columns _id,_key,_nsubrecs
 # [
 #   [
 #     0,
@@ -330,9 +321,9 @@ load --table Site
 # ]
 </pre></div>
 </div>
-<p>これでグループ化されたドメインの詳細がわかります。 <code class="docutils literal"><span class="pre">domain</span></code> の値が&quot;.org&quot;であるレコードに対して <code class="docutils literal"><span class="pre">country</span></code> カラムを使ってドリルダウンしてみましょう。</p>
+<p>これでグループ化されたドメインの詳細がわかります。 <code class="docutils literal notranslate"><span class="pre">domain</span></code> の値が&quot;.org&quot;であるレコードに対して <code class="docutils literal notranslate"><span class="pre">country</span></code> カラムを使ってドリルダウンしてみましょう。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select --table Site --limit 0 --filter &quot;domain._id == 1&quot; --drilldown country
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select --table Site --limit 0 --filter &quot;domain._id == 1&quot; --drilldown country
 # [
 #   [
 #     0,
@@ -412,9 +403,9 @@ load --table Site
 </div>
 <div class="section" id="drilldown-with-multiple-column">
 <h2>4.5.1. 複数のカラムでドリルダウン<a class="headerlink" href="#drilldown-with-multiple-column" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>ドリルダウンでは複数のカラムをサポートしています。 <code class="docutils literal"><span class="pre">drilldown</span></code> パラメータの引数にカンマ区切りの値を指定します。すると一度にまとめてドリルダウン結果を取得できます。</p>
+<p>ドリルダウンでは複数のカラムをサポートしています。 <code class="docutils literal notranslate"><span class="pre">drilldown</span></code> パラメータの引数にカンマ区切りの値を指定します。すると一度にまとめてドリルダウン結果を取得できます。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select --table Site --limit 0 --drilldown domain,country
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select --table Site --limit 0 --drilldown domain,country
 # [
 #   [
 #     0,
@@ -530,9 +521,9 @@ load --table Site
 </div>
 <div class="section" id="sorting-drildown-results">
 <h2>4.5.2. ドリルダウン結果をソートする<a class="headerlink" href="#sorting-drildown-results" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>ドリルダウン結果をソートしたい場合には <code class="docutils literal"><span class="pre">--drilldown_sort_keys</span></code> を使います。指定した <code class="docutils literal"><span class="pre">_nsubrecs</span></code> カラムを昇順でソートします。</p>
+<p>ドリルダウン結果をソートしたい場合には <code class="docutils literal notranslate"><span class="pre">--drilldown_sort_keys</span></code> を使います。指定した <code class="docutils literal notranslate"><span class="pre">_nsubrecs</span></code> カラムを昇順でソートします。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select --table Site --limit 0 --drilldown country --drilldown_sort_keys _nsubrecs
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select --table Site --limit 0 --drilldown country --drilldown_sort_keys _nsubrecs
 # [
 #   [
 #     0,
@@ -621,9 +612,9 @@ load --table Site
 </div>
 <div class="section" id="limits-drildown-results">
 <h2>4.5.3. ドリルダウン結果の制限<a class="headerlink" href="#limits-drildown-results" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>ドリルダウン結果はデフォルト10件に制限されています。 <code class="docutils literal"><span class="pre">drilldown_limit</span></code> と <code class="docutils literal"><span class="pre">drilldown_offset</span></code> パラメータをドリルダウン結果をカスタマイズするのに使います。</p>
+<p>ドリルダウン結果はデフォルト10件に制限されています。 <code class="docutils literal notranslate"><span class="pre">drilldown_limit</span></code> と <code class="docutils literal notranslate"><span class="pre">drilldown_offset</span></code> パラメータをドリルダウン結果をカスタマイズするのに使います。</p>
 <p>実行例:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select --table Site --limit 0 --drilldown country --drilldown_sort_keys _nsubrecs --drilldown_limit 2 --drilldown_offset 2
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select --table Site --limit 0 --drilldown country --drilldown_sort_keys _nsubrecs --drilldown_limit 2 --drilldown_offset 2
 # [
 #   [
 #     0,
@@ -725,12 +716,14 @@ load --table Site
                         title="次の章へ">4.6. タグ検索・参照関係の逆引き</a></p>
 <div id="searchbox" style="display: none" role="search">
   <h3>クイック検索</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="検索" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

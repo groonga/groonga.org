@@ -3,20 +3,12 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>7.13. Regular expression &#8212; Groonga v8.0.1 documentation</title>
     <link rel="stylesheet" href="../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '8.0.1',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  false,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="../static/documentation_options.js"></script>
     <script type="text/javascript" src="../static/jquery.js"></script>
     <script type="text/javascript" src="../static/underscore.js"></script>
     <script type="text/javascript" src="../static/doctools.js"></script>
@@ -33,8 +25,7 @@
 
     <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
   </head>
-
-    <body>
+  <body>
     <div id="fb-root"></div>
 
 <div class="header">
@@ -97,40 +88,40 @@
 expression is widely used format to describe a pattern. Regular
 expression is useful to represent complex pattern.</p>
 <p>In most cases, pattern match by regular expression is evaluated as
-sequential search. It'll be slow for many records and many texts.</p>
+sequential search. It’ll be slow for many records and many texts.</p>
 <p>In some cases, pattern match by regular expression can be evaluated
-by index. It's very fast rather than sequential search. Patterns
+by index. It’s very fast rather than sequential search. Patterns
 that can be evaluated by index are described later.</p>
 <div class="versionadded">
 <p><span class="versionmodified">New in version 5.0.7: </span>Groonga normalizes match target text by <a class="reference internal" href="normalizers.html#normalizer-auto"><span class="std std-ref">NormalizerAuto</span></a>
-normalizer when Groonga doesn't use index for regular expression
+normalizer when Groonga doesn’t use index for regular expression
 search. It means that regular expression that has upper case such
-as <code class="docutils literal"><span class="pre">Groonga</span></code> never match. Because <a class="reference internal" href="normalizers.html#normalizer-auto"><span class="std std-ref">NormalizerAuto</span></a>
-normalizer normalizes all alphabets to lower case. <code class="docutils literal"><span class="pre">groonga</span></code>
-matches to both <code class="docutils literal"><span class="pre">Groonga</span></code> and <code class="docutils literal"><span class="pre">groonga</span></code>.</p>
-<p>Why is match target text normalizered? It's for increasing index
-search-able patterns. If Groonga doesn't normalize match target
+as <code class="docutils literal notranslate"><span class="pre">Groonga</span></code> never match. Because <a class="reference internal" href="normalizers.html#normalizer-auto"><span class="std std-ref">NormalizerAuto</span></a>
+normalizer normalizes all alphabets to lower case. <code class="docutils literal notranslate"><span class="pre">groonga</span></code>
+matches to both <code class="docutils literal notranslate"><span class="pre">Groonga</span></code> and <code class="docutils literal notranslate"><span class="pre">groonga</span></code>.</p>
+<p>Why is match target text normalizered? It’s for increasing index
+search-able patterns. If Groonga doesn’t normalize match target
 text, you need to write complex regular expression such as
-<code class="docutils literal"><span class="pre">[Dd][Ii][Ss][Kk]</span></code> and <code class="docutils literal"><span class="pre">(?i)disk</span></code> for case-insensitive match.
-Groonga can't use index against complex regular expression.</p>
-<p>If you write <code class="docutils literal"><span class="pre">disk</span></code> regular expression for case-insensitive
-match, Groonga can search the pattern with index. It's fast.</p>
+<code class="docutils literal notranslate"><span class="pre">[Dd][Ii][Ss][Kk]</span></code> and <code class="docutils literal notranslate"><span class="pre">(?i)disk</span></code> for case-insensitive match.
+Groonga can’t use index against complex regular expression.</p>
+<p>If you write <code class="docutils literal notranslate"><span class="pre">disk</span></code> regular expression for case-insensitive
+match, Groonga can search the pattern with index. It’s fast.</p>
 <p>You may feel the behavior is strange. But fast search based on this
 behavior will help you.</p>
 </div>
 <p>There are many regular expression syntaxes. Groonga uses the same
 syntax in Ruby. Because Groonga uses the same regular expression
 engine as Ruby. The regular expression engine is <a class="reference external" href="https://github.com/k-takata/Onigmo/">Onigmo</a>. Characteristic difference
-with other regular expression syntax is <code class="docutils literal"><span class="pre">^</span></code> and <code class="docutils literal"><span class="pre">$</span></code>. The regular
-expression syntax in Ruby, <code class="docutils literal"><span class="pre">^</span></code> means the beginning of line and <code class="docutils literal"><span class="pre">$</span></code>
-means the end of line. <code class="docutils literal"><span class="pre">^</span></code> means the beginning of text and <code class="docutils literal"><span class="pre">$</span></code>
+with other regular expression syntax is <code class="docutils literal notranslate"><span class="pre">^</span></code> and <code class="docutils literal notranslate"><span class="pre">$</span></code>. The regular
+expression syntax in Ruby, <code class="docutils literal notranslate"><span class="pre">^</span></code> means the beginning of line and <code class="docutils literal notranslate"><span class="pre">$</span></code>
+means the end of line. <code class="docutils literal notranslate"><span class="pre">^</span></code> means the beginning of text and <code class="docutils literal notranslate"><span class="pre">$</span></code>
 means the end of text in other most regular expression syntaxes. The regular
-expression syntax in Ruby uses <code class="docutils literal"><span class="pre">\A</span></code> for the beginning of text and
-<code class="docutils literal"><span class="pre">\z</span></code> for the end of text.</p>
+expression syntax in Ruby uses <code class="docutils literal notranslate"><span class="pre">\A</span></code> for the beginning of text and
+<code class="docutils literal notranslate"><span class="pre">\z</span></code> for the end of text.</p>
 <div class="versionadded">
-<p><span class="versionmodified">New in version 5.0.6: </span>Groonga uses multiline mode since 5.0.6. It means that <code class="docutils literal"><span class="pre">.</span></code>
-matches on <code class="docutils literal"><span class="pre">\n</span></code>.</p>
-<p>But it's meaningless. Because <code class="docutils literal"><span class="pre">\n</span></code> is removed by
+<p><span class="versionmodified">New in version 5.0.6: </span>Groonga uses multiline mode since 5.0.6. It means that <code class="docutils literal notranslate"><span class="pre">.</span></code>
+matches on <code class="docutils literal notranslate"><span class="pre">\n</span></code>.</p>
+<p>But it’s meaningless. Because <code class="docutils literal notranslate"><span class="pre">\n</span></code> is removed by
 <a class="reference internal" href="normalizers.html#normalizer-auto"><span class="std std-ref">NormalizerAuto</span></a> normalizer.</p>
 </div>
 <p>You can use regular expression in <a class="reference internal" href="commands/select.html#select-query"><span class="std std-ref">query</span></a> and
@@ -140,10 +131,10 @@ command.</p>
 <div class="section" id="usage">
 <h2>7.13.2. Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
 <p>Here are a schema definition and sample data to show usage. There is
-only one table, <code class="docutils literal"><span class="pre">Logs</span></code>. <code class="docutils literal"><span class="pre">Logs</span></code> table has only <code class="docutils literal"><span class="pre">message</span></code>
-column. Log messages are stored into the <code class="docutils literal"><span class="pre">message</span></code> column.</p>
+only one table, <code class="docutils literal notranslate"><span class="pre">Logs</span></code>. <code class="docutils literal notranslate"><span class="pre">Logs</span></code> table has only <code class="docutils literal notranslate"><span class="pre">message</span></code>
+column. Log messages are stored into the <code class="docutils literal notranslate"><span class="pre">message</span></code> column.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>table_create Logs TABLE_NO_KEY
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>table_create Logs TABLE_NO_KEY
 # [[0, 1337566253.89858, 0.000355720520019531], true]
 column_create Logs message COLUMN_SCALAR Text
 # [[0, 1337566253.89858, 0.000355720520019531], true]
@@ -160,9 +151,9 @@ load --table Logs
 </div>
 <p>Here is an example that uses regular expression in
 <a class="reference internal" href="commands/select.html#select-query"><span class="std std-ref">query</span></a>. You need to use
-<code class="docutils literal"><span class="pre">${COLUMN}:~${REGULAR_EXPRESSION}</span></code> syntax.</p>
+<code class="docutils literal notranslate"><span class="pre">${COLUMN}:~${REGULAR_EXPRESSION}</span></code> syntax.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Logs --query &#39;message:~&quot;disk (space|full)&quot;&#39;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Logs --query &#39;message:~&quot;disk (space|full)&quot;&#39;
 # [
 #   [
 #     0,
@@ -199,9 +190,9 @@ load --table Logs
 </div>
 <p>Here is an example that uses regular expression in
 <a class="reference internal" href="commands/select.html#select-filter"><span class="std std-ref">filter</span></a>. You need to use
-<code class="docutils literal"><span class="pre">${COLUMN}</span> <span class="pre">&#64;~</span> <span class="pre">${REGULAR_EXPRESSION}</span></code> syntax.</p>
+<code class="docutils literal notranslate"><span class="pre">${COLUMN}</span> <span class="pre">&#64;~</span> <span class="pre">${REGULAR_EXPRESSION}</span></code> syntax.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Logs --filter &#39;message @~ &quot;disk (space|full)&quot;&#39;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Logs --filter &#39;message @~ &quot;disk (space|full)&quot;&#39;
 # [
 #   [
 #     0,
@@ -239,16 +230,16 @@ load --table Logs
 </div>
 <div class="section" id="index">
 <span id="regular-expression-index"></span><h2>7.13.3. Index<a class="headerlink" href="#index" title="Permalink to this headline">¶</a></h2>
-<p>Groonga can search records by regular expression with index. It's very
+<p>Groonga can search records by regular expression with index. It’s very
 fast rather than sequential search.</p>
-<p>But it doesn't support all regular expression patterns. It supports
+<p>But it doesn’t support all regular expression patterns. It supports
 only the following regular expression patterns. The patterns will be
 increased in the future.</p>
 <blockquote>
 <div><ul class="simple">
-<li>Literal only pattern such as <code class="docutils literal"><span class="pre">disk</span></code></li>
-<li>The begging of text and literal only pattern such as <code class="docutils literal"><span class="pre">\Adisk</span></code></li>
-<li>The end of text and literal only pattern such as <code class="docutils literal"><span class="pre">disk\z</span></code></li>
+<li>Literal only pattern such as <code class="docutils literal notranslate"><span class="pre">disk</span></code></li>
+<li>The begging of text and literal only pattern such as <code class="docutils literal notranslate"><span class="pre">\Adisk</span></code></li>
+<li>The end of text and literal only pattern such as <code class="docutils literal notranslate"><span class="pre">disk\z</span></code></li>
 </ul>
 </div></blockquote>
 <p>You need to create an index for fast regular expression search. Here
@@ -257,16 +248,16 @@ are requirements of index:</p>
 <div><ul class="simple">
 <li>Lexicon must be <a class="reference internal" href="tables.html#table-pat-key"><span class="std std-ref">TABLE_PAT_KEY</span></a> table.</li>
 <li>Lexicon must use <a class="reference internal" href="tokenizers.html#token-regexp"><span class="std std-ref">TokenRegexp</span></a> tokenizer.</li>
-<li>Index column must has <code class="docutils literal"><span class="pre">WITH_POSITION</span></code> flag.</li>
+<li>Index column must has <code class="docutils literal notranslate"><span class="pre">WITH_POSITION</span></code> flag.</li>
 </ul>
 </div></blockquote>
-<p>Other configurations such as lexicon's normalizer are optional. You
+<p>Other configurations such as lexicon’s normalizer are optional. You
 can choose what you like. If you want to use case-insensitive search,
 use <a class="reference internal" href="normalizers.html#normalizer-auto"><span class="std std-ref">NormalizerAuto</span></a> normalizer.</p>
-<p>Here are recommended index definitions. In general, it's reasonable
+<p>Here are recommended index definitions. In general, it’s reasonable
 index definitions.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>table_create RegexpLexicon TABLE_PAT_KEY ShortText \
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>table_create RegexpLexicon TABLE_PAT_KEY ShortText \
   --default_tokenizer TokenRegexp \
   --normalizer NormalizerAuto
 # [[0, 1337566253.89858, 0.000355720520019531], true]
@@ -276,10 +267,10 @@ column_create RegexpLexicon logs_message_index \
 </pre></div>
 </div>
 <p>Now, you can use index for regular expression search. The following
-regular expression can be evaluated by index because it uses only &quot;the
-beginning of text&quot; and &quot;literal&quot;.</p>
+regular expression can be evaluated by index because it uses only “the
+beginning of text” and “literal”.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Logs --query message:~\\\\Ahost1
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Logs --query message:~\\\\Ahost1
 # [
 #   [
 #     0,
@@ -322,7 +313,7 @@ beginning of text&quot; and &quot;literal&quot;.</p>
 <a class="reference internal" href="commands/select.html#select-query"><span class="std std-ref">query</span></a>. It uses the same regular expression as the
 previous example.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Logs --filter &#39;message @~ &quot;\\\\Ahost1:&quot;&#39;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Logs --filter &#39;message @~ &quot;\\\\Ahost1:&quot;&#39;
 # [
 #   [
 #     0,
@@ -361,45 +352,45 @@ previous example.</p>
 # ]
 </pre></div>
 </div>
-<p><code class="docutils literal"><span class="pre">\</span></code> escape will confuse you because there are some steps that
+<p><code class="docutils literal notranslate"><span class="pre">\</span></code> escape will confuse you because there are some steps that
 require escape between you and Groonga. Here are steps that require
-<code class="docutils literal"><span class="pre">\</span></code> escape:</p>
+<code class="docutils literal notranslate"><span class="pre">\</span></code> escape:</p>
 <blockquote>
 <div><ul>
 <li><p class="first">Shell only when you pass Groonga command from command line the
 following:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>% groonga /tmp/db select Logs --filter &#39;&quot;message @~ \&quot;\\\\Ahost1:&quot;\&quot;&#39;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% groonga /tmp/db select Logs --filter &#39;&quot;message @~ \&quot;\\\\Ahost1:&quot;\&quot;&#39;
 </pre></div>
 </div>
-<p><code class="docutils literal"><span class="pre">--filter</span> <span class="pre">'&quot;message</span> <span class="pre">&#64;~</span> <span class="pre">\&quot;\\\\Ahost1:\&quot;&quot;'</span></code> is evaluated as the
+<p><code class="docutils literal notranslate"><span class="pre">--filter</span> <span class="pre">'&quot;message</span> <span class="pre">&#64;~</span> <span class="pre">\&quot;\\\\Ahost1:\&quot;&quot;'</span></code> is evaluated as the
 following two arguments by shell:</p>
 <blockquote>
 <div><ul class="simple">
-<li><code class="docutils literal"><span class="pre">--filter</span></code></li>
-<li><code class="docutils literal"><span class="pre">&quot;message</span> <span class="pre">&#64;~</span> <span class="pre">\&quot;\\\\Ahost1:\&quot;&quot;</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">--filter</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;message</span> <span class="pre">&#64;~</span> <span class="pre">\&quot;\\\\Ahost1:\&quot;&quot;</span></code></li>
 </ul>
 </div></blockquote>
 </li>
 <li><p class="first">Groonga command parser only when you pass Groonga command by
-command line style (<code class="docutils literal"><span class="pre">COMMAND</span> <span class="pre">ARG1_VALUE</span> <span class="pre">ARG2_VALUE</span> <span class="pre">...</span></code>) not
+command line style (<code class="docutils literal notranslate"><span class="pre">COMMAND</span> <span class="pre">ARG1_VALUE</span> <span class="pre">ARG2_VALUE</span> <span class="pre">...</span></code>) not
 HTTP path style
-(<code class="docutils literal"><span class="pre">/d/COMMAND?ARG1_NAME=ARG1_VALUE&amp;ARG2_NAME=ARG3_VALUE</span></code>).</p>
-<p><code class="docutils literal"><span class="pre">&quot;message</span> <span class="pre">&#64;~</span> <span class="pre">\&quot;\\\\Ahost1:\&quot;&quot;</span></code> is evaluated as the following
+(<code class="docutils literal notranslate"><span class="pre">/d/COMMAND?ARG1_NAME=ARG1_VALUE&amp;ARG2_NAME=ARG3_VALUE</span></code>).</p>
+<p><code class="docutils literal notranslate"><span class="pre">&quot;message</span> <span class="pre">&#64;~</span> <span class="pre">\&quot;\\\\Ahost1:\&quot;&quot;</span></code> is evaluated as the following
 value by Groonga command parser:</p>
 <blockquote>
 <div><ul class="simple">
-<li><code class="docutils literal"><span class="pre">message</span> <span class="pre">&#64;~</span> <span class="pre">&quot;\\Ahost1:&quot;</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">message</span> <span class="pre">&#64;~</span> <span class="pre">&quot;\\Ahost1:&quot;</span></code></li>
 </ul>
 </div></blockquote>
 </li>
-<li><p class="first"><a class="reference internal" href="grn_expr.html"><span class="doc">grn_expr</span></a> parser. <code class="docutils literal"><span class="pre">\</span></code> escape is required in both
+<li><p class="first"><a class="reference internal" href="grn_expr.html"><span class="doc">grn_expr</span></a> parser. <code class="docutils literal notranslate"><span class="pre">\</span></code> escape is required in both
 <a class="reference internal" href="grn_expr/query_syntax.html"><span class="doc">Query syntax</span></a> and
 <a class="reference internal" href="grn_expr/script_syntax.html"><span class="doc">Script syntax</span></a>.</p>
-<p><code class="docutils literal"><span class="pre">&quot;\\Ahost1:&quot;</span></code> string literal in script syntax is evaluated as
+<p><code class="docutils literal notranslate"><span class="pre">&quot;\\Ahost1:&quot;</span></code> string literal in script syntax is evaluated as
 the following value:</p>
 <blockquote>
 <div><ul class="simple">
-<li><code class="docutils literal"><span class="pre">\Ahost1</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">\Ahost1</span></code></li>
 </ul>
 </div></blockquote>
 <p>The value is evaluated as regular expression.</p>
@@ -417,46 +408,46 @@ syntaxes and details.</p>
 <p>In regular expression, there are the following special characters:</p>
 <blockquote>
 <div><ul class="simple">
-<li><code class="docutils literal"><span class="pre">\</span></code></li>
-<li><code class="docutils literal"><span class="pre">|</span></code></li>
-<li><code class="docutils literal"><span class="pre">(</span></code></li>
-<li><code class="docutils literal"><span class="pre">)</span></code></li>
-<li><code class="docutils literal"><span class="pre">[</span></code></li>
-<li><code class="docutils literal"><span class="pre">]</span></code></li>
-<li><code class="docutils literal"><span class="pre">.</span></code></li>
-<li><code class="docutils literal"><span class="pre">*</span></code></li>
-<li><code class="docutils literal"><span class="pre">+</span></code></li>
-<li><code class="docutils literal"><span class="pre">?</span></code></li>
-<li><code class="docutils literal"><span class="pre">{</span></code></li>
-<li><code class="docutils literal"><span class="pre">}</span></code></li>
-<li><code class="docutils literal"><span class="pre">^</span></code></li>
-<li><code class="docutils literal"><span class="pre">$</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">\</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">|</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">(</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">)</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">[</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">]</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">.</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">*</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">+</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">?</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">{</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">}</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">^</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">$</span></code></li>
 </ul>
 </div></blockquote>
 <p>If you want to write pattern that matches these special character as
 is, you need to escape them.</p>
-<p>You can escape them by putting <code class="docutils literal"><span class="pre">\</span></code> before special character. Here
+<p>You can escape them by putting <code class="docutils literal notranslate"><span class="pre">\</span></code> before special character. Here
 are regular expressions that match special character itself:</p>
 <blockquote>
 <div><ul class="simple">
-<li><code class="docutils literal"><span class="pre">\\</span></code></li>
-<li><code class="docutils literal"><span class="pre">\|</span></code></li>
-<li><code class="docutils literal"><span class="pre">\(</span></code></li>
-<li><code class="docutils literal"><span class="pre">\)</span></code></li>
-<li><code class="docutils literal"><span class="pre">\[</span></code></li>
-<li><code class="docutils literal"><span class="pre">\]</span></code></li>
-<li><code class="docutils literal"><span class="pre">\.</span></code></li>
-<li><code class="docutils literal"><span class="pre">\*</span></code></li>
-<li><code class="docutils literal"><span class="pre">\+</span></code></li>
-<li><code class="docutils literal"><span class="pre">\?</span></code></li>
-<li><code class="docutils literal"><span class="pre">\{</span></code></li>
-<li><code class="docutils literal"><span class="pre">\}</span></code></li>
-<li><code class="docutils literal"><span class="pre">\^</span></code></li>
-<li><code class="docutils literal"><span class="pre">\$</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">\\</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">\|</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">\(</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">\)</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">\[</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">\]</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">\.</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">\*</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">\+</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">\?</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">\{</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">\}</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">\^</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">\$</span></code></li>
 </ul>
 </div></blockquote>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Logs --filter &#39;message @~ &quot;warning|info&quot;&#39;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Logs --filter &#39;message @~ &quot;warning|info&quot;&#39;
 # [
 #   [
 #     0,
@@ -491,15 +482,15 @@ are regular expressions that match special character itself:</p>
 # ]
 </pre></div>
 </div>
-<p>If your regular expression doesn't work as you expected, confirm that
+<p>If your regular expression doesn’t work as you expected, confirm that
 some special characters are used without escaping.</p>
 </div>
 <div class="section" id="choice">
 <span id="regular-expression-choice"></span><h3>7.13.4.2. Choice<a class="headerlink" href="#choice" title="Permalink to this headline">¶</a></h3>
-<p>Choice syntax is <code class="docutils literal"><span class="pre">A|B</span></code>. The regular expression matches when either
-<code class="docutils literal"><span class="pre">A</span></code> pattern or <code class="docutils literal"><span class="pre">B</span></code> pattern is matched.</p>
+<p>Choice syntax is <code class="docutils literal notranslate"><span class="pre">A|B</span></code>. The regular expression matches when either
+<code class="docutils literal notranslate"><span class="pre">A</span></code> pattern or <code class="docutils literal notranslate"><span class="pre">B</span></code> pattern is matched.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Logs --filter &#39;message @~ &quot;warning|info&quot;&#39;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Logs --filter &#39;message @~ &quot;warning|info&quot;&#39;
 # [
 #   [
 #     0,
@@ -536,24 +527,24 @@ some special characters are used without escaping.</p>
 </div>
 <div class="admonition caution">
 <p class="first admonition-title">Caution</p>
-<p class="last">Regular expression that uses this syntax can't be evaluated by
+<p class="last">Regular expression that uses this syntax can’t be evaluated by
 index.</p>
 </div>
 </div>
 <div class="section" id="group">
 <span id="regular-expression-group"></span><h3>7.13.4.3. Group<a class="headerlink" href="#group" title="Permalink to this headline">¶</a></h3>
-<p>Group syntax is <code class="docutils literal"><span class="pre">(...)</span></code>. Group provides the following features:</p>
+<p>Group syntax is <code class="docutils literal notranslate"><span class="pre">(...)</span></code>. Group provides the following features:</p>
 <blockquote>
 <div><ul class="simple">
 <li>Back reference</li>
 <li>Scope reducing</li>
 </ul>
 </div></blockquote>
-<p>You can refer matched groups by <code class="docutils literal"><span class="pre">\n</span></code> (<code class="docutils literal"><span class="pre">n</span></code> is the group number)
-syntax. For example, <code class="docutils literal"><span class="pre">e(r)\1o\1</span></code> matches <code class="docutils literal"><span class="pre">error</span></code>. Because <code class="docutils literal"><span class="pre">\1</span></code>
-is replaced with match result (<code class="docutils literal"><span class="pre">r</span></code>) of the first group <code class="docutils literal"><span class="pre">(r)</span></code>.</p>
+<p>You can refer matched groups by <code class="docutils literal notranslate"><span class="pre">\n</span></code> (<code class="docutils literal notranslate"><span class="pre">n</span></code> is the group number)
+syntax. For example, <code class="docutils literal notranslate"><span class="pre">e(r)\1o\1</span></code> matches <code class="docutils literal notranslate"><span class="pre">error</span></code>. Because <code class="docutils literal notranslate"><span class="pre">\1</span></code>
+is replaced with match result (<code class="docutils literal notranslate"><span class="pre">r</span></code>) of the first group <code class="docutils literal notranslate"><span class="pre">(r)</span></code>.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Logs --filter &#39;message @~ &quot;e(r)\\\\1o\\\\1&quot;&#39;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Logs --filter &#39;message @~ &quot;e(r)\\\\1o\\\\1&quot;&#39;
 # [
 #   [
 #     0,
@@ -592,14 +583,14 @@ is replaced with match result (<code class="docutils literal"><span class="pre">
 # ]
 </pre></div>
 </div>
-<p>You can also use more powerful back reference features. See <a class="reference external" href="https://github.com/k-takata/Onigmo/blob/master/doc/RE#L302">&quot;8. Back
-reference&quot; section in Onigmo documentation</a> for
+<p>You can also use more powerful back reference features. See <a class="reference external" href="https://github.com/k-takata/Onigmo/blob/master/doc/RE#L302">“8. Back
+reference” section in Onigmo documentation</a> for
 details.</p>
-<p>Group syntax reduces scope. For example, <code class="docutils literal"><span class="pre">\[(warning|info)\]</span></code>
+<p>Group syntax reduces scope. For example, <code class="docutils literal notranslate"><span class="pre">\[(warning|info)\]</span></code>
 reduces choice syntax scope. The regular expression matches
-<code class="docutils literal"><span class="pre">[warning]</span></code> and <code class="docutils literal"><span class="pre">[info]</span></code>.</p>
+<code class="docutils literal notranslate"><span class="pre">[warning]</span></code> and <code class="docutils literal notranslate"><span class="pre">[info]</span></code>.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Logs --filter &#39;message @~ &quot;\\\\[(warning|info)\\\\]&quot;&#39;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Logs --filter &#39;message @~ &quot;\\\\[(warning|info)\\\\]&quot;&#39;
 # [
 #   [
 #     0,
@@ -635,21 +626,21 @@ reduces choice syntax scope. The regular expression matches
 </pre></div>
 </div>
 <p>You can also use more powerful group related features. See
-<a class="reference external" href="https://github.com/k-takata/Onigmo/blob/master/doc/RE#L225">&quot;7. Extended groups&quot; section in Onigmo documentation</a> for
+<a class="reference external" href="https://github.com/k-takata/Onigmo/blob/master/doc/RE#L225">“7. Extended groups” section in Onigmo documentation</a> for
 details.</p>
 <div class="admonition caution">
 <p class="first admonition-title">Caution</p>
-<p class="last">Regular expression that uses this syntax can't be evaluated by
+<p class="last">Regular expression that uses this syntax can’t be evaluated by
 index.</p>
 </div>
 </div>
 <div class="section" id="character-class">
 <span id="regular-expression-character-class"></span><h3>7.13.4.4. Character class<a class="headerlink" href="#character-class" title="Permalink to this headline">¶</a></h3>
-<p>Character class syntax is <code class="docutils literal"><span class="pre">[...]</span></code>. Character class is useful to
+<p>Character class syntax is <code class="docutils literal notranslate"><span class="pre">[...]</span></code>. Character class is useful to
 specify multiple characters to be matched.</p>
-<p>For example, <code class="docutils literal"><span class="pre">[12]</span></code> matches <code class="docutils literal"><span class="pre">1</span></code> or <code class="docutils literal"><span class="pre">2</span></code>.</p>
+<p>For example, <code class="docutils literal notranslate"><span class="pre">[12]</span></code> matches <code class="docutils literal notranslate"><span class="pre">1</span></code> or <code class="docutils literal notranslate"><span class="pre">2</span></code>.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Logs --filter &#39;message @~ &quot;host[12]&quot;&#39;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Logs --filter &#39;message @~ &quot;host[12]&quot;&#39;
 # [
 #   [
 #     0,
@@ -696,10 +687,10 @@ specify multiple characters to be matched.</p>
 # ]
 </pre></div>
 </div>
-<p>You can specify characters by range. For example, <code class="docutils literal"><span class="pre">[0-9]</span></code> matches
+<p>You can specify characters by range. For example, <code class="docutils literal notranslate"><span class="pre">[0-9]</span></code> matches
 one digit.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Logs --filter &#39;message @~ &quot;[0-9][0-9]%&quot;&#39;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Logs --filter &#39;message @~ &quot;[0-9][0-9]%&quot;&#39;
 # [
 #   [
 #     0,
@@ -731,11 +722,11 @@ one digit.</p>
 </pre></div>
 </div>
 <p>You can also use more powerful character class related features. See
-<a class="reference external" href="https://github.com/k-takata/Onigmo/blob/master/doc/RE#L164">&quot;6. Character class&quot; section in Onigmo documentation</a> for
+<a class="reference external" href="https://github.com/k-takata/Onigmo/blob/master/doc/RE#L164">“6. Character class” section in Onigmo documentation</a> for
 details.</p>
 <div class="admonition caution">
 <p class="first admonition-title">Caution</p>
-<p class="last">Regular expression that uses this syntax can't be evaluated by
+<p class="last">Regular expression that uses this syntax can’t be evaluated by
 index.</p>
 </div>
 </div>
@@ -756,27 +747,27 @@ can be evaluated by index.</p>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">^</span></code></td>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">^</span></code></td>
 <td>The beginning of line</td>
 <td>o</td>
 </tr>
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">$</span></code></td>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">$</span></code></td>
 <td>The end of line</td>
 <td>x</td>
 </tr>
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">\A</span></code></td>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">\A</span></code></td>
 <td>The beginning of text</td>
 <td>o</td>
 </tr>
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">\z</span></code></td>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">\z</span></code></td>
 <td>The end of text</td>
 <td>x</td>
 </tr>
 </tbody>
 </table>
-<p>Here is an example that uses <code class="docutils literal"><span class="pre">\z</span></code>.</p>
+<p>Here is an example that uses <code class="docutils literal notranslate"><span class="pre">\z</span></code>.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Logs --filter &#39;message @~ &quot;%\\\\z&quot;&#39;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Logs --filter &#39;message @~ &quot;%\\\\z&quot;&#39;
 # [
 #   [
 #     0,
@@ -807,13 +798,13 @@ can be evaluated by index.</p>
 # ]
 </pre></div>
 </div>
-<p>You can also use more anchors. See <a class="reference external" href="https://github.com/k-takata/Onigmo/blob/master/doc/RE#L152">&quot;5. Anchors&quot; section in Onigmo
+<p>You can also use more anchors. See <a class="reference external" href="https://github.com/k-takata/Onigmo/blob/master/doc/RE#L152">“5. Anchors” section in Onigmo
 documentation</a> for
 details.</p>
 <div class="admonition caution">
 <p class="first admonition-title">Caution</p>
-<p class="last">Regular expression that uses this syntax except <code class="docutils literal"><span class="pre">\A</span></code> and <code class="docutils literal"><span class="pre">\z</span></code>
-can't be evaluated by index.</p>
+<p class="last">Regular expression that uses this syntax except <code class="docutils literal notranslate"><span class="pre">\A</span></code> and <code class="docutils literal notranslate"><span class="pre">\z</span></code>
+can’t be evaluated by index.</p>
 </div>
 </div>
 <div class="section" id="quantifier">
@@ -830,20 +821,20 @@ can't be evaluated by index.</p>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">?</span></code></td>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">?</span></code></td>
 <td>0 or 1 time</td>
 </tr>
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">*</span></code></td>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">*</span></code></td>
 <td>0 or more times</td>
 </tr>
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">+</span></code></td>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">+</span></code></td>
 <td>1 or more times</td>
 </tr>
 </tbody>
 </table>
-<p>For example, <code class="docutils literal"><span class="pre">er+or</span></code> matches <code class="docutils literal"><span class="pre">error</span></code>, <code class="docutils literal"><span class="pre">errror</span></code> and so on.</p>
+<p>For example, <code class="docutils literal notranslate"><span class="pre">er+or</span></code> matches <code class="docutils literal notranslate"><span class="pre">error</span></code>, <code class="docutils literal notranslate"><span class="pre">errror</span></code> and so on.</p>
 <p>Execution example:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>select Logs --filter &#39;message @~ &quot;er+or&quot;&#39;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Logs --filter &#39;message @~ &quot;er+or&quot;&#39;
 # [
 #   [
 #     0,
@@ -882,20 +873,20 @@ can't be evaluated by index.</p>
 # ]
 </pre></div>
 </div>
-<p>You can also use more quantifiers. See <a class="reference external" href="https://github.com/k-takata/Onigmo/blob/master/doc/RE#L119">&quot;4. Quantifier&quot; section in Onigmo
+<p>You can also use more quantifiers. See <a class="reference external" href="https://github.com/k-takata/Onigmo/blob/master/doc/RE#L119">“4. Quantifier” section in Onigmo
 documentation</a> for
 details.</p>
 <div class="admonition caution">
 <p class="first admonition-title">Caution</p>
-<p class="last">Regular expression that uses this syntax can't be evaluated by
+<p class="last">Regular expression that uses this syntax can’t be evaluated by
 index.</p>
 </div>
 </div>
 <div class="section" id="others">
 <h3>7.13.4.7. Others<a class="headerlink" href="#others" title="Permalink to this headline">¶</a></h3>
-<p>There are more syntaxes. If you're interested in them, see <a class="reference external" href="https://github.com/k-takata/Onigmo/blob/master/doc/RE">Onigmo
+<p>There are more syntaxes. If you’re interested in them, see <a class="reference external" href="https://github.com/k-takata/Onigmo/blob/master/doc/RE">Onigmo
 documentation</a> for
-details. You may be interested in &quot;character type&quot; and &quot;character&quot;
+details. You may be interested in “character type” and “character”
 syntaxes.</p>
 </div>
 </div>
@@ -935,12 +926,14 @@ syntaxes.</p>
                         title="next chapter">7.14. Function</a></p>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

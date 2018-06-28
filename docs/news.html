@@ -70,98 +70,58 @@
 <span id="release-8-0-4"></span><h2>Release 8.0.4 - 2018-06-29<a class="headerlink" href="#release-8-0-4-2018-06-29" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="improvements">
 <h3>Improvements<a class="headerlink" href="#improvements" title="Permalink to this headline">¶</a></h3>
-<ul>
-<li><p class="first">kytea: follow variable name change
-* Fix build error.</p>
-</li>
-<li><p class="first">ii: add sub error message
-* Improve error message.</p>
-</li>
-<li><p class="first">sub_filter: fix too much score with a too filtered case</p>
-</li>
-<li><p class="first">highlighter: add grn_highlighter_clear_keywords()</p>
-</li>
-<li><p class="first">Add a new predicate: grn_obj_is_number_family_bulk()</p>
-</li>
-<li><p class="first">Add a new API: grn_plugin_proc_get_value_mode()</p>
-</li>
-<li><p class="first">vector_find: add</p>
-</li>
-<li><p class="first">Suppress memcpy warnings in msgpack</p>
-</li>
-<li><p class="first">Update mruby
-* from 1.0.0 to 1.4.1</p>
-</li>
-<li><p class="first">doc: add api reference for “grn_obj_is_index_column”
-* Merge pull request #855 from komainu8/add_api_document</p>
-</li>
-<li><p class="first">windows: suppress printf format warnings</p>
-</li>
-<li><p class="first">windows: suppress warning by msgpack</p>
-</li>
-<li><p class="first">Add encoding converter
-* windows convert: fix inverted from/to 関連</p>
-</li>
-<li><p class="first">mrb: add LocaleOutput
-* windows: support install path that has non-ascii characters again 関連？</p>
-</li>
-<li><p class="first">windows: convert image path to grn_encoding</p>
-</li>
-<li><p class="first">mecab: convert error message encoding
-* TokenMecab windows: MeCab requires UTF-8 for rcfile 関連？</p>
-</li>
-<li><p class="first">grndb: fix output channel</p>
-</li>
-<li><p class="first">window_sum: support dynamic column as a target column</p>
-</li>
-<li><p class="first">query-log show-condition: (maybe) fix a crash bug</p>
-</li>
-<li><p class="first">doc: add api reference for “grn_obj_is_vector_column”</p>
-</li>
-<li><p class="first">? Fix codes_curr check position
-* We should not touch expr-&gt;codes[si-&gt;end] when si-&gt;start &gt;=</p>
-<blockquote>
-<div><p>expr-&gt;codes_curr.</p>
-</div></blockquote>
 <ul class="simple">
-<li>-#:000000000000000 filter(1): nop: and</li>
-<li>+#:000000000000000 filter(1): and</li>
+<li>[log] Add sub error for error message <code class="docutils literal notranslate"><span class="pre">[ii][update][one]</span></code>.</li>
+<li>Added a new API: <code class="docutils literal notranslate"><span class="pre">grn_highlighter_clear_keywords()</span></code>.</li>
+<li>Added a new predicate: <code class="docutils literal notranslate"><span class="pre">grn_obj_is_number_family_bulk()</span></code>.</li>
+<li>Added a new API: <code class="docutils literal notranslate"><span class="pre">grn_plugin_proc_get_value_mode()</span></code>.</li>
+<li>[<a class="reference internal" href="reference/functions/vector_find.html"><span class="doc">vector_find</span></a>] Added a new function <code class="docutils literal notranslate"><span class="pre">vector_find()</span></code>.</li>
+<li>Suppress memcpy warnings in msgpack.</li>
+<li>Updated mruby from 1.0.0 to 1.4.1.</li>
+<li>[doc][<a class="reference internal" href="reference/api/grn_obj.html"><span class="doc">grn_obj</span></a>] Added API reference for <code class="docutils literal notranslate"><span class="pre">grn_obj_is_index_column()</span></code>.</li>
+<li>[windows] Suppress printf format warnings.</li>
+<li>[windows] Suppress warning by msgpack.</li>
+<li>[<a class="reference internal" href="reference/api/grn_obj.html"><span class="doc">grn_obj</span></a>][<a class="reference internal" href="reference/api/plugin.html"><span class="doc">Plugin</span></a>] Added encoding converter.
+rules:<ul>
+<li>grn_ctx::errbuf: grn_encoding</li>
+<li>grn_logger_put: grn_encoding</li>
+<li>mruby: UTF-8</li>
+<li>path: locale</li>
 </ul>
 </li>
-<li><p class="first">column_create: add more validations
-* 08e2456ba35407e3d5172f71a0200fac2a770142 に詳細有り</p>
+<li>[mrb] Added <code class="docutils literal notranslate"><span class="pre">LocaleOutput</span></code>.</li>
+<li>[windows] Supported converting image path to grn_encoding.</li>
+<li>[<a class="reference internal" href="reference/tokenizers.html"><span class="doc">Tokenizers</span></a>][TokenMecab] Convert error message encoding.</li>
+<li>[<a class="reference internal" href="reference/window_functions/window_sum.html"><span class="doc">window_sum</span></a>] Supported dynamic column as a target column.</li>
+<li>[doc][<a class="reference internal" href="reference/api/grn_obj.html"><span class="doc">grn_obj</span></a>] Added API reference for <code class="docutils literal notranslate"><span class="pre">grn_obj_is_vector_column()</span></code>.</li>
+<li>[<a class="reference internal" href="reference/commands/column_create.html"><span class="doc">column_create</span></a>] Added more validations.<ul>
+<li>1: Full text search index for vector column must have <code class="docutils literal notranslate"><span class="pre">WITH_SECTION</span></code> flag.
+(Note that TokenDelmit with <code class="docutils literal notranslate"><span class="pre">WITH_POSITION</span></code> without <code class="docutils literal notranslate"><span class="pre">WITH_SECTION</span></code> is permitted.
+It’s useful pattern for tag search.)</li>
+<li>2: Full text search index for vector column must not be multi column index.
+detail: <a class="reference external" href="https://github.com/groonga/groonga/commit/08e2456ba35407e3d5172f71a0200fac2a770142">https://github.com/groonga/groonga/commit/08e2456ba35407e3d5172f71a0200fac2a770142</a></li>
+</ul>
 </li>
-<li><p class="first">highlighter lexicon: fix a not highlighted bug
-* If keyword is less than N, the keyword wasn’t highlighted.</p>
-</li>
-<li><p class="first">Add missing path encoding conversion on plugin load error</p>
-</li>
-<li><p class="first">windows: fix a base path detection bug
-* If system locale DLL path includes 0x5c (“” in ASCII) such as “U+8868</p>
-<blockquote>
-<div><p>CJK UNIFIED IDEOGRAPH-8868” in CP932, the base path detection is
-buggy.</p>
-</div></blockquote>
-</li>
-<li><p class="first">grndb: disabling log check
-* Disable for now
-* Because it’s not completed yet.</p>
-</li>
-<li><p class="first">TokenNgram: fix wrong first character length</p>
-</li>
-<li><p class="first">column_create: accept TokenDelmit with WITH_POSITION
-* It’s useful pattern for tag search.
-* column_create: add more validations 関連</p>
-</li>
-<li><p class="first">doc vector_find: add
-* TODO: translation</p>
-</li>
+<li>[<a class="reference internal" href="reference/executables/grndb.html"><span class="doc">grndb</span></a>] Disabled log check temporarily.
+Because it’s not completed yet.</li>
 </ul>
 </div>
 <div class="section" id="fixes">
 <h3>Fixes<a class="headerlink" href="#fixes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>…</li>
+<li>[<a class="reference internal" href="reference/functions/sub_filter.html"><span class="doc">sub_filter</span></a>] Fixed too much score with a too filtered case.</li>
+<li>Fixed build error if KyTea is installed.</li>
+<li>[<a class="reference internal" href="reference/executables/grndb.html"><span class="doc">grndb</span></a>] Fixed output channel.</li>
+<li>[query-log][show-condition] Maybe fixed a crash bug.
+We need to check scan_info that doesn’t have corresponding expr_code.</li>
+<li>[highlighter][lexicon] Fixed a not highlighted bug.
+If keyword is less than N, the keyword wasn’t highlighted.</li>
+<li>[windows] Fixed a base path detection bug.
+If system locale DLL path includes 0x5c (<code class="docutils literal notranslate"><span class="pre">\</span></code> in ASCII) such as “U+8868
+CJK UNIFIED IDEOGRAPH-8868” in CP932, the base path detection is buggy.</li>
+<li>[<a class="reference internal" href="reference/tokenizers.html"><span class="doc">Tokenizers</span></a>][TokenNgram] Fixed wrong first character length.
+It’s caused for “PARENTHESIZED IDEOGRAPH” characters such as
+“U+3231 PARENTHESIZED IDEOGRAPH STOCK”.</li>
 </ul>
 </div>
 </div>

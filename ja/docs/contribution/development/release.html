@@ -5,10 +5,10 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>12.3.7. リリース手順 &#8212; Groonga v8.0.4ドキュメント</title>
+    <title>12.3.7. リリース手順 &#8212; Groonga v8.0.5ドキュメント</title>
     <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
-    <script type="text/javascript" src="../../static/documentation_options.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../static/documentation_options.js"></script>
     <script type="text/javascript" src="../../static/jquery.js"></script>
     <script type="text/javascript" src="../../static/underscore.js"></script>
     <script type="text/javascript" src="../../static/doctools.js"></script>
@@ -64,7 +64,7 @@
         <li class="right" >
           <a href="query.html" title="12.3.5. クエリの実現"
              accesskey="P">前へ</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v8.0.4ドキュメント</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v8.0.5ドキュメント</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../contribution.html" >12. Groongaへのコントリビュート方法</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../development.html" accesskey="U">12.3. Groonga開発者向け情報</a> &#187;</li> 
       </ul>
@@ -100,7 +100,11 @@
 <p>以下にGroongaのリリース作業を行うために事前にインストール
 しておくべきパッケージを示します。</p>
 <p>なお、ビルド環境としては Debian GNU/Linux (sid)を前提として説明しているため、その他の環境では適宜読み替えて下さい。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% sudo apt-get install -V debootstrap createrepo rpm mercurial python-docutils python-jinja2 ruby-full mingw-w64 g++-mingw-w64 mecab libmecab-dev nsis gnupg2 dh-autoreconf python-sphinx bison
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% sudo apt-get install -V debootstrap createrepo rpm mercurial python-docutils python-jinja2 ruby-full mingw-w64 g++-mingw-w64 mecab libmecab-dev nsis gnupg2 dh-autoreconf bison
+</pre></div>
+</div>
+<p>また、Sphinxは常に最新のバージョンを使う事を推奨します。 <code class="docutils literal notranslate"><span class="pre">pip</span></code> を使用して最新のSphinxをインストールするようにして下さい。:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% pip install --upgrade sphinx
 </pre></div>
 </div>
 <p>Debian系（.deb）やRed Hat系（.rpm）パッケージのビルドには <a class="reference external" href="https://www.vagrantup.com/">Vagrant</a> を使用します。apt-getでインストールできるのは古いバージョンなので、Webサイトから最新版をダウンロードしてインストールすることをおすすめします。</p>
@@ -305,11 +309,13 @@ gpg&gt; quit
 % make -C doc/locale/en html
 </pre></div>
 </div>
-<p>修正が必要な箇所を調べて、 <code class="docutils literal notranslate"><span class="pre">***.edit</span></code> というファイルを適宜修正します。</p>
-<blockquote>
-<div>% cd groonga/doc/locale
-% gir diff</div></blockquote>
-<p>ファイルを編集したら、再度poファイルとHTMLを更新するために以下のコマンドを実行します。:</p>
+<p>修正が必要な箇所を調べて、 <code class="docutils literal notranslate"><span class="pre">***.edit</span></code> というファイルを適宜修正します。:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% cd groonga/doc/locale
+% git diff
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">***.edit</span></code> というファイルの編集中は、翻訳元のファイルは絶対に編集しないで下さい（編集すると、<code class="docutils literal notranslate"><span class="pre">***.edit</span></code> に加えた変更が make update-po の実行時に失われます）。
+ファイルを編集したら、再度poファイルとHTMLを更新するために以下のコマンドを実行します。:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% make update-po
 % make -C doc/locale/ja html
 % make -C doc/locale/en html
@@ -659,11 +665,13 @@ published: false
 <div class="section" id="id23">
 <h3>12.3.7.3.23. ドキュメントのアップロード<a class="headerlink" href="#id23" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <p>doc/source以下のドキュメントを更新、翻訳まで完了している状態で、ドキュメントのアップロード作業を行います。</p>
-<p>そのためにはまず以下のコマンドを実行します。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% make update-document
+<p>そのためにはまず <code class="docutils literal notranslate"><span class="pre">groonga</span></code> のリポジトリをカレントディレクトリにして以下のコマンドを実行します。:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% GROONGA_VERSION=$(git tag --list | tail -n 1 | tr -d v)
+% make update-document DOCUMENT_VERSION=$GROONGA_VERSION DOCUMENT_VERSION_FULL=$GROONGA_VERSION
 </pre></div>
 </div>
-<p>これによりcloneしておいたgroonga.orgのdoc/locale以下に更新したドキュメントがコピーされます。</p>
+<p>ここでは最新のtagに基づいてリリースバージョンを調べ、明示的にそのバージョンを指定してドキュメントを更新するようにしています。
+これによりcloneしておいたgroonga.orgのdoc/locale以下に更新したドキュメントがコピーされます。</p>
 <p>生成されているドキュメントに問題のないことを確認できたら、コミット、pushしてgroonga.orgへと反映します。</p>
 </div>
 <div class="section" id="homebrew">
@@ -749,14 +757,6 @@ published: false
 <p>パッケージの署名に必要な秘密鍵のパスフレーズについては
 リリース担当者向けの秘密鍵を復号したテキストの1行目に記載してあります。</p>
 </div>
-<div class="section" id="id31">
-<h4>12.3.7.3.29.4. バージョンを明示的に指定してドキュメントを生成したい<a class="headerlink" href="#id31" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p>リリース後にドキュメントの一部を差し替えたい場合、特に何も指定しないと生成したHTMLに埋め込まれるバージョンが「v3.0.1-xxxxxドキュメント」となってしまうことがあります。gitでのコミット時ハッシュの一部が使われるためです。</p>
-<p>これを回避するには、以下のようにDOCUMENT_VERSIONやDOCUMENT_VERSION_FULLを明示的に指定します。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% make update-document DOCUMENT_VERSION=3.0.1 DOCUMENT_VERSION_FULL=3.0.1
-</pre></div>
-</div>
-</div>
 </div>
 </div>
 </div>
@@ -827,7 +827,6 @@ published: false
 <li><a class="reference internal" href="#id28">12.3.7.3.29.1. ビルドを並列化したい</a></li>
 <li><a class="reference internal" href="#id29">12.3.7.3.29.2. 特定の環境向けのみビルドしたい</a></li>
 <li><a class="reference internal" href="#id30">12.3.7.3.29.3. パッケージの署名用のパスフレーズを知りたい</a></li>
-<li><a class="reference internal" href="#id31">12.3.7.3.29.4. バージョンを明示的に指定してドキュメントを生成したい</a></li>
 </ul>
 </li>
 </ul>
@@ -870,7 +869,7 @@ published: false
         <li class="right" >
           <a href="query.html" title="12.3.5. クエリの実現"
              >前へ</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v8.0.4ドキュメント</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v8.0.5ドキュメント</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../contribution.html" >12. Groongaへのコントリビュート方法</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../development.html" >12.3. Groonga開発者向け情報</a> &#187;</li> 
       </ul>

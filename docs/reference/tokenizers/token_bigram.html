@@ -1,0 +1,326 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>7.8.3.1. TokenBigram &#8212; Groonga v8.1.0 documentation</title>
+    <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
+    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../../static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../static/favicon.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="7.8.3.2. TokenBigramIgnoreBlank" href="token_bigram_ignore_blank.html" />
+    <link rel="prev" title="7.8. Tokenizers" href="../tokenizers.html" /> 
+      <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
+    <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
+    <meta property="og:type" content="product" />
+    <meta property="og:image" content="http://groonga.org/images/logos/groonga-icon-full-size.png" />
+    <meta property="og:site_name" content="groonga" />
+
+    <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
+  </head>
+  <body>
+    <div id="fb-root"></div>
+
+<div class="header">
+  <h1 class="title">
+    <a id="top-link" href="../../../">
+      <span class="project">groonga</span>
+      <span class="separator">-</span>
+      <span class="description">An open-source fulltext search engine and column store.</span>
+    </a>
+  </h1>
+
+      <div class="facebook-buttons">
+      <fb:like href="http://www.facebook.com/pages/groonga/201193596592346"
+               layout="standard"
+               width="290"></fb:like>
+    </div>
+    <div class="other-language-links">
+
+    <ul>
+      <li><a href="../../../ja/docs/reference/tokenizers/token_bigram.html">日本語</a></li>
+    </ul>
+  </div>
+</div>
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="token_bigram_ignore_blank.html" title="7.8.3.2. TokenBigramIgnoreBlank"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../tokenizers.html" title="7.8. Tokenizers"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v8.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../reference.html" >7. Reference manual</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../tokenizers.html" accesskey="U">7.8. Tokenizers</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="tokenbigram">
+<span id="token-bigram"></span><h1>7.8.3.1. <code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code><a class="headerlink" href="#tokenbigram" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="summary">
+<h2>7.8.3.1.1. Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code> is a bigram based tokenizer. It’s recommended to use
+this tokenizer for most cases.</p>
+<p>Bigram tokenize method tokenizes a text to two adjacent characters
+tokens. For example, <code class="docutils literal notranslate"><span class="pre">Hello</span></code> is tokenized to the following tokens:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">He</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">el</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">ll</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">lo</span></code></li>
+</ul>
+</div></blockquote>
+<p>Bigram tokenize method is good for recall because you can find all
+texts by query consists of two or more characters.</p>
+<p>In general, you can’t find all texts by query consists of one
+character because one character token doesn’t exist. But you can find
+all texts by query consists of one character in Groonga. Because
+Groonga find tokens that start with query by predictive search. For
+example, Groonga can find <code class="docutils literal notranslate"><span class="pre">ll</span></code> and <code class="docutils literal notranslate"><span class="pre">lo</span></code> tokens by <code class="docutils literal notranslate"><span class="pre">l</span></code> query.</p>
+<p>Bigram tokenize method isn’t good for precision because you can find
+texts that includes query in word. For example, you can find <code class="docutils literal notranslate"><span class="pre">world</span></code>
+by <code class="docutils literal notranslate"><span class="pre">or</span></code>. This is more sensitive for ASCII only languages rather than
+non-ASCII languages. <code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code> has solution for this problem
+described in the below.</p>
+</div>
+<div class="section" id="syntax">
+<h2>7.8.3.1.2. Syntax<a class="headerlink" href="#syntax" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code> hasn’t parameter:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>TokenBigram
+</pre></div>
+</div>
+</div>
+<div class="section" id="usage">
+<h2>7.8.3.1.3. Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code> behavior is different when it’s worked with any
+<a class="reference internal" href="../normalizers.html"><span class="doc">Normalizers</span></a>.</p>
+<p>If no normalizer is used, <code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code> uses pure bigram (all tokens
+except the last token have two characters) tokenize method:</p>
+<p>If normalizer is used, <code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code> uses white-space-separate like
+tokenize method for ASCII characters. <code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code> uses bigram
+tokenize method for non-ASCII characters.</p>
+<p>You may be confused with this combined behavior. But it’s reasonable
+for most use cases such as English text (only ASCII characters) and
+Japanese text (ASCII and non-ASCII characters are mixed).</p>
+<p>Most languages consists of only ASCII characters use white-space for
+word separator. White-space-separate tokenize method is suitable for
+the case.</p>
+<p>Languages consists of non-ASCII characters don’t use white-space for
+word separator. Bigram tokenize method is suitable for the case.</p>
+<p>Mixed tokenize method is suitable for mixed language case.</p>
+<p>If you want to use bigram tokenize method for ASCII character, see
+<code class="docutils literal notranslate"><span class="pre">TokenBigramSplitXXX</span></code> type tokenizers such as
+<a class="reference internal" href="token_bigram_split_symbol_alpha.html#token-bigram-split-symbol-alpha"><span class="std std-ref">TokenBigramSplitSymbolAlpha</span></a>.</p>
+<p>Let’s confirm <code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code> behavior by example.</p>
+<p><code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code> uses one or more white-spaces as token delimiter for
+ASCII characters:</p>
+<p>Execution example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>tokenize TokenBigram &quot;Hello World&quot; NormalizerAuto
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     {
+#       &quot;position&quot;: 0,
+#       &quot;force_prefix&quot;: false,
+#       &quot;value&quot;: &quot;hello&quot;
+#     },
+#     {
+#       &quot;position&quot;: 1,
+#       &quot;force_prefix&quot;: false,
+#       &quot;value&quot;: &quot;world&quot;
+#     }
+#   ]
+# ]
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code> uses character type change as token delimiter for
+ASCII characters. Character type is one of them:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Alphabet</li>
+<li>Digit</li>
+<li>Symbol (such as <code class="docutils literal notranslate"><span class="pre">(</span></code>, <code class="docutils literal notranslate"><span class="pre">)</span></code> and <code class="docutils literal notranslate"><span class="pre">!</span></code>)</li>
+<li>Hiragana</li>
+<li>Katakana</li>
+<li>Kanji</li>
+<li>Others</li>
+</ul>
+</div></blockquote>
+<p>The following example shows two token delimiters:</p>
+<blockquote>
+<div><ul class="simple">
+<li>at between <code class="docutils literal notranslate"><span class="pre">100</span></code> (digits) and <code class="docutils literal notranslate"><span class="pre">cents</span></code> (alphabets)</li>
+<li>at between <code class="docutils literal notranslate"><span class="pre">cents</span></code> (alphabets) and <code class="docutils literal notranslate"><span class="pre">!!!</span></code> (symbols)</li>
+</ul>
+</div></blockquote>
+<p>Execution example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>tokenize TokenBigram &quot;100cents!!!&quot; NormalizerAuto
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     {
+#       &quot;position&quot;: 0,
+#       &quot;force_prefix&quot;: false,
+#       &quot;value&quot;: &quot;100&quot;
+#     },
+#     {
+#       &quot;position&quot;: 1,
+#       &quot;force_prefix&quot;: false,
+#       &quot;value&quot;: &quot;cents&quot;
+#     },
+#     {
+#       &quot;position&quot;: 2,
+#       &quot;force_prefix&quot;: false,
+#       &quot;value&quot;: &quot;!!!&quot;
+#     }
+#   ]
+# ]
+</pre></div>
+</div>
+<p>Here is an example that <code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code> uses bigram tokenize method
+for non-ASCII characters.</p>
+<p>Execution example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>tokenize TokenBigram &quot;日本語の勉強&quot; NormalizerAuto
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     {
+#       &quot;position&quot;: 0,
+#       &quot;force_prefix&quot;: false,
+#       &quot;value&quot;: &quot;日本&quot;
+#     },
+#     {
+#       &quot;position&quot;: 1,
+#       &quot;force_prefix&quot;: false,
+#       &quot;value&quot;: &quot;本語&quot;
+#     },
+#     {
+#       &quot;position&quot;: 2,
+#       &quot;force_prefix&quot;: false,
+#       &quot;value&quot;: &quot;語の&quot;
+#     },
+#     {
+#       &quot;position&quot;: 3,
+#       &quot;force_prefix&quot;: false,
+#       &quot;value&quot;: &quot;の勉&quot;
+#     },
+#     {
+#       &quot;position&quot;: 4,
+#       &quot;force_prefix&quot;: false,
+#       &quot;value&quot;: &quot;勉強&quot;
+#     },
+#     {
+#       &quot;position&quot;: 5,
+#       &quot;force_prefix&quot;: false,
+#       &quot;value&quot;: &quot;強&quot;
+#     }
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">7.8.3.1. <code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code></a><ul>
+<li><a class="reference internal" href="#summary">7.8.3.1.1. Summary</a></li>
+<li><a class="reference internal" href="#syntax">7.8.3.1.2. Syntax</a></li>
+<li><a class="reference internal" href="#usage">7.8.3.1.3. Usage</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../tokenizers.html"
+                        title="previous chapter">7.8. Tokenizers</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="token_bigram_ignore_blank.html"
+                        title="next chapter">7.8.3.2. <code class="docutils literal notranslate"><span class="pre">TokenBigramIgnoreBlank</span></code></a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="token_bigram_ignore_blank.html" title="7.8.3.2. TokenBigramIgnoreBlank"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../tokenizers.html" title="7.8. Tokenizers"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v8.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../reference.html" >7. Reference manual</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../tokenizers.html" >7.8. Tokenizers</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2009-2019, Brazil, Inc.
+    </div>
+      <script src="http://connect.facebook.net/en_US/all.js"></script>
+
+    <script>
+      FB.init({
+         appId  : null,
+         status : true, // check login status
+         cookie : true, // enable cookies to allow the server to access the session
+         xfbml  : true  // parse XFBML
+      });
+    </script>
+  </body>
+
+</html>

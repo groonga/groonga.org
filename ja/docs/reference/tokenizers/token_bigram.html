@@ -1,0 +1,302 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ja">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>7.8.3.1. TokenBigram &#8212; Groonga v8.1.0ドキュメント</title>
+    <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
+    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../../static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../static/doctools.js"></script>
+    <script type="text/javascript" src="../../static/translations.js"></script>
+    <link rel="shortcut icon" href="../../static/favicon.ico"/>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="検索" href="../../search.html" />
+    <link rel="next" title="7.8.3.2. TokenBigramIgnoreBlank" href="token_bigram_ignore_blank.html" />
+    <link rel="prev" title="7.8. トークナイザー" href="../tokenizers.html" /> 
+      <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
+    <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
+    <meta property="og:type" content="product" />
+    <meta property="og:image" content="http://groonga.org/images/logos/groonga-icon-full-size.png" />
+    <meta property="og:site_name" content="groonga" />
+
+    <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
+  </head>
+  <body>
+    <div id="fb-root"></div>
+
+<div class="header">
+  <h1 class="title">
+    <a id="top-link" href="../../../">
+      <span class="project">groonga</span>
+      <span class="separator">-</span>
+      <span class="description">オープンソースのカラムストア機能付き全文検索エンジン</span>
+    </a>
+  </h1>
+
+      <div class="facebook-buttons">
+      <fb:like href="http://www.facebook.com/pages/groonga/201193596592346"
+               layout="standard"
+               width="290"></fb:like>
+    </div>
+    <div class="other-language-links">
+
+    <ul>
+      <li><a href="../../../../docs/reference/tokenizers/token_bigram.html">English</a></li>
+    </ul>
+  </div>
+</div>
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="token_bigram_ignore_blank.html" title="7.8.3.2. TokenBigramIgnoreBlank"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="../tokenizers.html" title="7.8. トークナイザー"
+             accesskey="P">前へ</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v8.1.0ドキュメント</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../reference.html" >7. リファレンスマニュアル</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../tokenizers.html" accesskey="U">7.8. トークナイザー</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="tokenbigram">
+<span id="token-bigram"></span><h1>7.8.3.1. <code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code><a class="headerlink" href="#tokenbigram" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<div class="section" id="summary">
+<h2>7.8.3.1.1. 概要<a class="headerlink" href="#summary" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code> はバイグラムベースのトークナイザーです。多くのケースでは、このトークナイザーを使うことをオススメします。</p>
+<p>バイグラムというトークナイズ方法は、隣り合った2つの文字を1つのトークンとしてテキストをトークナイズします。例えば、 <code class="docutils literal notranslate"><span class="pre">Hello</span></code> は次のトークンにトークナイズします。</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">He</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">el</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">ll</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">lo</span></code></li>
+</ul>
+</div></blockquote>
+<p>バイグラムというトークナイズ方法は再現性に優れています。なぜなら、2文字以上の文字のクエリーに対してはすべてのテキストを見つけることができるからです。</p>
+<p>一般的に、1文字のクエリーではすべてのテキストを見つけることはできません。なぜなら、1つの文字のトークンが存在しないからです。しかし、Groongaでは1文字のクエリーでもすべてのテキストを見つけることができます。なぜなら、Groongaは前方一致検索によりクエリーで指定した文字で始まるトークンをすべて見つけることができるからです。例えば、Groongaは <code class="docutils literal notranslate"><span class="pre">l</span></code> というクエリーから <code class="docutils literal notranslate"><span class="pre">ll</span></code> というトークンと <code class="docutils literal notranslate"><span class="pre">lo</span></code> というトークンを見つけることができます。</p>
+<p>バイグラムというトークナイズ方法は適合率はそれほど優れていません。なぜなら、単語の一部にクエリーが含まれていればすべてのテキストが見つかってしまうからです。例えば、 <code class="docutils literal notranslate"><span class="pre">or</span></code> で <code class="docutils literal notranslate"><span class="pre">world</span></code> が見つかります。これは非ASCIIを使う言語よりASCIIのみを使う言語で顕著です。以降の説明で触れる通り、 <code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code> はこの問題を解決しています。</p>
+</div>
+<div class="section" id="syntax">
+<h2>7.8.3.1.2. 構文<a class="headerlink" href="#syntax" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code> には、引数がありません。</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>TokenBigram
+</pre></div>
+</div>
+</div>
+<div class="section" id="usage">
+<h2>7.8.3.1.3. 使い方<a class="headerlink" href="#usage" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code> の挙動は <a class="reference internal" href="../normalizers.html"><span class="doc">ノーマライザー</span></a> を使うかどうかで変わります。</p>
+<p>ノーマライザーを使っていない場合は <code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code> は純粋なバイグラム（最後のトークンをのぞいてすべてのトークンを2文字にする）のトークナイズ方法を使います。</p>
+<p>ノーマライザーを使っている場合は <code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code> はASCIIの文字には空白区切りのようなトークナイズ方法を使います。非ASCII文字にはバイグラムのトークナイズ方法を使います。</p>
+<p>もしかしたら、複数の方法が混ざったこの挙動はわかりにくいかもしれません。しかし、英語のテキスト（ASCII文字列のみ）や日本語テキスト（ASCII文字列と非ASCII文字列が混ざっている）ような多くのユースケースでは合理的な方法です。</p>
+<p>ASCII文字しか使わない多くの言語は単語の区切りに空白文字を使っています。このようなケースに空白区切りのトークナイズ方法は適切です。</p>
+<p>非ASCII文字を使う言語では単語の区切りに空白文字を使いません。このケースにはバイグラムなトークナイズ方法は適切です。</p>
+<p>複数の言語が混ざっている場合は、複数の方法を組み合わせたトークナイズ方法が適切です。</p>
+<p>ASCII文字にバイグラムなトークナイズ方法を使いたい場合は <a class="reference internal" href="token_bigram_split_symbol_alpha.html#token-bigram-split-symbol-alpha"><span class="std std-ref">TokenBigramSplitSymbolAlpha</span></a> のような <code class="docutils literal notranslate"><span class="pre">TokenBigramSplitXXX</span></code> というトークナイザーを参照してください。</p>
+<p>例を使いながら <code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code> の挙動を確認しましょう。</p>
+<p><code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code> はASCII文字には1つ以上の空白文字をトークンの区切りとして使います。</p>
+<p>実行例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>tokenize TokenBigram &quot;Hello World&quot; NormalizerAuto
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     {
+#       &quot;position&quot;: 0,
+#       &quot;force_prefix&quot;: false,
+#       &quot;value&quot;: &quot;hello&quot;
+#     },
+#     {
+#       &quot;position&quot;: 1,
+#       &quot;force_prefix&quot;: false,
+#       &quot;value&quot;: &quot;world&quot;
+#     }
+#   ]
+# ]
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code> はASCII文字には文字の種類が変わったところをトークンの区切りとします。文字の種類は次のどれかです。</p>
+<blockquote>
+<div><ul class="simple">
+<li>アルファベット</li>
+<li>数字</li>
+<li>記号（たとえば <code class="docutils literal notranslate"><span class="pre">(</span></code> 、 <code class="docutils literal notranslate"><span class="pre">)</span></code> 、 <code class="docutils literal notranslate"><span class="pre">!</span></code> など）</li>
+<li>ひらがな</li>
+<li>カタカナ</li>
+<li>漢字</li>
+<li>その他</li>
+</ul>
+</div></blockquote>
+<p>次の例は2つのトークン区切りを示しています。</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">100</span></code> （数字）と <code class="docutils literal notranslate"><span class="pre">cents</span></code> （アルファベット）の間のところ</li>
+<li><code class="docutils literal notranslate"><span class="pre">cents</span></code> （アルファベット）と <code class="docutils literal notranslate"><span class="pre">!!!</span></code> （記号）の間のところ</li>
+</ul>
+</div></blockquote>
+<p>実行例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>tokenize TokenBigram &quot;100cents!!!&quot; NormalizerAuto
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     {
+#       &quot;position&quot;: 0,
+#       &quot;force_prefix&quot;: false,
+#       &quot;value&quot;: &quot;100&quot;
+#     },
+#     {
+#       &quot;position&quot;: 1,
+#       &quot;force_prefix&quot;: false,
+#       &quot;value&quot;: &quot;cents&quot;
+#     },
+#     {
+#       &quot;position&quot;: 2,
+#       &quot;force_prefix&quot;: false,
+#       &quot;value&quot;: &quot;!!!&quot;
+#     }
+#   ]
+# ]
+</pre></div>
+</div>
+<p>以下は <code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code> が非ASCII文字にはトークナイズ方法としてバイグラムを使う例です。</p>
+<p>実行例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>tokenize TokenBigram &quot;日本語の勉強&quot; NormalizerAuto
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     {
+#       &quot;position&quot;: 0,
+#       &quot;force_prefix&quot;: false,
+#       &quot;value&quot;: &quot;日本&quot;
+#     },
+#     {
+#       &quot;position&quot;: 1,
+#       &quot;force_prefix&quot;: false,
+#       &quot;value&quot;: &quot;本語&quot;
+#     },
+#     {
+#       &quot;position&quot;: 2,
+#       &quot;force_prefix&quot;: false,
+#       &quot;value&quot;: &quot;語の&quot;
+#     },
+#     {
+#       &quot;position&quot;: 3,
+#       &quot;force_prefix&quot;: false,
+#       &quot;value&quot;: &quot;の勉&quot;
+#     },
+#     {
+#       &quot;position&quot;: 4,
+#       &quot;force_prefix&quot;: false,
+#       &quot;value&quot;: &quot;勉強&quot;
+#     },
+#     {
+#       &quot;position&quot;: 5,
+#       &quot;force_prefix&quot;: false,
+#       &quot;value&quot;: &quot;強&quot;
+#     }
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">7.8.3.1. <code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code></a><ul>
+<li><a class="reference internal" href="#summary">7.8.3.1.1. 概要</a></li>
+<li><a class="reference internal" href="#syntax">7.8.3.1.2. 構文</a></li>
+<li><a class="reference internal" href="#usage">7.8.3.1.3. 使い方</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="../tokenizers.html"
+                        title="前の章へ">7.8. トークナイザー</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="token_bigram_ignore_blank.html"
+                        title="次の章へ">7.8.3.2. <code class="docutils literal notranslate"><span class="pre">TokenBigramIgnoreBlank</span></code></a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="token_bigram_ignore_blank.html" title="7.8.3.2. TokenBigramIgnoreBlank"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="../tokenizers.html" title="7.8. トークナイザー"
+             >前へ</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v8.1.0ドキュメント</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../reference.html" >7. リファレンスマニュアル</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../tokenizers.html" >7.8. トークナイザー</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2009-2019, Brazil, Inc.
+    </div>
+      <script src="http://connect.facebook.net/ja_JP/all.js"></script>
+
+    <script>
+      FB.init({
+         appId  : null,
+         status : true, // check login status
+         cookie : true, // enable cookies to allow the server to access the session
+         xfbml  : true  // parse XFBML
+      });
+    </script>
+  </body>
+
+</html>

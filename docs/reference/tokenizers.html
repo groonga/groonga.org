@@ -15,8 +15,8 @@
     <link rel="shortcut icon" href="../static/favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="7.8.3.1. TokenBigram" href="tokenizers/token_bigram.html" />
-    <link rel="prev" title="7.7. Normalizers" href="normalizers.html" /> 
+    <link rel="next" title="7.8.1. Summary" href="tokenizer/summary.html" />
+    <link rel="prev" title="7.7.2.1. NormalizerNFKC100" href="normalizers/normalizer_nfkc100.html" /> 
       <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
     <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
     <meta property="og:type" content="product" />
@@ -58,10 +58,10 @@
           <a href="../genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="tokenizers/token_bigram.html" title="7.8.3.1. TokenBigram"
+          <a href="tokenizer/summary.html" title="7.8.1. Summary"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="normalizers.html" title="7.7. Normalizers"
+          <a href="normalizers/normalizer_nfkc100.html" title="7.7.2.1. NormalizerNFKC100"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">Groonga v8.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../reference.html" accesskey="U">7. Reference manual</a> &#187;</li> 
@@ -75,177 +75,24 @@
             
   <div class="section" id="tokenizers">
 <h1>7.8. Tokenizers<a class="headerlink" href="#tokenizers" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="summary">
-<h2>7.8.1. Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
-<p>Groonga has tokenizer module that tokenizes text. It is used when
-the following cases:</p>
-<blockquote>
-<div><ul>
-<li><p class="first">Indexing text</p>
-<div class="figure align-center" id="id1">
-<a class="reference internal image-reference" href="../images/used-when-indexing.png"><img alt="../_images/used-when-indexing.png" src="../images/used-when-indexing.png" style="width: 80%;" /></a>
-<p class="caption"><span class="caption-text">Tokenizer is used when indexing text.</span></p>
-</div>
-</li>
-<li><p class="first">Searching by query</p>
-<div class="figure align-center" id="id2">
-<a class="reference internal image-reference" href="../images/used-when-searching.png"><img alt="../_images/used-when-searching.png" src="../images/used-when-searching.png" style="width: 80%;" /></a>
-<p class="caption"><span class="caption-text">Tokenizer is used when searching by query.</span></p>
-</div>
-</li>
-</ul>
-</div></blockquote>
-<p>Tokenizer is an important module for full-text search. You can change
-trade-off between <a class="reference external" href="http://en.wikipedia.org/wiki/Precision_and_recall">precision and recall</a> by changing
-tokenizer.</p>
-<p>Normally, <a class="reference internal" href="tokenizers/token_bigram.html#token-bigram"><span class="std std-ref">TokenBigram</span></a> is a suitable tokenizer. If you don’t
-know much about tokenizer, it’s recommended that you choose
-<a class="reference internal" href="tokenizers/token_bigram.html#token-bigram"><span class="std std-ref">TokenBigram</span></a>.</p>
-<p>You can try a tokenizer by <a class="reference internal" href="commands/tokenize.html"><span class="doc">tokenize</span></a> and
-<a class="reference internal" href="commands/table_tokenize.html"><span class="doc">table_tokenize</span></a>. Here is an example to
-try <a class="reference internal" href="tokenizers/token_bigram.html#token-bigram"><span class="std std-ref">TokenBigram</span></a> tokenizer by
-<a class="reference internal" href="commands/tokenize.html"><span class="doc">tokenize</span></a>:</p>
-<p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>tokenize TokenBigram &quot;Hello World&quot;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     {
-#       &quot;position&quot;: 0,
-#       &quot;force_prefix&quot;: false,
-#       &quot;value&quot;: &quot;He&quot;
-#     },
-#     {
-#       &quot;position&quot;: 1,
-#       &quot;force_prefix&quot;: false,
-#       &quot;value&quot;: &quot;el&quot;
-#     },
-#     {
-#       &quot;position&quot;: 2,
-#       &quot;force_prefix&quot;: false,
-#       &quot;value&quot;: &quot;ll&quot;
-#     },
-#     {
-#       &quot;position&quot;: 3,
-#       &quot;force_prefix&quot;: false,
-#       &quot;value&quot;: &quot;lo&quot;
-#     },
-#     {
-#       &quot;position&quot;: 4,
-#       &quot;force_prefix&quot;: false,
-#       &quot;value&quot;: &quot;o &quot;
-#     },
-#     {
-#       &quot;position&quot;: 5,
-#       &quot;force_prefix&quot;: false,
-#       &quot;value&quot;: &quot; W&quot;
-#     },
-#     {
-#       &quot;position&quot;: 6,
-#       &quot;force_prefix&quot;: false,
-#       &quot;value&quot;: &quot;Wo&quot;
-#     },
-#     {
-#       &quot;position&quot;: 7,
-#       &quot;force_prefix&quot;: false,
-#       &quot;value&quot;: &quot;or&quot;
-#     },
-#     {
-#       &quot;position&quot;: 8,
-#       &quot;force_prefix&quot;: false,
-#       &quot;value&quot;: &quot;rl&quot;
-#     },
-#     {
-#       &quot;position&quot;: 9,
-#       &quot;force_prefix&quot;: false,
-#       &quot;value&quot;: &quot;ld&quot;
-#     },
-#     {
-#       &quot;position&quot;: 10,
-#       &quot;force_prefix&quot;: false,
-#       &quot;value&quot;: &quot;d&quot;
-#     }
-#   ]
-# ]
-</pre></div>
-</div>
-</div>
-<div class="section" id="what-is-tokenize">
-<h2>7.8.2. What is “tokenize”?<a class="headerlink" href="#what-is-tokenize" title="Permalink to this headline">¶</a></h2>
-<p>“tokenize” is the process that extracts zero or more tokens from a
-text. There are some “tokenize” methods.</p>
-<p>For example, <code class="docutils literal notranslate"><span class="pre">Hello</span> <span class="pre">World</span></code> is tokenized to the following tokens by
-bigram tokenize method:</p>
-<blockquote>
-<div><ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">He</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">el</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">ll</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">lo</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">o_</span></code> (<code class="docutils literal notranslate"><span class="pre">_</span></code> means a white-space)</li>
-<li><code class="docutils literal notranslate"><span class="pre">_W</span></code> (<code class="docutils literal notranslate"><span class="pre">_</span></code> means a white-space)</li>
-<li><code class="docutils literal notranslate"><span class="pre">Wo</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">or</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">rl</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">ld</span></code></li>
-</ul>
-</div></blockquote>
-<p>In the above example, 10 tokens are extracted from one text <code class="docutils literal notranslate"><span class="pre">Hello</span>
-<span class="pre">World</span></code>.</p>
-<p>For example, <code class="docutils literal notranslate"><span class="pre">Hello</span> <span class="pre">World</span></code> is tokenized to the following tokens by
-white-space-separate tokenize method:</p>
-<blockquote>
-<div><ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">Hello</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">World</span></code></li>
-</ul>
-</div></blockquote>
-<p>In the above example, 2 tokens are extracted from one text <code class="docutils literal notranslate"><span class="pre">Hello</span>
-<span class="pre">World</span></code>.</p>
-<p>Token is used as search key. You can find indexed documents only by
-tokens that are extracted by used tokenize method. For example, you
-can find <code class="docutils literal notranslate"><span class="pre">Hello</span> <span class="pre">World</span></code> by <code class="docutils literal notranslate"><span class="pre">ll</span></code> with bigram tokenize method but you
-can’t find <code class="docutils literal notranslate"><span class="pre">Hello</span> <span class="pre">World</span></code> by <code class="docutils literal notranslate"><span class="pre">ll</span></code> with white-space-separate tokenize
-method. Because white-space-separate tokenize method doesn’t extract
-<code class="docutils literal notranslate"><span class="pre">ll</span></code> token. It just extracts <code class="docutils literal notranslate"><span class="pre">Hello</span></code> and <code class="docutils literal notranslate"><span class="pre">World</span></code> tokens.</p>
-<p>In general, tokenize method that generates small tokens increases
-recall but decreases precision. Tokenize method that generates large
-tokens increases precision but decreases recall.</p>
-<p>For example, we can find <code class="docutils literal notranslate"><span class="pre">Hello</span> <span class="pre">World</span></code> and <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">or</span> <span class="pre">B</span></code> by <code class="docutils literal notranslate"><span class="pre">or</span></code> with
-bigram tokenize method. <code class="docutils literal notranslate"><span class="pre">Hello</span> <span class="pre">World</span></code> is a noise for people who
-wants to search “logical and”. It means that precision is
-decreased. But recall is increased.</p>
-<p>We can find only <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">or</span> <span class="pre">B</span></code> by <code class="docutils literal notranslate"><span class="pre">or</span></code> with white-space-separate
-tokenize method. Because <code class="docutils literal notranslate"><span class="pre">World</span></code> is tokenized to one token <code class="docutils literal notranslate"><span class="pre">World</span></code>
-with white-space-separate tokenize method. It means that precision is
-increased for people who wants to search “logical and”. But recall is
-decreased because <code class="docutils literal notranslate"><span class="pre">Hello</span> <span class="pre">World</span></code> that contains <code class="docutils literal notranslate"><span class="pre">or</span></code> isn’t found.</p>
-</div>
-<div class="section" id="built-in-tokenizsers">
-<h2>7.8.3. Built-in tokenizsers<a class="headerlink" href="#built-in-tokenizsers" title="Permalink to this headline">¶</a></h2>
-<p>Here is a list of built-in tokenizers:</p>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="tokenizers/token_bigram.html">7.8.3.1. <code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="tokenizers/token_bigram_ignore_blank.html">7.8.3.2. <code class="docutils literal notranslate"><span class="pre">TokenBigramIgnoreBlank</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="tokenizers/token_bigram_ignore_blank_split_symbol.html">7.8.3.3. <code class="docutils literal notranslate"><span class="pre">TokenBigramIgnoreBlankSplitSymbol</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="tokenizers/token_bigram_ignore_blank_split_symbol_alpha.html">7.8.3.4. <code class="docutils literal notranslate"><span class="pre">TokenBigramIgnoreBlankSplitSymbolAlpha</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="tokenizers/token_bigram_ignore_blank_split_symbol_alpha_digit.html">7.8.3.5. <code class="docutils literal notranslate"><span class="pre">TokenBigramIgnoreBlankSplitSymbolAlphaDigit</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="tokenizers/token_bigram_split_symbol.html">7.8.3.6. <code class="docutils literal notranslate"><span class="pre">TokenBigramSplitSymbol</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="tokenizers/token_bigram_split_symbol_alpha.html">7.8.3.7. <code class="docutils literal notranslate"><span class="pre">TokenBigramSplitSymbolAlpha</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="tokenizers/token_bigram_split_symbol_alpha_digit.html">7.8.3.8. <code class="docutils literal notranslate"><span class="pre">TokenBigramSplitSymbolAlphaDigit</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="tokenizers/token_delimit.html">7.8.3.9. <code class="docutils literal notranslate"><span class="pre">TokenDelimit</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="tokenizers/token_delimit_null.html">7.8.3.10. <code class="docutils literal notranslate"><span class="pre">TokenDelimitNull</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="tokenizers/token_mecab.html">7.8.3.11. <code class="docutils literal notranslate"><span class="pre">TokenMecab</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="tokenizers/token_regexp.html">7.8.3.12. <code class="docutils literal notranslate"><span class="pre">TokenRegexp</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="tokenizers/token_trigram.html">7.8.3.13. <code class="docutils literal notranslate"><span class="pre">TokenTrigram</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="tokenizers/token_unigram.html">7.8.3.14. <code class="docutils literal notranslate"><span class="pre">TokenUnigram</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="tokenizer/summary.html">7.8.1. Summary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tokenizers/token_bigram.html">7.8.2. <code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="tokenizers/token_bigram_ignore_blank.html">7.8.3. <code class="docutils literal notranslate"><span class="pre">TokenBigramIgnoreBlank</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="tokenizers/token_bigram_ignore_blank_split_symbol.html">7.8.4. <code class="docutils literal notranslate"><span class="pre">TokenBigramIgnoreBlankSplitSymbol</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="tokenizers/token_bigram_ignore_blank_split_symbol_alpha.html">7.8.5. <code class="docutils literal notranslate"><span class="pre">TokenBigramIgnoreBlankSplitSymbolAlpha</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="tokenizers/token_bigram_ignore_blank_split_symbol_alpha_digit.html">7.8.6. <code class="docutils literal notranslate"><span class="pre">TokenBigramIgnoreBlankSplitSymbolAlphaDigit</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="tokenizers/token_bigram_split_symbol.html">7.8.7. <code class="docutils literal notranslate"><span class="pre">TokenBigramSplitSymbol</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="tokenizers/token_bigram_split_symbol_alpha.html">7.8.8. <code class="docutils literal notranslate"><span class="pre">TokenBigramSplitSymbolAlpha</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="tokenizers/token_bigram_split_symbol_alpha_digit.html">7.8.9. <code class="docutils literal notranslate"><span class="pre">TokenBigramSplitSymbolAlphaDigit</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="tokenizers/token_delimit.html">7.8.10. <code class="docutils literal notranslate"><span class="pre">TokenDelimit</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="tokenizers/token_delimit_null.html">7.8.11. <code class="docutils literal notranslate"><span class="pre">TokenDelimitNull</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="tokenizers/token_mecab.html">7.8.12. <code class="docutils literal notranslate"><span class="pre">TokenMecab</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="tokenizers/token_regexp.html">7.8.13. <code class="docutils literal notranslate"><span class="pre">TokenRegexp</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="tokenizers/token_trigram.html">7.8.14. <code class="docutils literal notranslate"><span class="pre">TokenTrigram</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="tokenizers/token_unigram.html">7.8.15. <code class="docutils literal notranslate"><span class="pre">TokenUnigram</span></code></a></li>
 </ul>
-</div>
 </div>
 </div>
 
@@ -255,22 +102,12 @@ decreased because <code class="docutils literal notranslate"><span class="pre">H
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="../index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">7.8. Tokenizers</a><ul>
-<li><a class="reference internal" href="#summary">7.8.1. Summary</a></li>
-<li><a class="reference internal" href="#what-is-tokenize">7.8.2. What is “tokenize”?</a></li>
-<li><a class="reference internal" href="#built-in-tokenizsers">7.8.3. Built-in tokenizsers</a></li>
-</ul>
-</li>
-</ul>
-
   <h4>Previous topic</h4>
-  <p class="topless"><a href="normalizers.html"
-                        title="previous chapter">7.7. Normalizers</a></p>
+  <p class="topless"><a href="normalizers/normalizer_nfkc100.html"
+                        title="previous chapter">7.7.2.1. <code class="docutils literal notranslate"><span class="pre">NormalizerNFKC100</span></code></a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="tokenizers/token_bigram.html"
-                        title="next chapter">7.8.3.1. <code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code></a></p>
+  <p class="topless"><a href="tokenizer/summary.html"
+                        title="next chapter">7.8.1. Summary</a></p>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <div class="searchformwrapper">
@@ -294,10 +131,10 @@ decreased because <code class="docutils literal notranslate"><span class="pre">H
           <a href="../genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="tokenizers/token_bigram.html" title="7.8.3.1. TokenBigram"
+          <a href="tokenizer/summary.html" title="7.8.1. Summary"
              >next</a> |</li>
         <li class="right" >
-          <a href="normalizers.html" title="7.7. Normalizers"
+          <a href="normalizers/normalizer_nfkc100.html" title="7.7.2.1. NormalizerNFKC100"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">Groonga v8.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../reference.html" >7. Reference manual</a> &#187;</li> 

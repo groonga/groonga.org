@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>7.3.54. select &#8212; Groonga v8.1.0 documentation</title>
+    <title>7.3.54. select &#8212; Groonga v8.1.1 documentation</title>
     <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
     <script type="text/javascript" src="../../static/documentation_options.js"></script>
@@ -63,7 +63,7 @@
         <li class="right" >
           <a href="schema.html" title="7.3.53. schema"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v8.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v8.1.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../reference.html" >7. Reference manual</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../command.html" accesskey="U">7.3. Command</a> &#187;</li> 
       </ul>
@@ -1861,6 +1861,7 @@ column value by <code class="docutils literal notranslate"><span class="pre">que
 <li><code class="docutils literal notranslate"><span class="pre">ALLOW_COLUMN</span></code></li>
 <li><code class="docutils literal notranslate"><span class="pre">ALLOW_UPDATE</span></code></li>
 <li><code class="docutils literal notranslate"><span class="pre">ALLOW_LEADING_NOT</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">QUERY_NO_SYNTAX_ERROR</span></code></li>
 <li><code class="docutils literal notranslate"><span class="pre">NONE</span></code></li>
 </ul>
 <p><code class="docutils literal notranslate"><span class="pre">ALLOW_PRAGMA</span></code> enables pragma at the head of <code class="docutils literal notranslate"><span class="pre">query</span></code>. This is not
@@ -1876,6 +1877,9 @@ syntax. The query searches records that doesn’t match
 <code class="docutils literal notranslate"><span class="pre">WORD</span></code>. Leading NOT condition query is heavy query in many cases
 because it matches many records. So this flag is disabled by
 default. Be careful about it when you use the flag.</p>
+<p><code class="docutils literal notranslate"><span class="pre">QUERY_NO_SYNTAX_ERROR</span></code> enables never causes syntax error for query.
+This flag is useful when an application uses user input directly and doesn’t want to show syntax error to the user and in a log.
+This flag is disabled by default.</p>
 <p><code class="docutils literal notranslate"><span class="pre">NONE</span></code> is just ignores. You can use <code class="docutils literal notranslate"><span class="pre">NONE</span></code> for specifying no flags.</p>
 <p>They can be combined by separated <code class="docutils literal notranslate"><span class="pre">|</span></code> such as
 <code class="docutils literal notranslate"><span class="pre">ALLOW_COLUMN|ALLOW_UPDATE</span></code>.</p>
@@ -2096,6 +2100,84 @@ column values.</p>
 </div>
 <p>The <code class="docutils literal notranslate"><span class="pre">select</span></code> command searches records that don’t contain <code class="docutils literal notranslate"><span class="pre">mroonga</span></code>
 in <code class="docutils literal notranslate"><span class="pre">content</span></code> column value from <code class="docutils literal notranslate"><span class="pre">Entries</span></code> table.</p>
+<p>Here is a usage example of <code class="docutils literal notranslate"><span class="pre">QUERY_NO_SYNTAX_ERROR</span></code>.</p>
+<p>Execution example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>table_create --name Magazine --flags TABLE_HASH_KEY --key_type ShortText
+# [[0,1546673320.275529,0.08708477020263672],true]
+column_create --table Magazine --name title --type ShortText
+# [[0,1546673346.042032,0.09989762306213379],true]
+load --table Magazine
+[
+{&quot;_key&quot;:&quot;http://test.jp/magazine/webplus&quot;,&quot;title&quot;:&quot;WEB+&quot;},
+{&quot;_key&quot;:&quot;http://test.jp/magazine/database&quot;,&quot;title&quot;:&quot;DataBase&quot;},
+]
+# [[0,1546673366.725134,0.0009036064147949219],2]
+select Magazine --output_pretty yes --match_columns title --query &#39;WEB +&#39;  --query_flags ALLOW_PRAGMA|ALLOW_COLUMN|QUERY_NO_SYNTAX_ERROR
+# [
+#   [
+#     0,
+#     1546673389.499156,
+#     0.04232335090637207
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;title&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;http://test.jp/magazine/webplus&quot;,
+#         &quot;WEB+&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>If you don’t specify this flag, this query of example causes a syntax error as below.</p>
+<p>Execution example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>table_create --name Magazine --flags TABLE_HASH_KEY --key_type ShortText
+# [[0,1546673320.275529,0.08708477020263672],true]
+column_create --table Magazine --name title --type ShortText
+# [[0,1546673346.042032,0.09989762306213379],true]
+load --table Magazine
+[
+{&quot;_key&quot;:&quot;http://test.jp/magazine/webplus&quot;,&quot;title&quot;:&quot;WEB+&quot;},
+{&quot;_key&quot;:&quot;http://test.jp/magazine/database&quot;,&quot;title&quot;:&quot;DataBase&quot;},
+]
+# [[0,1546673366.725134,0.0009036064147949219],2]
+select Magazine --output_pretty yes --match_columns title --query &#39;WEB +&#39;  --query_flags ALLOW_PRAGMA|ALLOW_COLUMN
+# [
+#   [
+#     -63,
+#     1546674147.89755,
+#     0.0006532669067382812,
+#     &quot;Syntax error: &lt;WEB +||&gt;&quot;,
+#     [
+#       [
+#         &quot;yy_syntax_error&quot;,
+#         &quot;grn_ecmascript.lemon&quot;,
+#         37
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
 <p>Here is a usage example of <code class="docutils literal notranslate"><span class="pre">NONE</span></code>.</p>
 <p>Execution example:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --match_columns content --query &#39;mroonga OR _key:Groonga&#39; --query_flags NONE
@@ -6691,13 +6773,13 @@ pairs):</p>
         <li class="right" >
           <a href="schema.html" title="7.3.53. schema"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v8.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v8.1.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../reference.html" >7. Reference manual</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../command.html" >7.3. Command</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2009-2018, Brazil, Inc.
+        &#169; Copyright 2009-2019, Brazil, Inc.
     </div>
       <script src="http://connect.facebook.net/en_US/all.js"></script>
 

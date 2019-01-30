@@ -113,6 +113,9 @@
                [query=null]
                [drilldown_filter=null]
                [post_filter=null]
+               [load_table=null]
+               [load_columns=null]
+               [load_values=null]
 </pre></div>
 </div>
 <p>いくつか名前付き引数としてしか使えない引数があります。これらの引数を「○番目の引数」として使うことはできません。必ず名前を指定する必要があります。</p>
@@ -1039,6 +1042,164 @@ load --table Entries_20150709
 # ]
 </pre></div>
 </div>
+</div>
+<div class="section" id="load-table">
+<span id="logical-select-load-table"></span><h4>7.3.34.5.3.5. <code class="docutils literal notranslate"><span class="pre">load_table</span></code><a class="headerlink" href="#load-table" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">バージョン 8.1.1 で追加.</span></p>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">--load_table</span></code> 、 <code class="docutils literal notranslate"><span class="pre">--load_columns</span></code> 、 <code class="docutils literal notranslate"><span class="pre">--load_values</span></code> を使って、<code class="docutils literal notranslate"><span class="pre">logical_select</span></code> の結果を指定したテーブルに格納できます。 <code class="docutils literal notranslate"><span class="pre">--load_table</span></code> は、<code class="docutils literal notranslate"><span class="pre">logical_select</span></code> の結果を格納するテーブルの名前を指定します。</p>
+<p>既に存在するテーブルを指定する必要があります。</p>
+<p>この引数は、 <a class="reference internal" href="#logical-select-load-columns"><span class="std std-ref">load_columns</span></a> と <a class="reference internal" href="#logical-select-load-values"><span class="std std-ref">load_values</span></a> と一緒に使う必要があります。</p>
+<p>以下は、 <code class="docutils literal notranslate"><span class="pre">--load_table</span></code> で指定したLogsテーブルに <code class="docutils literal notranslate"><span class="pre">logical_select</span></code> の結果である <code class="docutils literal notranslate"><span class="pre">_id</span></code> と <code class="docutils literal notranslate"><span class="pre">timestamp</span></code> を格納する例です。</p>
+<p>実行例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>table_create Logs_20150203 TABLE_HASH_KEY ShortText
+column_create Logs_20150203 timestamp COLUMN_SCALAR Time
+table_create Logs_20150204 TABLE_HASH_KEY ShortText
+column_create Logs_20150204 timestamp COLUMN_SCALAR Time
+
+table_create Logs TABLE_HASH_KEY ShortText
+column_create Logs original_id COLUMN_SCALAR UInt32
+column_create Logs timestamp_text COLUMN_SCALAR ShortText
+
+load --table Logs_20150203
+[
+{
+  &quot;_key&quot;: &quot;2015-02-03:1&quot;,
+  &quot;timestamp&quot;: &quot;2015-02-03 10:49:00&quot;
+},
+{
+  &quot;_key&quot;: &quot;2015-02-03:2&quot;,
+  &quot;timestamp&quot;: &quot;2015-02-03 12:49:00&quot;
+}
+]
+load --table Logs_20150204
+[
+{
+  &quot;_key&quot;: &quot;2015-02-04:1&quot;,
+  &quot;timestamp&quot;: &quot;2015-02-04 00:00:00&quot;
+}
+]
+logical_select \
+  --logical_table Logs \
+  --shard_key timestamp \
+  --load_table Logs \
+  --load_columns &quot;original_id, timestamp_text&quot; \
+  --load_values &quot;_id, timestamp&quot;
+# [
+#   [
+#     0,
+#     0.0,
+#     0.0
+#   ],
+#   [
+#     [
+#       [
+#         3
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;timestamp&quot;,
+#           &quot;Time&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;2015-02-03:1&quot;,
+#         1422928140.0
+#       ],
+#       [
+#         2,
+#         &quot;2015-02-03:2&quot;,
+#         1422935340.0
+#       ],
+#       [
+#         1,
+#         &quot;2015-02-04:1&quot;,
+#         1422975600.0
+#       ]
+#     ]
+#   ]
+# ]
+select --table Logs
+# [
+#   [
+#     0,
+#     0.0,
+#     0.0
+#   ],
+#   [
+#     [
+#       [
+#         3
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;original_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;timestamp_text&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;2015-02-03:1&quot;,
+#         1,
+#         &quot;1422928140000000&quot;
+#       ],
+#       [
+#         2,
+#         &quot;2015-02-03:2&quot;,
+#         2,
+#         &quot;1422935340000000&quot;
+#       ],
+#       [
+#         3,
+#         &quot;2015-02-04:1&quot;,
+#         1,
+#         &quot;1422975600000000&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
+<div class="section" id="load-columns">
+<span id="logical-select-load-columns"></span><h4>7.3.34.5.3.6. <code class="docutils literal notranslate"><span class="pre">load_columns</span></code><a class="headerlink" href="#load-columns" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">バージョン 8.1.1 で追加.</span></p>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">--load_table</span></code> で指定したテーブルのカラムを指定します。<a class="reference internal" href="#logical-select-load-values"><span class="std std-ref">load_values</span></a> で指定したカラムの値をこの引数で指定したカラムに格納します。既に存在するカラムを指定する必要があります。</p>
+<p>この引数は、 <a class="reference internal" href="#logical-select-load-table"><span class="std std-ref">load_table</span></a> と <a class="reference internal" href="#logical-select-load-values"><span class="std std-ref">load_values</span></a> と一緒に使う必要があります。</p>
+<p>この引数の使い方は、 <code class="docutils literal notranslate"><span class="pre">--load_table</span></code> の例を参照してください。</p>
+</div>
+<div class="section" id="load-values">
+<span id="logical-select-load-values"></span><h4>7.3.34.5.3.7. <code class="docutils literal notranslate"><span class="pre">load_values</span></code><a class="headerlink" href="#load-values" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">バージョン 8.1.1 で追加.</span></p>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">logical_select</span></code> の結果のカラムを指定します。 <a class="reference internal" href="#logical-select-load-columns"><span class="std std-ref">load_columns</span></a> で指定したカラムに値を格納するカラムを指定します。既に存在するカラムを指定する必要があります。</p>
+<p>この引数は、 <a class="reference internal" href="#logical-select-load-table"><span class="std std-ref">load_table</span></a> と <a class="reference internal" href="#logical-select-load-columns"><span class="std std-ref">load_columns</span></a> と一緒に使う必要があります。</p>
+<p>この引数の使い方は、 <code class="docutils literal notranslate"><span class="pre">--load_table</span></code> の例を参照してください。</p>
 </div>
 </div>
 <div class="section" id="advanced-search-parameters">
@@ -3470,6 +3631,9 @@ logical_select \
 <li><a class="reference internal" href="#query">7.3.34.5.3.2. <code class="docutils literal notranslate"><span class="pre">query</span></code></a></li>
 <li><a class="reference internal" href="#filter">7.3.34.5.3.3. <code class="docutils literal notranslate"><span class="pre">filter</span></code></a></li>
 <li><a class="reference internal" href="#post-filter">7.3.34.5.3.4. <code class="docutils literal notranslate"><span class="pre">post_filter</span></code></a></li>
+<li><a class="reference internal" href="#load-table">7.3.34.5.3.5. <code class="docutils literal notranslate"><span class="pre">load_table</span></code></a></li>
+<li><a class="reference internal" href="#load-columns">7.3.34.5.3.6. <code class="docutils literal notranslate"><span class="pre">load_columns</span></code></a></li>
+<li><a class="reference internal" href="#load-values">7.3.34.5.3.7. <code class="docutils literal notranslate"><span class="pre">load_values</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#advanced-search-parameters">7.3.34.5.4. 高度な検索のための引数</a><ul>

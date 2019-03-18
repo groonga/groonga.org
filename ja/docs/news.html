@@ -440,14 +440,24 @@
 <span id="release-8-0-6"></span><h2>8.0.6リリース - 2018-08-29<a class="headerlink" href="#release-8-0-6-2018-08-29" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <div class="section" id="id11">
 <h3>改良<a class="headerlink" href="#id11" title="このヘッドラインへのパーマリンク">¶</a></h3>
-<ul class="simple">
-<li>[<a class="reference internal" href="reference/tokenizers.html"><span class="doc">トークナイザー</span></a>][TokenMecab] <code class="docutils literal notranslate"><span class="pre">chunked_tokenize</span></code> と <code class="docutils literal notranslate"><span class="pre">chunk_size_threshold</span></code> の両オプションに対応しました。</li>
-<li>[optimizer] query family expressionの推定に対応しました。<code class="docutils literal notranslate"><span class="pre">column</span> <span class="pre">&#64;</span> <span class="pre">query</span></code> や <code class="docutils literal notranslate"><span class="pre">column</span> <span class="pre">&#64;~</span> <span class="pre">pattern</span></code> のようなquery family expressionについて、より効果的な実行計画を立てられます。</li>
-<li>[optimizer] オプティマイザをプラグインから組み込みの機能に変更し、初期状態で無効としました。環境変数を <code class="docutils literal notranslate"><span class="pre">GRN_EXPR_OPTIMIZE=yes</span></code> と定義するか、従来通りに <code class="docutils literal notranslate"><span class="pre">expression_rewriters</span></code> テーブルを使う事で機能を有効化できます。</li>
-<li>充分に絞り込み済みの場合において、初期状態でシーケンシャルサーチを行うようにしました。現在の結果が充分に少数である場合、シーケンシャルサーチはインデックス検索よりも高速です。現在の結果が元の結果の1%で1000件未満の場合、インデックス検索可能な場合であってもシーケンシャルサーチが使われます。この機能は環境変数で <code class="docutils literal notranslate"><span class="pre">GRN_TABLE_SELECT_ENOUGH_FILTERED_RATIO=0.0</span></code> と設定する事で無効化できます。</li>
-<li>[load] エラーメッセージにテーブル名を含めるようにしました。</li>
-<li>[load] <code class="docutils literal notranslate"><span class="pre">lock_table</span></code> オプションを追加しました。<code class="docutils literal notranslate"><span class="pre">--lock_table</span> <span class="pre">yes</span></code> が指定された場合、カラムの更新と <code class="docutils literal notranslate"><span class="pre">--each</span></code> の適用を行っている間、<code class="docutils literal notranslate"><span class="pre">load</span></code> は対象のテーブルをロックします。このオプションは <code class="docutils literal notranslate"><span class="pre">load</span></code> と <code class="docutils literal notranslate"><span class="pre">delete</span></code> の衝突を防ぎますが、読み込みの性能を低下させるでしょう。</li>
-<li>[vector_find] サポートされていないモードでクラッシュしないようにしました。</li>
+<ul>
+<li><p class="first">[<a class="reference internal" href="reference/tokenizers.html"><span class="doc">トークナイザー</span></a>][TokenMecab] <code class="docutils literal notranslate"><span class="pre">chunked_tokenize</span></code> と <code class="docutils literal notranslate"><span class="pre">chunk_size_threshold</span></code> の両オプションに対応しました。</p>
+</li>
+<li><p class="first">[optimizer] query family expressionの推定に対応しました。<code class="docutils literal notranslate"><span class="pre">column</span> <span class="pre">&#64;</span> <span class="pre">query</span></code> や <code class="docutils literal notranslate"><span class="pre">column</span> <span class="pre">&#64;~</span> <span class="pre">pattern</span></code> のようなquery family expressionについて、より効果的な実行計画を立てられます。</p>
+</li>
+<li><p class="first">[optimizer] オプティマイザをプラグインから組み込みの機能に変更し、初期状態で無効としました。環境変数を <code class="docutils literal notranslate"><span class="pre">GRN_EXPR_OPTIMIZE=yes</span></code> と定義するか、従来通りに <code class="docutils literal notranslate"><span class="pre">expression_rewriters</span></code> テーブルを使う事で機能を有効化できます。</p>
+</li>
+<li><p class="first">充分に絞り込み済みの場合において、初期状態でシーケンシャルサーチを行うようにしました。現在の結果が充分に少数である場合、シーケンシャルサーチはインデックス検索よりも高速です。現在の結果がテーブル内の全レコードの1%で1000件未満の場合、インデックス検索可能な場合であってもシーケンシャルサーチが使われます。</p>
+<p>現在、この最適化は、 <code class="docutils literal notranslate"><span class="pre">==</span></code> と <code class="docutils literal notranslate"><span class="pre">&gt;</span></code> と <code class="docutils literal notranslate"><span class="pre">&lt;</span></code> と <code class="docutils literal notranslate"><span class="pre">&gt;=</span></code> と <code class="docutils literal notranslate"><span class="pre">&lt;=</span></code> を使った検索時に適用されます。</p>
+<p>絞り込みに指定したカラムを持つテーブルのキーが <code class="docutils literal notranslate"><span class="pre">ShortText</span></code> の場合、この最適化を適用するためには、そのテーブルのノーマライザーを <code class="docutils literal notranslate"><span class="pre">NormalizerAuto</span></code> にする必要があります。</p>
+<p>この機能は環境変数で <code class="docutils literal notranslate"><span class="pre">GRN_TABLE_SELECT_ENOUGH_FILTERED_RATIO=0.0</span></code> と設定する事で無効化できます。</p>
+</li>
+<li><p class="first">[load] エラーメッセージにテーブル名を含めるようにしました。</p>
+</li>
+<li><p class="first">[load] <code class="docutils literal notranslate"><span class="pre">lock_table</span></code> オプションを追加しました。<code class="docutils literal notranslate"><span class="pre">--lock_table</span> <span class="pre">yes</span></code> が指定された場合、カラムの更新と <code class="docutils literal notranslate"><span class="pre">--each</span></code> の適用を行っている間、<code class="docutils literal notranslate"><span class="pre">load</span></code> は対象のテーブルをロックします。このオプションは <code class="docutils literal notranslate"><span class="pre">load</span></code> と <code class="docutils literal notranslate"><span class="pre">delete</span></code> の衝突を防ぎますが、読み込みの性能を低下させるでしょう。</p>
+</li>
+<li><p class="first">[vector_find] サポートされていないモードでクラッシュしないようにしました。</p>
+</li>
 </ul>
 </div>
 <div class="section" id="id12">

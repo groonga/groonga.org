@@ -441,23 +441,32 @@ Currently, this option is not supported Windows.</p>
 <span id="release-8-0-6"></span><h2>Release 8.0.6 - 2018-08-29<a class="headerlink" href="#release-8-0-6-2018-08-29" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="id11">
 <h3>Improvements<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
-<ul class="simple">
-<li>[<a class="reference internal" href="reference/tokenizers.html"><span class="doc">Tokenizers</span></a>][TokenMecab] add <code class="docutils literal notranslate"><span class="pre">chunked_tokenize</span></code> and <code class="docutils literal notranslate"><span class="pre">chunk_size_threshold</span></code> options.</li>
-<li>[optimizer] support estimation for query family expressions.
-It will generate more effective execution plan with query family expressions such as <code class="docutils literal notranslate"><span class="pre">column</span> <span class="pre">&#64;</span> <span class="pre">query</span></code>, <code class="docutils literal notranslate"><span class="pre">column</span> <span class="pre">&#64;~</span> <span class="pre">pattern</span></code> and so on.</li>
-<li>[optimizer] plug-in -&gt; built-in
+<ul>
+<li><p class="first">[<a class="reference internal" href="reference/tokenizers.html"><span class="doc">Tokenizers</span></a>][TokenMecab] add <code class="docutils literal notranslate"><span class="pre">chunked_tokenize</span></code> and <code class="docutils literal notranslate"><span class="pre">chunk_size_threshold</span></code> options.</p>
+</li>
+<li><p class="first">[optimizer] support estimation for query family expressions.
+It will generate more effective execution plan with query family expressions such as <code class="docutils literal notranslate"><span class="pre">column</span> <span class="pre">&#64;</span> <span class="pre">query</span></code>, <code class="docutils literal notranslate"><span class="pre">column</span> <span class="pre">&#64;~</span> <span class="pre">pattern</span></code> and so on.</p>
+</li>
+<li><p class="first">[optimizer] plug-in -&gt; built-in
 It’s disabled by default for now.
-We can enable it by defining <code class="docutils literal notranslate"><span class="pre">GRN_EXPR_OPTIMIZE=yes</span></code> environment variable or using <code class="docutils literal notranslate"><span class="pre">expression_rewriters</span></code> table as before.</li>
-<li>Enable sequential search for enough filtered case by default.
+We can enable it by defining <code class="docutils literal notranslate"><span class="pre">GRN_EXPR_OPTIMIZE=yes</span></code> environment variable or using <code class="docutils literal notranslate"><span class="pre">expression_rewriters</span></code> table as before.</p>
+</li>
+<li><p class="first">Enable sequential search for enough filtered case by default.
 If the current result is enough filtered, sequential search is faster than index search.
-If the current result has only 1% records and less than 1000 records, sequential search is used even when index search is available.
-You can disable this feature by <code class="docutils literal notranslate"><span class="pre">GRN_TABLE_SELECT_ENOUGH_FILTERED_RATIO=0.0</span></code> environment variable.</li>
-<li>[load] improve error message.
-Table name is included.</li>
-<li>[load] add <code class="docutils literal notranslate"><span class="pre">lock_table</span></code> option.
+If the current result has only 1% records of all records in a table and less than 1000 records, sequential search is used even when index search is available.</p>
+<p>Cullently, this optimization is applied when search by <code class="docutils literal notranslate"><span class="pre">==</span></code>, <code class="docutils literal notranslate"><span class="pre">&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">&lt;</span></code>, <code class="docutils literal notranslate"><span class="pre">&gt;=</span></code>, or <code class="docutils literal notranslate"><span class="pre">&lt;=</span></code>.</p>
+<p>When a key of a table that has columns specified by the filter is <code class="docutils literal notranslate"><span class="pre">ShortText</span></code>, you must set <code class="docutils literal notranslate"><span class="pre">NormalizerAuto</span></code> to normalizer of the table to apply this optimization.</p>
+<p>You can disable this feature by <code class="docutils literal notranslate"><span class="pre">GRN_TABLE_SELECT_ENOUGH_FILTERED_RATIO=0.0</span></code> environment variable.</p>
+</li>
+<li><p class="first">[load] improve error message.
+Table name is included.</p>
+</li>
+<li><p class="first">[load] add <code class="docutils literal notranslate"><span class="pre">lock_table</span></code> option.
 If <code class="docutils literal notranslate"><span class="pre">--lock_table</span> <span class="pre">yes</span></code> is specified, <code class="docutils literal notranslate"><span class="pre">load</span></code> locks the target table while updating columns and applying <code class="docutils literal notranslate"><span class="pre">--each</span></code>.
-This option avoids <code class="docutils literal notranslate"><span class="pre">load</span></code> and <code class="docutils literal notranslate"><span class="pre">delete</span></code> conflicts but it’ll reduce load performance.</li>
-<li>[vector_find] avoid to crash with unsupported modes</li>
+This option avoids <code class="docutils literal notranslate"><span class="pre">load</span></code> and <code class="docutils literal notranslate"><span class="pre">delete</span></code> conflicts but it’ll reduce load performance.</p>
+</li>
+<li><p class="first">[vector_find] avoid to crash with unsupported modes</p>
+</li>
 </ul>
 </div>
 <div class="section" id="id12">

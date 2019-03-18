@@ -114,6 +114,9 @@ optional:</p>
        [sort_keys=null]
        [drilldown_sort_keys=null]
        [match_escalation=auto]
+       [load_table=null]
+       [load_columns=null]
+       [load_values=null]
 </pre></div>
 </div>
 <p>This command has the following named parameters for dynamic columns:</p>
@@ -1580,6 +1583,148 @@ the value of <code class="docutils literal notranslate"><span class="pre">column
 <p>The <code class="docutils literal notranslate"><span class="pre">select</span></code> command searches records that <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> column value
 is less than <code class="docutils literal notranslate"><span class="pre">11</span></code> from <code class="docutils literal notranslate"><span class="pre">Entries</span></code> table.</p>
 <p>See <a class="reference internal" href="../grn_expr/script_syntax.html"><span class="doc">Script syntax</span></a> for other operators.</p>
+</div>
+<div class="section" id="load-table">
+<span id="select-load-table"></span><h4>7.3.54.4.2.4. <code class="docutils literal notranslate"><span class="pre">load_table</span></code><a class="headerlink" href="#load-table" title="Permalink to this headline">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 9.0.1.</span></p>
+</div>
+<p>You can store specified a table a result of <code class="docutils literal notranslate"><span class="pre">select</span></code> with <code class="docutils literal notranslate"><span class="pre">--load_table</span></code>, <code class="docutils literal notranslate"><span class="pre">--load-columns</span></code> and <code class="docutils literal notranslate"><span class="pre">--load_values</span></code> arguments.
+<code class="docutils literal notranslate"><span class="pre">--load_table</span></code> specifies a table name for storing a result of <code class="docutils literal notranslate"><span class="pre">select</span></code>.</p>
+<p>You must specify a table that already exists.</p>
+<p>This argument must use with <a class="reference internal" href="#select-load-columns"><span class="std std-ref">load_columns</span></a> and <a class="reference internal" href="#select-load-values"><span class="std std-ref">load_values</span></a>.</p>
+<p>Here is an example that can store <code class="docutils literal notranslate"><span class="pre">_id</span></code> and <code class="docutils literal notranslate"><span class="pre">timestamp</span></code> that a result of <code class="docutils literal notranslate"><span class="pre">select</span></code> in a Logs table specified by <code class="docutils literal notranslate"><span class="pre">--load_table</span></code>.</p>
+<p>Execution example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>table_create Logs_20150203 TABLE_HASH_KEY ShortText
+column_create Logs_20150203 timestamp COLUMN_SCALAR Time
+
+table_create Logs TABLE_HASH_KEY ShortText
+column_create Logs original_id COLUMN_SCALAR UInt32
+column_create Logs timestamp_text COLUMN_SCALAR ShortText
+
+load --table Logs_20150203
+[
+{
+  &quot;_key&quot;: &quot;2015-02-03:1&quot;,
+  &quot;timestamp&quot;: &quot;2015-02-03 10:49:00&quot;
+},
+{
+  &quot;_key&quot;: &quot;2015-02-03:2&quot;,
+  &quot;timestamp&quot;: &quot;2015-02-03 12:49:00&quot;
+}
+]
+select \
+  --table Logs_20150203 \
+  --load_table Logs \
+  --load_columns &quot;original_id, timestamp_text&quot; \
+  --load_values &quot;_id, timestamp&quot;
+# [
+#   [
+#     0,
+#     0.0,
+#     0.0
+#   ],
+#   [
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;timestamp&quot;,
+#           &quot;Time&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;2015-02-03:1&quot;,
+#         1422928140.0
+#       ],
+#       [
+#         2,
+#         &quot;2015-02-03:2&quot;,
+#         1422935340.0
+#       ]
+#     ]
+#   ]
+# ]
+select --table Logs
+# [
+#   [
+#     0,
+#     0.0,
+#     0.0
+#   ],
+#   [
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_key&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;original_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;timestamp_text&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;2015-02-03:1&quot;,
+#         1,
+#         &quot;1422928140000000&quot;
+#       ],
+#       [
+#         2,
+#         &quot;2015-02-03:2&quot;,
+#         2,
+#         &quot;1422935340000000&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
+<div class="section" id="load-columns">
+<span id="select-load-columns"></span><h4>7.3.54.4.2.5. <code class="docutils literal notranslate"><span class="pre">load_columns</span></code><a class="headerlink" href="#load-columns" title="Permalink to this headline">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 9.0.1.</span></p>
+</div>
+<p>Specifies columns of a table that specifying <code class="docutils literal notranslate"><span class="pre">--load-table</span></code>.
+Stores value of columns that specified with <a class="reference internal" href="#select-load-values"><span class="std std-ref">load_values</span></a> in columns that specified with this argument.
+You must specify columns that already exists.</p>
+<p>This argument must use with <a class="reference internal" href="#select-load-table"><span class="std std-ref">load_table</span></a> and <a class="reference internal" href="#select-load-values"><span class="std std-ref">load_values</span></a>.</p>
+<p>See example of <code class="docutils literal notranslate"><span class="pre">--load_table</span></code> for how to use this argument.</p>
+</div>
+<div class="section" id="load-values">
+<span id="select-load-values"></span><h4>7.3.54.4.2.6. <code class="docutils literal notranslate"><span class="pre">load_values</span></code><a class="headerlink" href="#load-values" title="Permalink to this headline">¶</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 9.0.1.</span></p>
+</div>
+<p>Specifies columns of result of <code class="docutils literal notranslate"><span class="pre">select</span></code>.
+Specifies columns for storing values into columns that specified with <a class="reference internal" href="#select-load-columns"><span class="std std-ref">load_columns</span></a>.
+You must specify columns that already exists.</p>
+<p>This argument must use with <a class="reference internal" href="#select-load-table"><span class="std std-ref">load_table</span></a> and <a class="reference internal" href="#select-load-columns"><span class="std std-ref">load_columns</span></a>.</p>
+<p>See example of <code class="docutils literal notranslate"><span class="pre">--load_table</span></code> for how to use this argument.</p>
 </div>
 </div>
 <div class="section" id="advanced-search-parameters">
@@ -6660,6 +6805,9 @@ pairs):</p>
 <li><a class="reference internal" href="#match-columns">7.3.54.4.2.1. <code class="docutils literal notranslate"><span class="pre">match_columns</span></code></a></li>
 <li><a class="reference internal" href="#query">7.3.54.4.2.2. <code class="docutils literal notranslate"><span class="pre">query</span></code></a></li>
 <li><a class="reference internal" href="#filter">7.3.54.4.2.3. <code class="docutils literal notranslate"><span class="pre">filter</span></code></a></li>
+<li><a class="reference internal" href="#load-table">7.3.54.4.2.4. <code class="docutils literal notranslate"><span class="pre">load_table</span></code></a></li>
+<li><a class="reference internal" href="#load-columns">7.3.54.4.2.5. <code class="docutils literal notranslate"><span class="pre">load_columns</span></code></a></li>
+<li><a class="reference internal" href="#load-values">7.3.54.4.2.6. <code class="docutils literal notranslate"><span class="pre">load_values</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#advanced-search-parameters">7.3.54.4.3. Advanced search parameters</a><ul>

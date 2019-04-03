@@ -1,18 +1,19 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml" lang="ja">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
     <title>7.14. 正規表現 &#8212; Groonga v9.0.1ドキュメント</title>
     <link rel="stylesheet" href="../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
-    <script type="text/javascript" src="../static/documentation_options.js"></script>
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../static/documentation_options.js"></script>
     <script type="text/javascript" src="../static/jquery.js"></script>
     <script type="text/javascript" src="../static/underscore.js"></script>
     <script type="text/javascript" src="../static/doctools.js"></script>
+    <script type="text/javascript" src="../static/language_data.js"></script>
     <script type="text/javascript" src="../static/translations.js"></script>
+    
     <link rel="shortcut icon" href="../static/favicon.ico"/>
     <link rel="index" title="索引" href="../genindex.html" />
     <link rel="search" title="検索" href="../search.html" />
@@ -79,17 +80,17 @@
 <div class="section" id="summary">
 <h2>7.14.1. 概要<a class="headerlink" href="#summary" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <div class="admonition note">
-<p class="first admonition-title">注釈</p>
-<p class="last">正規表現は実験的な機能です。</p>
+<p class="admonition-title">注釈</p>
+<p>正規表現は実験的な機能です。</p>
 </div>
 <div class="versionadded">
-<p><span class="versionmodified">バージョン 5.0.1 で追加.</span></p>
+<p><span class="versionmodified added">バージョン 5.0.1 で追加.</span></p>
 </div>
 <p>Groongaは正規表現を用いたパターンマッチをサポートしています。正規表現はパターンを表現するために広く使われています。正規表現は複雑なパターンを表現するときに便利です。</p>
 <p>多くの場合は、正規表現検索は逐次検索で実行します。これはたくさんのレコードがあったり、たくさんのテキストがある場合は遅くなります。</p>
 <p>いくつかの場合では、正規表現を使ったパターンマッチをインデックスを使って実現します。これは逐次検索よりも非常に高速です。インデックスを使って評価できるパターンについては後述します。</p>
 <div class="versionadded">
-<p><span class="versionmodified">バージョン 5.0.7 で追加: </span>Groongaは正規表現検索にインデックスを使わないときは、 <a class="reference internal" href="normalizers/normalizer_auto.html#normalizer-auto"><span class="std std-ref">NormalizerAuto</span></a> ノーマライザーでマッチ対象のテキストを正規化します。これは、 <code class="docutils literal notranslate"><span class="pre">Groonga</span></code> というような大文字を使った正規表現は必ずマッチに失敗するということです。なぜなら、 <a class="reference internal" href="normalizers/normalizer_auto.html#normalizer-auto"><span class="std std-ref">NormalizerAuto</span></a> ノーマライザーはすべてのアルファベットを小文字に正規化するからです。 <code class="docutils literal notranslate"><span class="pre">groonga</span></code> は <code class="docutils literal notranslate"><span class="pre">Groonga</span></code> にも <code class="docutils literal notranslate"><span class="pre">groonga</span></code> にも両方にマッチします。</p>
+<p><span class="versionmodified added">バージョン 5.0.7 で追加: </span>Groongaは正規表現検索にインデックスを使わないときは、 <a class="reference internal" href="normalizers/normalizer_auto.html#normalizer-auto"><span class="std std-ref">NormalizerAuto</span></a> ノーマライザーでマッチ対象のテキストを正規化します。これは、 <code class="docutils literal notranslate"><span class="pre">Groonga</span></code> というような大文字を使った正規表現は必ずマッチに失敗するということです。なぜなら、 <a class="reference internal" href="normalizers/normalizer_auto.html#normalizer-auto"><span class="std std-ref">NormalizerAuto</span></a> ノーマライザーはすべてのアルファベットを小文字に正規化するからです。 <code class="docutils literal notranslate"><span class="pre">groonga</span></code> は <code class="docutils literal notranslate"><span class="pre">Groonga</span></code> にも <code class="docutils literal notranslate"><span class="pre">groonga</span></code> にも両方にマッチします。</p>
 <p>なぜマッチ対象のテキストを正規化するのでしょうか？それは、インデックスを使って検索できるパターンを増やすためです。もし、Groongaがマッチ対象のテキストを正規化しなかった場合、大文字小文字を区別しないマッチをするために、 <code class="docutils literal notranslate"><span class="pre">[Dd][Ii][Ss][Kk]</span></code> や <code class="docutils literal notranslate"><span class="pre">(?i)disk</span></code> のような複雑な正規表現を書く必要があります。Groongaは複雑な正規表現に対してインデックスを使うことができません。</p>
 <p>もし、大文字小文字を区別しないマッチに <code class="docutils literal notranslate"><span class="pre">disk</span></code> という正規表現を使うなら、Groongaはインデックスを使ってこのパターンを検索できます。これは高速です。</p>
 <p>全文検索では通常、Groongaは検索キーワードを語彙表に指定されているノーマライザーを使って正規化します。正規表現を使った検索では、Groongaは、検索キーワードを正規化しません。これは、正規表現は大文字と小文字に意味があるためです。</p>
@@ -98,7 +99,7 @@
 </div>
 <p>正規表現の構文はたくさんあります。GroongaはRubyと同じ構文を使います。なぜなら、Groongaが使っている正規表現エンジンはRubyが使っている正規表現エンジンと同じだからです。この正規表現エンジンは <a class="reference external" href="https://github.com/k-takata/Onigmo/">Onigmo</a> といいます。他の正規表現の構文との特徴的な違いは <code class="docutils literal notranslate"><span class="pre">^</span></code> と <code class="docutils literal notranslate"><span class="pre">$</span></code> です。Rubyの正規表現の構文では <code class="docutils literal notranslate"><span class="pre">^</span></code> は行頭を表し、 <code class="docutils literal notranslate"><span class="pre">$</span></code> は行末を表します。他の多くの正規表現の構文では、 <code class="docutils literal notranslate"><span class="pre">^</span></code> はテキストの先頭を表し、 <code class="docutils literal notranslate"><span class="pre">$</span></code> はテキストの最後を表します。Rubyの正規表現の構文ではテキストの先頭を表す場合は <code class="docutils literal notranslate"><span class="pre">\A</span></code> を使い、テキストの最後を表す場合は <code class="docutils literal notranslate"><span class="pre">\z</span></code> を使います。</p>
 <div class="versionadded">
-<p><span class="versionmodified">バージョン 5.0.6 で追加: </span>Groongaは5.0.6からマルチラインモードを有効にしています。これは、 <code class="docutils literal notranslate"><span class="pre">.</span></code> が <code class="docutils literal notranslate"><span class="pre">\n</span></code> にマッチするということです。</p>
+<p><span class="versionmodified added">バージョン 5.0.6 で追加: </span>Groongaは5.0.6からマルチラインモードを有効にしています。これは、 <code class="docutils literal notranslate"><span class="pre">.</span></code> が <code class="docutils literal notranslate"><span class="pre">\n</span></code> にマッチするということです。</p>
 <p>しかし、この挙動は意味がありません。なぜなら、 <code class="docutils literal notranslate"><span class="pre">\n</span></code> は <a class="reference internal" href="normalizers/normalizer_auto.html#normalizer-auto"><span class="std std-ref">NormalizerAuto</span></a> ノーマライザーが削除するからです。</p>
 </div>
 <p><a class="reference internal" href="commands/select.html"><span class="doc">select</span></a> コマンドの <a class="reference internal" href="commands/select.html#select-query"><span class="std std-ref">query</span></a> オプションと <a class="reference internal" href="commands/select.html#select-filter"><span class="std std-ref">filter</span></a> オプションで正規表現を使えます。</p>
@@ -203,17 +204,17 @@ load --table Logs
 <p>しかし、すべての正規表現には対応していません。以下の正規表現にのみ対応しています。対応している正規表現は今後増えていく予定です。</p>
 <blockquote>
 <div><ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">disk</span></code> のようにリテラルしかないパターン</li>
-<li><code class="docutils literal notranslate"><span class="pre">\A/disk</span></code> のようにテキストの最初でのマッチとリテラルのみのケース</li>
-<li><code class="docutils literal notranslate"><span class="pre">disk\z</span></code> のようにテキストの最後でのマッチとリテラルのみのケース</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">disk</span></code> のようにリテラルしかないパターン</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">\A/disk</span></code> のようにテキストの最初でのマッチとリテラルのみのケース</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">disk\z</span></code> のようにテキストの最後でのマッチとリテラルのみのケース</p></li>
 </ul>
 </div></blockquote>
 <p>高速に正規表現検索を実現するためにはインデックスを作る必要があります。以下は正規表現用のインデックスが満たさなければいけないことのリストです。</p>
 <blockquote>
 <div><ul class="simple">
-<li>語彙表は <a class="reference internal" href="tables.html#table-pat-key"><span class="std std-ref">TABLE_PAT_KEY</span></a> テーブルであること。</li>
-<li>語彙表は <a class="reference internal" href="tokenizers/token_regexp.html#token-regexp"><span class="std std-ref">TokenRegexp</span></a> トークナイザーを使っていること。</li>
-<li>インデックスカラムは <code class="docutils literal notranslate"><span class="pre">WITH_POSITION</span></code> フラグ付きであること。</li>
+<li><p>語彙表は <a class="reference internal" href="tables.html#table-pat-key"><span class="std std-ref">TABLE_PAT_KEY</span></a> テーブルであること。</p></li>
+<li><p>語彙表は <a class="reference internal" href="tokenizers/token_regexp.html#token-regexp"><span class="std std-ref">TokenRegexp</span></a> トークナイザーを使っていること。</p></li>
+<li><p>インデックスカラムは <code class="docutils literal notranslate"><span class="pre">WITH_POSITION</span></code> フラグ付きであること。</p></li>
 </ul>
 </div></blockquote>
 <p>語彙表のノーマライザーといった他の設定は用途に応じて適切なものを設定してください。もし、大文字小文字を区別せずに検索したい場合は <a class="reference internal" href="normalizers/normalizer_auto.html#normalizer-auto"><span class="std std-ref">NormalizerAuto</span></a> ノーマライザーを使ってください。</p>
@@ -313,31 +314,31 @@ column_create RegexpLexicon logs_message_index \
 <p><code class="docutils literal notranslate"><span class="pre">\</span></code> エスケープは紛らわしいかもしれません。あなたが書いたクエリーをGroongaが実行するまでにエスケープが必要なステップがいくつもあるからです。以下は <code class="docutils literal notranslate"><span class="pre">\</span></code> エスケープが必要なステップです。</p>
 <blockquote>
 <div><ul>
-<li><p class="first">シェル。ただし、次のようにGroongaのコマンドをコマンドラインで指定した場合のみ:</p>
+<li><p>シェル。ただし、次のようにGroongaのコマンドをコマンドラインで指定した場合のみ:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% groonga /tmp/db select Logs --filter &#39;&quot;message @~ \&quot;\\\\Ahost1:&quot;\&quot;&#39;
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">--filter</span> <span class="pre">'&quot;message</span> <span class="pre">&#64;~</span> <span class="pre">\&quot;\\\\Ahost1:\&quot;&quot;'</span></code> はシェルが評価して次の2つの引数になります。</p>
 <blockquote>
 <div><ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">--filter</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">&quot;message</span> <span class="pre">&#64;~</span> <span class="pre">\&quot;\\\\Ahost1:\&quot;&quot;</span></code></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--filter</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;message</span> <span class="pre">&#64;~</span> <span class="pre">\&quot;\\\\Ahost1:\&quot;&quot;</span></code></p></li>
 </ul>
 </div></blockquote>
 </li>
-<li><p class="first">Groongaコマンドパーサー。ただし、GroongaのコマンドをHTTPパススタイル （ <code class="docutils literal notranslate"><span class="pre">/d/COMMAND?ARG1_NAME=ARG1_VALUE&amp;ARG2_NAME=ARG3_VALUE</span></code> ） ではなく、コマンドラインスタイル （ <code class="docutils literal notranslate"><span class="pre">COMMAND</span> <span class="pre">ARG1_VALUE</span> <span class="pre">ARG2_VALUE</span> <span class="pre">...</span></code> ）で指定した場合のみ。</p>
+<li><p>Groongaコマンドパーサー。ただし、GroongaのコマンドをHTTPパススタイル （ <code class="docutils literal notranslate"><span class="pre">/d/COMMAND?ARG1_NAME=ARG1_VALUE&amp;ARG2_NAME=ARG3_VALUE</span></code> ） ではなく、コマンドラインスタイル （ <code class="docutils literal notranslate"><span class="pre">COMMAND</span> <span class="pre">ARG1_VALUE</span> <span class="pre">ARG2_VALUE</span> <span class="pre">...</span></code> ）で指定した場合のみ。</p>
 <p><code class="docutils literal notranslate"><span class="pre">&quot;message</span> <span class="pre">&#64;~</span> <span class="pre">\&quot;\\\\Ahost1:\&quot;&quot;</span></code> はGroongaコマンドパーサーが評価して次の値になります。</p>
 <blockquote>
 <div><ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">message</span> <span class="pre">&#64;~</span> <span class="pre">&quot;\\Ahost1:&quot;</span></code></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">message</span> <span class="pre">&#64;~</span> <span class="pre">&quot;\\Ahost1:&quot;</span></code></p></li>
 </ul>
 </div></blockquote>
 </li>
-<li><p class="first"><a class="reference internal" href="grn_expr.html"><span class="doc">grn_expr</span></a> パーサー。 <a class="reference internal" href="grn_expr/query_syntax.html"><span class="doc">クエリー構文</span></a> でも <a class="reference internal" href="grn_expr/script_syntax.html"><span class="doc">スクリプト構文</span></a> でも <code class="docutils literal notranslate"><span class="pre">\</span></code> エスケープが必要です。</p>
+<li><p><a class="reference internal" href="grn_expr.html"><span class="doc">grn_expr</span></a> パーサー。 <a class="reference internal" href="grn_expr/query_syntax.html"><span class="doc">クエリー構文</span></a> でも <a class="reference internal" href="grn_expr/script_syntax.html"><span class="doc">スクリプト構文</span></a> でも <code class="docutils literal notranslate"><span class="pre">\</span></code> エスケープが必要です。</p>
 <p>スクリプト構文で <code class="docutils literal notranslate"><span class="pre">&quot;\\Ahost1:&quot;</span></code> という文字列リテラルを評価すると次の値になります。</p>
 <blockquote>
 <div><ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">\Ahost1</span></code></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">\Ahost1</span></code></p></li>
 </ul>
 </div></blockquote>
 <p>この値が正規表現として評価されます。</p>
@@ -353,40 +354,40 @@ column_create RegexpLexicon logs_message_index \
 <p>正規表現で特別な文字は次の通りです。</p>
 <blockquote>
 <div><ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">\</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">|</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">(</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">)</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">[</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">]</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">.</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">*</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">+</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">?</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">{</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">}</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">^</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">$</span></code></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">\</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">|</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">(</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">]</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">.</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">*</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">+</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">?</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">{</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">}</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">^</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">$</span></code></p></li>
 </ul>
 </div></blockquote>
 <p>これらの特別な文字そのものにマッチするパターンを書きたいときはこれらの文字をエスケープする必要があります。</p>
 <p>特別な文字の前に <code class="docutils literal notranslate"><span class="pre">\</span></code> を入れることでエスケープできます。以下は特別な文字そのものにマッチする正規表現です。</p>
 <blockquote>
 <div><ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">\\</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">\|</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">\(</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">\)</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">\[</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">\]</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">\.</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">\*</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">\+</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">\?</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">\{</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">\}</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">\^</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">\$</span></code></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">\\</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">\|</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">\(</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">\)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">\[</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">\]</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">\.</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">\*</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">\+</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">\?</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">\{</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">\}</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">\^</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">\$</span></code></p></li>
 </ul>
 </div></blockquote>
 <p>実行例:</p>
@@ -467,8 +468,8 @@ column_create RegexpLexicon logs_message_index \
 </pre></div>
 </div>
 <div class="admonition caution">
-<p class="first admonition-title">ご用心</p>
-<p class="last">この構文を使った正規表現はインデックスを使って評価できません。</p>
+<p class="admonition-title">ご用心</p>
+<p>この構文を使った正規表現はインデックスを使って評価できません。</p>
 </div>
 </div>
 <div class="section" id="group">
@@ -476,8 +477,8 @@ column_create RegexpLexicon logs_message_index \
 <p>グループの構文は <code class="docutils literal notranslate"><span class="pre">(...)</span></code> です。グループは次の機能を提供します。</p>
 <blockquote>
 <div><ul class="simple">
-<li>後方参照</li>
-<li>スケープの限定</li>
+<li><p>後方参照</p></li>
+<li><p>スケープの限定</p></li>
 </ul>
 </div></blockquote>
 <p>マッチしたグループを <code class="docutils literal notranslate"><span class="pre">\n</span></code> （ <code class="docutils literal notranslate"><span class="pre">n</span></code> はグループの番号とする） という構文で参照できます。例えば、 <code class="docutils literal notranslate"><span class="pre">e(r)\1o\1</span></code> は <code class="docutils literal notranslate"><span class="pre">error</span></code> にマッチします。なぜなら、 <code class="docutils literal notranslate"><span class="pre">\1</span></code> は1番目ののグループ <code class="docutils literal notranslate"><span class="pre">(r)</span></code> のマッチ結果（ <code class="docutils literal notranslate"><span class="pre">r</span></code> ）に置き換えられるからです。</p>
@@ -561,8 +562,8 @@ column_create RegexpLexicon logs_message_index \
 </div>
 <p>より強力なグループ関連の機能を使うこともできます。詳細は <a class="reference external" href="https://github.com/k-takata/Onigmo/blob/master/doc/RE.ja#L224">Onigmoのドキュメントの「7. 拡張式集合」セクション</a> を参照してください。</p>
 <div class="admonition caution">
-<p class="first admonition-title">ご用心</p>
-<p class="last">この構文を使った正規表現はインデックスを使って評価できません。</p>
+<p class="admonition-title">ご用心</p>
+<p>この構文を使った正規表現はインデックスを使って評価できません。</p>
 </div>
 </div>
 <div class="section" id="character-class">
@@ -652,41 +653,41 @@ column_create RegexpLexicon logs_message_index \
 </div>
 <p>より強力な文字クラス関連の機能も使うことができます。詳細は <a class="reference external" href="https://github.com/k-takata/Onigmo/blob/master/doc/RE.ja#L164">Onigmoのドキュメントの「6. 文字集合」セクション</a> を参照してください。</p>
 <div class="admonition caution">
-<p class="first admonition-title">ご用心</p>
-<p class="last">この構文を使った正規表現はインデックスを使って評価できません。</p>
+<p class="admonition-title">ご用心</p>
+<p>この構文を使った正規表現はインデックスを使って評価できません。</p>
 </div>
 </div>
 <div class="section" id="anchor">
 <span id="regular-expression-anchor"></span><h3>7.14.4.5. アンカー<a class="headerlink" href="#anchor" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <p>以下はよく使われるアンカーの構文です。いくつかのアンカーはインデックスを使って評価できます。</p>
-<table border="1" class="docutils">
+<table class="docutils align-center">
 <colgroup>
-<col width="33%" />
-<col width="33%" />
-<col width="33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">アンカー</th>
-<th class="head">説明</th>
-<th class="head">インデックスを使えるか</th>
+<thead>
+<tr class="row-odd"><th class="head"><p>アンカー</p></th>
+<th class="head"><p>説明</p></th>
+<th class="head"><p>インデックスを使えるか</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">^</span></code></td>
-<td>行頭</td>
-<td>o</td>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">^</span></code></p></td>
+<td><p>行頭</p></td>
+<td><p>o</p></td>
 </tr>
-<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">$</span></code></td>
-<td>行末</td>
-<td>x</td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$</span></code></p></td>
+<td><p>行末</p></td>
+<td><p>x</p></td>
 </tr>
-<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">\A</span></code></td>
-<td>テキストの先頭</td>
-<td>o</td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">\A</span></code></p></td>
+<td><p>テキストの先頭</p></td>
+<td><p>o</p></td>
 </tr>
-<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">\z</span></code></td>
-<td>テキストの末尾</td>
-<td>x</td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">\z</span></code></p></td>
+<td><p>テキストの末尾</p></td>
+<td><p>x</p></td>
 </tr>
 </tbody>
 </table>
@@ -725,32 +726,32 @@ column_create RegexpLexicon logs_message_index \
 </div>
 <p>他にも使えるアンカーがあります。詳細は <a class="reference external" href="https://github.com/k-takata/Onigmo/blob/master/doc/RE.ja#L152">Onigmoのドキュメントの「5. 錨」セクション</a> を参照してください。</p>
 <div class="admonition caution">
-<p class="first admonition-title">ご用心</p>
-<p class="last"><code class="docutils literal notranslate"><span class="pre">\A</span></code> と <code class="docutils literal notranslate"><span class="pre">\z</span></code> 以外のアンカーを使った正規表現はインデックスを使って評価できません。</p>
+<p class="admonition-title">ご用心</p>
+<p><code class="docutils literal notranslate"><span class="pre">\A</span></code> と <code class="docutils literal notranslate"><span class="pre">\z</span></code> 以外のアンカーを使った正規表現はインデックスを使って評価できません。</p>
 </div>
 </div>
 <div class="section" id="quantifier">
 <span id="regular-expression-quantifier"></span><h3>7.14.4.6. 量指定子<a class="headerlink" href="#quantifier" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <p>以下はよく使われる量指定子の構文です。</p>
-<table border="1" class="docutils">
+<table class="docutils align-center">
 <colgroup>
-<col width="50%" />
-<col width="50%" />
+<col style="width: 50%" />
+<col style="width: 50%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">量指定子</th>
-<th class="head">説明</th>
+<thead>
+<tr class="row-odd"><th class="head"><p>量指定子</p></th>
+<th class="head"><p>説明</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">?</span></code></td>
-<td>0回か1回</td>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">?</span></code></p></td>
+<td><p>0回か1回</p></td>
 </tr>
-<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">*</span></code></td>
-<td>0回以上</td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">*</span></code></p></td>
+<td><p>0回以上</p></td>
 </tr>
-<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">+</span></code></td>
-<td>1回以上</td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">+</span></code></p></td>
+<td><p>1回以上</p></td>
 </tr>
 </tbody>
 </table>
@@ -797,8 +798,8 @@ column_create RegexpLexicon logs_message_index \
 </div>
 <p>他の量指定子を使うこともできます。詳細は <a class="reference external" href="https://github.com/k-takata/Onigmo/blob/master/doc/RE.ja#L119">Onigmoのドキュメントの「4. 量指定子」セクション</a> を参照してください。</p>
 <div class="admonition caution">
-<p class="first admonition-title">ご用心</p>
-<p class="last">この構文を使った正規表現はインデックスを使って評価できません。</p>
+<p class="admonition-title">ご用心</p>
+<p>この構文を使った正規表現はインデックスを使って評価できません。</p>
 </div>
 </div>
 <div class="section" id="others">
@@ -846,8 +847,6 @@ column_create RegexpLexicon logs_message_index \
     <form class="search" action="../search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="検索" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>

@@ -1,17 +1,18 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
     <title>10.1. 同じ検索キーワードなのに全文検索結果が異なる &#8212; Groonga v9.0.1 documentation</title>
     <link rel="stylesheet" href="../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
-    <script type="text/javascript" src="../static/documentation_options.js"></script>
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../static/documentation_options.js"></script>
     <script type="text/javascript" src="../static/jquery.js"></script>
     <script type="text/javascript" src="../static/underscore.js"></script>
     <script type="text/javascript" src="../static/doctools.js"></script>
+    <script type="text/javascript" src="../static/language_data.js"></script>
+    
     <link rel="shortcut icon" href="../static/favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -117,17 +118,19 @@ column_create Terms blog_body COLUMN_INDEX|WITH_POSITION Blogs body
 <p>このような挙動になるのは全文検索時に複数の検索の挙動を使い分けているからです。ここでは簡単に説明するので、詳細は <a class="reference internal" href="../spec/search.html"><span class="doc">検索</span></a> を参照してください。</p>
 <p>検索の挙動には以下の3種類があります。</p>
 <ol class="arabic simple">
-<li>完全一致検索</li>
-<li>非わかち書き検索</li>
-<li>部分一致検索</li>
+<li><p>完全一致検索</p></li>
+<li><p>非わかち書き検索</p></li>
+<li><p>部分一致検索</p></li>
 </ol>
 <p>Groongaは基本的に完全一致検索のみを行います。上記の例では「東京都民に深刻なダメージを与えました。」を「東京都」というクエリで検索していますが、TokenMecabトークナイザーを使っている場合はこのクエリはマッチしません。</p>
 <p>検索対象の「東京都民に深刻なダメージを与えました。」は</p>
 <blockquote>
-<div>東京 / 都民 / に / 深刻 / な / ダメージ / を / 与え / まし / た / 。</div></blockquote>
+<div><p>東京 / 都民 / に / 深刻 / な / ダメージ / を / 与え / まし / た / 。</p>
+</div></blockquote>
 <p>とトークナイズされますが、クエリの「東京都」は</p>
 <blockquote>
-<div>東京 / 都</div></blockquote>
+<div><p>東京 / 都</p>
+</div></blockquote>
 <p>とトークナイズされるため、完全一致しません。</p>
 <p>Groongaは完全一致検索した結果のヒット件数が所定の閾値を超えない場合に限り、非わかち書き検索を行い、それでもヒット件数が閾値を超えない場合は部分一致検索を行います（閾値は1がデフォルト値となっています）。このケースのデータは部分一致検索ではヒットするので、「東京都」クエリのみを指定するとヒットします。</p>
 <p>しかし、以下のように全文検索前にすでに閾値が越えている場合（「updated_at &lt; 1285858800」で1件ヒットし、閾値を越える）は、たとえ完全一致検索で1件もヒットしない場合でも部分一致検索などを行いません。:</p>
@@ -159,22 +162,24 @@ column_create Bigram blog_body COLUMN_INDEX|WITH_POSITION Blogs body
 <p>この場合はスコアが11になっています。内訳は、Terms.blog_body索引（TokenMecabトークナイザーを使用）でマッチしたので10、Bigram.blog_body索引（TokenBigramトークナイザーを使用）でマッチしたので3、これらを合計して13になっています。このようにTokenMecabトークナイザーの重みを高くすることにより、検索ノイズが上位にくることを抑えつつ再現率を上げることができます。</p>
 <p>この例は日本語だったのでTokenBigramトークナイザーでよかったのですが、アルファベットの場合はTokenBigramSplitSymbolAlphaトークナイザーなども利用する必要があります。例えば、「楽しいbilliard」はTokenBigramトークナイザーでは</p>
 <blockquote>
-<div>楽し / しい / billiard</div></blockquote>
+<div><p>楽し / しい / billiard</p>
+</div></blockquote>
 <p>となり、「bill」では完全一致しません。一方、TokenBigramSplitSymbolAlphaトークナイザーを使うと</p>
 <blockquote>
-<div>楽し / しい / いb / bi / il / ll / li / ia / ar / rd / d</div></blockquote>
+<div><p>楽し / しい / いb / bi / il / ll / li / ia / ar / rd / d</p>
+</div></blockquote>
 <p>となり、「bill」でも完全一致します。</p>
 <p>TokenBigramSplitSymbolAlphaトークナイザーを使う場合も重み付けを考慮する必要があることはかわりありません。</p>
 <p>利用できるバイグラム系のトークナイザーの一覧は以下の通りです。</p>
 <ul class="simple">
-<li>TokenBigram: バイグラムでトークナイズする。連続する記号・アルファベット・数字は一語として扱う。</li>
-<li>TokenBigramSplitSymbol: 記号もバイグラムでトークナイズする。連続するアルファベット・数字は一語として扱う。</li>
-<li>TokenBigramSplitSymbolAlpha: 記号とアルファベットもバイグラムでトークナイズする。連続する数字は一語として扱う。</li>
-<li>TokenBigramSplitSymbolAlphaDigit: 記号・アルファベット・数字もバイグラムでトークナイズする。</li>
-<li>TokenBigramIgnoreBlank: バイグラムでトークナイズする。連続する記号・アルファベット・数字は一語として扱う。空白は無視する。</li>
-<li>TokenBigramIgnoreBlankSplitSymbol: 記号もバイグラムでトークナイズする。連続するアルファベット・数字は一語として扱う。空白は無視する。</li>
-<li>TokenBigramIgnoreBlankSplitSymbolAlpha: 記号とアルファベットもバイグラムでトークナイズする。連続する数字は一語として扱う。空白は無視する。</li>
-<li>TokenBigramIgnoreBlankSplitSymbolAlphaDigit: 記号・アルファベット・数字もバイグラムでトークナイズする。空白は無視する。</li>
+<li><p>TokenBigram: バイグラムでトークナイズする。連続する記号・アルファベット・数字は一語として扱う。</p></li>
+<li><p>TokenBigramSplitSymbol: 記号もバイグラムでトークナイズする。連続するアルファベット・数字は一語として扱う。</p></li>
+<li><p>TokenBigramSplitSymbolAlpha: 記号とアルファベットもバイグラムでトークナイズする。連続する数字は一語として扱う。</p></li>
+<li><p>TokenBigramSplitSymbolAlphaDigit: 記号・アルファベット・数字もバイグラムでトークナイズする。</p></li>
+<li><p>TokenBigramIgnoreBlank: バイグラムでトークナイズする。連続する記号・アルファベット・数字は一語として扱う。空白は無視する。</p></li>
+<li><p>TokenBigramIgnoreBlankSplitSymbol: 記号もバイグラムでトークナイズする。連続するアルファベット・数字は一語として扱う。空白は無視する。</p></li>
+<li><p>TokenBigramIgnoreBlankSplitSymbolAlpha: 記号とアルファベットもバイグラムでトークナイズする。連続する数字は一語として扱う。空白は無視する。</p></li>
+<li><p>TokenBigramIgnoreBlankSplitSymbolAlphaDigit: 記号・アルファベット・数字もバイグラムでトークナイズする。空白は無視する。</p></li>
 </ul>
 </div>
 <div class="section" id="id5">
@@ -193,7 +198,7 @@ column_create Bigram blog_body COLUMN_INDEX|WITH_POSITION Blogs body
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <h3><a href="../index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">10.1. 同じ検索キーワードなのに全文検索結果が異なる</a><ul>
 <li><a class="reference internal" href="#id2">10.1.1. 例</a></li>
@@ -216,8 +221,6 @@ column_create Bigram blog_body COLUMN_INDEX|WITH_POSITION Blogs body
     <form class="search" action="../search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>

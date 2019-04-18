@@ -134,6 +134,9 @@
 <div class="versionadded">
 <p><span class="versionmodified added">バージョン 7.0.4 で追加: </span><a class="reference internal" href="#io-flush-only-opened"><span class="std std-ref">only_opened</span></a> が追加されました。</p>
 </div>
+<div class="versionadded">
+<p><span class="versionmodified added">バージョン 9.0.2 で追加: </span><code class="docutils literal notranslate"><span class="pre">--recursive</span> <span class="pre">dependent</span></code> が追加されました。9.0.2以降で対象のオブジェクトを書き出すのにおすすめの方法です。オプションの詳細は <a class="reference internal" href="#io-flush-recursive"><span class="std std-ref">recursive</span></a> を参照してください。</p>
+</div>
 </div>
 <div class="section" id="usage">
 <h2>7.3.23.3. 使い方<a class="headerlink" href="#usage" title="このヘッドラインへのパーマリンク">¶</a></h2>
@@ -143,7 +146,90 @@
 # [[0, 1337566253.89858, 0.000355720520019531], true]
 </pre></div>
 </div>
-<p>もし変更点を把握しているなら、書き出し対象を狭めることができます。以下はコマンドと書き出し対象の対応表です。</p>
+<p>もし変更点を把握しているなら、書き出し対象を狭めることができます。以下はGroonga 9.0.2以降向けのコマンドと書き出し対象の対応表です。</p>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>Groonga が9.0.1以前の場合( <code class="docutils literal notranslate"><span class="pre">--recursive</span> <span class="pre">dependent</span></code> が使えないので)関連するオブジェクトを明示的に書き出す必要があります。それ以降はオブジェクトの書き出し忘れをしないようにするのには <code class="docutils literal notranslate"><span class="pre">--recursive</span> <span class="pre">dependent</span></code> を使うのがおすすめです。</p>
+</div>
+<table class="docutils align-center">
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>コマンド</p></th>
+<th class="head"><p>書き出し対象</p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">io_flush</span></code> の引数</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference internal" href="load.html"><span class="doc">load</span></a> と <a class="reference internal" href="delete.html"><span class="doc">delete</span></a></p></td>
+<td><p>テーブルとそのテーブルのカラム。</p>
+<p>カラムの中に参照カラムがある場合、参照されているテーブルも書き出し対象になる。</p>
+<p>インデックスが張られているカラムがある場合、対応するインデックスカラムとそのインデックスカラムのテーブルも書き出し対象になる。</p>
+</td>
+<td><p>対象となるテーブルとそのカラム、参照先のテーブル、インデックスが張られているカラムがある場合、対応するインデックスカラムとそのインデックスカラムのテーブルを書き出すのに <code class="docutils literal notranslate"><span class="pre">--recursive</span> <span class="pre">dependent</span></code> を使います。</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>io_flush --target_name TABLE_NAME --recursive dependent
+</pre></div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="truncate.html"><span class="doc">truncate</span></a></p></td>
+<td><p>テーブルとそのテーブルのカラム。</p>
+<p>カラムの中に参照カラムがある場合、参照されているテーブルも書き出し対象になる。</p>
+<p>インデックスが張られているカラムがある場合、対応するインデックスカラムとそのインデックスカラムのテーブルも書き出し対象になる。</p>
+<p>データベースも書き出し対象。</p>
+</td>
+<td><p>対象となるテーブルとそのカラム、参照先のテーブル、インデックスが張られているカラムがある場合、対応するインデックスカラムとそのインデックスカラムのテーブルを書き出すのに <code class="docutils literal notranslate"><span class="pre">--recursive</span> <span class="pre">dependent</span></code> を使います。</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>io_flush --target_name TABLE_NAME --recursive dependent
+</pre></div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="table_create.html"><span class="doc">table_create</span></a></p></td>
+<td><p>処理対象のテーブルとデータベース。</p></td>
+<td><p>テーブル:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>io_flush --target_name TABLE_NAME --recursive dependent
+</pre></div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="table_remove.html"><span class="doc">table_remove</span></a> と <a class="reference internal" href="table_rename.html"><span class="doc">table_rename</span></a> と <a class="reference internal" href="logical_table_remove.html"><span class="doc">logical_table_remove</span></a></p></td>
+<td><p>データベース。</p></td>
+<td><p>データベース:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>io_flush --recursive no
+</pre></div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="column_create.html"><span class="doc">column_create</span></a></p></td>
+<td><p>処理対象のカラムとデータベース。</p></td>
+<td><p>テーブル:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>io_flush --target_name TABLE_NAME.COLUMN_NAME --recursive dependent
+</pre></div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="column_remove.html"><span class="doc">column_remove</span></a> と <a class="reference internal" href="column_rename.html"><span class="doc">column_rename</span></a></p></td>
+<td><p>データベース。</p></td>
+<td><p>データベース:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>io_flush --recursive no
+</pre></div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="plugin_register.html"><span class="doc">plugin_register</span></a> と <a class="reference internal" href="plugin_unregister.html"><span class="doc">plugin_unregister</span></a></p></td>
+<td><p>データベース。</p></td>
+<td><p>データベース:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>io_flush --recursive no
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<p>もしGroongaが9.0.1以前なら( <code class="docutils literal notranslate"><span class="pre">--recursive</span> <span class="pre">dependent</span></code> が使えないので) 明示的にオブジェクトを書き出す必要があります。以下はGroonga 9.0.1以前向けのコマンドと書き出し対象の対応表です。</p>
 <table class="docutils align-center">
 <colgroup>
 <col style="width: 33%" />
@@ -302,7 +388,7 @@ io_flush --target_name Users.age
 <p>テーブルの子オブジェクトはそのテーブルのすべてのカラムです。</p>
 <p>カラムの子オブジェクトはありません。</p>
 <p><a class="reference internal" href="#io-flush-only-opened"><span class="std std-ref">only_opened</span></a> に <code class="docutils literal notranslate"><span class="pre">yes</span></code> を指定すると <code class="docutils literal notranslate"><span class="pre">recursive</span></code> は無視されます。</p>
-<p><code class="docutils literal notranslate"><span class="pre">recursive</span></code> の値は <code class="docutils literal notranslate"><span class="pre">yes</span></code> または <code class="docutils literal notranslate"><span class="pre">no</span></code> でなければいけません。 <code class="docutils literal notranslate"><span class="pre">yes</span></code> は指定した書き出し対象オブジェクトとその子オブジェクトすべてを書き出し対象オブジェクトにするという意味です。 <code class="docutils literal notranslate"><span class="pre">no</span></code> は指定した書き出し対象オブジェクトのみを書き出し対象オブジェクトにするという意味です。</p>
+<p><code class="docutils literal notranslate"><span class="pre">recursive</span></code> の値は <code class="docutils literal notranslate"><span class="pre">yes</span></code> または <code class="docutils literal notranslate"><span class="pre">no</span></code> もしくは <code class="docutils literal notranslate"><span class="pre">dependent</span></code> でなければいけません。 <code class="docutils literal notranslate"><span class="pre">yes</span></code> は指定した書き出し対象オブジェクトとその子オブジェクトすべてを書き出し対象オブジェクトにするという意味です。 <code class="docutils literal notranslate"><span class="pre">no</span></code> は指定した書き出し対象オブジェクトのみを書き出し対象オブジェクトにするという意味です。<code class="docutils literal notranslate"><span class="pre">dependent</span></code> は指定した書き出し対象オブジェクトとその子オブジェクトすべて、参照先のテーブル、インデックスが張られているカラムがある場合、対応するインデックスカラムとそのインデックスカラムのテーブルを書き出し対象オブジェクトにするという意味です。</p>
 <p>次の <code class="docutils literal notranslate"><span class="pre">io_flush</span></code> はデータベースとすべてのテーブルとすべてのカラムのすべての変更を書き出します。</p>
 <p>実行例:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>io_flush --recursive yes
@@ -328,6 +414,84 @@ io_flush --target_name Users.age
 # [[0, 1337566253.89858, 0.000355720520019531], true]
 </pre></div>
 </div>
+<p>9.0.2から <code class="docutils literal notranslate"><span class="pre">--recursive</span> <span class="pre">dependent</span></code> が追加され、書き出し対象とその子オブジェクトだけでなく、関連したオブジェクトも書き出し対象にするようになりました。関連するオブジェクトは次のとおり:</p>
+<ul class="simple">
+<li><p>参照されているテーブル</p></li>
+<li><p>関連するインデックスカラム(対象の <code class="docutils literal notranslate"><span class="pre">TABLE_NAME</span></code> にソースカラムがある)</p></li>
+<li><p>関連するインデックスカラムのテーブル(対象の <code class="docutils literal notranslate"><span class="pre">TABLE_NAME</span></code> にソースカラムがある)</p></li>
+</ul>
+<p>関連するオブジェクトのフラッシュ漏れをなくすのに便利です。</p>
+<p>例えば、 <code class="docutils literal notranslate"><span class="pre">--recursive</span> <span class="pre">dependent</span></code> が <code class="docutils literal notranslate"><span class="pre">TABLE_NAME</span></code> に指定されていると、このオプションは以下と同等のコマンドを内部で実行します。</p>
+<ul>
+<li><p>テーブルとそのテーブルのカラムをフラッシュ:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>io_flush --target_name TABLE_NAME --recursive yes
+</pre></div>
+</div>
+</li>
+<li><p>参照されているテーブルをフラッシュ:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>io_flush --target_name REFERENCED_TABLE_NAME --recursive no
+</pre></div>
+</div>
+</li>
+<li><p>関連するインデックスカラムをフラッシュ(対象の <code class="docutils literal notranslate"><span class="pre">TABLE_NAME</span></code> にソースカラムがある):</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>io_flush --target_name TABLE_NAME_OF_INDEX_COLUMN.INDEX_COLUMN
+</pre></div>
+</div>
+</li>
+<li><p>関連するインデックスカラムのテーブルをフラッシュ(対象の <code class="docutils literal notranslate"><span class="pre">TABLE_NAME</span></code> にソースカラムがある):</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>io_flush --target_name TABLE_NAME_OF_INDEX_COLUMN --recursive no
+</pre></div>
+</div>
+</li>
+</ul>
+<p>すべての対象となるオブジェクトが正しくフラッシュされたかを確認するにはクエリーログをチェックします:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&gt; io_flush --recursive &quot;dependent&quot; --target_name &quot;Users&quot;
+:000000000000000 flush[Users]
+:000000000000000 flush[Terms]
+:000000000000000 flush[Terms.users_name]
+:000000000000000 flush[Users.name]
+:000000000000000 flush[(anonymous:table:dat_key)]
+:000000000000000 flush[(anonymous:column:var_size)]
+:000000000000000 flush[(anonymous:table:hash_key)]
+:000000000000000 flush[(anonymous:column:var_size)]
+:000000000000000 flush[(DB)]
+&lt;000000000000000 rc=0
+</pre></div>
+</div>
+<p>上記の例では、 指定した <code class="docutils literal notranslate"><span class="pre">Users</span></code> テーブルだけでなく、関連する語彙表の <code class="docutils literal notranslate"><span class="pre">Terms</span></code> テーブルとインデックスカラム <code class="docutils literal notranslate"><span class="pre">Terms.users_name</span></code> カラム( <code class="docutils literal notranslate"><span class="pre">Users.name</span></code> がソースカラム)もフラッシュされています。</p>
+<p><code class="docutils literal notranslate"><span class="pre">flush[(anonymous:...)]</span></code> と <code class="docutils literal notranslate"><span class="pre">flush[(DB)]</span></code> はGroongaの内部のオブジェクトがフラッシュされたことを意味します。</p>
+<table class="docutils align-center">
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>ログ</p></th>
+<th class="head"><p>説明</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">flush[(anonymous:table:dat_key)]</span></code></p></td>
+<td><p>DB内部のオブジェクト名がフラッシュされます。もし <code class="docutils literal notranslate"><span class="pre">GRN_DB_KEY=pat</span></code> が指定されていると <code class="docutils literal notranslate"><span class="pre">TABLE_PAT_KEY</span></code> が使われます。</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">flush[(anonymous:column:var_size)]</span></code> (1番目に記録されている <code class="docutils literal notranslate"><span class="pre">(anonymous:column:var_size)</span></code> オブジェクト)</p></td>
+<td><p>内部のオブジェクトのメタデータ(組込の型だったり、トークンフィルターなど)がフラッシュされます。</p>
+<p>可変長のカラムで、内部で使っているオブジェクトのメタデータを保持しています。</p>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">flush[(anonymous:table:hash_key)]</span></code></p></td>
+<td><p>設定情報のオブジェクト( <code class="docutils literal notranslate"><span class="pre">config_set</span></code> で設定される)がフラッシュされます。</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">flush[(anonymous:column:var_size)]</span></code> (2番目に記録されている <code class="docutils literal notranslate"><span class="pre">(anonymous:column:var_size)</span></code> オブジェクト)</p></td>
+<td><p>内部のオブジェクトのメタデータ(内部で使っているオブジェクトのオプション。トークナイザーのオプションなど)がフラッシュされます。</p>
+<p>可変長のカラムで、内部で使っているオブジェクトのメタデータを保持しています。</p>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">flush[(DB)]</span></code></p></td>
+<td><p>DBの変更( <code class="docutils literal notranslate"><span class="pre">io_flush</span></code> を実行中にロックを獲得している) がフラッシュされます。</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="section" id="only-opened">
 <span id="io-flush-only-opened"></span><h4>7.3.23.4.2.3. <code class="docutils literal notranslate"><span class="pre">only_opened</span></code><a class="headerlink" href="#only-opened" title="このヘッドラインへのパーマリンク">¶</a></h4>

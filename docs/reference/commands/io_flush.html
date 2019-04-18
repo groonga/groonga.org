@@ -145,6 +145,10 @@ you can’t run the following commands while <code class="docutils literal notra
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 7.0.4: </span><a class="reference internal" href="#io-flush-only-opened"><span class="std std-ref">only_opened</span></a> is added.</p>
 </div>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 9.0.2: </span><code class="docutils literal notranslate"><span class="pre">--recursive</span> <span class="pre">dependent</span></code> option is added. It is recommended way to flush
+target object and its related objects since 9.0.2. See <a class="reference internal" href="#io-flush-recursive"><span class="std std-ref">recursive</span></a> about details.</p>
+</div>
 </div>
 <div class="section" id="usage">
 <h2>7.3.23.3. Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
@@ -155,7 +159,105 @@ you can’t run the following commands while <code class="docutils literal notra
 </pre></div>
 </div>
 <p>If you know what is changed, you can narrow flush targets. Here is a
-correspondence table between command and flush targets.</p>
+correspondence table between command and flush targets for Groonga 9.0.2 or later.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>There is a different recommended way which depends on Groonga version.
+If Groonga is 9.0.1 or earlier ( <code class="docutils literal notranslate"><span class="pre">--recursive</span> <span class="pre">dependent</span></code> is not available ), you
+need to flush related objects explicitly, otherwise, using <code class="docutils literal notranslate"><span class="pre">--recursive</span> <span class="pre">dependent</span></code>
+is a recommended way not to forget flush target objects.</p>
+</div>
+<table class="docutils align-center">
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Flush targets</p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">io_flush</span></code> arguments</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference internal" href="load.html"><span class="doc">load</span></a> and <a class="reference internal" href="delete.html"><span class="doc">delete</span></a></p></td>
+<td><p>Target table and its columns.</p>
+<p>If there are one or more reference columns in these columns,
+referenced tables are also flush targets.</p>
+<p>If there are one or more indexed columns in these columns,
+tables of corresponding index columns and corresponding index
+columns are also flush targets.</p>
+</td>
+<td><p>Use <code class="docutils literal notranslate"><span class="pre">--recursive</span> <span class="pre">dependent</span></code> to flush target table and
+its columns, referenced tables and tables of corresponding index columns
+and corresponding index columns at once:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>io_flush --target_name TABLE_NAME --recursive dependent
+</pre></div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="truncate.html"><span class="doc">truncate</span></a></p></td>
+<td><p>Target table and its columns.</p>
+<p>If there are one or more reference columns in these columns,
+referenced tables are also flush targets.</p>
+<p>If there are one or more indexed columns in these columns,
+tables of corresponding index columns and corresponding index
+columns are also flush targets.</p>
+<p>Database is also flush target.</p>
+</td>
+<td><p>Use <code class="docutils literal notranslate"><span class="pre">--recursive</span> <span class="pre">dependent</span></code> to flush target table and its columns,
+referenced tables and tables of corresponding index columns and corresponding index
+columns at once:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>io_flush --target_name TABLE_NAME --recursive dependent
+</pre></div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="table_create.html"><span class="doc">table_create</span></a></p></td>
+<td><p>Target table and database.</p></td>
+<td><p>Table:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>io_flush --target_name TABLE_NAME --recursive dependent
+</pre></div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="table_remove.html"><span class="doc">table_remove</span></a>, <a class="reference internal" href="table_rename.html"><span class="doc">table_rename</span></a> and <a class="reference internal" href="logical_table_remove.html"><span class="doc">logical_table_remove</span></a></p></td>
+<td><p>Database.</p></td>
+<td><p>Database:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>io_flush --recursive no
+</pre></div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="column_create.html"><span class="doc">column_create</span></a></p></td>
+<td><p>Target column and database.</p></td>
+<td><p>Table:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>io_flush --target_name TABLE_NAME.COLUMN_NAME --recursive dependent
+</pre></div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="column_remove.html"><span class="doc">column_remove</span></a> and <a class="reference internal" href="column_rename.html"><span class="doc">column_rename</span></a></p></td>
+<td><p>Database.</p></td>
+<td><p>Database:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>io_flush --recursive no
+</pre></div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="plugin_register.html"><span class="doc">plugin_register</span></a> and <a class="reference internal" href="plugin_unregister.html"><span class="doc">plugin_unregister</span></a></p></td>
+<td><p>Database.</p></td>
+<td><p>Database:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>io_flush --recursive no
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<p>If Groonga is 9.0.1 or earlier ( <code class="docutils literal notranslate"><span class="pre">--recursive</span> <span class="pre">dependent</span></code> is not available ), flush
+objects explicitly. Here is a correspondence table between command and flush targets
+for Groonga 9.0.1 or earlier.</p>
 <table class="docutils align-center">
 <colgroup>
 <col style="width: 33%" />
@@ -323,10 +425,12 @@ flush target objects.</p>
 <p>Child objects of column is nothing.</p>
 <p>If you specify <code class="docutils literal notranslate"><span class="pre">yes</span></code> to <a class="reference internal" href="#io-flush-only-opened"><span class="std std-ref">only_opened</span></a>, <code class="docutils literal notranslate"><span class="pre">recursive</span></code>
 is ignored.</p>
-<p><code class="docutils literal notranslate"><span class="pre">recursive</span></code> value must be <code class="docutils literal notranslate"><span class="pre">yes</span></code> or <code class="docutils literal notranslate"><span class="pre">no</span></code>. <code class="docutils literal notranslate"><span class="pre">yes</span></code> means that all
+<p><code class="docutils literal notranslate"><span class="pre">recursive</span></code> value must be <code class="docutils literal notranslate"><span class="pre">yes</span></code>, <code class="docutils literal notranslate"><span class="pre">no</span></code> or <code class="docutils literal notranslate"><span class="pre">dependent</span></code>. <code class="docutils literal notranslate"><span class="pre">yes</span></code> means that all
 of the specified flush target object and child objects are flush
 target objects. <code class="docutils literal notranslate"><span class="pre">no</span></code> means that only the specified flush target
-object is flush target object.</p>
+object is flush target object. <code class="docutils literal notranslate"><span class="pre">dependent</span></code> means that all of the specified flush target object,
+child objects, corresponding table of index column and corresponding index column are flush
+target objects.</p>
 <p>The following <code class="docutils literal notranslate"><span class="pre">io_flush</span></code> flushes all changes in database, all tables
 and all columns:</p>
 <p>Execution example:</p>
@@ -356,6 +460,88 @@ isn’t specified:</p>
 # [[0, 1337566253.89858, 0.000355720520019531], true]
 </pre></div>
 </div>
+<p>Since 9.0.2, <code class="docutils literal notranslate"><span class="pre">--recursive</span> <span class="pre">dependent</span></code> is added to flush not only target object
+and child objects, but also related objects. The related objects are:</p>
+<ul class="simple">
+<li><p>A referenced table</p></li>
+<li><p>A related index column (There is source column in target <code class="docutils literal notranslate"><span class="pre">TABLE_NAME</span></code>)</p></li>
+<li><p>A table of related index column (There is source column in target <code class="docutils literal notranslate"><span class="pre">TABLE_NAME</span></code>)</p></li>
+</ul>
+<p>It is useful not to forget flushing related objects.</p>
+<p>For example, <code class="docutils literal notranslate"><span class="pre">--recursive</span> <span class="pre">dependent</span></code> is specified for <code class="docutils literal notranslate"><span class="pre">TABLE_NAME</span></code>, this
+option executes equivalent to the following commands internally.</p>
+<ul>
+<li><p>Flush table and its columns:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>io_flush --target_name TABLE_NAME --recursive yes
+</pre></div>
+</div>
+</li>
+<li><p>Flush a referenced table:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>io_flush --target_name REFERENCED_TABLE_NAME --recursive no
+</pre></div>
+</div>
+</li>
+<li><p>Flush a related index column (There is source column in <code class="docutils literal notranslate"><span class="pre">TABLE_NAME</span></code>):</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>io_flush --target_name TABLE_NAME_OF_INDEX_COLUMN.INDEX_COLUMN
+</pre></div>
+</div>
+</li>
+<li><p>Flush a table of related index column (There is source column in <code class="docutils literal notranslate"><span class="pre">TABLE_NAME</span></code>):</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>io_flush --target_name TABLE_NAME_OF_INDEX_COLUMN --recursive no
+</pre></div>
+</div>
+</li>
+</ul>
+<p>To confirm whether all target objects are flushed correctly, you can check query log:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&gt; io_flush --recursive &quot;dependent&quot; --target_name &quot;Users&quot;
+:000000000000000 flush[Users]
+:000000000000000 flush[Terms]
+:000000000000000 flush[Terms.users_name]
+:000000000000000 flush[Users.name]
+:000000000000000 flush[(anonymous:table:dat_key)]
+:000000000000000 flush[(anonymous:column:var_size)]
+:000000000000000 flush[(anonymous:table:hash_key)]
+:000000000000000 flush[(anonymous:column:var_size)]
+:000000000000000 flush[(DB)]
+&lt;000000000000000 rc=0
+</pre></div>
+</div>
+<p>In above example, specified not only <code class="docutils literal notranslate"><span class="pre">Users</span></code> table, related lexicon table <code class="docutils literal notranslate"><span class="pre">Terms</span></code> and
+index column <code class="docutils literal notranslate"><span class="pre">Terms.users_name</span></code> (data source is <code class="docutils literal notranslate"><span class="pre">Users.name</span></code>) are also flushed.</p>
+<p><code class="docutils literal notranslate"><span class="pre">flush[(anonymous:...)]</span></code> and <code class="docutils literal notranslate"><span class="pre">flush[(DB)]</span></code> means that Groonga’s internal objects
+are also flushed.</p>
+<table class="docutils align-center">
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Log</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">flush[(anonymous:table:dat_key)]</span></code></p></td>
+<td><p>The internal object names in DB are flushed. If <code class="docutils literal notranslate"><span class="pre">GRN_DB_KEY=pat</span></code> is set, <code class="docutils literal notranslate"><span class="pre">TABLE_PAT_KEY</span></code> is used instead.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">flush[(anonymous:column:var_size)]</span></code> (logged as first <code class="docutils literal notranslate"><span class="pre">(anonymous:column:var_size)</span></code> object)</p></td>
+<td><p>The internal object metadata (builtin types, token filter and so on) are flushed.</p>
+<p>This is a variable sized column which stores the above internal object metadata.</p>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">flush[(anonymous:table:hash_key)]</span></code></p></td>
+<td><p>The internal configuration objects (which is set by <code class="docutils literal notranslate"><span class="pre">config_set</span></code>) are flushed.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">flush[(anonymous:column:var_size)]</span></code> (logged as second <code class="docutils literal notranslate"><span class="pre">(anonymous:column:var_size)</span></code> object)</p></td>
+<td><p>The internal object metadata (options about internal objects such as specified tokenizer options) are flushed.</p>
+<p>This is a variable sized column which stores the above internal object metadata.</p>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">flush[(DB)]</span></code></p></td>
+<td><p>The DB changes (lock acquired during <code class="docutils literal notranslate"><span class="pre">io_flush</span></code>) are flushed.</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="section" id="only-opened">
 <span id="io-flush-only-opened"></span><h4>7.3.23.4.2.3. <code class="docutils literal notranslate"><span class="pre">only_opened</span></code><a class="headerlink" href="#only-opened" title="Permalink to this headline">¶</a></h4>

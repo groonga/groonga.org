@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="ja">
   <head>
     <meta charset="utf-8" />
-    <title>7.3.33. logical_range_filter &#8212; Groonga v9.0.1ドキュメント</title>
+    <title>7.3.33. logical_range_filter &#8212; Groonga v9.0.2ドキュメント</title>
     <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
     
@@ -65,7 +65,7 @@
         <li class="right" >
           <a href="logical_parameters.html" title="7.3.32. logical_parameters"
              accesskey="P">前へ</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v9.0.1ドキュメント</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v9.0.2ドキュメント</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../reference.html" >7. リファレンスマニュアル</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../command.html" accesskey="U">7.3. コマンド</a> &#187;</li> 
       </ul>
@@ -1080,7 +1080,94 @@ logical_range_filter \
 <p><a class="reference internal" href="select.html"><span class="doc">select</span></a> のすべてのウィンドウ関数関連パラメーターをサポートしています。詳細は <a class="reference internal" href="select.html#select-window-function-related-parameters"><span class="std std-ref">ウィンドウ関数関連の引数</span></a> を見てください。</p>
 <div class="admonition note">
 <p class="admonition-title">注釈</p>
-<p>複数のテーブルをまたがったウィンドウ関数はまだサポートしていません。</p>
+<p>バージョン9.0.1以前では、複数のテーブルをまたがったウィンドウ関数はサポートしていません。バージョン9.0.2以降ではサポートしていますが、先頭のグループキーまたは、ソートキーがシャードキーと同じ順序で並んでいる必要があります。</p>
+<p>例えば、以下のようなケースでは、複数のテーブルをまたいでウインドウ関数を適用できます。以下の例では、先頭のグループキーがシャードキーと同じ順序で並んでいるからです。</p>
+<p>以下の例では、先頭のグループキーは <code class="docutils literal notranslate"><span class="pre">price</span></code> でシャードキーは <code class="docutils literal notranslate"><span class="pre">timestamp</span></code> です。 <code class="docutils literal notranslate"><span class="pre">price</span></code> と <code class="docutils literal notranslate"><span class="pre">timestamp</span></code> は同じ順序で並んでいるため、複数のテーブルをまたいでウインドウ関数を適用できます。</p>
+</div>
+<p>実行例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>plugin_register sharding
+
+table_create Logs_20170415 TABLE_NO_KEY
+column_create Logs_20170415 timestamp COLUMN_SCALAR Time
+column_create Logs_20170415 price COLUMN_SCALAR UInt32
+column_create Logs_20170415 n_likes COLUMN_SCALAR UInt32
+
+table_create Logs_20170416 TABLE_NO_KEY
+column_create Logs_20170416 timestamp COLUMN_SCALAR Time
+column_create Logs_20170416 price COLUMN_SCALAR UInt32
+column_create Logs_20170416 n_likes COLUMN_SCALAR UInt32
+
+load --table Logs_20170415
+[
+{&quot;timestamp&quot;: &quot;2017/04/15 00:00:00&quot;, &quot;n_likes&quot;: 2, &quot;price&quot;: 100},
+{&quot;timestamp&quot;: &quot;2017/04/15 01:00:00&quot;, &quot;n_likes&quot;: 1, &quot;price&quot;: 100},
+{&quot;timestamp&quot;: &quot;2017/04/15 01:00:00&quot;, &quot;n_likes&quot;: 2, &quot;price&quot;: 200}
+]
+
+load --table Logs_20170416
+[
+{&quot;timestamp&quot;: &quot;2017/04/16 10:00:00&quot;, &quot;n_likes&quot;: 1, &quot;price&quot;: 200},
+{&quot;timestamp&quot;: &quot;2017/04/16 11:00:00&quot;, &quot;n_likes&quot;: 2, &quot;price&quot;: 300},
+{&quot;timestamp&quot;: &quot;2017/04/16 11:00:00&quot;, &quot;n_likes&quot;: 1, &quot;price&quot;: 300}
+]
+
+logical_range_filter Logs \
+  --shard_key timestamp \
+  --columns[count].stage initial \
+  --columns[count].type UInt32 \
+  --columns[count].flags COLUMN_SCALAR \
+  --columns[count].value &#39;window_count()&#39; \
+  --columns[count].window.group_keys price \
+  --output_columns price,count
+# [
+#   [
+#     0,
+#     0.0,
+#     0.0
+#   ],
+#   [
+#     [
+#       [
+#         6
+#       ],
+#       [
+#         [
+#           &quot;price&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;count&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         100,
+#         2
+#       ],
+#       [
+#         100,
+#         2
+#       ],
+#       [
+#         200,
+#         2
+#       ],
+#       [
+#         200,
+#         2
+#       ],
+#       [
+#         300,
+#         2
+#       ],
+#       [
+#         300,
+#         2
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
 </div>
 <div class="section" id="columns-name-window-sort-keys">
 <span id="logical-range-filter-columns-name-window-sort-keys"></span><h4>7.3.33.4.7.1. <code class="docutils literal notranslate"><span class="pre">columns[${NAME}].window.sort_keys</span></code><a class="headerlink" href="#columns-name-window-sort-keys" title="このヘッドラインへのパーマリンク">¶</a></h4>
@@ -1532,7 +1619,7 @@ logical_range_filter \
         <li class="right" >
           <a href="logical_parameters.html" title="7.3.32. logical_parameters"
              >前へ</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v9.0.1ドキュメント</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v9.0.2ドキュメント</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../reference.html" >7. リファレンスマニュアル</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../command.html" >7.3. コマンド</a> &#187;</li> 
       </ul>

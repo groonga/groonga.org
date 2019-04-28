@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>7.3.34. logical_select &#8212; Groonga v9.0.1 documentation</title>
+    <title>7.3.34. logical_select &#8212; Groonga v9.0.2 documentation</title>
     <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
     
@@ -64,7 +64,7 @@
         <li class="right" >
           <a href="logical_range_filter.html" title="7.3.33. logical_range_filter"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v9.0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v9.0.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../reference.html" >7. Reference manual</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../command.html" accesskey="U">7.3. Command</a> &#187;</li> 
       </ul>
@@ -2039,7 +2039,99 @@ supported. See <a class="reference internal" href="select.html#select-window-fun
 details.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Window function over multiple tables aren’t supported yet.</p>
+<p>Window function over multiple tables aren’t supported version 9.0.1 or before.
+Groonga supported it since version 9.0.2 or later.
+However, we need to align the same order for shard key and leading group key or sort key.</p>
+<p>For example, we can apply the window function to over multiple tables as below case.
+Because the below example aligns the same order for shard key and leading group key.</p>
+<p>The leading group key is <code class="docutils literal notranslate"><span class="pre">price</span></code> and shard key is <code class="docutils literal notranslate"><span class="pre">timestamp</span></code> in the below example.
+We can apply the window function to over multiple tables in the below example.
+Because <code class="docutils literal notranslate"><span class="pre">price</span></code> and <code class="docutils literal notranslate"><span class="pre">timestamp</span></code> aligns the same order.</p>
+</div>
+<p>Execution example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>plugin_register sharding
+
+table_create Logs_20170415 TABLE_NO_KEY
+column_create Logs_20170415 timestamp COLUMN_SCALAR Time
+column_create Logs_20170415 price COLUMN_SCALAR UInt32
+column_create Logs_20170415 n_likes COLUMN_SCALAR UInt32
+
+table_create Logs_20170416 TABLE_NO_KEY
+column_create Logs_20170416 timestamp COLUMN_SCALAR Time
+column_create Logs_20170416 price COLUMN_SCALAR UInt32
+column_create Logs_20170416 n_likes COLUMN_SCALAR UInt32
+
+load --table Logs_20170415
+[
+{&quot;timestamp&quot;: &quot;2017/04/15 00:00:00&quot;, &quot;n_likes&quot;: 2, &quot;price&quot;: 100},
+{&quot;timestamp&quot;: &quot;2017/04/15 01:00:00&quot;, &quot;n_likes&quot;: 1, &quot;price&quot;: 100},
+{&quot;timestamp&quot;: &quot;2017/04/15 01:00:00&quot;, &quot;n_likes&quot;: 2, &quot;price&quot;: 200}
+]
+
+load --table Logs_20170416
+[
+{&quot;timestamp&quot;: &quot;2017/04/16 10:00:00&quot;, &quot;n_likes&quot;: 1, &quot;price&quot;: 200},
+{&quot;timestamp&quot;: &quot;2017/04/16 11:00:00&quot;, &quot;n_likes&quot;: 2, &quot;price&quot;: 300},
+{&quot;timestamp&quot;: &quot;2017/04/16 11:00:00&quot;, &quot;n_likes&quot;: 1, &quot;price&quot;: 300}
+]
+
+logical_select Logs \
+  --shard_key timestamp \
+  --columns[count].stage initial \
+  --columns[count].type UInt32 \
+  --columns[count].flags COLUMN_SCALAR \
+  --columns[count].value &#39;window_count()&#39; \
+  --columns[count].window.group_keys price \
+  --output_columns price,count
+# [
+#   [
+#     0,
+#     0.0,
+#     0.0
+#   ],
+#   [
+#     [
+#       [
+#         6
+#       ],
+#       [
+#         [
+#           &quot;price&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;count&quot;,
+#           &quot;UInt32&quot;
+#         ]
+#       ],
+#       [
+#         100,
+#         2
+#       ],
+#       [
+#         100,
+#         2
+#       ],
+#       [
+#         200,
+#         2
+#       ],
+#       [
+#         200,
+#         2
+#       ],
+#       [
+#         300,
+#         2
+#       ],
+#       [
+#         300,
+#         2
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
 </div>
 <div class="section" id="columns-name-window-sort-keys">
 <span id="logical-select-columns-name-window-sort-keys"></span><h4>7.3.34.5.7.1. <code class="docutils literal notranslate"><span class="pre">columns[${NAME}].window.sort_keys</span></code><a class="headerlink" href="#columns-name-window-sort-keys" title="Permalink to this headline">¶</a></h4>
@@ -3996,7 +4088,7 @@ It’s the default value.</p></td>
         <li class="right" >
           <a href="logical_range_filter.html" title="7.3.33. logical_range_filter"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v9.0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v9.0.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../reference.html" >7. Reference manual</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../command.html" >7.3. Command</a> &#187;</li> 
       </ul>

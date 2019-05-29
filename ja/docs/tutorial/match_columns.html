@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="ja">
   <head>
     <meta charset="utf-8" />
-    <title>4.7. match_columnsパラメータ &#8212; Groonga v9.0.2ドキュメント</title>
+    <title>4.7. match_columnsパラメータ &#8212; Groonga v9.0.3ドキュメント</title>
     <link rel="stylesheet" href="../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
     
@@ -65,7 +65,7 @@
         <li class="right" >
           <a href="index.html" title="4.6. タグ検索・参照関係の逆引き"
              accesskey="P">前へ</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Groonga v9.0.2ドキュメント</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Groonga v9.0.3ドキュメント</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../tutorial.html" accesskey="U">4. チュートリアル</a> &#187;</li> 
       </ul>
     </div>  
@@ -82,7 +82,7 @@
 <p>Groongaでは、複数のカラムを対象とした全文検索を行うことができます。例えば、ブログのテーブルで、タイトルと内容とがそれぞれ別のカラムに入ったものがあるとしましょう。「タイトルもしくは内容に特定の単語を含む」検索を行いたいとします。</p>
 <p>この場合、2つのインデックス作成方式があります。1つは、それぞれのカラムに1つずつインデックスを付与する方式です。もう1つは、複数のカラムに対して1つのインデックスを付与する方式です。Groongaでは、どちらの形式のインデックスが存在している場合でも、同一の記法で全文検索を行うことができます。</p>
 <div class="section" id="creating-column-index-against-each-column">
-<h3>4.7.1.1. カラムごとにインデックスを付与する場合<a class="headerlink" href="#creating-column-index-against-each-column" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<span id="id1"></span><h3>4.7.1.1. カラムごとにインデックスを付与する場合<a class="headerlink" href="#creating-column-index-against-each-column" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <p>カラムごとにインデックスを作成する方法はこの通りです。</p>
 <p>まず、 <code class="docutils literal notranslate"><span class="pre">Blog1</span></code> テーブルを作成し、 <code class="docutils literal notranslate"><span class="pre">title</span></code> カラムと <code class="docutils literal notranslate"><span class="pre">message</span></code> カラムを追加します。 <code class="docutils literal notranslate"><span class="pre">title</span></code> カラムにブログのタイトルを保存し、 <code class="docutils literal notranslate"><span class="pre">message</span></code> カラムにブログの本文を保存します。</p>
 <p>インデックス用の <code class="docutils literal notranslate"><span class="pre">IndexBlog1</span></code> テーブルも作り、 <code class="docutils literal notranslate"><span class="pre">title</span></code> カラムのインデックス用に <code class="docutils literal notranslate"><span class="pre">index_title</span></code> カラム、 <code class="docutils literal notranslate"><span class="pre">message</span></code> カラムのインデックス用に <code class="docutils literal notranslate"><span class="pre">index_message</span></code> カラムと、それぞれ1カラムごとに1つずつ追加しています。</p>
@@ -424,7 +424,7 @@ select --table Blog2 --match_columns title --query message
 </div>
 </div>
 <div class="section" id="full-text-search-with-specific-index-name">
-<span id="id1"></span><h2>4.7.2. インデックス名を指定した全文検索<a class="headerlink" href="#full-text-search-with-specific-index-name" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<span id="id2"></span><h2>4.7.2. インデックス名を指定した全文検索<a class="headerlink" href="#full-text-search-with-specific-index-name" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <p>Groongaは、インデックス名を指定した全文検索もサポートしています。</p>
 <p>このセクションでは、インデックス名を指定した全文検索の方法を学びます。</p>
 <p>インデックス名の指定について具体的な例を示します。</p>
@@ -842,7 +842,65 @@ select Articles2 --match_columns comment.comment.content --query mroonga --outpu
 </div>
 <div class="section" id="indexes-with-weight">
 <h2>4.7.4. インデックスの重み<a class="headerlink" href="#indexes-with-weight" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>TODO</p>
+<p>もし、インデックスカラムがデータカラムに対して作成されていたら、インデックスの重みを使って検索できます。例えば、 <code class="docutils literal notranslate"><span class="pre">Groonga</span></code> が重要なキーワードとしてブログエントリに含まれている <code class="docutils literal notranslate"><span class="pre">Blog1</span></code> テーブルをインデックスの重みを使って検索してみましょう。一般的に重要なキーワードはブログのタイトルに含まれます。そのため、 <code class="docutils literal notranslate"><span class="pre">title</span></code> カラムが <code class="docutils literal notranslate"><span class="pre">Groonga</span></code> を含んでいればそのスコア( <code class="docutils literal notranslate"><span class="pre">_score</span></code> )が <code class="docutils literal notranslate"><span class="pre">message</span></code> カラムにくらべて高くないといけません。インデックスの重みはそのような目的に使われます。</p>
+<p>次は、<code class="docutils literal notranslate"><span class="pre">tittle</span></code> や <code class="docutils literal notranslate"><span class="pre">message</span></code> カラムに重要なキーワードとして <code class="docutils literal notranslate"><span class="pre">Groonga</span></code> が含まれているブログエントリを検索する例です。</p>
+<p>サンプルのスキーマとデータは <a class="reference internal" href="#creating-column-index-against-each-column"><span class="std std-ref">カラムごとにインデックスを付与する場合</span></a> と同じです。</p>
+<p>実行例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select --table Blog1 --match_columns &#39;IndexBlog1.index_title * 10 || IndexBlog1.index_message&#39; --query &#39;Groonga&#39; --output_columns &quot;_id, _score, *&quot;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         3
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_score&quot;,
+#           &quot;Int32&quot;
+#         ],
+#         [
+#           &quot;message&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;title&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         11,
+#         &quot;Groonga message&quot;,
+#         &quot;Groonga test&quot;
+#       ],
+#       [
+#         3,
+#         10,
+#         &quot;none&quot;,
+#         &quot;Groonga message&quot;
+#       ],
+#       [
+#         2,
+#         1,
+#         &quot;rakutan eggs 4 - 4 Groonga moritars&quot;,
+#         &quot;baseball result&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>上記の例では、 <code class="docutils literal notranslate"><span class="pre">'IndexBlog1.index_title</span> <span class="pre">*</span> <span class="pre">10</span> <span class="pre">||</span> <span class="pre">IndexBlog1.index_message'</span></code> が <code class="docutils literal notranslate"><span class="pre">--match_columns</span></code> に指定されています。これは <code class="docutils literal notranslate"><span class="pre">title</span></code> カラム( <code class="docutils literal notranslate"><span class="pre">IndexBlog1.index_title</span></code> インデックスを使って検索)が <code class="docutils literal notranslate"><span class="pre">Groonga</span></code> にマッチしたら、その重みは10倍されます。もし <code class="docutils literal notranslate"><span class="pre">message</span></code> カラム( <code class="docutils literal notranslate"><span class="pre">IndexBlog1.index_message</span></code> インデックスを使って検索)が <code class="docutils literal notranslate"><span class="pre">Groonga</span></code> にマッチしたら、その重みは1(既定値)になります。もし <code class="docutils literal notranslate"><span class="pre">Groonga</span></code> が <code class="docutils literal notranslate"><span class="pre">title</span></code> と <code class="docutils literal notranslate"><span class="pre">message</span></code> カラムの両方にマッチしたら、その重みはこの場合11(10 + 1)になります。</p>
+<p>結果として、 <code class="docutils literal notranslate"><span class="pre">Groonga</span> <span class="pre">test</span></code> ブログエントリがリストの最初に表示されます。</p>
 </div>
 </div>
 
@@ -899,7 +957,7 @@ select Articles2 --match_columns comment.comment.content --query mroonga --outpu
         <li class="right" >
           <a href="index.html" title="4.6. タグ検索・参照関係の逆引き"
              >前へ</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Groonga v9.0.2ドキュメント</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Groonga v9.0.3ドキュメント</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../tutorial.html" >4. チュートリアル</a> &#187;</li> 
       </ul>
     </div>

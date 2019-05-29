@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>4.7. match_columns parameter &#8212; Groonga v9.0.2 documentation</title>
+    <title>4.7. match_columns parameter &#8212; Groonga v9.0.3 documentation</title>
     <link rel="stylesheet" href="../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
     
@@ -64,7 +64,7 @@
         <li class="right" >
           <a href="index.html" title="4.6. Tag search and reverse resolution of reference relationships"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Groonga v9.0.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Groonga v9.0.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../tutorial.html" accesskey="U">4. Tutorial</a> &#187;</li> 
       </ul>
     </div>  
@@ -81,7 +81,7 @@
 <p>Groonga supports full-text search against multiple columns. Let’s consider blog site. Usually, blog site has a table which contains title column and content column. How do you search the blog entry which contains specified keywords in title or content?</p>
 <p>In such a case, there are two ways to create indexes. One way is creating column index against each column. The other way is creating one column index against multiple columns. Either way, Groonga supports similar full-text search syntax.</p>
 <div class="section" id="creating-column-index-against-each-column">
-<h3>4.7.1.1. Creating column index against each column<a class="headerlink" href="#creating-column-index-against-each-column" title="Permalink to this headline">¶</a></h3>
+<span id="id1"></span><h3>4.7.1.1. Creating column index against each column<a class="headerlink" href="#creating-column-index-against-each-column" title="Permalink to this headline">¶</a></h3>
 <p>Here is the example which create column index against each column.</p>
 <p>First, create <code class="docutils literal notranslate"><span class="pre">Blog1</span></code> table, add <code class="docutils literal notranslate"><span class="pre">title</span></code> column which stores title string, <code class="docutils literal notranslate"><span class="pre">message</span></code> column which stores content of blog entry.</p>
 <p>Then create <code class="docutils literal notranslate"><span class="pre">IndexBlog1</span></code> table for column indexes, add <code class="docutils literal notranslate"><span class="pre">index_title</span></code> column for <code class="docutils literal notranslate"><span class="pre">title</span></code> column, <code class="docutils literal notranslate"><span class="pre">index_message</span></code> column for <code class="docutils literal notranslate"><span class="pre">message</span></code> column.</p>
@@ -425,7 +425,7 @@ It depends on the case.</p>
 </div>
 </div>
 <div class="section" id="full-text-search-with-specific-index-name">
-<span id="id1"></span><h2>4.7.2. Full text search with specific index name<a class="headerlink" href="#full-text-search-with-specific-index-name" title="Permalink to this headline">¶</a></h2>
+<span id="id2"></span><h2>4.7.2. Full text search with specific index name<a class="headerlink" href="#full-text-search-with-specific-index-name" title="Permalink to this headline">¶</a></h2>
 <p>Groonga also supports full text search with specific index name.</p>
 <p>In this section, you learn how to use specific index column efficiently.</p>
 <p>Here is the concrete example about specific index name.</p>
@@ -850,7 +850,69 @@ select Articles2 --match_columns comment.comment.content --query mroonga --outpu
 </div>
 <div class="section" id="indexes-with-weight">
 <h2>4.7.4. Indexes with Weight<a class="headerlink" href="#indexes-with-weight" title="Permalink to this headline">¶</a></h2>
-<p>TODO</p>
+<p>If index columns are created for data columns, you can search by indexes with weight.
+For example, let’s try to search blog entries by indexes with weight which contains <code class="docutils literal notranslate"><span class="pre">Groonga</span></code> as important keyword in <code class="docutils literal notranslate"><span class="pre">Blog1</span></code> table.
+Generally speaking, an important keyword tend to be included in blog title, so if <code class="docutils literal notranslate"><span class="pre">title</span></code> column contains <code class="docutils literal notranslate"><span class="pre">Groonga</span></code>, its score ( <code class="docutils literal notranslate"><span class="pre">_score</span></code> ) must be raised in contrast to <code class="docutils literal notranslate"><span class="pre">message</span></code> column. The indexes with weight is used for such a purpose.</p>
+<p>Here is the example which search blog entries with <code class="docutils literal notranslate"><span class="pre">Groonga</span></code> as important keyword in <code class="docutils literal notranslate"><span class="pre">title</span></code> or <code class="docutils literal notranslate"><span class="pre">message</span></code> columns.</p>
+<p>The sample schema and data is same as <a class="reference internal" href="#creating-column-index-against-each-column"><span class="std std-ref">Creating column index against each column</span></a>.</p>
+<p>Execution example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select --table Blog1 --match_columns &#39;IndexBlog1.index_title * 10 || IndexBlog1.index_message&#39; --query &#39;Groonga&#39; --output_columns &quot;_id, _score, *&quot;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         3
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;_score&quot;,
+#           &quot;Int32&quot;
+#         ],
+#         [
+#           &quot;message&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;title&quot;,
+#           &quot;ShortText&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         11,
+#         &quot;Groonga message&quot;,
+#         &quot;Groonga test&quot;
+#       ],
+#       [
+#         3,
+#         10,
+#         &quot;none&quot;,
+#         &quot;Groonga message&quot;
+#       ],
+#       [
+#         2,
+#         1,
+#         &quot;rakutan eggs 4 - 4 Groonga moritars&quot;,
+#         &quot;baseball result&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>In above query, <code class="docutils literal notranslate"><span class="pre">'IndexBlog1.index_title</span> <span class="pre">*</span> <span class="pre">10</span> <span class="pre">||</span> <span class="pre">IndexBlog1.index_message'</span></code> is specified for <code class="docutils literal notranslate"><span class="pre">--match_columns</span></code>.
+It means that if <code class="docutils literal notranslate"><span class="pre">title</span></code> column (search <code class="docutils literal notranslate"><span class="pre">title</span></code> column using <code class="docutils literal notranslate"><span class="pre">IndexBlog1.index_title</span></code> index) matches to <code class="docutils literal notranslate"><span class="pre">Groonga</span></code>, its weight is multiplied to 10 and if <code class="docutils literal notranslate"><span class="pre">message</span></code> column (search <code class="docutils literal notranslate"><span class="pre">message</span></code> column using <code class="docutils literal notranslate"><span class="pre">IndexBlog1.index_message</span></code> index) matches to <code class="docutils literal notranslate"><span class="pre">Groonga</span></code>,
+its weight is 1 (default). If <code class="docutils literal notranslate"><span class="pre">Groonga</span></code> matches to <code class="docutils literal notranslate"><span class="pre">title</span></code> and <code class="docutils literal notranslate"><span class="pre">message</span></code>, its weight is 11 (10 + 1) in this case.</p>
+<p>As a result, <code class="docutils literal notranslate"><span class="pre">Groonga</span> <span class="pre">test</span></code> blog entry is listed in first.</p>
 </div>
 </div>
 
@@ -907,7 +969,7 @@ select Articles2 --match_columns comment.comment.content --query mroonga --outpu
         <li class="right" >
           <a href="index.html" title="4.6. Tag search and reverse resolution of reference relationships"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Groonga v9.0.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Groonga v9.0.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../tutorial.html" >4. Tutorial</a> &#187;</li> 
       </ul>
     </div>

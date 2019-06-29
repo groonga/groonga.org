@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <title>7.8.14. TokenPattern &#8212; Groonga v9.0.4ドキュメント</title>
+    <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
+    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../static/doctools.js"></script>
+    <script type="text/javascript" src="../../static/language_data.js"></script>
+    <script type="text/javascript" src="../../static/translations.js"></script>
+    
+    <link rel="shortcut icon" href="../../static/favicon.ico"/>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="検索" href="../../search.html" />
+    <link rel="next" title="7.8.15. TokenRegexp" href="token_regexp.html" />
+    <link rel="prev" title="7.8.13. TokenNgram" href="token_ngram.html" /> 
+      <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
+    <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
+    <meta property="og:type" content="product" />
+    <meta property="og:image" content="http://groonga.org/images/logos/groonga-icon-full-size.png" />
+    <meta property="og:site_name" content="groonga" />
+
+    <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
+  </head>
+  <body>
+    <div id="fb-root"></div>
+
+<div class="header">
+  <h1 class="title">
+    <a id="top-link" href="../../../">
+      <span class="project">groonga</span>
+      <span class="separator">-</span>
+      <span class="description">オープンソースのカラムストア機能付き全文検索エンジン</span>
+    </a>
+  </h1>
+
+      <div class="facebook-buttons">
+      <fb:like href="http://www.facebook.com/pages/groonga/201193596592346"
+               layout="standard"
+               width="290"></fb:like>
+    </div>
+    <div class="other-language-links">
+
+    <ul>
+      <li><a href="../../../../docs/reference/tokenizers/token_pattern.html">English</a></li>
+    </ul>
+  </div>
+</div>
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="token_regexp.html" title="7.8.15. TokenRegexp"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="token_ngram.html" title="7.8.13. TokenNgram"
+             accesskey="P">前へ</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v9.0.4ドキュメント</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../reference.html" >7. リファレンスマニュアル</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../tokenizers.html" accesskey="U">7.8. トークナイザー</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="tokenpattern">
+<h1>7.8.14. <code class="docutils literal notranslate"><span class="pre">TokenPattern</span></code><a class="headerlink" href="#tokenpattern" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<div class="section" id="summary">
+<h2>7.8.14.1. 概要<a class="headerlink" href="#summary" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">TokenPattern</span></code> は正規表現でトークンを抽出するのに使われるトークナイザーです。このトークナイザーは指定した正規表現にマッチしたトークンだけを抽出します。</p>
+<p>複数の正規表現を指定することもできます。</p>
+</div>
+<div class="section" id="syntax">
+<h2>7.8.14.2. 構文<a class="headerlink" href="#syntax" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">TokenPattern</span></code> は、省略可能な引数があります。</p>
+<p>パターンを1つ指定:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>TokenPattern(&quot;pattern&quot;, PATTERN)
+</pre></div>
+</div>
+<p>複数のパターンを指定:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>TokenPattern(&quot;pattern&quot;, PATTERN_1, &quot;pattern&quot;, PATTERN_2, ... &quot;pattern&quot;, PATTERN_N)
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">TokenPattern</span></code> は上記のように複数のパターンを受け付けます。</p>
+</div>
+<div class="section" id="usage">
+<h2>7.8.14.3. 使い方<a class="headerlink" href="#usage" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">TokenPattern</span></code> の例です。<code class="docutils literal notranslate"><span class="pre">TokenPattern</span></code> は指定した正規表現にマッチするトークンのみを抽出します。そのため抽出したトークンにのみマッチした検索結果になります。</p>
+<p>例として、特定のキーワードによる検索結果を比較してみましょう。1つは <code class="docutils literal notranslate"><span class="pre">TokenPattern</span></code> に指定されているキーワードで、もう1つは <code class="docutils literal notranslate"><span class="pre">TokenPattern</span></code> に指定されていないキーワードとします。</p>
+<p><code class="docutils literal notranslate"><span class="pre">Foods</span></code> テーブルには特定のキーワードを含むメニューが両方あります。</p>
+<p>スキーマ定義とサンプルデータは以下の通りです。</p>
+<p>実行例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>table_create Foods TABLE_NO_KEY
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Foods name COLUMN_SCALAR Text
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create Keywords TABLE_PAT_KEY ShortText --default_tokenizer &#39;TokenPattern(&quot;pattern&quot;, &quot;Apple|Orange&quot;)&#39;
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Keywords index COLUMN_INDEX Foods name
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+load --table Foods
+[
+{&quot;name&quot;: &quot;Apple Pie&quot;},
+{&quot;name&quot;: &quot;Orange Pie&quot;}
+{&quot;name&quot;: &quot;Raspberry Pie&quot;}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 3]
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">--query</span> <span class="pre">Apple</span></code> で <code class="docutils literal notranslate"><span class="pre">Apple</span> <span class="pre">Pie</span></code> を検索します。</p>
+<p>実行例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Foods --match_columns name --query &#39;Apple&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;name&quot;,
+#           &quot;Text&quot;
+#         ]
+#       ],
+#       [
+#         1,
+#         &quot;Apple Pie&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>上記の例では、 <code class="docutils literal notranslate"><span class="pre">Apple</span></code> は <code class="docutils literal notranslate"><span class="pre">TokenPattern</span></code> で指定したパターンにマッチします。そのため <code class="docutils literal notranslate"><span class="pre">select</span></code> は <code class="docutils literal notranslate"><span class="pre">Apple</span> <span class="pre">Pie</span></code> にマッチします。</p>
+<p><code class="docutils literal notranslate"><span class="pre">--query</span> <span class="pre">Raspberry</span></code> で <code class="docutils literal notranslate"><span class="pre">Raspberry</span> <span class="pre">Pie</span></code> を検索します。</p>
+<p>実行例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Foods --match_columns name --query &#39;Raspberry&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         0
+#       ],
+#       [
+#         [
+#           &quot;_id&quot;,
+#           &quot;UInt32&quot;
+#         ],
+#         [
+#           &quot;name&quot;,
+#           &quot;Text&quot;
+#         ]
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>上記の例では、 <code class="docutils literal notranslate"><span class="pre">Foods</span></code> テーブルに <code class="docutils literal notranslate"><span class="pre">Raspberry</span> <span class="pre">Pie</span></code> が含まれているにもかかわらず、 <code class="docutils literal notranslate"><span class="pre">select</span></code> ではヒットしません。これは <code class="docutils literal notranslate"><span class="pre">Raspberry</span></code> は <code class="docutils literal notranslate"><span class="pre">TokenPattern</span></code> のパターンにマッチしないからです。</p>
+</div>
+<div class="section" id="see-also">
+<h2>7.8.14.4. 参考<a class="headerlink" href="#see-also" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="../commands/tokenize.html"><span class="doc">tokenize</span></a></p></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">7.8.14. <code class="docutils literal notranslate"><span class="pre">TokenPattern</span></code></a><ul>
+<li><a class="reference internal" href="#summary">7.8.14.1. 概要</a></li>
+<li><a class="reference internal" href="#syntax">7.8.14.2. 構文</a></li>
+<li><a class="reference internal" href="#usage">7.8.14.3. 使い方</a></li>
+<li><a class="reference internal" href="#see-also">7.8.14.4. 参考</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="token_ngram.html"
+                        title="前の章へ">7.8.13. <code class="docutils literal notranslate"><span class="pre">TokenNgram</span></code></a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="token_regexp.html"
+                        title="次の章へ">7.8.15. <code class="docutils literal notranslate"><span class="pre">TokenRegexp</span></code></a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="token_regexp.html" title="7.8.15. TokenRegexp"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="token_ngram.html" title="7.8.13. TokenNgram"
+             >前へ</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v9.0.4ドキュメント</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../reference.html" >7. リファレンスマニュアル</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../tokenizers.html" >7.8. トークナイザー</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2009-2019, Brazil, Inc.
+    </div>
+      <script src="http://connect.facebook.net/ja_JP/all.js"></script>
+
+    <script>
+      FB.init({
+         appId  : null,
+         status : true, // check login status
+         cookie : true, // enable cookies to allow the server to access the session
+         xfbml  : true  // parse XFBML
+      });
+    </script>
+  </body>
+
+</html>

@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>7.8.13. TokenNgram &#8212; Groonga v9.0.4 documentation</title>
+    <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
+    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../static/doctools.js"></script>
+    <script type="text/javascript" src="../../static/language_data.js"></script>
+    
+    <link rel="shortcut icon" href="../../static/favicon.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="7.8.14. TokenPattern" href="token_pattern.html" />
+    <link rel="prev" title="7.8.12. TokenMecab" href="token_mecab.html" /> 
+      <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
+    <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
+    <meta property="og:type" content="product" />
+    <meta property="og:image" content="http://groonga.org/images/logos/groonga-icon-full-size.png" />
+    <meta property="og:site_name" content="groonga" />
+
+    <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
+  </head>
+  <body>
+    <div id="fb-root"></div>
+
+<div class="header">
+  <h1 class="title">
+    <a id="top-link" href="../../../">
+      <span class="project">groonga</span>
+      <span class="separator">-</span>
+      <span class="description">An open-source fulltext search engine and column store.</span>
+    </a>
+  </h1>
+
+      <div class="facebook-buttons">
+      <fb:like href="http://www.facebook.com/pages/groonga/201193596592346"
+               layout="standard"
+               width="290"></fb:like>
+    </div>
+    <div class="other-language-links">
+
+    <ul>
+      <li><a href="../../../ja/docs/reference/tokenizers/token_ngram.html">日本語</a></li>
+    </ul>
+  </div>
+</div>
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="token_pattern.html" title="7.8.14. TokenPattern"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="token_mecab.html" title="7.8.12. TokenMecab"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v9.0.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../reference.html" >7. Reference manual</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../tokenizers.html" accesskey="U">7.8. Tokenizers</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="tokenngram">
+<span id="token-ngram"></span><h1>7.8.13. <code class="docutils literal notranslate"><span class="pre">TokenNgram</span></code><a class="headerlink" href="#tokenngram" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="summary">
+<h2>7.8.13.1. Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">TokenNgram</span></code> can change define its behavior dynamically via its options.
+For example, we can use it as unigram, bigram, trigram on with changing <code class="docutils literal notranslate"><span class="pre">n</span></code> option value as below.</p>
+<p>Uni-gram:</p>
+<p>Execution example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>tokenize --tokenizer &#39;TokenNgram(&quot;n&quot;, 1)&#39; --string &quot;Hello World&quot;
+# [
+#   [
+#     0,
+#     1556063953.911713,
+#     0.05761265754699707
+#   ],
+#   [
+#     {
+#       &quot;value&quot;: &quot;H&quot;,
+#       &quot;position&quot;: 0,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;e&quot;,
+#       &quot;position&quot;: 1,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;l&quot;,
+#       &quot;position&quot;: 2,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;l&quot;,
+#       &quot;position&quot;: 3,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;o&quot;,
+#       &quot;position&quot;: 4,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot; &quot;,
+#       &quot;position&quot;: 5,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;W&quot;,
+#       &quot;position&quot;: 6,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;o&quot;,
+#       &quot;position&quot;: 7,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;r&quot;,
+#       &quot;position&quot;: 8,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;l&quot;,
+#       &quot;position&quot;: 9,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;d&quot;,
+#       &quot;position&quot;: 10,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     }
+#   ]
+# ]
+</pre></div>
+</div>
+<p>Bi-gram:</p>
+<p>Execution example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>tokenize --tokenizer &#39;TokenNgram(&quot;n&quot;, 2)&#39; --string &quot;Hello World&quot;
+# [
+#   [
+#     0,
+#     1556064877.095833,
+#     0.0002193450927734375
+#   ],
+#   [
+#     {
+#       &quot;value&quot;: &quot;He&quot;,
+#       &quot;position&quot;: 0,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;el&quot;,
+#       &quot;position&quot;: 1,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;ll&quot;,
+#       &quot;position&quot;: 2,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;lo&quot;,
+#       &quot;position&quot;: 3,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;o &quot;,
+#       &quot;position&quot;: 4,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot; W&quot;,
+#       &quot;position&quot;: 5,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;Wo&quot;,
+#       &quot;position&quot;: 6,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;or&quot;,
+#       &quot;position&quot;: 7,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;rl&quot;,
+#       &quot;position&quot;: 8,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;ld&quot;,
+#       &quot;position&quot;: 9,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;d&quot;,
+#       &quot;position&quot;: 10,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     }
+#   ]
+# ]
+</pre></div>
+</div>
+<p>Tri-gram:</p>
+<p>Execution example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>tokenize --tokenizer &#39;TokenNgram(&quot;n&quot;, 3)&#39; --string &quot;Hello World&quot;
+# [
+#   [
+#     0,
+#     1556064951.790899,
+#     0.0002274513244628906
+#   ],
+#   [
+#     {
+#       &quot;value&quot;: &quot;Hel&quot;,
+#       &quot;position&quot;: 0,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;ell&quot;,
+#       &quot;position&quot;: 1,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;llo&quot;,
+#       &quot;position&quot;: 2,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;lo &quot;,
+#       &quot;position&quot;: 3,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;o W&quot;,
+#       &quot;position&quot;: 4,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot; Wo&quot;,
+#       &quot;position&quot;: 5,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;Wor&quot;,
+#       &quot;position&quot;: 6,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;orl&quot;,
+#       &quot;position&quot;: 7,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;rld&quot;,
+#       &quot;position&quot;: 8,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;ld&quot;,
+#       &quot;position&quot;: 9,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;d&quot;,
+#       &quot;position&quot;: 10,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     }
+#   ]
+# ]
+</pre></div>
+</div>
+<p>This tokenizer also has options other than the above.</p>
+</div>
+<div class="section" id="syntax">
+<h2>7.8.13.2. Syntax<a class="headerlink" href="#syntax" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">TokenNgram</span></code> has optional parameter.</p>
+<p>No options:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>TokenNgram
+</pre></div>
+</div>
+<p>If we don’t use options, <code class="docutils literal notranslate"><span class="pre">TokenNgram</span></code> is the same behavior for <code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code>.</p>
+<p>Specify option:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>TokenNgram(&quot;n&quot;, true)
+
+TokenNgram(&quot;loose_symbol&quot;, true)
+
+TokenNgram(&quot;loose_blank&quot;, true)
+
+TokenNgram(&quot;remove_blank&quot;, true)
+
+TokenNgram(&quot;report_source_location&quot;, true)
+
+TokenNgram(&quot;unify_alphabet&quot;, true)
+
+TokenNgram(&quot;unify_symbol&quot;, true)
+
+TokenNgram(&quot;unify_digit&quot;, true)
+</pre></div>
+</div>
+<p>Specify multiple options:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>TokenNgram(&quot;loose_symbol&quot;, true, &quot;loose_blank&quot;, true)
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">TokenNgram</span></code> We can also specify multiple options at the same time except the above examples.</p>
+</div>
+<div class="section" id="usage">
+<h2>7.8.13.3. Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="simple-usage">
+<h2>7.8.13.4. Simple usage<a class="headerlink" href="#simple-usage" title="Permalink to this headline">¶</a></h2>
+<p>Here is an example of <code class="docutils literal notranslate"><span class="pre">TokenNgram</span></code>.</p>
+<p>If we use <code class="docutils literal notranslate"><span class="pre">TokenNgram</span></code> in the nothing of option.
+<code class="docutils literal notranslate"><span class="pre">TokenNgram</span></code> behavior is the same as <code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code> as below:</p>
+<ul class="simple">
+<li><p>If no normalizer is used.</p></li>
+</ul>
+<p>Execution example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>tokenize --tokenizer TokenNgram --string &quot;Hello World&quot;
+# [
+#   [
+#     0,
+#     1556063548.341422,
+#     0.0002450942993164062
+#   ],
+#   [
+#     {
+#       &quot;value&quot;: &quot;He&quot;,
+#       &quot;position&quot;: 0,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;el&quot;,
+#       &quot;position&quot;: 1,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;ll&quot;,
+#       &quot;position&quot;: 2,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;lo&quot;,
+#       &quot;position&quot;: 3,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;o &quot;,
+#       &quot;position&quot;: 4,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot; W&quot;,
+#       &quot;position&quot;: 5,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;Wo&quot;,
+#       &quot;position&quot;: 6,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;or&quot;,
+#       &quot;position&quot;: 7,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;rl&quot;,
+#       &quot;position&quot;: 8,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;ld&quot;,
+#       &quot;position&quot;: 9,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;d&quot;,
+#       &quot;position&quot;: 10,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     }
+#   ]
+# ]
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>If normalizer is used.</p></li>
+</ul>
+<p>Execution example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>tokenize --tokenizer TokenNgram --string &quot;Hello World&quot; --normalizer NormalizerAuto
+# [
+#   [
+#     0,
+#     1556063752.798628,
+#     0.0001776218414306641
+#   ],
+#   [
+#     {
+#       &quot;value&quot;: &quot;hello&quot;,
+#       &quot;position&quot;: 0,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;world&quot;,
+#       &quot;position&quot;: 1,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     }
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
+<div class="section" id="advanced-usage">
+<h2>7.8.13.5. Advanced usage<a class="headerlink" href="#advanced-usage" title="Permalink to this headline">¶</a></h2>
+<p>We can specify multiple options for <code class="docutils literal notranslate"><span class="pre">TokenNgram</span></code>.</p>
+<p>For example, we can deal with variantsas as phone number by using <code class="docutils literal notranslate"><span class="pre">loose_symbol</span></code> and <code class="docutils literal notranslate"><span class="pre">loose_blank</span></code> as below.</p>
+<p>We can search <code class="docutils literal notranslate"><span class="pre">0123(45)6789</span></code>, <code class="docutils literal notranslate"><span class="pre">0123-45-6789</span></code> and, <code class="docutils literal notranslate"><span class="pre">0123</span> <span class="pre">45</span> <span class="pre">6789</span></code> by using <code class="docutils literal notranslate"><span class="pre">0123456789</span></code> as below example.</p>
+<p>Execution example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>tokenize --tokenizer &#39;TokenNgram(&quot;loose_symbol&quot;, true, &quot;loose_blank&quot;, true)&#39; --string &quot;0123(45)6789&quot; --normalizer NormalizerAuto
+# [
+#   [
+#     0,
+#     1557187317.825164,
+#     0.0003116130828857422
+#   ],
+#   [
+#     {
+#       &quot;value&quot;: &quot;0123&quot;,
+#       &quot;position&quot;: 0,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;(&quot;,
+#       &quot;position&quot;: 1,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;45&quot;,
+#       &quot;position&quot;: 2,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;)&quot;,
+#       &quot;position&quot;: 3,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;6789&quot;,
+#       &quot;position&quot;: 4,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;￰&quot;,
+#       &quot;position&quot;: 5,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;0123456789&quot;,
+#       &quot;position&quot;: 6,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     }
+#   ]
+# ]
+tokenize --tokenizer &#39;TokenNgram(&quot;loose_symbol&quot;, true, &quot;loose_blank&quot;, true)&#39; --string &quot;0123-45-6789&quot; --normalizer NormalizerAuto
+# [
+#   [
+#     0,
+#     1557187366.441741,
+#     0.0002820491790771484
+#   ],
+#   [
+#     {
+#       &quot;value&quot;: &quot;0123&quot;,
+#       &quot;position&quot;: 0,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;-&quot;,
+#       &quot;position&quot;: 1,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;45&quot;,
+#       &quot;position&quot;: 2,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;-&quot;,
+#       &quot;position&quot;: 3,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;6789&quot;,
+#       &quot;position&quot;: 4,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;￰&quot;,
+#       &quot;position&quot;: 5,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;0123456789&quot;,
+#       &quot;position&quot;: 6,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     }
+#   ]
+# ]
+tokenize --tokenizer &#39;TokenNgram(&quot;loose_symbol&quot;, true, &quot;loose_blank&quot;, true)&#39; --string &quot;0123 45 6789&quot; --normalizer NormalizerAuto
+# [
+#   [
+#     0,
+#     1557187404.034283,
+#     0.0003006458282470703
+#   ],
+#   [
+#     {
+#       &quot;value&quot;: &quot;0123&quot;,
+#       &quot;position&quot;: 0,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;45&quot;,
+#       &quot;position&quot;: 1,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;6789&quot;,
+#       &quot;position&quot;: 2,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;￰&quot;,
+#       &quot;position&quot;: 3,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;0123456789&quot;,
+#       &quot;position&quot;: 4,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     }
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
+<div class="section" id="parameters">
+<h2>7.8.13.6. Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="optional-parameter">
+<h3>7.8.13.6.1. Optional parameter<a class="headerlink" href="#optional-parameter" title="Permalink to this headline">¶</a></h3>
+<p>There are eight optional parameters.</p>
+<div class="section" id="n">
+<span id="token-ngram-n"></span><h4>7.8.13.6.1.1. <code class="docutils literal notranslate"><span class="pre">n</span></code><a class="headerlink" href="#n" title="Permalink to this headline">¶</a></h4>
+<p>This option shows <code class="docutils literal notranslate"><span class="pre">N</span></code> of Ngram. For example, <code class="docutils literal notranslate"><span class="pre">n</span></code> is <code class="docutils literal notranslate"><span class="pre">3</span></code> for trigram.</p>
+</div>
+<div class="section" id="loose-symbol">
+<span id="token-ngram-loose-symbol"></span><h4>7.8.13.6.1.2. <code class="docutils literal notranslate"><span class="pre">loose_symbol</span></code><a class="headerlink" href="#loose-symbol" title="Permalink to this headline">¶</a></h4>
+<p>Tokenize keywords including symbols, to be searched by both queries with/without symbols.
+For example, a keyword <code class="docutils literal notranslate"><span class="pre">090-1111-2222</span></code> will be found by any of <code class="docutils literal notranslate"><span class="pre">09011112222</span></code>, <code class="docutils literal notranslate"><span class="pre">090</span></code>, <code class="docutils literal notranslate"><span class="pre">1111</span></code>, <code class="docutils literal notranslate"><span class="pre">2222</span></code> and <code class="docutils literal notranslate"><span class="pre">090-1111-2222</span></code>.</p>
+</div>
+<div class="section" id="loose-blank">
+<span id="token-ngram-loose-blank"></span><h4>7.8.13.6.1.3. <code class="docutils literal notranslate"><span class="pre">loose_blank</span></code><a class="headerlink" href="#loose-blank" title="Permalink to this headline">¶</a></h4>
+<p>Tokenize keywords including blanks, to be searched by both queries with/without blanks.
+For example, a keyword <code class="docutils literal notranslate"><span class="pre">090</span> <span class="pre">1111</span> <span class="pre">2222</span></code> will be found by any of <code class="docutils literal notranslate"><span class="pre">09011112222</span></code>, <code class="docutils literal notranslate"><span class="pre">090</span></code>, <code class="docutils literal notranslate"><span class="pre">1111</span></code>, <code class="docutils literal notranslate"><span class="pre">2222</span></code> and <code class="docutils literal notranslate"><span class="pre">090</span> <span class="pre">1111</span> <span class="pre">2222</span></code>.</p>
+</div>
+<div class="section" id="remove-blank">
+<span id="token-ngram-remove-blank"></span><h4>7.8.13.6.1.4. <code class="docutils literal notranslate"><span class="pre">remove_blank</span></code><a class="headerlink" href="#remove-blank" title="Permalink to this headline">¶</a></h4>
+<p>Tokenize keywords including blanks, to be searched by queries without blanks.
+For example, a keyword <code class="docutils literal notranslate"><span class="pre">090</span> <span class="pre">1111</span> <span class="pre">2222</span></code> will be found by any of <code class="docutils literal notranslate"><span class="pre">09011112222</span></code>, <code class="docutils literal notranslate"><span class="pre">090</span></code>, <code class="docutils literal notranslate"><span class="pre">1111</span></code> or <code class="docutils literal notranslate"><span class="pre">2222</span></code>.</p>
+<p>Note that the keyword won’t be found by a query including blanks like <code class="docutils literal notranslate"><span class="pre">090</span> <span class="pre">1111</span> <span class="pre">2222</span></code>.</p>
+</div>
+<div class="section" id="report-source-location">
+<span id="token-ngram-report-source-location"></span><h4>7.8.13.6.1.5. <code class="docutils literal notranslate"><span class="pre">report_source_location</span></code><a class="headerlink" href="#report-source-location" title="Permalink to this headline">¶</a></h4>
+<p>This option tells us a location of token of highlight target when we highlight token by <code class="docutils literal notranslate"><span class="pre">highlight_html</span></code>.</p>
+<p>We only use this option when we want to highlight token by <code class="docutils literal notranslate"><span class="pre">highlight_html</span></code>.</p>
+<p>When Groonga tokenize texts that target highlight, always used <code class="docutils literal notranslate"><span class="pre">NormalizerAuto</span></code> to normalizer until now.
+Therefore, if we use <code class="docutils literal notranslate"><span class="pre">NormalizerNFKC100</span></code> to normalizer, sometimes it
+can’t find the position of the highlight as below.</p>
+<p>Execution example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>table_create Entries TABLE_NO_KEY
+#[[0,0.0,0.0],true]
+column_create Entries body COLUMN_SCALAR ShortText
+#[[0,0.0,0.0],true]
+table_create Terms TABLE_PAT_KEY ShortText --normalizer &#39;NormalizerNFKC100&#39;
+#[[0,0.0,0.0],true]
+column_create Terms document_index COLUMN_INDEX|WITH_POSITION Entries body
+#[[0,0.0,0.0],true]
+load --table Entries
+[
+{&quot;body&quot;: &quot;ア㌕Ａz&quot;}
+]
+#[[0,0.0,0.0],1]
+select Entries   --match_columns body   --query &#39;グラム&#39;   --output_columns &#39;highlight_html(body, Terms)&#39;
+#[
+#  [
+#    0,
+#    1558915202.24493,
+#    0.0003714561462402344
+#  ],
+#  [[[0],[[&quot;highlight_html&quot;,null]]]]
+#]
+</pre></div>
+</div>
+<p>Because we use different normalizer to normalize token.</p>
+<p>This option is used to reduce the shift of the position of the highlight as below.</p>
+<p>Execution example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>table_create Entries TABLE_NO_KEY
+#[[0,0.0,0.0],true]
+column_create Entries body COLUMN_SCALAR ShortText
+#[[0,0.0,0.0],true]
+table_create Terms TABLE_PAT_KEY ShortText   --default_tokenizer &#39;TokenNgram(&quot;report_source_location&quot;, true)&#39;   --normalizer &#39;NormalizerNFKC100&#39;
+#[[0,0.0,0.0],true]
+column_create Terms document_index COLUMN_INDEX|WITH_POSITION Entries body
+#[[0,0.0,0.0],true]
+load --table Entries
+[
+{&quot;body&quot;: &quot;ア㌕Ａz&quot;}
+]
+#[[0,0.0,0.0],1]
+select Entries   --match_columns body   --query &#39;グラム&#39;   --output_columns &#39;highlight_html(body, Terms)&#39;
+#[
+#  [
+#    0,
+#    0.0,
+#    0.0
+#  ],
+#  [
+#    [
+#      [
+#        1
+#      ],
+#      [
+#        [
+#          &quot;highlight_html&quot;,
+#          null
+#        ]
+#      ],
+#      [
+#        &quot;ア&lt;span class=\&quot;keyword\&quot;&gt;㌕&lt;/span&gt;Ａz&quot;
+#      ]
+#    ]
+#  ]
+#]
+</pre></div>
+</div>
+</div>
+<div class="section" id="unify-alphabet">
+<span id="token-ngram-unify-alphabet"></span><h4>7.8.13.6.1.6. <code class="docutils literal notranslate"><span class="pre">unify_alphabet</span></code><a class="headerlink" href="#unify-alphabet" title="Permalink to this headline">¶</a></h4>
+<p>If we set false, <code class="docutils literal notranslate"><span class="pre">TokenNgram</span></code> uses bigram tokenize method for ASCII character.</p>
+<p>Default value of this option is true.</p>
+<p>Execution example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>tokenize --tokenizer &#39;TokenNgram(&quot;unify_alphabet&quot;, false)&#39; --string &quot;abcd ABCD&quot; --normaluzer NormalizeAuto
+#[
+#  [
+#    0,
+#    1558570398.145967,
+#    0.0009109973907470703
+#  ],
+#  [
+#    {
+#      &quot;value&quot;: &quot;ab&quot;,
+#      &quot;position&quot;: 0,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    },
+#    {
+#      &quot;value&quot;: &quot;bc&quot;,
+#      &quot;position&quot;: 1,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    },
+#    {
+#      &quot;value&quot;: &quot;cd&quot;,
+#      &quot;position&quot;: 2,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    },
+#    {
+#      &quot;value&quot;: &quot;d &quot;,
+#      &quot;position&quot;: 3,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    },
+#    {
+#      &quot;value&quot;: &quot; A&quot;,
+#      &quot;position&quot;: 4,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    },
+#    {
+#      &quot;value&quot;: &quot;AB&quot;,
+#      &quot;position&quot;: 5,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    },
+#    {
+#      &quot;value&quot;: &quot;BC&quot;,
+#      &quot;position&quot;: 6,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    },
+#    {
+#      &quot;value&quot;: &quot;CD&quot;,
+#      &quot;position&quot;: 7,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    },
+#    {
+#      &quot;value&quot;: &quot;D&quot;,
+#      &quot;position&quot;: 8,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    }
+#  ]
+#]
+</pre></div>
+</div>
+</div>
+<div class="section" id="unify-symbol">
+<span id="token-ngram-unify-symbol"></span><h4>7.8.13.6.1.7. <code class="docutils literal notranslate"><span class="pre">unify_symbol</span></code><a class="headerlink" href="#unify-symbol" title="Permalink to this headline">¶</a></h4>
+<p>If we set false, <code class="docutils literal notranslate"><span class="pre">TokenNgram</span></code> uses bigram tokenize method for symbols.
+<code class="docutils literal notranslate"><span class="pre">TokenNgram(&quot;unify_symbol&quot;,</span> <span class="pre">false)</span></code> is same behavior of <code class="docutils literal notranslate"><span class="pre">TokenBigramSplitSymbol</span></code>.</p>
+<p>Default value of this option is true.</p>
+<p>Execution example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>tokenize --tokenizer &#39;TokenNgram(&quot;unify_symbol&quot;, false)&#39; --string &quot;___---&quot; --normalizer NormalizerAuto
+#[
+#  [
+#    0,
+#    1558913369.875591,
+#    0.0008268356323242188
+#  ],
+#  [
+#    {
+#      &quot;value&quot;: &quot;__&quot;,
+#      &quot;position&quot;: 0,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    },
+#    {
+#      &quot;value&quot;: &quot;__&quot;,
+#      &quot;position&quot;: 1,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    },
+#    {
+#      &quot;value&quot;: &quot;_-&quot;,
+#      &quot;position&quot;: 2,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    },
+#    {
+#      &quot;value&quot;: &quot;--&quot;,
+#      &quot;position&quot;: 3,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    },
+#    {
+#      &quot;value&quot;: &quot;--&quot;,
+#      &quot;position&quot;: 4,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    },
+#    {
+#      &quot;value&quot;: &quot;-&quot;,
+#      &quot;position&quot;: 5,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    }
+#  ]
+#]
+</pre></div>
+</div>
+</div>
+<div class="section" id="unify-digit">
+<span id="token-ngram-unify-digit"></span><h4>7.8.13.6.1.8. <code class="docutils literal notranslate"><span class="pre">unify_digit</span></code><a class="headerlink" href="#unify-digit" title="Permalink to this headline">¶</a></h4>
+<p>If we set false, <code class="docutils literal notranslate"><span class="pre">TokenNgram</span></code> uses bigram tokenize method for digits.</p>
+<p>Default value of this option is true.</p>
+<p>Execution example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>tokenize --tokenizer &#39;TokenNgram(&quot;unify_digit&quot;, false)&#39; --string &quot;012345 6789&quot; --normalizer NormalizerAuto
+#[
+#  [
+#    0,
+#    1558914023.967506,
+#    0.001635313034057617
+#  ],
+#  [
+#    {
+#      &quot;value&quot;: &quot;01&quot;,
+#      &quot;position&quot;: 0,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    },
+#    {
+#      &quot;value&quot;: &quot;12&quot;,
+#      &quot;position&quot;: 1,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    },
+#    {
+#      &quot;value&quot;: &quot;23&quot;,
+#      &quot;position&quot;: 2,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    },
+#    {
+#      &quot;value&quot;: &quot;34&quot;,
+#      &quot;position&quot;: 3,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    },
+#    {
+#      &quot;value&quot;: &quot;45&quot;,
+#      &quot;position&quot;: 4,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    },
+#    {
+#      &quot;value&quot;: &quot;5&quot;,
+#      &quot;position&quot;: 5,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    },
+#    {
+#      &quot;value&quot;: &quot;67&quot;,
+#      &quot;position&quot;: 6,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    },
+#    {
+#      &quot;value&quot;: &quot;78&quot;,
+#      &quot;position&quot;: 7,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    },
+#    {
+#      &quot;value&quot;: &quot;89&quot;,
+#      &quot;position&quot;: 8,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    },
+#    {
+#      &quot;value&quot;: &quot;9&quot;,
+#      &quot;position&quot;: 9,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    }
+#  ]
+#]
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="see-also">
+<h2>7.8.13.7. See also<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="../commands/tokenize.html"><span class="doc">tokenize</span></a></p></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">7.8.13. <code class="docutils literal notranslate"><span class="pre">TokenNgram</span></code></a><ul>
+<li><a class="reference internal" href="#summary">7.8.13.1. Summary</a></li>
+<li><a class="reference internal" href="#syntax">7.8.13.2. Syntax</a></li>
+<li><a class="reference internal" href="#usage">7.8.13.3. Usage</a></li>
+<li><a class="reference internal" href="#simple-usage">7.8.13.4. Simple usage</a></li>
+<li><a class="reference internal" href="#advanced-usage">7.8.13.5. Advanced usage</a></li>
+<li><a class="reference internal" href="#parameters">7.8.13.6. Parameters</a><ul>
+<li><a class="reference internal" href="#optional-parameter">7.8.13.6.1. Optional parameter</a><ul>
+<li><a class="reference internal" href="#n">7.8.13.6.1.1. <code class="docutils literal notranslate"><span class="pre">n</span></code></a></li>
+<li><a class="reference internal" href="#loose-symbol">7.8.13.6.1.2. <code class="docutils literal notranslate"><span class="pre">loose_symbol</span></code></a></li>
+<li><a class="reference internal" href="#loose-blank">7.8.13.6.1.3. <code class="docutils literal notranslate"><span class="pre">loose_blank</span></code></a></li>
+<li><a class="reference internal" href="#remove-blank">7.8.13.6.1.4. <code class="docutils literal notranslate"><span class="pre">remove_blank</span></code></a></li>
+<li><a class="reference internal" href="#report-source-location">7.8.13.6.1.5. <code class="docutils literal notranslate"><span class="pre">report_source_location</span></code></a></li>
+<li><a class="reference internal" href="#unify-alphabet">7.8.13.6.1.6. <code class="docutils literal notranslate"><span class="pre">unify_alphabet</span></code></a></li>
+<li><a class="reference internal" href="#unify-symbol">7.8.13.6.1.7. <code class="docutils literal notranslate"><span class="pre">unify_symbol</span></code></a></li>
+<li><a class="reference internal" href="#unify-digit">7.8.13.6.1.8. <code class="docutils literal notranslate"><span class="pre">unify_digit</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#see-also">7.8.13.7. See also</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="token_mecab.html"
+                        title="previous chapter">7.8.12. <code class="docutils literal notranslate"><span class="pre">TokenMecab</span></code></a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="token_pattern.html"
+                        title="next chapter">7.8.14. <code class="docutils literal notranslate"><span class="pre">TokenPattern</span></code></a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="token_pattern.html" title="7.8.14. TokenPattern"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="token_mecab.html" title="7.8.12. TokenMecab"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v9.0.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../reference.html" >7. Reference manual</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../tokenizers.html" >7.8. Tokenizers</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2009-2019, Brazil, Inc.
+    </div>
+      <script src="http://connect.facebook.net/en_US/all.js"></script>
+
+    <script>
+      FB.init({
+         appId  : null,
+         status : true, // check login status
+         cookie : true, // enable cookies to allow the server to access the session
+         xfbml  : true  // parse XFBML
+      });
+    </script>
+  </body>
+
+</html>

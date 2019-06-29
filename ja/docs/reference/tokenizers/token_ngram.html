@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <title>7.8.13. TokenNgram &#8212; Groonga v9.0.4ドキュメント</title>
+    <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
+    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../static/doctools.js"></script>
+    <script type="text/javascript" src="../../static/language_data.js"></script>
+    <script type="text/javascript" src="../../static/translations.js"></script>
+    
+    <link rel="shortcut icon" href="../../static/favicon.ico"/>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="検索" href="../../search.html" />
+    <link rel="next" title="7.8.14. TokenPattern" href="token_pattern.html" />
+    <link rel="prev" title="7.8.12. TokenMecab" href="token_mecab.html" /> 
+      <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
+    <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
+    <meta property="og:type" content="product" />
+    <meta property="og:image" content="http://groonga.org/images/logos/groonga-icon-full-size.png" />
+    <meta property="og:site_name" content="groonga" />
+
+    <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
+  </head>
+  <body>
+    <div id="fb-root"></div>
+
+<div class="header">
+  <h1 class="title">
+    <a id="top-link" href="../../../">
+      <span class="project">groonga</span>
+      <span class="separator">-</span>
+      <span class="description">オープンソースのカラムストア機能付き全文検索エンジン</span>
+    </a>
+  </h1>
+
+      <div class="facebook-buttons">
+      <fb:like href="http://www.facebook.com/pages/groonga/201193596592346"
+               layout="standard"
+               width="290"></fb:like>
+    </div>
+    <div class="other-language-links">
+
+    <ul>
+      <li><a href="../../../../docs/reference/tokenizers/token_ngram.html">English</a></li>
+    </ul>
+  </div>
+</div>
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="token_pattern.html" title="7.8.14. TokenPattern"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="token_mecab.html" title="7.8.12. TokenMecab"
+             accesskey="P">前へ</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v9.0.4ドキュメント</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../reference.html" >7. リファレンスマニュアル</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../tokenizers.html" accesskey="U">7.8. トークナイザー</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="tokenngram">
+<span id="token-ngram"></span><h1>7.8.13. <code class="docutils literal notranslate"><span class="pre">TokenNgram</span></code><a class="headerlink" href="#tokenngram" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<div class="section" id="summary">
+<h2>7.8.13.1. 概要<a class="headerlink" href="#summary" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">TokenNgram</span></code> はオプションによって、動的に動作を定義できます。例えば、以下のように <code class="docutils literal notranslate"><span class="pre">n</span></code> オプションの値を変更する事によって、ユニグラム、バイグラム、トリグラムとして使えます。</p>
+<p>ユニグラム:</p>
+<p>実行例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>tokenize --tokenizer &#39;TokenNgram(&quot;n&quot;, 1)&#39; --string &quot;Hello World&quot;
+# [
+#   [
+#     0,
+#     1556063953.911713,
+#     0.05761265754699707
+#   ],
+#   [
+#     {
+#       &quot;value&quot;: &quot;H&quot;,
+#       &quot;position&quot;: 0,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;e&quot;,
+#       &quot;position&quot;: 1,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;l&quot;,
+#       &quot;position&quot;: 2,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;l&quot;,
+#       &quot;position&quot;: 3,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;o&quot;,
+#       &quot;position&quot;: 4,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot; &quot;,
+#       &quot;position&quot;: 5,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;W&quot;,
+#       &quot;position&quot;: 6,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;o&quot;,
+#       &quot;position&quot;: 7,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;r&quot;,
+#       &quot;position&quot;: 8,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;l&quot;,
+#       &quot;position&quot;: 9,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;d&quot;,
+#       &quot;position&quot;: 10,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     }
+#   ]
+# ]
+</pre></div>
+</div>
+<p>バイグラム:</p>
+<p>実行例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>tokenize --tokenizer &#39;TokenNgram(&quot;n&quot;, 2)&#39; --string &quot;Hello World&quot;
+# [
+#   [
+#     0,
+#     1556064877.095833,
+#     0.0002193450927734375
+#   ],
+#   [
+#     {
+#       &quot;value&quot;: &quot;He&quot;,
+#       &quot;position&quot;: 0,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;el&quot;,
+#       &quot;position&quot;: 1,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;ll&quot;,
+#       &quot;position&quot;: 2,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;lo&quot;,
+#       &quot;position&quot;: 3,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;o &quot;,
+#       &quot;position&quot;: 4,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot; W&quot;,
+#       &quot;position&quot;: 5,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;Wo&quot;,
+#       &quot;position&quot;: 6,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;or&quot;,
+#       &quot;position&quot;: 7,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;rl&quot;,
+#       &quot;position&quot;: 8,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;ld&quot;,
+#       &quot;position&quot;: 9,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;d&quot;,
+#       &quot;position&quot;: 10,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     }
+#   ]
+# ]
+</pre></div>
+</div>
+<p>トリグラム:</p>
+<p>実行例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>tokenize --tokenizer &#39;TokenNgram(&quot;n&quot;, 3)&#39; --string &quot;Hello World&quot;
+# [
+#   [
+#     0,
+#     1556064951.790899,
+#     0.0002274513244628906
+#   ],
+#   [
+#     {
+#       &quot;value&quot;: &quot;Hel&quot;,
+#       &quot;position&quot;: 0,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;ell&quot;,
+#       &quot;position&quot;: 1,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;llo&quot;,
+#       &quot;position&quot;: 2,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;lo &quot;,
+#       &quot;position&quot;: 3,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;o W&quot;,
+#       &quot;position&quot;: 4,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot; Wo&quot;,
+#       &quot;position&quot;: 5,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;Wor&quot;,
+#       &quot;position&quot;: 6,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;orl&quot;,
+#       &quot;position&quot;: 7,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;rld&quot;,
+#       &quot;position&quot;: 8,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;ld&quot;,
+#       &quot;position&quot;: 9,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;d&quot;,
+#       &quot;position&quot;: 10,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     }
+#   ]
+# ]
+</pre></div>
+</div>
+<p>このトークナイザーには、上記以外のオプションもあります。</p>
+</div>
+<div class="section" id="syntax">
+<h2>7.8.13.2. 構文<a class="headerlink" href="#syntax" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">TokenNgram</span></code> は、省略可能な引数があります。</p>
+<p>オプションなし:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>TokenNgram
+</pre></div>
+</div>
+<p>オプションを使わない場合、 <code class="docutils literal notranslate"><span class="pre">TokenNgram</span></code> は <code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code> と同じ動作になります。</p>
+<p>オプション指定:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>TokenNgram(&quot;n&quot;, true)
+
+TokenNgram(&quot;loose_symbol&quot;, true)
+
+TokenNgram(&quot;loose_blank&quot;, true)
+
+TokenNgram(&quot;remove_blank&quot;, true)
+
+TokenNgram(&quot;report_source_location&quot;, true)
+
+TokenNgram(&quot;unify_alphabet&quot;, true)
+
+TokenNgram(&quot;unify_symbol&quot;, true)
+
+TokenNgram(&quot;unify_digit&quot;, true)
+</pre></div>
+</div>
+<p>複数のオプション指定:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>TokenNgram(&quot;loose_symbol&quot;, true, &quot;loose_blank&quot;, true)
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">TokenNgram</span></code> We can also specify multiple options at the same time except the above examples.</p>
+</div>
+<div class="section" id="usage">
+<h2>7.8.13.3. 使い方<a class="headerlink" href="#usage" title="このヘッドラインへのパーマリンク">¶</a></h2>
+</div>
+<div class="section" id="simple-usage">
+<h2>7.8.13.4. 簡単な使い方<a class="headerlink" href="#simple-usage" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>以下は <code class="docutils literal notranslate"><span class="pre">TokenNgram</span></code> の例です。</p>
+<p><code class="docutils literal notranslate"><span class="pre">TokenNgram</span></code> をオプション無しで使った場合、以下のように <code class="docutils literal notranslate"><span class="pre">TokenNgram</span></code> は <code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code> と同じ動作をします。:</p>
+<ul class="simple">
+<li><p>ノーマライザーを使用しない場合。</p></li>
+</ul>
+<p>実行例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>tokenize --tokenizer TokenNgram --string &quot;Hello World&quot;
+# [
+#   [
+#     0,
+#     1556063548.341422,
+#     0.0002450942993164062
+#   ],
+#   [
+#     {
+#       &quot;value&quot;: &quot;He&quot;,
+#       &quot;position&quot;: 0,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;el&quot;,
+#       &quot;position&quot;: 1,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;ll&quot;,
+#       &quot;position&quot;: 2,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;lo&quot;,
+#       &quot;position&quot;: 3,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;o &quot;,
+#       &quot;position&quot;: 4,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot; W&quot;,
+#       &quot;position&quot;: 5,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;Wo&quot;,
+#       &quot;position&quot;: 6,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;or&quot;,
+#       &quot;position&quot;: 7,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;rl&quot;,
+#       &quot;position&quot;: 8,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;ld&quot;,
+#       &quot;position&quot;: 9,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;d&quot;,
+#       &quot;position&quot;: 10,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     }
+#   ]
+# ]
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>ノーマライザーを使用する場合。</p></li>
+</ul>
+<p>実行例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>tokenize --tokenizer TokenNgram --string &quot;Hello World&quot; --normalizer NormalizerAuto
+# [
+#   [
+#     0,
+#     1556063752.798628,
+#     0.0001776218414306641
+#   ],
+#   [
+#     {
+#       &quot;value&quot;: &quot;hello&quot;,
+#       &quot;position&quot;: 0,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;world&quot;,
+#       &quot;position&quot;: 1,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     }
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
+<div class="section" id="advanced-usage">
+<h2>7.8.13.5. 高度な使い方<a class="headerlink" href="#advanced-usage" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">TokenNgram</span></code> は複数のオプションを指定できます。</p>
+<p>例えば、以下のように <code class="docutils literal notranslate"><span class="pre">loose_symbol</span></code> と <code class="docutils literal notranslate"><span class="pre">loose_blank</span></code> を使って、電話番号の表記ゆれに対処できます。</p>
+<p>以下の例のように、 <code class="docutils literal notranslate"><span class="pre">0123456789</span></code> で <code class="docutils literal notranslate"><span class="pre">0123(45)6789</span></code> 、 <code class="docutils literal notranslate"><span class="pre">0123-45-6789</span></code> 、 <code class="docutils literal notranslate"><span class="pre">0123</span> <span class="pre">45</span> <span class="pre">6789</span></code> を検索できます。</p>
+<p>実行例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>tokenize --tokenizer &#39;TokenNgram(&quot;loose_symbol&quot;, true, &quot;loose_blank&quot;, true)&#39; --string &quot;0123(45)6789&quot; --normalizer NormalizerAuto
+# [
+#   [
+#     0,
+#     1557187317.825164,
+#     0.0003116130828857422
+#   ],
+#   [
+#     {
+#       &quot;value&quot;: &quot;0123&quot;,
+#       &quot;position&quot;: 0,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;(&quot;,
+#       &quot;position&quot;: 1,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;45&quot;,
+#       &quot;position&quot;: 2,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;)&quot;,
+#       &quot;position&quot;: 3,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;6789&quot;,
+#       &quot;position&quot;: 4,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;￰&quot;,
+#       &quot;position&quot;: 5,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;0123456789&quot;,
+#       &quot;position&quot;: 6,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     }
+#   ]
+# ]
+tokenize --tokenizer &#39;TokenNgram(&quot;loose_symbol&quot;, true, &quot;loose_blank&quot;, true)&#39; --string &quot;0123-45-6789&quot; --normalizer NormalizerAuto
+# [
+#   [
+#     0,
+#     1557187366.441741,
+#     0.0002820491790771484
+#   ],
+#   [
+#     {
+#       &quot;value&quot;: &quot;0123&quot;,
+#       &quot;position&quot;: 0,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;-&quot;,
+#       &quot;position&quot;: 1,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;45&quot;,
+#       &quot;position&quot;: 2,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;-&quot;,
+#       &quot;position&quot;: 3,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;6789&quot;,
+#       &quot;position&quot;: 4,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;￰&quot;,
+#       &quot;position&quot;: 5,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;0123456789&quot;,
+#       &quot;position&quot;: 6,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     }
+#   ]
+# ]
+tokenize --tokenizer &#39;TokenNgram(&quot;loose_symbol&quot;, true, &quot;loose_blank&quot;, true)&#39; --string &quot;0123 45 6789&quot; --normalizer NormalizerAuto
+# [
+#   [
+#     0,
+#     1557187404.034283,
+#     0.0003006458282470703
+#   ],
+#   [
+#     {
+#       &quot;value&quot;: &quot;0123&quot;,
+#       &quot;position&quot;: 0,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;45&quot;,
+#       &quot;position&quot;: 1,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;6789&quot;,
+#       &quot;position&quot;: 2,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;￰&quot;,
+#       &quot;position&quot;: 3,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     },
+#     {
+#       &quot;value&quot;: &quot;0123456789&quot;,
+#       &quot;position&quot;: 4,
+#       &quot;force_prefix&quot;: false,
+#       &quot;force_prefix_search&quot;: false
+#     }
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
+<div class="section" id="parameters">
+<h2>7.8.13.6. 引数<a class="headerlink" href="#parameters" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<div class="section" id="optional-parameter">
+<h3>7.8.13.6.1. 省略可能引数<a class="headerlink" href="#optional-parameter" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>8つの省略可能な引数があります。</p>
+<div class="section" id="n">
+<span id="token-ngram-n"></span><h4>7.8.13.6.1.1. <code class="docutils literal notranslate"><span class="pre">n</span></code><a class="headerlink" href="#n" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>このオプションは、Ngramの <code class="docutils literal notranslate"><span class="pre">N</span></code> を表します。例えば、trigramでは、 <code class="docutils literal notranslate"><span class="pre">n</span></code> が <code class="docutils literal notranslate"><span class="pre">3</span></code> です。</p>
+</div>
+<div class="section" id="loose-symbol">
+<span id="token-ngram-loose-symbol"></span><h4>7.8.13.6.1.2. <code class="docutils literal notranslate"><span class="pre">loose_symbol</span></code><a class="headerlink" href="#loose-symbol" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>記号を含むクエリー、含まないクエリーの両方で検索されるよう、記号を含むキーワードをトークナイズします。例えば、キーワード <code class="docutils literal notranslate"><span class="pre">090-1111-2222</span></code> は <code class="docutils literal notranslate"><span class="pre">09011112222</span></code> 、 <code class="docutils literal notranslate"><span class="pre">090</span></code> 、 <code class="docutils literal notranslate"><span class="pre">1111</span></code> 、 <code class="docutils literal notranslate"><span class="pre">2222</span></code> 、 <code class="docutils literal notranslate"><span class="pre">090-1111-2222</span></code> で見つけられます。</p>
+</div>
+<div class="section" id="loose-blank">
+<span id="token-ngram-loose-blank"></span><h4>7.8.13.6.1.3. <code class="docutils literal notranslate"><span class="pre">loose_blank</span></code><a class="headerlink" href="#loose-blank" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>空白を含むクエリー、含まないクエリーの両方で検索されるように、空白を含むキーワードをトークナイズします。例えば、キーワード <code class="docutils literal notranslate"><span class="pre">090</span> <span class="pre">1111</span> <span class="pre">2222</span></code> は <code class="docutils literal notranslate"><span class="pre">09011112222</span></code> 、 <code class="docutils literal notranslate"><span class="pre">090</span></code> 、 <code class="docutils literal notranslate"><span class="pre">1111</span></code> 、 <code class="docutils literal notranslate"><span class="pre">2222</span></code>　、 <code class="docutils literal notranslate"><span class="pre">090</span> <span class="pre">1111</span> <span class="pre">2222</span></code> で見つけられます。</p>
+</div>
+<div class="section" id="remove-blank">
+<span id="token-ngram-remove-blank"></span><h4>7.8.13.6.1.4. <code class="docutils literal notranslate"><span class="pre">remove_blank</span></code><a class="headerlink" href="#remove-blank" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>空白を含まないクエリーで検索できるよう、空白を含むキーワードをトークナイズします。例えば、キーワード <code class="docutils literal notranslate"><span class="pre">090</span> <span class="pre">1111</span> <span class="pre">2222</span></code> は <code class="docutils literal notranslate"><span class="pre">09011112222</span></code> 、 <code class="docutils literal notranslate"><span class="pre">090</span></code> 、 <code class="docutils literal notranslate"><span class="pre">1111</span></code> 、 <code class="docutils literal notranslate"><span class="pre">2222</span></code> でも見つけられます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">090</span> <span class="pre">1111</span> <span class="pre">2222</span></code> のような空白を含むクエリーでは、キーワードを見つけられないことに注意して下さい。</p>
+</div>
+<div class="section" id="report-source-location">
+<span id="token-ngram-report-source-location"></span><h4>7.8.13.6.1.5. <code class="docutils literal notranslate"><span class="pre">report_source_location</span></code><a class="headerlink" href="#report-source-location" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>このオプションは、 <code class="docutils literal notranslate"><span class="pre">highlight_html</span></code> によってトークンをハイライトする際、ハイライト対象のトークンの位置を教えてくれます。</p>
+<p>このオプションは、 <code class="docutils literal notranslate"><span class="pre">highlight_html</span></code> を使ってトークンをハイライトしたい時のみ使用します。</p>
+<p>Groongaがハイライト対象のテキストをトークナイズするとき、いままでは、常に <code class="docutils literal notranslate"><span class="pre">NormalizerAuto</span></code> が使われていました。そのため、 <code class="docutils literal notranslate"><span class="pre">NormalizerNFKC100</span></code> を使ってノーマライズすると、ハイライトの位置が見つけられないことがあります。</p>
+<p>実行例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>table_create Entries TABLE_NO_KEY
+#[[0,0.0,0.0],true]
+column_create Entries body COLUMN_SCALAR ShortText
+#[[0,0.0,0.0],true]
+table_create Terms TABLE_PAT_KEY ShortText --normalizer &#39;NormalizerNFKC100&#39;
+#[[0,0.0,0.0],true]
+column_create Terms document_index COLUMN_INDEX|WITH_POSITION Entries body
+#[[0,0.0,0.0],true]
+load --table Entries
+[
+{&quot;body&quot;: &quot;ア㌕Ａz&quot;}
+]
+#[[0,0.0,0.0],1]
+select Entries   --match_columns body   --query &#39;グラム&#39;   --output_columns &#39;highlight_html(body, Terms)&#39;
+#[
+#  [
+#    0,
+#    1558915202.24493,
+#    0.0003714561462402344
+#  ],
+#  [[[0],[[&quot;highlight_html&quot;,null]]]]
+#]
+</pre></div>
+</div>
+<p>異なるノーマライザーを使ってトークンをノーマライズするためです。</p>
+<p>このオプションは、ハイライト位置のズレを減らすためのものです。</p>
+<p>実行例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>table_create Entries TABLE_NO_KEY
+#[[0,0.0,0.0],true]
+column_create Entries body COLUMN_SCALAR ShortText
+#[[0,0.0,0.0],true]
+table_create Terms TABLE_PAT_KEY ShortText   --default_tokenizer &#39;TokenNgram(&quot;report_source_location&quot;, true)&#39;   --normalizer &#39;NormalizerNFKC100&#39;
+#[[0,0.0,0.0],true]
+column_create Terms document_index COLUMN_INDEX|WITH_POSITION Entries body
+#[[0,0.0,0.0],true]
+load --table Entries
+[
+{&quot;body&quot;: &quot;ア㌕Ａz&quot;}
+]
+#[[0,0.0,0.0],1]
+select Entries   --match_columns body   --query &#39;グラム&#39;   --output_columns &#39;highlight_html(body, Terms)&#39;
+#[
+#  [
+#    0,
+#    0.0,
+#    0.0
+#  ],
+#  [
+#    [
+#      [
+#        1
+#      ],
+#      [
+#        [
+#          &quot;highlight_html&quot;,
+#          null
+#        ]
+#      ],
+#      [
+#        &quot;ア&lt;span class=\&quot;keyword\&quot;&gt;㌕&lt;/span&gt;Ａz&quot;
+#      ]
+#    ]
+#  ]
+#]
+</pre></div>
+</div>
+</div>
+<div class="section" id="unify-alphabet">
+<span id="token-ngram-unify-alphabet"></span><h4>7.8.13.6.1.6. <code class="docutils literal notranslate"><span class="pre">unify_alphabet</span></code><a class="headerlink" href="#unify-alphabet" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>falseを設定すると、 <code class="docutils literal notranslate"><span class="pre">TokenNgram</span></code> はASCII文字にトークナイズ方法としてバイグラムを使います。</p>
+<p>デフォルト値はtrueです。</p>
+<p>実行例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>tokenize --tokenizer &#39;TokenNgram(&quot;unify_alphabet&quot;, false)&#39; --string &quot;abcd ABCD&quot; --normaluzer NormalizeAuto
+#[
+#  [
+#    0,
+#    1558570398.145967,
+#    0.0009109973907470703
+#  ],
+#  [
+#    {
+#      &quot;value&quot;: &quot;ab&quot;,
+#      &quot;position&quot;: 0,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    },
+#    {
+#      &quot;value&quot;: &quot;bc&quot;,
+#      &quot;position&quot;: 1,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    },
+#    {
+#      &quot;value&quot;: &quot;cd&quot;,
+#      &quot;position&quot;: 2,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    },
+#    {
+#      &quot;value&quot;: &quot;d &quot;,
+#      &quot;position&quot;: 3,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    },
+#    {
+#      &quot;value&quot;: &quot; A&quot;,
+#      &quot;position&quot;: 4,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    },
+#    {
+#      &quot;value&quot;: &quot;AB&quot;,
+#      &quot;position&quot;: 5,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    },
+#    {
+#      &quot;value&quot;: &quot;BC&quot;,
+#      &quot;position&quot;: 6,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    },
+#    {
+#      &quot;value&quot;: &quot;CD&quot;,
+#      &quot;position&quot;: 7,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    },
+#    {
+#      &quot;value&quot;: &quot;D&quot;,
+#      &quot;position&quot;: 8,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    }
+#  ]
+#]
+</pre></div>
+</div>
+</div>
+<div class="section" id="unify-symbol">
+<span id="token-ngram-unify-symbol"></span><h4>7.8.13.6.1.7. <code class="docutils literal notranslate"><span class="pre">unify_symbol</span></code><a class="headerlink" href="#unify-symbol" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>falseを設定すると、 <code class="docutils literal notranslate"><span class="pre">TokenNgram</span></code> は記号にトークナイズ方法としてバイグラムを使います。<code class="docutils literal notranslate"><span class="pre">TokenNgram(&quot;unify_symbol&quot;,</span> <span class="pre">false)</span></code> は <code class="docutils literal notranslate"><span class="pre">TokenBigramSplitSymbol</span></code> と同じ動作になります。</p>
+<p>デフォルト値はtrueです。</p>
+<p>実行例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>tokenize --tokenizer &#39;TokenNgram(&quot;unify_symbol&quot;, false)&#39; --string &quot;___---&quot; --normalizer NormalizerAuto
+#[
+#  [
+#    0,
+#    1558913369.875591,
+#    0.0008268356323242188
+#  ],
+#  [
+#    {
+#      &quot;value&quot;: &quot;__&quot;,
+#      &quot;position&quot;: 0,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    },
+#    {
+#      &quot;value&quot;: &quot;__&quot;,
+#      &quot;position&quot;: 1,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    },
+#    {
+#      &quot;value&quot;: &quot;_-&quot;,
+#      &quot;position&quot;: 2,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    },
+#    {
+#      &quot;value&quot;: &quot;--&quot;,
+#      &quot;position&quot;: 3,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    },
+#    {
+#      &quot;value&quot;: &quot;--&quot;,
+#      &quot;position&quot;: 4,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    },
+#    {
+#      &quot;value&quot;: &quot;-&quot;,
+#      &quot;position&quot;: 5,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    }
+#  ]
+#]
+</pre></div>
+</div>
+</div>
+<div class="section" id="unify-digit">
+<span id="token-ngram-unify-digit"></span><h4>7.8.13.6.1.8. <code class="docutils literal notranslate"><span class="pre">unify_digit</span></code><a class="headerlink" href="#unify-digit" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>falseを設定すると、 <code class="docutils literal notranslate"><span class="pre">TokenNgram</span></code> は数字にトークナイズ方法としてバイグラムを使います。</p>
+<p>デフォルト値はtrueです。</p>
+<p>実行例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>tokenize --tokenizer &#39;TokenNgram(&quot;unify_digit&quot;, false)&#39; --string &quot;012345 6789&quot; --normalizer NormalizerAuto
+#[
+#  [
+#    0,
+#    1558914023.967506,
+#    0.001635313034057617
+#  ],
+#  [
+#    {
+#      &quot;value&quot;: &quot;01&quot;,
+#      &quot;position&quot;: 0,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    },
+#    {
+#      &quot;value&quot;: &quot;12&quot;,
+#      &quot;position&quot;: 1,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    },
+#    {
+#      &quot;value&quot;: &quot;23&quot;,
+#      &quot;position&quot;: 2,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    },
+#    {
+#      &quot;value&quot;: &quot;34&quot;,
+#      &quot;position&quot;: 3,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    },
+#    {
+#      &quot;value&quot;: &quot;45&quot;,
+#      &quot;position&quot;: 4,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    },
+#    {
+#      &quot;value&quot;: &quot;5&quot;,
+#      &quot;position&quot;: 5,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    },
+#    {
+#      &quot;value&quot;: &quot;67&quot;,
+#      &quot;position&quot;: 6,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    },
+#    {
+#      &quot;value&quot;: &quot;78&quot;,
+#      &quot;position&quot;: 7,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    },
+#    {
+#      &quot;value&quot;: &quot;89&quot;,
+#      &quot;position&quot;: 8,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    },
+#    {
+#      &quot;value&quot;: &quot;9&quot;,
+#      &quot;position&quot;: 9,
+#      &quot;force_prefix&quot;: false,
+#      &quot;force_prefix_search&quot;: false
+#    }
+#  ]
+#]
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="see-also">
+<h2>7.8.13.7. 参考<a class="headerlink" href="#see-also" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="../commands/tokenize.html"><span class="doc">tokenize</span></a></p></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">7.8.13. <code class="docutils literal notranslate"><span class="pre">TokenNgram</span></code></a><ul>
+<li><a class="reference internal" href="#summary">7.8.13.1. 概要</a></li>
+<li><a class="reference internal" href="#syntax">7.8.13.2. 構文</a></li>
+<li><a class="reference internal" href="#usage">7.8.13.3. 使い方</a></li>
+<li><a class="reference internal" href="#simple-usage">7.8.13.4. 簡単な使い方</a></li>
+<li><a class="reference internal" href="#advanced-usage">7.8.13.5. 高度な使い方</a></li>
+<li><a class="reference internal" href="#parameters">7.8.13.6. 引数</a><ul>
+<li><a class="reference internal" href="#optional-parameter">7.8.13.6.1. 省略可能引数</a><ul>
+<li><a class="reference internal" href="#n">7.8.13.6.1.1. <code class="docutils literal notranslate"><span class="pre">n</span></code></a></li>
+<li><a class="reference internal" href="#loose-symbol">7.8.13.6.1.2. <code class="docutils literal notranslate"><span class="pre">loose_symbol</span></code></a></li>
+<li><a class="reference internal" href="#loose-blank">7.8.13.6.1.3. <code class="docutils literal notranslate"><span class="pre">loose_blank</span></code></a></li>
+<li><a class="reference internal" href="#remove-blank">7.8.13.6.1.4. <code class="docutils literal notranslate"><span class="pre">remove_blank</span></code></a></li>
+<li><a class="reference internal" href="#report-source-location">7.8.13.6.1.5. <code class="docutils literal notranslate"><span class="pre">report_source_location</span></code></a></li>
+<li><a class="reference internal" href="#unify-alphabet">7.8.13.6.1.6. <code class="docutils literal notranslate"><span class="pre">unify_alphabet</span></code></a></li>
+<li><a class="reference internal" href="#unify-symbol">7.8.13.6.1.7. <code class="docutils literal notranslate"><span class="pre">unify_symbol</span></code></a></li>
+<li><a class="reference internal" href="#unify-digit">7.8.13.6.1.8. <code class="docutils literal notranslate"><span class="pre">unify_digit</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#see-also">7.8.13.7. 参考</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="token_mecab.html"
+                        title="前の章へ">7.8.12. <code class="docutils literal notranslate"><span class="pre">TokenMecab</span></code></a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="token_pattern.html"
+                        title="次の章へ">7.8.14. <code class="docutils literal notranslate"><span class="pre">TokenPattern</span></code></a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="token_pattern.html" title="7.8.14. TokenPattern"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="token_mecab.html" title="7.8.12. TokenMecab"
+             >前へ</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v9.0.4ドキュメント</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../reference.html" >7. リファレンスマニュアル</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../tokenizers.html" >7.8. トークナイザー</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2009-2019, Brazil, Inc.
+    </div>
+      <script src="http://connect.facebook.net/ja_JP/all.js"></script>
+
+    <script>
+      FB.init({
+         appId  : null,
+         status : true, // check login status
+         cookie : true, // enable cookies to allow the server to access the session
+         xfbml  : true  // parse XFBML
+      });
+    </script>
+  </body>
+
+</html>

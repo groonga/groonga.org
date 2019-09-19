@@ -80,13 +80,16 @@
 <h1>7.3.30. <code class="docutils literal notranslate"><span class="pre">log_reopen</span></code><a class="headerlink" href="#log-reopen" title="このヘッドラインへのパーマリンク">¶</a></h1>
 <div class="section" id="summary">
 <h2>7.3.30.1. 概要<a class="headerlink" href="#summary" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>log_reopen - ログファイルの再読み込み</p>
-<p>Groonga組込コマンドの一つであるlog_reopenについて説明します。組込コマンドは、groonga実行ファイルの引数、標準入力、またはソケット経由でgroongaサーバにリクエストを送信することによって実行します。</p>
-<p>log_reopenは、ログファイルを再読み込みします。</p>
-<p>現在、デフォルトのログ関数を用いている場合のみに対応しています。</p>
+<p><code class="docutils literal notranslate"><span class="pre">log_reopen</span></code> はログを再読込するコマンドです。</p>
+<p><code class="docutils literal notranslate"><span class="pre">--log-path</span></code> や <code class="docutils literal notranslate"><span class="pre">--query-log-path</span></code> オプションで指定されたログやクエリーログを再読込するのに使います。</p>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>このコマンドはワーカープロセス数が1のときのみ動作します。つまり、 <code class="docutils literal notranslate"><span class="pre">groonga-httpd</span></code> をワーカー数2以上で使っている場合には、<code class="docutils literal notranslate"><span class="pre">log_reopen</span></code> ではなく <code class="docutils literal notranslate"><span class="pre">groonga-httpd</span> <span class="pre">-s</span> <span class="pre">reopen</span></code> を使わなければなりません。</p>
+</div>
 </div>
 <div class="section" id="syntax">
 <h2>7.3.30.2. 構文<a class="headerlink" href="#syntax" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>このコマンドに引数はありません:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>log_reopen
 </pre></div>
 </div>
@@ -98,30 +101,29 @@
 [true]
 </pre></div>
 </div>
-<div class="section" id="id1">
-<h3>7.3.30.3.1. log_reopenを用いたログのローテーション<a class="headerlink" href="#id1" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="lotate-log-files-with-log-reopen">
+<h3>7.3.30.3.1. <code class="docutils literal notranslate"><span class="pre">log_reopen</span></code> でログローテートを実施する<a class="headerlink" href="#lotate-log-files-with-log-reopen" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ol class="arabic simple">
-<li><p>ログファイルをmvなどで移動する。
-ログはmvで移動された先のファイルに書き込まれる。</p></li>
-<li><p>log_reopenコマンドを実行する。</p></li>
-<li><p>既存のログファイル名と同じファイル名で、新たなログファイルが作成される。
-今後のログは新たなログファイルに書き込まれる。</p></li>
+<li><p>対象となるログファイルをmvコマンドなどで変更する(ログは変更されたログに書かれます)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">log_reopen</span></code> コマンドを実行する</p></li>
+<li><p>既存のログファイル名と同名の新しいログファイルが作成されます。新規ログは新しいログファイルに書かれます。</p></li>
 </ol>
 </div>
 </div>
 <div class="section" id="parameters">
 <h2>7.3.30.4. 引数<a class="headerlink" href="#parameters" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>ありません。</p>
+<p>必須の引数はありません。</p>
 </div>
 <div class="section" id="return-value">
 <h2>7.3.30.5. 戻り値<a class="headerlink" href="#return-value" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[成功かどうかのフラグ]
+<p>このコマンドが成功したときは以下のようにボディは <code class="docutils literal notranslate"><span class="pre">true</span></code> になります:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[HEADER, true]
 </pre></div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">成功かどうかのフラグ</span></code></p>
-<blockquote>
-<div><p>エラーが生じなかった場合にはtrue、エラーが生じた場合にはfalseを返す。</p>
-</div></blockquote>
+<p>そうでない場合は <code class="docutils literal notranslate"><span class="pre">false</span></code> を返します:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[HEADER, false]
+</pre></div>
+</div>
 </div>
 <div class="section" id="see-also">
 <h2>7.3.30.6. 参考<a class="headerlink" href="#see-also" title="このヘッドラインへのパーマリンク">¶</a></h2>
@@ -142,7 +144,7 @@
 <li><a class="reference internal" href="#summary">7.3.30.1. 概要</a></li>
 <li><a class="reference internal" href="#syntax">7.3.30.2. 構文</a></li>
 <li><a class="reference internal" href="#usage">7.3.30.3. 使い方</a><ul>
-<li><a class="reference internal" href="#id1">7.3.30.3.1. log_reopenを用いたログのローテーション</a></li>
+<li><a class="reference internal" href="#lotate-log-files-with-log-reopen">7.3.30.3.1. <code class="docutils literal notranslate"><span class="pre">log_reopen</span></code> でログローテートを実施する</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#parameters">7.3.30.4. 引数</a></li>

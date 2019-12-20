@@ -188,6 +188,17 @@ only when <a class="reference internal" href="#load-columns"><span class="std st
 <p>When a target table contains primary key, you must specify <code class="docutils literal notranslate"><span class="pre">_key</span></code>
 column (pseudo column associated primary key) as the one of
 <code class="docutils literal notranslate"><span class="pre">COLUMN_NAME</span></code>.</p>
+<p>If you specify <code class="docutils literal notranslate"><span class="pre">apache-arrow</span></code> as <code class="docutils literal notranslate"><span class="pre">input_type</span></code>, you must use
+<a class="reference external" href="https://arrow.apache.org/docs/format/Columnar.html#ipc-streaming-format">Apache Arrow IPC Streaming Format</a>. You can’t use <a class="reference external" href="https://arrow.apache.org/docs/format/Columnar.html#ipc-file-format">Apache Arrow IPC
+File Format</a>.</p>
+<p>You must use HTTP interface to use Apache Arrow. You can’t use Apache
+Arrow in command line interface.</p>
+<p>You must choose suitable record batch size. Groonga loads data per
+record batch. If you choose very large record batch size, Groonga
+can’t start loading until whole data of a record batch are received.
+If you choose very small record batch size, Groonga can load data
+incrementally but overhead will be large. Suitable record batch size
+depends on your system but 1024 or so will be suitable.</p>
 <p>If <code class="docutils literal notranslate"><span class="pre">values</span></code> isn’t specified any values, they are read from the
 standard input in command line style or body in HTTP style.</p>
 </div>
@@ -213,9 +224,39 @@ in other (all columns excluding <code class="docutils literal notranslate"><span
 </div>
 <div class="section" id="input-type">
 <span id="load-input-type"></span><h4>7.3.24.4.2.3. <code class="docutils literal notranslate"><span class="pre">input_type</span></code><a class="headerlink" href="#input-type" title="Permalink to this headline">¶</a></h4>
-<p>Specifies an input format for <code class="docutils literal notranslate"><span class="pre">values</span></code>. It supports only <code class="docutils literal notranslate"><span class="pre">json</span></code>
-for now. It means format of <code class="docutils literal notranslate"><span class="pre">values</span></code> is JSON.</p>
-<p>The default value is <code class="docutils literal notranslate"><span class="pre">json</span></code>.</p>
+<p>Specifies an input format for <code class="docutils literal notranslate"><span class="pre">values</span></code>.</p>
+<p>Note that you must also specify suitable HTTP <code class="docutils literal notranslate"><span class="pre">Content-Type</span></code> header
+value when you use <code class="docutils literal notranslate"><span class="pre">input_type</span></code> with HTTP interface.</p>
+<p>Here are available types and <code class="docutils literal notranslate"><span class="pre">Content-Type</span></code> values:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Type</p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">Content-Type</span></code></p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">json</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">application/json</span></code></p></td>
+<td><p>Use JSON for <code class="docutils literal notranslate"><span class="pre">values</span></code> format.</p>
+<p>This is the default.</p>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">apache-arrow</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">application/x-apache-arrow-streaming</span></code></p></td>
+<td><div class="versionadded">
+<p><span class="versionmodified added">New in version 9.1.1.</span></p>
+</div>
+<p>Use Apache Arrow for <code class="docutils literal notranslate"><span class="pre">values</span></code> format.</p>
+</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="section" id="each">
 <span id="load-each"></span><h4>7.3.24.4.2.4. <code class="docutils literal notranslate"><span class="pre">each</span></code><a class="headerlink" href="#each" title="Permalink to this headline">¶</a></h4>

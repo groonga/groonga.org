@@ -77,43 +77,108 @@
             
   <div class="section" id="groonga-http-server">
 <h1>7.1.6. Groonga HTTP server<a class="headerlink" href="#groonga-http-server" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="name">
-<h2>7.1.6.1. Name<a class="headerlink" href="#name" title="Permalink to this headline">¶</a></h2>
-<p>Groonga HTTP server</p>
-</div>
-<div class="section" id="synopsis">
-<h2>7.1.6.2. Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>groonga -d --protocol http DB_PATH
-</pre></div>
-</div>
-</div>
 <div class="section" id="summary">
-<h2>7.1.6.3. Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<h2>7.1.6.1. Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
 <p>You can communicate by HTTP if you specify <code class="docutils literal notranslate"><span class="pre">http</span></code> to <code class="docutils literal notranslate"><span class="pre">--protocol</span></code> option. And output a file that is put under the path, and correspond to specified URI to HTTP request if you specify static page path by <code class="docutils literal notranslate"><span class="pre">--document-root</span></code>.</p>
 <p>Groonga has an Web-based administration tool implemented with HTML and JavaScript. If you don’t specify <code class="docutils literal notranslate"><span class="pre">--document-root</span></code>, regarded as administration tool installed path is specified, so you can use administration tool to access <code class="docutils literal notranslate"><span class="pre">http://HOSTNAME:PORT/</span></code> in Web browser.</p>
 </div>
-<div class="section" id="command">
-<h2>7.1.6.4. Command<a class="headerlink" href="#command" title="Permalink to this headline">¶</a></h2>
-<p>You can use the same commands of Groonga that starts of the other mode to Groonga server that starts to specify <code class="docutils literal notranslate"><span class="pre">http</span></code>.</p>
-<p>A command takes the arguments. An argument has a name. And there are special arguments <code class="docutils literal notranslate"><span class="pre">output_type</span></code> and <code class="docutils literal notranslate"><span class="pre">command_version</span></code>.</p>
-<p>In standalone mode or client mode, a command is specified by the following format.</p>
-<blockquote>
-<div><p>Format 1: COMMAND_NAME VALUE1 VALUE2,..</p>
-<p>Format 2: COMMAND_NAME –PARAMETER_NAME1 VALUE1 –PARAMETER_NAME2 VALUE2,..</p>
-</div></blockquote>
-<p>Format 1 and Format 2 are possible to mix. Output type is specified by <code class="docutils literal notranslate"><span class="pre">output_type</span></code> in the formats.</p>
-<p>In HTTP server mode, the following formats to specify command:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Format: /d/COMMAND_NAME.OUTPUT_TYPE?ARGUMENT_NAME1=VALUE1&amp;ARGUMENT_NAME2=VALUE2&amp;...
+<div class="section" id="syntax">
+<h2>7.1.6.2. Syntax<a class="headerlink" href="#syntax" title="Permalink to this headline">¶</a></h2>
+<p>You must specify <code class="docutils literal notranslate"><span class="pre">--protocol</span> <span class="pre">http</span></code>:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>groonga --protocol http -d [options...] DB_PATH
 </pre></div>
 </div>
-<p>But, they need URL encode for command names, arguments names and values.</p>
-<p>You can use GET method only.</p>
-<p>You can specify JSON, TSV and XML to output type.</p>
-<p><code class="docutils literal notranslate"><span class="pre">command_version</span></code> is specified for command specification compatibility. See <a class="reference internal" href="../command/command_version.html"><span class="doc">Command version</span></a> for details.</p>
 </div>
-<div class="section" id="return-value">
-<h2>7.1.6.5. Return value<a class="headerlink" href="#return-value" title="Permalink to this headline">¶</a></h2>
-<p>The execution result is output that follows output type specification by the command.</p>
+<div class="section" id="usage">
+<h2>7.1.6.3. Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>You can use HTTP GET or HTTP POST to send a request. One request runs
+only one command. You can’t run multiple commands by one request.</p>
+<p>You must use <code class="docutils literal notranslate"><span class="pre">/d/${COMMAND_NAME}</span></code> path for request.</p>
+<p>Here is an example URL to run <a class="reference internal" href="../commands/status.html"><span class="doc">status</span></a>:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>http://127.0.0.1:10041/d/status
+</pre></div>
+</div>
+<p>If you use HTTP GET, you must specify parameters as URL “query”.</p>
+<p>Here is an example URL to specify <code class="docutils literal notranslate"><span class="pre">3</span></code> as <code class="docutils literal notranslate"><span class="pre">command_version</span></code>:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>http://127.0.0.1:10041/d/status?command_version=3
+</pre></div>
+</div>
+<p>You can also specify multiple parameters:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>http://127.0.0.1:10041/d/status?command_version=3&amp;output_pretty=yes
+</pre></div>
+</div>
+<p>If you use HTTP POST, you can specify parameters by URL “query” and
+HTTP request body. If you use HTTP request body, you must specify
+<code class="docutils literal notranslate"><span class="pre">application/x-www-form-urlencoded</span></code> as <code class="docutils literal notranslate"><span class="pre">Content-Type</span></code> header
+value.</p>
+<p>Here is an example HTTP POST request to specify multiple parameters by
+HTTP request body:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>POST /d/status HTTP/1.1
+Host: 127.0.0.1:10041
+Content-Length: 35
+Content-Type: application/x-www-form-urlencoded
+
+command_version=3&amp;output_pretty=yes
+</pre></div>
+</div>
+<p>You can mix URL “query” and HTTP request body:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>POST /d/status?command_version=3 HTTP/1.1
+Host: 127.0.0.1:10041
+Content-Length: 17
+Content-Type: application/x-www-form-urlencoded
+
+output_pretty=yes
+</pre></div>
+</div>
+<p>You can also use HTTP POST to specify data for
+<a class="reference internal" href="../commands/load.html"><span class="doc">load</span></a>. If you send data by HTTP POST, you
+can’t specify parameters as HTTP body. You must specify parameters by
+URL “path”.</p>
+<p>You must specify suitable HTTP <code class="docutils literal notranslate"><span class="pre">Content-Type</span></code> header value and
+<a class="reference internal" href="../commands/load.html"><span class="doc">load</span></a> <code class="docutils literal notranslate"><span class="pre">input_type</span></code> parameter value for
+your data. Here are available values:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p><code class="docutils literal notranslate"><span class="pre">Content-Type</span></code></p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">input_type</span></code></p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">application/json</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">json</span></code></p></td>
+<td><p>Send JSON data.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">application/x-apache-arrow-streaming</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">apache-arrow</span></code></p></td>
+<td><p>Send Apache Arrow data.</p></td>
+</tr>
+</tbody>
+</table>
+<p>You can specify <a class="reference internal" href="../command/output_format.html"><span class="doc">Output format</span></a> as URL
+“path” extension.</p>
+<p>Here is an example HTTP request to get response as JSON:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>http://127.0.0.1:10041/d/status.json
+</pre></div>
+</div>
+<p>Here is an example HTTP request to get response as XML:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>http://127.0.0.1:10041/d/status.xml
+</pre></div>
+</div>
+</div>
+<div class="section" id="see-also">
+<h2>7.1.6.4. See also<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="groonga-httpd.html"><span class="doc">groonga-httpd</span></a></p></li>
+<li><p><a class="reference internal" href="../commands/load.html"><span class="doc">load</span></a></p></li>
+</ul>
+</div></blockquote>
 </div>
 </div>
 
@@ -126,11 +191,10 @@
   <h3><a href="../../index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">7.1.6. Groonga HTTP server</a><ul>
-<li><a class="reference internal" href="#name">7.1.6.1. Name</a></li>
-<li><a class="reference internal" href="#synopsis">7.1.6.2. Synopsis</a></li>
-<li><a class="reference internal" href="#summary">7.1.6.3. Summary</a></li>
-<li><a class="reference internal" href="#command">7.1.6.4. Command</a></li>
-<li><a class="reference internal" href="#return-value">7.1.6.5. Return value</a></li>
+<li><a class="reference internal" href="#summary">7.1.6.1. Summary</a></li>
+<li><a class="reference internal" href="#syntax">7.1.6.2. Syntax</a></li>
+<li><a class="reference internal" href="#usage">7.1.6.3. Usage</a></li>
+<li><a class="reference internal" href="#see-also">7.1.6.4. See also</a></li>
 </ul>
 </li>
 </ul>

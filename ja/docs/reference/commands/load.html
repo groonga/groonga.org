@@ -181,6 +181,9 @@ column_create Entries content COLUMN_SCALAR Text
 </div>
 <p>角括弧スタイルの <code class="docutils literal notranslate"><span class="pre">[COLUMN_NAME1,</span> <span class="pre">COLUMN_NAME2,</span> <span class="pre">...]</span></code> は <a class="reference internal" href="#load-columns"><span class="std std-ref">columns</span></a> パラメーターを指定していないときだけ有効です。</p>
 <p>対象のテーブルが主キーを持つテーブルであった場合は、カラム名のどれかを <code class="docutils literal notranslate"><span class="pre">_key</span></code> （主キーを示す疑似カラム名）にしなければいけません。</p>
+<p><code class="docutils literal notranslate"><span class="pre">input_type</span></code> に <code class="docutils literal notranslate"><span class="pre">apache-arrow</span></code> を指定した場合は <a class="reference external" href="https://arrow.apache.org/docs/format/Columnar.html#ipc-streaming-format">Apache Arrow IPC Streaming Format</a> を使わなければいけません。 <a class="reference external" href="https://arrow.apache.org/docs/format/Columnar.html#ipc-file-format">Apache Arrow IPC File Format</a> は使えません。</p>
+<p>Apache Arrowを使うにはHTTPインターフェイスを使わないといけません。コマンドラインインターフェイスではApache Arrowを使えません。</p>
+<p>適切なレコードバッチサイズを選ばないといけません。Groongaはレコードバッチごとにデータをロードします。もし、とても大きいレコードバッチサイズを選んだら、Groongaは各レコードバッチのすべてのデータを受信するまでロードしはじめることができません。もし、とても小さいレコードバッチサイズを選ぶと、Groongaは随時データをロードできますがオーバーヘッドが大きいでしょう。適切なレコードバッチサイズはシステムによりますが、1024あたりが適切でしょう。</p>
 <p><code class="docutils literal notranslate"><span class="pre">values</span></code> を指定していない場合、コマンドラインスタイルのときは標準入力から読み込んだ値を使い、HTTPスタイルのときはボディの値を使います。</p>
 </div>
 <div class="section" id="table">
@@ -202,8 +205,38 @@ column_create Entries content COLUMN_SCALAR Text
 </div>
 <div class="section" id="input-type">
 <span id="load-input-type"></span><h4>7.3.24.4.2.3. <code class="docutils literal notranslate"><span class="pre">input_type</span></code><a class="headerlink" href="#input-type" title="このヘッドラインへのパーマリンク">¶</a></h4>
-<p><code class="docutils literal notranslate"><span class="pre">values</span></code> の入力フォーマットを指定します。現在のところ <code class="docutils literal notranslate"><span class="pre">json</span></code> のみサポートしています。つまり、 <code class="docutils literal notranslate"><span class="pre">values</span></code> のフォーマットはJSONでなければいけません。</p>
-<p>デフォルト値は <code class="docutils literal notranslate"><span class="pre">json</span></code> です。</p>
+<p><code class="docutils literal notranslate"><span class="pre">values</span></code> のフォーマットを指定します。</p>
+<p>HTTP POSTで <code class="docutils literal notranslate"><span class="pre">input_type</span></code> を使うときは適切なHTTP <code class="docutils literal notranslate"><span class="pre">Content-Type</span></code> ヘッダーの値も指定しなければいけないことに注意してください。</p>
+<p>指定可能な型と <code class="docutils literal notranslate"><span class="pre">Content-Type</span></code> の値は以下の通りです。</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>型</p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">Content-Type</span></code></p></th>
+<th class="head"><p>説明</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">json</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">application/json</span></code></p></td>
+<td><p>JSONフォーマットで <code class="docutils literal notranslate"><span class="pre">values</span></code> を指定するときに使います。</p>
+<p>これがデフォルトです。</p>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">apache-arrow</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">application/x-apache-arrow-streaming</span></code></p></td>
+<td><div class="versionadded">
+<p><span class="versionmodified added">バージョン 9.1.1 で追加.</span></p>
+</div>
+<p>Apache Arrowフォーマットで <code class="docutils literal notranslate"><span class="pre">values</span></code> を指定するときに使います。</p>
+</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="section" id="each">
 <span id="load-each"></span><h4>7.3.24.4.2.4. <code class="docutils literal notranslate"><span class="pre">each</span></code><a class="headerlink" href="#each" title="このヘッドラインへのパーマリンク">¶</a></h4>

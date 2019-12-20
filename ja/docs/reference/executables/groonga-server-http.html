@@ -78,43 +78,97 @@
             
   <div class="section" id="groonga-http-server">
 <h1>7.1.6. Groonga HTTPサーバー<a class="headerlink" href="#groonga-http-server" title="このヘッドラインへのパーマリンク">¶</a></h1>
-<div class="section" id="name">
-<h2>7.1.6.1. 名前<a class="headerlink" href="#name" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>Groonga HTTPサーバー</p>
-</div>
-<div class="section" id="synopsis">
-<h2>7.1.6.2. 書式<a class="headerlink" href="#synopsis" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>groonga -d --protocol http DB_PATH
-</pre></div>
-</div>
-</div>
 <div class="section" id="summary">
-<h2>7.1.6.3. 概要<a class="headerlink" href="#summary" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<h2>7.1.6.1. 概要<a class="headerlink" href="#summary" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <p>Groongaサーバを起動する時に <code class="docutils literal notranslate"><span class="pre">--protocol</span></code> オプションに <code class="docutils literal notranslate"><span class="pre">http</span></code> を指定すると、HTTPで通信可能になります。また、 <code class="docutils literal notranslate"><span class="pre">--document-root</span></code> によって静的ページのパスを指定すると、HTTPリクエストに指定されたURIに対応する、パス配下に置かれたファイルを出力します。</p>
 <p>GroongaにはHTML + JavaScriptで実装された管理ツールが標準で付属しています。 <code class="docutils literal notranslate"><span class="pre">--document-root</span></code> を指定しない場合は管理ツールがインストールされているパスが指定されたとみなされますので、ウェブブラウザで <code class="docutils literal notranslate"><span class="pre">http://HOSTNAME:PORT/</span></code> にアクセスすると、管理ツールを利用できます。</p>
 </div>
-<div class="section" id="command">
-<h2>7.1.6.4. コマンド<a class="headerlink" href="#command" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">http</span></code> を指定して起動したGroongaサーバーに対しても、他のモードで起動したGroongaと同じコマンドが使用できます。</p>
-<p>コマンドは、複数の引数をとります。引数にはそれぞれ名前があります。また、特殊な引数である <code class="docutils literal notranslate"><span class="pre">output_type</span></code> と <code class="docutils literal notranslate"><span class="pre">command_version</span></code> があります。</p>
-<p>スタンドアロンやクライアントモードでは、コマンドは以下のような形式で指定します。</p>
-<blockquote>
-<div><p>形式1: コマンド名 値1 値2,..</p>
-<p>形式2: コマンド名 --引数名1 値1 --引数名2 値2,..</p>
-</div></blockquote>
-<p>形式1と形式2は混在させることができます。これらの形式では、 <code class="docutils literal notranslate"><span class="pre">output_type</span></code> という引数名を用いて出力形式を指定します。</p>
-<p>HTTPでGroongaサーバーと通信する際には、以下のような形式でコマンドを指定します。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Format: /d/COMMAND_NAME.OUTPUT_TYPE?ARGUMENT_NAME1=VALUE1&amp;ARGUMENT_NAME2=VALUE2&amp;...
+<div class="section" id="syntax">
+<h2>7.1.6.2. 構文<a class="headerlink" href="#syntax" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><a href="#id1"><span class="problematic" id="id2">``</span></a>--protocol http``を指定してください。:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>groonga --protocol http -d [options...] DB_PATH
 </pre></div>
 </div>
-<p>ただし、コマンド名、引数名、値はURLエンコードが必要です。</p>
-<p>GETメソッドのみが使用可能です。</p>
-<p>出力形式にはJSON, TSV, XMLが指定可能です。</p>
-<p><code class="docutils literal notranslate"><span class="pre">command_version</span></code> はコマンドの仕様の互換性を指定します。詳細は <a class="reference internal" href="../command/command_version.html"><span class="doc">コマンドバージョン</span></a> を参照してください。</p>
 </div>
-<div class="section" id="return-value">
-<h2>7.1.6.5. 戻り値<a class="headerlink" href="#return-value" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p>出力形式の指定に従って、コマンドの実行結果を出力します。</p>
+<div class="section" id="usage">
+<h2>7.1.6.3. 使い方<a class="headerlink" href="#usage" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>リクエストを送るときはHTTP GETまたはHTTP POSTを使えます。1つのリクエストで1つのコマンドだけ実行できます。1つのリクエストで複数のコマンドを実行することはできません。</p>
+<p>リクエストには <code class="docutils literal notranslate"><span class="pre">/d/${コマンド名}</span></code> というパスを使います。</p>
+<p>以下のURLは <a class="reference internal" href="../commands/status.html"><span class="doc">status</span></a> を実行します。:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>http://127.0.0.1:10041/d/status
+</pre></div>
+</div>
+<p>HTTP GETを使うときはパラメーターはURLの「クエリー」で指定します。</p>
+<p>以下のURLは <code class="docutils literal notranslate"><span class="pre">command_version</span></code> に <code class="docutils literal notranslate"><span class="pre">3</span></code> を指定しています。:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>http://127.0.0.1:10041/d/status?command_version=3
+</pre></div>
+</div>
+<p>複数のパラメーターを指定することもできます。:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>http://127.0.0.1:10041/d/status?command_version=3&amp;output_pretty=yes
+</pre></div>
+</div>
+<p>HTTP POSTを使うときは、URLの「クエリー」とHTTPリクエストのボディでパラメーターを指定できます。もし、HTTPリクエストのボディを使うときは <code class="docutils literal notranslate"><span class="pre">Content-Type</span></code> ヘッダーの値には <code class="docutils literal notranslate"><span class="pre">application/x-www-form-urlencoded</span></code> を指定しなければいけません。</p>
+<p>以下のHTTP POSTリクエストは複数のパラメーターをHTTPリクエストボディで指定しています。:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>POST /d/status HTTP/1.1
+Host: 127.0.0.1:10041
+Content-Length: 35
+Content-Type: application/x-www-form-urlencoded
+
+command_version=3&amp;output_pretty=yes
+</pre></div>
+</div>
+<p>URLの「クエリー」とHTTPリクエストのボディを一緒に使うこともできます。:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>POST /d/status?command_version=3 HTTP/1.1
+Host: 127.0.0.1:10041
+Content-Length: 17
+Content-Type: application/x-www-form-urlencoded
+
+output_pretty=yes
+</pre></div>
+</div>
+<p><a class="reference internal" href="../commands/load.html"><span class="doc">load</span></a> のデータを指定するためにHTTP POSTを使うこともできます。もし、HTTP POSTでデータを送る場合はHTTPリクエストのボディでパラメーターを指定することはできません。パラメーターはURLの「パス」で指定しなければいけません。</p>
+<p>指定するデータにあわせて適切なHTTP <code class="docutils literal notranslate"><span class="pre">Content-Type</span></code> ヘッダーの値と <a class="reference internal" href="../commands/load.html"><span class="doc">load</span></a> の <code class="docutils literal notranslate"><span class="pre">input_type</span></code> パラメーターの値を指定しなければいけません。利用可能な値は次の通りです。</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p><code class="docutils literal notranslate"><span class="pre">Content-Type</span></code></p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">input_type</span></code></p></th>
+<th class="head"><p>説明</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">application/json</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">json</span></code></p></td>
+<td><p>JSONデータを送ります。</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">application/x-apache-arrow-streaming</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">apache-arrow</span></code></p></td>
+<td><p>Apache Arrowデータを送ります。</p></td>
+</tr>
+</tbody>
+</table>
+<p>URLの「パス」の拡張子で <a class="reference internal" href="../command/output_format.html"><span class="doc">出力形式</span></a> を指定できます。</p>
+<p>以下はJSONでレスポンスを受け取るHTTPリクエストです。:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>http://127.0.0.1:10041/d/status.json
+</pre></div>
+</div>
+<p>以下はXMLでレスポンスを受け取るHTTPリクエストです。:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>http://127.0.0.1:10041/d/status.xml
+</pre></div>
+</div>
+</div>
+<div class="section" id="see-also">
+<h2>7.1.6.4. 参考<a class="headerlink" href="#see-also" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="groonga-httpd.html"><span class="doc">groonga-httpd</span></a></p></li>
+<li><p><a class="reference internal" href="../commands/load.html"><span class="doc">load</span></a></p></li>
+</ul>
+</div></blockquote>
 </div>
 </div>
 
@@ -127,11 +181,10 @@
   <h3><a href="../../index.html">目次</a></h3>
   <ul>
 <li><a class="reference internal" href="#">7.1.6. Groonga HTTPサーバー</a><ul>
-<li><a class="reference internal" href="#name">7.1.6.1. 名前</a></li>
-<li><a class="reference internal" href="#synopsis">7.1.6.2. 書式</a></li>
-<li><a class="reference internal" href="#summary">7.1.6.3. 概要</a></li>
-<li><a class="reference internal" href="#command">7.1.6.4. コマンド</a></li>
-<li><a class="reference internal" href="#return-value">7.1.6.5. 戻り値</a></li>
+<li><a class="reference internal" href="#summary">7.1.6.1. 概要</a></li>
+<li><a class="reference internal" href="#syntax">7.1.6.2. 構文</a></li>
+<li><a class="reference internal" href="#usage">7.1.6.3. 使い方</a></li>
+<li><a class="reference internal" href="#see-also">7.1.6.4. 参考</a></li>
 </ul>
 </li>
 </ul>

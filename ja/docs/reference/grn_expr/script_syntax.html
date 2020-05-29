@@ -3,7 +3,7 @@
 <html lang="ja">
   <head>
     <meta charset="utf-8" />
-    <title>7.13.2. スクリプト構文 &#8212; Groonga v10.0.2ドキュメント</title>
+    <title>7.13.2. スクリプト構文 &#8212; Groonga v10.0.3ドキュメント</title>
     <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
     
@@ -65,7 +65,7 @@
         <li class="right" >
           <a href="query_syntax.html" title="7.13.1. クエリー構文"
              accesskey="P">前へ</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v10.0.2ドキュメント</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v10.0.3ドキュメント</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../reference.html" ><span class="section-number">7. </span>リファレンスマニュアル</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../grn_expr.html" accesskey="U"><span class="section-number">7.13. </span>grn_expr</a> &#187;</li> 
       </ul>
@@ -2088,10 +2088,10 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 #         ]
 #       ],
 #       [
-#         &quot;Good-bye Tritonn&quot;
+#         &quot;Good-bye Senna&quot;
 #       ],
 #       [
-#         &quot;Good-bye Senna&quot;
+#         &quot;Good-bye Tritonn&quot;
 #       ]
 #     ]
 #   ]
@@ -2242,8 +2242,87 @@ select Entries --filter &#39;content *N &quot;also Really&quot;&#39; --output_co
 <p>二番目の式は <code class="docutils literal notranslate"><span class="pre">I</span></code> と <code class="docutils literal notranslate"><span class="pre">Really</span></code> が含まれていて、かつ、これらの単語が10単語以内近くにあるレコードにマッチします。そのため、 <code class="docutils literal notranslate"><span class="pre">I</span> <span class="pre">also</span> <span class="pre">st</span> <span class="pre">arted</span> <span class="pre">to</span> <span class="pre">use</span> <span class="pre">mroonga.</span> <span class="pre">It's</span> <span class="pre">also</span> <span class="pre">very</span> <span class="pre">fast!</span> <span class="pre">Really</span> <span class="pre">fast!</span></code> はマッチしません。 <code class="docutils literal notranslate"><span class="pre">I</span></code> と <code class="docutils literal notranslate"><span class="pre">Really</span></code> の間の単語数は11です。</p>
 <p>三番目の式は <code class="docutils literal notranslate"><span class="pre">also</span></code> と <code class="docutils literal notranslate"><span class="pre">Really</span></code> が含まれていて、かつ、これらの単語が10単語以内近くにあるレコードにマッチします。そのため、 <code class="docutils literal notranslate"><span class="pre">I</span> <span class="pre">also</span> <span class="pre">started</span> <span class="pre">to</span> <span class="pre">use</span> <span class="pre">mroonga.</span> <span class="pre">It's</span> <span class="pre">also</span> <span class="pre">very</span> <span class="pre">fast!</span> <span class="pre">Really</span> <span class="pre">fast!</span></code> にマッチします。 <code class="docutils literal notranslate"><span class="pre">also</span></code> と <code class="docutils literal notranslate"><span class="pre">Really</span></code> の間の単語数は10です。</p>
 </div>
+<div class="section" id="near-phrase-search-operator">
+<span id="script-syntax-near-phrase-search-operator"></span><h3><span class="section-number">7.13.2.9.5. </span>近傍フレーズ検索演算子<a class="headerlink" href="#near-phrase-search-operator" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>構文は以下のどれかです。:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>column *NP &quot;phrase1 phrase2 ...&quot;
+column *NP${MAX_INTERVAL} &quot;phrase1 phrase2 ...&quot;
+</pre></div>
+</div>
+<p>2つめの形式の例は次の通りです。</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>column *NP29 &quot;phrase1 phrase2 ...&quot;
+column *NP-1 &quot;phrase1 phrase2 ...&quot;
+</pre></div>
+</div>
+<p>最初の例は近いと判断する最大距離として <code class="docutils literal notranslate"><span class="pre">29</span></code> を使うという意味です。</p>
+<p>2つめの例は近いと判断する最大距離として <code class="docutils literal notranslate"><span class="pre">-1</span></code> を使うという意味です。 <code class="docutils literal notranslate"><span class="pre">-1</span></code> はどれだけ離れていてもよいという意味です。</p>
+<p>この演算子は <code class="docutils literal notranslate"><span class="pre">phrase1</span> <span class="pre">phrase2</span> <span class="pre">...</span></code> というフレーズで近傍フレーズ検索します。近傍フレーズ検索はすべてのフレーズが含まれていてかつそれぞれが指定した順番で出現していてかつそれぞれのフレーズが指定した距離以内にあるレコードを検索します。</p>
+<p>近いと判断する最大距離のデフォルトは <code class="docutils literal notranslate"><span class="pre">10</span></code> です。距離の単位はN-gram系のトークナイザーでは文字数で、形態素解析系のトークナイザーでは単語数です。</p>
+<p>しかし、<code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code> はASCIIだけの単語はトークンに分割しません。このケースでは、 <code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code> はASCIIの文字には空白区切りのようなトークナイズ方法を使うためです。</p>
+<p>このため、 <code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code> はN-gram系のトークナイザーですが、ASCIIだけの単語を扱う時の単位は単語数になります。</p>
+<p><code class="docutils literal notranslate"><span class="pre">column</span></code> 用の全文検索用インデックスカラムを定義しておく必要があることに注意してください。</p>
+<p>TODO: Use index that has <code class="docutils literal notranslate"><span class="pre">TokenNgram(&quot;unify_alphabet&quot;,</span> <span class="pre">false)</span></code>
+tokenizer to show difference with near search with English text.</p>
+<p>以下は簡単な使用例です。</p>
+<p>実行例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;content *NP &quot;I fast&quot;&#39;      --output_columns content
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ]
+#       ],
+#       [
+#         &quot;I started to use Groonga. It&#39;s very fast!&quot;
+#       ]
+#     ]
+#   ]
+# ]
+select Entries --filter &#39;content *NP &quot;I Really&quot;&#39;    --output_columns content
+# [[0, 1337566253.89858, 0.000355720520019531], [[[0], [[&quot;content&quot;, &quot;Text&quot;]]]]]
+select Entries --filter &#39;content *NP &quot;also Really&quot;&#39; --output_columns content
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ]
+#       ],
+#       [
+#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>最初の式は <code class="docutils literal notranslate"><span class="pre">I</span></code> と <code class="docutils literal notranslate"><span class="pre">fast</span></code> が含まれていて、かつ、これらの単語が10単語以内近くにあるレコードにマッチします。そのため <code class="docutils literal notranslate"><span class="pre">I</span> <span class="pre">also</span> <span class="pre">started</span> <span class="pre">to</span> <span class="pre">use</span> <span class="pre">mroonga.</span> <span class="pre">It's</span> <span class="pre">also</span> <span class="pre">very</span> <span class="pre">fast!</span> <span class="pre">...</span></code> にマッチします。 <code class="docutils literal notranslate"><span class="pre">I</span></code> と <code class="docutils literal notranslate"><span class="pre">fast</span></code> の間の単語数はちょうど10です。</p>
+<p>二番目の式は <code class="docutils literal notranslate"><span class="pre">I</span></code> と <code class="docutils literal notranslate"><span class="pre">Really</span></code> が含まれていて、かつ、これらの単語が10単語以内近くにあるレコードにマッチします。そのため、 <code class="docutils literal notranslate"><span class="pre">I</span> <span class="pre">also</span> <span class="pre">st</span> <span class="pre">arted</span> <span class="pre">to</span> <span class="pre">use</span> <span class="pre">mroonga.</span> <span class="pre">It's</span> <span class="pre">also</span> <span class="pre">very</span> <span class="pre">fast!</span> <span class="pre">Really</span> <span class="pre">fast!</span></code> はマッチしません。 <code class="docutils literal notranslate"><span class="pre">I</span></code> と <code class="docutils literal notranslate"><span class="pre">Really</span></code> の間の単語数は11です。</p>
+<p>三番目の式は <code class="docutils literal notranslate"><span class="pre">also</span></code> と <code class="docutils literal notranslate"><span class="pre">Really</span></code> が含まれていて、かつ、これらの単語が10単語以内近くにあるレコードにマッチします。そのため、 <code class="docutils literal notranslate"><span class="pre">I</span> <span class="pre">also</span> <span class="pre">started</span> <span class="pre">to</span> <span class="pre">use</span> <span class="pre">mroonga.</span> <span class="pre">It's</span> <span class="pre">also</span> <span class="pre">very</span> <span class="pre">fast!</span> <span class="pre">Really</span> <span class="pre">fast!</span></code> にマッチします。 <code class="docutils literal notranslate"><span class="pre">also</span></code> と <code class="docutils literal notranslate"><span class="pre">Really</span></code> の間の単語数は10です。</p>
+</div>
 <div class="section" id="similar-search">
-<span id="script-syntax-similar-search-operator"></span><h3><span class="section-number">7.13.2.9.5. </span>類似文書検索<a class="headerlink" href="#similar-search" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<span id="script-syntax-similar-search-operator"></span><h3><span class="section-number">7.13.2.9.6. </span>類似文書検索<a class="headerlink" href="#similar-search" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <p>構文は <code class="docutils literal notranslate"><span class="pre">column</span> <span class="pre">*S</span> <span class="pre">&quot;document&quot;</span></code> です。</p>
 <p>この演算子は <code class="docutils literal notranslate"><span class="pre">document</span></code> という文書で類似文書検索します。類似文書検索は <code class="docutils literal notranslate"><span class="pre">document</span></code> と似た内容を持つレコードを検索します。</p>
 <p><code class="docutils literal notranslate"><span class="pre">column</span></code> 用の全文検索用インデックスカラムを定義しておく必要があることに注意してください。</p>
@@ -2282,7 +2361,7 @@ select Entries --filter &#39;content *N &quot;also Really&quot;&#39; --output_co
 <p>日本語の文書に対して類似文書検索を行う場合は、 <code class="docutils literal notranslate"><span class="pre">TokenMecab</span></code> を使う方が良いです。<code class="docutils literal notranslate"><span class="pre">TokenMecab</span></code> は、対象の文書をほぼ単語にトークナイズするので、類似文書検索の精度が向上するためです。</p>
 </div>
 <div class="section" id="term-extract-operator">
-<span id="script-syntax-term-extract-operator"></span><h3><span class="section-number">7.13.2.9.6. </span>単語抽出演算子<a class="headerlink" href="#term-extract-operator" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<span id="script-syntax-term-extract-operator"></span><h3><span class="section-number">7.13.2.9.7. </span>単語抽出演算子<a class="headerlink" href="#term-extract-operator" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <p>構文は <code class="docutils literal notranslate"><span class="pre">_key</span> <span class="pre">*T</span> <span class="pre">&quot;document&quot;</span></code> です。</p>
 <p>この演算子は <code class="docutils literal notranslate"><span class="pre">document</span></code> から単語を抽出します。単語は <code class="docutils literal notranslate"><span class="pre">_key</span></code> のテーブルのキーとして登録されていなければいけません。</p>
 <p>テーブルはパトリシアトライ（ <code class="docutils literal notranslate"><span class="pre">TABLE_PAT_KEY</span></code> ）またはダブル配列トライ（ <code class="docutils literal notranslate"><span class="pre">TABLE_DAT_KEY</span></code> ）でなければいけません。ハッシュテーブル（ <code class="docutils literal notranslate"><span class="pre">TABLE_HASH_KEY</span></code> ）や配列（ <code class="docutils literal notranslate"><span class="pre">TABLE_NO_KEY</span></code> ）は最長共通接頭辞検索（Longest Common Prefix Search）できないため使えません。この演算子は最長共通接頭辞検索を使っています。</p>
@@ -2330,7 +2409,7 @@ select Words --filter &#39;_key *T &quot;Groonga is the successor project to Sen
 <p>この式は文書 <code class="docutils literal notranslate"><span class="pre">Groonga</span> <span class="pre">is</span> <span class="pre">the</span> <span class="pre">successor</span> <span class="pre">project</span> <span class="pre">to</span> <span class="pre">Senna.</span></code> に含まれている単語を抽出します。今回は <code class="docutils literal notranslate"><span class="pre">Words</span></code> に <code class="docutils literal notranslate"><span class="pre">NormalizerAuto</span></code> ノーマライザーが指定されています。そのため、 <code class="docutils literal notranslate"><span class="pre">Words</span></code> には <code class="docutils literal notranslate"><span class="pre">groonga</span></code> とロードしていますが <code class="docutils literal notranslate"><span class="pre">Groonga</span></code> も抽出できています。また、すべてての抽出された単語も正規化されています。</p>
 </div>
 <div class="section" id="regular-expression-operator">
-<span id="script-syntax-regular-expression-operator"></span><h3><span class="section-number">7.13.2.9.7. </span>正規表現演算子<a class="headerlink" href="#regular-expression-operator" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<span id="script-syntax-regular-expression-operator"></span><h3><span class="section-number">7.13.2.9.8. </span>正規表現演算子<a class="headerlink" href="#regular-expression-operator" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <div class="versionadded">
 <p><span class="versionmodified added">バージョン 5.0.1 で追加.</span></p>
 </div>
@@ -2476,9 +2555,10 @@ select Words --filter &#39;_key *T &quot;Groonga is the successor project to Sen
 <li><a class="reference internal" href="#prefix-search-operator">7.13.2.9.2. 前方一致検索演算子</a></li>
 <li><a class="reference internal" href="#suffix-search-operator">7.13.2.9.3. 後方一致検索演算子</a></li>
 <li><a class="reference internal" href="#near-search-operator">7.13.2.9.4. 近傍検索演算子</a></li>
-<li><a class="reference internal" href="#similar-search">7.13.2.9.5. 類似文書検索</a></li>
-<li><a class="reference internal" href="#term-extract-operator">7.13.2.9.6. 単語抽出演算子</a></li>
-<li><a class="reference internal" href="#regular-expression-operator">7.13.2.9.7. 正規表現演算子</a></li>
+<li><a class="reference internal" href="#near-phrase-search-operator">7.13.2.9.5. 近傍フレーズ検索演算子</a></li>
+<li><a class="reference internal" href="#similar-search">7.13.2.9.6. 類似文書検索</a></li>
+<li><a class="reference internal" href="#term-extract-operator">7.13.2.9.7. 単語抽出演算子</a></li>
+<li><a class="reference internal" href="#regular-expression-operator">7.13.2.9.8. 正規表現演算子</a></li>
 </ul>
 </li>
 </ul>
@@ -2517,7 +2597,7 @@ select Words --filter &#39;_key *T &quot;Groonga is the successor project to Sen
         <li class="right" >
           <a href="query_syntax.html" title="7.13.1. クエリー構文"
              >前へ</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v10.0.2ドキュメント</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v10.0.3ドキュメント</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../reference.html" ><span class="section-number">7. </span>リファレンスマニュアル</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../grn_expr.html" ><span class="section-number">7.13. </span>grn_expr</a> &#187;</li> 
       </ul>

@@ -3,7 +3,7 @@
 <html lang="ja">
   <head>
     <meta charset="utf-8" />
-    <title>7.15.23. time_classify_day &#8212; Groonga v10.0.2ドキュメント</title>
+    <title>7.15.23. time_classify_day &#8212; Groonga v10.0.3ドキュメント</title>
     <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
     
@@ -65,7 +65,7 @@
         <li class="right" >
           <a href="sub_filter.html" title="7.15.22. sub_filter"
              accesskey="P">前へ</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v10.0.2ドキュメント</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v10.0.3ドキュメント</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../reference.html" ><span class="section-number">7. </span>リファレンスマニュアル</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../function.html" accesskey="U"><span class="section-number">7.15. </span>関数</a> &#187;</li> 
       </ul>
@@ -80,15 +80,125 @@
 <h1><span class="section-number">7.15.23. </span><code class="docutils literal notranslate"><span class="pre">time_classify_day</span></code><a class="headerlink" href="#time-classify-day" title="このヘッドラインへのパーマリンク">¶</a></h1>
 <div class="section" id="summary">
 <h2><span class="section-number">7.15.23.1. </span>概要<a class="headerlink" href="#summary" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified added">バージョン 6.0.3 で追加.</span></p>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">time_classify_day</span></code> は時刻を日単位に丸めます。</p>
+<p>これは、<code class="docutils literal notranslate"><span class="pre">2020-01-30</span> <span class="pre">11:50:11.000000</span></code> や <code class="docutils literal notranslate"><span class="pre">2020-01-30</span> <span class="pre">22:50:11.000000</span></code> を <code class="docutils literal notranslate"><span class="pre">2020-01-30</span> <span class="pre">00:00:00.000000</span></code> に丸めます。</p>
+<p>この関数を有効にするには、以下のコマンドで <code class="docutils literal notranslate"><span class="pre">functions/time</span></code> プラグインを登録します。:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>plugin_register functions/time
+</pre></div>
+</div>
 </div>
 <div class="section" id="syntax">
-<h2><span class="section-number">7.15.23.2. </span>構文<a class="headerlink" href="#syntax" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<span id="time-classify-day-syntax"></span><h2><span class="section-number">7.15.23.2. </span>構文<a class="headerlink" href="#syntax" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>この関数の引数は1つです。:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>time_classify_day(time)
+</pre></div>
+</div>
 </div>
 <div class="section" id="usage">
 <h2><span class="section-number">7.15.23.3. </span>使い方<a class="headerlink" href="#usage" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>使い方を示すために使うスキーマ定義とサンプルデータは以下の通りです。</p>
+<p>まず <code class="docutils literal notranslate"><span class="pre">functions/time</span></code> プラグインを登録します。</p>
+<p>使い方を示すために使うスキーマ定義とサンプルデータは以下の通りです。</p>
+<p>サンプルスキーマ:</p>
+<p>実行例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>table_create Sales TABLE_NO_KEY
+# [[0,1590571264.10303,0.007408380508422852],true]
+column_create Sales name COLUMN_SCALAR ShortText
+# [[0,1590571264.110569,0.003055095672607422],true]
+column_create Sales price COLUMN_SCALAR UInt32
+# [[0,1590571264.113767,0.002195358276367188],true]
+column_create Sales timestamp COLUMN_SCALAR Time
+# [[0,1590571264.116081,0.002101898193359375],true]
+</pre></div>
+</div>
+<p>サンプルデータ:</p>
+<p>実行例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>load --table Sales
+[
+{&quot;name&quot;: &quot;Apple&quot; , &quot;price&quot;: &quot;256&quot;, &quot;timestamp&quot;: &quot;2020-05-01 11:50:11.000000&quot;},
+{&quot;name&quot;: &quot;Apple&quot; , &quot;price&quot;: &quot;256&quot;, &quot;timestamp&quot;: &quot;2020-05-01 10:20:00.000000&quot;},
+{&quot;name&quot;: &quot;Orange&quot;, &quot;price&quot;: &quot;122&quot;, &quot;timestamp&quot;: &quot;2020-05-01 11:44:12.000001&quot;},
+{&quot;name&quot;: &quot;Apple&quot; , &quot;price&quot;: &quot;256&quot;, &quot;timestamp&quot;: &quot;2020-05-01 19:50:23.000020&quot;},
+{&quot;name&quot;: &quot;Banana&quot;, &quot;price&quot;: &quot;88&quot; , &quot;timestamp&quot;: &quot;2020-05-01 11:00:02.000000&quot;},
+{&quot;name&quot;: &quot;Banana&quot;, &quot;price&quot;: &quot;88&quot; , &quot;timestamp&quot;: &quot;2020-05-01 21:34:12.000001&quot;}
+]
+# [[0,1590571264.118352,0.001252651214599609],6]
+</pre></div>
+</div>
+<p>以下は簡単な <code class="docutils literal notranslate"><span class="pre">time_classify_day</span></code> の使用例です。</p>
+<p>実行例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select \
+  --table Sales \
+  --output_columns &quot;name, time_classify_day(timestamp)&quot;
+# [
+#   [
+#     0,
+#     1590136820.452553,
+#     0.0008840560913085938
+#   ],
+#   [
+#     [
+#       [
+#         6
+#       ],
+#       [
+#         [
+#           &quot;name&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;time_classify_day&quot;,
+#           null
+#         ]
+#       ],
+#       [
+#         &quot;Apple&quot;,
+#         1588258800.0
+#       ],
+#       [
+#         &quot;Apple&quot;,
+#         1588258800.0
+#       ],
+#       [
+#         &quot;Orange&quot;,
+#         1588258800.0
+#       ],
+#       [
+#         &quot;Apple&quot;,
+#         1588258800.0
+#       ],
+#       [
+#         &quot;Banana&quot;,
+#         1588258800.0
+#       ],
+#       [
+#         &quot;Banana&quot;,
+#         1588258800.0
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
+<div class="section" id="parameters">
+<h2><span class="section-number">7.15.23.4. </span>引数<a class="headerlink" href="#parameters" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<div class="section" id="required-parameters">
+<h3><span class="section-number">7.15.23.4.1. </span>必須引数<a class="headerlink" href="#required-parameters" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>必須の引数は1つです。</p>
+<div class="section" id="column">
+<h4><span class="section-number">7.15.23.4.1.1. </span><code class="docutils literal notranslate"><span class="pre">column</span></code><a class="headerlink" href="#column" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>対象のカラムを指定します。</p>
+</div>
+</div>
 </div>
 <div class="section" id="return-value">
-<h2><span class="section-number">7.15.23.4. </span>戻り値<a class="headerlink" href="#return-value" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<h2><span class="section-number">7.15.23.5. </span>戻り値<a class="headerlink" href="#return-value" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>日単位に丸めた時刻を返します。</p>
+<p>戻り値はUNIX時間です。</p>
 </div>
 </div>
 
@@ -104,7 +214,14 @@
 <li><a class="reference internal" href="#summary">7.15.23.1. 概要</a></li>
 <li><a class="reference internal" href="#syntax">7.15.23.2. 構文</a></li>
 <li><a class="reference internal" href="#usage">7.15.23.3. 使い方</a></li>
-<li><a class="reference internal" href="#return-value">7.15.23.4. 戻り値</a></li>
+<li><a class="reference internal" href="#parameters">7.15.23.4. 引数</a><ul>
+<li><a class="reference internal" href="#required-parameters">7.15.23.4.1. 必須引数</a><ul>
+<li><a class="reference internal" href="#column">7.15.23.4.1.1. <code class="docutils literal notranslate"><span class="pre">column</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#return-value">7.15.23.5. 戻り値</a></li>
 </ul>
 </li>
 </ul>
@@ -141,7 +258,7 @@
         <li class="right" >
           <a href="sub_filter.html" title="7.15.22. sub_filter"
              >前へ</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v10.0.2ドキュメント</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v10.0.3ドキュメント</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../reference.html" ><span class="section-number">7. </span>リファレンスマニュアル</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../function.html" ><span class="section-number">7.15. </span>関数</a> &#187;</li> 
       </ul>

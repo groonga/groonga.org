@@ -3,7 +3,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>7.13.2. Script syntax &#8212; Groonga v10.0.2 documentation</title>
+    <title>7.13.2. Script syntax &#8212; Groonga v10.0.3 documentation</title>
     <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
     
@@ -64,7 +64,7 @@
         <li class="right" >
           <a href="query_syntax.html" title="7.13.1. Query syntax"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v10.0.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v10.0.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../reference.html" ><span class="section-number">7. </span>Reference manual</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../grn_expr.html" accesskey="U"><span class="section-number">7.13. </span>grn_expr</a> &#187;</li> 
       </ul>
@@ -2223,10 +2223,10 @@ time for large records.</p>
 #         ]
 #       ],
 #       [
-#         &quot;Good-bye Tritonn&quot;
+#         &quot;Good-bye Senna&quot;
 #       ],
 #       [
-#         &quot;Good-bye Senna&quot;
+#         &quot;Good-bye Tritonn&quot;
 #       ]
 #     ]
 #   ]
@@ -2418,8 +2418,109 @@ the record that its content is <code class="docutils literal notranslate"><span 
 <span class="pre">also</span> <span class="pre">very</span> <span class="pre">fast!</span> <span class="pre">Really</span> <span class="pre">fast!</span></code> is matched. The number of words between
 <code class="docutils literal notranslate"><span class="pre">also</span></code> and <code class="docutils literal notranslate"><span class="pre">Really</span></code> is 10.</p>
 </div>
+<div class="section" id="near-phrase-search-operator">
+<span id="script-syntax-near-phrase-search-operator"></span><h3><span class="section-number">7.13.2.9.5. </span>Near phrase search operator<a class="headerlink" href="#near-phrase-search-operator" title="Permalink to this headline">¶</a></h3>
+<p>Its syntax is one of them:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>column *NP &quot;phrase1 phrase2 ...&quot;
+column *NP${MAX_INTERVAL} &quot;phrase1 phrase2 ...&quot;
+</pre></div>
+</div>
+<p>Here are the examples of the second form:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>column *NP29 &quot;phrase1 phrase2 ...&quot;
+column *NP-1 &quot;phrase1 phrase2 ...&quot;
+</pre></div>
+</div>
+<p>The first example means that <code class="docutils literal notranslate"><span class="pre">29</span></code> is used for the max interval.</p>
+<p>The second example means that <code class="docutils literal notranslate"><span class="pre">-1</span></code> is used for the max interval.
+<code class="docutils literal notranslate"><span class="pre">-1</span></code> max interval means no limit.</p>
+<p>The operator does near phrase search with phrases <code class="docutils literal notranslate"><span class="pre">phrase1</span> <span class="pre">phrase2</span>
+<span class="pre">...</span></code>. Near phrase search searches records that contain the phrases
+and the phrases are appeared in the specified order and the max
+interval.</p>
+<p>The max interval is <code class="docutils literal notranslate"><span class="pre">10</span></code> by default. The unit of the max interval is
+the number of characters in N-gram family tokenizers and the number of
+words in morphological analysis family tokenizers.</p>
+<p>However, <code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code> doesn’t split ASCII only word into tokens.
+Because <code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code> uses white-space-separate like tokenize method
+for ASCII characters in this case.</p>
+<p>So the unit for ASCII words with <code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code> is the number of
+words even if <code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code> is a N-gram family tokenizer.</p>
+<p>Note that an index column for full text search must be defined for
+<code class="docutils literal notranslate"><span class="pre">column</span></code>.</p>
+<p>TODO: Use index that has <code class="docutils literal notranslate"><span class="pre">TokenNgram(&quot;unify_alphabet&quot;,</span> <span class="pre">false)</span></code>
+tokenizer to show difference with near search with English text.</p>
+<p>Here is a simple example.</p>
+<p>Execution example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;content *NP &quot;I fast&quot;&#39;      --output_columns content
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ]
+#       ],
+#       [
+#         &quot;I started to use Groonga. It&#39;s very fast!&quot;
+#       ]
+#     ]
+#   ]
+# ]
+select Entries --filter &#39;content *NP &quot;I Really&quot;&#39;    --output_columns content
+# [[0, 1337566253.89858, 0.000355720520019531], [[[0], [[&quot;content&quot;, &quot;Text&quot;]]]]]
+select Entries --filter &#39;content *NP &quot;also Really&quot;&#39; --output_columns content
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         1
+#       ],
+#       [
+#         [
+#           &quot;content&quot;,
+#           &quot;Text&quot;
+#         ]
+#       ],
+#       [
+#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>The first expression matches records that contain <code class="docutils literal notranslate"><span class="pre">I</span></code> and <code class="docutils literal notranslate"><span class="pre">fast</span></code>
+and the max interval of those words are in 10 words. So the record
+that its content is <code class="docutils literal notranslate"><span class="pre">I</span> <span class="pre">also</span> <span class="pre">started</span> <span class="pre">to</span> <span class="pre">use</span> <span class="pre">mroonga.</span> <span class="pre">It's</span> <span class="pre">also</span> <span class="pre">very</span>
+<span class="pre">fast!</span> <span class="pre">...</span></code> is matched. The number of words between <code class="docutils literal notranslate"><span class="pre">I</span></code> and <code class="docutils literal notranslate"><span class="pre">fast</span></code>
+is just 10.</p>
+<p>The second expression matches records that contain <code class="docutils literal notranslate"><span class="pre">I</span></code> and
+<code class="docutils literal notranslate"><span class="pre">Really</span></code> and the max interval of those words are in 10 words. So the
+record that its content is <code class="docutils literal notranslate"><span class="pre">I</span> <span class="pre">also</span> <span class="pre">started</span> <span class="pre">to</span> <span class="pre">use</span> <span class="pre">mroonga.</span> <span class="pre">It's</span> <span class="pre">also</span>
+<span class="pre">very</span> <span class="pre">fast!</span> <span class="pre">Really</span> <span class="pre">fast!</span></code> is not matched. The number of words between
+<code class="docutils literal notranslate"><span class="pre">I</span></code> and <code class="docutils literal notranslate"><span class="pre">Really</span></code> is 11.</p>
+<p>The third expression matches records that contain <code class="docutils literal notranslate"><span class="pre">also</span></code> and
+<code class="docutils literal notranslate"><span class="pre">Really</span></code> and the max interval of those words are in 10 words. So
+the record that its content is <code class="docutils literal notranslate"><span class="pre">I</span> <span class="pre">also</span> <span class="pre">st</span> <span class="pre">arted</span> <span class="pre">to</span> <span class="pre">use</span> <span class="pre">mroonga.</span> <span class="pre">It's</span>
+<span class="pre">also</span> <span class="pre">very</span> <span class="pre">fast!</span> <span class="pre">Really</span> <span class="pre">fast!</span></code> is matched. The number of words between
+<code class="docutils literal notranslate"><span class="pre">also</span></code> and <code class="docutils literal notranslate"><span class="pre">Really</span></code> is 10.</p>
+</div>
 <div class="section" id="similar-search">
-<span id="script-syntax-similar-search-operator"></span><h3><span class="section-number">7.13.2.9.5. </span>Similar search<a class="headerlink" href="#similar-search" title="Permalink to this headline">¶</a></h3>
+<span id="script-syntax-similar-search-operator"></span><h3><span class="section-number">7.13.2.9.6. </span>Similar search<a class="headerlink" href="#similar-search" title="Permalink to this headline">¶</a></h3>
 <p>Its syntax is <code class="docutils literal notranslate"><span class="pre">column</span> <span class="pre">*S</span> <span class="pre">&quot;document&quot;</span></code>.</p>
 <p>The operator does similar search with document <code class="docutils literal notranslate"><span class="pre">document</span></code>. Similar
 search searches records that have similar content to
@@ -2464,7 +2565,7 @@ search searches records that have similar content to
 Because <code class="docutils literal notranslate"><span class="pre">TokenMecab</span></code> will tokenize target documents to almost words, it improves similar search precision.</p>
 </div>
 <div class="section" id="term-extract-operator">
-<span id="script-syntax-term-extract-operator"></span><h3><span class="section-number">7.13.2.9.6. </span>Term extract operator<a class="headerlink" href="#term-extract-operator" title="Permalink to this headline">¶</a></h3>
+<span id="script-syntax-term-extract-operator"></span><h3><span class="section-number">7.13.2.9.7. </span>Term extract operator<a class="headerlink" href="#term-extract-operator" title="Permalink to this headline">¶</a></h3>
 <p>Its syntax is <code class="docutils literal notranslate"><span class="pre">_key</span> <span class="pre">*T</span> <span class="pre">&quot;document&quot;</span></code>.</p>
 <p>The operator extracts terms from <code class="docutils literal notranslate"><span class="pre">document</span></code>. Terms must be
 registered as keys of the table of <code class="docutils literal notranslate"><span class="pre">_key</span></code>.</p>
@@ -2521,7 +2622,7 @@ even if it is loaded as <code class="docutils literal notranslate"><span class="
 terms are also normalized.</p>
 </div>
 <div class="section" id="regular-expression-operator">
-<span id="script-syntax-regular-expression-operator"></span><h3><span class="section-number">7.13.2.9.7. </span>Regular expression operator<a class="headerlink" href="#regular-expression-operator" title="Permalink to this headline">¶</a></h3>
+<span id="script-syntax-regular-expression-operator"></span><h3><span class="section-number">7.13.2.9.8. </span>Regular expression operator<a class="headerlink" href="#regular-expression-operator" title="Permalink to this headline">¶</a></h3>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 5.0.1.</span></p>
 </div>
@@ -2674,9 +2775,10 @@ very fast. See <a class="reference internal" href="../regular_expression.html"><
 <li><a class="reference internal" href="#prefix-search-operator">7.13.2.9.2. Prefix search operator</a></li>
 <li><a class="reference internal" href="#suffix-search-operator">7.13.2.9.3. Suffix search operator</a></li>
 <li><a class="reference internal" href="#near-search-operator">7.13.2.9.4. Near search operator</a></li>
-<li><a class="reference internal" href="#similar-search">7.13.2.9.5. Similar search</a></li>
-<li><a class="reference internal" href="#term-extract-operator">7.13.2.9.6. Term extract operator</a></li>
-<li><a class="reference internal" href="#regular-expression-operator">7.13.2.9.7. Regular expression operator</a></li>
+<li><a class="reference internal" href="#near-phrase-search-operator">7.13.2.9.5. Near phrase search operator</a></li>
+<li><a class="reference internal" href="#similar-search">7.13.2.9.6. Similar search</a></li>
+<li><a class="reference internal" href="#term-extract-operator">7.13.2.9.7. Term extract operator</a></li>
+<li><a class="reference internal" href="#regular-expression-operator">7.13.2.9.8. Regular expression operator</a></li>
 </ul>
 </li>
 </ul>
@@ -2715,7 +2817,7 @@ very fast. See <a class="reference internal" href="../regular_expression.html"><
         <li class="right" >
           <a href="query_syntax.html" title="7.13.1. Query syntax"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v10.0.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v10.0.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../reference.html" ><span class="section-number">7. </span>Reference manual</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../grn_expr.html" ><span class="section-number">7.13. </span>grn_expr</a> &#187;</li> 
       </ul>

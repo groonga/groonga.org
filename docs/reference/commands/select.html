@@ -5945,8 +5945,20 @@ parameter to create a dynamic column.</p>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">initial</span></code></p></td>
 <td><p>Dynamic column is created at first.</p></td>
 </tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">filtered</span></code></p></td>
+<td><p>Dynamic column is created after <code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].filter</span></code>
+is evaluated.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">output</span></code></p></td>
+<td><p>Dynamic column is created before <a class="reference internal" href="#select-drilldowns-label-output-columns"><span class="std std-ref">drilldowns[${LABEL}].output_columns</span></a>
+is evaluated.</p></td>
+</tr>
 </tbody>
 </table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">filtered</span></code> stage and <code class="docutils literal notranslate"><span class="pre">output</span></code> stage will be able to use from 10.0.3 or later.</p>
+</div>
 <p>Here is one drilldown process flow with dynamic column creation
 points. You should choose stage as late as possible:</p>
 <blockquote>
@@ -5958,12 +5970,17 @@ points. You should choose stage as late as possible:</p>
 result records have these dynamic columns.</p></li>
 <li><p>Evaluates <code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].filter</span></code>. You can use dynamic
 columns created in <code class="docutils literal notranslate"><span class="pre">initial</span></code> stage.</p></li>
+<li><p>Creates dynamic columns for <code class="docutils literal notranslate"><span class="pre">filtered</span></code> stage.
+Only filtered records have these dynamic columns.</p></li>
 <li><p>Evaluates <code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].sort_keys</span></code>,
 <code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].offset</span></code> and
 <code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].limit</span></code>. You can use dynamic columns
-created in <code class="docutils literal notranslate"><span class="pre">initial</span></code> stage.</p></li>
+created in <code class="docutils literal notranslate"><span class="pre">initial</span></code> stage and <code class="docutils literal notranslate"><span class="pre">filtered</span></code> stage.</p></li>
+<li><p>Creates dynamic columns for <code class="docutils literal notranslate"><span class="pre">output</span></code> stage.
+Only <code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].limit</span></code> records have these dynamic columns.</p></li>
 <li><p>Evaluates <a class="reference internal" href="#select-drilldowns-label-output-columns"><span class="std std-ref">drilldowns[${LABEL}].output_columns</span></a>. You can
-use dynamic columns created in <code class="docutils literal notranslate"><span class="pre">initial</span></code> stage.</p></li>
+use dynamic columns created in <code class="docutils literal notranslate"><span class="pre">initial</span></code> stage, <code class="docutils literal notranslate"><span class="pre">filtered</span></code> stage,
+and <code class="docutils literal notranslate"><span class="pre">output</span></code> stage.</p></li>
 </ol>
 </div></blockquote>
 <p>Here is a <code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].columns[${NAME}].stage</span></code> example. It

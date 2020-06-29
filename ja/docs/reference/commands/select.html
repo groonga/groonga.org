@@ -5440,16 +5440,28 @@ load --table Items
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">initial</span></code></p></td>
 <td><p>最初に動的カラムを作成します。</p></td>
 </tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">filtered</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].filter</span></code> を評価してから動的カラムを作成します。</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">output</span></code></p></td>
+<td><p><a class="reference internal" href="#select-drilldowns-label-output-columns"><span class="std std-ref">drilldowns[${LABEL}].output_columns</span></a> を評価する前に動的カラムを作成します。</p></td>
+</tr>
 </tbody>
 </table>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p><code class="docutils literal notranslate"><span class="pre">filtered</span></code> ステージと <code class="docutils literal notranslate"><span class="pre">output</span></code> ステージは10.0.3以降で使用できます。</p>
+</div>
 <p>以下は動的カラム作成タイミング入りの各ドリルダウンの処理の流れです。できるだけ後のステージを選ぶべきです。</p>
 <blockquote>
 <div><ol class="arabic simple">
 <li><p><a class="reference internal" href="#select-drilldowns-label-keys"><span class="std std-ref">drilldowns[${LABEL}].keys</span></a> 、 <code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].calc_types</span></code> 、 <code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].calc_target</span></code> を評価します。</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">initial</span></code> ステージの動的カラムを作ります。すべてのドリルダウン結果レコードはこの動的カラムを持ちます。</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].filter</span></code> を評価します。 <code class="docutils literal notranslate"><span class="pre">initial</span></code> ステージで作った動的カラムを使えます。</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].sort_keys</span></code> 、 <code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].offset</span></code> 、 <code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].limit</span></code> を評価します。 <code class="docutils literal notranslate"><span class="pre">initial</span></code> ステージで作った動的カラムを使えます。</p></li>
-<li><p><a class="reference internal" href="#select-drilldowns-label-output-columns"><span class="std std-ref">drilldowns[${LABEL}].output_columns</span></a> を評価します。 <code class="docutils literal notranslate"><span class="pre">initial</span></code> ステージで作った動的カラムを使えます。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">filtered</span></code> ステージの動的カラムを作ります。フィルター後のレコードだけがこの動的カラムを持ちます。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].sort_keys</span></code> 、 <code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].offset</span></code> 、 <code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].limit</span></code> を評価します。 <code class="docutils literal notranslate"><span class="pre">initial</span></code> と`filtered` ステージで作った動的カラムを使えます。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">output</span></code> ステージの動的カラムを作ります。最大 <code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].limit</span></code> 件のレコードだけがこの動的カラムを持ちます。</p></li>
+<li><p><a class="reference internal" href="#select-drilldowns-label-output-columns"><span class="std std-ref">drilldowns[${LABEL}].output_columns</span></a> を評価します。 <code class="docutils literal notranslate"><span class="pre">initial</span></code> ステージと <code class="docutils literal notranslate"><span class="pre">filtered</span></code> ステージと <code class="docutils literal notranslate"><span class="pre">output</span></code> ステージで作った動的カラムを使えます。</p></li>
 </ol>
 </div></blockquote>
 <p>以下は <code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].columns[${NAME}].stage</span></code> の使用例です。この例では <code class="docutils literal notranslate"><span class="pre">initial</span></code> ステージで <code class="docutils literal notranslate"><span class="pre">is_popular</span></code> カラムを作っています。作成した <code class="docutils literal notranslate"><span class="pre">is_popular</span></code> カラムは <code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].filter</span></code> と <code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].output_columns</span></code> で使えます。</p>

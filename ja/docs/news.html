@@ -15,7 +15,7 @@
 
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>お知らせ &#8212; Groonga v10.1.0ドキュメント</title>
+    <title>お知らせ &#8212; Groonga v10.1.1ドキュメント</title>
     <link rel="stylesheet" href="static/groonga.css" type="text/css" />
     <link rel="stylesheet" href="static/pygments.css" type="text/css" />
     
@@ -69,7 +69,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="総合索引"
              accesskey="I">索引</a></li>
-        <li class="nav-item nav-item-0"><a href="index.html">Groonga v10.1.0ドキュメント</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Groonga v10.1.1ドキュメント</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">お知らせ</a></li> 
       </ul>
     </div>  
@@ -81,10 +81,111 @@
             
   <div class="section" id="news">
 <h1>お知らせ<a class="headerlink" href="#news" title="このヘッドラインへのパーマリンク">¶</a></h1>
-<div class="section" id="release-10-1-0-2020-12-29">
-<span id="release-10-1-0"></span><h2>10.1.0リリース - 2020-12-29<a class="headerlink" href="#release-10-1-0-2020-12-29" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<div class="section" id="release-10-1-1-2021-01-25">
+<span id="release-10-1-1"></span><h2>10.1.1リリース - 2021-01-25<a class="headerlink" href="#release-10-1-1-2021-01-25" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <div class="section" id="improvements">
 <h3>改良<a class="headerlink" href="#improvements" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<ul>
+<li><p>[<a class="reference internal" href="reference/commands/select.html"><span class="doc">select</span></a>] Apache Arrow形式でUInt64の値の出力をサポートしました。</p></li>
+<li><p>[<a class="reference internal" href="reference/commands/select.html"><span class="doc">select</span></a>] Apache Arrow形式で以下のようにヒット数の出力をサポートしました。</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>-- metadata --
+GROONGA:n-hits: 10
+</pre></div>
+</div>
+</li>
+<li><p>[<a class="reference internal" href="reference/functions/query.html"><span class="doc">query</span></a>] &quot;order by estimated size&quot; の最適化をサポートしました。</p>
+<ul class="simple">
+<li><p>通常、ヒット数の少ない条件から最初に実行すると、高速に検索できます。</p>
+<ul>
+<li><p>&quot;A (ヒット数が多い) &amp;&amp; B (ヒット数が少ない)&quot; より &quot;B (ヒット数が少ない) &amp;&amp; A (ヒット数が多い)&quot; 方が高速です。</p></li>
+</ul>
+</li>
+<li><p>これは、よく知られた最適化ですが、自分で条件を並び替える必要があります。</p></li>
+<li><p>Groongaは、 &quot;order by estimated size&quot; の最適化を使うことで、自動的にこの並び替えを実行します。</p></li>
+<li><p>この最適化は、 <code class="docutils literal notranslate"><span class="pre">GRN_ORDER_BY_ESTIMATED_SIZE_ENABLE=yes</span></code> で有効になります。</p></li>
+</ul>
+</li>
+<li><p>[<a class="reference internal" href="reference/functions/between.html"><span class="doc">between</span></a>] 以下の改良で、パフォーマンスを改善しました。</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">between()</span></code> でシーケンシャルサーチを使うかどうかの判断の精度を改善しました。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">between()</span></code> の結果を結果セットに一度にセットするよう改善しました。</p></li>
+</ul>
+</li>
+<li><p>[<a class="reference internal" href="reference/commands/select.html"><span class="doc">select</span></a>] 前方一致検索のパフォーマンスを改善しました。</p>
+<ul>
+<li><p>例えば、以下のような &quot;*&quot; を使った前方一致検索のパフォーマンスが向上します。</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>table_create Memos TABLE_PAT_KEY ShortText
+table_create Contents TABLE_PAT_KEY ShortText   --normalizer NormalizerAuto
+column_create Contents entries_key_index COLUMN_INDEX Memos _key
+
+load --table Memos
+[
+{&quot;_key&quot;: &quot;(groonga) Start to try!&quot;},
+{&quot;_key&quot;: &quot;(mroonga) Installed&quot;},
+{&quot;_key&quot;: &quot;(groonga) Upgraded!&quot;}
+]
+
+select \
+  --table Memos \
+  --match_columns _key \
+  --query &#39;\\(groonga\\)*&#39;
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+<li><p>[<a class="reference internal" href="reference/tokenizers.html"><span class="doc">トークナイザー</span></a>][TokenMecab] トークンカラムを並列で構築する際のパフォーマンスを改善しました。 [GitHub#1158][naoaさんがパッチ提供]</p></li>
+</ul>
+</div>
+<div class="section" id="fixes">
+<h3>修正<a class="headerlink" href="#fixes" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<ul>
+<li><p>[<a class="reference internal" href="reference/functions/sub_filter.html"><span class="doc">sub_filter</span></a>] <code class="docutils literal notranslate"><span class="pre">slices[].filter</span></code> 内で <code class="docutils literal notranslate"><span class="pre">sub_filter</span></code> が動作しない問題を修正しました。</p>
+<ul>
+<li><p>例えば、以下のクエリーでは、この問題によって、 <code class="docutils literal notranslate"><span class="pre">sub_filter</span></code> の結果は0件になります。</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>table_create Users TABLE_HASH_KEY ShortText
+column_create Users age COLUMN_SCALAR UInt8
+
+table_create Memos TABLE_NO_KEY
+column_create Memos user COLUMN_SCALAR Users
+column_create Memos content COLUMN_SCALAR Text
+
+load --table Users
+[
+{&quot;_key&quot;: &quot;alice&quot;, &quot;age&quot;: 9},
+{&quot;_key&quot;: &quot;bob&quot;,   &quot;age&quot;: 29}
+]
+
+load --table Memos
+[
+{&quot;user&quot;: &quot;alice&quot;, &quot;content&quot;: &quot;hello&quot;},
+{&quot;user&quot;: &quot;bob&quot;,   &quot;content&quot;: &quot;world&quot;},
+{&quot;user&quot;: &quot;alice&quot;, &quot;content&quot;: &quot;bye&quot;},
+{&quot;user&quot;: &quot;bob&quot;,   &quot;content&quot;: &quot;yay&quot;}
+]
+
+select \
+  --table Memos \
+  --slices[adult].filter &#39;_id &gt; 1 &amp;&amp; sub_filter(user, &quot;age &gt;= 18&quot;)&#39;
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+<li><p>ハッシュテーブルに対して、繰り返し大量のデータを追加、削除すると、Groongaがクラッシュしたり、データの追加ができなくなる可能性がある問題を修正しました。</p></li>
+</ul>
+</div>
+<div class="section" id="thanks">
+<h3>感謝<a class="headerlink" href="#thanks" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<ul class="simple">
+<li><p>naoaさん</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="release-10-1-0-2020-12-29">
+<span id="release-10-1-0"></span><h2>10.1.0リリース - 2020-12-29<a class="headerlink" href="#release-10-1-0-2020-12-29" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<div class="section" id="id1">
+<h3>改良<a class="headerlink" href="#id1" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul>
 <li><p>[<a class="reference internal" href="reference/functions/highlight_html.html"><span class="doc">highlight_html</span></a>] 全角スペースをハイライト対処から除外しました。[PGroonga#GitHub#155][Hung Nguyen Vさんが報告]</p>
 <ul>
@@ -659,8 +760,8 @@ select Memos
 <li><p>[httpd] バンドルしているnginxのバージョンを1.19.6に更新しました。</p></li>
 </ul>
 </div>
-<div class="section" id="fixes">
-<h3>修正<a class="headerlink" href="#fixes" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id2">
+<h3>修正<a class="headerlink" href="#id2" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul>
 <li><p>以下のように、複数のドリルダウンのキーと複数のアクセサーを使用した時にGroongaがクラッシュする問題を修正しました。[GitHub#1153][naoaさんがパッチ提供]</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>table_create Tags TABLE_PAT_KEY ShortText
@@ -714,8 +815,8 @@ select Entries \
 </li>
 </ul>
 </div>
-<div class="section" id="thanks">
-<h3>感謝<a class="headerlink" href="#thanks" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id3">
+<h3>感謝<a class="headerlink" href="#id3" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>Hung Nguyen Vさん</p></li>
 <li><p>naoaさん</p></li>
@@ -725,8 +826,8 @@ select Entries \
 </div>
 <div class="section" id="release-10-0-9-2020-12-01">
 <span id="release-10-0-9"></span><h2>10.0.9リリース - 2020-12-01<a class="headerlink" href="#release-10-0-9-2020-12-01" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="section" id="id1">
-<h3>改良<a class="headerlink" href="#id1" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id4">
+<h3>改良<a class="headerlink" href="#id4" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">limit</span></code> に <code class="docutils literal notranslate"><span class="pre">-1</span></code> を指定した時のパフォーマンスを改善しました。</p></li>
 <li><p>[<a class="reference internal" href="reference/commands/reference_acquire.html"><span class="doc">reference_acquire</span></a>] 新しいオプション <code class="docutils literal notranslate"><span class="pre">--auto_release_count</span></code> を追加しました。</p>
@@ -887,8 +988,8 @@ select Entries --filter &#39;content *ONP &quot;abc def&quot;&#39; --output_colu
 <li><p>[httpd] バンドルしているnginxのバージョンを1.19.5に更新しました。</p></li>
 </ul>
 </div>
-<div class="section" id="id2">
-<h3>修正<a class="headerlink" href="#id2" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id5">
+<h3>修正<a class="headerlink" href="#id5" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>[<a class="reference internal" href="reference/executables/groonga-server-http.html"><span class="doc">Groonga HTTPサーバー</span></a>] Groonga HTTP server が全てのワーカースレッドの完全な終了を待たずに終了していた問題を修正しました。</p>
 <ul>
@@ -900,8 +1001,8 @@ select Entries --filter &#39;content *ONP &quot;abc def&quot;&#39; --output_colu
 </div>
 <div class="section" id="release-10-0-8-2020-10-29">
 <span id="release-10-0-8"></span><h2>10.0.8リリース - 2020-10-29<a class="headerlink" href="#release-10-0-8-2020-10-29" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="section" id="id3">
-<h3>改良<a class="headerlink" href="#id3" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id6">
+<h3>改良<a class="headerlink" href="#id6" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul>
 <li><p>[<a class="reference internal" href="reference/commands/select.html"><span class="doc">select</span></a>] 大きいサイズのドリルダウンのキーを使えるようになりました。</p>
 <ul>
@@ -978,8 +1079,8 @@ select Customers \
 <li><p>[httpd] バンドルしているnginxのバージョンを1.19.4に更新しました。</p></li>
 </ul>
 </div>
-<div class="section" id="id5">
-<h3>修正<a class="headerlink" href="#id5" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id8">
+<h3>修正<a class="headerlink" href="#id8" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>ブラウザーベースの管理ツール関連の問題を修正しました。　[GitHub#1139][sutaminさんの報告]</p>
 <ul>
@@ -990,8 +1091,8 @@ select Customers \
 <li><p>[<a class="reference internal" href="reference/functions/between.html"><span class="doc">between</span></a>] <code class="docutils literal notranslate"><span class="pre">between(_key,</span> <span class="pre">...)</span></code> が常にシーケンシャルサーチで評価される問題を修正しました。</p></li>
 </ul>
 </div>
-<div class="section" id="id6">
-<h3>感謝<a class="headerlink" href="#id6" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id9">
+<h3>感謝<a class="headerlink" href="#id9" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>sutaminさん</p></li>
 </ul>
@@ -999,8 +1100,8 @@ select Customers \
 </div>
 <div class="section" id="release-10-0-7-2020-09-29">
 <span id="release-10-0-7"></span><h2>10.0.7リリース - 2020-09-29<a class="headerlink" href="#release-10-0-7-2020-09-29" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="section" id="id7">
-<h3>改良<a class="headerlink" href="#id7" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id10">
+<h3>改良<a class="headerlink" href="#id10" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>[highlight], [<a class="reference internal" href="reference/functions/highlight_full.html"><span class="doc">highlight_full</span></a>] ノーマライザーにオプションを指定できるようになりました。</p></li>
 <li><p>[<a class="reference internal" href="reference/command/return_code.html"><span class="doc">リターンコード</span></a>] 新しいリターンコード <code class="docutils literal notranslate"><span class="pre">GRN_CONNECTION_RESET</span></code> を追加しました。</p>
@@ -1067,8 +1168,8 @@ select Customers \
 <li><p>[<a class="reference internal" href="reference/commands/select.html"><span class="doc">select</span></a>] 同一センテンス内での、フレーズ近傍検索をサポートしました。</p></li>
 </ul>
 </div>
-<div class="section" id="id8">
-<h3>修正<a class="headerlink" href="#id8" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id11">
+<h3>修正<a class="headerlink" href="#id11" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>[<a class="reference internal" href="reference/commands/load.html"><span class="doc">load</span></a>] 257個のカラムに対して <code class="docutils literal notranslate"><span class="pre">load</span></code> を実行すると <code class="docutils literal notranslate"><span class="pre">load</span></code> の応答が返らなくなる問題を修正しました。</p>
 <ul>
@@ -1097,8 +1198,8 @@ select Customers \
 </div>
 <div class="section" id="release-10-0-6-2020-08-29">
 <span id="release-10-0-6"></span><h2>10.0.6リリース - 2020-08-29<a class="headerlink" href="#release-10-0-6-2020-08-29" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="section" id="id9">
-<h3>改良<a class="headerlink" href="#id9" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id12">
+<h3>改良<a class="headerlink" href="#id12" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>[<a class="reference internal" href="reference/commands/logical_range_filter.html"><span class="doc">logical_range_filter</span></a>] 大きなデータの検索プランを改善しました。</p>
 <ul>
@@ -1148,8 +1249,8 @@ select Customers \
 </li>
 </ul>
 </div>
-<div class="section" id="id10">
-<h3>修正<a class="headerlink" href="#id10" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id13">
+<h3>修正<a class="headerlink" href="#id13" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>応答送信のエラーが発生した後の応答にゴミが含まれることがある問題を修正しました。</p>
 <ul>
@@ -1158,8 +1259,8 @@ select Customers \
 </li>
 </ul>
 </div>
-<div class="section" id="id11">
-<h3>感謝<a class="headerlink" href="#id11" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id14">
+<h3>感謝<a class="headerlink" href="#id14" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>gaeeyoさん</p></li>
 <li><p>naoaさん</p></li>
@@ -1168,8 +1269,8 @@ select Customers \
 </div>
 <div class="section" id="release-10-0-5-2020-07-30">
 <span id="release-10-0-5"></span><h2>10.0.5リリース - 2020-07-30<a class="headerlink" href="#release-10-0-5-2020-07-30" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="section" id="id12">
-<h3>改良<a class="headerlink" href="#id12" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id15">
+<h3>改良<a class="headerlink" href="#id15" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul>
 <li><p>[<a class="reference internal" href="reference/commands/select.html"><span class="doc">select</span></a>] <code class="docutils literal notranslate"><span class="pre">-load_table</span></code> で指定したテーブルに参照を格納できるようにしました。</p>
 <ul>
@@ -1570,8 +1671,8 @@ select Items \
 <li><p>[Windows] Visual Studio 2013のサポートをやめました。</p></li>
 </ul>
 </div>
-<div class="section" id="id13">
-<h3>修正<a class="headerlink" href="#id13" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id16">
+<h3>修正<a class="headerlink" href="#id16" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>[<a class="reference internal" href="reference/executables/groonga-server-http.html"><span class="doc">Groonga HTTPサーバー</span></a>] 応答がエラーで中断された時に、 <code class="docutils literal notranslate"><span class="pre">shutdown?immediate</span></code> を実行しても、リクエストが中断しない問題を修正しました。</p></li>
 <li><p>リクエスト中にエラーが発生した時にクラッシュする問題を修正しました。</p>
@@ -1596,8 +1697,8 @@ select Items \
 <li><p><code class="docutils literal notranslate"><span class="pre">token_column</span></code> を使った静的インデックス構築中に正規化エラーが発生する問題を修正しました。[GitHub#1122][naoaさんの報告]</p></li>
 </ul>
 </div>
-<div class="section" id="id14">
-<h3>感謝<a class="headerlink" href="#id14" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id17">
+<h3>感謝<a class="headerlink" href="#id17" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>naoaさん</p></li>
 </ul>
@@ -1605,8 +1706,8 @@ select Items \
 </div>
 <div class="section" id="release-10-0-4-2020-06-29">
 <span id="release-10-0-4"></span><h2>10.0.4リリース - 2020-06-29<a class="headerlink" href="#release-10-0-4-2020-06-29" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="section" id="id15">
-<h3>改良<a class="headerlink" href="#id15" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id18">
+<h3>改良<a class="headerlink" href="#id18" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul>
 <li><p>[<a class="reference internal" href="reference/tables.html"><span class="doc">テーブル</span></a>] ハッシュテーブルで4億件のレコードの登録をサポートしました。</p></li>
 <li><p>[<a class="reference internal" href="reference/commands/select.html"><span class="doc">select</span></a>] <code class="docutils literal notranslate"><span class="pre">_score</span></code> が再帰的に値を取得しない時のパフォーマンスを改善しました。</p>
@@ -1818,16 +1919,16 @@ select Items \
 <li><p>[<a class="reference internal" href="reference/commands/select.html"><span class="doc">select</span></a>] 参照カウントモード時の <code class="docutils literal notranslate"><span class="pre">load_table</span></code> のパフォーマンスを改善しました。</p></li>
 </ul>
 </div>
-<div class="section" id="id16">
-<h3>修正<a class="headerlink" href="#id16" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id19">
+<h3>修正<a class="headerlink" href="#id19" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>シャードをまたいでいて、かつ <code class="docutils literal notranslate"><span class="pre">--filter</span></code> を指定していない動的カラムを使って検索すると、Gronngaのデータベースが破損する問題を修正しました。</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">schema</span></code> コマンドの結果に <code class="docutils literal notranslate"><span class="pre">Float32</span></code> 型が表示されなかった問題を修正しました。</p></li>
 <li><p>参照 <code class="docutils literal notranslate"><span class="pre">uvector</span></code> が要素を持っていないとき、 <code class="docutils literal notranslate"><span class="pre">_nsubrecs</span></code> を余分にカウントする問題を修正しました。</p></li>
 </ul>
 </div>
-<div class="section" id="id17">
-<h3>感謝<a class="headerlink" href="#id17" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id20">
+<h3>感謝<a class="headerlink" href="#id20" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>naoaさん</p></li>
 </ul>
@@ -1835,8 +1936,8 @@ select Items \
 </div>
 <div class="section" id="release-10-0-3-2020-05-29">
 <span id="release-10-0-3"></span><h2>10.0.3リリース - 2020-05-29<a class="headerlink" href="#release-10-0-3-2020-05-29" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="section" id="id18">
-<h3>改良<a class="headerlink" href="#id18" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id21">
+<h3>改良<a class="headerlink" href="#id21" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul>
 <li><p>予めトークナイズされたデータから転置インデックスを構築できるようになりました。</p>
 <ul>
@@ -2294,8 +2395,8 @@ select Entries --filter &#39;content *NP &quot;\\&quot;I started\\&quot; \\&quot
 </li>
 </ul>
 </div>
-<div class="section" id="id19">
-<h3>修正<a class="headerlink" href="#id19" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id22">
+<h3>修正<a class="headerlink" href="#id22" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>複数のスレッドから、同時にモジュール(トークナイザー、ノーマライザー、トークンフィルター)が使われた場合にクラッシュする問題を修正しました。</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">Float32</span></code> の値を表示する際の精度を修正しました。</p>
@@ -2306,8 +2407,8 @@ select Entries --filter &#39;content *NP &quot;\\&quot;I started\\&quot; \\&quot
 <li><p>動的カラムのパラメーターだけが違うクエリーが実行された時にGroongaが誤ったキャッシュを使用していた問題を修正しました。 [GitHub#1102 naoaさんがパッチ提供]</p></li>
 </ul>
 </div>
-<div class="section" id="id20">
-<h3>感謝<a class="headerlink" href="#id20" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id23">
+<h3>感謝<a class="headerlink" href="#id23" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>naoaさん</p></li>
 </ul>
@@ -2315,8 +2416,8 @@ select Entries --filter &#39;content *NP &quot;\\&quot;I started\\&quot; \\&quot
 </div>
 <div class="section" id="release-10-0-2-2020-04-29">
 <span id="release-10-0-2"></span><h2>10.0.2リリース - 2020-04-29<a class="headerlink" href="#release-10-0-2-2020-04-29" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="section" id="id21">
-<h3>改良<a class="headerlink" href="#id21" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id24">
+<h3>改良<a class="headerlink" href="#id24" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">time_classify_*</span></code> 関数が <code class="docutils literal notranslate"><span class="pre">uvector</span></code> に対応しました。 [GitHub#1089][naoaさんがパッチ提供]</p>
 <ul class="simple">
@@ -2429,8 +2530,8 @@ load --table Data
 </li>
 </ul>
 </div>
-<div class="section" id="id22">
-<h3>修正<a class="headerlink" href="#id22" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id25">
+<h3>修正<a class="headerlink" href="#id25" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>32bit GUN/Linux等でGroongaがクラッシュすることがある問題を修正しました。</p></li>
 <li><p>関係のないカラムの値をクリアーしてしまう問題を修正しました。 [GitHub#1087][sutaminさんの報告]</p></li>
@@ -2453,8 +2554,8 @@ load --table Data
 <li><p>Apache Arrow形式でデータをロードした際に <code class="docutils literal notranslate"><span class="pre">_key</span></code> アクセサーを解放しすぎる問題を修正しました。</p></li>
 </ul>
 </div>
-<div class="section" id="id23">
-<h3>感謝<a class="headerlink" href="#id23" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id26">
+<h3>感謝<a class="headerlink" href="#id26" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>sutaminさん</p></li>
 <li><p>naoaさん</p></li>
@@ -2465,8 +2566,8 @@ load --table Data
 <span id="release-10-0-1"></span><h2>10.0.1リリース - 2020-03-30<a class="headerlink" href="#release-10-0-1-2020-03-30" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <p>Groonga 10.0.0 のUbuntuとWindows(VC++版)のパッケージに誤りがあったため Groonga 10.0.1 をリリースしました。</p>
 <p>既にCentOS、Debian、Windows(MinGW版)のGroonga 10.0.0を使用している方は、そのまま使っていただいて問題ありません。</p>
-<div class="section" id="id24">
-<h3>修正<a class="headerlink" href="#id24" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id27">
+<h3>修正<a class="headerlink" href="#id27" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>Windows(VC++版)のパッケージに不足していたランタイム(vcruntime140_1.dll)を追加しました。</p></li>
 </ul>
@@ -2474,8 +2575,8 @@ load --table Data
 </div>
 <div class="section" id="release-10-0-0-2020-03-29">
 <span id="release-10-0-0"></span><h2>10.0.0リリース - 2020-03-29<a class="headerlink" href="#release-10-0-0-2020-03-29" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="section" id="id25">
-<h3>改良<a class="headerlink" href="#id25" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id28">
+<h3>改良<a class="headerlink" href="#id28" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul>
 <li><p>[httpd] バンドルしているnginxのバージョンを1.17.9に更新しました。</p></li>
 <li><p>[httpd] 出力形式を拡張子として指定できるようにしました。</p>
@@ -2589,8 +2690,8 @@ load --table Data
 </div>
 <div class="section" id="release-9-1-2-2020-01-29">
 <span id="release-9-1-2"></span><h2>9.1.2リリース - 2020-01-29<a class="headerlink" href="#release-9-1-2-2020-01-29" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="section" id="id26">
-<h3>改良<a class="headerlink" href="#id26" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id29">
+<h3>改良<a class="headerlink" href="#id29" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>[tools] 指定したテーブルまたはカラムのファイルのみをコピーするスクリプトを追加しました。</p>
 <ul>
@@ -2628,8 +2729,8 @@ load --table Data
 </div>
 <div class="section" id="release-9-1-1-2020-01-07">
 <span id="release-9-1-1"></span><h2>9.1.1リリース - 2020-01-07<a class="headerlink" href="#release-9-1-1-2020-01-07" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="section" id="id27">
-<h3>改良<a class="headerlink" href="#id27" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id30">
+<h3>改良<a class="headerlink" href="#id30" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>[<a class="reference internal" href="reference/commands/load.html"><span class="doc">load</span></a>] Apache Arrow 形式のデータをサポートしました。</p>
 <ul>
@@ -2657,8 +2758,8 @@ load --table Data
 </div>
 <div class="section" id="release-9-1-0-2019-11-29">
 <span id="release-9-1-0"></span><h2>9.1.0リリース - 2019-11-29<a class="headerlink" href="#release-9-1-0-2019-11-29" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="section" id="id28">
-<h3>改良<a class="headerlink" href="#id28" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id31">
+<h3>改良<a class="headerlink" href="#id31" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>&quot;&amp;&amp;&quot;演算のパフォーマンスを改善しました。</p>
 <ul>
@@ -2674,8 +2775,8 @@ load --table Data
 </li>
 </ul>
 </div>
-<div class="section" id="id29">
-<h3>修正<a class="headerlink" href="#id29" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id32">
+<h3>修正<a class="headerlink" href="#id32" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>インデックスがアクセサーの際にパフォーマンスが低下する問題を修正しました。</p>
 <ul>
@@ -2696,8 +2797,8 @@ load --table Data
 </li>
 </ul>
 </div>
-<div class="section" id="id30">
-<h3>感謝<a class="headerlink" href="#id30" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id33">
+<h3>感謝<a class="headerlink" href="#id33" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>Albert Songさん</p></li>
 <li><p>おばたさん</p></li>
@@ -2710,8 +2811,8 @@ load --table Data
 <p class="admonition-title">注釈</p>
 <p>今回のバージョンからパフォーマンスが低下しているかもしれません。もし、以前よりパフォーマンスが低下していたら、是非、再現手順を報告してほしいです。</p>
 </div>
-<div class="section" id="id31">
-<h3>改良<a class="headerlink" href="#id31" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id34">
+<h3>改良<a class="headerlink" href="#id34" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>[<a class="reference internal" href="reference/log.html"><span class="doc">ログ</span></a>] 応答の送信時間をクエリーログに出力するように改良しました。</p></li>
 <li><p>[<a class="reference internal" href="reference/commands/status.html"><span class="doc">status</span></a>] <code class="docutils literal notranslate"><span class="pre">status</span></code> コマンドの応答に現在のジョブ数を追加しました。</p></li>
@@ -2741,14 +2842,14 @@ load --table Data
 </li>
 </ul>
 </div>
-<div class="section" id="id32">
-<h3>修正<a class="headerlink" href="#id32" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id35">
+<h3>修正<a class="headerlink" href="#id35" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>between の最初の引数として値を指定すると、Groongaがクラッシュする問題を修正しました。[GitHub#1045][yagisumiさんの報告]</p></li>
 </ul>
 </div>
-<div class="section" id="id33">
-<h3>感謝<a class="headerlink" href="#id33" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id36">
+<h3>感謝<a class="headerlink" href="#id36" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>yagisumiさん</p></li>
 </ul>
@@ -2756,8 +2857,8 @@ load --table Data
 </div>
 <div class="section" id="release-9-0-8-2019-09-27">
 <span id="release-9-0-8"></span><h2>9.0.8リリース - 2019-09-27<a class="headerlink" href="#release-9-0-8-2019-09-27" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="section" id="id34">
-<h3>改良<a class="headerlink" href="#id34" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id37">
+<h3>改良<a class="headerlink" href="#id37" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>[<a class="reference internal" href="reference/commands/log_reopen.html"><span class="doc">log_reopen</span></a>] 2つ以上のワーカーで <code class="docutils literal notranslate"><span class="pre">groonga-httpd</span></code> を使用する場合の補足説明を追記しました。</p></li>
 <li><p>作成中のインデックスを無視するように改良しました。</p>
@@ -2776,8 +2877,8 @@ load --table Data
 <li><p>[<a class="reference internal" href="install/centos.html"><span class="doc">CentOS</span></a>] CentOS 6の32-bitパッケージのサポートをやめました。</p></li>
 </ul>
 </div>
-<div class="section" id="id35">
-<h3>修正<a class="headerlink" href="#id35" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id38">
+<h3>修正<a class="headerlink" href="#id38" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>[<a class="reference internal" href="reference/commands/logical_range_filter.html"><span class="doc">logical_range_filter</span></a>] レコードが十分にあるとき、かつフィルター条件にマッチしないレコードが推定値を超えた時に、同じオブジェクトを2回閉じるという例外が発生する問題を修正しました。</p></li>
 </ul>
@@ -2785,8 +2886,8 @@ load --table Data
 </div>
 <div class="section" id="release-9-0-7-2019-08-29">
 <span id="release-9-0-7"></span><h2>9.0.7リリース - 2019-08-29<a class="headerlink" href="#release-9-0-7-2019-08-29" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="section" id="id36">
-<h3>改良<a class="headerlink" href="#id36" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id39">
+<h3>改良<a class="headerlink" href="#id39" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>[httpd] バンドルしているnginxのバージョンを1.17.3に更新しました。</p>
 <ul>
@@ -2795,8 +2896,8 @@ load --table Data
 </li>
 </ul>
 </div>
-<div class="section" id="id37">
-<h3>修正<a class="headerlink" href="#id37" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id40">
+<h3>修正<a class="headerlink" href="#id40" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>ポスティングリストが巨大になった時にGroongaがクラッシュする問題を修正しました。</p>
 <ul>
@@ -2810,8 +2911,8 @@ load --table Data
 <li><p>前方一致検索や後方一致検索時に適切なインデックスを使わない問題を修正しました。[GitHub#1007, PGroonga#GitHub#96][oknjさんの報告]</p></li>
 </ul>
 </div>
-<div class="section" id="id38">
-<h3>感謝<a class="headerlink" href="#id38" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id41">
+<h3>感謝<a class="headerlink" href="#id41" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>oknjさん</p></li>
 <li><p>Yutaro Shimamuraさん</p></li>
@@ -2822,14 +2923,14 @@ load --table Data
 </div>
 <div class="section" id="release-9-0-6-2019-08-05">
 <span id="release-9-0-6"></span><h2>9.0.6リリース - 2019-08-05<a class="headerlink" href="#release-9-0-6-2019-08-05" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="section" id="id39">
-<h3>改良<a class="headerlink" href="#id39" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id42">
+<h3>改良<a class="headerlink" href="#id42" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>Debian 10 (buster)をサポートしました。</p></li>
 </ul>
 </div>
-<div class="section" id="id40">
-<h3>修正<a class="headerlink" href="#id40" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id43">
+<h3>修正<a class="headerlink" href="#id43" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>[<a class="reference internal" href="reference/commands/select.html"><span class="doc">select</span></a>] 検索エスカレーションが起こった際に検索がエラーになるバグを修正しました。</p></li>
 <li><p>[<a class="reference internal" href="reference/commands/select.html"><span class="doc">select</span></a>] ネストされた等価演算を使った際に、誤った検索結果を返すことがあるバグを修正しました。</p></li>
@@ -2837,8 +2938,8 @@ load --table Data
 <li><p>[<a class="reference internal" href="tutorial/micro_blog.html"><span class="doc">マイクロブログ検索システムの作成</span></a>] 検索結果が誤っている例を修正しました。[GitHub#1024][yagisumiさんがパッチ提供]</p></li>
 </ul>
 </div>
-<div class="section" id="id41">
-<h3>感謝<a class="headerlink" href="#id41" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id44">
+<h3>感謝<a class="headerlink" href="#id44" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>yagisumiさん</p></li>
 </ul>
@@ -2850,8 +2951,8 @@ load --table Data
 <p class="admonition-title">警告</p>
 <p>このリリースには影響の大きい不具合があることがわかりました。<code class="docutils literal notranslate"><span class="pre">select</span></code> コマンドが誤った結果を返します。この問題を修正し、9.0.6をリリースする予定です。Groonga 9.0.5は使わず、後日リリースされる9.0.6を使ってください。問題の詳細については <a class="reference external" href="http://groonga.org/ja/blog/2019/07/30/groonga-9.0.5.html">http://groonga.org/ja/blog/2019/07/30/groonga-9.0.5.html</a> で解説しています。</p>
 </div>
-<div class="section" id="id42">
-<h3>改良<a class="headerlink" href="#id42" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id45">
+<h3>改良<a class="headerlink" href="#id45" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>[<a class="reference internal" href="reference/commands/logical_range_filter.html"><span class="doc">logical_range_filter</span></a>] 検索対象のシャードが十分に大きい時にのみ最適化を適用するように改良しました。</p>
 <ul>
@@ -2894,8 +2995,8 @@ load --table Data
 <li><p>Amazon Linux 2 をサポートしました。</p></li>
 </ul>
 </div>
-<div class="section" id="id43">
-<h3>修正<a class="headerlink" href="#id43" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id46">
+<h3>修正<a class="headerlink" href="#id46" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">&quot;[1,</span> <span class="pre">2,</span> <span class="pre">3]&quot;</span></code> のようなJSONのベクター値がインデックスされないバグを修正しました。</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">table_create</span></code> のテストのパラメーター名が誤っていたバグを修正しました。[GitHub#1000][yagisumiさんがパッチ提供]</p></li>
@@ -2914,8 +3015,8 @@ load --table Data
 <li><p><code class="docutils literal notranslate"><span class="pre">groonga-release</span></code> version 1.5.0より前から1.5.0-1へアップデートした際に <code class="docutils literal notranslate"><span class="pre">groonga.repo</span></code> が削除されるバグを修正しました。[groonga-talk:429][Josep Sanzさんの報告]</p></li>
 </ul>
 </div>
-<div class="section" id="id44">
-<h3>感謝<a class="headerlink" href="#id44" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id47">
+<h3>感謝<a class="headerlink" href="#id47" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>yagisumiさん</p></li>
 <li><p>島津製作所さん</p></li>
@@ -2925,8 +3026,8 @@ load --table Data
 </div>
 <div class="section" id="release-9-0-4-2019-06-29">
 <span id="release-9-0-4"></span><h2>9.0.4リリース - 2019-06-29<a class="headerlink" href="#release-9-0-4-2019-06-29" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="section" id="id45">
-<h3>改良<a class="headerlink" href="#id45" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id48">
+<h3>改良<a class="headerlink" href="#id48" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>配列リテラルの複数要素をサポートしました。</p></li>
 <li><p>ベクターの等価演算をサポートしました。</p></li>
@@ -2982,8 +3083,8 @@ load --table Data
 </li>
 </ul>
 </div>
-<div class="section" id="id46">
-<h3>修正<a class="headerlink" href="#id46" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id49">
+<h3>修正<a class="headerlink" href="#id49" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>[optimizer] 複数のfilter条件と <code class="docutils literal notranslate"><span class="pre">xxx.yyy==&quot;keyword&quot;</span></code> のような条件を指定した際にエラーが発生するバグを修正しました。</p></li>
 <li><p>GroongaのWindows用のパッケージ(VC++版)に不足していたライセンスファイルを追加しました。</p></li>
@@ -2995,8 +3096,8 @@ load --table Data
 </li>
 </ul>
 </div>
-<div class="section" id="id47">
-<h3>感謝<a class="headerlink" href="#id47" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id50">
+<h3>感謝<a class="headerlink" href="#id50" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>Takashi Hashidaさん</p></li>
 </ul>
@@ -3004,8 +3105,8 @@ load --table Data
 </div>
 <div class="section" id="release-9-0-3-2019-05-29">
 <span id="release-9-0-3"></span><h2>9.0.3リリース - 2019-05-29<a class="headerlink" href="#release-9-0-3-2019-05-29" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="section" id="id48">
-<h3>改良<a class="headerlink" href="#id48" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id51">
+<h3>改良<a class="headerlink" href="#id51" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>[<a class="reference internal" href="reference/commands/select.html"><span class="doc">select</span></a>] より多くのクエリーログを追加しました。</p>
 <ul>
@@ -3062,8 +3163,8 @@ load --table Data
 <li><p>Ubuntu 14.04 のサポートをやめました。</p></li>
 </ul>
 </div>
-<div class="section" id="id49">
-<h3>修正<a class="headerlink" href="#id49" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id52">
+<h3>修正<a class="headerlink" href="#id52" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>[index_column_diff] <code class="docutils literal notranslate"><span class="pre">remains</span></code> を多く報告するバグを修正しました。</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">--without-onigmo</span></code> オプションを使った際にビルドエラーになるバグを修正しました。[GitHub#951] [Tomohiro KATOさんが報告]</p></li>
@@ -3075,8 +3176,8 @@ load --table Data
 </li>
 </ul>
 </div>
-<div class="section" id="id50">
-<h3>感謝<a class="headerlink" href="#id50" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id53">
+<h3>感謝<a class="headerlink" href="#id53" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>Tomohiro KATOさん</p></li>
 <li><p>Wolfgang Hotwagnerさん</p></li>
@@ -3088,8 +3189,8 @@ load --table Data
 <span id="release-9-0-2"></span><h2>9.0.2リリース - 2019-04-29<a class="headerlink" href="#release-9-0-2-2019-04-29" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <p>このリリースからVC++で作成したWindows版パッケージを提供します。</p>
 <p>今までどおり、MinGWで作成したWindows版パッケージも提供しますが、近いうちにMinGWで作ったパッケージの代わりにVC++で作ったパッケージを提供する予定です。</p>
-<div class="section" id="id51">
-<h3>改良<a class="headerlink" href="#id51" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id54">
+<h3>改良<a class="headerlink" href="#id54" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>[<a class="reference internal" href="reference/commands/column_create.html"><span class="doc">column_create</span></a>] 新しいフラグ <code class="docutils literal notranslate"><span class="pre">INDEX_LARGE</span></code> を追加しました。</p>
 <ul>
@@ -3120,15 +3221,15 @@ load --table Data
 </li>
 </ul>
 </div>
-<div class="section" id="id52">
-<h3>修正<a class="headerlink" href="#id52" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id55">
+<h3>修正<a class="headerlink" href="#id55" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>一部の環境でコンパイルエラー &quot;unknown type name 'bool'&quot; が発生する問題を修正しました。</p></li>
 <li><p>mrubyを経由して実行するコマンド(例えば、 <code class="docutils literal notranslate"><span class="pre">logical_select</span></code>、 <code class="docutils literal notranslate"><span class="pre">logical_range_filter</span></code>、 <code class="docutils literal notranslate"><span class="pre">logical_count</span></code> 等)で、Int32を超える数を正しく出力できない問題を修正しました。[GitHub#936] [HashidaTKSさんがパッチ提供]</p></li>
 </ul>
 </div>
-<div class="section" id="id53">
-<h3>感謝<a class="headerlink" href="#id53" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id56">
+<h3>感謝<a class="headerlink" href="#id56" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>HashidaTKSさん</p></li>
 </ul>
@@ -3136,8 +3237,8 @@ load --table Data
 </div>
 <div class="section" id="release-9-0-1-2019-03-29">
 <span id="release-9-0-1"></span><h2>9.0.1リリース - 2019-03-29<a class="headerlink" href="#release-9-0-1-2019-03-29" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="section" id="id54">
-<h3>改良<a class="headerlink" href="#id54" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id57">
+<h3>改良<a class="headerlink" href="#id57" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>ベクターの値にnullが使えるようになりました。</p>
 <ul>
@@ -3172,8 +3273,8 @@ load --table Data
 <li><p>壊れたインデックスをチェックするためのコマンド <code class="docutils literal notranslate"><span class="pre">index_column_diff</span></code> を追加しました。コマンド実行の進捗を記録したい場合は、ログレベルをdebugに設定してください。</p></li>
 </ul>
 </div>
-<div class="section" id="id55">
-<h3>修正<a class="headerlink" href="#id55" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id58">
+<h3>修正<a class="headerlink" href="#id58" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>[<a class="reference internal" href="reference/functions/snippet_html.html"><span class="doc">snippet_html</span></a>] 一致しない場合、空のベクターを返すよう変更しました。</p>
 <ul>
@@ -3208,8 +3309,8 @@ load --table Data
 <li><p>インデックス更新時に十分な作業領域を確保できずにクラッシュするバクを修正しました。</p></li>
 </ul>
 </div>
-<div class="section" id="id56">
-<h3>感謝<a class="headerlink" href="#id56" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id59">
+<h3>感謝<a class="headerlink" href="#id59" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>shiro615さん</p></li>
 <li><p>HashidaTKSさん</p></li>
@@ -3221,8 +3322,8 @@ load --table Data
 <div class="section" id="release-9-0-0-2019-02-09">
 <span id="release-9-0-0"></span><h2>9.0.0リリース - 2019-02-09<a class="headerlink" href="#release-9-0-0-2019-02-09" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <p>メジャーバージョンアップです! メジャーバージョンアップですが、互換性は壊れていないので、データベースを再構築することなく9.0.0へアップグレードできます。</p>
-<div class="section" id="id57">
-<h3>改良<a class="headerlink" href="#id57" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id60">
+<h3>改良<a class="headerlink" href="#id60" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>[<a class="reference internal" href="reference/tokenizers.html"><span class="doc">トークナイザー</span></a>] 新しいトークナイザー <code class="docutils literal notranslate"><span class="pre">TokenPattern</span></code> を追加しました。</p>
 <ul>
@@ -3260,8 +3361,8 @@ load --table Data
 </div>
 <div class="section" id="release-8-1-1-2019-01-29">
 <span id="release-8-1-1"></span><h2>8.1.1リリース - 2019-01-29<a class="headerlink" href="#release-8-1-1-2019-01-29" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="section" id="id58">
-<h3>改良<a class="headerlink" href="#id58" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id61">
+<h3>改良<a class="headerlink" href="#id61" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>[<a class="reference internal" href="reference/commands/logical_select.html"><span class="doc">logical_select</span></a>] 新しい引数 <code class="docutils literal notranslate"><span class="pre">--load_table</span></code> 、<code class="docutils literal notranslate"><span class="pre">--load_columns</span></code> 、 <code class="docutils literal notranslate"><span class="pre">--load_values</span></code> を追加しました。</p>
 <ul>
@@ -3362,8 +3463,8 @@ load --table Data
 </li>
 </ul>
 </div>
-<div class="section" id="id59">
-<h3>修正<a class="headerlink" href="#id59" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id62">
+<h3>修正<a class="headerlink" href="#id62" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul>
 <li><p>インデックスの更新エラー発生時にメモリリークする問題を修正しました。</p></li>
 <li><p>[<a class="reference internal" href="reference/normalizers.html"><span class="doc">ノーマライザー</span></a>] ステートレスなノーマライザーとステートフルなノーマライザーを同時に使用した時に、それらが誤った結果を返すバグを修正しました。</p>
@@ -3395,14 +3496,14 @@ load --table Data
 </div>
 <div class="section" id="release-8-1-0-2018-12-29">
 <span id="release-8-1-0"></span><h2>8.1.0リリース - 2018-12-29<a class="headerlink" href="#release-8-1-0-2018-12-29" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="section" id="id60">
-<h3>改良<a class="headerlink" href="#id60" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id63">
+<h3>改良<a class="headerlink" href="#id63" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>[httpd] バンドルしているnginxのバージョンを1.15.8に更新しました。</p></li>
 </ul>
 </div>
-<div class="section" id="id61">
-<h3>修正<a class="headerlink" href="#id61" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id64">
+<h3>修正<a class="headerlink" href="#id64" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">io_flush</span></code> コマンド実行後に、DBに対するアンロックが常にフラッシュの実行後になってしまうバグを修正しました。</p></li>
 <li><p>参照先を持たないレコードを持つテーブルに対して <code class="docutils literal notranslate"><span class="pre">reindex</span></code> コマンドを実行した際に、 <code class="docutils literal notranslate"><span class="pre">reindex</span></code> コマンドが終了しないバグを修正しました。</p></li>
@@ -3411,8 +3512,8 @@ load --table Data
 </div>
 <div class="section" id="release-8-0-9-2018-11-29">
 <span id="release-8-0-9"></span><h2>8.0.9リリース - 2018-11-29<a class="headerlink" href="#release-8-0-9-2018-11-29" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="section" id="id62">
-<h3>改良<a class="headerlink" href="#id62" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id65">
+<h3>改良<a class="headerlink" href="#id65" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>[<a class="reference internal" href="reference/tokenizers.html"><span class="doc">トークナイザー</span></a>] トークナイザーの作成に失敗した際のエラーメッセージにトークナイザーの名前を出力するよう改良。</p></li>
 <li><p>[<a class="reference internal" href="reference/tokenizers.html"><span class="doc">トークナイザー</span></a>][TokenDelimit] トークンの区切り文字のカスタマイズをサポートしました。</p>
@@ -3471,8 +3572,8 @@ load --table Data
 </li>
 </ul>
 </div>
-<div class="section" id="id63">
-<h3>修正<a class="headerlink" href="#id63" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id66">
+<h3>修正<a class="headerlink" href="#id66" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul>
 <li><p>ウインドウ関数を評価する際にメモリリークする問題を修正しました。</p></li>
 <li><p>[<a class="reference internal" href="reference/executables/groonga-httpd.html"><span class="doc">groonga-httpd</span></a>] ログの内容が混在することがあるバグを修正しました。</p></li>
@@ -3488,8 +3589,8 @@ load --table Data
 <li><p>deleteコマンドで削除したベクターカラムの値がヒットするバグを修正しました。[dodaisukeさんの報告]</p></li>
 </ul>
 </div>
-<div class="section" id="id64">
-<h3>感謝<a class="headerlink" href="#id64" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id67">
+<h3>感謝<a class="headerlink" href="#id67" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>dodaisukeさん</p></li>
 </ul>
@@ -3497,8 +3598,8 @@ load --table Data
 </div>
 <div class="section" id="release-8-0-8-2018-10-29">
 <span id="release-8-0-8"></span><h2>8.0.8リリース - 2018-10-29<a class="headerlink" href="#release-8-0-8-2018-10-29" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="section" id="id65">
-<h3>改良<a class="headerlink" href="#id65" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id68">
+<h3>改良<a class="headerlink" href="#id68" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul>
 <li><p>[<a class="reference internal" href="reference/commands/table_list.html"><span class="doc">table_list</span></a>] デフォルトトークナイザーのオプションをサポートしました。</p>
 <ul class="simple">
@@ -3545,8 +3646,8 @@ load --table Data
 <li><p>Ubuntu 18.10 (Cosmic Cuttlefish)をサポートしました。</p></li>
 </ul>
 </div>
-<div class="section" id="id66">
-<h3>修正<a class="headerlink" href="#id66" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id69">
+<h3>修正<a class="headerlink" href="#id69" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>Groonga GQTP サーバーが新しい接続を受け付けなくなることがあるバグを修正しました。[groonga-dev,04688][Yutaro Shimamuraさんの報告]</p>
 <ul>
@@ -3555,8 +3656,8 @@ load --table Data
 </li>
 </ul>
 </div>
-<div class="section" id="id67">
-<h3>感謝<a class="headerlink" href="#id67" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id70">
+<h3>感謝<a class="headerlink" href="#id70" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>Masatoshi SEKIさん</p></li>
 <li><p>Yutaro Shimamuraさん</p></li>
@@ -3565,8 +3666,8 @@ load --table Data
 </div>
 <div class="section" id="release-8-0-7-2018-09-29">
 <span id="release-8-0-7"></span><h2>8.0.7リリース - 2018-09-29<a class="headerlink" href="#release-8-0-7-2018-09-29" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="section" id="id68">
-<h3>改良<a class="headerlink" href="#id68" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id71">
+<h3>改良<a class="headerlink" href="#id71" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul>
 <li><p>[<a class="reference internal" href="reference/tokenizers.html"><span class="doc">トークナイザー</span></a>][TokenMecab] Mecabのメタデータの出力をサポートしました。</p>
 <ul>
@@ -3601,8 +3702,8 @@ load --table Data
 <li><p>[httpd] バンドルしているnginxのバージョンを1.15.4に更新しました。</p></li>
 </ul>
 </div>
-<div class="section" id="id69">
-<h3>修正<a class="headerlink" href="#id69" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id72">
+<h3>修正<a class="headerlink" href="#id72" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>いくつかのケースでの誤ったスコア計算を修正しました。</p>
 <ul>
@@ -3615,8 +3716,8 @@ load --table Data
 </div>
 <div class="section" id="release-8-0-6-2018-08-29">
 <span id="release-8-0-6"></span><h2>8.0.6リリース - 2018-08-29<a class="headerlink" href="#release-8-0-6-2018-08-29" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="section" id="id70">
-<h3>改良<a class="headerlink" href="#id70" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id73">
+<h3>改良<a class="headerlink" href="#id73" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul>
 <li><p>[<a class="reference internal" href="reference/tokenizers.html"><span class="doc">トークナイザー</span></a>][TokenMecab] <code class="docutils literal notranslate"><span class="pre">chunked_tokenize</span></code> と <code class="docutils literal notranslate"><span class="pre">chunk_size_threshold</span></code> の両オプションに対応しました。</p></li>
 <li><p>[optimizer] query family expressionの推定に対応しました。<code class="docutils literal notranslate"><span class="pre">column</span> <span class="pre">&#64;</span> <span class="pre">query</span></code> や <code class="docutils literal notranslate"><span class="pre">column</span> <span class="pre">&#64;~</span> <span class="pre">pattern</span></code> のようなquery family expressionについて、より効果的な実行計画を立てられます。</p></li>
@@ -3631,8 +3732,8 @@ load --table Data
 <li><p>[vector_find] サポートされていないモードでクラッシュしないようにしました。</p></li>
 </ul>
 </div>
-<div class="section" id="id71">
-<h3>修正<a class="headerlink" href="#id71" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id74">
+<h3>修正<a class="headerlink" href="#id74" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>[index] <code class="docutils literal notranslate"><span class="pre">HASH_KEY</span></code> を伴ったテキストのベクターに対するオフラインでのインデックス構築に関して、誤ったセクションIDを持つインデックスが構築されてしまうバグを修正しました。</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">--match_columns</span> <span class="pre">'index[0]</span> <span class="pre">||</span> <span class="pre">index[9]'</span></code> が誤ったセクションを使用してしまう問題を修正しました。</p></li>
@@ -3646,8 +3747,8 @@ load --table Data
 </div>
 <div class="section" id="release-8-0-5-2018-07-29">
 <span id="release-8-0-5"></span><h2>8.0.5リリース - 2018-07-29<a class="headerlink" href="#release-8-0-5-2018-07-29" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="section" id="id72">
-<h3>改良<a class="headerlink" href="#id72" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id75">
+<h3>改良<a class="headerlink" href="#id75" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>[<a class="reference internal" href="reference/grn_expr/script_syntax.html"><span class="doc">スクリプト構文</span></a>] 類似文書検索の補足説明とその日本語訳を追加しました。 [GitHub groonga/GitHub#858] [堀本さんがパッチ提供]</p></li>
 <li><p>[<a class="reference internal" href="reference/functions/time_classify_day_of_week.html"><span class="doc">time_classify_day_of_week</span></a>] 新しい関数 <code class="docutils literal notranslate"><span class="pre">time_classify_day_of_week()</span></code> を追加しました。</p></li>
@@ -3661,8 +3762,8 @@ load --table Data
 <li><p>[<a class="reference internal" href="install/debian.html"><span class="doc">Debian GNU/Linux</span></a>] jessieのサポートをやめました。Debianのセキュリティ＆リリースチームはもはやjessieの更新を提供しません。</p></li>
 </ul>
 </div>
-<div class="section" id="id73">
-<h3>修正<a class="headerlink" href="#id73" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id76">
+<h3>修正<a class="headerlink" href="#id76" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>POSTでの <code class="docutils literal notranslate"><span class="pre">/d/load</span></code> へのデータ送信が中断された後に誤った結果が返されていたのを修正しました。</p></li>
 <li><p>KyTeaに関する間違った関数呼び出しを修正しました。</p></li>
@@ -3674,8 +3775,8 @@ load --table Data
 </div>
 <div class="section" id="release-8-0-4-2018-06-29">
 <span id="release-8-0-4"></span><h2>8.0.4リリース - 2018-06-29<a class="headerlink" href="#release-8-0-4-2018-06-29" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="section" id="id74">
-<h3>改良<a class="headerlink" href="#id74" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id77">
+<h3>改良<a class="headerlink" href="#id77" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>[log] <code class="docutils literal notranslate"><span class="pre">[ii][update][one]</span></code> のエラーメッセージにサブエラーを追加しました。</p></li>
 <li><p>新しいAPI <code class="docutils literal notranslate"><span class="pre">grn_highlighter_clear_keywords()</span></code> を追加しました。</p></li>
@@ -3709,8 +3810,8 @@ load --table Data
 <li><p>[<a class="reference internal" href="reference/executables/grndb.html"><span class="doc">grndb</span></a>] 実装が不十分だったため、ログのチェックを一時的に無効にしました</p></li>
 </ul>
 </div>
-<div class="section" id="id75">
-<h3>修正<a class="headerlink" href="#id75" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id78">
+<h3>修正<a class="headerlink" href="#id78" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>[<a class="reference internal" href="reference/functions/sub_filter.html"><span class="doc">sub_filter</span></a>] 十分にフィルターされたケースで、スコアが多すぎる問題を修正</p></li>
 <li><p>KyTeaがインストールされているとビルドに失敗する問題を修正しました。</p></li>
@@ -3724,8 +3825,8 @@ load --table Data
 </div>
 <div class="section" id="release-8-0-3-2018-05-29">
 <span id="release-8-0-3"></span><h2>8.0.3リリース - 2018-05-29<a class="headerlink" href="#release-8-0-3-2018-05-29" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="section" id="id76">
-<h3>改良<a class="headerlink" href="#id76" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id79">
+<h3>改良<a class="headerlink" href="#id79" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul>
 <li><p>[<a class="reference internal" href="reference/functions/highlight_html.html"><span class="doc">highlight_html</span></a>] <code class="docutils literal notranslate"><span class="pre">NormalizerNFKC100</span></code> または <code class="docutils literal notranslate"><span class="pre">TokenNgram</span></code> を使って検索した結果のハイライトをサポートしました。</p></li>
 <li><p>[<a class="reference internal" href="reference/tokenizers.html"><span class="doc">トークナイザー</span></a>] <code class="docutils literal notranslate"><span class="pre">TokenNgram</span></code> に新しいオプション <code class="docutils literal notranslate"><span class="pre">report_source_location</span> <span class="pre">option</span></code> を追加しました。このオプションは、<code class="docutils literal notranslate"><span class="pre">highlight_html</span></code> で語彙表を使ったハイライトをする時に使用します。</p></li>
@@ -3745,8 +3846,8 @@ load --table Data
 <li><p>[httpd] バンドルしているnginxのバージョンを1.14.0に更新しました。</p></li>
 </ul>
 </div>
-<div class="section" id="id77">
-<h3>修正<a class="headerlink" href="#id77" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id80">
+<h3>修正<a class="headerlink" href="#id80" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>[<a class="reference internal" href="reference/commands/logical_select.html"><span class="doc">logical_select</span></a>] 動的カラムをフィルターした時にエラーが発生するとメモリリークする不具合を修正しました。</p></li>
 <li><p>[<a class="reference internal" href="reference/commands/logical_count.html"><span class="doc">logical_count</span></a>] 動的カラムの初期化に失敗した際にメモリリークする不具合を修正しました。</p></li>
@@ -3758,8 +3859,8 @@ load --table Data
 </div>
 <div class="section" id="release-8-0-2-2018-04-29">
 <span id="release-8-0-2"></span><h2>8.0.2リリース - 2018-04-29<a class="headerlink" href="#release-8-0-2-2018-04-29" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="section" id="id78">
-<h3>改良<a class="headerlink" href="#id78" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id81">
+<h3>改良<a class="headerlink" href="#id81" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul>
 <li><p>[<a class="reference internal" href="reference/executables/grndb.html"><span class="doc">grndb</span></a>][<a class="reference internal" href="reference/executables/grndb.html#grndb-force-truncate"><span class="std std-ref">--force-truncate</span></a>]  <code class="docutils literal notranslate"><span class="pre">grndb</span> <span class="pre">recover</span> <span class="pre">--force-truncate</span></code> オプションを指定することで、テーブルにロックが残ったままの状態でも truncate できるようにしました。</p></li>
 <li><p>[<a class="reference internal" href="reference/commands/logical_range_filter.html"><span class="doc">logical_range_filter</span></a>] <code class="docutils literal notranslate"><span class="pre">sort_keys</span></code> オプションに対応しました。</p></li>
@@ -3792,16 +3893,16 @@ load --table Data
 <li><p>Ubuntu 18.04 (Bionic Beaver)をサポートしました。</p></li>
 </ul>
 </div>
-<div class="section" id="id79">
-<h3>修正<a class="headerlink" href="#id79" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id82">
+<h3>修正<a class="headerlink" href="#id82" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>スペースのみの検索クエリが意図しないレコードにマッチする不具合を修正しました。[groonga-dev,04609][satouyuzhさんの報告]</p></li>
 <li><p>誤ったスコアラーが使われる場合があった不具合を修正しました。この問題は以下のように複数のスコアラーが使われた時に発生していました： <code class="docutils literal notranslate"><span class="pre">--match_columns</span> <span class="pre">'title</span> <span class="pre">||</span> <span class="pre">scorer_tf_at_most(content,</span> <span class="pre">2.0)'</span></code></p></li>
 <li><p>「thread_limit」の変更に時間がかかりすぎる問題を修正しました。</p></li>
 </ul>
 </div>
-<div class="section" id="id80">
-<h3>感謝<a class="headerlink" href="#id80" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id83">
+<h3>感謝<a class="headerlink" href="#id83" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>satouyuzhさん</p></li>
 </ul>
@@ -3809,8 +3910,8 @@ load --table Data
 </div>
 <div class="section" id="release-8-0-1-2018-03-29">
 <span id="release-8-0-1"></span><h2>8.0.1リリース - 2018-03-29<a class="headerlink" href="#release-8-0-1-2018-03-29" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="section" id="id81">
-<h3>改良<a class="headerlink" href="#id81" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id84">
+<h3>改良<a class="headerlink" href="#id84" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul>
 <li><p>[<a class="reference internal" href="reference/log.html"><span class="doc">ログ</span></a>] クエリーログ内で <code class="docutils literal notranslate"><span class="pre">filter</span></code> 条件を表示するようにしました。この機能はデフォルトでは、無効になっています。有効にするためには、環境変数 <code class="docutils literal notranslate"><span class="pre">GRN_QUERY_LOG_SHOW_CONDITION=yes</span></code> を設定します。</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">*.pdb</span></code> を <code class="docutils literal notranslate"><span class="pre">*.dll</span></code> と <code class="docutils literal notranslate"><span class="pre">*.exe</span></code> と同じディレクトリにインストールされるようにしました。</p></li>
@@ -3829,8 +3930,8 @@ load --table Data
 <li><p>[httpd] バンドルしているnginxのバージョンを1.13.10に更新しました。</p></li>
 </ul>
 </div>
-<div class="section" id="id82">
-<h3>修正<a class="headerlink" href="#id82" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id85">
+<h3>修正<a class="headerlink" href="#id85" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>共通接頭辞がどのトークンにもマッチしない時にメモリリークする問題を修正しました。[GitHub#820] [村上さんがパッチ提供]</p></li>
 <li><p>同一プロセスで複数のデータベースを開いている時に、異なるデータベースのキャッシュを使用してしまう問題を修正しました。</p></li>
@@ -3838,8 +3939,8 @@ load --table Data
 <li><p>比較時(&gt;,&gt;=,&lt;,&lt;=,==,!=)に定数がオーバーフローまたは、アンダーフローし得る問題を修正しました。</p></li>
 </ul>
 </div>
-<div class="section" id="id83">
-<h3>感謝<a class="headerlink" href="#id83" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id86">
+<h3>感謝<a class="headerlink" href="#id86" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>村上さん</p></li>
 </ul>
@@ -3848,8 +3949,8 @@ load --table Data
 <div class="section" id="release-8-0-0-2018-02-09">
 <span id="release-8-0-0"></span><h2>8.0.0リリース - 2018-02-09<a class="headerlink" href="#release-8-0-0-2018-02-09" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <p>メジャーバージョンアップです! メジャーバージョンアップですが、互換性は壊れていないので、データベースを再構築することなくアップグレードできます。</p>
-<div class="section" id="id84">
-<h3>改良<a class="headerlink" href="#id84" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id87">
+<h3>改良<a class="headerlink" href="#id87" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul>
 <li><p>[<a class="reference internal" href="reference/commands/select.html"><span class="doc">select</span></a>] <code class="docutils literal notranslate"><span class="pre">--drilldown_adjuster</span></code> と <code class="docutils literal notranslate"><span class="pre">drilldowns[LABEL].adjuster</span></code> を追加しました。drilldown結果に対して、スコア調整できるようになります。</p></li>
 <li><p>[<a class="reference internal" href="reference/indexing.html#online-index-construction"><span class="std std-ref">動的なインデックス構築方法</span></a>] 環境変数の名前を <code class="docutils literal notranslate"><span class="pre">GRN_II_REDUCE_EXPIRE_ENABLE</span></code> から <code class="docutils literal notranslate"><span class="pre">GRN_II_REDUCE_EXPIRE_THRESHOLD</span></code> へ変更しました。</p>
@@ -3858,8 +3959,8 @@ load --table Data
 <li><p>[<a class="reference internal" href="reference/functions/between.html"><span class="doc">between</span></a>] 境界値なしの <code class="docutils literal notranslate"><span class="pre">between()</span></code> を受け付けるようにしました。<code class="docutils literal notranslate"><span class="pre">between()</span></code> の引数の数が3つでも実行できます。2番目と3番目の引数が境界を含むものとして処理されます。</p></li>
 </ul>
 </div>
-<div class="section" id="id85">
-<h3>修正<a class="headerlink" href="#id85" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id88">
+<h3>修正<a class="headerlink" href="#id88" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>ハッシュテーブルのメモリリークを修正しました。 [GitHub:mroonga/mroonga#190][fuku1さんの報告]</p></li>
 <li><p>配列のメモリリークを修正しました。</p></li>
@@ -3867,8 +3968,8 @@ load --table Data
 <li><p>[Windows] <code class="docutils literal notranslate"><span class="pre">WSASend</span></code> が適切なエラーコードを返すようにしました。</p></li>
 </ul>
 </div>
-<div class="section" id="id86">
-<h3>感謝<a class="headerlink" href="#id86" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id89">
+<h3>感謝<a class="headerlink" href="#id89" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>fuku1さん</p></li>
 </ul>
@@ -3876,8 +3977,8 @@ load --table Data
 </div>
 <div class="section" id="release-7-1-1-2018-01-29">
 <span id="release-7-1-1"></span><h2>7.1.1リリース - 2018-01-29<a class="headerlink" href="#release-7-1-1-2018-01-29" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="section" id="id87">
-<h3>改良<a class="headerlink" href="#id87" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id90">
+<h3>改良<a class="headerlink" href="#id90" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul>
 <li><p>[<a class="reference internal" href="install/ubuntu.html"><span class="doc">Ubuntu</span></a>] Ubuntu 17.04（Zesty Zapus）のサポートをやめました。2018年1月13日でサポートが切れた（EOLになった）ためです。</p></li>
 <li><p>Quorum matchをサポートしました。スクリプト構文でもクエリー構文でもquorum matchを使うことができます。</p>
@@ -3897,15 +3998,15 @@ load --table Data
 <li><p>[<a class="reference internal" href="reference/commands/logical_range_filter.html"><span class="doc">logical_range_filter</span></a>] [<a class="reference internal" href="reference/commands/logical_range_filter.html#logical-range-filter-post-filter"><span class="std std-ref">post_filter</span></a>]フィルタータイミングを新規追加しました。 <code class="docutils literal notranslate"><span class="pre">filtered</span></code> ステージで生成されるカラムが生成された後に実行されます。</p></li>
 </ul>
 </div>
-<div class="section" id="id88">
-<h3>修正<a class="headerlink" href="#id88" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id91">
+<h3>修正<a class="headerlink" href="#id91" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>参照ベクタのインデックスを作成する際に使用するリソースを削減しました。[GitHub#806][村上さんが報告]</p></li>
 <li><p>[<a class="reference internal" href="reference/commands/table_create.html"><span class="doc">table_create</span></a>] <code class="docutils literal notranslate"><span class="pre">token_filters</span></code> が無効であってもテーブルが作成される不具合を修正しました。</p></li>
 </ul>
 </div>
-<div class="section" id="id89">
-<h3>感謝<a class="headerlink" href="#id89" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id92">
+<h3>感謝<a class="headerlink" href="#id92" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>付超群さん</p></li>
 <li><p>村上さん</p></li>
@@ -3914,8 +4015,8 @@ load --table Data
 </div>
 <div class="section" id="release-7-1-0-2017-12-29">
 <span id="release-7-1-0"></span><h2>7.1.0リリース - 2017-12-29<a class="headerlink" href="#release-7-1-0-2017-12-29" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="section" id="id90">
-<h3>改良<a class="headerlink" href="#id90" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id93">
+<h3>改良<a class="headerlink" href="#id93" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul>
 <li><p>[<a class="reference internal" href="reference/commands/load.html"><span class="doc">load</span></a>] <code class="docutils literal notranslate"><span class="pre">load</span></code> コマンドのクエリーログのフォーマットを改良しました。<code class="docutils literal notranslate"><span class="pre">load</span></code> コマンドのクエリーログに以下の項目が追加されます。</p>
 <blockquote>
@@ -3969,8 +4070,8 @@ load --table Data
 <li><p>[httpd] バンドルしているnginxのバージョンを1.13.8に更新しました。</p></li>
 </ul>
 </div>
-<div class="section" id="id91">
-<h3>修正<a class="headerlink" href="#id91" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id94">
+<h3>修正<a class="headerlink" href="#id94" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">highlight_full</span></code> 関数を使用するとメモリリークする問題を修正しました。</p></li>
 <li><p>Mroongaで以下ような呼び出しを行った際にクラッシュする問題を修正しました。</p>
@@ -3983,8 +4084,8 @@ load --table Data
 </li>
 </ul>
 </div>
-<div class="section" id="id92">
-<h3>感謝<a class="headerlink" href="#id92" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id95">
+<h3>感謝<a class="headerlink" href="#id95" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>takagi01</p></li>
 <li><p>村上さん</p></li>
@@ -3993,8 +4094,8 @@ load --table Data
 </div>
 <div class="section" id="release-7-0-9-2017-11-29">
 <span id="release-7-0-9"></span><h2>7.0.9リリース - 2017-11-29<a class="headerlink" href="#release-7-0-9-2017-11-29" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="section" id="id93">
-<h3>改良<a class="headerlink" href="#id93" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id96">
+<h3>改良<a class="headerlink" href="#id96" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>Apache Arrowの新しいバージョンをサポートしました。このリリースでは、Apache Arrowサポートを有効にするには0.8.0以降が必要です。</p></li>
 <li><p>[sharding] 動的カラムの新しいAPIを追加しました。</p>
@@ -4012,8 +4113,8 @@ load --table Data
 <li><p>[httpd] バンドルしているnginxのバージョンを1.13.7に更新しました。</p></li>
 </ul>
 </div>
-<div class="section" id="id94">
-<h3>修正<a class="headerlink" href="#id94" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id97">
+<h3>修正<a class="headerlink" href="#id97" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>[httpd] 古いバージョンのGroongaがすでにインストールされている場合にそちらを参照してしまい、ビルドエラーになる問題を修正しました。　[GitHub#775] [myamanishi3さんが報告]</p></li>
 <li><p>[<a class="reference internal" href="reference/functions/in_values.html"><span class="doc">in_values</span></a>] <code class="docutils literal notranslate"><span class="pre">in_values</span></code> に多すぎる引数を指定するとクラッシュする不具合を修正しました。この不具合は126を超える引数をサポートする過程で見つかりました。 [GitHub#780]</p></li>
@@ -4021,8 +4122,8 @@ load --table Data
 <li><p>[<a class="reference internal" href="reference/indexing.html#offline-index-construction"><span class="std std-ref">静的なインデックス構築方法</span></a>] ベクターカラムの静的索引構築時に必要以上のリソースを使用する問題を修正しました。1つのベクターカラムの要素数が多く、大量のレコードがある場合はGroongaがクラッシュしていました。 [groonga-dev,04533][内山敏郎さんが報告]</p></li>
 </ul>
 </div>
-<div class="section" id="id95">
-<h3>感謝<a class="headerlink" href="#id95" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id98">
+<h3>感謝<a class="headerlink" href="#id98" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>むらたさん</p></li>
 <li><p>myamanishi3さん</p></li>
@@ -4033,8 +4134,8 @@ load --table Data
 </div>
 <div class="section" id="release-7-0-8-2017-10-29">
 <span id="release-7-0-8"></span><h2>7.0.8リリース - 2017-10-29<a class="headerlink" href="#release-7-0-8-2017-10-29" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="section" id="id96">
-<h3>改良<a class="headerlink" href="#id96" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id99">
+<h3>改良<a class="headerlink" href="#id99" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>[windows] クラッシュした際にバックトレースを出せるようにしました。関数呼び出しだけでなく、ソースコードの該当行も可能な限り表示します。バックトレースのサポートにより、問題の素早い解決につながります。</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">QUERY_NO_SYNTAX_ERROR</span></code> を指定してあれば &quot;( )&quot; を <code class="docutils literal notranslate"><span class="pre">--query</span></code> に指定して実行できるようにしました。 以前のバージョンでは、エラーになっていました。 [GitHub#767]</p></li>
@@ -4044,8 +4145,8 @@ load --table Data
 <li><p>Ubuntu 17.10 Artful Aardvarkをサポート。</p></li>
 </ul>
 </div>
-<div class="section" id="id97">
-<h3>修正<a class="headerlink" href="#id97" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id100">
+<h3>修正<a class="headerlink" href="#id100" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>[dat] データベースを拡張する際、意図せず大きなファイルが(ワーストケースで)作成されてしまうことのある不具合を修正しました。この不具合はインデックスカラムを頻繁に作成/削除を繰り返したときに発生する可能性があります。7.0.7ではこの不具合に関連して&quot;大量にキーを削除したケースで <code class="docutils literal notranslate"><span class="pre">table_create</span></code> に失敗する&quot;問題を修正しましたが、その修正が不十分なケースに対応しました。</p></li>
 <li><p>[<a class="reference internal" href="reference/commands/logical_select.html"><span class="doc">logical_select</span></a>] <code class="docutils literal notranslate"><span class="pre">offset</span></code> と <code class="docutils literal notranslate"><span class="pre">limit</span></code> が複数のシャードに対して適用されたとき、実際よりも少ないレコードが返される不具合を修正しました。</p></li>
@@ -4054,8 +4155,8 @@ load --table Data
 </div>
 <div class="section" id="release-7-0-7-2017-09-29">
 <span id="release-7-0-7"></span><h2>7.0.7リリース - 2017-09-29<a class="headerlink" href="#release-7-0-7-2017-09-29" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="section" id="id98">
-<h3>改良<a class="headerlink" href="#id98" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id101">
+<h3>改良<a class="headerlink" href="#id101" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">QUERY_NO_SYNTAX_ERROR</span></code> を <code class="docutils literal notranslate"><span class="pre">+</span></code> のみのクエリーに指定したときにも動作するようにしました。以前のバージョンではそのようなクエリーはエラーになっていました。</p></li>
 <li><p>[httpd] バンドルしているnginxのバージョンを1.13.5に更新しました。</p></li>
@@ -4070,8 +4171,8 @@ load --table Data
 </li>
 </ul>
 </div>
-<div class="section" id="id99">
-<h3>修正<a class="headerlink" href="#id99" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id102">
+<h3>修正<a class="headerlink" href="#id102" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul>
 <li><p>[windows] <code class="docutils literal notranslate"><span class="pre">database_unmap</span></code> が実行される前のファイルハンドルのエラー処理を適切に行うようにしました。<code class="docutils literal notranslate"><span class="pre">database_unmap</span></code> 実行前にリクエストがキャンセルされた場合、排他制御部分が未初期化となる場合がありました。その場合、クラッシュしていました。</p></li>
 <li><p>[<a class="reference internal" href="reference/tokenizers.html"><span class="doc">トークナイザー</span></a>] トークナイザー名のドキュメントを修正しました。<code class="docutils literal notranslate"><span class="pre">TokenBigramIgnoreBlankSplitSymbolAlpha</span></code> や <code class="docutils literal notranslate"><span class="pre">TokenBigramIgnoreBlankSplitSymbolAlphaDigit</span></code> であるべきでした。</p></li>
@@ -4093,8 +4194,8 @@ load --table Data
 </div>
 <div class="section" id="release-7-0-6-2017-08-29">
 <span id="release-7-0-6"></span><h2>7.0.6リリース - 2017-08-29<a class="headerlink" href="#release-7-0-6-2017-08-29" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="section" id="id100">
-<h3>改良<a class="headerlink" href="#id100" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id103">
+<h3>改良<a class="headerlink" href="#id103" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>前方一致検索を複数インデックスを指定してできるようになりました。 (例 <code class="docutils literal notranslate"><span class="pre">--query</span> <span class="pre">&quot;Foo*&quot;</span> <span class="pre">--match_columns</span> <span class="pre">&quot;TITLE_INDEX_COLUMN||BODY_INDEX_COLUMN&quot;</span></code>)</p></li>
 <li><p>[<a class="reference internal" href="reference/window_functions/window_count.html"><span class="doc">window_count</span></a>] <code class="docutils literal notranslate"><span class="pre">window_count</span></code> 関数を追加しました。検索した結果にカウントした値を追加するのに使います。検索結果をもとに分析したり、カウント結果をもとにフィルタしたりすると便利です。</p></li>
@@ -4113,16 +4214,16 @@ load --table Data
 <li><p>[httpd] バンドルしているnginxのバージョンを1.13.4に更新しました。</p></li>
 </ul>
 </div>
-<div class="section" id="id101">
-<h3>修正<a class="headerlink" href="#id101" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id104">
+<h3>修正<a class="headerlink" href="#id104" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>[<a class="reference internal" href="reference/commands/dump.html"><span class="doc">dump</span></a>] 7番目の引数 ( <code class="docutils literal notranslate"><span class="pre">--sort_hash_table</span></code> )が名前無しだと無視される不具合を修正しました。</p></li>
 <li><p>[<a class="reference internal" href="reference/commands/schema.html"><span class="doc">schema</span></a>] コマンドラインパラメータの誤りを修正しました。<cite>source</cite> であるべきところが <cite>sources</cite> になっていました。[groonga-dev,04449] [むらたさんが報告]</p></li>
 <li><p>[<a class="reference internal" href="reference/commands/ruby_eval.html"><span class="doc">ruby_eval</span></a>] ruby_evalコマンドがシンタックスエラーのときにクラッシュする問題を修正しました。 [GitHub#751] [ryo-pinusさんがパッチ提供]</p></li>
 </ul>
 </div>
-<div class="section" id="id102">
-<h3>感謝<a class="headerlink" href="#id102" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id105">
+<h3>感謝<a class="headerlink" href="#id105" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>murata satoshi</p></li>
 <li><p>ryo-pinus</p></li>
@@ -4131,8 +4232,8 @@ load --table Data
 </div>
 <div class="section" id="release-7-0-5-2017-07-29">
 <span id="release-7-0-5"></span><h2>7.0.5リリース - 2017-07-29<a class="headerlink" href="#release-7-0-5-2017-07-29" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="section" id="id103">
-<h3>改良<a class="headerlink" href="#id103" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id106">
+<h3>改良<a class="headerlink" href="#id106" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>[httpd] バンドルしているnginxのバージョンを1.13.3に更新しました。セキュリティーに関する修正(CVE-2017-7529)を含んでいます。</p></li>
 <li><p>[<a class="reference internal" href="reference/commands/load.html"><span class="doc">load</span></a>] UInt64の最大値をロードできるようにしました。以前のバージョンでは意図せず0に変換されてしまっていました。</p></li>
@@ -4156,16 +4257,16 @@ load --table Data
 <li><p>[<a class="reference internal" href="install/ubuntu.html"><span class="doc">Ubuntu</span></a>] Ubuntu 16.10（Yakkety Yak）のサポートをやめました。2017年7月20日でサポートが切れた（EOLになった）ためです。</p></li>
 </ul>
 </div>
-<div class="section" id="id104">
-<h3>修正<a class="headerlink" href="#id104" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id107">
+<h3>修正<a class="headerlink" href="#id107" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>テキスト型( <code class="docutils literal notranslate"><span class="pre">ShortText</span></code> など)のベクターカラムに対するインデックスを正しく構築できるようにしました。この修正でインデックス更新後に全文検索でマッチしない問題が解決します。 [GitHub#494]</p></li>
 <li><p>[<a class="reference internal" href="reference/commands/thread_limit.html"><span class="doc">thread_limit</span></a>] <code class="docutils literal notranslate"><span class="pre">thread_limit?max=1</span></code> というリクエストが同時にきたときにデッドロックが発生する問題を修正しました。</p></li>
 <li><p>[<a class="reference internal" href="reference/executables/groonga-httpd.html"><span class="doc">groonga-httpd</span></a>] デフォルトのPIDのパスと再起動時に想定しているPIDのパスがあっていない問題を修正しました。そのせいで groonga-httpd の再起動に失敗していました。 [GitHub#743] [sozakiさんが報告]</p></li>
 </ul>
 </div>
-<div class="section" id="id105">
-<h3>感謝<a class="headerlink" href="#id105" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id108">
+<h3>感謝<a class="headerlink" href="#id108" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>村上さん</p></li>
 </ul>
@@ -4173,8 +4274,8 @@ load --table Data
 </div>
 <div class="section" id="release-7-0-4-2017-06-29">
 <span id="release-7-0-4"></span><h2>7.0.4リリース - 2017-06-29<a class="headerlink" href="#release-7-0-4-2017-06-29" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="section" id="id106">
-<h3>改良<a class="headerlink" href="#id106" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id109">
+<h3>改良<a class="headerlink" href="#id109" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>物理的なファイルの作成/削除のログを障害の切り分けのために記録するようにしました。 [GitHub#700,#701]</p></li>
 <li><p>[<a class="reference internal" href="reference/functions/in_records.html"><span class="doc">in_records</span></a>] 固定長カラムの検索パフォーマンスを改善しました。速度が50%程度改善する可能性があります。</p></li>
@@ -4193,21 +4294,21 @@ load --table Data
 <li><p>[<a class="reference internal" href="reference/executables/grndb.html"><span class="doc">grndb</span></a>] 参照先のない &quot;inspect&quot; オブジェクトの検出と削除をサポートしました。この状態はコマンド名が <code class="docutils literal notranslate"><span class="pre">inspect</span></code> から <code class="docutils literal notranslate"><span class="pre">object_inspect</span></code> に変更されたことによって発生していました。</p></li>
 </ul>
 </div>
-<div class="section" id="id107">
-<h3>修正<a class="headerlink" href="#id107" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id110">
+<h3>修正<a class="headerlink" href="#id110" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>[rpm][centos] カスタマイズ版のビルドで意図しないマクロ展開が発生する問題を修正しました。この不具合はGroongaをSRPMからビルドする際にspecファイルの <code class="docutils literal notranslate"><span class="pre">additional_configure_options</span></code> パラメータを使ってリビルドするときのみ発生していました。</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">grn_table_setoperation()</span></code> のNULLチェックを追加しました。インデックスが壊れている際に、クラッシュする可能性がありました。 [GitHub#699]</p></li>
 </ul>
 </div>
-<div class="section" id="id108">
-<h3>感謝<a class="headerlink" href="#id108" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id111">
+<h3>感謝<a class="headerlink" href="#id111" title="このヘッドラインへのパーマリンク">¶</a></h3>
 </div>
 </div>
 <div class="section" id="release-7-0-3-2017-05-29">
 <span id="release-7-0-3"></span><h2>7.0.3リリース - 2017-05-29<a class="headerlink" href="#release-7-0-3-2017-05-29" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="section" id="id109">
-<h3>改良<a class="headerlink" href="#id109" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id112">
+<h3>改良<a class="headerlink" href="#id112" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>[<a class="reference internal" href="reference/commands/select.html"><span class="doc">select</span></a>] <a class="reference internal" href="tutorial/match_columns.html#full-text-search-with-specific-index-name"><span class="std std-ref">インデックス名を指定した全文検索</span></a> のドキュメントを追加しました。</p></li>
 <li><p>[インデックス] どのレコードに対するポスティングリストが長すぎるのかわかるように、警告メッセージをログに出すようにしました。</p></li>
@@ -4228,8 +4329,8 @@ load --table Data
 </li>
 </ul>
 </div>
-<div class="section" id="id110">
-<h3>修正<a class="headerlink" href="#id110" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id113">
+<h3>修正<a class="headerlink" href="#id113" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>[<a class="reference internal" href="reference/commands/delete.html"><span class="doc">delete</span></a>] エラーが適切にクリアされていない不具合を修正しました。そのせいで、後続の削除処理に影響し意図しない振る舞いをしていました。</p></li>
 <li><p>[windows] ファイルを <code class="docutils literal notranslate"><span class="pre">O_CREAT</span></code> フラグ付きで開くときに、IOのバージョンが正しく検出されない不具合を修正しました。</p></li>
@@ -4238,8 +4339,8 @@ load --table Data
 <li><p>[<a class="reference internal" href="reference/commands/logical_select.html"><span class="doc">logical_select</span></a>] <code class="docutils literal notranslate"><span class="pre">min</span></code> に月の最終日を指定すると &quot;argument out of range&quot; が発生する不具合を修正しました。</p></li>
 </ul>
 </div>
-<div class="section" id="id111">
-<h3>感謝<a class="headerlink" href="#id111" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id114">
+<h3>感謝<a class="headerlink" href="#id114" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>Sergei Golubchikさん</p></li>
 <li><p>村上さん</p></li>
@@ -4248,8 +4349,8 @@ load --table Data
 </div>
 <div class="section" id="release-7-0-2-2017-04-29">
 <span id="release-7-0-2"></span><h2>7.0.2リリース - 2017-04-29<a class="headerlink" href="#release-7-0-2-2017-04-29" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="section" id="id112">
-<h3>改良<a class="headerlink" href="#id112" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id115">
+<h3>改良<a class="headerlink" href="#id115" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>[<a class="reference internal" href="reference/commands/logical_select.html"><span class="doc">logical_select</span></a>] <a class="reference internal" href="reference/commands/logical_select.html#logical-select-drilldowns-label-columns-name-window-sort-keys"><span class="std std-ref">drilldowns[${LABEL}].columns[${NAME}].window.sort_keys</span></a> と <a class="reference internal" href="reference/commands/logical_select.html#logical-select-drilldowns-label-columns-name-window-group-keys"><span class="std std-ref">drilldowns[${LABEL}].columns[${NAME}].window.group_keys</span></a> で複数のキーを指定できるようになりました。</p></li>
 <li><p>[Windows] バンドルしているLZ4を1.7.5に更新しました。</p></li>
@@ -4272,8 +4373,8 @@ load --table Data
 <li><p>[<a class="reference internal" href="install/ubuntu.html"><span class="doc">Ubuntu</span></a>] EOLのため、Ubuntu 12.04のサポートをやめました。</p></li>
 </ul>
 </div>
-<div class="section" id="id113">
-<h3>修正<a class="headerlink" href="#id113" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id116">
+<h3>修正<a class="headerlink" href="#id116" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>[<a class="reference internal" href="reference/commands/logical_select.html"><span class="doc">logical_select</span></a>] 異なるキャッシュが使われてしまう不具合を修正しました。この問題は動的カラムを使っているときに発生していました。</p></li>
 <li><p>[<a class="reference internal" href="reference/commands/logical_select.html"><span class="doc">logical_select</span></a>] 動的カラムが作成されない不具合を修正しました。レコードにマッチしない場合に発生していました。</p></li>
@@ -4284,8 +4385,8 @@ load --table Data
 </div>
 <div class="section" id="release-7-0-1-2017-03-29">
 <span id="release-7-0-1"></span><h2>7.0.1リリース - 2017-03-29<a class="headerlink" href="#release-7-0-1-2017-03-29" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="section" id="id114">
-<h3>改良<a class="headerlink" href="#id114" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id117">
+<h3>改良<a class="headerlink" href="#id117" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>以下のAPIを公開しました。</p>
 <ul>
@@ -4330,8 +4431,8 @@ load --table Data
 <li><p>[<a class="reference internal" href="reference/commands/select.html"><span class="doc">select</span></a>] <code class="docutils literal notranslate"><span class="pre">drilldown_filter</span></code> のドキュメントを追加しました。</p></li>
 </ul>
 </div>
-<div class="section" id="id115">
-<h3>修正<a class="headerlink" href="#id115" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id118">
+<h3>修正<a class="headerlink" href="#id118" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>[<a class="reference internal" href="reference/commands/lock_clear.html"><span class="doc">lock_clear</span></a>] テンポラリデータベースに対して実行するとクラッシュする不具合を修正しました。</p></li>
 <li><p>自然言語に対する動的インデックス更新でインデックスサイズが肥大化する問題を修正しました。Groonga 6.1.4から発生していました。</p></li>
@@ -4340,8 +4441,8 @@ load --table Data
 <li><p>[<a class="reference internal" href="reference/commands/logical_table_remove.html"><span class="doc">logical_table_remove</span></a>] 最大スレッド数が1のときにクラッシュする不具合を修正しました。</p></li>
 </ul>
 </div>
-<div class="section" id="id116">
-<h3>感謝<a class="headerlink" href="#id116" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id119">
+<h3>感謝<a class="headerlink" href="#id119" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>株式会社ぐるなびさん</p></li>
 </ul>
@@ -4349,8 +4450,8 @@ load --table Data
 </div>
 <div class="section" id="release-7-0-0-2017-02-09">
 <span id="release-7-0-0"></span><h2>7.0.0リリース - 2017-02-09<a class="headerlink" href="#release-7-0-0-2017-02-09" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<div class="section" id="id117">
-<h3>改良<a class="headerlink" href="#id117" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id120">
+<h3>改良<a class="headerlink" href="#id120" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>[<a class="reference internal" href="reference/functions/in_values.html"><span class="doc">in_values</span></a>] 参照型ベクターカラムのシーケンシャルサーチに対応しました。 [GitHub#629] [村上さんがパッチ提供]</p></li>
 <li><p>[<a class="reference internal" href="reference/commands/select.html"><span class="doc">select</span></a>] 誤った <code class="docutils literal notranslate"><span class="pre">drilldown[LABEL].sort_keys</span></code> が指定されたとき、無視するのではなく、エラーを報告するようにしました。</p></li>
@@ -4371,8 +4472,8 @@ load --table Data
 <li><p>[httpd] バンドルしているnginxのバージョンを1.11.9に更新しました。</p></li>
 </ul>
 </div>
-<div class="section" id="id118">
-<h3>修正<a class="headerlink" href="#id118" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id121">
+<h3>修正<a class="headerlink" href="#id121" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>存在しないソートキーを <code class="docutils literal notranslate"><span class="pre">drilldowns[LABEL]</span></code> や <code class="docutils literal notranslate"><span class="pre">slices[LABEL]</span></code> に指定するとJSONパースエラーとなる不具合を修正しました。 [GitHub#627] [村上さんがパッチ提供]</p></li>
 <li><p>存在しないグループのサブレコードにアクセスしようとするとクラッシュする不具合を修正しました。例えば、 <code class="docutils literal notranslate"><span class="pre">drilldowns[LABEL].sort_keys</span> <span class="pre">_sum</span></code> を <code class="docutils literal notranslate"><span class="pre">calc_types</span></code> の指定なしに使っていた場合に問題が発生していました。 [GitHub#625] [村上さんがパッチ提供]</p></li>
@@ -4380,8 +4481,8 @@ load --table Data
 <li><p>[<a class="reference internal" href="reference/window_functions/window_record_number.html"><span class="doc">window_record_number</span></a>] ウィンドウ関数の引数が正しく渡されていない不具合を修正しました。 [GitHub#634] [村上さんがパッチ提供]</p></li>
 </ul>
 </div>
-<div class="section" id="id119">
-<h3>感謝<a class="headerlink" href="#id119" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="id122">
+<h3>感謝<a class="headerlink" href="#id122" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <ul class="simple">
 <li><p>村上さん</p></li>
 <li><p>aomi-nさん</p></li>
@@ -4542,269 +4643,275 @@ load --table Data
   <h3><a href="index.html">目次</a></h3>
   <ul>
 <li><a class="reference internal" href="#">お知らせ</a><ul>
-<li><a class="reference internal" href="#release-10-1-0-2020-12-29">10.1.0リリース - 2020-12-29</a><ul>
+<li><a class="reference internal" href="#release-10-1-1-2021-01-25">10.1.1リリース - 2021-01-25</a><ul>
 <li><a class="reference internal" href="#improvements">改良</a></li>
 <li><a class="reference internal" href="#fixes">修正</a></li>
 <li><a class="reference internal" href="#thanks">感謝</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#release-10-0-9-2020-12-01">10.0.9リリース - 2020-12-01</a><ul>
+<li><a class="reference internal" href="#release-10-1-0-2020-12-29">10.1.0リリース - 2020-12-29</a><ul>
 <li><a class="reference internal" href="#id1">改良</a></li>
 <li><a class="reference internal" href="#id2">修正</a></li>
+<li><a class="reference internal" href="#id3">感謝</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#release-10-0-9-2020-12-01">10.0.9リリース - 2020-12-01</a><ul>
+<li><a class="reference internal" href="#id4">改良</a></li>
+<li><a class="reference internal" href="#id5">修正</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#release-10-0-8-2020-10-29">10.0.8リリース - 2020-10-29</a><ul>
-<li><a class="reference internal" href="#id3">改良</a></li>
-<li><a class="reference internal" href="#id5">修正</a></li>
-<li><a class="reference internal" href="#id6">感謝</a></li>
+<li><a class="reference internal" href="#id6">改良</a></li>
+<li><a class="reference internal" href="#id8">修正</a></li>
+<li><a class="reference internal" href="#id9">感謝</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#release-10-0-7-2020-09-29">10.0.7リリース - 2020-09-29</a><ul>
-<li><a class="reference internal" href="#id7">改良</a></li>
-<li><a class="reference internal" href="#id8">修正</a></li>
+<li><a class="reference internal" href="#id10">改良</a></li>
+<li><a class="reference internal" href="#id11">修正</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#release-10-0-6-2020-08-29">10.0.6リリース - 2020-08-29</a><ul>
-<li><a class="reference internal" href="#id9">改良</a></li>
-<li><a class="reference internal" href="#id10">修正</a></li>
-<li><a class="reference internal" href="#id11">感謝</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#release-10-0-5-2020-07-30">10.0.5リリース - 2020-07-30</a><ul>
 <li><a class="reference internal" href="#id12">改良</a></li>
 <li><a class="reference internal" href="#id13">修正</a></li>
 <li><a class="reference internal" href="#id14">感謝</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#release-10-0-4-2020-06-29">10.0.4リリース - 2020-06-29</a><ul>
+<li><a class="reference internal" href="#release-10-0-5-2020-07-30">10.0.5リリース - 2020-07-30</a><ul>
 <li><a class="reference internal" href="#id15">改良</a></li>
 <li><a class="reference internal" href="#id16">修正</a></li>
 <li><a class="reference internal" href="#id17">感謝</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#release-10-0-3-2020-05-29">10.0.3リリース - 2020-05-29</a><ul>
+<li><a class="reference internal" href="#release-10-0-4-2020-06-29">10.0.4リリース - 2020-06-29</a><ul>
 <li><a class="reference internal" href="#id18">改良</a></li>
 <li><a class="reference internal" href="#id19">修正</a></li>
 <li><a class="reference internal" href="#id20">感謝</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#release-10-0-2-2020-04-29">10.0.2リリース - 2020-04-29</a><ul>
+<li><a class="reference internal" href="#release-10-0-3-2020-05-29">10.0.3リリース - 2020-05-29</a><ul>
 <li><a class="reference internal" href="#id21">改良</a></li>
 <li><a class="reference internal" href="#id22">修正</a></li>
 <li><a class="reference internal" href="#id23">感謝</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#release-10-0-2-2020-04-29">10.0.2リリース - 2020-04-29</a><ul>
+<li><a class="reference internal" href="#id24">改良</a></li>
+<li><a class="reference internal" href="#id25">修正</a></li>
+<li><a class="reference internal" href="#id26">感謝</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#release-10-0-1-2020-03-30">10.0.1リリース - 2020-03-30</a><ul>
-<li><a class="reference internal" href="#id24">修正</a></li>
+<li><a class="reference internal" href="#id27">修正</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#release-10-0-0-2020-03-29">10.0.0リリース - 2020-03-29</a><ul>
-<li><a class="reference internal" href="#id25">改良</a></li>
+<li><a class="reference internal" href="#id28">改良</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#release-9-1-2-2020-01-29">9.1.2リリース - 2020-01-29</a><ul>
-<li><a class="reference internal" href="#id26">改良</a></li>
+<li><a class="reference internal" href="#id29">改良</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#release-9-1-1-2020-01-07">9.1.1リリース - 2020-01-07</a><ul>
-<li><a class="reference internal" href="#id27">改良</a></li>
+<li><a class="reference internal" href="#id30">改良</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#release-9-1-0-2019-11-29">9.1.0リリース - 2019-11-29</a><ul>
-<li><a class="reference internal" href="#id28">改良</a></li>
-<li><a class="reference internal" href="#id29">修正</a></li>
-<li><a class="reference internal" href="#id30">感謝</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#release-9-0-9-2019-10-30">9.0.9リリース - 2019-10-30</a><ul>
 <li><a class="reference internal" href="#id31">改良</a></li>
 <li><a class="reference internal" href="#id32">修正</a></li>
 <li><a class="reference internal" href="#id33">感謝</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#release-9-0-8-2019-09-27">9.0.8リリース - 2019-09-27</a><ul>
+<li><a class="reference internal" href="#release-9-0-9-2019-10-30">9.0.9リリース - 2019-10-30</a><ul>
 <li><a class="reference internal" href="#id34">改良</a></li>
 <li><a class="reference internal" href="#id35">修正</a></li>
+<li><a class="reference internal" href="#id36">感謝</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#release-9-0-8-2019-09-27">9.0.8リリース - 2019-09-27</a><ul>
+<li><a class="reference internal" href="#id37">改良</a></li>
+<li><a class="reference internal" href="#id38">修正</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#release-9-0-7-2019-08-29">9.0.7リリース - 2019-08-29</a><ul>
-<li><a class="reference internal" href="#id36">改良</a></li>
-<li><a class="reference internal" href="#id37">修正</a></li>
-<li><a class="reference internal" href="#id38">感謝</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#release-9-0-6-2019-08-05">9.0.6リリース - 2019-08-05</a><ul>
 <li><a class="reference internal" href="#id39">改良</a></li>
 <li><a class="reference internal" href="#id40">修正</a></li>
 <li><a class="reference internal" href="#id41">感謝</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#release-9-0-5-2019-07-30">9.0.5リリース - 2019-07-30</a><ul>
+<li><a class="reference internal" href="#release-9-0-6-2019-08-05">9.0.6リリース - 2019-08-05</a><ul>
 <li><a class="reference internal" href="#id42">改良</a></li>
 <li><a class="reference internal" href="#id43">修正</a></li>
 <li><a class="reference internal" href="#id44">感謝</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#release-9-0-4-2019-06-29">9.0.4リリース - 2019-06-29</a><ul>
+<li><a class="reference internal" href="#release-9-0-5-2019-07-30">9.0.5リリース - 2019-07-30</a><ul>
 <li><a class="reference internal" href="#id45">改良</a></li>
 <li><a class="reference internal" href="#id46">修正</a></li>
 <li><a class="reference internal" href="#id47">感謝</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#release-9-0-3-2019-05-29">9.0.3リリース - 2019-05-29</a><ul>
+<li><a class="reference internal" href="#release-9-0-4-2019-06-29">9.0.4リリース - 2019-06-29</a><ul>
 <li><a class="reference internal" href="#id48">改良</a></li>
 <li><a class="reference internal" href="#id49">修正</a></li>
 <li><a class="reference internal" href="#id50">感謝</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#release-9-0-2-2019-04-29">9.0.2リリース - 2019-04-29</a><ul>
+<li><a class="reference internal" href="#release-9-0-3-2019-05-29">9.0.3リリース - 2019-05-29</a><ul>
 <li><a class="reference internal" href="#id51">改良</a></li>
 <li><a class="reference internal" href="#id52">修正</a></li>
 <li><a class="reference internal" href="#id53">感謝</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#release-9-0-1-2019-03-29">9.0.1リリース - 2019-03-29</a><ul>
+<li><a class="reference internal" href="#release-9-0-2-2019-04-29">9.0.2リリース - 2019-04-29</a><ul>
 <li><a class="reference internal" href="#id54">改良</a></li>
 <li><a class="reference internal" href="#id55">修正</a></li>
 <li><a class="reference internal" href="#id56">感謝</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#release-9-0-0-2019-02-09">9.0.0リリース - 2019-02-09</a><ul>
+<li><a class="reference internal" href="#release-9-0-1-2019-03-29">9.0.1リリース - 2019-03-29</a><ul>
 <li><a class="reference internal" href="#id57">改良</a></li>
+<li><a class="reference internal" href="#id58">修正</a></li>
+<li><a class="reference internal" href="#id59">感謝</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#release-9-0-0-2019-02-09">9.0.0リリース - 2019-02-09</a><ul>
+<li><a class="reference internal" href="#id60">改良</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#release-8-1-1-2019-01-29">8.1.1リリース - 2019-01-29</a><ul>
-<li><a class="reference internal" href="#id58">改良</a></li>
-<li><a class="reference internal" href="#id59">修正</a></li>
+<li><a class="reference internal" href="#id61">改良</a></li>
+<li><a class="reference internal" href="#id62">修正</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#release-8-1-0-2018-12-29">8.1.0リリース - 2018-12-29</a><ul>
-<li><a class="reference internal" href="#id60">改良</a></li>
-<li><a class="reference internal" href="#id61">修正</a></li>
+<li><a class="reference internal" href="#id63">改良</a></li>
+<li><a class="reference internal" href="#id64">修正</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#release-8-0-9-2018-11-29">8.0.9リリース - 2018-11-29</a><ul>
-<li><a class="reference internal" href="#id62">改良</a></li>
-<li><a class="reference internal" href="#id63">修正</a></li>
-<li><a class="reference internal" href="#id64">感謝</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#release-8-0-8-2018-10-29">8.0.8リリース - 2018-10-29</a><ul>
 <li><a class="reference internal" href="#id65">改良</a></li>
 <li><a class="reference internal" href="#id66">修正</a></li>
 <li><a class="reference internal" href="#id67">感謝</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#release-8-0-7-2018-09-29">8.0.7リリース - 2018-09-29</a><ul>
+<li><a class="reference internal" href="#release-8-0-8-2018-10-29">8.0.8リリース - 2018-10-29</a><ul>
 <li><a class="reference internal" href="#id68">改良</a></li>
 <li><a class="reference internal" href="#id69">修正</a></li>
+<li><a class="reference internal" href="#id70">感謝</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#release-8-0-7-2018-09-29">8.0.7リリース - 2018-09-29</a><ul>
+<li><a class="reference internal" href="#id71">改良</a></li>
+<li><a class="reference internal" href="#id72">修正</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#release-8-0-6-2018-08-29">8.0.6リリース - 2018-08-29</a><ul>
-<li><a class="reference internal" href="#id70">改良</a></li>
-<li><a class="reference internal" href="#id71">修正</a></li>
+<li><a class="reference internal" href="#id73">改良</a></li>
+<li><a class="reference internal" href="#id74">修正</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#release-8-0-5-2018-07-29">8.0.5リリース - 2018-07-29</a><ul>
-<li><a class="reference internal" href="#id72">改良</a></li>
-<li><a class="reference internal" href="#id73">修正</a></li>
+<li><a class="reference internal" href="#id75">改良</a></li>
+<li><a class="reference internal" href="#id76">修正</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#release-8-0-4-2018-06-29">8.0.4リリース - 2018-06-29</a><ul>
-<li><a class="reference internal" href="#id74">改良</a></li>
-<li><a class="reference internal" href="#id75">修正</a></li>
+<li><a class="reference internal" href="#id77">改良</a></li>
+<li><a class="reference internal" href="#id78">修正</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#release-8-0-3-2018-05-29">8.0.3リリース - 2018-05-29</a><ul>
-<li><a class="reference internal" href="#id76">改良</a></li>
-<li><a class="reference internal" href="#id77">修正</a></li>
+<li><a class="reference internal" href="#id79">改良</a></li>
+<li><a class="reference internal" href="#id80">修正</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#release-8-0-2-2018-04-29">8.0.2リリース - 2018-04-29</a><ul>
-<li><a class="reference internal" href="#id78">改良</a></li>
-<li><a class="reference internal" href="#id79">修正</a></li>
-<li><a class="reference internal" href="#id80">感謝</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#release-8-0-1-2018-03-29">8.0.1リリース - 2018-03-29</a><ul>
 <li><a class="reference internal" href="#id81">改良</a></li>
 <li><a class="reference internal" href="#id82">修正</a></li>
 <li><a class="reference internal" href="#id83">感謝</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#release-8-0-0-2018-02-09">8.0.0リリース - 2018-02-09</a><ul>
+<li><a class="reference internal" href="#release-8-0-1-2018-03-29">8.0.1リリース - 2018-03-29</a><ul>
 <li><a class="reference internal" href="#id84">改良</a></li>
 <li><a class="reference internal" href="#id85">修正</a></li>
 <li><a class="reference internal" href="#id86">感謝</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#release-7-1-1-2018-01-29">7.1.1リリース - 2018-01-29</a><ul>
+<li><a class="reference internal" href="#release-8-0-0-2018-02-09">8.0.0リリース - 2018-02-09</a><ul>
 <li><a class="reference internal" href="#id87">改良</a></li>
 <li><a class="reference internal" href="#id88">修正</a></li>
 <li><a class="reference internal" href="#id89">感謝</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#release-7-1-0-2017-12-29">7.1.0リリース - 2017-12-29</a><ul>
+<li><a class="reference internal" href="#release-7-1-1-2018-01-29">7.1.1リリース - 2018-01-29</a><ul>
 <li><a class="reference internal" href="#id90">改良</a></li>
 <li><a class="reference internal" href="#id91">修正</a></li>
 <li><a class="reference internal" href="#id92">感謝</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#release-7-0-9-2017-11-29">7.0.9リリース - 2017-11-29</a><ul>
+<li><a class="reference internal" href="#release-7-1-0-2017-12-29">7.1.0リリース - 2017-12-29</a><ul>
 <li><a class="reference internal" href="#id93">改良</a></li>
 <li><a class="reference internal" href="#id94">修正</a></li>
 <li><a class="reference internal" href="#id95">感謝</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#release-7-0-8-2017-10-29">7.0.8リリース - 2017-10-29</a><ul>
+<li><a class="reference internal" href="#release-7-0-9-2017-11-29">7.0.9リリース - 2017-11-29</a><ul>
 <li><a class="reference internal" href="#id96">改良</a></li>
 <li><a class="reference internal" href="#id97">修正</a></li>
+<li><a class="reference internal" href="#id98">感謝</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#release-7-0-8-2017-10-29">7.0.8リリース - 2017-10-29</a><ul>
+<li><a class="reference internal" href="#id99">改良</a></li>
+<li><a class="reference internal" href="#id100">修正</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#release-7-0-7-2017-09-29">7.0.7リリース - 2017-09-29</a><ul>
-<li><a class="reference internal" href="#id98">改良</a></li>
-<li><a class="reference internal" href="#id99">修正</a></li>
+<li><a class="reference internal" href="#id101">改良</a></li>
+<li><a class="reference internal" href="#id102">修正</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#release-7-0-6-2017-08-29">7.0.6リリース - 2017-08-29</a><ul>
-<li><a class="reference internal" href="#id100">改良</a></li>
-<li><a class="reference internal" href="#id101">修正</a></li>
-<li><a class="reference internal" href="#id102">感謝</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#release-7-0-5-2017-07-29">7.0.5リリース - 2017-07-29</a><ul>
 <li><a class="reference internal" href="#id103">改良</a></li>
 <li><a class="reference internal" href="#id104">修正</a></li>
 <li><a class="reference internal" href="#id105">感謝</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#release-7-0-4-2017-06-29">7.0.4リリース - 2017-06-29</a><ul>
+<li><a class="reference internal" href="#release-7-0-5-2017-07-29">7.0.5リリース - 2017-07-29</a><ul>
 <li><a class="reference internal" href="#id106">改良</a></li>
 <li><a class="reference internal" href="#id107">修正</a></li>
 <li><a class="reference internal" href="#id108">感謝</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#release-7-0-3-2017-05-29">7.0.3リリース - 2017-05-29</a><ul>
+<li><a class="reference internal" href="#release-7-0-4-2017-06-29">7.0.4リリース - 2017-06-29</a><ul>
 <li><a class="reference internal" href="#id109">改良</a></li>
 <li><a class="reference internal" href="#id110">修正</a></li>
 <li><a class="reference internal" href="#id111">感謝</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#release-7-0-2-2017-04-29">7.0.2リリース - 2017-04-29</a><ul>
+<li><a class="reference internal" href="#release-7-0-3-2017-05-29">7.0.3リリース - 2017-05-29</a><ul>
 <li><a class="reference internal" href="#id112">改良</a></li>
 <li><a class="reference internal" href="#id113">修正</a></li>
+<li><a class="reference internal" href="#id114">感謝</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#release-7-0-2-2017-04-29">7.0.2リリース - 2017-04-29</a><ul>
+<li><a class="reference internal" href="#id115">改良</a></li>
+<li><a class="reference internal" href="#id116">修正</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#release-7-0-1-2017-03-29">7.0.1リリース - 2017-03-29</a><ul>
-<li><a class="reference internal" href="#id114">改良</a></li>
-<li><a class="reference internal" href="#id115">修正</a></li>
-<li><a class="reference internal" href="#id116">感謝</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#release-7-0-0-2017-02-09">7.0.0リリース - 2017-02-09</a><ul>
 <li><a class="reference internal" href="#id117">改良</a></li>
 <li><a class="reference internal" href="#id118">修正</a></li>
 <li><a class="reference internal" href="#id119">感謝</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#release-7-0-0-2017-02-09">7.0.0リリース - 2017-02-09</a><ul>
+<li><a class="reference internal" href="#id120">改良</a></li>
+<li><a class="reference internal" href="#id121">修正</a></li>
+<li><a class="reference internal" href="#id122">感謝</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#the-old-releases">古いリリース</a></li>
@@ -4832,12 +4939,12 @@ load --table Data
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="総合索引"
              >索引</a></li>
-        <li class="nav-item nav-item-0"><a href="index.html">Groonga v10.1.0ドキュメント</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Groonga v10.1.1ドキュメント</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">お知らせ</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2009-2020, Brazil, Inc.
+        &#169; Copyright 2009-2021, Brazil, Inc.
     </div>
       <script src="http://connect.facebook.net/ja_JP/all.js"></script>
 

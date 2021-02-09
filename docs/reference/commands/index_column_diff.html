@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-7532323-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-7532323-1');
+    </script>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>7.3.23. index_column_diff &#8212; Groonga v11.0.0 documentation</title>
+    <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
+    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../../" src="../../static/documentation_options.js"></script>
+    <script src="../../static/jquery.js"></script>
+    <script src="../../static/underscore.js"></script>
+    <script src="../../static/doctools.js"></script>
+    <script src="../../static/language_data.js"></script>
+    
+    <link rel="shortcut icon" href="../../static/favicon.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="7.3.24. io_flush" href="io_flush.html" />
+    <link rel="prev" title="7.3.22. dump" href="dump.html" /> 
+      <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
+    <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
+    <meta property="og:type" content="product" />
+    <meta property="og:image" content="http://groonga.org/images/logos/groonga-icon-full-size.png" />
+    <meta property="og:site_name" content="groonga" />
+
+    <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
+  </head>
+  <body>
+    <div id="fb-root"></div>
+
+<div class="header">
+  <h1 class="title">
+    <a id="top-link" href="../../../">
+      <span class="project">groonga</span>
+      <span class="separator">-</span>
+      <span class="description">An open-source fulltext search engine and column store.</span>
+    </a>
+  </h1>
+
+      <div class="facebook-buttons">
+      <fb:like href="http://www.facebook.com/pages/groonga/201193596592346"
+               layout="standard"
+               width="290"></fb:like>
+    </div>
+    <div class="other-language-links">
+
+    <ul>
+      <li><a href="../../../ja/docs/reference/commands/index_column_diff.html">日本語</a></li>
+    </ul>
+  </div>
+</div>
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="io_flush.html" title="7.3.24. io_flush"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="dump.html" title="7.3.22. dump"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v11.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../reference.html" ><span class="section-number">7. </span>Reference manual</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../command.html" accesskey="U"><span class="section-number">7.3. </span>Command</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">7.3.23. </span><code class="docutils literal notranslate"><span class="pre">index_column_diff</span></code></a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="index-column-diff">
+<h1><span class="section-number">7.3.23. </span><code class="docutils literal notranslate"><span class="pre">index_column_diff</span></code><a class="headerlink" href="#index-column-diff" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="summary">
+<h2><span class="section-number">7.3.23.1. </span>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 9.0.1.</span></p>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">index_column_diff</span></code> command check where indexes are broken or not.</p>
+<p>We can found already a broken index by this command.
+Normally, we don’t found it unless Groonga refer, delete, or update it.
+However, it is possible that Groonga crashes or returns wrong search
+results by using it.
+it make us want to found it in advance.
+This command useful in this case.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This command may use many memory and execution time depending on the size of the target index.
+Also, if we stop in the middle of execution of this command, the target index may break.
+Therefore, we suggest that we don’t execute this command on active system, but execute
+this command on standby system.</p>
+</div>
+</div>
+<div class="section" id="syntax">
+<h2><span class="section-number">7.3.23.2. </span>Syntax<a class="headerlink" href="#syntax" title="Permalink to this headline">¶</a></h2>
+<p>This command takes two parameters.
+All parameters are required:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>index_column_diff table index_column
+</pre></div>
+</div>
+</div>
+<div class="section" id="usage">
+<h2><span class="section-number">7.3.23.3. </span>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>Here is an example to check a index column in the database:</p>
+<p>Execution example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>table_create Data TABLE_HASH_KEY ShortText
+# [[0,1612416118.30525,0.003424882888793945],true]
+table_create Terms TABLE_PAT_KEY ShortText \
+  --default_tokenizer TokenNgram \
+  --normalizer NormalizerNFKC130
+# [[0,1612416136.049046,0.003507614135742188],true]
+load --table Data
+[
+{&quot;_key&quot;: &quot;Hello World&quot;},
+{&quot;_key&quot;: &quot;Hello Groonga&quot;}
+]
+# [[0,1612416155.418526,0.3676469326019287],2]
+column_create \
+  --table Terms \
+  --name data_index \
+  --flags COLUMN_INDEX|WITH_POSITION \
+  --type Data \
+  --source _key
+# [[0,1612416424.515037,0.00576472282409668],true]
+truncate Terms.data_index
+# [[0,1612416439.925894,0.009646892547607422],true]
+load --table Data
+[
+{&quot;_key&quot;: &quot;Good-by World&quot;},
+{&quot;_key&quot;: &quot;Good-by Groonga&quot;}
+]
+# [[0,1612416450.429434,1.51789665222168],2]
+index_column_diff Terms data_index
+# [
+#   [
+#     0,
+#     1612416577.921113,
+#     0.006278038024902344
+#   ],
+#   [
+#     {
+#       &quot;token&quot;: {
+#         &quot;id&quot;: 2,
+#         &quot;value&quot;: &quot;hello&quot;
+#       },
+#       &quot;remains&quot;: [
+#       ],
+#       &quot;missings&quot;: [
+#         {
+#           &quot;record_id&quot;: 1,
+#           &quot;position&quot;: 0
+#         },
+#         {
+#           &quot;record_id&quot;: 2,
+#           &quot;position&quot;: 0
+#         }
+#       ]
+#     },
+#     {
+#       &quot;token&quot;: {
+#         &quot;id&quot;: 3,
+#         &quot;value&quot;: &quot;world&quot;
+#       },
+#       &quot;remains&quot;: [
+#       ],
+#       &quot;missings&quot;: [
+#         {
+#           &quot;record_id&quot;: 1,
+#           &quot;position&quot;: 1
+#         }
+#       ]
+#     },
+#     {
+#       &quot;token&quot;: {
+#         &quot;id&quot;: 1,
+#         &quot;value&quot;: &quot;groonga&quot;
+#       },
+#       &quot;remains&quot;: [
+#       ],
+#       &quot;missings&quot;: [
+#         {
+#           &quot;record_id&quot;: 2,
+#           &quot;position&quot;: 1
+#         }
+#       ]
+#     }
+#   ]
+# ]
+</pre></div>
+</div>
+</div>
+<div class="section" id="parameters">
+<h2><span class="section-number">7.3.23.4. </span>Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+<p>This section describes all parameters.</p>
+<div class="section" id="table">
+<h3><span class="section-number">7.3.23.4.1. </span><code class="docutils literal notranslate"><span class="pre">table</span></code><a class="headerlink" href="#table" title="Permalink to this headline">¶</a></h3>
+<p>Specifies the name of a table include check target of the index column.</p>
+</div>
+<div class="section" id="index-column">
+<h3><span class="section-number">7.3.23.4.2. </span><code class="docutils literal notranslate"><span class="pre">index_column</span></code><a class="headerlink" href="#index-column" title="Permalink to this headline">¶</a></h3>
+<p>Specifies the name of check target of the index column.</p>
+</div>
+</div>
+<div class="section" id="return-value">
+<h2><span class="section-number">7.3.23.5. </span>Return value<a class="headerlink" href="#return-value" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">index_column_diff</span></code> command returns result of check indexes:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[HEADER, CHECK_RESULT]
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">HEADER</span></code></p>
+<p>See <a class="reference internal" href="../command/output_format.html"><span class="doc">Output format</span></a> about <code class="docutils literal notranslate"><span class="pre">HEADER</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">CHECK_RESULT</span></code></p>
+<p>This command returns the result of compression between the current
+value of the index column and the result of tokenize when this command
+execute as below:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{
+  &quot;token&quot;: {
+    &quot;id&quot;: TOKEN_ID,
+    &quot;value&quot;: TOKEN_VALUE
+  },
+  &quot;remains&quot;: [
+    {
+      &quot;record_id&quot;: RECORD_ID
+    }
+  ],
+  &quot;missings&quot;: [
+    {
+      &quot;record_id&quot;: RECORD_ID,
+      &quot;position&quot;: POSITION
+    }
+  ]
+}
+</pre></div>
+</div>
+<p>If there are something in <code class="docutils literal notranslate"><span class="pre">remains</span></code>, a token that Groonga
+was supposed to delete is remaining in a index.</p>
+<p>If there are something in <code class="docutils literal notranslate"><span class="pre">missing</span></code>, a token that Groonga
+is supposing to remain in a index has been deleted from the index.</p>
+<p><code class="docutils literal notranslate"><span class="pre">index_column_diff</span></code> returns nothing as below When indexes haven’t broken:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>index_column_diff --table table --name index_column
+[[0,0.0,0.0],[]]
+</pre></div>
+</div>
+<div class="section" id="token-id">
+<h3><span class="section-number">7.3.23.5.1. </span><code class="docutils literal notranslate"><span class="pre">TOKEN_ID</span></code><a class="headerlink" href="#token-id" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">TOKEN_ID</span></code> is id of a broken token.</p>
+</div>
+<div class="section" id="token-value">
+<h3><span class="section-number">7.3.23.5.2. </span><code class="docutils literal notranslate"><span class="pre">TOKEN_VALUE</span></code><a class="headerlink" href="#token-value" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">TOKEN_VALUE</span></code> is value of a broken token.</p>
+</div>
+<div class="section" id="record-id">
+<h3><span class="section-number">7.3.23.5.3. </span><code class="docutils literal notranslate"><span class="pre">RECORD_ID</span></code><a class="headerlink" href="#record-id" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">RECORD_ID</span></code> is id of a record include a broken token.</p>
+</div>
+<div class="section" id="position">
+<h3><span class="section-number">7.3.23.5.4. </span><code class="docutils literal notranslate"><span class="pre">POSITION</span></code><a class="headerlink" href="#position" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">POSITION</span></code> is appearing position of a broken token.</p>
+</div>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">7.3.23. <code class="docutils literal notranslate"><span class="pre">index_column_diff</span></code></a><ul>
+<li><a class="reference internal" href="#summary">7.3.23.1. Summary</a></li>
+<li><a class="reference internal" href="#syntax">7.3.23.2. Syntax</a></li>
+<li><a class="reference internal" href="#usage">7.3.23.3. Usage</a></li>
+<li><a class="reference internal" href="#parameters">7.3.23.4. Parameters</a><ul>
+<li><a class="reference internal" href="#table">7.3.23.4.1. <code class="docutils literal notranslate"><span class="pre">table</span></code></a></li>
+<li><a class="reference internal" href="#index-column">7.3.23.4.2. <code class="docutils literal notranslate"><span class="pre">index_column</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#return-value">7.3.23.5. Return value</a><ul>
+<li><a class="reference internal" href="#token-id">7.3.23.5.1. <code class="docutils literal notranslate"><span class="pre">TOKEN_ID</span></code></a></li>
+<li><a class="reference internal" href="#token-value">7.3.23.5.2. <code class="docutils literal notranslate"><span class="pre">TOKEN_VALUE</span></code></a></li>
+<li><a class="reference internal" href="#record-id">7.3.23.5.3. <code class="docutils literal notranslate"><span class="pre">RECORD_ID</span></code></a></li>
+<li><a class="reference internal" href="#position">7.3.23.5.4. <code class="docutils literal notranslate"><span class="pre">POSITION</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="dump.html"
+                        title="previous chapter"><span class="section-number">7.3.22. </span><code class="docutils literal notranslate"><span class="pre">dump</span></code></a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="io_flush.html"
+                        title="next chapter"><span class="section-number">7.3.24. </span><code class="docutils literal notranslate"><span class="pre">io_flush</span></code></a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="io_flush.html" title="7.3.24. io_flush"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="dump.html" title="7.3.22. dump"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v11.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../reference.html" ><span class="section-number">7. </span>Reference manual</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../command.html" ><span class="section-number">7.3. </span>Command</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">7.3.23. </span><code class="docutils literal notranslate"><span class="pre">index_column_diff</span></code></a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2009-2021, Brazil, Inc.
+    </div>
+      <script src="http://connect.facebook.net/en_US/all.js"></script>
+
+    <script>
+      FB.init({
+         appId  : null,
+         status : true, // check login status
+         cookie : true, // enable cookies to allow the server to access the session
+         xfbml  : true  // parse XFBML
+      });
+    </script>
+  </body>
+
+</html>

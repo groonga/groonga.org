@@ -15,15 +15,14 @@
 
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>7.3.57. select &#8212; Groonga v11.0.0 documentation</title>
-    <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
+    <title>7.3.57. select &#8212; Groonga v11.0.1 documentation</title>
     <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
     
     <script id="documentation_options" data-url_root="../../" src="../../static/documentation_options.js"></script>
     <script src="../../static/jquery.js"></script>
     <script src="../../static/underscore.js"></script>
     <script src="../../static/doctools.js"></script>
-    <script src="../../static/language_data.js"></script>
     
     <link rel="shortcut icon" href="../../static/favicon.ico"/>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -76,7 +75,7 @@
         <li class="right" >
           <a href="schema.html" title="7.3.56. schema"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v11.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v11.0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../reference.html" ><span class="section-number">7. </span>Reference manual</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../command.html" accesskey="U"><span class="section-number">7.3. </span>Command</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href=""><span class="section-number">7.3.57. </span><code class="docutils literal notranslate"><span class="pre">select</span></code></a></li> 
@@ -1022,7 +1021,7 @@ select \
 #       [
 #         &quot;grn_select&quot;,
 #         &quot;proc_select.c&quot;,
-#         3095
+#         4240
 #       ]
 #     ]
 #   ]
@@ -1610,12 +1609,15 @@ is less than <code class="docutils literal notranslate"><span class="pre">11</sp
 <p>Here is an example that can store <code class="docutils literal notranslate"><span class="pre">_id</span></code> and <code class="docutils literal notranslate"><span class="pre">timestamp</span></code> that a result of <code class="docutils literal notranslate"><span class="pre">select</span></code> in a Logs table specified by <code class="docutils literal notranslate"><span class="pre">--load_table</span></code>.</p>
 <p>Execution example:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>table_create Logs_20150203 TABLE_HASH_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
 column_create Logs_20150203 timestamp COLUMN_SCALAR Time
-
+# [[0, 1337566253.89858, 0.000355720520019531], true]
 table_create Logs TABLE_HASH_KEY ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
 column_create Logs original_id COLUMN_SCALAR UInt32
+# [[0, 1337566253.89858, 0.000355720520019531], true]
 column_create Logs timestamp_text COLUMN_SCALAR ShortText
-
+# [[0, 1337566253.89858, 0.000355720520019531], true]
 load --table Logs_20150203
 [
 {
@@ -1627,16 +1629,17 @@ load --table Logs_20150203
   &quot;timestamp&quot;: &quot;2015-02-03 12:49:00&quot;
 }
 ]
+# [[0, 1337566253.89858, 0.000355720520019531], 2]
 select \
   --table Logs_20150203 \
   --load_table Logs \
-  --load_columns &quot;original_id, timestamp_text&quot; \
-  --load_values &quot;_id, timestamp&quot;
+  --load_columns &quot;_key, original_id, timestamp_text&quot; \
+  --load_values &quot;_key, _id, timestamp&quot;
 # [
 #   [
 #     0,
-#     0.0,
-#     0.0
+#     1337566253.89858,
+#     0.000355720520019531
 #   ],
 #   [
 #     [
@@ -1674,8 +1677,8 @@ select --table Logs
 # [
 #   [
 #     0,
-#     0.0,
-#     0.0
+#     1337566253.89858,
+#     0.000355720520019531
 #   ],
 #   [
 #     [
@@ -2259,24 +2262,28 @@ column values.</p>
 </div>
 <p>The <code class="docutils literal notranslate"><span class="pre">select</span></code> command searches records that don’t contain <code class="docutils literal notranslate"><span class="pre">mroonga</span></code>
 in <code class="docutils literal notranslate"><span class="pre">content</span></code> column value from <code class="docutils literal notranslate"><span class="pre">Entries</span></code> table.</p>
-<p>Here is a usage example of <code class="docutils literal notranslate"><span class="pre">QUERY_NO_SYNTAX_ERROR</span></code>.</p>
+<p>Here are a schema definition and sample data to describe other flags:</p>
 <p>Execution example:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>table_create --name Magazine --flags TABLE_HASH_KEY --key_type ShortText
-# [[0,1546673320.275529,0.08708477020263672],true]
+# [[0, 1337566253.89858, 0.000355720520019531], true]
 column_create --table Magazine --name title --type ShortText
-# [[0,1546673346.042032,0.09989762306213379],true]
+# [[0, 1337566253.89858, 0.000355720520019531], true]
 load --table Magazine
 [
 {&quot;_key&quot;:&quot;http://test.jp/magazine/webplus&quot;,&quot;title&quot;:&quot;WEB+&quot;},
 {&quot;_key&quot;:&quot;http://test.jp/magazine/database&quot;,&quot;title&quot;:&quot;DataBase&quot;},
 ]
-# [[0,1546673366.725134,0.0009036064147949219],2]
-select Magazine --output_pretty yes --match_columns title --query &#39;WEB +&#39;  --query_flags ALLOW_PRAGMA|ALLOW_COLUMN|QUERY_NO_SYNTAX_ERROR
+# [[0, 1337566253.89858, 0.000355720520019531], 2]
+</pre></div>
+</div>
+<p>Here is an example of <code class="docutils literal notranslate"><span class="pre">QUERY_NO_SYNTAX_ERROR</span></code>:</p>
+<p>Execution example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Magazine --match_columns title --query &#39;WEB +&#39;  --query_flags ALLOW_PRAGMA|ALLOW_COLUMN|QUERY_NO_SYNTAX_ERROR
 # [
 #   [
 #     0,
-#     1546673389.499156,
-#     0.04232335090637207
+#     1337566253.89858,
+#     0.000355720520019531
 #   ],
 #   [
 #     [
@@ -2307,30 +2314,20 @@ select Magazine --output_pretty yes --match_columns title --query &#39;WEB +&#39
 # ]
 </pre></div>
 </div>
-<p>If you don’t specify this flag, this query of example causes a syntax error as below.</p>
+<p>If you don’t specify this flag, the quey causes a syntax error as below.</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>table_create --name Magazine --flags TABLE_HASH_KEY --key_type ShortText
-# [[0,1546673320.275529,0.08708477020263672],true]
-column_create --table Magazine --name title --type ShortText
-# [[0,1546673346.042032,0.09989762306213379],true]
-load --table Magazine
-[
-{&quot;_key&quot;:&quot;http://test.jp/magazine/webplus&quot;,&quot;title&quot;:&quot;WEB+&quot;},
-{&quot;_key&quot;:&quot;http://test.jp/magazine/database&quot;,&quot;title&quot;:&quot;DataBase&quot;},
-]
-# [[0,1546673366.725134,0.0009036064147949219],2]
-select Magazine --output_pretty yes --match_columns title --query &#39;WEB +&#39;  --query_flags ALLOW_PRAGMA|ALLOW_COLUMN
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Magazine --match_columns title --query &#39;WEB +&#39;  --query_flags ALLOW_PRAGMA|ALLOW_COLUMN
 # [
 #   [
 #     -63,
-#     1546674147.89755,
-#     0.0006532669067382812,
+#     1337566253.89858,
+#     0.000355720520019531,
 #     &quot;Syntax error: &lt;WEB +||&gt;&quot;,
 #     [
 #       [
 #         &quot;yy_syntax_error&quot;,
-#         &quot;grn_ecmascript.lemon&quot;,
-#         37
+#         &quot;lib/grn_ecmascript.lemon&quot;,
+#         78
 #       ]
 #     ]
 #   ]
@@ -5810,8 +5807,8 @@ only one group key by <a class="reference internal" href="#select-drilldowns-lab
 # [
 #   [
 #     0,
-#     1542772065.869136,
-#     0.0003108978271484375
+#     1337566253.89858,
+#     0.000355720520019531
 #   ],
 #   [
 #     [
@@ -6954,7 +6951,7 @@ pairs):</p>
         <li class="right" >
           <a href="schema.html" title="7.3.56. schema"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v11.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v11.0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../reference.html" ><span class="section-number">7. </span>Reference manual</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../command.html" ><span class="section-number">7.3. </span>Command</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href=""><span class="section-number">7.3.57. </span><code class="docutils literal notranslate"><span class="pre">select</span></code></a></li> 

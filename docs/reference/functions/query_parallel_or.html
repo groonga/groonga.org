@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-7532323-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-7532323-1');
+    </script>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>7.15.18. query_parallel_or &#8212; Groonga v11.0.1 documentation</title>
+    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../../" src="../../static/documentation_options.js"></script>
+    <script src="../../static/jquery.js"></script>
+    <script src="../../static/underscore.js"></script>
+    <script src="../../static/doctools.js"></script>
+    
+    <link rel="shortcut icon" href="../../static/favicon.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="7.15.19. rand" href="rand.html" />
+    <link rel="prev" title="7.15.17. query" href="query.html" /> 
+      <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
+    <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
+    <meta property="og:type" content="product" />
+    <meta property="og:image" content="http://groonga.org/images/logos/groonga-icon-full-size.png" />
+    <meta property="og:site_name" content="groonga" />
+
+    <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
+  </head>
+  <body>
+    <div id="fb-root"></div>
+
+<div class="header">
+  <h1 class="title">
+    <a id="top-link" href="../../../">
+      <span class="project">groonga</span>
+      <span class="separator">-</span>
+      <span class="description">An open-source fulltext search engine and column store.</span>
+    </a>
+  </h1>
+
+      <div class="facebook-buttons">
+      <fb:like href="http://www.facebook.com/pages/groonga/201193596592346"
+               layout="standard"
+               width="290"></fb:like>
+    </div>
+    <div class="other-language-links">
+
+    <ul>
+      <li><a href="../../../ja/docs/reference/functions/query_parallel_or.html">日本語</a></li>
+    </ul>
+  </div>
+</div>
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="rand.html" title="7.15.19. rand"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="query.html" title="7.15.17. query"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v11.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../reference.html" ><span class="section-number">7. </span>Reference manual</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../function.html" accesskey="U"><span class="section-number">7.15. </span>Function</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">7.15.18. </span><code class="docutils literal notranslate"><span class="pre">query_parallel_or</span></code></a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="query-parallel-or">
+<h1><span class="section-number">7.15.18. </span><code class="docutils literal notranslate"><span class="pre">query_parallel_or</span></code><a class="headerlink" href="#query-parallel-or" title="Permalink to this headline">¶</a></h1>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 11.0.1.</span></p>
+</div>
+<div class="section" id="summary">
+<h2><span class="section-number">7.15.18.1. </span>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">query_parallel_or</span></code> is similar to <a class="reference internal" href="query.html"><span class="doc">query</span></a> but
+<code class="docutils literal notranslate"><span class="pre">query_parallel_or</span></code> processes query that has multiple <code class="docutils literal notranslate"><span class="pre">OR</span></code>
+conditions in parallel.</p>
+</div>
+<div class="section" id="syntax">
+<h2><span class="section-number">7.15.18.2. </span>Syntax<a class="headerlink" href="#syntax" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">query_parallel_or</span></code> requires two or more parameters -
+<code class="docutils literal notranslate"><span class="pre">match_columns</span></code> and <code class="docutils literal notranslate"><span class="pre">query_string</span></code> s.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">options</span></code> parameter is optional.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>query(match_columns, query_string0, query_string1, ..., query_stringN)
+query(match_columns, query_string0, query_string1, ..., query_stringN, options)
+</pre></div>
+</div>
+<p>You must specify at least one <code class="docutils literal notranslate"><span class="pre">query_string</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">options</span></code> uses the following format. All of key-value pairs are
+optional:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{
+  &quot;expander&quot;: query_expander,
+  &quot;default_mode&quot;: default_mode,
+  &quot;default_operator&quot;: default_operator,
+  &quot;flags&quot;: flags
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="usage">
+<h2><span class="section-number">7.15.18.3. </span>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>Here are a schema definition and sample data to show usage.</p>
+<p>Sample schema:</p>
+<p>Execution example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>table_create Documents TABLE_NO_KEY
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Documents content COLUMN_SCALAR Text
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create Terms TABLE_PAT_KEY ShortText --default_tokenizer TokenBigram  --normalizer NormalizerAuto
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Terms documents_content_index COLUMN_INDEX|WITH_POSITION Documents content
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create Users TABLE_NO_KEY
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Users name COLUMN_SCALAR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Users memo COLUMN_SCALAR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create Lexicon TABLE_HASH_KEY ShortText \
+  --default_tokenizer &#39;TokenNgram(&quot;unify_alphabet&quot;, false)&#39; \
+  --normalizer NormalizerNFKC130
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Lexicon users_name COLUMN_INDEX|WITH_POSITION Users name
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Lexicon users_memo COLUMN_INDEX|WITH_POSITION Users memo
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>Sample data:</p>
+<p>Execution example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>load --table Users
+[
+{&quot;name&quot;: &quot;Alice&quot;, &quot;memo&quot;: &quot;Groonga user&quot;},
+{&quot;name&quot;: &quot;Alisa&quot;, &quot;memo&quot;: &quot;Mroonga user&quot;},
+{&quot;name&quot;: &quot;Bob&quot;,   &quot;memo&quot;: &quot;Rroonga user&quot;},
+{&quot;name&quot;: &quot;Tom&quot;,   &quot;memo&quot;: &quot;Nroonga user&quot;},
+{&quot;name&quot;: &quot;Tobby&quot;, &quot;memo&quot;: &quot;Groonga and Mroonga user. Mroonga is ...&quot;}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 5]
+</pre></div>
+</div>
+<p>Here is an example to execute full text searches in parallel by
+<code class="docutils literal notranslate"><span class="pre">query_parallel_or</span></code> function:</p>
+<p>Execution example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Users \
+  --output_columns name,memo,_score \
+  --filter &#39;query_parallel_or(&quot;name * 10 || memo&quot;, &quot;alice&quot;, &quot;Groonga&quot;)&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;name&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;memo&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;_score&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Alice&quot;,
+#         &quot;Groonga user&quot;,
+#         11
+#       ],
+#       [
+#         &quot;Tobby&quot;,
+#         &quot;Groonga and Mroonga user. Mroonga is ...&quot;,
+#         1
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>This <code class="docutils literal notranslate"><span class="pre">select</span></code> command needs to execute the following full text
+searches:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;alice&quot;</span></code> against <code class="docutils literal notranslate"><span class="pre">name</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;alice&quot;</span></code> against <code class="docutils literal notranslate"><span class="pre">memo</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;Groonga&quot;</span></code> against <code class="docutils literal notranslate"><span class="pre">name</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;Groonga&quot;</span></code> against <code class="docutils literal notranslate"><span class="pre">memo</span></code></p></li>
+</ul>
+</div></blockquote>
+<p>And all result sets of them are needed to be combined by <code class="docutils literal notranslate"><span class="pre">OR</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">query</span></code> function executes them in a sequential
+order. <code class="docutils literal notranslate"><span class="pre">query_parallel_or</span></code> function executes them in
+parallel. Result sets of both of them are same.</p>
+</div>
+<div class="section" id="parameters">
+<h2><span class="section-number">7.15.18.4. </span>Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="required-parameters">
+<h3><span class="section-number">7.15.18.4.1. </span>Required parameters<a class="headerlink" href="#required-parameters" title="Permalink to this headline">¶</a></h3>
+<p>There are two required parameters, <code class="docutils literal notranslate"><span class="pre">match_columns</span></code> and
+<code class="docutils literal notranslate"><span class="pre">query_string</span></code>.</p>
+<div class="section" id="match-columns">
+<span id="query-parallel-or-match-columns"></span><h4><span class="section-number">7.15.18.4.1.1. </span><code class="docutils literal notranslate"><span class="pre">match_columns</span></code><a class="headerlink" href="#match-columns" title="Permalink to this headline">¶</a></h4>
+<p>Specifies the default target columns for full text search by
+<code class="docutils literal notranslate"><span class="pre">query_string</span></code> parameters. It is the same role as
+<a class="reference internal" href="../commands/select.html#select-match-columns"><span class="std std-ref">match_columns</span></a> parameter in <code class="docutils literal notranslate"><span class="pre">select</span></code>.</p>
+<p>Each pair of target column and query string is processed in
+parallel. For example, <code class="docutils literal notranslate"><span class="pre">query_parallel_or(&quot;C1</span> <span class="pre">||</span> <span class="pre">C2</span> <span class="pre">||</span> <span class="pre">C3&quot;,</span> <span class="pre">&quot;Q1&quot;,</span>
+<span class="pre">&quot;Q2&quot;)</span></code> has the following pairs:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">C1</span> <span class="pre">&#64;</span> <span class="pre">&quot;Q1&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">C2</span> <span class="pre">&#64;</span> <span class="pre">&quot;Q1&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">C3</span> <span class="pre">&#64;</span> <span class="pre">&quot;Q1&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">C1</span> <span class="pre">&#64;</span> <span class="pre">&quot;Q2&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">C2</span> <span class="pre">&#64;</span> <span class="pre">&quot;Q2&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">C3</span> <span class="pre">&#64;</span> <span class="pre">&quot;Q2&quot;</span></code></p></li>
+</ul>
+</div></blockquote>
+<p>Each pair is processed in parallel. Degree of parallelism is depends
+on your system. The default max number of threads is <code class="docutils literal notranslate"><span class="pre">N_CPU_THREADS</span> <span class="pre">/</span>
+<span class="pre">3</span></code>.</p>
+</div>
+<div class="section" id="query-string">
+<h4><span class="section-number">7.15.18.4.1.2. </span><code class="docutils literal notranslate"><span class="pre">query_string</span></code><a class="headerlink" href="#query-string" title="Permalink to this headline">¶</a></h4>
+<p>Specifies the search condition in
+<a class="reference internal" href="../grn_expr/query_syntax.html"><span class="doc">Query syntax</span></a>. It is the same role as
+<code class="docutils literal notranslate"><span class="pre">query</span></code> parameter in <code class="docutils literal notranslate"><span class="pre">select</span></code>.</p>
+<p>See <a class="reference internal" href="../commands/select.html#select-match-columns"><span class="std std-ref">match_columns</span></a> about <code class="docutils literal notranslate"><span class="pre">query</span></code> parameter in
+<code class="docutils literal notranslate"><span class="pre">select</span></code>.</p>
+<p>You can specify multiple <code class="docutils literal notranslate"><span class="pre">query_string</span></code> s to execute full text
+searches in parallel. See also <a class="reference internal" href="#query-parallel-or-match-columns"><span class="std std-ref">match_columns</span></a>
+how to parallelize.</p>
+</div>
+</div>
+<div class="section" id="optional-parameter">
+<h3><span class="section-number">7.15.18.4.2. </span>Optional parameter<a class="headerlink" href="#optional-parameter" title="Permalink to this headline">¶</a></h3>
+<p>There are some optional parameters.</p>
+<div class="section" id="query-expander">
+<h4><span class="section-number">7.15.18.4.2.1. </span><code class="docutils literal notranslate"><span class="pre">query_expander</span></code><a class="headerlink" href="#query-expander" title="Permalink to this headline">¶</a></h4>
+<p>See <a class="reference internal" href="query.html#query-query-expander"><span class="std std-ref">query_expander</span></a> for details.</p>
+</div>
+<div class="section" id="default-mode">
+<h4><span class="section-number">7.15.18.4.2.2. </span><code class="docutils literal notranslate"><span class="pre">default_mode</span></code><a class="headerlink" href="#default-mode" title="Permalink to this headline">¶</a></h4>
+<p>See <a class="reference internal" href="query.html#query-default-mode"><span class="std std-ref">default_mode</span></a> for details.</p>
+</div>
+<div class="section" id="default-operator">
+<h4><span class="section-number">7.15.18.4.2.3. </span><code class="docutils literal notranslate"><span class="pre">default_operator</span></code><a class="headerlink" href="#default-operator" title="Permalink to this headline">¶</a></h4>
+<p>See <a class="reference internal" href="query.html#query-default-operator"><span class="std std-ref">default_operator</span></a> for details.</p>
+</div>
+<div class="section" id="flags">
+<h4><span class="section-number">7.15.18.4.2.4. </span><code class="docutils literal notranslate"><span class="pre">flags</span></code><a class="headerlink" href="#flags" title="Permalink to this headline">¶</a></h4>
+<p>See <a class="reference internal" href="query.html#query-flags"><span class="std std-ref">flags</span></a> for details.</p>
+</div>
+</div>
+</div>
+<div class="section" id="return-value">
+<h2><span class="section-number">7.15.18.5. </span>Return value<a class="headerlink" href="#return-value" title="Permalink to this headline">¶</a></h2>
+<p>This function returns whether a record is matched or not as boolean.</p>
+<p>This function is also worked as a selector. It means that this
+function can be executable effectively.</p>
+</div>
+<div class="section" id="see-also">
+<h2><span class="section-number">7.15.18.6. </span>See also<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="../commands/select.html"><span class="doc">select</span></a></p></li>
+<li><p><a class="reference internal" href="query.html"><span class="doc">query</span></a></p></li>
+</ul>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">7.15.18. <code class="docutils literal notranslate"><span class="pre">query_parallel_or</span></code></a><ul>
+<li><a class="reference internal" href="#summary">7.15.18.1. Summary</a></li>
+<li><a class="reference internal" href="#syntax">7.15.18.2. Syntax</a></li>
+<li><a class="reference internal" href="#usage">7.15.18.3. Usage</a></li>
+<li><a class="reference internal" href="#parameters">7.15.18.4. Parameters</a><ul>
+<li><a class="reference internal" href="#required-parameters">7.15.18.4.1. Required parameters</a><ul>
+<li><a class="reference internal" href="#match-columns">7.15.18.4.1.1. <code class="docutils literal notranslate"><span class="pre">match_columns</span></code></a></li>
+<li><a class="reference internal" href="#query-string">7.15.18.4.1.2. <code class="docutils literal notranslate"><span class="pre">query_string</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#optional-parameter">7.15.18.4.2. Optional parameter</a><ul>
+<li><a class="reference internal" href="#query-expander">7.15.18.4.2.1. <code class="docutils literal notranslate"><span class="pre">query_expander</span></code></a></li>
+<li><a class="reference internal" href="#default-mode">7.15.18.4.2.2. <code class="docutils literal notranslate"><span class="pre">default_mode</span></code></a></li>
+<li><a class="reference internal" href="#default-operator">7.15.18.4.2.3. <code class="docutils literal notranslate"><span class="pre">default_operator</span></code></a></li>
+<li><a class="reference internal" href="#flags">7.15.18.4.2.4. <code class="docutils literal notranslate"><span class="pre">flags</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#return-value">7.15.18.5. Return value</a></li>
+<li><a class="reference internal" href="#see-also">7.15.18.6. See also</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="query.html"
+                        title="previous chapter"><span class="section-number">7.15.17. </span><code class="docutils literal notranslate"><span class="pre">query</span></code></a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="rand.html"
+                        title="next chapter"><span class="section-number">7.15.19. </span>rand</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="rand.html" title="7.15.19. rand"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="query.html" title="7.15.17. query"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v11.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../reference.html" ><span class="section-number">7. </span>Reference manual</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../function.html" ><span class="section-number">7.15. </span>Function</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">7.15.18. </span><code class="docutils literal notranslate"><span class="pre">query_parallel_or</span></code></a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2009-2021, Brazil, Inc.
+    </div>
+      <script src="http://connect.facebook.net/en_US/all.js"></script>
+
+    <script>
+      FB.init({
+         appId  : null,
+         status : true, // check login status
+         cookie : true, // enable cookies to allow the server to access the session
+         xfbml  : true  // parse XFBML
+      });
+    </script>
+  </body>
+
+</html>

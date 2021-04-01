@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+  <head>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-7532323-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-7532323-1');
+    </script>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>7.15.18. query_parallel_or &#8212; Groonga v11.0.1ドキュメント</title>
+    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../../" src="../../static/documentation_options.js"></script>
+    <script src="../../static/jquery.js"></script>
+    <script src="../../static/underscore.js"></script>
+    <script src="../../static/doctools.js"></script>
+    <script src="../../static/translations.js"></script>
+    
+    <link rel="shortcut icon" href="../../static/favicon.ico"/>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="検索" href="../../search.html" />
+    <link rel="next" title="7.15.19. rand" href="rand.html" />
+    <link rel="prev" title="7.15.17. query" href="query.html" /> 
+      <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
+    <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
+    <meta property="og:type" content="product" />
+    <meta property="og:image" content="http://groonga.org/images/logos/groonga-icon-full-size.png" />
+    <meta property="og:site_name" content="groonga" />
+
+    <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
+  </head>
+  <body>
+    <div id="fb-root"></div>
+
+<div class="header">
+  <h1 class="title">
+    <a id="top-link" href="../../../">
+      <span class="project">groonga</span>
+      <span class="separator">-</span>
+      <span class="description">オープンソースのカラムストア機能付き全文検索エンジン</span>
+    </a>
+  </h1>
+
+      <div class="facebook-buttons">
+      <fb:like href="http://www.facebook.com/pages/groonga/201193596592346"
+               layout="standard"
+               width="290"></fb:like>
+    </div>
+    <div class="other-language-links">
+
+    <ul>
+      <li><a href="../../../../docs/reference/functions/query_parallel_or.html">English</a></li>
+    </ul>
+  </div>
+</div>
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="rand.html" title="7.15.19. rand"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="query.html" title="7.15.17. query"
+             accesskey="P">前へ</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v11.0.1ドキュメント</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../reference.html" ><span class="section-number">7. </span>リファレンスマニュアル</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../function.html" accesskey="U"><span class="section-number">7.15. </span>関数</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">7.15.18. </span><code class="docutils literal notranslate"><span class="pre">query_parallel_or</span></code></a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="query-parallel-or">
+<h1><span class="section-number">7.15.18. </span><code class="docutils literal notranslate"><span class="pre">query_parallel_or</span></code><a class="headerlink" href="#query-parallel-or" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<div class="versionadded">
+<p><span class="versionmodified added">バージョン 11.0.1 で追加.</span></p>
+</div>
+<div class="section" id="summary">
+<h2><span class="section-number">7.15.18.1. </span>概要<a class="headerlink" href="#summary" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">query_parallel_or</span></code> は <a class="reference internal" href="query.html"><span class="doc">query</span></a> と似ていますが、 <code class="docutils literal notranslate"><span class="pre">query_parallel_or</span></code> は複数の <code class="docutils literal notranslate"><span class="pre">OR</span></code> 条件を並列に処理します。</p>
+</div>
+<div class="section" id="syntax">
+<h2><span class="section-number">7.15.18.2. </span>構文<a class="headerlink" href="#syntax" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">query_parallel_or</span></code> は2つ以上の引数が必要です。 <code class="docutils literal notranslate"><span class="pre">match_columns</span></code> と1つ以上の <code class="docutils literal notranslate"><span class="pre">query_string</span></code> です。</p>
+<p><code class="docutils literal notranslate"><span class="pre">options</span></code> 引数は省略可能です。</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>query(match_columns, query_string0, query_string1, ..., query_stringN)
+query(match_columns, query_string0, query_string1, ..., query_stringN, options)
+</pre></div>
+</div>
+<p>少なくとも1つ <code class="docutils literal notranslate"><span class="pre">query_string</span></code> を指定しなければいけません。</p>
+<p><code class="docutils literal notranslate"><span class="pre">options</span></code> には以下のキーを指定します。すべてのキー・値のペアは省略可能です。:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{
+  &quot;expander&quot;: query_expander,
+  &quot;default_mode&quot;: default_mode,
+  &quot;default_operator&quot;: default_operator,
+  &quot;flags&quot;: flags
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="usage">
+<h2><span class="section-number">7.15.18.3. </span>使い方<a class="headerlink" href="#usage" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>使い方を示すために使うスキーマ定義とサンプルデータは以下の通りです。</p>
+<p>サンプルスキーマ:</p>
+<p>実行例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>table_create Documents TABLE_NO_KEY
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Documents content COLUMN_SCALAR Text
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create Terms TABLE_PAT_KEY ShortText --default_tokenizer TokenBigram  --normalizer NormalizerAuto
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Terms documents_content_index COLUMN_INDEX|WITH_POSITION Documents content
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create Users TABLE_NO_KEY
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Users name COLUMN_SCALAR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Users memo COLUMN_SCALAR ShortText
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+table_create Lexicon TABLE_HASH_KEY ShortText \
+  --default_tokenizer &#39;TokenNgram(&quot;unify_alphabet&quot;, false)&#39; \
+  --normalizer NormalizerNFKC130
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Lexicon users_name COLUMN_INDEX|WITH_POSITION Users name
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+column_create Lexicon users_memo COLUMN_INDEX|WITH_POSITION Users memo
+# [[0, 1337566253.89858, 0.000355720520019531], true]
+</pre></div>
+</div>
+<p>サンプルデータ:</p>
+<p>実行例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>load --table Users
+[
+{&quot;name&quot;: &quot;Alice&quot;, &quot;memo&quot;: &quot;Groonga user&quot;},
+{&quot;name&quot;: &quot;Alisa&quot;, &quot;memo&quot;: &quot;Mroonga user&quot;},
+{&quot;name&quot;: &quot;Bob&quot;,   &quot;memo&quot;: &quot;Rroonga user&quot;},
+{&quot;name&quot;: &quot;Tom&quot;,   &quot;memo&quot;: &quot;Nroonga user&quot;},
+{&quot;name&quot;: &quot;Tobby&quot;, &quot;memo&quot;: &quot;Groonga and Mroonga user. Mroonga is ...&quot;}
+]
+# [[0, 1337566253.89858, 0.000355720520019531], 5]
+</pre></div>
+</div>
+<p>以下は <code class="docutils literal notranslate"><span class="pre">query_parallel_or</span></code> 関数で並列に複数の全文検索を実行する例です。</p>
+<p>実行例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Users \
+  --output_columns name,memo,_score \
+  --filter &#39;query_parallel_or(&quot;name * 10 || memo&quot;, &quot;alice&quot;, &quot;Groonga&quot;)&#39;
+# [
+#   [
+#     0,
+#     1337566253.89858,
+#     0.000355720520019531
+#   ],
+#   [
+#     [
+#       [
+#         2
+#       ],
+#       [
+#         [
+#           &quot;name&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;memo&quot;,
+#           &quot;ShortText&quot;
+#         ],
+#         [
+#           &quot;_score&quot;,
+#           &quot;Int32&quot;
+#         ]
+#       ],
+#       [
+#         &quot;Alice&quot;,
+#         &quot;Groonga user&quot;,
+#         11
+#       ],
+#       [
+#         &quot;Tobby&quot;,
+#         &quot;Groonga and Mroonga user. Mroonga is ...&quot;,
+#         1
+#       ]
+#     ]
+#   ]
+# ]
+</pre></div>
+</div>
+<p>この <code class="docutils literal notranslate"><span class="pre">select</span></code> コマンドは以下の全文検索を実行しなければいけません。</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">name</span></code> から <code class="docutils literal notranslate"><span class="pre">&quot;alice&quot;</span></code> を全文検索</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">memo</span></code> から <code class="docutils literal notranslate"><span class="pre">&quot;alice&quot;</span></code> を全文検索</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">name</span></code> から <code class="docutils literal notranslate"><span class="pre">&quot;Groonga&quot;</span></code> を全文検索</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">memo</span></code> から <code class="docutils literal notranslate"><span class="pre">&quot;Groonga&quot;</span></code> を全文検索</p></li>
+</ul>
+</div></blockquote>
+<p>さらに、これらのすべての結果セットは <code class="docutils literal notranslate"><span class="pre">OR</span></code> で結合する必要があります。</p>
+<p><code class="docutils literal notranslate"><span class="pre">query</span></code> 関数はこれらを順番に実行します。 <code class="docutils literal notranslate"><span class="pre">query_parallel_or</span></code> 関数はこれらを並列に実行します。どちらの結果セットも同じになります。</p>
+</div>
+<div class="section" id="parameters">
+<h2><span class="section-number">7.15.18.4. </span>引数<a class="headerlink" href="#parameters" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<div class="section" id="required-parameters">
+<h3><span class="section-number">7.15.18.4.1. </span>必須引数<a class="headerlink" href="#required-parameters" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>必須引数は二つあります。 <code class="docutils literal notranslate"><span class="pre">match_columns</span></code> と <code class="docutils literal notranslate"><span class="pre">query_string</span></code> です。</p>
+<div class="section" id="match-columns">
+<span id="query-parallel-or-match-columns"></span><h4><span class="section-number">7.15.18.4.1.1. </span><code class="docutils literal notranslate"><span class="pre">match_columns</span></code><a class="headerlink" href="#match-columns" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">query_string</span></code> パラメーターの値で全文検索するときのデフォルトの検索対象カラムを指定します。このパラメーターは <code class="docutils literal notranslate"><span class="pre">select</span></code> の <a class="reference internal" href="../commands/select.html#select-match-columns"><span class="std std-ref">match_columns</span></a> パラメーターと同じ役割です。</p>
+<p>検索対象カラムとクエリー文字列の各ペアは並列に処理されます。たとえば、 <code class="docutils literal notranslate"><span class="pre">query_parallel_or(&quot;C1</span> <span class="pre">||</span> <span class="pre">C2</span> <span class="pre">||</span> <span class="pre">C3&quot;,</span> <span class="pre">&quot;Q1&quot;,</span> <span class="pre">&quot;Q2&quot;)</span></code> には次のペアがあります。</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">C1</span> <span class="pre">&#64;</span> <span class="pre">&quot;Q1&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">C2</span> <span class="pre">&#64;</span> <span class="pre">&quot;Q1&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">C3</span> <span class="pre">&#64;</span> <span class="pre">&quot;Q1&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">C1</span> <span class="pre">&#64;</span> <span class="pre">&quot;Q2&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">C2</span> <span class="pre">&#64;</span> <span class="pre">&quot;Q2&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">C3</span> <span class="pre">&#64;</span> <span class="pre">&quot;Q2&quot;</span></code></p></li>
+</ul>
+</div></blockquote>
+<p>各ペアは並列に処理されます。並列度はシステムによります。デフォルトの最大スレッド数は <code class="docutils literal notranslate"><span class="pre">CPUスレッド数</span> <span class="pre">/</span> <span class="pre">3</span></code> です。</p>
+</div>
+<div class="section" id="query-string">
+<h4><span class="section-number">7.15.18.4.1.2. </span><code class="docutils literal notranslate"><span class="pre">query_string</span></code><a class="headerlink" href="#query-string" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p><a class="reference internal" href="../grn_expr/query_syntax.html"><span class="doc">クエリー構文</span></a> で検索条件を指定します。このパラメーターは <code class="docutils literal notranslate"><span class="pre">select</span></code> コマンドの <code class="docutils literal notranslate"><span class="pre">query</span></code> パラメーターと同じ役割です。</p>
+<p><code class="docutils literal notranslate"><span class="pre">select</span></code> コマンドの <code class="docutils literal notranslate"><span class="pre">query</span></code> については <a class="reference internal" href="../commands/select.html#select-match-columns"><span class="std std-ref">match_columns</span></a> を参照してください。</p>
+<p>並列に全文検索するために複数の <code class="docutils literal notranslate"><span class="pre">query_string</span></code> を指定できます。どのように並列化されるかは <a class="reference internal" href="#query-parallel-or-match-columns"><span class="std std-ref">match_columns</span></a> を参照してください。</p>
+</div>
+</div>
+<div class="section" id="optional-parameter">
+<h3><span class="section-number">7.15.18.4.2. </span>省略可能引数<a class="headerlink" href="#optional-parameter" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>いくつか省略可能な引数があります。</p>
+<div class="section" id="query-expander">
+<h4><span class="section-number">7.15.18.4.2.1. </span><code class="docutils literal notranslate"><span class="pre">query_expander</span></code><a class="headerlink" href="#query-expander" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>詳細は <a class="reference internal" href="query.html#query-query-expander"><span class="std std-ref">query_expander</span></a> を見てください。</p>
+</div>
+<div class="section" id="default-mode">
+<h4><span class="section-number">7.15.18.4.2.2. </span><code class="docutils literal notranslate"><span class="pre">default_mode</span></code><a class="headerlink" href="#default-mode" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>詳細は <a class="reference internal" href="query.html#query-default-mode"><span class="std std-ref">default_mode</span></a> を見てください。</p>
+</div>
+<div class="section" id="default-operator">
+<h4><span class="section-number">7.15.18.4.2.3. </span><code class="docutils literal notranslate"><span class="pre">default_operator</span></code><a class="headerlink" href="#default-operator" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>詳細は <a class="reference internal" href="query.html#query-default-operator"><span class="std std-ref">default_operator</span></a> を見てください。</p>
+</div>
+<div class="section" id="flags">
+<h4><span class="section-number">7.15.18.4.2.4. </span><code class="docutils literal notranslate"><span class="pre">flags</span></code><a class="headerlink" href="#flags" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>詳細は <a class="reference internal" href="query.html#query-flags"><span class="std std-ref">flags</span></a> を見てください。</p>
+</div>
+</div>
+</div>
+<div class="section" id="return-value">
+<h2><span class="section-number">7.15.18.5. </span>戻り値<a class="headerlink" href="#return-value" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>この関数は対象レコードがマッチしたかどうかを真偽値で返します。</p>
+<p>この関数はセレクターとしても動きます。つまり、効率的に実行できるということです。</p>
+</div>
+<div class="section" id="see-also">
+<h2><span class="section-number">7.15.18.6. </span>参考<a class="headerlink" href="#see-also" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="../commands/select.html"><span class="doc">select</span></a></p></li>
+<li><p><a class="reference internal" href="query.html"><span class="doc">query</span></a></p></li>
+</ul>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">7.15.18. <code class="docutils literal notranslate"><span class="pre">query_parallel_or</span></code></a><ul>
+<li><a class="reference internal" href="#summary">7.15.18.1. 概要</a></li>
+<li><a class="reference internal" href="#syntax">7.15.18.2. 構文</a></li>
+<li><a class="reference internal" href="#usage">7.15.18.3. 使い方</a></li>
+<li><a class="reference internal" href="#parameters">7.15.18.4. 引数</a><ul>
+<li><a class="reference internal" href="#required-parameters">7.15.18.4.1. 必須引数</a><ul>
+<li><a class="reference internal" href="#match-columns">7.15.18.4.1.1. <code class="docutils literal notranslate"><span class="pre">match_columns</span></code></a></li>
+<li><a class="reference internal" href="#query-string">7.15.18.4.1.2. <code class="docutils literal notranslate"><span class="pre">query_string</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#optional-parameter">7.15.18.4.2. 省略可能引数</a><ul>
+<li><a class="reference internal" href="#query-expander">7.15.18.4.2.1. <code class="docutils literal notranslate"><span class="pre">query_expander</span></code></a></li>
+<li><a class="reference internal" href="#default-mode">7.15.18.4.2.2. <code class="docutils literal notranslate"><span class="pre">default_mode</span></code></a></li>
+<li><a class="reference internal" href="#default-operator">7.15.18.4.2.3. <code class="docutils literal notranslate"><span class="pre">default_operator</span></code></a></li>
+<li><a class="reference internal" href="#flags">7.15.18.4.2.4. <code class="docutils literal notranslate"><span class="pre">flags</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#return-value">7.15.18.5. 戻り値</a></li>
+<li><a class="reference internal" href="#see-also">7.15.18.6. 参考</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="query.html"
+                        title="前の章へ"><span class="section-number">7.15.17. </span><code class="docutils literal notranslate"><span class="pre">query</span></code></a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="rand.html"
+                        title="次の章へ"><span class="section-number">7.15.19. </span>rand</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="rand.html" title="7.15.19. rand"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="query.html" title="7.15.17. query"
+             >前へ</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v11.0.1ドキュメント</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../reference.html" ><span class="section-number">7. </span>リファレンスマニュアル</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../function.html" ><span class="section-number">7.15. </span>関数</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">7.15.18. </span><code class="docutils literal notranslate"><span class="pre">query_parallel_or</span></code></a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2009-2021, Brazil, Inc.
+    </div>
+      <script src="http://connect.facebook.net/ja_JP/all.js"></script>
+
+    <script>
+      FB.init({
+         appId  : null,
+         status : true, // check login status
+         cookie : true, // enable cookies to allow the server to access the session
+         xfbml  : true  // parse XFBML
+      });
+    </script>
+  </body>
+
+</html>

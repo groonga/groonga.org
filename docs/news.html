@@ -296,6 +296,40 @@ select Articles --match_columns comments.content --query groonga \
 </li>
 </ul>
 </li>
+<li><p>[<a class="reference internal" href="reference/commands/load.html"><span class="doc">load</span></a>] Added support for loading reference vector with inline object literal.</p>
+<ul>
+<li><p>For example, we can load data like <code class="docutils literal notranslate"><span class="pre">&quot;key&quot;</span> <span class="pre">:</span> <span class="pre">&quot;[</span> <span class="pre">{</span> <span class="pre">&quot;key&quot;</span> <span class="pre">:</span> <span class="pre">&quot;value&quot;,</span> <span class="pre">...,</span> <span class="pre">&quot;key&quot;</span> <span class="pre">:</span> <span class="pre">&quot;value&quot;</span> <span class="pre">}</span> <span class="pre">]&quot;</span></code> as below.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>table_create Purchases TABLE_NO_KEY
+column_create Purchases item COLUMN_SCALAR ShortText
+column_create Purchases price COLUMN_SCALAR UInt32
+
+table_create Settlements TABLE_HASH_KEY ShortText
+column_create Settlements purchases COLUMN_VECTOR Purchases
+column_create Purchases settlements_purchases COLUMN_INDEX Settlements purchases
+
+load --table Settlements
+[
+{
+  &quot;_key&quot;: &quot;super market&quot;,
+  &quot;purchases&quot;: [
+     {&quot;item&quot;: &quot;apple&quot;, &quot;price&quot;: 100},
+     {&quot;item&quot;: &quot;milk&quot;,  &quot;price&quot;: 200}
+  ]
+},
+{
+  &quot;_key&quot;: &quot;shoes shop&quot;,
+  &quot;purchases&quot;: [
+     {&quot;item&quot;: &quot;sneakers&quot;, &quot;price&quot;: 3000}
+  ]
+}
+]
+</pre></div>
+</div>
+</li>
+<li><p>It makes easier to add JSON data into reference columns by this feature.</p></li>
+<li><p>Currently, this feature only support with JSON input.</p></li>
+</ul>
+</li>
 <li><p>[<a class="reference internal" href="reference/commands/load.html"><span class="doc">load</span></a>] Added support for loading reference vector from JSON text.</p>
 <ul>
 <li><p>We can load data to reference vector from source table with JSON text as below.</p>
@@ -345,43 +379,11 @@ column_create Purchases settlements_purchases COLUMN_INDEX Settlements purchases
 <li><p>Currently, this feature doesn’t support nested reference record.</p></li>
 </ul>
 </li>
-<li><p>[<a class="reference internal" href="reference/commands/load.html"><span class="doc">load</span></a>] Added support for loading reference vector with inline object literal.</p>
+<li><p>[Windows] Added support for UNIX epoch for <code class="docutils literal notranslate"><span class="pre">time_classify_*</span></code> functions.</p>
 <ul>
-<li><p>For example, we can load data like <code class="docutils literal notranslate"><span class="pre">&quot;key&quot;</span> <span class="pre">:</span> <span class="pre">&quot;[</span> <span class="pre">{</span> <span class="pre">&quot;key&quot;</span> <span class="pre">:</span> <span class="pre">&quot;value&quot;,</span> <span class="pre">...,</span> <span class="pre">&quot;key&quot;</span> <span class="pre">:</span> <span class="pre">&quot;value&quot;</span> <span class="pre">}</span> <span class="pre">]&quot;</span></code> as below.</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>table_create Purchases TABLE_NO_KEY
-column_create Purchases item COLUMN_SCALAR ShortText
-column_create Purchases price COLUMN_SCALAR UInt32
-
-table_create Settlements TABLE_HASH_KEY ShortText
-column_create Settlements purchases COLUMN_VECTOR Purchases
-column_create Purchases settlements_purchases COLUMN_INDEX Settlements purchases
-
-load --table Settlements
-[
-{
-  &quot;_key&quot;: &quot;super market&quot;,
-  &quot;purchases&quot;: [
-     {&quot;item&quot;: &quot;apple&quot;, &quot;price&quot;: 100},
-     {&quot;item&quot;: &quot;milk&quot;,  &quot;price&quot;: 200}
-  ]
-},
-{
-  &quot;_key&quot;: &quot;shoes shop&quot;,
-  &quot;purchases&quot;: [
-     {&quot;item&quot;: &quot;sneakers&quot;, &quot;price&quot;: 3000}
-  ]
-}
-]
-</pre></div>
-</div>
-</li>
-<li><p>It makes easier to add JSON data into reference columns by this feature.</p></li>
-<li><p>Currently, this feature only support with JSON input.</p></li>
-</ul>
-</li>
-<li><p>Added support for UNIX epoch time for <code class="docutils literal notranslate"><span class="pre">time_classify_*</span></code> functions.</p>
-<ul>
-<li><p>We can use UNIX epoch time in <code class="docutils literal notranslate"><span class="pre">time_classify_*</span></code> functions as below.</p>
+<li><p>Groonga handles timestamps on local time. Therefore, for example, if we input the UNIX epoch in Japan, inputting time is 9 hours behind the UNIX epoch.</p></li>
+<li><p>The Windows API outputs an error when we input the time before the UNIX epoch.</p></li>
+<li><p>We can use the UNIX epoch in <code class="docutils literal notranslate"><span class="pre">time_classify_*</span></code> functions as below in this release.</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>plugin_register functions/time
 
 table_create Timestamps TABLE_PAT_KEY Time

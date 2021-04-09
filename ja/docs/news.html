@@ -289,6 +289,40 @@ select Articles --match_columns comments.content --query groonga \
 </li>
 <li><p>[<a class="reference internal" href="reference/commands/load.html"><span class="doc">load</span></a>] オブジェクトリテラルを使って、参照先のレコードをロードできるようにしました。</p>
 <ul>
+<li><p>例えば、以下のように、 <code class="docutils literal notranslate"><span class="pre">&quot;key&quot;</span> <span class="pre">:</span> <span class="pre">&quot;[</span> <span class="pre">{</span> <span class="pre">&quot;key&quot;</span> <span class="pre">:</span> <span class="pre">&quot;value&quot;,</span> <span class="pre">...,</span> <span class="pre">&quot;key&quot;</span> <span class="pre">:</span> <span class="pre">&quot;value&quot;</span> <span class="pre">}</span> <span class="pre">]&quot;</span></code> のようなデータをロードできます。</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>table_create Purchases TABLE_NO_KEY
+column_create Purchases item COLUMN_SCALAR ShortText
+column_create Purchases price COLUMN_SCALAR UInt32
+
+table_create Settlements TABLE_HASH_KEY ShortText
+column_create Settlements purchases COLUMN_VECTOR Purchases
+column_create Purchases settlements_purchases COLUMN_INDEX Settlements purchases
+
+load --table Settlements
+[
+{
+  &quot;_key&quot;: &quot;super market&quot;,
+  &quot;purchases&quot;: [
+     {&quot;item&quot;: &quot;apple&quot;, &quot;price&quot;: 100},
+     {&quot;item&quot;: &quot;milk&quot;,  &quot;price&quot;: 200}
+  ]
+},
+{
+  &quot;_key&quot;: &quot;shoes shop&quot;,
+  &quot;purchases&quot;: [
+     {&quot;item&quot;: &quot;sneakers&quot;, &quot;price&quot;: 3000}
+  ]
+}
+]
+</pre></div>
+</div>
+</li>
+<li><p>この機能によって、参照カラムにJSONデータを追加しやすくなります。</p></li>
+<li><p>現状、この機能は、JSONの入力のみをサポートしています。</p></li>
+</ul>
+</li>
+<li><p>[<a class="reference internal" href="reference/commands/load.html"><span class="doc">load</span></a>] JSON文字列で、参照先のレコードをロードできるようにしました。</p>
+<ul>
 <li><p>以下のように、JSONテキストを使ってソーステーブルから参照ベクターへデータをロードできます。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>table_create Purchases TABLE_HASH_KEY ShortText
 column_create Purchases item COLUMN_SCALAR ShortText
@@ -336,43 +370,11 @@ column_create Purchases settlements_purchases COLUMN_INDEX Settlements purchases
 <li><p>現状、この機能は、ネストされた参照レコードをサポートしていません。</p></li>
 </ul>
 </li>
-<li><p>[<a class="reference internal" href="reference/commands/load.html"><span class="doc">load</span></a>] オブジェクトリテラルを使って、参照先のレコードをロードできるようにしました。</p>
+<li><p>[Windows] <code class="docutils literal notranslate"><span class="pre">time_classify_*</span></code> 関数で UNIXエポック を扱えるようになりました。</p>
 <ul>
-<li><p>例えば、以下のように、 <code class="docutils literal notranslate"><span class="pre">&quot;key&quot;</span> <span class="pre">:</span> <span class="pre">&quot;[</span> <span class="pre">{</span> <span class="pre">&quot;key&quot;</span> <span class="pre">:</span> <span class="pre">&quot;value&quot;,</span> <span class="pre">...,</span> <span class="pre">&quot;key&quot;</span> <span class="pre">:</span> <span class="pre">&quot;value&quot;</span> <span class="pre">}</span> <span class="pre">]&quot;</span></code> のようなデータをロードできます。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>table_create Purchases TABLE_NO_KEY
-column_create Purchases item COLUMN_SCALAR ShortText
-column_create Purchases price COLUMN_SCALAR UInt32
-
-table_create Settlements TABLE_HASH_KEY ShortText
-column_create Settlements purchases COLUMN_VECTOR Purchases
-column_create Purchases settlements_purchases COLUMN_INDEX Settlements purchases
-
-load --table Settlements
-[
-{
-  &quot;_key&quot;: &quot;super market&quot;,
-  &quot;purchases&quot;: [
-     {&quot;item&quot;: &quot;apple&quot;, &quot;price&quot;: 100},
-     {&quot;item&quot;: &quot;milk&quot;,  &quot;price&quot;: 200}
-  ]
-},
-{
-  &quot;_key&quot;: &quot;shoes shop&quot;,
-  &quot;purchases&quot;: [
-     {&quot;item&quot;: &quot;sneakers&quot;, &quot;price&quot;: 3000}
-  ]
-}
-]
-</pre></div>
-</div>
-</li>
-<li><p>この機能によって、参照カラムにJSONデータを追加しやすくなります。</p></li>
-<li><p>現状、この機能は、JSONの入力のみをサポートしています。</p></li>
-</ul>
-</li>
-<li><p><code class="docutils literal notranslate"><span class="pre">time_classify_*</span></code> 関数で UNIX時間 を扱えるようになりました。</p>
-<ul>
-<li><p>以下のようにUNIX時間を <code class="docutils literal notranslate"><span class="pre">time_classify_*</span></code> 内で使えます。</p>
+<li><p>Groongaは、現地時刻でタイムスタンプを扱っています。したがって、例えば日本でUNIXエポックを入力した場合、入力した時刻はUNIXエポックの9時間前になります。</p></li>
+<li><p>WindowsのAPIはUNIXエポックより前の時間が入力されるとエラーになります。</p></li>
+<li><p>今回のリリースから、以下のようにUNIXエポックを <code class="docutils literal notranslate"><span class="pre">time_classify_*</span></code> 内で使えるように</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>plugin_register functions/time
 
 table_create Timestamps TABLE_PAT_KEY Time
@@ -468,13 +470,13 @@ select Timestamps \
 <li><p>[<a class="reference internal" href="reference/commands/select.html"><span class="doc">select</span></a>] 存在しないソートキーを無視するようにしました。</p>
 <ul class="simple">
 <li><p>今まで、存在しないソートキーを指定したとき、Groongaはエラーを出力していましたが、今回のリリースから存在しないソートキーを無視します。(エラーを出力しなくなります。)</p></li>
-<li><p>この機能は、一貫性のために実装しています。<code class="docutils literal notranslate"><span class="pre">outout_columns</span></code> も無効な値を無視します。また、 <code class="docutils literal notranslate"><span class="pre">sort_key</span></code> も無効な値のほとんどを無視します。</p></li>
+<li><p>この機能は、一貫性のために実装しています。<code class="docutils literal notranslate"><span class="pre">output_columns</span></code> も無効な値を無視します。また、 <code class="docutils literal notranslate"><span class="pre">sort_keys</span></code> も無効な値のほとんどを無視します。</p></li>
 </ul>
 </li>
 <li><p>[<a class="reference internal" href="reference/commands/select.html"><span class="doc">select</span></a>] drilldowns[].table で存在しないテーブルを無視します。 [GitHub#1169][naoaさんが報告]</p>
 <ul class="simple">
 <li><p>今まで、  <code class="docutils literal notranslate"><span class="pre">drilldowns[].table</span></code> で存在しないテーブルを指定したとき、Groongaはエラーを出力していましたが、今回のリリースから存在しないテーブルを無視します。(エラーを出力しなくなります。)</p></li>
-<li><p>この機能は、一貫性のために実装しています。<code class="docutils literal notranslate"><span class="pre">outout_columns</span></code> も無効な値を無視します。また、 <code class="docutils literal notranslate"><span class="pre">sort_key</span></code> も無効な値のほとんどを無視します。</p></li>
+<li><p>この機能は、一貫性のために実装しています。<code class="docutils literal notranslate"><span class="pre">output_columns</span></code> も無効な値を無視します。また、 <code class="docutils literal notranslate"><span class="pre">sort_keys</span></code> も無効な値のほとんどを無視します。</p></li>
 </ul>
 </li>
 <li><p>[httpd] バンドルしているnginxのバージョンを1.19.8に更新しました。</p></li>

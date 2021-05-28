@@ -15,17 +15,16 @@
 
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>4.10. マイクロブログ検索システムの作成 &#8212; Groonga v11.0.2ドキュメント</title>
-    <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../static/groonga.css" type="text/css" />
+    <title>4.10. マイクロブログ検索システムの作成 &#8212; Groonga v11.0.3ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../static/groonga.css" />
     
-    <script id="documentation_options" data-url_root="../" src="../static/documentation_options.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../static/documentation_options.js"></script>
     <script src="../static/jquery.js"></script>
     <script src="../static/underscore.js"></script>
     <script src="../static/doctools.js"></script>
     <script src="../static/translations.js"></script>
     
-    <link rel="shortcut icon" href="../static/favicon.ico"/>
     <link rel="index" title="索引" href="../genindex.html" />
     <link rel="search" title="検索" href="../search.html" />
     <link rel="next" title="4.11. クエリ拡張" href="query_expansion.html" />
@@ -76,7 +75,7 @@
         <li class="right" >
           <a href="lexicon.html" title="4.9. 全文検索用の語彙表の作成"
              accesskey="P">前へ</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Groonga v11.0.2ドキュメント</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Groonga v11.0.3ドキュメント</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../tutorial.html" accesskey="U"><span class="section-number">4. </span>チュートリアル</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href=""><span class="section-number">4.10. </span>マイクロブログ検索システムの作成</a></li> 
       </ul>
@@ -93,36 +92,36 @@
 <div class="section" id="create-a-table">
 <h2><span class="section-number">4.10.1. </span>テーブルの作成<a class="headerlink" href="#create-a-table" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <p>まずは、テーブルを作成します。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>table_create --name Users --flags TABLE_HASH_KEY --key_type ShortText
-table_create --name Comments --flags TABLE_HASH_KEY --key_type ShortText
-table_create --name HashTags --flags TABLE_HASH_KEY --key_type ShortText
-table_create --name Bigram --flags TABLE_PAT_KEY --key_type ShortText --default_tokenizer TokenBigram --normalizer NormalizerAuto
-table_create --name GeoIndex --flags TABLE_PAT_KEY --key_type WGS84GeoPoint
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">table_create</span> <span class="o">--</span><span class="n">name</span> <span class="n">Users</span> <span class="o">--</span><span class="n">flags</span> <span class="n">TABLE_HASH_KEY</span> <span class="o">--</span><span class="n">key_type</span> <span class="n">ShortText</span>
+<span class="n">table_create</span> <span class="o">--</span><span class="n">name</span> <span class="n">Comments</span> <span class="o">--</span><span class="n">flags</span> <span class="n">TABLE_HASH_KEY</span> <span class="o">--</span><span class="n">key_type</span> <span class="n">ShortText</span>
+<span class="n">table_create</span> <span class="o">--</span><span class="n">name</span> <span class="n">HashTags</span> <span class="o">--</span><span class="n">flags</span> <span class="n">TABLE_HASH_KEY</span> <span class="o">--</span><span class="n">key_type</span> <span class="n">ShortText</span>
+<span class="n">table_create</span> <span class="o">--</span><span class="n">name</span> <span class="n">Bigram</span> <span class="o">--</span><span class="n">flags</span> <span class="n">TABLE_PAT_KEY</span> <span class="o">--</span><span class="n">key_type</span> <span class="n">ShortText</span> <span class="o">--</span><span class="n">default_tokenizer</span> <span class="n">TokenBigram</span> <span class="o">--</span><span class="n">normalizer</span> <span class="n">NormalizerAuto</span>
+<span class="n">table_create</span> <span class="o">--</span><span class="n">name</span> <span class="n">GeoIndex</span> <span class="o">--</span><span class="n">flags</span> <span class="n">TABLE_PAT_KEY</span> <span class="o">--</span><span class="n">key_type</span> <span class="n">WGS84GeoPoint</span>
 
-column_create --table Users --name name --flags COLUMN_SCALAR --type ShortText
-column_create --table Users --name follower --flags COLUMN_VECTOR --type Users
-column_create --table Users --name favorites --flags COLUMN_VECTOR --type Comments
-column_create --table Users --name location --flags COLUMN_SCALAR --type WGS84GeoPoint
-column_create --table Users --name location_str --flags COLUMN_SCALAR --type ShortText
-column_create --table Users --name description --flags COLUMN_SCALAR --type ShortText
-column_create --table Users --name followee --flags COLUMN_INDEX --type Users --source follower
+<span class="n">column_create</span> <span class="o">--</span><span class="n">table</span> <span class="n">Users</span> <span class="o">--</span><span class="n">name</span> <span class="n">name</span> <span class="o">--</span><span class="n">flags</span> <span class="n">COLUMN_SCALAR</span> <span class="o">--</span><span class="nb">type</span> <span class="n">ShortText</span>
+<span class="n">column_create</span> <span class="o">--</span><span class="n">table</span> <span class="n">Users</span> <span class="o">--</span><span class="n">name</span> <span class="n">follower</span> <span class="o">--</span><span class="n">flags</span> <span class="n">COLUMN_VECTOR</span> <span class="o">--</span><span class="nb">type</span> <span class="n">Users</span>
+<span class="n">column_create</span> <span class="o">--</span><span class="n">table</span> <span class="n">Users</span> <span class="o">--</span><span class="n">name</span> <span class="n">favorites</span> <span class="o">--</span><span class="n">flags</span> <span class="n">COLUMN_VECTOR</span> <span class="o">--</span><span class="nb">type</span> <span class="n">Comments</span>
+<span class="n">column_create</span> <span class="o">--</span><span class="n">table</span> <span class="n">Users</span> <span class="o">--</span><span class="n">name</span> <span class="n">location</span> <span class="o">--</span><span class="n">flags</span> <span class="n">COLUMN_SCALAR</span> <span class="o">--</span><span class="nb">type</span> <span class="n">WGS84GeoPoint</span>
+<span class="n">column_create</span> <span class="o">--</span><span class="n">table</span> <span class="n">Users</span> <span class="o">--</span><span class="n">name</span> <span class="n">location_str</span> <span class="o">--</span><span class="n">flags</span> <span class="n">COLUMN_SCALAR</span> <span class="o">--</span><span class="nb">type</span> <span class="n">ShortText</span>
+<span class="n">column_create</span> <span class="o">--</span><span class="n">table</span> <span class="n">Users</span> <span class="o">--</span><span class="n">name</span> <span class="n">description</span> <span class="o">--</span><span class="n">flags</span> <span class="n">COLUMN_SCALAR</span> <span class="o">--</span><span class="nb">type</span> <span class="n">ShortText</span>
+<span class="n">column_create</span> <span class="o">--</span><span class="n">table</span> <span class="n">Users</span> <span class="o">--</span><span class="n">name</span> <span class="n">followee</span> <span class="o">--</span><span class="n">flags</span> <span class="n">COLUMN_INDEX</span> <span class="o">--</span><span class="nb">type</span> <span class="n">Users</span> <span class="o">--</span><span class="n">source</span> <span class="n">follower</span>
 
-column_create --table Comments --name comment --flags COLUMN_SCALAR --type ShortText
-column_create --table Comments --name last_modified --flags COLUMN_SCALAR --type Time
-column_create --table Comments --name replied_to --flags COLUMN_SCALAR --type Comments
-column_create --table Comments --name replied_users --flags COLUMN_VECTOR --type Users
-column_create --table Comments --name hash_tags --flags COLUMN_VECTOR --type HashTags
-column_create --table Comments --name location --flags COLUMN_SCALAR --type WGS84GeoPoint
-column_create --table Comments --name posted_by --flags COLUMN_SCALAR --type Users
-column_create --table Comments --name favorited_by --flags COLUMN_INDEX --type Users --source favorites
+<span class="n">column_create</span> <span class="o">--</span><span class="n">table</span> <span class="n">Comments</span> <span class="o">--</span><span class="n">name</span> <span class="n">comment</span> <span class="o">--</span><span class="n">flags</span> <span class="n">COLUMN_SCALAR</span> <span class="o">--</span><span class="nb">type</span> <span class="n">ShortText</span>
+<span class="n">column_create</span> <span class="o">--</span><span class="n">table</span> <span class="n">Comments</span> <span class="o">--</span><span class="n">name</span> <span class="n">last_modified</span> <span class="o">--</span><span class="n">flags</span> <span class="n">COLUMN_SCALAR</span> <span class="o">--</span><span class="nb">type</span> <span class="n">Time</span>
+<span class="n">column_create</span> <span class="o">--</span><span class="n">table</span> <span class="n">Comments</span> <span class="o">--</span><span class="n">name</span> <span class="n">replied_to</span> <span class="o">--</span><span class="n">flags</span> <span class="n">COLUMN_SCALAR</span> <span class="o">--</span><span class="nb">type</span> <span class="n">Comments</span>
+<span class="n">column_create</span> <span class="o">--</span><span class="n">table</span> <span class="n">Comments</span> <span class="o">--</span><span class="n">name</span> <span class="n">replied_users</span> <span class="o">--</span><span class="n">flags</span> <span class="n">COLUMN_VECTOR</span> <span class="o">--</span><span class="nb">type</span> <span class="n">Users</span>
+<span class="n">column_create</span> <span class="o">--</span><span class="n">table</span> <span class="n">Comments</span> <span class="o">--</span><span class="n">name</span> <span class="n">hash_tags</span> <span class="o">--</span><span class="n">flags</span> <span class="n">COLUMN_VECTOR</span> <span class="o">--</span><span class="nb">type</span> <span class="n">HashTags</span>
+<span class="n">column_create</span> <span class="o">--</span><span class="n">table</span> <span class="n">Comments</span> <span class="o">--</span><span class="n">name</span> <span class="n">location</span> <span class="o">--</span><span class="n">flags</span> <span class="n">COLUMN_SCALAR</span> <span class="o">--</span><span class="nb">type</span> <span class="n">WGS84GeoPoint</span>
+<span class="n">column_create</span> <span class="o">--</span><span class="n">table</span> <span class="n">Comments</span> <span class="o">--</span><span class="n">name</span> <span class="n">posted_by</span> <span class="o">--</span><span class="n">flags</span> <span class="n">COLUMN_SCALAR</span> <span class="o">--</span><span class="nb">type</span> <span class="n">Users</span>
+<span class="n">column_create</span> <span class="o">--</span><span class="n">table</span> <span class="n">Comments</span> <span class="o">--</span><span class="n">name</span> <span class="n">favorited_by</span> <span class="o">--</span><span class="n">flags</span> <span class="n">COLUMN_INDEX</span> <span class="o">--</span><span class="nb">type</span> <span class="n">Users</span> <span class="o">--</span><span class="n">source</span> <span class="n">favorites</span>
 
-column_create --table HashTags --name hash_index --flags COLUMN_INDEX --type Comments --source hash_tags
+<span class="n">column_create</span> <span class="o">--</span><span class="n">table</span> <span class="n">HashTags</span> <span class="o">--</span><span class="n">name</span> <span class="n">hash_index</span> <span class="o">--</span><span class="n">flags</span> <span class="n">COLUMN_INDEX</span> <span class="o">--</span><span class="nb">type</span> <span class="n">Comments</span> <span class="o">--</span><span class="n">source</span> <span class="n">hash_tags</span>
 
-column_create --table Bigram --name users_index --flags COLUMN_INDEX|WITH_POSITION|WITH_SECTION --type Users --source name,location_str,description
-column_create --table Bigram --name comment_index --flags COLUMN_INDEX|WITH_POSITION --type Comments --source comment
+<span class="n">column_create</span> <span class="o">--</span><span class="n">table</span> <span class="n">Bigram</span> <span class="o">--</span><span class="n">name</span> <span class="n">users_index</span> <span class="o">--</span><span class="n">flags</span> <span class="n">COLUMN_INDEX</span><span class="o">|</span><span class="n">WITH_POSITION</span><span class="o">|</span><span class="n">WITH_SECTION</span> <span class="o">--</span><span class="nb">type</span> <span class="n">Users</span> <span class="o">--</span><span class="n">source</span> <span class="n">name</span><span class="p">,</span><span class="n">location_str</span><span class="p">,</span><span class="n">description</span>
+<span class="n">column_create</span> <span class="o">--</span><span class="n">table</span> <span class="n">Bigram</span> <span class="o">--</span><span class="n">name</span> <span class="n">comment_index</span> <span class="o">--</span><span class="n">flags</span> <span class="n">COLUMN_INDEX</span><span class="o">|</span><span class="n">WITH_POSITION</span> <span class="o">--</span><span class="nb">type</span> <span class="n">Comments</span> <span class="o">--</span><span class="n">source</span> <span class="n">comment</span>
 
-column_create --table GeoIndex --name users_location --type Users --flags COLUMN_INDEX --source location
-column_create --table GeoIndex --name comments_location --type Comments --flags COLUMN_INDEX --source location
+<span class="n">column_create</span> <span class="o">--</span><span class="n">table</span> <span class="n">GeoIndex</span> <span class="o">--</span><span class="n">name</span> <span class="n">users_location</span> <span class="o">--</span><span class="nb">type</span> <span class="n">Users</span> <span class="o">--</span><span class="n">flags</span> <span class="n">COLUMN_INDEX</span> <span class="o">--</span><span class="n">source</span> <span class="n">location</span>
+<span class="n">column_create</span> <span class="o">--</span><span class="n">table</span> <span class="n">GeoIndex</span> <span class="o">--</span><span class="n">name</span> <span class="n">comments_location</span> <span class="o">--</span><span class="nb">type</span> <span class="n">Comments</span> <span class="o">--</span><span class="n">flags</span> <span class="n">COLUMN_INDEX</span> <span class="o">--</span><span class="n">source</span> <span class="n">location</span>
 </pre></div>
 </div>
 <div class="section" id="users-table">
@@ -207,99 +206,99 @@ column_create --table GeoIndex --name comments_location --type Comments --flags 
 <div class="section" id="loading-data">
 <h2><span class="section-number">4.10.2. </span>データのロード<a class="headerlink" href="#loading-data" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <p>つづいて、テスト用データをロードします。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>load --table Users
-[
-  {
-    &quot;_key&quot;: &quot;alice&quot;,
-    &quot;name&quot;: &quot;Alice&quot;,
-    &quot;follower&quot;: [&quot;bob&quot;],
-    &quot;favorites&quot;: [],
-    &quot;location&quot;: &quot;152489000x-255829000&quot;,
-    &quot;location_str&quot;: &quot;Boston, Massachusetts&quot;,
-    &quot;description&quot;: &quot;Groonga developer&quot;
-  },
-  {
-    &quot;_key&quot;: &quot;bob&quot;,
-    &quot;name&quot;: &quot;Bob&quot;,
-    &quot;follower&quot;: [&quot;alice&quot;,&quot;charlie&quot;],
-    &quot;favorites&quot;: [&quot;alice:1&quot;,&quot;charlie:1&quot;],
-    &quot;location&quot;: &quot;146249000x-266228000&quot;,
-    &quot;location_str&quot;: &quot;Brooklyn, New York City&quot;,
-    &quot;description&quot;: &quot;&quot;
-  },
-  {
-    &quot;_key&quot;: &quot;charlie&quot;,
-    &quot;name&quot;: &quot;Charlie&quot;,
-    &quot;follower&quot;: [&quot;alice&quot;,&quot;bob&quot;],
-    &quot;favorites&quot;: [&quot;alice:1&quot;,&quot;bob:1&quot;],
-    &quot;location&quot;: &quot;146607190x-267021260&quot;,
-    &quot;location_str&quot;: &quot;Newark, New Jersey&quot;,
-    &quot;description&quot;: &quot;Hmm,Hmm&quot;
-  }
-]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">load</span> <span class="o">--</span><span class="n">table</span> <span class="n">Users</span>
+<span class="p">[</span>
+  <span class="p">{</span>
+    <span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;alice&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Alice&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;follower&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;bob&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;favorites&quot;</span><span class="p">:</span> <span class="p">[],</span>
+    <span class="s2">&quot;location&quot;</span><span class="p">:</span> <span class="s2">&quot;152489000x-255829000&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;location_str&quot;</span><span class="p">:</span> <span class="s2">&quot;Boston, Massachusetts&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Groonga developer&quot;</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;bob&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Bob&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;follower&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;alice&quot;</span><span class="p">,</span><span class="s2">&quot;charlie&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;favorites&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;alice:1&quot;</span><span class="p">,</span><span class="s2">&quot;charlie:1&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;location&quot;</span><span class="p">:</span> <span class="s2">&quot;146249000x-266228000&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;location_str&quot;</span><span class="p">:</span> <span class="s2">&quot;Brooklyn, New York City&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;charlie&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Charlie&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;follower&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;alice&quot;</span><span class="p">,</span><span class="s2">&quot;bob&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;favorites&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;alice:1&quot;</span><span class="p">,</span><span class="s2">&quot;bob:1&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;location&quot;</span><span class="p">:</span> <span class="s2">&quot;146607190x-267021260&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;location_str&quot;</span><span class="p">:</span> <span class="s2">&quot;Newark, New Jersey&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Hmm,Hmm&quot;</span>
+  <span class="p">}</span>
+<span class="p">]</span>
 
-load --table Comments
-[
-  {
-    &quot;_key&quot;: &quot;alice:1&quot;,
-    &quot;comment&quot;: &quot;I&#39;ve created micro-blog!&quot;,
-    &quot;last_modified&quot;: &quot;2010/03/17 12:05:00&quot;,
-    &quot;posted_by&quot;: &quot;alice&quot;,
-  },
-  {
-    &quot;_key&quot;: &quot;bob:1&quot;,
-    &quot;comment&quot;: &quot;First post. test,test...&quot;,
-    &quot;last_modified&quot;: &quot;2010/03/17 12:00:00&quot;,
-    &quot;posted_by&quot;: &quot;bob&quot;,
-  },
-  {
-    &quot;_key&quot;: &quot;alice:2&quot;,
-    &quot;comment&quot;: &quot;@bob Welcome!!!&quot;,
-    &quot;last_modified&quot;: &quot;2010/03/17 12:05:00&quot;,
-    &quot;replied_to&quot;: &quot;bob:1&quot;,
-    &quot;replied_users&quot;: [&quot;bob&quot;],
-    &quot;posted_by&quot;: &quot;alice&quot;,
-  },
-  {
-    &quot;_key&quot;: &quot;bob:2&quot;,
-    &quot;comment&quot;: &quot;@alice Thanks!&quot;,
-    &quot;last_modified&quot;: &quot;2010/03/17 13:00:00&quot;,
-    &quot;replied_to&quot;: &quot;alice:2&quot;,
-    &quot;replied_users&quot;: [&quot;alice&quot;],
-    &quot;posted_by&quot;: &quot;bob&quot;,
-  },
-  {
-    &quot;_key&quot;: &quot;bob:3&quot;,
-    &quot;comment&quot;: &quot;I&#39;ve just used &#39;Try-Groonga&#39; now! #groonga&quot;,
-    &quot;last_modified&quot;: &quot;2010/03/17 14:00:00&quot;,
-    &quot;hash_tags&quot;: [&quot;groonga&quot;],
-    &quot;location&quot;: &quot;146566000x-266422000&quot;,
-    &quot;posted_by&quot;: &quot;bob&quot;,
-  },
-  {
-    &quot;_key&quot;: &quot;bob:4&quot;,
-    &quot;comment&quot;: &quot;I&#39;m come at city of New York for development camp! #groonga #travel&quot;,
-    &quot;last_modified&quot;: &quot;2010/03/17 14:05:00&quot;,
-    &quot;hash_tags&quot;: [&quot;groonga&quot;, &quot;travel&quot;],
-    &quot;location&quot;: &quot;146566000x-266422000&quot;,
-    &quot;posted_by&quot;: &quot;bob&quot;,
-  },
-  {
-    &quot;_key&quot;: &quot;charlie:1&quot;,
-    &quot;comment&quot;: &quot;@alice @bob I&#39;ve tried to register!&quot;,
-    &quot;last_modified&quot;: &quot;2010/03/17 15:00:00&quot;,
-    &quot;replied_users&quot;: [&quot;alice&quot;, &quot;bob&quot;],
-    &quot;location&quot;: &quot;146607190x-267021260&quot;,
-    &quot;posted_by&quot;: &quot;charlie&quot;,
-  }
-  {
-    &quot;_key&quot;: &quot;charlie:2&quot;,
-    &quot;comment&quot;: &quot;I&#39;m at the Museum of Modern Art in NY now!&quot;,
-    &quot;last_modified&quot;: &quot;2010/03/17 15:05:00&quot;,
-    &quot;location&quot;: &quot;146741340x-266319590&quot;,
-    &quot;posted_by&quot;: &quot;charlie&quot;,
-  }
-]
+<span class="n">load</span> <span class="o">--</span><span class="n">table</span> <span class="n">Comments</span>
+<span class="p">[</span>
+  <span class="p">{</span>
+    <span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;alice:1&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;comment&quot;</span><span class="p">:</span> <span class="s2">&quot;I&#39;ve created micro-blog!&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;last_modified&quot;</span><span class="p">:</span> <span class="s2">&quot;2010/03/17 12:05:00&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;posted_by&quot;</span><span class="p">:</span> <span class="s2">&quot;alice&quot;</span><span class="p">,</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;bob:1&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;comment&quot;</span><span class="p">:</span> <span class="s2">&quot;First post. test,test...&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;last_modified&quot;</span><span class="p">:</span> <span class="s2">&quot;2010/03/17 12:00:00&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;posted_by&quot;</span><span class="p">:</span> <span class="s2">&quot;bob&quot;</span><span class="p">,</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;alice:2&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;comment&quot;</span><span class="p">:</span> <span class="s2">&quot;@bob Welcome!!!&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;last_modified&quot;</span><span class="p">:</span> <span class="s2">&quot;2010/03/17 12:05:00&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;replied_to&quot;</span><span class="p">:</span> <span class="s2">&quot;bob:1&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;replied_users&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;bob&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;posted_by&quot;</span><span class="p">:</span> <span class="s2">&quot;alice&quot;</span><span class="p">,</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;bob:2&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;comment&quot;</span><span class="p">:</span> <span class="s2">&quot;@alice Thanks!&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;last_modified&quot;</span><span class="p">:</span> <span class="s2">&quot;2010/03/17 13:00:00&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;replied_to&quot;</span><span class="p">:</span> <span class="s2">&quot;alice:2&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;replied_users&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;alice&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;posted_by&quot;</span><span class="p">:</span> <span class="s2">&quot;bob&quot;</span><span class="p">,</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;bob:3&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;comment&quot;</span><span class="p">:</span> <span class="s2">&quot;I&#39;ve just used &#39;Try-Groonga&#39; now! #groonga&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;last_modified&quot;</span><span class="p">:</span> <span class="s2">&quot;2010/03/17 14:00:00&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;hash_tags&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;groonga&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;location&quot;</span><span class="p">:</span> <span class="s2">&quot;146566000x-266422000&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;posted_by&quot;</span><span class="p">:</span> <span class="s2">&quot;bob&quot;</span><span class="p">,</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;bob:4&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;comment&quot;</span><span class="p">:</span> <span class="s2">&quot;I&#39;m come at city of New York for development camp! #groonga #travel&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;last_modified&quot;</span><span class="p">:</span> <span class="s2">&quot;2010/03/17 14:05:00&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;hash_tags&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;groonga&quot;</span><span class="p">,</span> <span class="s2">&quot;travel&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;location&quot;</span><span class="p">:</span> <span class="s2">&quot;146566000x-266422000&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;posted_by&quot;</span><span class="p">:</span> <span class="s2">&quot;bob&quot;</span><span class="p">,</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;charlie:1&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;comment&quot;</span><span class="p">:</span> <span class="s2">&quot;@alice @bob I&#39;ve tried to register!&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;last_modified&quot;</span><span class="p">:</span> <span class="s2">&quot;2010/03/17 15:00:00&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;replied_users&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;alice&quot;</span><span class="p">,</span> <span class="s2">&quot;bob&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;location&quot;</span><span class="p">:</span> <span class="s2">&quot;146607190x-267021260&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;posted_by&quot;</span><span class="p">:</span> <span class="s2">&quot;charlie&quot;</span><span class="p">,</span>
+  <span class="p">}</span>
+  <span class="p">{</span>
+    <span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;charlie:2&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;comment&quot;</span><span class="p">:</span> <span class="s2">&quot;I&#39;m at the Museum of Modern Art in NY now!&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;last_modified&quot;</span><span class="p">:</span> <span class="s2">&quot;2010/03/17 15:05:00&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;location&quot;</span><span class="p">:</span> <span class="s2">&quot;146741340x-266319590&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;posted_by&quot;</span><span class="p">:</span> <span class="s2">&quot;charlie&quot;</span><span class="p">,</span>
+  <span class="p">}</span>
+<span class="p">]</span>
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">Users</span></code> テーブルの <code class="docutils literal notranslate"><span class="pre">follower</span></code> カラムと <code class="docutils literal notranslate"><span class="pre">favorites</span></code> カラム、そして <code class="docutils literal notranslate"><span class="pre">Comments</span></code> テーブルの <code class="docutils literal notranslate"><span class="pre">replied_users</span></code> カラムは、ベクターカラムです。そのため、これらのカラムは配列で値を指定します。</p>
@@ -315,35 +314,35 @@ load --table Comments
 <p>ここでは、 <a class="reference internal" href="match_columns.html"><span class="doc">match_columnsパラメータ</span></a> で扱った、複数カラムを対象とした検索を行います。</p>
 <p>指定された文字列で、ユーザー名・現在地・自己紹介文を対象に検索をします。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select --table Users --match_columns name,location_str,description --query &quot;New York&quot; --output_columns _key,name
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         1
-#       ],
-#       [
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;name&quot;,
-#           &quot;ShortText&quot;
-#         ]
-#       ],
-#       [
-#         &quot;bob&quot;,
-#         &quot;Bob&quot;
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="o">--</span><span class="n">table</span> <span class="n">Users</span> <span class="o">--</span><span class="n">match_columns</span> <span class="n">name</span><span class="p">,</span><span class="n">location_str</span><span class="p">,</span><span class="n">description</span> <span class="o">--</span><span class="n">query</span> <span class="s2">&quot;New York&quot;</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">_key</span><span class="p">,</span><span class="n">name</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;name&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;bob&quot;,</span>
+<span class="c1">#         &quot;Bob&quot;</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>「New York」をキーワードにユーザー検索した結果、New Yorkに住んでいる「Bob」がヒットしました。</p>
@@ -353,39 +352,39 @@ load --table Comments
 <p>ここでは、GeoPoint型のカラムで検索をします。GeoPoint型については <a class="reference internal" href="search.html"><span class="doc">さまざまな検索条件</span></a> を参照してください。</p>
 <p>次の例では、特定の場所から20km以内に住んでいる人を検索します。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select --table Users --filter &#39;geo_in_circle(location,&quot;146710080x-266315480&quot;,20000)&#39; --output_columns _key,name
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         2
-#       ],
-#       [
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;name&quot;,
-#           &quot;ShortText&quot;
-#         ]
-#       ],
-#       [
-#         &quot;charlie&quot;,
-#         &quot;Charlie&quot;
-#       ],
-#       [
-#         &quot;bob&quot;,
-#         &quot;Bob&quot;
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="o">--</span><span class="n">table</span> <span class="n">Users</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;geo_in_circle(location,&quot;146710080x-266315480&quot;,20000)&#39;</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">_key</span><span class="p">,</span><span class="n">name</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;name&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;charlie&quot;,</span>
+<span class="c1">#         &quot;Charlie&quot;</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;bob&quot;,</span>
+<span class="c1">#         &quot;Bob&quot;</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>「Bob」と「Charlie」が「Grand Central Terminal」から20km以内に住んでいることがわかります。</p>
@@ -395,39 +394,39 @@ load --table Comments
 <p>ここでは、 <a class="reference internal" href="index.html"><span class="doc">タグ検索・参照関係の逆引き</span></a> の参照関係の逆引きをします。</p>
 <p>次の例は、 <code class="docutils literal notranslate"><span class="pre">Users</span></code> テーブルの <code class="docutils literal notranslate"><span class="pre">follower</span></code> カラムにあるフォローリストを逆引きします。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select --table Users --query follower:@bob --output_columns _key,name
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         2
-#       ],
-#       [
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;name&quot;,
-#           &quot;ShortText&quot;
-#         ]
-#       ],
-#       [
-#         &quot;alice&quot;,
-#         &quot;Alice&quot;
-#       ],
-#       [
-#         &quot;charlie&quot;,
-#         &quot;Charlie&quot;
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="o">--</span><span class="n">table</span> <span class="n">Users</span> <span class="o">--</span><span class="n">query</span> <span class="n">follower</span><span class="p">:</span><span class="nd">@bob</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">_key</span><span class="p">,</span><span class="n">name</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;name&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;alice&quot;,</span>
+<span class="c1">#         &quot;Alice&quot;</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;charlie&quot;,</span>
+<span class="c1">#         &quot;Charlie&quot;</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>「Alice」と「Charlie」が「Bob」をフォローしていることがわかります。</p>
@@ -437,93 +436,93 @@ load --table Comments
 <p>ある範囲内で書かれたコメントを検索します。</p>
 <p>また、 <a class="reference internal" href="drilldown.html"><span class="doc">ドリルダウン</span></a> をおこないます。検索結果をハッシュタグとユーザーでドリルダウンし、ユーザー別・ハッシュタグ別のカウントを出します。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select --table Comments --filter &#39;geo_in_circle(location,&quot;146867000x-266280000&quot;,20000)&#39; --output_columns posted_by.name,comment --drilldown hash_tags,posted_by
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         4
-#       ],
-#       [
-#         [
-#           &quot;posted_by.name&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;comment&quot;,
-#           &quot;ShortText&quot;
-#         ]
-#       ],
-#       [
-#         &quot;Charlie&quot;,
-#         &quot;I&#39;m at the Museum of Modern Art in NY now!&quot;
-#       ],
-#       [
-#         &quot;Bob&quot;,
-#         &quot;I&#39;ve just used &#39;Try-Groonga&#39; now! #groonga&quot;
-#       ],
-#       [
-#         &quot;Bob&quot;,
-#         &quot;I&#39;m come at city of New York for development camp! #groonga #travel&quot;
-#       ],
-#       [
-#         &quot;Charlie&quot;,
-#         &quot;@alice @bob I&#39;ve tried to register!&quot;
-#       ]
-#     ],
-#     [
-#       [
-#         2
-#       ],
-#       [
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;_nsubrecs&quot;,
-#           &quot;Int32&quot;
-#         ]
-#       ],
-#       [
-#         &quot;groonga&quot;,
-#         2
-#       ],
-#       [
-#         &quot;travel&quot;,
-#         1
-#       ]
-#     ],
-#     [
-#       [
-#         2
-#       ],
-#       [
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;_nsubrecs&quot;,
-#           &quot;Int32&quot;
-#         ]
-#       ],
-#       [
-#         &quot;charlie&quot;,
-#         2
-#       ],
-#       [
-#         &quot;bob&quot;,
-#         2
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="o">--</span><span class="n">table</span> <span class="n">Comments</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;geo_in_circle(location,&quot;146867000x-266280000&quot;,20000)&#39;</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">posted_by</span><span class="o">.</span><span class="n">name</span><span class="p">,</span><span class="n">comment</span> <span class="o">--</span><span class="n">drilldown</span> <span class="n">hash_tags</span><span class="p">,</span><span class="n">posted_by</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         4</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;posted_by.name&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;comment&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Charlie&quot;,</span>
+<span class="c1">#         &quot;I&#39;m at the Museum of Modern Art in NY now!&quot;</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Bob&quot;,</span>
+<span class="c1">#         &quot;I&#39;ve just used &#39;Try-Groonga&#39; now! #groonga&quot;</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Bob&quot;,</span>
+<span class="c1">#         &quot;I&#39;m come at city of New York for development camp! #groonga #travel&quot;</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Charlie&quot;,</span>
+<span class="c1">#         &quot;@alice @bob I&#39;ve tried to register!&quot;</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ],</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_nsubrecs&quot;,</span>
+<span class="c1">#           &quot;Int32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;groonga&quot;,</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;travel&quot;,</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ],</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_nsubrecs&quot;,</span>
+<span class="c1">#           &quot;Int32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;charlie&quot;,</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;bob&quot;,</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>このクエリは、ニューヨークのセントラルパークから20km圏内で投稿されたコメントを検索します。</p>
@@ -533,39 +532,39 @@ load --table Comments
 <h3><span class="section-number">4.10.3.5. </span>キーワードでコメント検索<a class="headerlink" href="#search-comments-by-keyword" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <p>あるキーワードを含むコメントを検索します。そして、 <a class="reference internal" href="search.html"><span class="doc">さまざまな検索条件</span></a> で言及している <cite>_score</cite> を出してみます。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select --table Comments --query comment:@Now --output_columns comment,_score
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         2
-#       ],
-#       [
-#         [
-#           &quot;comment&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;_score&quot;,
-#           &quot;Int32&quot;
-#         ]
-#       ],
-#       [
-#         &quot;I&#39;ve just used &#39;Try-Groonga&#39; now! #groonga&quot;,
-#         1
-#       ],
-#       [
-#         &quot;I&#39;m at the Museum of Modern Art in NY now!&quot;,
-#         1
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="o">--</span><span class="n">table</span> <span class="n">Comments</span> <span class="o">--</span><span class="n">query</span> <span class="n">comment</span><span class="p">:</span><span class="nd">@Now</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">comment</span><span class="p">,</span><span class="n">_score</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;comment&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_score&quot;,</span>
+<span class="c1">#           &quot;Int32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;I&#39;ve just used &#39;Try-Groonga&#39; now! #groonga&quot;,</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;I&#39;m at the Museum of Modern Art in NY now!&quot;,</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>'Now'をキーワードに使っているので、このクエリは2件のコメントを返します。 <cite>_score</cite> の値として 'Now'のカウントを含んでいます。</p>
@@ -574,77 +573,77 @@ load --table Comments
 <h3><span class="section-number">4.10.3.6. </span>キーワードと位置情報で検索<a class="headerlink" href="#search-comments-by-keyword-and-geolocation" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <p>あるキーワードと位置情報の両方でコメントを検索します。 <cite>--query</cite> と <cite>--filter</cite> オプションの両方を使用した場合、両方の条件に一致するレコードを返します。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select --table Comments --query comment:@New --filter &#39;geo_in_circle(location,&quot;146867000x-266280000&quot;,20000)&#39; --output_columns posted_by.name,comment --drilldown hash_tags,posted_by
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         1
-#       ],
-#       [
-#         [
-#           &quot;posted_by.name&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;comment&quot;,
-#           &quot;ShortText&quot;
-#         ]
-#       ],
-#       [
-#         &quot;Bob&quot;,
-#         &quot;I&#39;m come at city of New York for development camp! #groonga #travel&quot;
-#       ]
-#     ],
-#     [
-#       [
-#         2
-#       ],
-#       [
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;_nsubrecs&quot;,
-#           &quot;Int32&quot;
-#         ]
-#       ],
-#       [
-#         &quot;groonga&quot;,
-#         1
-#       ],
-#       [
-#         &quot;travel&quot;,
-#         1
-#       ]
-#     ],
-#     [
-#       [
-#         1
-#       ],
-#       [
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;_nsubrecs&quot;,
-#           &quot;Int32&quot;
-#         ]
-#       ],
-#       [
-#         &quot;bob&quot;,
-#         1
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="o">--</span><span class="n">table</span> <span class="n">Comments</span> <span class="o">--</span><span class="n">query</span> <span class="n">comment</span><span class="p">:</span><span class="nd">@New</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;geo_in_circle(location,&quot;146867000x-266280000&quot;,20000)&#39;</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">posted_by</span><span class="o">.</span><span class="n">name</span><span class="p">,</span><span class="n">comment</span> <span class="o">--</span><span class="n">drilldown</span> <span class="n">hash_tags</span><span class="p">,</span><span class="n">posted_by</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;posted_by.name&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;comment&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Bob&quot;,</span>
+<span class="c1">#         &quot;I&#39;m come at city of New York for development camp! #groonga #travel&quot;</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ],</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_nsubrecs&quot;,</span>
+<span class="c1">#           &quot;Int32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;groonga&quot;,</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;travel&quot;,</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ],</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_nsubrecs&quot;,</span>
+<span class="c1">#           &quot;Int32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;bob&quot;,</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>両方の条件をみたすコメントが1件あります。ドリルダウンの結果も含まれ、Bobによるコメントであることがわかります。</p>
@@ -653,58 +652,58 @@ load --table Comments
 <h3><span class="section-number">4.10.3.7. </span>ハッシュタグでコメントを検索<a class="headerlink" href="#search-comments-by-hash-tags" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <p>あるハッシュタグのついているコメントを検索します。テーブルの参照関係を逆にたどってみましょう。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select --table Comments --query hash_tags:@groonga --output_columns posted_by.name,comment --drilldown posted_by
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         2
-#       ],
-#       [
-#         [
-#           &quot;posted_by.name&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;comment&quot;,
-#           &quot;ShortText&quot;
-#         ]
-#       ],
-#       [
-#         &quot;Bob&quot;,
-#         &quot;I&#39;ve just used &#39;Try-Groonga&#39; now! #groonga&quot;
-#       ],
-#       [
-#         &quot;Bob&quot;,
-#         &quot;I&#39;m come at city of New York for development camp! #groonga #travel&quot;
-#       ]
-#     ],
-#     [
-#       [
-#         1
-#       ],
-#       [
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;_nsubrecs&quot;,
-#           &quot;Int32&quot;
-#         ]
-#       ],
-#       [
-#         &quot;bob&quot;,
-#         2
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="o">--</span><span class="n">table</span> <span class="n">Comments</span> <span class="o">--</span><span class="n">query</span> <span class="n">hash_tags</span><span class="p">:</span><span class="nd">@groonga</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">posted_by</span><span class="o">.</span><span class="n">name</span><span class="p">,</span><span class="n">comment</span> <span class="o">--</span><span class="n">drilldown</span> <span class="n">posted_by</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;posted_by.name&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;comment&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Bob&quot;,</span>
+<span class="c1">#         &quot;I&#39;ve just used &#39;Try-Groonga&#39; now! #groonga&quot;</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Bob&quot;,</span>
+<span class="c1">#         &quot;I&#39;m come at city of New York for development camp! #groonga #travel&quot;</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ],</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_nsubrecs&quot;,</span>
+<span class="c1">#           &quot;Int32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;bob&quot;,</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>このクエリは#groongaハッシュタグを含む2件のコメントを返します。投稿者のドリルダウン結果を2件含んでいて、Bobが投稿したことがわかります。</p>
@@ -713,62 +712,62 @@ load --table Comments
 <h3><span class="section-number">4.10.3.8. </span>ユーザーIDでコメントを検索<a class="headerlink" href="#search-comments-by-user-id" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <p>あるユーザーが投稿したコメントを検索します。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select --table Comments --query posted_by:bob --output_columns comment --drilldown hash_tags
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         4
-#       ],
-#       [
-#         [
-#           &quot;comment&quot;,
-#           &quot;ShortText&quot;
-#         ]
-#       ],
-#       [
-#         &quot;First post. test,test...&quot;
-#       ],
-#       [
-#         &quot;@alice Thanks!&quot;
-#       ],
-#       [
-#         &quot;I&#39;ve just used &#39;Try-Groonga&#39; now! #groonga&quot;
-#       ],
-#       [
-#         &quot;I&#39;m come at city of New York for development camp! #groonga #travel&quot;
-#       ]
-#     ],
-#     [
-#       [
-#         2
-#       ],
-#       [
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;_nsubrecs&quot;,
-#           &quot;Int32&quot;
-#         ]
-#       ],
-#       [
-#         &quot;groonga&quot;,
-#         2
-#       ],
-#       [
-#         &quot;travel&quot;,
-#         1
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="o">--</span><span class="n">table</span> <span class="n">Comments</span> <span class="o">--</span><span class="n">query</span> <span class="n">posted_by</span><span class="p">:</span><span class="n">bob</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">comment</span> <span class="o">--</span><span class="n">drilldown</span> <span class="n">hash_tags</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         4</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;comment&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;First post. test,test...&quot;</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;@alice Thanks!&quot;</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;I&#39;ve just used &#39;Try-Groonga&#39; now! #groonga&quot;</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;I&#39;m come at city of New York for development camp! #groonga #travel&quot;</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ],</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_nsubrecs&quot;,</span>
+<span class="c1">#           &quot;Int32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;groonga&quot;,</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;travel&quot;,</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>このクエリはBobによる4件のコメントを返します。ハッシュタグによるドリルダウン結果も含まれ、#groongaが2件、#travelが1件であることがわかります。</p>
@@ -777,41 +776,41 @@ load --table Comments
 <h3><span class="section-number">4.10.3.9. </span>ユーザーのお気に入りのコメント一覧<a class="headerlink" href="#search-user-s-favorite-comments" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <p>あるユーザーのお気に入りコメントを検索します。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select --table Users --query _key:bob --output_columns favorites.posted_by,favorites.comment
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         1
-#       ],
-#       [
-#         [
-#           &quot;favorites.posted_by&quot;,
-#           &quot;Users&quot;
-#         ],
-#         [
-#           &quot;favorites.comment&quot;,
-#           &quot;ShortText&quot;
-#         ]
-#       ],
-#       [
-#         [
-#           &quot;alice&quot;,
-#           &quot;charlie&quot;
-#         ],
-#         [
-#           &quot;I&#39;ve created micro-blog!&quot;,
-#           &quot;@alice @bob I&#39;ve tried to register!&quot;
-#         ]
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="o">--</span><span class="n">table</span> <span class="n">Users</span> <span class="o">--</span><span class="n">query</span> <span class="n">_key</span><span class="p">:</span><span class="n">bob</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">favorites</span><span class="o">.</span><span class="n">posted_by</span><span class="p">,</span><span class="n">favorites</span><span class="o">.</span><span class="n">comment</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;favorites.posted_by&quot;,</span>
+<span class="c1">#           &quot;Users&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;favorites.comment&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;alice&quot;,</span>
+<span class="c1">#           &quot;charlie&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;I&#39;ve created micro-blog!&quot;,</span>
+<span class="c1">#           &quot;@alice @bob I&#39;ve tried to register!&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>このクエリはBobのお気に入りのコメント一覧を返します。</p>
@@ -821,102 +820,102 @@ load --table Comments
 <p>コメントの投稿時間で検索をします。<cite>Time</cite> 型については <a class="reference internal" href="data.html"><span class="doc">いろいろなデータの保存</span></a> を参照してください。</p>
 <p>ある時刻よりも古いコメントを検索します。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Comments --filter &#39;last_modified&lt;=1268802000&#39; --output_columns posted_by.name,comment,last_modified --drilldown hash_tags,posted_by
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         5
-#       ],
-#       [
-#         [
-#           &quot;posted_by.name&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;comment&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;last_modified&quot;,
-#           &quot;Time&quot;
-#         ]
-#       ],
-#       [
-#         &quot;Alice&quot;,
-#         &quot;I&#39;ve created micro-blog!&quot;,
-#         1268795100.0
-#       ],
-#       [
-#         &quot;Bob&quot;,
-#         &quot;First post. test,test...&quot;,
-#         1268794800.0
-#       ],
-#       [
-#         &quot;Alice&quot;,
-#         &quot;@bob Welcome!!!&quot;,
-#         1268795100.0
-#       ],
-#       [
-#         &quot;Bob&quot;,
-#         &quot;@alice Thanks!&quot;,
-#         1268798400.0
-#       ],
-#       [
-#         &quot;Bob&quot;,
-#         &quot;I&#39;ve just used &#39;Try-Groonga&#39; now! #groonga&quot;,
-#         1268802000.0
-#       ]
-#     ],
-#     [
-#       [
-#         1
-#       ],
-#       [
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;_nsubrecs&quot;,
-#           &quot;Int32&quot;
-#         ]
-#       ],
-#       [
-#         &quot;groonga&quot;,
-#         1
-#       ]
-#     ],
-#     [
-#       [
-#         2
-#       ],
-#       [
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;_nsubrecs&quot;,
-#           &quot;Int32&quot;
-#         ]
-#       ],
-#       [
-#         &quot;alice&quot;,
-#         2
-#       ],
-#       [
-#         &quot;bob&quot;,
-#         3
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Comments</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;last_modified&lt;=1268802000&#39;</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">posted_by</span><span class="o">.</span><span class="n">name</span><span class="p">,</span><span class="n">comment</span><span class="p">,</span><span class="n">last_modified</span> <span class="o">--</span><span class="n">drilldown</span> <span class="n">hash_tags</span><span class="p">,</span><span class="n">posted_by</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;posted_by.name&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;comment&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;last_modified&quot;,</span>
+<span class="c1">#           &quot;Time&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Alice&quot;,</span>
+<span class="c1">#         &quot;I&#39;ve created micro-blog!&quot;,</span>
+<span class="c1">#         1268795100.0</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Bob&quot;,</span>
+<span class="c1">#         &quot;First post. test,test...&quot;,</span>
+<span class="c1">#         1268794800.0</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Alice&quot;,</span>
+<span class="c1">#         &quot;@bob Welcome!!!&quot;,</span>
+<span class="c1">#         1268795100.0</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Bob&quot;,</span>
+<span class="c1">#         &quot;@alice Thanks!&quot;,</span>
+<span class="c1">#         1268798400.0</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Bob&quot;,</span>
+<span class="c1">#         &quot;I&#39;ve just used &#39;Try-Groonga&#39; now! #groonga&quot;,</span>
+<span class="c1">#         1268802000.0</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ],</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_nsubrecs&quot;,</span>
+<span class="c1">#           &quot;Int32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;groonga&quot;,</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ],</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_nsubrecs&quot;,</span>
+<span class="c1">#           &quot;Int32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;alice&quot;,</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;bob&quot;,</span>
+<span class="c1">#         3</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>このクエリは2010/03/17 14:00:00以前の5件のコメントを返します。投稿者によるドリルダウン結果も含まれ、Aliceが2件、Bobが3件であることがわかります。</p>
@@ -992,7 +991,7 @@ load --table Comments
         <li class="right" >
           <a href="lexicon.html" title="4.9. 全文検索用の語彙表の作成"
              >前へ</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Groonga v11.0.2ドキュメント</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Groonga v11.0.3ドキュメント</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../tutorial.html" ><span class="section-number">4. </span>チュートリアル</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href=""><span class="section-number">4.10. </span>マイクロブログ検索システムの作成</a></li> 
       </ul>

@@ -15,16 +15,15 @@
 
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>12.3.7. リリース手順 &#8212; Groonga v11.0.2 documentation</title>
-    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
+    <title>12.3.7. リリース手順 &#8212; Groonga v11.0.3 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../static/groonga.css" />
     
-    <script id="documentation_options" data-url_root="../../" src="../../static/documentation_options.js"></script>
+    <script data-url_root="../../" id="documentation_options" src="../../static/documentation_options.js"></script>
     <script src="../../static/jquery.js"></script>
     <script src="../../static/underscore.js"></script>
     <script src="../../static/doctools.js"></script>
     
-    <link rel="shortcut icon" href="../../static/favicon.ico"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="12.3.8. テスト方法" href="test.html" />
@@ -75,7 +74,7 @@
         <li class="right" >
           <a href="query.html" title="12.3.5. クエリの実現"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v11.0.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v11.0.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../contribution.html" ><span class="section-number">12. </span>How to contribute to groonga</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../development.html" accesskey="U"><span class="section-number">12.3. </span>For Groonga developers</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href=""><span class="section-number">12.3.7. </span>リリース手順</a></li> 
@@ -114,15 +113,15 @@
 <p>以下にGroongaのリリース作業を行うために事前にインストール
 しておくべきパッケージを示します。</p>
 <p>なお、ビルド環境としては Debian GNU/Linux (sid)を前提として説明しているため、その他の環境では適宜読み替えて下さい。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% sudo apt-get install -V debootstrap createrepo rpm mercurial python-docutils python-jinja2 ruby-full mingw-w64 g++-mingw-w64 mecab libmecab-dev nsis gnupg2 dh-autoreconf bison
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="o">-</span><span class="n">V</span> <span class="n">debootstrap</span> <span class="n">createrepo</span> <span class="n">rpm</span> <span class="n">mercurial</span> <span class="n">python</span><span class="o">-</span><span class="n">docutils</span> <span class="n">python</span><span class="o">-</span><span class="n">jinja2</span> <span class="n">ruby</span><span class="o">-</span><span class="n">full</span> <span class="n">mingw</span><span class="o">-</span><span class="n">w64</span> <span class="n">g</span><span class="o">++-</span><span class="n">mingw</span><span class="o">-</span><span class="n">w64</span> <span class="n">mecab</span> <span class="n">libmecab</span><span class="o">-</span><span class="n">dev</span> <span class="n">nsis</span> <span class="n">gnupg2</span> <span class="n">dh</span><span class="o">-</span><span class="n">autoreconf</span> <span class="n">bison</span>
 </pre></div>
 </div>
 <p>また、Sphinxは常に最新のバージョンを使う事を推奨します。 <code class="docutils literal notranslate"><span class="pre">pip3</span></code> を使用して最新のSphinxをインストールするようにして下さい。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% pip3 install --upgrade sphinx
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">pip3</span> <span class="n">install</span> <span class="o">--</span><span class="n">upgrade</span> <span class="n">sphinx</span>
 </pre></div>
 </div>
 <p>また、rubyのrakeパッケージを以下のコマンドによりインストールします。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% sudo gem install rake
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">sudo</span> <span class="n">gem</span> <span class="n">install</span> <span class="n">rake</span>
 </pre></div>
 </div>
 </div>
@@ -132,26 +131,26 @@
 その際、パッケージ署名用の鍵が必要です。</p>
 <p>Groongaプロジェクトでは署名用の鍵をリリース担当者の公開鍵で暗号化してリポジトリのpackages/ディレクトリ以下へと登録しています。新しいリリース担当者に任命されたばかりで、まだ自分用に暗号化された鍵が無い場合には、他のリリース担当者に依頼して署名用の鍵を暗号化してもらって下さい。</p>
 <p>リリース担当者はリポジトリに登録された秘密鍵を復号した後に鍵のインポートを以下のコマンドにて行います。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% cd packages
-% gpg --decrypt release-key-secret.asc.gpg.(担当者) &gt; (復号した鍵
-ファイル)
-% gpg --import  (復号した鍵ファイル)
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">cd</span> <span class="n">packages</span>
+<span class="o">%</span> <span class="n">gpg</span> <span class="o">--</span><span class="n">decrypt</span> <span class="n">release</span><span class="o">-</span><span class="n">key</span><span class="o">-</span><span class="n">secret</span><span class="o">.</span><span class="n">asc</span><span class="o">.</span><span class="n">gpg</span><span class="o">.</span><span class="p">(</span><span class="n">担当者</span><span class="p">)</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">復号した鍵</span>
+<span class="n">ファイル</span><span class="p">)</span>
+<span class="o">%</span> <span class="n">gpg</span> <span class="o">--</span><span class="kn">import</span>  <span class="p">(</span><span class="n">復号した鍵ファイル</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>鍵のインポートが正常終了すると gpg –list-keys でGroongaの署名用の鍵を確認することができます。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>pub   1024R/F10399C0 2012-04-24
-uid                  groonga Key (groonga Official Signing Key)
-&lt;packages@groonga.org&gt;
-sub   1024R/BC009774 2012-04-24
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pub</span>   <span class="mi">1024</span><span class="n">R</span><span class="o">/</span><span class="n">F10399C0</span> <span class="mi">2012</span><span class="o">-</span><span class="mi">04</span><span class="o">-</span><span class="mi">24</span>
+<span class="n">uid</span>                  <span class="n">groonga</span> <span class="n">Key</span> <span class="p">(</span><span class="n">groonga</span> <span class="n">Official</span> <span class="n">Signing</span> <span class="n">Key</span><span class="p">)</span>
+<span class="o">&lt;</span><span class="n">packages</span><span class="nd">@groonga</span><span class="o">.</span><span class="n">org</span><span class="o">&gt;</span>
+<span class="n">sub</span>   <span class="mi">1024</span><span class="n">R</span><span class="o">/</span><span class="n">BC009774</span> <span class="mi">2012</span><span class="o">-</span><span class="mi">04</span><span class="o">-</span><span class="mi">24</span>
 </pre></div>
 </div>
 <p>鍵をインポートしただけでは使用することができないため、インポートした鍵に対してtrust,signを行う必要があります。</p>
 <p>以下のコマンドを実行して署名を行います。(途中の選択肢は省略):</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% gpg --edit-key packages@groonga.org
-gpg&gt; trust
-gpg&gt; sign
-gpg&gt; save
-gpg&gt; quit
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">gpg</span> <span class="o">--</span><span class="n">edit</span><span class="o">-</span><span class="n">key</span> <span class="n">packages</span><span class="nd">@groonga</span><span class="o">.</span><span class="n">org</span>
+<span class="n">gpg</span><span class="o">&gt;</span> <span class="n">trust</span>
+<span class="n">gpg</span><span class="o">&gt;</span> <span class="n">sign</span>
+<span class="n">gpg</span><span class="o">&gt;</span> <span class="n">save</span>
+<span class="n">gpg</span><span class="o">&gt;</span> <span class="n">quit</span>
 </pre></div>
 </div>
 <p>この作業は、新規にリリースを行うことになった担当者やパッケージに署名する鍵に変更があった場合などに行います。</p>
@@ -173,7 +172,7 @@ gpg&gt; quit
 <div class="section" id="groonga">
 <h3><span class="section-number">12.3.7.3.1. </span>Groongaのソースコード取得<a class="headerlink" href="#groonga" title="Permalink to this headline">¶</a></h3>
 <p>リリース用のクリーンな状態でソースコードを取得するために$GROONGA_DIRにて以下のコマンドを実行します。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% git clone --recursive git@github.com:groonga/groonga.git groonga.clean
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">git</span> <span class="n">clone</span> <span class="o">--</span><span class="n">recursive</span> <span class="n">git</span><span class="nd">@github</span><span class="o">.</span><span class="n">com</span><span class="p">:</span><span class="n">groonga</span><span class="o">/</span><span class="n">groonga</span><span class="o">.</span><span class="n">git</span> <span class="n">groonga</span><span class="o">.</span><span class="n">clean</span>
 </pre></div>
 </div>
 <p>この作業はリリース作業ごとに行います。</p>
@@ -183,7 +182,7 @@ gpg&gt; quit
 <p>GroongaのウェブサイトのソースはGroonga同様にGitHubにリポジトリを置いています。</p>
 <p>リリース作業では後述するコマンド(make update-latest-release)にてトップページのバージョンを置き換えることができるようになっています。</p>
 <p>Groongaのウェブサイトのソースコードを$GROONGA_ORG_PATHとして取得するためには、$GROONGA_DIRにて以下のコマンドを実行します。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% git clone git@github.com:groonga/groonga.org.git
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">git</span> <span class="n">clone</span> <span class="n">git</span><span class="nd">@github</span><span class="o">.</span><span class="n">com</span><span class="p">:</span><span class="n">groonga</span><span class="o">/</span><span class="n">groonga</span><span class="o">.</span><span class="n">org</span><span class="o">.</span><span class="n">git</span>
 </pre></div>
 </div>
 <p>これで、$GROONGA_ORG_PATHにgroonga.orgのソースを取得できます。</p>
@@ -192,7 +191,7 @@ gpg&gt; quit
 <h3><span class="section-number">12.3.7.3.3. </span>cutterのソースコード取得<a class="headerlink" href="#cutter" title="Permalink to this headline">¶</a></h3>
 <p>Groongaのリリース作業では、cutterに含まれるスクリプトを使用しています。</p>
 <p>そこであらかじめ用意しておいた$HOME/work/cutterディレクトリにてcutterのソースコードを以下のコマンドにて取得します。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% git clone git@github.com:clear-code/cutter.git
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">git</span> <span class="n">clone</span> <span class="n">git</span><span class="nd">@github</span><span class="o">.</span><span class="n">com</span><span class="p">:</span><span class="n">clear</span><span class="o">-</span><span class="n">code</span><span class="o">/</span><span class="n">cutter</span><span class="o">.</span><span class="n">git</span>
 </pre></div>
 </div>
 <p>これで、$CUTTER_SOURCE_PATHディレクトリにcutterのソースを取得できます。</p>
@@ -201,7 +200,7 @@ gpg&gt; quit
 <h3><span class="section-number">12.3.7.3.4. </span>configureスクリプトの生成<a class="headerlink" href="#configure" title="Permalink to this headline">¶</a></h3>
 <p>Groongaのソースコードをcloneした時点ではconfigureスクリプトが含まれておらず、そのままmakeコマンドにてビルドすることができません。</p>
 <p>$GROONGA_CLONE_DIRにてautogen.shを以下のように実行します。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% sh autogen.sh
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">sh</span> <span class="n">autogen</span><span class="o">.</span><span class="n">sh</span>
 </pre></div>
 </div>
 <p>このコマンドの実行により、configureスクリプトが生成されます。</p>
@@ -210,7 +209,7 @@ gpg&gt; quit
 <h3><span class="section-number">12.3.7.3.5. </span>configureスクリプトの実行<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
 <p>Makefileを生成するためにconfigureスクリプトを実行します。</p>
 <p>リリース用にビルドするためには以下のオプションを指定してconfigureを実行します。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% ./configure \
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>% ./configure \
       --prefix=/tmp/local \
       --with-launchpad-uploader-pgp-key=(Launchpadに登録したkeyID) \
       --with-groonga-org-path=$HOME/work/groonga/groonga.org \
@@ -223,23 +222,23 @@ gpg&gt; quit
 <p>configureオプションである–with-groonga-org-pathにはGroongaのウェブサイトのリポジトリをcloneした場所を指定します。</p>
 <p>configureオプションである–with-cutter-source-pathにはcutterのソースをcloneした場所を指定します。</p>
 <p>以下のようにGroongaのソースコードをcloneした先からの相対パスを指定することもできます。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% ./configure \
-      --prefix=/tmp/local \
-      --with-launchpad-uploader-pgp-key=(Launchpadに登録したkeyID) \
-      --with-groonga-org-path=../groonga.org \
-      --enable-document \
-      --with-ruby \
-      --enable-mruby \
-      --with-cutter-source-path=../../cutter/cutter
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="o">./</span><span class="n">configure</span> \
+      <span class="o">--</span><span class="n">prefix</span><span class="o">=/</span><span class="n">tmp</span><span class="o">/</span><span class="n">local</span> \
+      <span class="o">--</span><span class="k">with</span><span class="o">-</span><span class="n">launchpad</span><span class="o">-</span><span class="n">uploader</span><span class="o">-</span><span class="n">pgp</span><span class="o">-</span><span class="n">key</span><span class="o">=</span><span class="p">(</span><span class="n">Launchpadに登録したkeyID</span><span class="p">)</span> \
+      <span class="o">--</span><span class="k">with</span><span class="o">-</span><span class="n">groonga</span><span class="o">-</span><span class="n">org</span><span class="o">-</span><span class="n">path</span><span class="o">=../</span><span class="n">groonga</span><span class="o">.</span><span class="n">org</span> \
+      <span class="o">--</span><span class="n">enable</span><span class="o">-</span><span class="n">document</span> \
+      <span class="o">--</span><span class="k">with</span><span class="o">-</span><span class="n">ruby</span> \
+      <span class="o">--</span><span class="n">enable</span><span class="o">-</span><span class="n">mruby</span> \
+      <span class="o">--</span><span class="k">with</span><span class="o">-</span><span class="n">cutter</span><span class="o">-</span><span class="n">source</span><span class="o">-</span><span class="n">path</span><span class="o">=../../</span><span class="n">cutter</span><span class="o">/</span><span class="n">cutter</span>
 </pre></div>
 </div>
 <p>あらかじめpackagesユーザでpackages.groonga.orgにsshログインできることを確認しておいてください。</p>
 <p>ログイン可能であるかの確認は以下のようにコマンドを実行して行います。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% ssh packages@packages.groonga.org
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">ssh</span> <span class="n">packages</span><span class="nd">@packages</span><span class="o">.</span><span class="n">groonga</span><span class="o">.</span><span class="n">org</span>
 </pre></div>
 </div>
 <p>デバッグ用や開発用のパッケージをテスト用に公開する時は、 <code class="docutils literal notranslate"><span class="pre">--with-launchpad-ppa=groonga-nightly</span></code> を指定して不安定版のリポジトリにアップロードするように指定します。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% ./configure \
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>% ./configure \
       --with-launchpad-ppa=groonga-nightly \
       --prefix=/tmp/local \
       --with-launchpad-uploader-pgp-key=(Launchpadに登録したkeyID) \
@@ -258,7 +257,7 @@ gpg&gt; quit
 <p>前回リリース時からの変更点を$GROONGA_CLONE_DIR/doc/source/news.rst（英語）にまとめます。
 ここでまとめた内容についてはリリースアナウンスにも使用します。</p>
 <p>前回リリースからの変更履歴を参照するには以下のコマンドを実行します。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% git log -p --reverse $(git tag | tail -1)..
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>% git log -p --reverse $(git tag | tail -1)..
 </pre></div>
 </div>
 <p>ログを^commitで検索しながら、以下の基準を目安として変更点を追記していきます。</p>
@@ -276,7 +275,7 @@ gpg&gt; quit
 <h3><span class="section-number">12.3.7.3.7. </span>make update-latest-releaseの実行<a class="headerlink" href="#make-update-latest-release" title="Permalink to this headline">¶</a></h3>
 <p>make update-latest-releaseコマンドでは、OLD_RELEASE_DATEに前回のリリースの日付を、NEW_RELEASE_DATEに次回リリースの日付（未来の日付）を指定します。</p>
 <p>2.0.2のリリースを行った際は以下のコマンドを実行しました。::</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% make update-latest-release OLD_RELEASE=2.0.1 OLD_RELEASE_DATE=2012-03-29 NEW_RELEASE_DATE=2012-04-29
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">make</span> <span class="n">update</span><span class="o">-</span><span class="n">latest</span><span class="o">-</span><span class="n">release</span> <span class="n">OLD_RELEASE</span><span class="o">=</span><span class="mf">2.0</span><span class="o">.</span><span class="mi">1</span> <span class="n">OLD_RELEASE_DATE</span><span class="o">=</span><span class="mi">2012</span><span class="o">-</span><span class="mi">03</span><span class="o">-</span><span class="mi">29</span> <span class="n">NEW_RELEASE_DATE</span><span class="o">=</span><span class="mi">2012</span><span class="o">-</span><span class="mi">04</span><span class="o">-</span><span class="mi">29</span>
 </pre></div>
 </div>
 <p>これにより、clone済みのGroongaのWebサイトのトップページのソース(index.html,ja/index.html)やRPMパッケージのspecファイルのバージョン表記などが更新されます。</p>
@@ -284,7 +283,7 @@ gpg&gt; quit
 <div class="section" id="make-update-examples">
 <h3><span class="section-number">12.3.7.3.8. </span>make update-examplesの実行<a class="headerlink" href="#make-update-examples" title="Permalink to this headline">¶</a></h3>
 <p>ドキュメントに埋め込まれている実行結果を更新するために、以下のコマンドを実行します。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% cd doc &amp;&amp; make update-examples
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">cd</span> <span class="n">doc</span> <span class="o">&amp;&amp;</span> <span class="n">make</span> <span class="n">update</span><span class="o">-</span><span class="n">examples</span>
 </pre></div>
 </div>
 <p>doc/source/examples以下が更新されるので、それらをコミットします。</p>
@@ -292,7 +291,7 @@ gpg&gt; quit
 <div class="section" id="make-update-files">
 <h3><span class="section-number">12.3.7.3.9. </span>make update-filesの実行<a class="headerlink" href="#make-update-files" title="Permalink to this headline">¶</a></h3>
 <p>ロケールメッセージの更新や変更されたファイルのリスト等を更新するために以下のコマンドを実行します。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% make update-files
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">make</span> <span class="n">update</span><span class="o">-</span><span class="n">files</span>
 </pre></div>
 </div>
 <p>make update-filesを実行すると新規に追加されたファイルなどが各種.amファイルへとリストアップされます。</p>
@@ -301,7 +300,7 @@ gpg&gt; quit
 <div class="section" id="make-update-po">
 <h3><span class="section-number">12.3.7.3.10. </span>make update-poの実行<a class="headerlink" href="#make-update-po" title="Permalink to this headline">¶</a></h3>
 <p>ドキュメントの最新版と各国語版の内容を同期するために、poファイルの更新を以下のコマンドにて実行します。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% make update-po
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">make</span> <span class="n">update</span><span class="o">-</span><span class="n">po</span>
 </pre></div>
 </div>
 <p>make update-poを実行すると、doc/locale/ja/LC_MESSAGES以下の各種.poファイルが更新されます。</p>
@@ -310,20 +309,20 @@ gpg&gt; quit
 <h3><span class="section-number">12.3.7.3.11. </span>poファイルの翻訳<a class="headerlink" href="#po" title="Permalink to this headline">¶</a></h3>
 <p>make update-poコマンドの実行により更新した各種.poファイルを翻訳します。</p>
 <p>翻訳結果をHTMLで確認するために、以下のコマンドを実行します。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% make -C doc/locale/ja html
-% make -C doc/locale/en html
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">make</span> <span class="o">-</span><span class="n">C</span> <span class="n">doc</span><span class="o">/</span><span class="n">locale</span><span class="o">/</span><span class="n">ja</span> <span class="n">html</span>
+<span class="o">%</span> <span class="n">make</span> <span class="o">-</span><span class="n">C</span> <span class="n">doc</span><span class="o">/</span><span class="n">locale</span><span class="o">/</span><span class="n">en</span> <span class="n">html</span>
 </pre></div>
 </div>
 <p>修正が必要な箇所を調べて、 <code class="docutils literal notranslate"><span class="pre">***.edit</span></code> というファイルを適宜修正します。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% cd groonga/doc/locale
-% git diff
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">cd</span> <span class="n">groonga</span><span class="o">/</span><span class="n">doc</span><span class="o">/</span><span class="n">locale</span>
+<span class="o">%</span> <span class="n">git</span> <span class="n">diff</span>
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">***.edit</span></code> というファイルの編集中は、翻訳元のファイルは絶対に編集しないで下さい（編集すると、<code class="docutils literal notranslate"><span class="pre">***.edit</span></code> に加えた変更が make update-po の実行時に失われます）。
 ファイルを編集したら、再度poファイルとHTMLを更新するために以下のコマンドを実行します。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% make update-po
-% make -C doc/locale/ja html
-% make -C doc/locale/en html
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">make</span> <span class="n">update</span><span class="o">-</span><span class="n">po</span>
+<span class="o">%</span> <span class="n">make</span> <span class="o">-</span><span class="n">C</span> <span class="n">doc</span><span class="o">/</span><span class="n">locale</span><span class="o">/</span><span class="n">ja</span> <span class="n">html</span>
+<span class="o">%</span> <span class="n">make</span> <span class="o">-</span><span class="n">C</span> <span class="n">doc</span><span class="o">/</span><span class="n">locale</span><span class="o">/</span><span class="n">en</span> <span class="n">html</span>
 </pre></div>
 </div>
 <p>確認が完了したら、翻訳済みpoファイルをコミットします。</p>
@@ -342,8 +341,8 @@ gpg&gt; quit
 <div class="section" id="id12">
 <h3><span class="section-number">12.3.7.3.13. </span>リリースタグの設定<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
 <p>リリース用のタグを打つには以下のコマンドを実行します。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% make tag
-% git push --tags origin
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">make</span> <span class="n">tag</span>
+<span class="o">%</span> <span class="n">git</span> <span class="n">push</span> <span class="o">--</span><span class="n">tags</span> <span class="n">origin</span>
 </pre></div>
 </div>
 <div class="admonition note">
@@ -354,7 +353,7 @@ gpg&gt; quit
 <div class="section" id="id13">
 <h3><span class="section-number">12.3.7.3.14. </span>リリース用アーカイブファイルの作成<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
 <p>リリース用のソースアーカイブファイルを作成するために以下のコマンドを$GROONGA_CLONE_DIRにて実行します。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% make dist
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">make</span> <span class="n">dist</span>
 </pre></div>
 </div>
 <p>これにより$GROONGA_CLONE_DIR/groonga-(バージョン).tar.gzが作成されます。</p>
@@ -372,15 +371,15 @@ make distで生成したtar.gzのversionおよびversion.shがタグと一致す
 <p>リリース用のアーカイブファイルは以下の手順でアップロードします。</p>
 <p>アップロードはrsyncコマンドで行います。
 以下のコマンドを実行して、現在のリポジトリーと同期します。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% cd packages/source
-% make download
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">cd</span> <span class="n">packages</span><span class="o">/</span><span class="n">source</span>
+<span class="o">%</span> <span class="n">make</span> <span class="n">download</span>
 </pre></div>
 </div>
 <p>これにより過去にリリースしたソースアーカイブ(.tar.gz)が
 packages/source/filesディレクトリ以下へとダウンロードされます。</p>
 <p>その後、以下のコマンドを実行してリリース用ソースアーカイブをアップロードします。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% cd packages/source
-% make upload
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">cd</span> <span class="n">packages</span><span class="o">/</span><span class="n">source</span>
+<span class="o">%</span> <span class="n">make</span> <span class="n">upload</span>
 </pre></div>
 </div>
 <p>アップロードが正常終了すると、リリース用ソースアーカイブがpackages.groonga.orgへと反映されます。</p>
@@ -410,16 +409,16 @@ packages/source/filesディレクトリ以下へとダウンロードされま�
 </ul>
 <p>正常にビルドが終了すると$GROONGA_CLONE_DIR/packages/apt/repositories配下に.debパッケージが生成されます。</p>
 <p>debパッケージをビルドするには以下のコマンドを実行します。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% cd packages
-% rake apt
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">cd</span> <span class="n">packages</span>
+<span class="o">%</span> <span class="n">rake</span> <span class="n">apt</span>
 </pre></div>
 </div>
 <p>パッケージのビルドが完了したら、以下のコマンドを実行してビルドしたパッケージをpackages.groonga.orgへアップロードします。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% rake apt:release
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">rake</span> <span class="n">apt</span><span class="p">:</span><span class="n">release</span>
 </pre></div>
 </div>
 <p>この段階では、ビルドしたパッケージはまだ未署名なので、$PACKAGES_GROONGA_ORG_REPOSITORYに移動し、以下のコマンドを実行します。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% rake apt
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">rake</span> <span class="n">apt</span>
 </pre></div>
 </div>
 <p>上記のコマンドを実行することで、リポジトリーの同期、パッケージの署名、リポジトリーの更新、アップロードまで実行できます。</p>
@@ -427,12 +426,12 @@ packages/source/filesディレクトリ以下へとダウンロードされま�
 <div class="section" id="ubuntu">
 <h3><span class="section-number">12.3.7.3.18. </span>Ubuntu用パッケージのアップロード<a class="headerlink" href="#ubuntu" title="Permalink to this headline">¶</a></h3>
 <p>Ubuntu向けパッケージの作成には、作業マシン上にGroongaのビルドに必要な依存ソフトウェア一式がインストールされている必要があります。以下のようにしてインストールしておいて下さい。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% sudo apt build-dep groonga
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">sudo</span> <span class="n">apt</span> <span class="n">build</span><span class="o">-</span><span class="n">dep</span> <span class="n">groonga</span>
 </pre></div>
 </div>
 <p>Ubuntu向けのパッケージのアップロードには以下のコマンドを実行します。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% cd packages
-% rake ubuntu
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">cd</span> <span class="n">packages</span>
+<span class="o">%</span> <span class="n">rake</span> <span class="n">ubuntu</span>
 </pre></div>
 </div>
 <p>現在サポートされているのは以下の通りです。</p>
@@ -467,16 +466,16 @@ packages/source/filesディレクトリ以下へとダウンロードされま�
 <li><p>repositories/yum/centos/8/x86_64/Packages</p></li>
 </ul>
 <p>rpmパッケージをビルドするには以下のコマンドを実行します。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% cd packages
-% rake yum
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">cd</span> <span class="n">packages</span>
+<span class="o">%</span> <span class="n">rake</span> <span class="n">yum</span>
 </pre></div>
 </div>
 <p>パッケージのビルドが完了したら、以下のコマンドを実行してビルドしたパッケージをpackages.groonga.orgへアップロードします。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% rake yum:release
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">rake</span> <span class="n">yum</span><span class="p">:</span><span class="n">release</span>
 </pre></div>
 </div>
 <p>この段階では、ビルドしたパッケージはまだ未署名なので、$PACKAGES_GROONGA_ORG_REPOSITORYに移動し、以下のコマンドを実行します。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% rake yum
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">rake</span> <span class="n">yum</span>
 </pre></div>
 </div>
 <p>上記のコマンドを実行することで、リポジトリーの同期、パッケージの署名、リポジトリーの更新、アップロードまで実行できます。</p>
@@ -484,16 +483,16 @@ packages/source/filesディレクトリ以下へとダウンロードされま�
 <div class="section" id="windows">
 <h3><span class="section-number">12.3.7.3.20. </span>Windows用パッケージのビルドとアップロード<a class="headerlink" href="#windows" title="Permalink to this headline">¶</a></h3>
 <p>Windowsパッケージのビルドに必要なファイルを以下のコマンドを実行してダウンロードします。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% cd packages/windows
-% make download
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">cd</span> <span class="n">packages</span><span class="o">/</span><span class="n">windows</span>
+<span class="o">%</span> <span class="n">make</span> <span class="n">download</span>
 </pre></div>
 </div>
 <p>これにより、Groongaのインストーラやzipアーカイブが packages/windows以下へとダウンロードされます。</p>
 <p>次に、以下のコマンドを実行してWindowsパッケージをビルドします。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% cd packages/windows
-% make build
-% make package
-% make installer
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">cd</span> <span class="n">packages</span><span class="o">/</span><span class="n">windows</span>
+<span class="o">%</span> <span class="n">make</span> <span class="n">build</span>
+<span class="o">%</span> <span class="n">make</span> <span class="n">package</span>
+<span class="o">%</span> <span class="n">make</span> <span class="n">installer</span>
 </pre></div>
 </div>
 <p>make buildでクロスコンパイルを行います。
@@ -501,8 +500,8 @@ packages/source/filesディレクトリ以下へとダウンロードされま�
 <p>make packageが正常に終了するとzipアーカイブをfilesディレクトリ以下に作成します。</p>
 <p>make installerが正常に終了するとWindowsインストーラをfilesディレクトリ以下に作成します。</p>
 <p>パッケージのビルドが完了したら、以下のコマンドを実行してビルドしたパッケージをpackages.groonga.orgへアップロードします。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% cd packages/windows
-% make upload
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">cd</span> <span class="n">packages</span><span class="o">/</span><span class="n">windows</span>
+<span class="o">%</span> <span class="n">make</span> <span class="n">upload</span>
 </pre></div>
 </div>
 </div>
@@ -516,15 +515,15 @@ packages/source/filesディレクトリ以下へとダウンロードされま�
 <p>Debian系もしくはRed Hat系の場合には本番環境へとアップロードする前にローカルのaptないしyumのリポジトリを参照して正常に更新できることを確認します。</p>
 <p>ここでは以下のようにrubyを利用してリポジトリをwebサーバ経由で参照できるようにします。</p>
 <p>yumの場合:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% ruby -run -e httpd -- packages/yum/repositories
-% yum update
-...
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">ruby</span> <span class="o">-</span><span class="n">run</span> <span class="o">-</span><span class="n">e</span> <span class="n">httpd</span> <span class="o">--</span> <span class="n">packages</span><span class="o">/</span><span class="n">yum</span><span class="o">/</span><span class="n">repositories</span>
+<span class="o">%</span> <span class="n">yum</span> <span class="n">update</span>
+<span class="o">...</span>
 </pre></div>
 </div>
 <p>aptの場合:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% ruby -run -e httpd -- packages/apt/repositories
-% sudo apt update
-...
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">ruby</span> <span class="o">-</span><span class="n">run</span> <span class="o">-</span><span class="n">e</span> <span class="n">httpd</span> <span class="o">--</span> <span class="n">packages</span><span class="o">/</span><span class="n">apt</span><span class="o">/</span><span class="n">repositories</span>
+<span class="o">%</span> <span class="n">sudo</span> <span class="n">apt</span> <span class="n">update</span>
+<span class="o">...</span>
 </pre></div>
 </div>
 <div class="section" id="grntest">
@@ -532,13 +531,13 @@ packages/source/filesディレクトリ以下へとダウンロードされま�
 <p>TravisCIの結果が正常であれば、この手順はスキップして構いません。
 grntestを実行するためにはGroongaのテストデータとgrntestのソースが必要です。</p>
 <p>まずGroongaのソースを任意のディレクトリへと展開します。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% tar zxvf groonga-(バージョン).tar.gz
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">tar</span> <span class="n">zxvf</span> <span class="n">groonga</span><span class="o">-</span><span class="p">(</span><span class="n">バージョン</span><span class="p">)</span><span class="o">.</span><span class="n">tar</span><span class="o">.</span><span class="n">gz</span>
 </pre></div>
 </div>
 <p>次にGroongaのtest/functionディレクトリ以下にgrntestのソースを展開します。
 つまりtest/function/grntestという名前でgrntestのソースを配置します。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% ls test/function/grntest/
-README.md  binlib  license  test
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">ls</span> <span class="n">test</span><span class="o">/</span><span class="n">function</span><span class="o">/</span><span class="n">grntest</span><span class="o">/</span>
+<span class="n">README</span><span class="o">.</span><span class="n">md</span>  <span class="n">binlib</span>  <span class="n">license</span>  <span class="n">test</span>
 </pre></div>
 </div>
 </div>
@@ -546,12 +545,12 @@ README.md  binlib  license  test
 <h4><span class="section-number">12.3.7.3.21.2. </span>grntestの実行方法<a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h4>
 <p>grntestではGroongaコマンドを明示的に指定することができます。
 後述のパッケージごとのgrntestによる動作確認では以下のようにして実行します。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% GROONGA=(groongaのパス指定) test/function/run-test.sh
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">GROONGA</span><span class="o">=</span><span class="p">(</span><span class="n">groongaのパス指定</span><span class="p">)</span> <span class="n">test</span><span class="o">/</span><span class="n">function</span><span class="o">/</span><span class="n">run</span><span class="o">-</span><span class="n">test</span><span class="o">.</span><span class="n">sh</span>
 </pre></div>
 </div>
 <p>最後にgrntestによる実行結果が以下のようにまとめて表示されます。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>55 tests, 52 passes, 0 failures, 3 not checked tests.
-94.55% passed.
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">55</span> <span class="n">tests</span><span class="p">,</span> <span class="mi">52</span> <span class="n">passes</span><span class="p">,</span> <span class="mi">0</span> <span class="n">failures</span><span class="p">,</span> <span class="mi">3</span> <span class="ow">not</span> <span class="n">checked</span> <span class="n">tests</span><span class="o">.</span>
+<span class="mf">94.55</span><span class="o">%</span> <span class="n">passed</span><span class="o">.</span>
 </pre></div>
 </div>
 <p>grntestでエラーが発生しないことを確認します。</p>
@@ -636,22 +635,22 @@ README.md  binlib  license  test
 </ul>
 <p>編集した内容をpushする前に確認したい場合にはJekyllおよびRedCloth（Textileパーサー）、RDiscount（Markdownパーサー）、JavaScript interpreter（therubyracer、Node.jsなど）が必要です。
 インストールするには以下のコマンドを実行します。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% sudo gem install jekyll jekyll-paginate RedCloth rdiscount therubyracer
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">sudo</span> <span class="n">gem</span> <span class="n">install</span> <span class="n">jekyll</span> <span class="n">jekyll</span><span class="o">-</span><span class="n">paginate</span> <span class="n">RedCloth</span> <span class="n">rdiscount</span> <span class="n">therubyracer</span>
 </pre></div>
 </div>
 <p>jekyllのインストールを行ったら、以下のコマンドでローカルにwebサーバを起動します。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% jekyll serve --watch
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">jekyll</span> <span class="n">serve</span> <span class="o">--</span><span class="n">watch</span>
 </pre></div>
 </div>
 <p>あとはブラウザにてhttp://localhost:4000にアクセスして内容に問題がないかを確認します。</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>記事を非公開の状態でアップロードするには.mdファイルのpublished:をfalseに設定します。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>---
-layout: post.en
-title: Groonga 2.0.5 has been released
-published: false
----
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">---</span>
+<span class="n">layout</span><span class="p">:</span> <span class="n">post</span><span class="o">.</span><span class="n">en</span>
+<span class="n">title</span><span class="p">:</span> <span class="n">Groonga</span> <span class="mf">2.0</span><span class="o">.</span><span class="mi">5</span> <span class="n">has</span> <span class="n">been</span> <span class="n">released</span>
+<span class="n">published</span><span class="p">:</span> <span class="n">false</span>
+<span class="o">---</span>
 </pre></div>
 </div>
 </div>
@@ -660,7 +659,7 @@ published: false
 <h3><span class="section-number">12.3.7.3.24. </span>ドキュメントのアップロード<a class="headerlink" href="#id23" title="Permalink to this headline">¶</a></h3>
 <p>doc/source以下のドキュメントを更新、翻訳まで完了している状態で、ドキュメントのアップロード作業を行います。</p>
 <p>そのためにはまず <code class="docutils literal notranslate"><span class="pre">groonga</span></code> のリポジトリをカレントディレクトリにして以下のコマンドを実行します。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% GROONGA_VERSION=$(git tag --list | tail -n 1 | tr -d v)
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>% GROONGA_VERSION=$(git tag --list | tail -n 1 | tr -d v)
 % make update-document DOCUMENT_VERSION=$GROONGA_VERSION DOCUMENT_VERSION_FULL=$GROONGA_VERSION
 </pre></div>
 </div>
@@ -668,8 +667,8 @@ published: false
 これによりcloneしておいたgroonga.orgのdoc/locale以下に更新したドキュメントがコピーされます。</p>
 <p>生成されているドキュメントに問題のないことを確認できたら、コミット、pushしてgroonga.orgへと反映します。</p>
 <p>また、<code class="docutils literal notranslate"><span class="pre">groonga.org</span></code> リポジトリの <code class="docutils literal notranslate"><span class="pre">_config.yml</span></code> に最新リリースのバージョン番号と日付を表す情報の指定があるので、これらも更新します。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>groonga_version: x.x.x
-groonga_release_date: xxxx-xx-xx
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">groonga_version</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">x</span>
+<span class="n">groonga_release_date</span><span class="p">:</span> <span class="n">xxxx</span><span class="o">-</span><span class="n">xx</span><span class="o">-</span><span class="n">xx</span>
 </pre></div>
 </div>
 </div>
@@ -720,7 +719,7 @@ groonga_release_date: xxxx-xx-xx
 <div class="section" id="id27">
 <h4><span class="section-number">12.3.7.3.29.1. </span>Groonga バージョン更新<a class="headerlink" href="#id27" title="Permalink to this headline">¶</a></h4>
 <p>$GROONGA_CLONE_DIRにて以下のコマンドを実行します。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% make update-version NEW_VERSION=2.0.6
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">make</span> <span class="n">update</span><span class="o">-</span><span class="n">version</span> <span class="n">NEW_VERSION</span><span class="o">=</span><span class="mf">2.0</span><span class="o">.</span><span class="mi">6</span>
 </pre></div>
 </div>
 <p>これにより$GROONGA_CLONE_DIR/base_versionが更新されるのでコミットしておきます。</p>
@@ -838,7 +837,7 @@ groonga_release_date: xxxx-xx-xx
         <li class="right" >
           <a href="query.html" title="12.3.5. クエリの実現"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v11.0.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v11.0.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../contribution.html" ><span class="section-number">12. </span>How to contribute to groonga</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../development.html" ><span class="section-number">12.3. </span>For Groonga developers</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href=""><span class="section-number">12.3.7. </span>リリース手順</a></li> 

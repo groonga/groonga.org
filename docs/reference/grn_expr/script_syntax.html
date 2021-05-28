@@ -15,16 +15,15 @@
 
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>7.13.2. Script syntax &#8212; Groonga v11.0.2 documentation</title>
-    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
+    <title>7.13.2. Script syntax &#8212; Groonga v11.0.3 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../static/groonga.css" />
     
-    <script id="documentation_options" data-url_root="../../" src="../../static/documentation_options.js"></script>
+    <script data-url_root="../../" id="documentation_options" src="../../static/documentation_options.js"></script>
     <script src="../../static/jquery.js"></script>
     <script src="../../static/underscore.js"></script>
     <script src="../../static/doctools.js"></script>
     
-    <link rel="shortcut icon" href="../../static/favicon.ico"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="7.14. Regular expression" href="../regular_expression.html" />
@@ -75,7 +74,7 @@
         <li class="right" >
           <a href="query_syntax.html" title="7.13.1. Query syntax"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v11.0.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v11.0.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../reference.html" ><span class="section-number">7. </span>Reference manual</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../grn_expr.html" accesskey="U"><span class="section-number">7.13. </span>grn_expr</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href=""><span class="section-number">7.13.2. </span>Script syntax</a></li> 
@@ -109,22 +108,22 @@ that retrieves records that should not be shown to the user.</p>
 <p>Think about the following case.</p>
 <p>A Groonga application constructs a Groonga request by the following
 program:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>filter = &quot;column @ \&quot;#{user_input}\&quot;&quot;
-select_options = {
-  # ...
-  :filter =&gt; filter,
-}
-groonga_client.select(select_options)
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">filter</span> <span class="o">=</span> <span class="s2">&quot;column @ </span><span class="se">\&quot;</span><span class="s2">#</span><span class="si">{user_input}</span><span class="se">\&quot;</span><span class="s2">&quot;</span>
+<span class="n">select_options</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="c1"># ...</span>
+  <span class="p">:</span><span class="nb">filter</span> <span class="o">=&gt;</span> <span class="nb">filter</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="n">groonga_client</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">select_options</span><span class="p">)</span>
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">user_input</span></code> is an input from user. If the input is <code class="docutils literal notranslate"><span class="pre">query</span></code>,
 here is the constructed <a class="reference internal" href="../commands/select.html#select-filter"><span class="std std-ref">filter</span></a> parameter:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>column @ &quot;query&quot;
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">column</span> <span class="o">@</span> <span class="s2">&quot;query&quot;</span>
 </pre></div>
 </div>
 <p>If the input is <code class="docutils literal notranslate"><span class="pre">x&quot;</span> <span class="pre">||</span> <span class="pre">true</span> <span class="pre">||</span> <span class="pre">&quot;</span></code>, here is the constructed
 <a class="reference internal" href="../commands/select.html#select-filter"><span class="std std-ref">filter</span></a> parameter:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>column @ &quot;x&quot; || true || &quot;&quot;
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">column</span> <span class="o">@</span> <span class="s2">&quot;x&quot;</span> <span class="o">||</span> <span class="n">true</span> <span class="o">||</span> <span class="s2">&quot;&quot;</span>
 </pre></div>
 </div>
 <p>This query matches to all records. The user will get all records from
@@ -152,37 +151,37 @@ converted to <code class="docutils literal notranslate"><span class="pre">&quot;
 <h2><span class="section-number">7.13.2.2. </span>Sample data<a class="headerlink" href="#sample-data" title="Permalink to this headline">¶</a></h2>
 <p>Here are a schema definition and sample data to show usage.</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>table_create Entries TABLE_PAT_KEY ShortText
-# [[0, 1337566253.89858, 0.000355720520019531], true]
-column_create Entries content COLUMN_SCALAR Text
-# [[0, 1337566253.89858, 0.000355720520019531], true]
-column_create Entries n_likes COLUMN_SCALAR UInt32
-# [[0, 1337566253.89858, 0.000355720520019531], true]
-table_create Terms TABLE_PAT_KEY ShortText --default_tokenizer TokenBigram --normalizer NormalizerAuto
-# [[0, 1337566253.89858, 0.000355720520019531], true]
-column_create Terms entries_key_index COLUMN_INDEX|WITH_POSITION Entries _key
-# [[0, 1337566253.89858, 0.000355720520019531], true]
-column_create Terms entries_content_index COLUMN_INDEX|WITH_POSITION Entries content
-# [[0, 1337566253.89858, 0.000355720520019531], true]
-load --table Entries
-[
-{&quot;_key&quot;:    &quot;The first post!&quot;,
- &quot;content&quot;: &quot;Welcome! This is my first post!&quot;,
- &quot;n_likes&quot;: 5},
-{&quot;_key&quot;:    &quot;Groonga&quot;,
- &quot;content&quot;: &quot;I started to use Groonga. It&#39;s very fast!&quot;,
- &quot;n_likes&quot;: 10},
-{&quot;_key&quot;:    &quot;Mroonga&quot;,
- &quot;content&quot;: &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
- &quot;n_likes&quot;: 15},
-{&quot;_key&quot;:    &quot;Good-bye Senna&quot;,
- &quot;content&quot;: &quot;I migrated all Senna system!&quot;,
- &quot;n_likes&quot;: 3},
-{&quot;_key&quot;:    &quot;Good-bye Tritonn&quot;,
- &quot;content&quot;: &quot;I also migrated all Tritonn system!&quot;,
- &quot;n_likes&quot;: 3}
-]
-# [[0, 1337566253.89858, 0.000355720520019531], 5]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">table_create</span> <span class="n">Entries</span> <span class="n">TABLE_PAT_KEY</span> <span class="n">ShortText</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">column_create</span> <span class="n">Entries</span> <span class="n">content</span> <span class="n">COLUMN_SCALAR</span> <span class="n">Text</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">column_create</span> <span class="n">Entries</span> <span class="n">n_likes</span> <span class="n">COLUMN_SCALAR</span> <span class="n">UInt32</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">table_create</span> <span class="n">Terms</span> <span class="n">TABLE_PAT_KEY</span> <span class="n">ShortText</span> <span class="o">--</span><span class="n">default_tokenizer</span> <span class="n">TokenBigram</span> <span class="o">--</span><span class="n">normalizer</span> <span class="n">NormalizerAuto</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">column_create</span> <span class="n">Terms</span> <span class="n">entries_key_index</span> <span class="n">COLUMN_INDEX</span><span class="o">|</span><span class="n">WITH_POSITION</span> <span class="n">Entries</span> <span class="n">_key</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">column_create</span> <span class="n">Terms</span> <span class="n">entries_content_index</span> <span class="n">COLUMN_INDEX</span><span class="o">|</span><span class="n">WITH_POSITION</span> <span class="n">Entries</span> <span class="n">content</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">load</span> <span class="o">--</span><span class="n">table</span> <span class="n">Entries</span>
+<span class="p">[</span>
+<span class="p">{</span><span class="s2">&quot;_key&quot;</span><span class="p">:</span>    <span class="s2">&quot;The first post!&quot;</span><span class="p">,</span>
+ <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;Welcome! This is my first post!&quot;</span><span class="p">,</span>
+ <span class="s2">&quot;n_likes&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">},</span>
+<span class="p">{</span><span class="s2">&quot;_key&quot;</span><span class="p">:</span>    <span class="s2">&quot;Groonga&quot;</span><span class="p">,</span>
+ <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;I started to use Groonga. It&#39;s very fast!&quot;</span><span class="p">,</span>
+ <span class="s2">&quot;n_likes&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">},</span>
+<span class="p">{</span><span class="s2">&quot;_key&quot;</span><span class="p">:</span>    <span class="s2">&quot;Mroonga&quot;</span><span class="p">,</span>
+ <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;</span><span class="p">,</span>
+ <span class="s2">&quot;n_likes&quot;</span><span class="p">:</span> <span class="mi">15</span><span class="p">},</span>
+<span class="p">{</span><span class="s2">&quot;_key&quot;</span><span class="p">:</span>    <span class="s2">&quot;Good-bye Senna&quot;</span><span class="p">,</span>
+ <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;I migrated all Senna system!&quot;</span><span class="p">,</span>
+ <span class="s2">&quot;n_likes&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">},</span>
+<span class="p">{</span><span class="s2">&quot;_key&quot;</span><span class="p">:</span>    <span class="s2">&quot;Good-bye Tritonn&quot;</span><span class="p">,</span>
+ <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;I also migrated all Tritonn system!&quot;</span><span class="p">,</span>
+ <span class="s2">&quot;n_likes&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">}</span>
+<span class="p">]</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], 5]</span>
 </pre></div>
 </div>
 <p>There is a table, <code class="docutils literal notranslate"><span class="pre">Entries</span></code>, for blog entries. An entry has title,
@@ -293,57 +292,57 @@ control syntax.</p>
 <p><code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">?</span> <span class="pre">B</span> <span class="pre">:</span> <span class="pre">C</span></code> returns <code class="docutils literal notranslate"><span class="pre">B</span></code> if <code class="docutils literal notranslate"><span class="pre">A</span></code> is true, <code class="docutils literal notranslate"><span class="pre">C</span></code> otherwise.</p>
 <p>Here is a simple example.</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == (_id == 1 ? 5 : 3)&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         3
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         4,
-#         &quot;Good-bye Senna&quot;,
-#         &quot;I migrated all Senna system!&quot;,
-#         3
-#       ],
-#       [
-#         5,
-#         &quot;Good-bye Tritonn&quot;,
-#         &quot;I also migrated all Tritonn system!&quot;,
-#         3
-#       ],
-#       [
-#         1,
-#         &quot;The first post!&quot;,
-#         &quot;Welcome! This is my first post!&quot;,
-#         5
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;n_likes == (_id == 1 ? 5 : 3)&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         3</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         4,</span>
+<span class="c1">#         &quot;Good-bye Senna&quot;,</span>
+<span class="c1">#         &quot;I migrated all Senna system!&quot;,</span>
+<span class="c1">#         3</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         5,</span>
+<span class="c1">#         &quot;Good-bye Tritonn&quot;,</span>
+<span class="c1">#         &quot;I also migrated all Tritonn system!&quot;,</span>
+<span class="c1">#         3</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1,</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         &quot;Welcome! This is my first post!&quot;,</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>The expression matches records that <code class="docutils literal notranslate"><span class="pre">_id</span></code> column value is equal to <code class="docutils literal notranslate"><span class="pre">1</span></code>
@@ -359,96 +358,96 @@ or <code class="docutils literal notranslate"><span class="pre">c</span></code> 
 <code class="docutils literal notranslate"><span class="pre">b</span></code> and <code class="docutils literal notranslate"><span class="pre">c</span></code> are matched.</p>
 <p>Here is a simple example.</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; content @ &quot;senna&quot; || content @ &quot;fast&quot;&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         3
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         4,
-#         &quot;Good-bye Senna&quot;,
-#         &quot;I migrated all Senna system!&quot;,
-#         3
-#       ],
-#       [
-#         2,
-#         &quot;Groonga&quot;,
-#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
-#         10
-#       ],
-#       [
-#         3,
-#         &quot;Mroonga&quot;,
-#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
-#         15
-#       ]
-#     ]
-#   ]
-# ]
-select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&quot; || content @ &quot;fast&quot;)&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         1
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         4,
-#         &quot;Good-bye Senna&quot;,
-#         &quot;I migrated all Senna system!&quot;,
-#         3
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;n_likes &lt; 5 &amp;&amp; content @ &quot;senna&quot; || content @ &quot;fast&quot;&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         3</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         4,</span>
+<span class="c1">#         &quot;Good-bye Senna&quot;,</span>
+<span class="c1">#         &quot;I migrated all Senna system!&quot;,</span>
+<span class="c1">#         3</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2,</span>
+<span class="c1">#         &quot;Groonga&quot;,</span>
+<span class="c1">#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,</span>
+<span class="c1">#         10</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         &quot;Mroonga&quot;,</span>
+<span class="c1">#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,</span>
+<span class="c1">#         15</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
+<span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&quot; || content @ &quot;fast&quot;)&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         4,</span>
+<span class="c1">#         &quot;Good-bye Senna&quot;,</span>
+<span class="c1">#         &quot;I migrated all Senna system!&quot;,</span>
+<span class="c1">#         3</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>The first expression doesn’t use grouping. It matches records that
@@ -466,51 +465,51 @@ matched.</p>
 <p>See <a class="reference internal" href="../function.html"><span class="doc">Function</span></a> for available functin list.</p>
 <p>Here is a simple example.</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;edit_distance(_key, &quot;Groonga&quot;) &lt;= 1&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         2
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         2,
-#         &quot;Groonga&quot;,
-#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
-#         10
-#       ],
-#       [
-#         3,
-#         &quot;Mroonga&quot;,
-#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
-#         15
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;edit_distance(_key, &quot;Groonga&quot;) &lt;= 1&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2,</span>
+<span class="c1">#         &quot;Groonga&quot;,</span>
+<span class="c1">#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,</span>
+<span class="c1">#         10</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         &quot;Mroonga&quot;,</span>
+<span class="c1">#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,</span>
+<span class="c1">#         15</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>The expression uses <a class="reference internal" href="../functions/edit_distance.html"><span class="doc">edit_distance</span></a>. It
@@ -532,45 +531,45 @@ treated as similar.</p>
 <p>The operator adds <code class="docutils literal notranslate"><span class="pre">number1</span></code> and <code class="docutils literal notranslate"><span class="pre">number2</span></code> and returns the result.</p>
 <p>Here is a simple example.</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == 10 + 5&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         1
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         3,
-#         &quot;Mroonga&quot;,
-#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
-#         15
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;n_likes == 10 + 5&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         &quot;Mroonga&quot;,</span>
+<span class="c1">#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,</span>
+<span class="c1">#         15</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>The expression matches records that <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> column value is equal
@@ -582,45 +581,45 @@ to <code class="docutils literal notranslate"><span class="pre">15</span></code>
 <p>The operator subtracts <code class="docutils literal notranslate"><span class="pre">number2</span></code> from <code class="docutils literal notranslate"><span class="pre">number1</span></code> and returns the result.</p>
 <p>Here is a simple example.</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == 20 - 5&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         1
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         3,
-#         &quot;Mroonga&quot;,
-#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
-#         15
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;n_likes == 20 - 5&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         &quot;Mroonga&quot;,</span>
+<span class="c1">#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,</span>
+<span class="c1">#         15</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>The expression matches records that <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> column value is equal
@@ -632,45 +631,45 @@ to <code class="docutils literal notranslate"><span class="pre">15</span></code>
 <p>The operator multiplies <code class="docutils literal notranslate"><span class="pre">number1</span></code> and <code class="docutils literal notranslate"><span class="pre">number2</span></code> and returns the result.</p>
 <p>Here is a simple example.</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == 3 * 5&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         1
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         3,
-#         &quot;Mroonga&quot;,
-#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
-#         15
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;n_likes == 3 * 5&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         &quot;Mroonga&quot;,</span>
+<span class="c1">#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,</span>
+<span class="c1">#         15</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>The expression matches records that <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> column value is equal
@@ -683,95 +682,95 @@ to <code class="docutils literal notranslate"><span class="pre">15</span></code>
 quotient of result. <code class="docutils literal notranslate"><span class="pre">%</span></code> returns the remainder of result.</p>
 <p>Here is simple examples.</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == 26 / 7&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         2
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         4,
-#         &quot;Good-bye Senna&quot;,
-#         &quot;I migrated all Senna system!&quot;,
-#         3
-#       ],
-#       [
-#         5,
-#         &quot;Good-bye Tritonn&quot;,
-#         &quot;I also migrated all Tritonn system!&quot;,
-#         3
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;n_likes == 26 / 7&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         4,</span>
+<span class="c1">#         &quot;Good-bye Senna&quot;,</span>
+<span class="c1">#         &quot;I migrated all Senna system!&quot;,</span>
+<span class="c1">#         3</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         5,</span>
+<span class="c1">#         &quot;Good-bye Tritonn&quot;,</span>
+<span class="c1">#         &quot;I also migrated all Tritonn system!&quot;,</span>
+<span class="c1">#         3</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>The expression matches records that <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> column value is equal
 to <code class="docutils literal notranslate"><span class="pre">3</span></code> (= <code class="docutils literal notranslate"><span class="pre">26</span> <span class="pre">/</span> <span class="pre">7</span></code>).</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == 26 % 7&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         1
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         1,
-#         &quot;The first post!&quot;,
-#         &quot;Welcome! This is my first post!&quot;,
-#         5
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;n_likes == 26 % 7&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1,</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         &quot;Welcome! This is my first post!&quot;,</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>The expression matches records that <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> column value is equal
@@ -787,63 +786,63 @@ to <code class="docutils literal notranslate"><span class="pre">5</span></code> 
 <p>The operator inverts boolean value of <code class="docutils literal notranslate"><span class="pre">condition</span></code>.</p>
 <p>Here is a simple example.</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;!(n_likes == 5)&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         4
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         4,
-#         &quot;Good-bye Senna&quot;,
-#         &quot;I migrated all Senna system!&quot;,
-#         3
-#       ],
-#       [
-#         5,
-#         &quot;Good-bye Tritonn&quot;,
-#         &quot;I also migrated all Tritonn system!&quot;,
-#         3
-#       ],
-#       [
-#         2,
-#         &quot;Groonga&quot;,
-#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
-#         10
-#       ],
-#       [
-#         3,
-#         &quot;Mroonga&quot;,
-#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
-#         15
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;!(n_likes == 5)&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         4</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         4,</span>
+<span class="c1">#         &quot;Good-bye Senna&quot;,</span>
+<span class="c1">#         &quot;I migrated all Senna system!&quot;,</span>
+<span class="c1">#         3</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         5,</span>
+<span class="c1">#         &quot;Good-bye Tritonn&quot;,</span>
+<span class="c1">#         &quot;I also migrated all Tritonn system!&quot;,</span>
+<span class="c1">#         3</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2,</span>
+<span class="c1">#         &quot;Groonga&quot;,</span>
+<span class="c1">#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,</span>
+<span class="c1">#         10</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         &quot;Mroonga&quot;,</span>
+<span class="c1">#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,</span>
+<span class="c1">#         15</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>The expression matches records that <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> column value is not
@@ -856,51 +855,51 @@ equal to <code class="docutils literal notranslate"><span class="pre">5</span></
 <code class="docutils literal notranslate"><span class="pre">condition2</span></code> are true, false otherwise.</p>
 <p>Here is a simple example.</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;content @ &quot;fast&quot; &amp;&amp; n_likes &gt;= 10&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         2
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         2,
-#         &quot;Groonga&quot;,
-#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
-#         10
-#       ],
-#       [
-#         3,
-#         &quot;Mroonga&quot;,
-#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
-#         15
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;content @ &quot;fast&quot; &amp;&amp; n_likes &gt;= 10&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2,</span>
+<span class="c1">#         &quot;Groonga&quot;,</span>
+<span class="c1">#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,</span>
+<span class="c1">#         10</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         &quot;Mroonga&quot;,</span>
+<span class="c1">#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,</span>
+<span class="c1">#         15</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>The expression matches records that <code class="docutils literal notranslate"><span class="pre">content</span></code> column value has the
@@ -914,51 +913,51 @@ word <code class="docutils literal notranslate"><span class="pre">fast</span></c
 true, false otherwise.</p>
 <p>Here is a simple example.</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == 5 || n_likes == 10&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         2
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         1,
-#         &quot;The first post!&quot;,
-#         &quot;Welcome! This is my first post!&quot;,
-#         5
-#       ],
-#       [
-#         2,
-#         &quot;Groonga&quot;,
-#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
-#         10
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;n_likes == 5 || n_likes == 10&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1,</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         &quot;Welcome! This is my first post!&quot;,</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2,</span>
+<span class="c1">#         &quot;Groonga&quot;,</span>
+<span class="c1">#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,</span>
+<span class="c1">#         10</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>The expression matches records that <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> column value is equal
@@ -971,45 +970,45 @@ to <code class="docutils literal notranslate"><span class="pre">5</span></code> 
 is false, false otherwise. It returns difference set.</p>
 <p>Here is a simple example.</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;content @ &quot;fast&quot; &amp;! content @ &quot;mroonga&quot;&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         1
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         2,
-#         &quot;Groonga&quot;,
-#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
-#         10
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;content @ &quot;fast&quot; &amp;! content @ &quot;mroonga&quot;&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2,</span>
+<span class="c1">#         &quot;Groonga&quot;,</span>
+<span class="c1">#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,</span>
+<span class="c1">#         10</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>The expression matches records that <code class="docutils literal notranslate"><span class="pre">content</span></code> column value has the
@@ -1025,45 +1024,45 @@ word <code class="docutils literal notranslate"><span class="pre">fast</span></c
 <p>The operator returns bitwise NOT of <code class="docutils literal notranslate"><span class="pre">number</span></code>.</p>
 <p>Here is a simple example.</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;~n_likes == -6&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         1
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         1,
-#         &quot;The first post!&quot;,
-#         &quot;Welcome! This is my first post!&quot;,
-#         5
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;~n_likes == -6&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1,</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         &quot;Welcome! This is my first post!&quot;,</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>The expression matches records that <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> column value is equal
@@ -1075,63 +1074,63 @@ to <code class="docutils literal notranslate"><span class="pre">5</span></code> 
 <p>The operator returns bitwise AND between <code class="docutils literal notranslate"><span class="pre">number1</span></code> and <code class="docutils literal notranslate"><span class="pre">number2</span></code>.</p>
 <p>Here is a simple example.</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;(n_likes &amp; 1) == 1&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         4
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         4,
-#         &quot;Good-bye Senna&quot;,
-#         &quot;I migrated all Senna system!&quot;,
-#         3
-#       ],
-#       [
-#         5,
-#         &quot;Good-bye Tritonn&quot;,
-#         &quot;I also migrated all Tritonn system!&quot;,
-#         3
-#       ],
-#       [
-#         3,
-#         &quot;Mroonga&quot;,
-#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
-#         15
-#       ],
-#       [
-#         1,
-#         &quot;The first post!&quot;,
-#         &quot;Welcome! This is my first post!&quot;,
-#         5
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;(n_likes &amp; 1) == 1&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         4</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         4,</span>
+<span class="c1">#         &quot;Good-bye Senna&quot;,</span>
+<span class="c1">#         &quot;I migrated all Senna system!&quot;,</span>
+<span class="c1">#         3</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         5,</span>
+<span class="c1">#         &quot;Good-bye Tritonn&quot;,</span>
+<span class="c1">#         &quot;I also migrated all Tritonn system!&quot;,</span>
+<span class="c1">#         3</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         &quot;Mroonga&quot;,</span>
+<span class="c1">#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,</span>
+<span class="c1">#         15</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1,</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         &quot;Welcome! This is my first post!&quot;,</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>The expression matches records that <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> column value is even
@@ -1146,45 +1145,45 @@ to <code class="docutils literal notranslate"><span class="pre">1</span></code> 
 <p>The operator returns bitwise OR between <code class="docutils literal notranslate"><span class="pre">number1</span></code> and <code class="docutils literal notranslate"><span class="pre">number2</span></code>.</p>
 <p>Here is a simple example.</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == (1 | 4)&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         1
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         1,
-#         &quot;The first post!&quot;,
-#         &quot;Welcome! This is my first post!&quot;,
-#         5
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;n_likes == (1 | 4)&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1,</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         &quot;Welcome! This is my first post!&quot;,</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>The expression matches records that <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> column value is equal
@@ -1196,45 +1195,45 @@ to <code class="docutils literal notranslate"><span class="pre">5</span></code> 
 <p>The operator returns bitwise XOR between <code class="docutils literal notranslate"><span class="pre">number1</span></code> and <code class="docutils literal notranslate"><span class="pre">number2</span></code>.</p>
 <p>Here is a simple example.</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == (10 ^ 15)&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         1
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         1,
-#         &quot;The first post!&quot;,
-#         &quot;Welcome! This is my first post!&quot;,
-#         5
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;n_likes == (10 ^ 15)&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1,</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         &quot;Welcome! This is my first post!&quot;,</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>The expression matches records that <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> column value is equal
@@ -1250,45 +1249,45 @@ to <code class="docutils literal notranslate"><span class="pre">5</span></code> 
 <code class="docutils literal notranslate"><span class="pre">number2</span></code>.</p>
 <p>Here is a simple example.</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == (5 &lt;&lt; 1)&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         1
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         2,
-#         &quot;Groonga&quot;,
-#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
-#         10
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;n_likes == (5 &lt;&lt; 1)&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2,</span>
+<span class="c1">#         &quot;Groonga&quot;,</span>
+<span class="c1">#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,</span>
+<span class="c1">#         10</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>The expression matches records that <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> column value is equal
@@ -1301,45 +1300,45 @@ to <code class="docutils literal notranslate"><span class="pre">10</span></code>
 of the result is the same as <code class="docutils literal notranslate"><span class="pre">number1</span></code>.</p>
 <p>Here is a simple example.</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == -(-10 &gt;&gt; 1)&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         1
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         1,
-#         &quot;The first post!&quot;,
-#         &quot;Welcome! This is my first post!&quot;,
-#         5
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;n_likes == -(-10 &gt;&gt; 1)&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1,</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         &quot;Welcome! This is my first post!&quot;,</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>The expression matches records that <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> column value is equal
@@ -1352,45 +1351,45 @@ to <code class="docutils literal notranslate"><span class="pre">5</span></code> 
 leftmost <code class="docutils literal notranslate"><span class="pre">number2</span></code> bits are filled by <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p>
 <p>Here is a simple example.</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == (2147483648 - (-10 &gt;&gt;&gt; 1))&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         1
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         1,
-#         &quot;The first post!&quot;,
-#         &quot;Welcome! This is my first post!&quot;,
-#         5
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;n_likes == (2147483648 - (-10 &gt;&gt;&gt; 1))&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1,</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         &quot;Welcome! This is my first post!&quot;,</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>The expression matches records that <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> column value is equal
@@ -1407,45 +1406,45 @@ to <code class="docutils literal notranslate"><span class="pre">5</span></code> 
 otherwise.</p>
 <p>Here is a simple example.</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == 5&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         1
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         1,
-#         &quot;The first post!&quot;,
-#         &quot;Welcome! This is my first post!&quot;,
-#         5
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;n_likes == 5&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1,</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         &quot;Welcome! This is my first post!&quot;,</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>The expression matches records that <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> column value is equal
@@ -1458,63 +1457,63 @@ to <code class="docutils literal notranslate"><span class="pre">5</span></code>.
 <code class="docutils literal notranslate"><span class="pre">object2</span></code>, false otherwise.</p>
 <p>Here is a simple example.</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes != 5&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         4
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         4,
-#         &quot;Good-bye Senna&quot;,
-#         &quot;I migrated all Senna system!&quot;,
-#         3
-#       ],
-#       [
-#         5,
-#         &quot;Good-bye Tritonn&quot;,
-#         &quot;I also migrated all Tritonn system!&quot;,
-#         3
-#       ],
-#       [
-#         2,
-#         &quot;Groonga&quot;,
-#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
-#         10
-#       ],
-#       [
-#         3,
-#         &quot;Mroonga&quot;,
-#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
-#         15
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;n_likes != 5&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         4</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         4,</span>
+<span class="c1">#         &quot;Good-bye Senna&quot;,</span>
+<span class="c1">#         &quot;I migrated all Senna system!&quot;,</span>
+<span class="c1">#         3</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         5,</span>
+<span class="c1">#         &quot;Good-bye Tritonn&quot;,</span>
+<span class="c1">#         &quot;I also migrated all Tritonn system!&quot;,</span>
+<span class="c1">#         3</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2,</span>
+<span class="c1">#         &quot;Groonga&quot;,</span>
+<span class="c1">#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,</span>
+<span class="c1">#         10</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         &quot;Mroonga&quot;,</span>
+<span class="c1">#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,</span>
+<span class="c1">#         15</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>The expression matches records that <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> column value is not
@@ -1545,60 +1544,60 @@ equal to <code class="docutils literal notranslate"><span class="pre">5</span></
 <p>Its syntax is <code class="docutils literal notranslate"><span class="pre">column1</span> <span class="pre">+=</span> <span class="pre">column2</span></code>.</p>
 <p>The operator performs addition assignment operation on column1 by column2.</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --output_columns _key,n_likes,_score --filter true --scorer &#39;_score += n_likes&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         5
-#       ],
-#       [
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_score&quot;,
-#           &quot;Int32&quot;
-#         ]
-#       ],
-#       [
-#         &quot;Good-bye Senna&quot;,
-#         3,
-#         4
-#       ],
-#       [
-#         &quot;Good-bye Tritonn&quot;,
-#         3,
-#         4
-#       ],
-#       [
-#         &quot;Groonga&quot;,
-#         10,
-#         11
-#       ],
-#       [
-#         &quot;Mroonga&quot;,
-#         15,
-#         16
-#       ],
-#       [
-#         &quot;The first post!&quot;,
-#         5,
-#         6
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">_key</span><span class="p">,</span><span class="n">n_likes</span><span class="p">,</span><span class="n">_score</span> <span class="o">--</span><span class="nb">filter</span> <span class="n">true</span> <span class="o">--</span><span class="n">scorer</span> <span class="s1">&#39;_score += n_likes&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_score&quot;,</span>
+<span class="c1">#           &quot;Int32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Good-bye Senna&quot;,</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         4</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Good-bye Tritonn&quot;,</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         4</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Groonga&quot;,</span>
+<span class="c1">#         10,</span>
+<span class="c1">#         11</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Mroonga&quot;,</span>
+<span class="c1">#         15,</span>
+<span class="c1">#         16</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         5,</span>
+<span class="c1">#         6</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>The value of <code class="docutils literal notranslate"><span class="pre">_score</span></code> by <code class="docutils literal notranslate"><span class="pre">--filter</span></code> is always 1 in this case,
@@ -1612,60 +1611,60 @@ is 3.</p>
 <p>Its syntax is <code class="docutils literal notranslate"><span class="pre">column1</span> <span class="pre">-=</span> <span class="pre">column2</span></code>.</p>
 <p>The operator performs subtraction assignment operation on column1 by column2.</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --output_columns _key,n_likes,_score --filter true --scorer &#39;_score -= n_likes&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         5
-#       ],
-#       [
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_score&quot;,
-#           &quot;Int32&quot;
-#         ]
-#       ],
-#       [
-#         &quot;Good-bye Senna&quot;,
-#         3,
-#         -2
-#       ],
-#       [
-#         &quot;Good-bye Tritonn&quot;,
-#         3,
-#         -2
-#       ],
-#       [
-#         &quot;Groonga&quot;,
-#         10,
-#         -9
-#       ],
-#       [
-#         &quot;Mroonga&quot;,
-#         15,
-#         -14
-#       ],
-#       [
-#         &quot;The first post!&quot;,
-#         5,
-#         -4
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">_key</span><span class="p">,</span><span class="n">n_likes</span><span class="p">,</span><span class="n">_score</span> <span class="o">--</span><span class="nb">filter</span> <span class="n">true</span> <span class="o">--</span><span class="n">scorer</span> <span class="s1">&#39;_score -= n_likes&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_score&quot;,</span>
+<span class="c1">#           &quot;Int32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Good-bye Senna&quot;,</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         -2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Good-bye Tritonn&quot;,</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         -2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Groonga&quot;,</span>
+<span class="c1">#         10,</span>
+<span class="c1">#         -9</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Mroonga&quot;,</span>
+<span class="c1">#         15,</span>
+<span class="c1">#         -14</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         5,</span>
+<span class="c1">#         -4</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>The value of <code class="docutils literal notranslate"><span class="pre">_score</span></code> by <code class="docutils literal notranslate"><span class="pre">--filter</span></code> is always 1 in this case,
@@ -1679,60 +1678,60 @@ is 3.</p>
 <p>Its syntax is <code class="docutils literal notranslate"><span class="pre">column1</span> <span class="pre">*=</span> <span class="pre">column2</span></code>.</p>
 <p>The operator performs multiplication assignment operation on column1 by column2.</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --output_columns _key,n_likes,_score --filter true --scorer &#39;_score *= n_likes&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         5
-#       ],
-#       [
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_score&quot;,
-#           &quot;Int32&quot;
-#         ]
-#       ],
-#       [
-#         &quot;Good-bye Senna&quot;,
-#         3,
-#         3
-#       ],
-#       [
-#         &quot;Good-bye Tritonn&quot;,
-#         3,
-#         3
-#       ],
-#       [
-#         &quot;Groonga&quot;,
-#         10,
-#         10
-#       ],
-#       [
-#         &quot;Mroonga&quot;,
-#         15,
-#         15
-#       ],
-#       [
-#         &quot;The first post!&quot;,
-#         5,
-#         5
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">_key</span><span class="p">,</span><span class="n">n_likes</span><span class="p">,</span><span class="n">_score</span> <span class="o">--</span><span class="nb">filter</span> <span class="n">true</span> <span class="o">--</span><span class="n">scorer</span> <span class="s1">&#39;_score *= n_likes&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_score&quot;,</span>
+<span class="c1">#           &quot;Int32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Good-bye Senna&quot;,</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         3</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Good-bye Tritonn&quot;,</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         3</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Groonga&quot;,</span>
+<span class="c1">#         10,</span>
+<span class="c1">#         10</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Mroonga&quot;,</span>
+<span class="c1">#         15,</span>
+<span class="c1">#         15</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         5,</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>The value of <code class="docutils literal notranslate"><span class="pre">_score</span></code> by <code class="docutils literal notranslate"><span class="pre">--filter</span></code> is always 1 in this case,
@@ -1746,60 +1745,60 @@ is 3.</p>
 <p>Its syntax is <code class="docutils literal notranslate"><span class="pre">column1</span> <span class="pre">/=</span> <span class="pre">column2</span></code>.</p>
 <p>The operator performs division assignment operation on column1 by column2.</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --output_columns _key,n_likes,_score --filter true --scorer &#39;_score /= n_likes&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         5
-#       ],
-#       [
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_score&quot;,
-#           &quot;Int32&quot;
-#         ]
-#       ],
-#       [
-#         &quot;Good-bye Senna&quot;,
-#         3,
-#         0
-#       ],
-#       [
-#         &quot;Good-bye Tritonn&quot;,
-#         3,
-#         0
-#       ],
-#       [
-#         &quot;Groonga&quot;,
-#         10,
-#         0
-#       ],
-#       [
-#         &quot;Mroonga&quot;,
-#         15,
-#         0
-#       ],
-#       [
-#         &quot;The first post!&quot;,
-#         5,
-#         0
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">_key</span><span class="p">,</span><span class="n">n_likes</span><span class="p">,</span><span class="n">_score</span> <span class="o">--</span><span class="nb">filter</span> <span class="n">true</span> <span class="o">--</span><span class="n">scorer</span> <span class="s1">&#39;_score /= n_likes&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_score&quot;,</span>
+<span class="c1">#           &quot;Int32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Good-bye Senna&quot;,</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         0</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Good-bye Tritonn&quot;,</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         0</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Groonga&quot;,</span>
+<span class="c1">#         10,</span>
+<span class="c1">#         0</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Mroonga&quot;,</span>
+<span class="c1">#         15,</span>
+<span class="c1">#         0</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         5,</span>
+<span class="c1">#         0</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>The value of <code class="docutils literal notranslate"><span class="pre">_score</span></code> by <code class="docutils literal notranslate"><span class="pre">--filter</span></code> is always 1 in this case,
@@ -1813,60 +1812,60 @@ is 3.</p>
 <p>Its syntax is <code class="docutils literal notranslate"><span class="pre">column1</span> <span class="pre">%=</span> <span class="pre">column2</span></code>.</p>
 <p>The operator performs modulo assignment operation on column1 by column2.</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --output_columns _key,n_likes,_score --filter true --scorer &#39;_score %= n_likes&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         5
-#       ],
-#       [
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_score&quot;,
-#           &quot;Int32&quot;
-#         ]
-#       ],
-#       [
-#         &quot;Good-bye Senna&quot;,
-#         3,
-#         1
-#       ],
-#       [
-#         &quot;Good-bye Tritonn&quot;,
-#         3,
-#         1
-#       ],
-#       [
-#         &quot;Groonga&quot;,
-#         10,
-#         1
-#       ],
-#       [
-#         &quot;Mroonga&quot;,
-#         15,
-#         1
-#       ],
-#       [
-#         &quot;The first post!&quot;,
-#         5,
-#         1
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">_key</span><span class="p">,</span><span class="n">n_likes</span><span class="p">,</span><span class="n">_score</span> <span class="o">--</span><span class="nb">filter</span> <span class="n">true</span> <span class="o">--</span><span class="n">scorer</span> <span class="s1">&#39;_score %= n_likes&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_score&quot;,</span>
+<span class="c1">#           &quot;Int32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Good-bye Senna&quot;,</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Good-bye Tritonn&quot;,</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Groonga&quot;,</span>
+<span class="c1">#         10,</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Mroonga&quot;,</span>
+<span class="c1">#         15,</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         5,</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>The value of <code class="docutils literal notranslate"><span class="pre">_score</span></code> by <code class="docutils literal notranslate"><span class="pre">--filter</span></code> is always 1 in this case,
@@ -1880,60 +1879,60 @@ is 3.</p>
 <p>Its syntax is <code class="docutils literal notranslate"><span class="pre">column1</span> <span class="pre">&lt;&lt;=</span> <span class="pre">column2</span></code>.</p>
 <p>The operator performs left shift assignment operation on column1 by column2.</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --output_columns _key,n_likes,_score --filter true --scorer &#39;_score &lt;&lt;= n_likes&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         5
-#       ],
-#       [
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_score&quot;,
-#           &quot;Int32&quot;
-#         ]
-#       ],
-#       [
-#         &quot;Good-bye Senna&quot;,
-#         3,
-#         8
-#       ],
-#       [
-#         &quot;Good-bye Tritonn&quot;,
-#         3,
-#         8
-#       ],
-#       [
-#         &quot;Groonga&quot;,
-#         10,
-#         1024
-#       ],
-#       [
-#         &quot;Mroonga&quot;,
-#         15,
-#         32768
-#       ],
-#       [
-#         &quot;The first post!&quot;,
-#         5,
-#         32
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">_key</span><span class="p">,</span><span class="n">n_likes</span><span class="p">,</span><span class="n">_score</span> <span class="o">--</span><span class="nb">filter</span> <span class="n">true</span> <span class="o">--</span><span class="n">scorer</span> <span class="s1">&#39;_score &lt;&lt;= n_likes&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_score&quot;,</span>
+<span class="c1">#           &quot;Int32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Good-bye Senna&quot;,</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         8</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Good-bye Tritonn&quot;,</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         8</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Groonga&quot;,</span>
+<span class="c1">#         10,</span>
+<span class="c1">#         1024</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Mroonga&quot;,</span>
+<span class="c1">#         15,</span>
+<span class="c1">#         32768</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         5,</span>
+<span class="c1">#         32</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>The value of <code class="docutils literal notranslate"><span class="pre">_score</span></code> by <code class="docutils literal notranslate"><span class="pre">--filter</span></code> is always 1 in this case,
@@ -1957,60 +1956,60 @@ is 3.</p>
 <p>Its syntax is <code class="docutils literal notranslate"><span class="pre">column1</span> <span class="pre">&amp;=</span> <span class="pre">column2</span></code>.</p>
 <p>The operator performs bitwise AND assignment operation on column1 by column2.</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --output_columns _key,n_likes,_score --filter true --scorer &#39;_score &amp;= n_likes&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         5
-#       ],
-#       [
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_score&quot;,
-#           &quot;Int32&quot;
-#         ]
-#       ],
-#       [
-#         &quot;Good-bye Senna&quot;,
-#         3,
-#         1
-#       ],
-#       [
-#         &quot;Good-bye Tritonn&quot;,
-#         3,
-#         1
-#       ],
-#       [
-#         &quot;Groonga&quot;,
-#         10,
-#         0
-#       ],
-#       [
-#         &quot;Mroonga&quot;,
-#         15,
-#         1
-#       ],
-#       [
-#         &quot;The first post!&quot;,
-#         5,
-#         1
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">_key</span><span class="p">,</span><span class="n">n_likes</span><span class="p">,</span><span class="n">_score</span> <span class="o">--</span><span class="nb">filter</span> <span class="n">true</span> <span class="o">--</span><span class="n">scorer</span> <span class="s1">&#39;_score &amp;= n_likes&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_score&quot;,</span>
+<span class="c1">#           &quot;Int32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Good-bye Senna&quot;,</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Good-bye Tritonn&quot;,</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Groonga&quot;,</span>
+<span class="c1">#         10,</span>
+<span class="c1">#         0</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Mroonga&quot;,</span>
+<span class="c1">#         15,</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         5,</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>The value of <code class="docutils literal notranslate"><span class="pre">_score</span></code> by <code class="docutils literal notranslate"><span class="pre">--filter</span></code> is always 1 in this case,
@@ -2024,60 +2023,60 @@ is 10.</p>
 <p>Its syntax is <code class="docutils literal notranslate"><span class="pre">column1</span> <span class="pre">|=</span> <span class="pre">column2</span></code>.</p>
 <p>The operator performs bitwise OR assignment operation on column1 by column2.</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --output_columns _key,n_likes,_score --filter true --scorer &#39;_score |= n_likes&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         5
-#       ],
-#       [
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_score&quot;,
-#           &quot;Int32&quot;
-#         ]
-#       ],
-#       [
-#         &quot;Good-bye Senna&quot;,
-#         3,
-#         3
-#       ],
-#       [
-#         &quot;Good-bye Tritonn&quot;,
-#         3,
-#         3
-#       ],
-#       [
-#         &quot;Groonga&quot;,
-#         10,
-#         11
-#       ],
-#       [
-#         &quot;Mroonga&quot;,
-#         15,
-#         15
-#       ],
-#       [
-#         &quot;The first post!&quot;,
-#         5,
-#         5
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">_key</span><span class="p">,</span><span class="n">n_likes</span><span class="p">,</span><span class="n">_score</span> <span class="o">--</span><span class="nb">filter</span> <span class="n">true</span> <span class="o">--</span><span class="n">scorer</span> <span class="s1">&#39;_score |= n_likes&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_score&quot;,</span>
+<span class="c1">#           &quot;Int32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Good-bye Senna&quot;,</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         3</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Good-bye Tritonn&quot;,</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         3</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Groonga&quot;,</span>
+<span class="c1">#         10,</span>
+<span class="c1">#         11</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Mroonga&quot;,</span>
+<span class="c1">#         15,</span>
+<span class="c1">#         15</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         5,</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>The value of <code class="docutils literal notranslate"><span class="pre">_score</span></code> by <code class="docutils literal notranslate"><span class="pre">--filter</span></code> is always 1 in this case,
@@ -2091,60 +2090,60 @@ is 10.</p>
 <p>Its syntax is <code class="docutils literal notranslate"><span class="pre">column1</span> <span class="pre">^=</span> <span class="pre">column2</span></code>.</p>
 <p>The operator performs bitwise XOR assignment operation on column1 by column2.</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --output_columns _key,n_likes,_score --filter true --scorer &#39;_score ^= n_likes&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         5
-#       ],
-#       [
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_score&quot;,
-#           &quot;Int32&quot;
-#         ]
-#       ],
-#       [
-#         &quot;Good-bye Senna&quot;,
-#         3,
-#         2
-#       ],
-#       [
-#         &quot;Good-bye Tritonn&quot;,
-#         3,
-#         2
-#       ],
-#       [
-#         &quot;Groonga&quot;,
-#         10,
-#         11
-#       ],
-#       [
-#         &quot;Mroonga&quot;,
-#         15,
-#         14
-#       ],
-#       [
-#         &quot;The first post!&quot;,
-#         5,
-#         4
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">_key</span><span class="p">,</span><span class="n">n_likes</span><span class="p">,</span><span class="n">_score</span> <span class="o">--</span><span class="nb">filter</span> <span class="n">true</span> <span class="o">--</span><span class="n">scorer</span> <span class="s1">&#39;_score ^= n_likes&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_score&quot;,</span>
+<span class="c1">#           &quot;Int32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Good-bye Senna&quot;,</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Good-bye Tritonn&quot;,</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Groonga&quot;,</span>
+<span class="c1">#         10,</span>
+<span class="c1">#         11</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Mroonga&quot;,</span>
+<span class="c1">#         15,</span>
+<span class="c1">#         14</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         5,</span>
+<span class="c1">#         4</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>The value of <code class="docutils literal notranslate"><span class="pre">_score</span></code> by <code class="docutils literal notranslate"><span class="pre">--filter</span></code> is always 1 in this case,
@@ -2168,33 +2167,33 @@ Because tag search is also implemented by inverted index.</p>
 <p><a class="reference internal" href="query_syntax.html"><span class="doc">Query syntax</span></a> uses this operator by default.</p>
 <p>Here is a simple example.</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;content @ &quot;fast&quot;&#39; --output_columns content
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         2
-#       ],
-#       [
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ]
-#       ],
-#       [
-#         &quot;I started to use Groonga. It&#39;s very fast!&quot;
-#       ],
-#       [
-#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;content @ &quot;fast&quot;&#39;</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">content</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;I started to use Groonga. It&#39;s very fast!&quot;</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>The expression matches records that contain a word <code class="docutils literal notranslate"><span class="pre">fast</span></code> in
@@ -2216,33 +2215,33 @@ records scan. It’s not problem for small records but it spends more
 time for large records.</p>
 <p>Here is a simple example.</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;_key @^ &quot;Goo&quot;&#39; --output_columns _key
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         2
-#       ],
-#       [
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ]
-#       ],
-#       [
-#         &quot;Good-bye Senna&quot;
-#       ],
-#       [
-#         &quot;Good-bye Tritonn&quot;
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;_key @^ &quot;Goo&quot;&#39;</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">_key</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Good-bye Senna&quot;</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Good-bye Tritonn&quot;</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>The expression matches records that contain a word that starts with
@@ -2277,55 +2276,55 @@ large records.</p>
 <p>Here is a simple example. It uses fast suffix search for hiragana in
 Japanese that is one of non-ASCII characters.</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>table_create Titles TABLE_NO_KEY
-# [[0, 1337566253.89858, 0.000355720520019531], true]
-column_create Titles content COLUMN_SCALAR ShortText
-# [[0, 1337566253.89858, 0.000355720520019531], true]
-table_create SuffixSearchTerms TABLE_PAT_KEY|KEY_WITH_SIS ShortText
-# [[0, 1337566253.89858, 0.000355720520019531], true]
-column_create SuffixSearchTerms index COLUMN_INDEX Titles content
-# [[0, 1337566253.89858, 0.000355720520019531], true]
-load --table Titles
-[
-{&quot;content&quot;: &quot;ぐるんが&quot;},
-{&quot;content&quot;: &quot;むるんが&quot;},
-{&quot;content&quot;: &quot;せな&quot;},
-{&quot;content&quot;: &quot;とりとん&quot;}
-]
-# [[0, 1337566253.89858, 0.000355720520019531], 4]
-select Titles --query &#39;content:$んが&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         2
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;ShortText&quot;
-#         ]
-#       ],
-#       [
-#         2,
-#         &quot;むるんが&quot;
-#       ],
-#       [
-#         1,
-#         &quot;ぐるんが&quot;
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">table_create</span> <span class="n">Titles</span> <span class="n">TABLE_NO_KEY</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">column_create</span> <span class="n">Titles</span> <span class="n">content</span> <span class="n">COLUMN_SCALAR</span> <span class="n">ShortText</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">table_create</span> <span class="n">SuffixSearchTerms</span> <span class="n">TABLE_PAT_KEY</span><span class="o">|</span><span class="n">KEY_WITH_SIS</span> <span class="n">ShortText</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">column_create</span> <span class="n">SuffixSearchTerms</span> <span class="n">index</span> <span class="n">COLUMN_INDEX</span> <span class="n">Titles</span> <span class="n">content</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">load</span> <span class="o">--</span><span class="n">table</span> <span class="n">Titles</span>
+<span class="p">[</span>
+<span class="p">{</span><span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;ぐるんが&quot;</span><span class="p">},</span>
+<span class="p">{</span><span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;むるんが&quot;</span><span class="p">},</span>
+<span class="p">{</span><span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;せな&quot;</span><span class="p">},</span>
+<span class="p">{</span><span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;とりとん&quot;</span><span class="p">}</span>
+<span class="p">]</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], 4]</span>
+<span class="n">select</span> <span class="n">Titles</span> <span class="o">--</span><span class="n">query</span> <span class="s1">&#39;content:$んが&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2,</span>
+<span class="c1">#         &quot;むるんが&quot;</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1,</span>
+<span class="c1">#         &quot;ぐるんが&quot;</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>The expression matches records that have value that ends with <code class="docutils literal notranslate"><span class="pre">んが</span></code>
@@ -2335,13 +2334,13 @@ with the expression.</p>
 <div class="section" id="near-search-operator">
 <span id="script-syntax-near-search-operator"></span><h3><span class="section-number">7.13.2.9.4. </span>Near search operator<a class="headerlink" href="#near-search-operator" title="Permalink to this headline">¶</a></h3>
 <p>Its syntax is one of them:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>column *N &quot;word1 word2 ...&quot;
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>column *N &quot;word1 word2 ...&quot;
 column *N${MAX_INTERVAL} &quot;word1 word2 ...&quot;
 </pre></div>
 </div>
 <p>Here are the examples of the second form:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>column *N29 &quot;word1 word2 ...&quot;
-column *N-1 &quot;word1 word2 ...&quot;
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">column</span> <span class="o">*</span><span class="n">N29</span> <span class="s2">&quot;word1 word2 ...&quot;</span>
+<span class="n">column</span> <span class="o">*</span><span class="n">N</span><span class="o">-</span><span class="mi">1</span> <span class="s2">&quot;word1 word2 ...&quot;</span>
 </pre></div>
 </div>
 <p>The first example means that <code class="docutils literal notranslate"><span class="pre">29</span></code> is used for the max interval.</p>
@@ -2362,56 +2361,56 @@ words even if <code class="docutils literal notranslate"><span class="pre">Token
 <code class="docutils literal notranslate"><span class="pre">column</span></code>.</p>
 <p>Here is a simple example.</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;content *N &quot;I fast&quot;&#39;      --output_columns content
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         1
-#       ],
-#       [
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ]
-#       ],
-#       [
-#         &quot;I started to use Groonga. It&#39;s very fast!&quot;
-#       ]
-#     ]
-#   ]
-# ]
-select Entries --filter &#39;content *N &quot;I Really&quot;&#39;    --output_columns content
-# [[0, 1337566253.89858, 0.000355720520019531], [[[0], [[&quot;content&quot;, &quot;Text&quot;]]]]]
-select Entries --filter &#39;content *N &quot;also Really&quot;&#39; --output_columns content
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         1
-#       ],
-#       [
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ]
-#       ],
-#       [
-#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;content *N &quot;I fast&quot;&#39;</span>      <span class="o">--</span><span class="n">output_columns</span> <span class="n">content</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;I started to use Groonga. It&#39;s very fast!&quot;</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
+<span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;content *N &quot;I Really&quot;&#39;</span>    <span class="o">--</span><span class="n">output_columns</span> <span class="n">content</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], [[[0], [[&quot;content&quot;, &quot;Text&quot;]]]]]</span>
+<span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;content *N &quot;also Really&quot;&#39;</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">content</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>The first expression matches records that contain <code class="docutils literal notranslate"><span class="pre">I</span></code> and <code class="docutils literal notranslate"><span class="pre">fast</span></code>
@@ -2433,13 +2432,13 @@ the record that its content is <code class="docutils literal notranslate"><span 
 <div class="section" id="near-phrase-search-operator">
 <span id="script-syntax-near-phrase-search-operator"></span><h3><span class="section-number">7.13.2.9.5. </span>Near phrase search operator<a class="headerlink" href="#near-phrase-search-operator" title="Permalink to this headline">¶</a></h3>
 <p>Its syntax is one of them:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>column *NP &quot;phrase1 phrase2 ...&quot;
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>column *NP &quot;phrase1 phrase2 ...&quot;
 column *NP${MAX_INTERVAL} &quot;phrase1 phrase2 ...&quot;
 </pre></div>
 </div>
 <p>Here are the examples of the second form:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>column *NP29 &quot;phrase1 phrase2 ...&quot;
-column *NP-1 &quot;phrase1 phrase2 ...&quot;
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">column</span> <span class="o">*</span><span class="n">NP29</span> <span class="s2">&quot;phrase1 phrase2 ...&quot;</span>
+<span class="n">column</span> <span class="o">*</span><span class="n">NP</span><span class="o">-</span><span class="mi">1</span> <span class="s2">&quot;phrase1 phrase2 ...&quot;</span>
 </pre></div>
 </div>
 <p>The first example means that <code class="docutils literal notranslate"><span class="pre">29</span></code> is used for the max interval.</p>
@@ -2463,56 +2462,56 @@ words even if <code class="docutils literal notranslate"><span class="pre">Token
 tokenizer to show difference with near search with English text.</p>
 <p>Here is a simple example.</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;content *NP &quot;I fast&quot;&#39;      --output_columns content
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         1
-#       ],
-#       [
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ]
-#       ],
-#       [
-#         &quot;I started to use Groonga. It&#39;s very fast!&quot;
-#       ]
-#     ]
-#   ]
-# ]
-select Entries --filter &#39;content *NP &quot;I Really&quot;&#39;    --output_columns content
-# [[0, 1337566253.89858, 0.000355720520019531], [[[0], [[&quot;content&quot;, &quot;Text&quot;]]]]]
-select Entries --filter &#39;content *NP &quot;also Really&quot;&#39; --output_columns content
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         1
-#       ],
-#       [
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ]
-#       ],
-#       [
-#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;content *NP &quot;I fast&quot;&#39;</span>      <span class="o">--</span><span class="n">output_columns</span> <span class="n">content</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;I started to use Groonga. It&#39;s very fast!&quot;</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
+<span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;content *NP &quot;I Really&quot;&#39;</span>    <span class="o">--</span><span class="n">output_columns</span> <span class="n">content</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], [[[0], [[&quot;content&quot;, &quot;Text&quot;]]]]]</span>
+<span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;content *NP &quot;also Really&quot;&#39;</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">content</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>The first expression matches records that contain <code class="docutils literal notranslate"><span class="pre">I</span></code> and <code class="docutils literal notranslate"><span class="pre">fast</span></code>
@@ -2541,33 +2540,33 @@ search searches records that have similar content to
 <code class="docutils literal notranslate"><span class="pre">column</span></code>.</p>
 <p>Here is a simple example.</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;content *S &quot;I migrated all Solr system!&quot;&#39; --output_columns content
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         2
-#       ],
-#       [
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ]
-#       ],
-#       [
-#         &quot;I migrated all Senna system!&quot;
-#       ],
-#       [
-#         &quot;I also migrated all Tritonn system!&quot;
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;content *S &quot;I migrated all Solr system!&quot;&#39;</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">content</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;I migrated all Senna system!&quot;</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;I also migrated all Tritonn system!&quot;</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>The expression matches records that have similar content to <code class="docutils literal notranslate"><span class="pre">I</span>
@@ -2588,43 +2587,43 @@ support longest common prefix search. Longest common prefix search is
 used to implement the operator.</p>
 <p>Here is a simple example.</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>table_create Words TABLE_PAT_KEY ShortText --normalizer NormalizerAuto
-# [[0, 1337566253.89858, 0.000355720520019531], true]
-load --table Words
-[
-{&quot;_key&quot;: &quot;groonga&quot;},
-{&quot;_key&quot;: &quot;mroonga&quot;},
-{&quot;_key&quot;: &quot;Senna&quot;},
-{&quot;_key&quot;: &quot;Tritonn&quot;}
-]
-# [[0, 1337566253.89858, 0.000355720520019531], 4]
-select Words --filter &#39;_key *T &quot;Groonga is the successor project to Senna.&quot;&#39; --output_columns _key
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         2
-#       ],
-#       [
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ]
-#       ],
-#       [
-#         &quot;groonga&quot;
-#       ],
-#       [
-#         &quot;senna&quot;
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">table_create</span> <span class="n">Words</span> <span class="n">TABLE_PAT_KEY</span> <span class="n">ShortText</span> <span class="o">--</span><span class="n">normalizer</span> <span class="n">NormalizerAuto</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">load</span> <span class="o">--</span><span class="n">table</span> <span class="n">Words</span>
+<span class="p">[</span>
+<span class="p">{</span><span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;groonga&quot;</span><span class="p">},</span>
+<span class="p">{</span><span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;mroonga&quot;</span><span class="p">},</span>
+<span class="p">{</span><span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;Senna&quot;</span><span class="p">},</span>
+<span class="p">{</span><span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;Tritonn&quot;</span><span class="p">}</span>
+<span class="p">]</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], 4]</span>
+<span class="n">select</span> <span class="n">Words</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;_key *T &quot;Groonga is the successor project to Senna.&quot;&#39;</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">_key</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;groonga&quot;</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;senna&quot;</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>The expression extrcts terms that included in document <code class="docutils literal notranslate"><span class="pre">Groonga</span> <span class="pre">is</span>
@@ -2648,51 +2647,51 @@ details.</p>
 <p>The following example uses <code class="docutils literal notranslate"><span class="pre">.roonga</span></code> as pattern. It matches
 <code class="docutils literal notranslate"><span class="pre">Groonga</span></code>, <code class="docutils literal notranslate"><span class="pre">Mroonga</span></code> and so on.</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;content @~ &quot;.roonga&quot;&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         2
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         2,
-#         &quot;Groonga&quot;,
-#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
-#         10
-#       ],
-#       [
-#         3,
-#         &quot;Mroonga&quot;,
-#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
-#         15
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;content @~ &quot;.roonga&quot;&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2,</span>
+<span class="c1">#         &quot;Groonga&quot;,</span>
+<span class="c1">#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,</span>
+<span class="c1">#         10</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         &quot;Mroonga&quot;,</span>
+<span class="c1">#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,</span>
+<span class="c1">#         15</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>In most cases, regular expression is evaluated sequentially. So it may
@@ -2830,7 +2829,7 @@ very fast. See <a class="reference internal" href="../regular_expression.html"><
         <li class="right" >
           <a href="query_syntax.html" title="7.13.1. Query syntax"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v11.0.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v11.0.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../reference.html" ><span class="section-number">7. </span>Reference manual</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../grn_expr.html" ><span class="section-number">7.13. </span>grn_expr</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href=""><span class="section-number">7.13.2. </span>Script syntax</a></li> 

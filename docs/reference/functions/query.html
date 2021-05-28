@@ -15,16 +15,15 @@
 
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>7.15.17. query &#8212; Groonga v11.0.2 documentation</title>
-    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
+    <title>7.15.17. query &#8212; Groonga v11.0.3 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../static/groonga.css" />
     
-    <script id="documentation_options" data-url_root="../../" src="../../static/documentation_options.js"></script>
+    <script data-url_root="../../" id="documentation_options" src="../../static/documentation_options.js"></script>
     <script src="../../static/jquery.js"></script>
     <script src="../../static/underscore.js"></script>
     <script src="../../static/doctools.js"></script>
     
-    <link rel="shortcut icon" href="../../static/favicon.ico"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="7.15.18. query_parallel_or" href="query_parallel_or.html" />
@@ -75,7 +74,7 @@
         <li class="right" >
           <a href="prefix_rk_search.html" title="7.15.16. prefix_rk_search"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v11.0.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v11.0.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../reference.html" ><span class="section-number">7. </span>Reference manual</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../function.html" accesskey="U"><span class="section-number">7.15. </span>Function</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href=""><span class="section-number">7.15.17. </span><code class="docutils literal notranslate"><span class="pre">query</span></code></a></li> 
@@ -105,19 +104,19 @@ by combination of multiple <code class="docutils literal notranslate"><span clas
 <p><code class="docutils literal notranslate"><span class="pre">query</span></code> requires two parameters - <code class="docutils literal notranslate"><span class="pre">match_columns</span></code> and
 <code class="docutils literal notranslate"><span class="pre">query_string</span></code>.</p>
 <p>The parameter <code class="docutils literal notranslate"><span class="pre">query_expander</span></code> and <code class="docutils literal notranslate"><span class="pre">options</span></code> are optional:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>query(match_columns, query_string)
-query(match_columns, query_string, query_expander)
-query(match_columns, query_string, options)
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">query</span><span class="p">(</span><span class="n">match_columns</span><span class="p">,</span> <span class="n">query_string</span><span class="p">)</span>
+<span class="n">query</span><span class="p">(</span><span class="n">match_columns</span><span class="p">,</span> <span class="n">query_string</span><span class="p">,</span> <span class="n">query_expander</span><span class="p">)</span>
+<span class="n">query</span><span class="p">(</span><span class="n">match_columns</span><span class="p">,</span> <span class="n">query_string</span><span class="p">,</span> <span class="n">options</span><span class="p">)</span>
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">options</span></code> uses the following format. All of key-value pairs are
 optional:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{
-  &quot;expander&quot;: query_expander,
-  &quot;default_mode&quot;: default_mode,
-  &quot;default_operator&quot;: default_operator,
-  &quot;flags&quot;: flags
-}
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;expander&quot;</span><span class="p">:</span> <span class="n">query_expander</span><span class="p">,</span>
+  <span class="s2">&quot;default_mode&quot;</span><span class="p">:</span> <span class="n">default_mode</span><span class="p">,</span>
+  <span class="s2">&quot;default_operator&quot;</span><span class="p">:</span> <span class="n">default_operator</span><span class="p">,</span>
+  <span class="s2">&quot;flags&quot;</span><span class="p">:</span> <span class="n">flags</span>
+<span class="p">}</span>
 </pre></div>
 </div>
 </div>
@@ -126,196 +125,196 @@ optional:</p>
 <p>Here are a schema definition and sample data to show usage.</p>
 <p>Sample schema:</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>table_create Documents TABLE_NO_KEY
-# [[0, 1337566253.89858, 0.000355720520019531], true]
-column_create Documents content COLUMN_SCALAR Text
-# [[0, 1337566253.89858, 0.000355720520019531], true]
-table_create Terms TABLE_PAT_KEY ShortText --default_tokenizer TokenBigram  --normalizer NormalizerAuto
-# [[0, 1337566253.89858, 0.000355720520019531], true]
-column_create Terms documents_content_index COLUMN_INDEX|WITH_POSITION Documents content
-# [[0, 1337566253.89858, 0.000355720520019531], true]
-table_create Users TABLE_NO_KEY
-# [[0, 1337566253.89858, 0.000355720520019531], true]
-column_create Users name COLUMN_SCALAR ShortText
-# [[0, 1337566253.89858, 0.000355720520019531], true]
-column_create Users memo COLUMN_SCALAR ShortText
-# [[0, 1337566253.89858, 0.000355720520019531], true]
-table_create Lexicon TABLE_HASH_KEY ShortText \
-  --default_tokenizer TokenBigramSplitSymbolAlphaDigit \
-  --normalizer NormalizerAuto
-# [[0, 1337566253.89858, 0.000355720520019531], true]
-column_create Lexicon users_name COLUMN_INDEX|WITH_POSITION Users name
-# [[0, 1337566253.89858, 0.000355720520019531], true]
-column_create Lexicon users_memo COLUMN_INDEX|WITH_POSITION Users memo
-# [[0, 1337566253.89858, 0.000355720520019531], true]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">table_create</span> <span class="n">Documents</span> <span class="n">TABLE_NO_KEY</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">column_create</span> <span class="n">Documents</span> <span class="n">content</span> <span class="n">COLUMN_SCALAR</span> <span class="n">Text</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">table_create</span> <span class="n">Terms</span> <span class="n">TABLE_PAT_KEY</span> <span class="n">ShortText</span> <span class="o">--</span><span class="n">default_tokenizer</span> <span class="n">TokenBigram</span>  <span class="o">--</span><span class="n">normalizer</span> <span class="n">NormalizerAuto</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">column_create</span> <span class="n">Terms</span> <span class="n">documents_content_index</span> <span class="n">COLUMN_INDEX</span><span class="o">|</span><span class="n">WITH_POSITION</span> <span class="n">Documents</span> <span class="n">content</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">table_create</span> <span class="n">Users</span> <span class="n">TABLE_NO_KEY</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">column_create</span> <span class="n">Users</span> <span class="n">name</span> <span class="n">COLUMN_SCALAR</span> <span class="n">ShortText</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">column_create</span> <span class="n">Users</span> <span class="n">memo</span> <span class="n">COLUMN_SCALAR</span> <span class="n">ShortText</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">table_create</span> <span class="n">Lexicon</span> <span class="n">TABLE_HASH_KEY</span> <span class="n">ShortText</span> \
+  <span class="o">--</span><span class="n">default_tokenizer</span> <span class="n">TokenBigramSplitSymbolAlphaDigit</span> \
+  <span class="o">--</span><span class="n">normalizer</span> <span class="n">NormalizerAuto</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">column_create</span> <span class="n">Lexicon</span> <span class="n">users_name</span> <span class="n">COLUMN_INDEX</span><span class="o">|</span><span class="n">WITH_POSITION</span> <span class="n">Users</span> <span class="n">name</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">column_create</span> <span class="n">Lexicon</span> <span class="n">users_memo</span> <span class="n">COLUMN_INDEX</span><span class="o">|</span><span class="n">WITH_POSITION</span> <span class="n">Users</span> <span class="n">memo</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
 </pre></div>
 </div>
 <p>Sample data:</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>load --table Users
-[
-{&quot;name&quot;: &quot;Alice&quot;, &quot;memo&quot;: &quot;groonga user&quot;},
-{&quot;name&quot;: &quot;Alisa&quot;, &quot;memo&quot;: &quot;mroonga user&quot;},
-{&quot;name&quot;: &quot;Bob&quot;,   &quot;memo&quot;: &quot;rroonga user&quot;},
-{&quot;name&quot;: &quot;Tom&quot;,   &quot;memo&quot;: &quot;nroonga user&quot;},
-{&quot;name&quot;: &quot;Tobby&quot;, &quot;memo&quot;: &quot;groonga and mroonga user. mroonga is ...&quot;},
-]
-# [[0, 1337566253.89858, 0.000355720520019531], 5]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">load</span> <span class="o">--</span><span class="n">table</span> <span class="n">Users</span>
+<span class="p">[</span>
+<span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="s2">&quot;memo&quot;</span><span class="p">:</span> <span class="s2">&quot;groonga user&quot;</span><span class="p">},</span>
+<span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Alisa&quot;</span><span class="p">,</span> <span class="s2">&quot;memo&quot;</span><span class="p">:</span> <span class="s2">&quot;mroonga user&quot;</span><span class="p">},</span>
+<span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Bob&quot;</span><span class="p">,</span>   <span class="s2">&quot;memo&quot;</span><span class="p">:</span> <span class="s2">&quot;rroonga user&quot;</span><span class="p">},</span>
+<span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Tom&quot;</span><span class="p">,</span>   <span class="s2">&quot;memo&quot;</span><span class="p">:</span> <span class="s2">&quot;nroonga user&quot;</span><span class="p">},</span>
+<span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Tobby&quot;</span><span class="p">,</span> <span class="s2">&quot;memo&quot;</span><span class="p">:</span> <span class="s2">&quot;groonga and mroonga user. mroonga is ...&quot;</span><span class="p">},</span>
+<span class="p">]</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], 5]</span>
 </pre></div>
 </div>
 <p>Here is the simple usage of <code class="docutils literal notranslate"><span class="pre">query</span></code> function which executes full
 text search by keyword <code class="docutils literal notranslate"><span class="pre">alice</span></code> without using <code class="docutils literal notranslate"><span class="pre">--match_columns</span></code> and
 <code class="docutils literal notranslate"><span class="pre">--query</span></code> arguments in <code class="docutils literal notranslate"><span class="pre">--filter</span></code>.</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Users --output_columns name,_score --filter &#39;query(&quot;name * 10&quot;, &quot;alice&quot;)&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         1
-#       ],
-#       [
-#         [
-#           &quot;name&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;_score&quot;,
-#           &quot;Int32&quot;
-#         ]
-#       ],
-#       [
-#         &quot;Alice&quot;,
-#         10
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Users</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">name</span><span class="p">,</span><span class="n">_score</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;query(&quot;name * 10&quot;, &quot;alice&quot;)&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;name&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_score&quot;,</span>
+<span class="c1">#           &quot;Int32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Alice&quot;,</span>
+<span class="c1">#         10</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>When executing above query, the keyword <code class="docutils literal notranslate"><span class="pre">alice</span></code> is weighted to the
 value <code class="docutils literal notranslate"><span class="pre">10</span></code>.</p>
 <p>Here are the contrasting examples with/without <code class="docutils literal notranslate"><span class="pre">query</span></code>.</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Users --output_columns name,memo,_score --match_columns &quot;memo * 10&quot; --query &quot;memo:@groonga OR memo:@mroonga OR memo:@user&quot; --sort_keys -_score
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         5
-#       ],
-#       [
-#         [
-#           &quot;name&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;memo&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;_score&quot;,
-#           &quot;Int32&quot;
-#         ]
-#       ],
-#       [
-#         &quot;Tobby&quot;,
-#         &quot;groonga and mroonga user. mroonga is ...&quot;,
-#         4
-#       ],
-#       [
-#         &quot;Alice&quot;,
-#         &quot;groonga user&quot;,
-#         2
-#       ],
-#       [
-#         &quot;Alisa&quot;,
-#         &quot;mroonga user&quot;,
-#         2
-#       ],
-#       [
-#         &quot;Bob&quot;,
-#         &quot;rroonga user&quot;,
-#         1
-#       ],
-#       [
-#         &quot;Tom&quot;,
-#         &quot;nroonga user&quot;,
-#         1
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Users</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">name</span><span class="p">,</span><span class="n">memo</span><span class="p">,</span><span class="n">_score</span> <span class="o">--</span><span class="n">match_columns</span> <span class="s2">&quot;memo * 10&quot;</span> <span class="o">--</span><span class="n">query</span> <span class="s2">&quot;memo:@groonga OR memo:@mroonga OR memo:@user&quot;</span> <span class="o">--</span><span class="n">sort_keys</span> <span class="o">-</span><span class="n">_score</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;name&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;memo&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_score&quot;,</span>
+<span class="c1">#           &quot;Int32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Tobby&quot;,</span>
+<span class="c1">#         &quot;groonga and mroonga user. mroonga is ...&quot;,</span>
+<span class="c1">#         4</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Alice&quot;,</span>
+<span class="c1">#         &quot;groonga user&quot;,</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Alisa&quot;,</span>
+<span class="c1">#         &quot;mroonga user&quot;,</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Bob&quot;,</span>
+<span class="c1">#         &quot;rroonga user&quot;,</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Tom&quot;,</span>
+<span class="c1">#         &quot;nroonga user&quot;,</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>In this case, the all keywords <code class="docutils literal notranslate"><span class="pre">groonga</span></code>, <code class="docutils literal notranslate"><span class="pre">mroonga</span></code> and <code class="docutils literal notranslate"><span class="pre">user</span></code>
 use the default weight. You can’t pass different weight value to each
 keyword in this way.</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Users --output_columns name,memo,_score --filter &#39;query(&quot;memo * 10&quot;, &quot;groonga&quot;) || query(&quot;memo * 20&quot;, &quot;mroonga&quot;) || query(&quot;memo * 1&quot;, &quot;user&quot;)&#39; --sort_keys -_score
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         5
-#       ],
-#       [
-#         [
-#           &quot;name&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;memo&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;_score&quot;,
-#           &quot;Int32&quot;
-#         ]
-#       ],
-#       [
-#         &quot;Tobby&quot;,
-#         &quot;groonga and mroonga user. mroonga is ...&quot;,
-#         51
-#       ],
-#       [
-#         &quot;Alisa&quot;,
-#         &quot;mroonga user&quot;,
-#         21
-#       ],
-#       [
-#         &quot;Alice&quot;,
-#         &quot;groonga user&quot;,
-#         11
-#       ],
-#       [
-#         &quot;Tom&quot;,
-#         &quot;nroonga user&quot;,
-#         1
-#       ],
-#       [
-#         &quot;Bob&quot;,
-#         &quot;rroonga user&quot;,
-#         1
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Users</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">name</span><span class="p">,</span><span class="n">memo</span><span class="p">,</span><span class="n">_score</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;query(&quot;memo * 10&quot;, &quot;groonga&quot;) || query(&quot;memo * 20&quot;, &quot;mroonga&quot;) || query(&quot;memo * 1&quot;, &quot;user&quot;)&#39;</span> <span class="o">--</span><span class="n">sort_keys</span> <span class="o">-</span><span class="n">_score</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;name&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;memo&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_score&quot;,</span>
+<span class="c1">#           &quot;Int32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Tobby&quot;,</span>
+<span class="c1">#         &quot;groonga and mroonga user. mroonga is ...&quot;,</span>
+<span class="c1">#         51</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Alisa&quot;,</span>
+<span class="c1">#         &quot;mroonga user&quot;,</span>
+<span class="c1">#         21</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Alice&quot;,</span>
+<span class="c1">#         &quot;groonga user&quot;,</span>
+<span class="c1">#         11</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Tom&quot;,</span>
+<span class="c1">#         &quot;nroonga user&quot;,</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Bob&quot;,</span>
+<span class="c1">#         &quot;rroonga user&quot;,</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>On the other hand, by specifying multiple <code class="docutils literal notranslate"><span class="pre">query</span></code>, the keywords
@@ -482,9 +481,9 @@ logical operator.</p></td>
 <p>Specifies the flags that customizes how to parse query.</p>
 <p>You can specify multiple flags by separating each flags by <code class="docutils literal notranslate"><span class="pre">|</span></code>. Here
 is the example to specify multiple flags:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>query(&quot;title * 10 || content&quot;,
-      &quot;keyword&quot;,
-      {&quot;flags&quot;: &quot;ALLOW_COLUMN|ALLOW_LEADING_NOT&quot;})
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;title * 10 || content&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;keyword&quot;</span><span class="p">,</span>
+      <span class="p">{</span><span class="s2">&quot;flags&quot;</span><span class="p">:</span> <span class="s2">&quot;ALLOW_COLUMN|ALLOW_LEADING_NOT&quot;</span><span class="p">})</span>
 </pre></div>
 </div>
 <p>See <a class="reference internal" href="../commands/select.html#select-query-flags"><span class="std std-ref">query_flags</span></a> for available flags.</p>
@@ -572,7 +571,7 @@ function can be executable effectively.</p>
         <li class="right" >
           <a href="prefix_rk_search.html" title="7.15.16. prefix_rk_search"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v11.0.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v11.0.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../reference.html" ><span class="section-number">7. </span>Reference manual</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../function.html" ><span class="section-number">7.15. </span>Function</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href=""><span class="section-number">7.15.17. </span><code class="docutils literal notranslate"><span class="pre">query</span></code></a></li> 

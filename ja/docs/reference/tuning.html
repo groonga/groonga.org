@@ -15,17 +15,16 @@
 
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>7.24. チューニング &#8212; Groonga v11.0.2ドキュメント</title>
-    <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../static/groonga.css" type="text/css" />
+    <title>7.24. チューニング &#8212; Groonga v11.0.3ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../static/groonga.css" />
     
-    <script id="documentation_options" data-url_root="../" src="../static/documentation_options.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../static/documentation_options.js"></script>
     <script src="../static/jquery.js"></script>
     <script src="../static/underscore.js"></script>
     <script src="../static/doctools.js"></script>
     <script src="../static/translations.js"></script>
     
-    <link rel="shortcut icon" href="../static/favicon.ico"/>
     <link rel="index" title="索引" href="../genindex.html" />
     <link rel="search" title="検索" href="../search.html" />
     <link rel="next" title="7.25. API" href="api.html" />
@@ -76,7 +75,7 @@
         <li class="right" >
           <a href="log.html" title="7.23. ログ"
              accesskey="P">前へ</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Groonga v11.0.2ドキュメント</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Groonga v11.0.3ドキュメント</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../reference.html" accesskey="U"><span class="section-number">7. </span>リファレンスマニュアル</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href=""><span class="section-number">7.24. </span>チューニング</a></li> 
       </ul>
@@ -102,28 +101,28 @@
 <p>Groongaは1つのテーブル・カラムごとに1つ以上のファイルを作ります。もし、データベース内にたくさんのテーブル・カラムがある場合は、Groongaプロセスはたくさんのファイルを開く必要があります。</p>
 <p>システムでは1プロセスごとに開ける最大ファイル数を制限しています。そのため、この制限を緩和する必要があります。</p>
 <p>Groongaがどのくらいファイルを開くのかを計算する式は次の通りです。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>3 (for DB) +
-  N tables +
-  N columns (except index clumns) +
-  (N index columns * 2) +
-  X (the number of plugins etc.)
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">3</span> <span class="p">(</span><span class="k">for</span> <span class="n">DB</span><span class="p">)</span> <span class="o">+</span>
+  <span class="n">N</span> <span class="n">tables</span> <span class="o">+</span>
+  <span class="n">N</span> <span class="n">columns</span> <span class="p">(</span><span class="k">except</span> <span class="n">index</span> <span class="n">clumns</span><span class="p">)</span> <span class="o">+</span>
+  <span class="p">(</span><span class="n">N</span> <span class="n">index</span> <span class="n">columns</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span>
+  <span class="n">X</span> <span class="p">(</span><span class="n">the</span> <span class="n">number</span> <span class="n">of</span> <span class="n">plugins</span> <span class="n">etc</span><span class="o">.</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>次のスキーマを例として考えます。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>table_create Entries TABLE_HASH_KEY ShortText
-column_create Entries content COLUMN_SCALAR Text
-column_create Entries n_likes COLUMN_SCALAR UInt32
-table_create Terms TABLE_PAT_KEY ShortText --default_tokenizer TokenBigram --normalizer NormalizerAuto
-column_create Terms entries_key_index COLUMN_INDEX|WITH_POSITION Entries _key
-column_create Terms entries_content_index COLUMN_INDEX|WITH_POSITION Entries content
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">table_create</span> <span class="n">Entries</span> <span class="n">TABLE_HASH_KEY</span> <span class="n">ShortText</span>
+<span class="n">column_create</span> <span class="n">Entries</span> <span class="n">content</span> <span class="n">COLUMN_SCALAR</span> <span class="n">Text</span>
+<span class="n">column_create</span> <span class="n">Entries</span> <span class="n">n_likes</span> <span class="n">COLUMN_SCALAR</span> <span class="n">UInt32</span>
+<span class="n">table_create</span> <span class="n">Terms</span> <span class="n">TABLE_PAT_KEY</span> <span class="n">ShortText</span> <span class="o">--</span><span class="n">default_tokenizer</span> <span class="n">TokenBigram</span> <span class="o">--</span><span class="n">normalizer</span> <span class="n">NormalizerAuto</span>
+<span class="n">column_create</span> <span class="n">Terms</span> <span class="n">entries_key_index</span> <span class="n">COLUMN_INDEX</span><span class="o">|</span><span class="n">WITH_POSITION</span> <span class="n">Entries</span> <span class="n">_key</span>
+<span class="n">column_create</span> <span class="n">Terms</span> <span class="n">entries_content_index</span> <span class="n">COLUMN_INDEX</span><span class="o">|</span><span class="n">WITH_POSITION</span> <span class="n">Entries</span> <span class="n">content</span>
 </pre></div>
 </div>
 <p>この例では少なくとも11ファイル開きます。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>3 +
-  2 (Entries and Terms) +
-  2 (Entries.content and Entries.n_likes) +
-  4 (Terms.entries_key_index and Terms.entries_content_index) +
-  X = 11 + X
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">3</span> <span class="o">+</span>
+  <span class="mi">2</span> <span class="p">(</span><span class="n">Entries</span> <span class="ow">and</span> <span class="n">Terms</span><span class="p">)</span> <span class="o">+</span>
+  <span class="mi">2</span> <span class="p">(</span><span class="n">Entries</span><span class="o">.</span><span class="n">content</span> <span class="ow">and</span> <span class="n">Entries</span><span class="o">.</span><span class="n">n_likes</span><span class="p">)</span> <span class="o">+</span>
+  <span class="mi">4</span> <span class="p">(</span><span class="n">Terms</span><span class="o">.</span><span class="n">entries_key_index</span> <span class="ow">and</span> <span class="n">Terms</span><span class="o">.</span><span class="n">entries_content_index</span><span class="p">)</span> <span class="o">+</span>
+  <span class="n">X</span> <span class="o">=</span> <span class="mi">11</span> <span class="o">+</span> <span class="n">X</span>
 </pre></div>
 </div>
 </div>
@@ -142,13 +141,13 @@ column_create Terms entries_content_index COLUMN_INDEX|WITH_POSITION Entries con
 <div class="section" id="nofile">
 <span id="tuning-linux-nofile"></span><h3><span class="section-number">7.24.3.1. </span><code class="docutils literal notranslate"><span class="pre">nofile</span></code><a class="headerlink" href="#nofile" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <p>次の内容の <code class="docutils literal notranslate"><span class="pre">/etc/security/limits.d/groonga.conf</span></code> 設定ファイルを作ることで <a class="reference internal" href="#tuning-max-n-open-files"><span class="std std-ref">1プロセスで開ける最大ファイル数</span></a> パラメーターの制限を緩和することができます。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>${USER} soft nofile ${MAX_VALUE}
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>${USER} soft nofile ${MAX_VALUE}
 ${USER} hard nofile ${MAX_VALUE}
 </pre></div>
 </div>
 <p>Groongaプロセスを <code class="docutils literal notranslate"><span class="pre">groonga</span></code> ユーザーで動かし、Groongaプロセスが10000以下のファイルを開くなら、次の設定を使います。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>groonga soft nofile 10000
-groonga hard nofile 10000
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">groonga</span> <span class="n">soft</span> <span class="n">nofile</span> <span class="mi">10000</span>
+<span class="n">groonga</span> <span class="n">hard</span> <span class="n">nofile</span> <span class="mi">10000</span>
 </pre></div>
 </div>
 <p>この設定はGroongaサービスが再起動したあと、あるいは、 <code class="docutils literal notranslate"><span class="pre">groonga</span></code> ユーザーがログインし直したときに反映されます。</p>
@@ -158,11 +157,11 @@ groonga hard nofile 10000
 <p>これは <a class="reference internal" href="#tuning-memory-usage"><span class="std std-ref">メモリ使用量</span></a> 関連のパラメーターです。 <code class="docutils literal notranslate"><span class="pre">vm.overcommit_memory</span></code> カーネルパラメーターを <code class="docutils literal notranslate"><span class="pre">1</span></code> に設定することで、メモリーとスワップの総量以上のサイズのデータベースを扱うことができます。 <code class="docutils literal notranslate"><span class="pre">1</span></code> は「Groongaは常にデータベースファイルをメモリー上にマップできる」という意味です。Groongaはこの設定を推奨しています。</p>
 <p><code class="docutils literal notranslate"><span class="pre">vm.overcommit_memory</span></code> パラメーターの詳細は <a class="reference external" href="https://www.kernel.org/doc/Documentation/vm/overcommit-accounting">overcommitに関するLinuxカーネルのドキュメント</a> を参照してください。</p>
 <p>次の内容の <code class="docutils literal notranslate"><span class="pre">/etc/sysctl.d/groonga.conf</span></code> 設定ファイルを作成することでこの設定をすることができます。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>vm.overcommit_memory = 1
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vm</span><span class="o">.</span><span class="n">overcommit_memory</span> <span class="o">=</span> <span class="mi">1</span>
 </pre></div>
 </div>
 <p>設定した内容はシステムを再起動するか、次のコマンドを実行することで反映されます。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% sudo sysctl --system
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">sudo</span> <span class="n">sysctl</span> <span class="o">--</span><span class="n">system</span>
 </pre></div>
 </div>
 </div>
@@ -171,16 +170,16 @@ groonga hard nofile 10000
 <p>これは <a class="reference internal" href="#tuning-memory-usage"><span class="std std-ref">メモリ使用量</span></a> 関連のパラメーターです。 <code class="docutils literal notranslate"><span class="pre">vm.max_map_count</span></code> カーネルパラメーターの値を増やすことで16GiB以上のサイズのデータベースを扱うことができます。このパラメーターはメモリーマップの回数を制限します。</p>
 <p>このカーネルパラメーターのデフォルト値は <code class="docutils literal notranslate"><span class="pre">65530</span></code> か <code class="docutils literal notranslate"><span class="pre">65536</span></code> です。Groongaは一度に256KiBずつメモリー上にマップします。データベースが16GiBよりも大きい場合、Groongaはこの制限に達します。（ <code class="docutils literal notranslate"><span class="pre">256KiB</span> <span class="pre">*</span> <span class="pre">65536</span> <span class="pre">=</span> <span class="pre">16GiB</span></code> ）</p>
 <p>16GiB以上のサイズのデータベースを扱う場合はこのカーネルパラメーターの値を増やす必要があります。たとえば、 <code class="docutils literal notranslate"><span class="pre">65536</span> <span class="pre">*</span> <span class="pre">2</span> <span class="pre">=</span> <span class="pre">131072</span></code> まで増やすと32GiBくらいのデータベースを扱うことができます。次の内容の設定ファイルを <code class="docutils literal notranslate"><span class="pre">/etc/sysctl.d/groonga.conf</span></code> に置くとこの設定を適用できます。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>vm.max_map_count = 131072
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vm</span><span class="o">.</span><span class="n">max_map_count</span> <span class="o">=</span> <span class="mi">131072</span>
 </pre></div>
 </div>
 <p>すでに <code class="docutils literal notranslate"><span class="pre">vm.overcommit_memory</span></code> の設定があるはずなので、実際の設定ファイルの内容は次のようになることに注意してください。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>vm.overcommit_memory = 1
-vm.max_map_count = 131072
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vm</span><span class="o">.</span><span class="n">overcommit_memory</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">vm</span><span class="o">.</span><span class="n">max_map_count</span> <span class="o">=</span> <span class="mi">131072</span>
 </pre></div>
 </div>
 <p>設定した内容はシステムを再起動するか、次のコマンドを実行することで反映されます。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>% sudo sysctl -p
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">sudo</span> <span class="n">sysctl</span> <span class="o">-</span><span class="n">p</span>
 </pre></div>
 </div>
 </div>
@@ -257,7 +256,7 @@ vm.max_map_count = 131072
         <li class="right" >
           <a href="log.html" title="7.23. ログ"
              >前へ</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Groonga v11.0.2ドキュメント</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Groonga v11.0.3ドキュメント</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../reference.html" ><span class="section-number">7. </span>リファレンスマニュアル</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href=""><span class="section-number">7.24. </span>チューニング</a></li> 
       </ul>

@@ -15,17 +15,16 @@
 
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>7.13.2. スクリプト構文 &#8212; Groonga v11.0.2ドキュメント</title>
-    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
+    <title>7.13.2. スクリプト構文 &#8212; Groonga v11.0.3ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../../static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../static/groonga.css" />
     
-    <script id="documentation_options" data-url_root="../../" src="../../static/documentation_options.js"></script>
+    <script data-url_root="../../" id="documentation_options" src="../../static/documentation_options.js"></script>
     <script src="../../static/jquery.js"></script>
     <script src="../../static/underscore.js"></script>
     <script src="../../static/doctools.js"></script>
     <script src="../../static/translations.js"></script>
     
-    <link rel="shortcut icon" href="../../static/favicon.ico"/>
     <link rel="index" title="索引" href="../../genindex.html" />
     <link rel="search" title="検索" href="../../search.html" />
     <link rel="next" title="7.14. 正規表現" href="../regular_expression.html" />
@@ -76,7 +75,7 @@
         <li class="right" >
           <a href="query_syntax.html" title="7.13.1. クエリー構文"
              accesskey="P">前へ</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v11.0.2ドキュメント</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v11.0.3ドキュメント</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../reference.html" ><span class="section-number">7. </span>リファレンスマニュアル</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../grn_expr.html" accesskey="U"><span class="section-number">7.13. </span>grn_expr</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href=""><span class="section-number">7.13.2. </span>スクリプト構文</a></li> 
@@ -97,20 +96,20 @@
 <p>セキュリティーの観点からユーザーからの入力をそのままGroongaに渡すべきではありません。悪意のあるユーザーがそのユーザーには参照できてはいけないレコードを取得するクエリーを入力するかもしれないからです。</p>
 <p>例えば、以下の状況を考えてみましょう。</p>
 <p>あるGroongaアプリケーションがGroongaへのリクエストを次のようなプログラムで構築していたとします。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>filter = &quot;column @ \&quot;#{user_input}\&quot;&quot;
-select_options = {
-  # ...
-  :filter =&gt; filter,
-}
-groonga_client.select(select_options)
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">filter</span> <span class="o">=</span> <span class="s2">&quot;column @ </span><span class="se">\&quot;</span><span class="s2">#</span><span class="si">{user_input}</span><span class="se">\&quot;</span><span class="s2">&quot;</span>
+<span class="n">select_options</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="c1"># ...</span>
+  <span class="p">:</span><span class="nb">filter</span> <span class="o">=&gt;</span> <span class="nb">filter</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="n">groonga_client</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">select_options</span><span class="p">)</span>
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">user_input</span></code> はユーザーからの入力です。入力が <code class="docutils literal notranslate"><span class="pre">query</span></code> だった場合は構築された <a class="reference internal" href="../commands/select.html#select-filter"><span class="std std-ref">filter</span></a> 引数は次のようになります。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>column @ &quot;query&quot;
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">column</span> <span class="o">@</span> <span class="s2">&quot;query&quot;</span>
 </pre></div>
 </div>
 <p>もし、入力が <code class="docutils literal notranslate"><span class="pre">x&quot;</span> <span class="pre">||</span> <span class="pre">true</span> <span class="pre">||</span> <span class="pre">&quot;</span></code> だった場合は構築された <a class="reference internal" href="../commands/select.html#select-filter"><span class="std std-ref">filter</span></a> 引数は次のようになります。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>column @ &quot;x&quot; || true || &quot;&quot;
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">column</span> <span class="o">@</span> <span class="s2">&quot;x&quot;</span> <span class="o">||</span> <span class="n">true</span> <span class="o">||</span> <span class="s2">&quot;&quot;</span>
 </pre></div>
 </div>
 <p>このクエリーはすべてのレコードにマッチします。このユーザーはデータベース中のすべてのレコードを取得するでしょう。このユーザーには悪意があったのかもしれません。</p>
@@ -129,37 +128,37 @@ groonga_client.select(select_options)
 <h2><span class="section-number">7.13.2.2. </span>サンプルデータ<a class="headerlink" href="#sample-data" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <p>使い方を示すために使うスキーマ定義とサンプルデータは以下の通りです。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>table_create Entries TABLE_PAT_KEY ShortText
-# [[0, 1337566253.89858, 0.000355720520019531], true]
-column_create Entries content COLUMN_SCALAR Text
-# [[0, 1337566253.89858, 0.000355720520019531], true]
-column_create Entries n_likes COLUMN_SCALAR UInt32
-# [[0, 1337566253.89858, 0.000355720520019531], true]
-table_create Terms TABLE_PAT_KEY ShortText --default_tokenizer TokenBigram --normalizer NormalizerAuto
-# [[0, 1337566253.89858, 0.000355720520019531], true]
-column_create Terms entries_key_index COLUMN_INDEX|WITH_POSITION Entries _key
-# [[0, 1337566253.89858, 0.000355720520019531], true]
-column_create Terms entries_content_index COLUMN_INDEX|WITH_POSITION Entries content
-# [[0, 1337566253.89858, 0.000355720520019531], true]
-load --table Entries
-[
-{&quot;_key&quot;:    &quot;The first post!&quot;,
- &quot;content&quot;: &quot;Welcome! This is my first post!&quot;,
- &quot;n_likes&quot;: 5},
-{&quot;_key&quot;:    &quot;Groonga&quot;,
- &quot;content&quot;: &quot;I started to use Groonga. It&#39;s very fast!&quot;,
- &quot;n_likes&quot;: 10},
-{&quot;_key&quot;:    &quot;Mroonga&quot;,
- &quot;content&quot;: &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
- &quot;n_likes&quot;: 15},
-{&quot;_key&quot;:    &quot;Good-bye Senna&quot;,
- &quot;content&quot;: &quot;I migrated all Senna system!&quot;,
- &quot;n_likes&quot;: 3},
-{&quot;_key&quot;:    &quot;Good-bye Tritonn&quot;,
- &quot;content&quot;: &quot;I also migrated all Tritonn system!&quot;,
- &quot;n_likes&quot;: 3}
-]
-# [[0, 1337566253.89858, 0.000355720520019531], 5]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">table_create</span> <span class="n">Entries</span> <span class="n">TABLE_PAT_KEY</span> <span class="n">ShortText</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">column_create</span> <span class="n">Entries</span> <span class="n">content</span> <span class="n">COLUMN_SCALAR</span> <span class="n">Text</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">column_create</span> <span class="n">Entries</span> <span class="n">n_likes</span> <span class="n">COLUMN_SCALAR</span> <span class="n">UInt32</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">table_create</span> <span class="n">Terms</span> <span class="n">TABLE_PAT_KEY</span> <span class="n">ShortText</span> <span class="o">--</span><span class="n">default_tokenizer</span> <span class="n">TokenBigram</span> <span class="o">--</span><span class="n">normalizer</span> <span class="n">NormalizerAuto</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">column_create</span> <span class="n">Terms</span> <span class="n">entries_key_index</span> <span class="n">COLUMN_INDEX</span><span class="o">|</span><span class="n">WITH_POSITION</span> <span class="n">Entries</span> <span class="n">_key</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">column_create</span> <span class="n">Terms</span> <span class="n">entries_content_index</span> <span class="n">COLUMN_INDEX</span><span class="o">|</span><span class="n">WITH_POSITION</span> <span class="n">Entries</span> <span class="n">content</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">load</span> <span class="o">--</span><span class="n">table</span> <span class="n">Entries</span>
+<span class="p">[</span>
+<span class="p">{</span><span class="s2">&quot;_key&quot;</span><span class="p">:</span>    <span class="s2">&quot;The first post!&quot;</span><span class="p">,</span>
+ <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;Welcome! This is my first post!&quot;</span><span class="p">,</span>
+ <span class="s2">&quot;n_likes&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">},</span>
+<span class="p">{</span><span class="s2">&quot;_key&quot;</span><span class="p">:</span>    <span class="s2">&quot;Groonga&quot;</span><span class="p">,</span>
+ <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;I started to use Groonga. It&#39;s very fast!&quot;</span><span class="p">,</span>
+ <span class="s2">&quot;n_likes&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">},</span>
+<span class="p">{</span><span class="s2">&quot;_key&quot;</span><span class="p">:</span>    <span class="s2">&quot;Mroonga&quot;</span><span class="p">,</span>
+ <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;</span><span class="p">,</span>
+ <span class="s2">&quot;n_likes&quot;</span><span class="p">:</span> <span class="mi">15</span><span class="p">},</span>
+<span class="p">{</span><span class="s2">&quot;_key&quot;</span><span class="p">:</span>    <span class="s2">&quot;Good-bye Senna&quot;</span><span class="p">,</span>
+ <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;I migrated all Senna system!&quot;</span><span class="p">,</span>
+ <span class="s2">&quot;n_likes&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">},</span>
+<span class="p">{</span><span class="s2">&quot;_key&quot;</span><span class="p">:</span>    <span class="s2">&quot;Good-bye Tritonn&quot;</span><span class="p">,</span>
+ <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;I also migrated all Tritonn system!&quot;</span><span class="p">,</span>
+ <span class="s2">&quot;n_likes&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">}</span>
+<span class="p">]</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], 5]</span>
 </pre></div>
 </div>
 <p>ブログエントリ用の <code class="docutils literal notranslate"><span class="pre">Entries</span></code> テーブルがあります。各エントリはタイトルと内容と「いいね！」数を持っています。タイトルは <code class="docutils literal notranslate"><span class="pre">Entries</span></code> のキーとします。内容は <code class="docutils literal notranslate"><span class="pre">Entries.content</span></code> カラムの値とします。「いいね！」数は <code class="docutils literal notranslate"><span class="pre">Entries.n_likes</span></code> カラムの値とします。</p>
@@ -234,57 +233,57 @@ load --table Entries
 <p><code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">?</span> <span class="pre">B</span> <span class="pre">:</span> <span class="pre">C</span></code> は <code class="docutils literal notranslate"><span class="pre">A</span></code> が真なら <code class="docutils literal notranslate"><span class="pre">B</span></code> を返して、そうでなかったら <code class="docutils literal notranslate"><span class="pre">C</span></code> を返します。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == (_id == 1 ? 5 : 3)&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         3
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         4,
-#         &quot;Good-bye Senna&quot;,
-#         &quot;I migrated all Senna system!&quot;,
-#         3
-#       ],
-#       [
-#         5,
-#         &quot;Good-bye Tritonn&quot;,
-#         &quot;I also migrated all Tritonn system!&quot;,
-#         3
-#       ],
-#       [
-#         1,
-#         &quot;The first post!&quot;,
-#         &quot;Welcome! This is my first post!&quot;,
-#         5
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;n_likes == (_id == 1 ? 5 : 3)&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         3</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         4,</span>
+<span class="c1">#         &quot;Good-bye Senna&quot;,</span>
+<span class="c1">#         &quot;I migrated all Senna system!&quot;,</span>
+<span class="c1">#         3</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         5,</span>
+<span class="c1">#         &quot;Good-bye Tritonn&quot;,</span>
+<span class="c1">#         &quot;I also migrated all Tritonn system!&quot;,</span>
+<span class="c1">#         3</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1,</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         &quot;Welcome! This is my first post!&quot;,</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>この式は <code class="docutils literal notranslate"><span class="pre">_id</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">1</span></code> で <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">5</span></code> または <code class="docutils literal notranslate"><span class="pre">_id</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">1</span></code> ではなく <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">3</span></code> のレコードにマッチします。</p>
@@ -295,96 +294,96 @@ load --table Entries
 <p><code class="docutils literal notranslate"><span class="pre">(...)</span></code> は1つ以上の式をグループ化します。グループ化された式は1つの式として処理されます。 <code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">&amp;&amp;</span> <span class="pre">b</span> <span class="pre">||</span> <span class="pre">c</span></code> は <code class="docutils literal notranslate"><span class="pre">a</span></code> と <code class="docutils literal notranslate"><span class="pre">b</span></code> の両方がマッチするか、 <code class="docutils literal notranslate"><span class="pre">c</span></code> がマッチすれば式全体がマッチする、という意味になります。 <code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">&amp;&amp;</span> <span class="pre">(b</span> <span class="pre">||</span> <span class="pre">c)</span></code> は <code class="docutils literal notranslate"><span class="pre">a</span></code> がマッチして <code class="docutils literal notranslate"><span class="pre">b</span></code> と <code class="docutils literal notranslate"><span class="pre">c</span></code> はどちらか一方がマッチすれば式全体がマッチする、という意味になります。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; content @ &quot;senna&quot; || content @ &quot;fast&quot;&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         3
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         4,
-#         &quot;Good-bye Senna&quot;,
-#         &quot;I migrated all Senna system!&quot;,
-#         3
-#       ],
-#       [
-#         2,
-#         &quot;Groonga&quot;,
-#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
-#         10
-#       ],
-#       [
-#         3,
-#         &quot;Mroonga&quot;,
-#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
-#         15
-#       ]
-#     ]
-#   ]
-# ]
-select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&quot; || content @ &quot;fast&quot;)&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         1
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         4,
-#         &quot;Good-bye Senna&quot;,
-#         &quot;I migrated all Senna system!&quot;,
-#         3
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;n_likes &lt; 5 &amp;&amp; content @ &quot;senna&quot; || content @ &quot;fast&quot;&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         3</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         4,</span>
+<span class="c1">#         &quot;Good-bye Senna&quot;,</span>
+<span class="c1">#         &quot;I migrated all Senna system!&quot;,</span>
+<span class="c1">#         3</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2,</span>
+<span class="c1">#         &quot;Groonga&quot;,</span>
+<span class="c1">#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,</span>
+<span class="c1">#         10</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         &quot;Mroonga&quot;,</span>
+<span class="c1">#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,</span>
+<span class="c1">#         15</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
+<span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&quot; || content @ &quot;fast&quot;)&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         4,</span>
+<span class="c1">#         &quot;Good-bye Senna&quot;,</span>
+<span class="c1">#         &quot;I migrated all Senna system!&quot;,</span>
+<span class="c1">#         3</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>最初の式はグループ化していません。この式は <code class="docutils literal notranslate"><span class="pre">n_likes</span> <span class="pre">&lt;</span> <span class="pre">5</span></code> と <code class="docutils literal notranslate"><span class="pre">content</span> <span class="pre">&#64;</span> <span class="pre">&quot;senna&quot;</span></code> の両方がマッチするか <code class="docutils literal notranslate"><span class="pre">content</span> <span class="pre">&#64;</span> <span class="pre">&quot;fast&quot;</span></code> がマッチするレコードにマッチします。</p>
@@ -397,51 +396,51 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 <p>利用可能な関数の一覧は <a class="reference internal" href="../function.html"><span class="doc">関数</span></a> を参照してください。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;edit_distance(_key, &quot;Groonga&quot;) &lt;= 1&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         2
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         2,
-#         &quot;Groonga&quot;,
-#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
-#         10
-#       ],
-#       [
-#         3,
-#         &quot;Mroonga&quot;,
-#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
-#         15
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;edit_distance(_key, &quot;Groonga&quot;) &lt;= 1&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2,</span>
+<span class="c1">#         &quot;Groonga&quot;,</span>
+<span class="c1">#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,</span>
+<span class="c1">#         10</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         &quot;Mroonga&quot;,</span>
+<span class="c1">#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,</span>
+<span class="c1">#         15</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>この式は <a class="reference internal" href="../functions/edit_distance.html"><span class="doc">edit_distance</span></a> を使っています。この式は <code class="docutils literal notranslate"><span class="pre">_key</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">&quot;Groonga&quot;</span></code> に似ているレコードにマッチします。 <code class="docutils literal notranslate"><span class="pre">&quot;Groonga&quot;</span></code> との類似度は編集距離で計算します。編集距離が1文字以下なら似ているとします。この場合は <code class="docutils literal notranslate"><span class="pre">&quot;Groonga&quot;</span></code> と <code class="docutils literal notranslate"><span class="pre">&quot;Mroonga&quot;</span></code> が似ている値です。</p>
@@ -458,45 +457,45 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 <p>この演算子は <code class="docutils literal notranslate"><span class="pre">number1</span></code> と <code class="docutils literal notranslate"><span class="pre">number2</span></code> を足した結果を返します。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == 10 + 5&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         1
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         3,
-#         &quot;Mroonga&quot;,
-#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
-#         15
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;n_likes == 10 + 5&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         &quot;Mroonga&quot;,</span>
+<span class="c1">#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,</span>
+<span class="c1">#         15</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>この式は <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">15</span></code> (= <code class="docutils literal notranslate"><span class="pre">10</span> <span class="pre">+</span> <span class="pre">5</span></code>) のレコードにマッチします。</p>
@@ -507,45 +506,45 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 <p>この演算子は <code class="docutils literal notranslate"><span class="pre">number2</span></code> から <code class="docutils literal notranslate"><span class="pre">number1</span></code> を引いた結果を返します。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == 20 - 5&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         1
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         3,
-#         &quot;Mroonga&quot;,
-#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
-#         15
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;n_likes == 20 - 5&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         &quot;Mroonga&quot;,</span>
+<span class="c1">#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,</span>
+<span class="c1">#         15</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>この式は <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">15</span></code> (= <code class="docutils literal notranslate"><span class="pre">20</span> <span class="pre">-</span> <span class="pre">5</span></code>) のレコードにマッチします。</p>
@@ -556,45 +555,45 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 <p>この演算子は <code class="docutils literal notranslate"><span class="pre">number1</span></code> と <code class="docutils literal notranslate"><span class="pre">number2</span></code> を掛けた結果を返します。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == 3 * 5&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         1
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         3,
-#         &quot;Mroonga&quot;,
-#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
-#         15
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;n_likes == 3 * 5&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         &quot;Mroonga&quot;,</span>
+<span class="c1">#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,</span>
+<span class="c1">#         15</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>この式は <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">15</span></code> (= <code class="docutils literal notranslate"><span class="pre">3</span> <span class="pre">*</span> <span class="pre">5</span></code>) のレコードにマッチします。</p>
@@ -605,94 +604,94 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 <p>この演算子は <code class="docutils literal notranslate"><span class="pre">number2</span></code> を <code class="docutils literal notranslate"><span class="pre">number1</span></code> で割ります。 <code class="docutils literal notranslate"><span class="pre">/</span></code> は商を返します。 <code class="docutils literal notranslate"><span class="pre">%</span></code> は余りを返します。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == 26 / 7&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         2
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         4,
-#         &quot;Good-bye Senna&quot;,
-#         &quot;I migrated all Senna system!&quot;,
-#         3
-#       ],
-#       [
-#         5,
-#         &quot;Good-bye Tritonn&quot;,
-#         &quot;I also migrated all Tritonn system!&quot;,
-#         3
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;n_likes == 26 / 7&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         4,</span>
+<span class="c1">#         &quot;Good-bye Senna&quot;,</span>
+<span class="c1">#         &quot;I migrated all Senna system!&quot;,</span>
+<span class="c1">#         3</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         5,</span>
+<span class="c1">#         &quot;Good-bye Tritonn&quot;,</span>
+<span class="c1">#         &quot;I also migrated all Tritonn system!&quot;,</span>
+<span class="c1">#         3</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>この式は <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">3</span></code> (= <code class="docutils literal notranslate"><span class="pre">26</span> <span class="pre">/</span> <span class="pre">7</span></code>) のレコードにマッチします。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == 26 % 7&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         1
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         1,
-#         &quot;The first post!&quot;,
-#         &quot;Welcome! This is my first post!&quot;,
-#         5
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;n_likes == 26 % 7&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1,</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         &quot;Welcome! This is my first post!&quot;,</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>この式は <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">5</span></code> (= <code class="docutils literal notranslate"><span class="pre">26</span> <span class="pre">%</span> <span class="pre">7</span></code>) の値にマッチします。</p>
@@ -707,63 +706,63 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 <p>この演算子は <code class="docutils literal notranslate"><span class="pre">condition</span></code> の真偽値を反転します。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;!(n_likes == 5)&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         4
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         4,
-#         &quot;Good-bye Senna&quot;,
-#         &quot;I migrated all Senna system!&quot;,
-#         3
-#       ],
-#       [
-#         5,
-#         &quot;Good-bye Tritonn&quot;,
-#         &quot;I also migrated all Tritonn system!&quot;,
-#         3
-#       ],
-#       [
-#         2,
-#         &quot;Groonga&quot;,
-#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
-#         10
-#       ],
-#       [
-#         3,
-#         &quot;Mroonga&quot;,
-#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
-#         15
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;!(n_likes == 5)&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         4</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         4,</span>
+<span class="c1">#         &quot;Good-bye Senna&quot;,</span>
+<span class="c1">#         &quot;I migrated all Senna system!&quot;,</span>
+<span class="c1">#         3</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         5,</span>
+<span class="c1">#         &quot;Good-bye Tritonn&quot;,</span>
+<span class="c1">#         &quot;I also migrated all Tritonn system!&quot;,</span>
+<span class="c1">#         3</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2,</span>
+<span class="c1">#         &quot;Groonga&quot;,</span>
+<span class="c1">#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,</span>
+<span class="c1">#         10</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         &quot;Mroonga&quot;,</span>
+<span class="c1">#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,</span>
+<span class="c1">#         15</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>この式は <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">5</span></code> ではない式にマッチします。</p>
@@ -774,51 +773,51 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 <p>この演算子は <code class="docutils literal notranslate"><span class="pre">condition1</span></code> と <code class="docutils literal notranslate"><span class="pre">condition2</span></code> の両方が真のときに真を返し、そうでなければ偽を返します。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;content @ &quot;fast&quot; &amp;&amp; n_likes &gt;= 10&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         2
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         2,
-#         &quot;Groonga&quot;,
-#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
-#         10
-#       ],
-#       [
-#         3,
-#         &quot;Mroonga&quot;,
-#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
-#         15
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;content @ &quot;fast&quot; &amp;&amp; n_likes &gt;= 10&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2,</span>
+<span class="c1">#         &quot;Groonga&quot;,</span>
+<span class="c1">#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,</span>
+<span class="c1">#         10</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         &quot;Mroonga&quot;,</span>
+<span class="c1">#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,</span>
+<span class="c1">#         15</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>この式は <code class="docutils literal notranslate"><span class="pre">content</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">fast</span></code> を含んでいて、 <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">10</span></code> 以上のレコードにマッチします。</p>
@@ -829,51 +828,51 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 <p>この演算子は <code class="docutils literal notranslate"><span class="pre">condition1</span></code> と <code class="docutils literal notranslate"><span class="pre">condition2</span></code> のどちらか一方が真のときに真を返し、そうでなければ偽を返します。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == 5 || n_likes == 10&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         2
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         1,
-#         &quot;The first post!&quot;,
-#         &quot;Welcome! This is my first post!&quot;,
-#         5
-#       ],
-#       [
-#         2,
-#         &quot;Groonga&quot;,
-#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
-#         10
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;n_likes == 5 || n_likes == 10&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1,</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         &quot;Welcome! This is my first post!&quot;,</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2,</span>
+<span class="c1">#         &quot;Groonga&quot;,</span>
+<span class="c1">#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,</span>
+<span class="c1">#         10</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>この式は <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">5</span></code> または <code class="docutils literal notranslate"><span class="pre">10</span></code> のレコードにマッチします。</p>
@@ -884,45 +883,45 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 <p>この演算子は <code class="docutils literal notranslate"><span class="pre">condition1</span></code> が真で <code class="docutils literal notranslate"><span class="pre">condition2</span></code> が偽のときに真を返し、そうでなければ偽を返します。差集合を返すということです。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;content @ &quot;fast&quot; &amp;! content @ &quot;mroonga&quot;&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         1
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         2,
-#         &quot;Groonga&quot;,
-#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
-#         10
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;content @ &quot;fast&quot; &amp;! content @ &quot;mroonga&quot;&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2,</span>
+<span class="c1">#         &quot;Groonga&quot;,</span>
+<span class="c1">#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,</span>
+<span class="c1">#         10</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>この式は <code class="docutils literal notranslate"><span class="pre">content</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">fast</span></code> を含んでいるが <code class="docutils literal notranslate"><span class="pre">mroonga</span></code> を含んでいないレコードにマッチします。</p>
@@ -937,45 +936,45 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 <p>この演算子は <code class="docutils literal notranslate"><span class="pre">number</span></code> の各ビットを反転した結果を返します。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;~n_likes == -6&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         1
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         1,
-#         &quot;The first post!&quot;,
-#         &quot;Welcome! This is my first post!&quot;,
-#         5
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;~n_likes == -6&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1,</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         &quot;Welcome! This is my first post!&quot;,</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>この式は <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">5</span></code> のレコードにマッチします。なぜならば、 <code class="docutils literal notranslate"><span class="pre">5</span></code> の各ビットを反転すると <code class="docutils literal notranslate"><span class="pre">-6</span></code> になるからです。</p>
@@ -986,63 +985,63 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 <p>この演算子は <code class="docutils literal notranslate"><span class="pre">number1</span></code> と <code class="docutils literal notranslate"><span class="pre">number2</span></code> をビット単位で論理積をした結果を返します。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;(n_likes &amp; 1) == 1&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         4
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         4,
-#         &quot;Good-bye Senna&quot;,
-#         &quot;I migrated all Senna system!&quot;,
-#         3
-#       ],
-#       [
-#         5,
-#         &quot;Good-bye Tritonn&quot;,
-#         &quot;I also migrated all Tritonn system!&quot;,
-#         3
-#       ],
-#       [
-#         3,
-#         &quot;Mroonga&quot;,
-#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
-#         15
-#       ],
-#       [
-#         1,
-#         &quot;The first post!&quot;,
-#         &quot;Welcome! This is my first post!&quot;,
-#         5
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;(n_likes &amp; 1) == 1&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         4</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         4,</span>
+<span class="c1">#         &quot;Good-bye Senna&quot;,</span>
+<span class="c1">#         &quot;I migrated all Senna system!&quot;,</span>
+<span class="c1">#         3</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         5,</span>
+<span class="c1">#         &quot;Good-bye Tritonn&quot;,</span>
+<span class="c1">#         &quot;I also migrated all Tritonn system!&quot;,</span>
+<span class="c1">#         3</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         &quot;Mroonga&quot;,</span>
+<span class="c1">#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,</span>
+<span class="c1">#         15</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1,</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         &quot;Welcome! This is my first post!&quot;,</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>この式は <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> カラムの値が偶数のレコードにマッチします。なぜならば、偶数と <code class="docutils literal notranslate"><span class="pre">1</span></code> のビット単位の論理積は <code class="docutils literal notranslate"><span class="pre">1</span></code> になり、奇数と <code class="docutils literal notranslate"><span class="pre">1</span></code> のビット単位の論理積は <code class="docutils literal notranslate"><span class="pre">0</span></code> になるからです。</p>
@@ -1054,45 +1053,45 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 <p>この演算子は <code class="docutils literal notranslate"><span class="pre">number1</span></code> と <code class="docutils literal notranslate"><span class="pre">number2</span></code> をビット単位で論理和した結果を返します。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == (1 | 4)&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         1
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         1,
-#         &quot;The first post!&quot;,
-#         &quot;Welcome! This is my first post!&quot;,
-#         5
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;n_likes == (1 | 4)&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1,</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         &quot;Welcome! This is my first post!&quot;,</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>この式は <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">5</span></code> (= <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">|</span> <span class="pre">4</span></code>) のレコードにマッチします。</p>
@@ -1103,45 +1102,45 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 <p>この演算子は <code class="docutils literal notranslate"><span class="pre">number1</span></code> と <code class="docutils literal notranslate"><span class="pre">number2</span></code> をビット単位で排他的論理和した結果を返します。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == (10 ^ 15)&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         1
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         1,
-#         &quot;The first post!&quot;,
-#         &quot;Welcome! This is my first post!&quot;,
-#         5
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;n_likes == (10 ^ 15)&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1,</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         &quot;Welcome! This is my first post!&quot;,</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>この式は <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">5</span></code> (= <code class="docutils literal notranslate"><span class="pre">10</span> <span class="pre">^</span> <span class="pre">15</span></code>) の値にマッチします。</p>
@@ -1155,45 +1154,45 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 <p>この演算子は <code class="docutils literal notranslate"><span class="pre">number1</span></code> のビットを左に <code class="docutils literal notranslate"><span class="pre">number2</span></code> ビットシフトする。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == (5 &lt;&lt; 1)&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         1
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         2,
-#         &quot;Groonga&quot;,
-#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
-#         10
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;n_likes == (5 &lt;&lt; 1)&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2,</span>
+<span class="c1">#         &quot;Groonga&quot;,</span>
+<span class="c1">#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,</span>
+<span class="c1">#         10</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>この式は <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">10</span></code> (= <code class="docutils literal notranslate"><span class="pre">5</span> <span class="pre">&lt;&lt;</span> <span class="pre">1</span></code>) のレコードにマッチします。</p>
@@ -1204,45 +1203,45 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 <p>この演算子は <code class="docutils literal notranslate"><span class="pre">number1</span></code> のビットを右に <code class="docutils literal notranslate"><span class="pre">number2</span></code> ビットシフトします。結果の符号は <code class="docutils literal notranslate"><span class="pre">number1</span></code> の符号と同じです。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == -(-10 &gt;&gt; 1)&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         1
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         1,
-#         &quot;The first post!&quot;,
-#         &quot;Welcome! This is my first post!&quot;,
-#         5
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;n_likes == -(-10 &gt;&gt; 1)&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1,</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         &quot;Welcome! This is my first post!&quot;,</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>この式は <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">5</span></code> (= <code class="docutils literal notranslate"><span class="pre">-(-10</span> <span class="pre">&gt;&gt;</span> <span class="pre">1)</span></code> = <code class="docutils literal notranslate"><span class="pre">-(-5)</span></code>) のレコードにマッチします。</p>
@@ -1253,45 +1252,45 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 <p>この演算子は <code class="docutils literal notranslate"><span class="pre">number1</span></code> のビットを右に <code class="docutils literal notranslate"><span class="pre">number2</span></code> ビットシフトします。一番左の <code class="docutils literal notranslate"><span class="pre">number2</span></code> ビットには <code class="docutils literal notranslate"><span class="pre">0</span></code> が入ります。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == (2147483648 - (-10 &gt;&gt;&gt; 1))&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         1
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         1,
-#         &quot;The first post!&quot;,
-#         &quot;Welcome! This is my first post!&quot;,
-#         5
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;n_likes == (2147483648 - (-10 &gt;&gt;&gt; 1))&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1,</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         &quot;Welcome! This is my first post!&quot;,</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>この式は <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">5</span></code> (= <code class="docutils literal notranslate"><span class="pre">2147483648</span> <span class="pre">-</span> <span class="pre">(-10</span> <span class="pre">&gt;&gt;&gt;</span> <span class="pre">1)</span></code> = <code class="docutils literal notranslate"><span class="pre">2147483648</span> <span class="pre">-</span> <span class="pre">2147483643</span></code>) のレコードにマッチします。</p>
@@ -1306,45 +1305,45 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 <p>この演算子は <code class="docutils literal notranslate"><span class="pre">object1</span></code> が <code class="docutils literal notranslate"><span class="pre">object2</span></code> と等しいときは真を返し、そうでなければ偽を返します。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes == 5&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         1
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         1,
-#         &quot;The first post!&quot;,
-#         &quot;Welcome! This is my first post!&quot;,
-#         5
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;n_likes == 5&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1,</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         &quot;Welcome! This is my first post!&quot;,</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>この式は <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">5</span></code> の値にマッチします。</p>
@@ -1355,63 +1354,63 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 <p>この演算子は <code class="docutils literal notranslate"><span class="pre">object1</span></code> が <code class="docutils literal notranslate"><span class="pre">object2</span></code> と等しくないときに真を返し、そうでなければ偽を返します。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;n_likes != 5&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         4
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         4,
-#         &quot;Good-bye Senna&quot;,
-#         &quot;I migrated all Senna system!&quot;,
-#         3
-#       ],
-#       [
-#         5,
-#         &quot;Good-bye Tritonn&quot;,
-#         &quot;I also migrated all Tritonn system!&quot;,
-#         3
-#       ],
-#       [
-#         2,
-#         &quot;Groonga&quot;,
-#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
-#         10
-#       ],
-#       [
-#         3,
-#         &quot;Mroonga&quot;,
-#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
-#         15
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;n_likes != 5&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         4</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         4,</span>
+<span class="c1">#         &quot;Good-bye Senna&quot;,</span>
+<span class="c1">#         &quot;I migrated all Senna system!&quot;,</span>
+<span class="c1">#         3</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         5,</span>
+<span class="c1">#         &quot;Good-bye Tritonn&quot;,</span>
+<span class="c1">#         &quot;I also migrated all Tritonn system!&quot;,</span>
+<span class="c1">#         3</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2,</span>
+<span class="c1">#         &quot;Groonga&quot;,</span>
+<span class="c1">#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,</span>
+<span class="c1">#         10</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         &quot;Mroonga&quot;,</span>
+<span class="c1">#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,</span>
+<span class="c1">#         15</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>この式は <code class="docutils literal notranslate"><span class="pre">n_likes</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">5</span></code> ではない式にマッチします。</p>
@@ -1441,60 +1440,60 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 <p>構文は <code class="docutils literal notranslate"><span class="pre">column</span> <span class="pre">+=</span> <span class="pre">value</span></code> です。</p>
 <p>この演算子は <code class="docutils literal notranslate"><span class="pre">column1</span></code> に <code class="docutils literal notranslate"><span class="pre">column2</span></code> を加算代入します。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --output_columns _key,n_likes,_score --filter true --scorer &#39;_score += n_likes&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         5
-#       ],
-#       [
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_score&quot;,
-#           &quot;Int32&quot;
-#         ]
-#       ],
-#       [
-#         &quot;Good-bye Senna&quot;,
-#         3,
-#         4
-#       ],
-#       [
-#         &quot;Good-bye Tritonn&quot;,
-#         3,
-#         4
-#       ],
-#       [
-#         &quot;Groonga&quot;,
-#         10,
-#         11
-#       ],
-#       [
-#         &quot;Mroonga&quot;,
-#         15,
-#         16
-#       ],
-#       [
-#         &quot;The first post!&quot;,
-#         5,
-#         6
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">_key</span><span class="p">,</span><span class="n">n_likes</span><span class="p">,</span><span class="n">_score</span> <span class="o">--</span><span class="nb">filter</span> <span class="n">true</span> <span class="o">--</span><span class="n">scorer</span> <span class="s1">&#39;_score += n_likes&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_score&quot;,</span>
+<span class="c1">#           &quot;Int32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Good-bye Senna&quot;,</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         4</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Good-bye Tritonn&quot;,</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         4</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Groonga&quot;,</span>
+<span class="c1">#         10,</span>
+<span class="c1">#         11</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Mroonga&quot;,</span>
+<span class="c1">#         15,</span>
+<span class="c1">#         16</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         5,</span>
+<span class="c1">#         6</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">--filter</span></code> による <code class="docutils literal notranslate"><span class="pre">_score</span></code> の値はこの場合は常に1です。その後、'_score = _score + n_likes' という加算代入演算をそれぞれのレコードへ適用します。</p>
@@ -1506,60 +1505,60 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 <p>構文は <code class="docutils literal notranslate"><span class="pre">column1</span> <span class="pre">-=</span> <span class="pre">column2</span></code> です。</p>
 <p>この演算子は <code class="docutils literal notranslate"><span class="pre">column1</span></code> から <code class="docutils literal notranslate"><span class="pre">column2</span></code> を減算代入します。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --output_columns _key,n_likes,_score --filter true --scorer &#39;_score -= n_likes&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         5
-#       ],
-#       [
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_score&quot;,
-#           &quot;Int32&quot;
-#         ]
-#       ],
-#       [
-#         &quot;Good-bye Senna&quot;,
-#         3,
-#         -2
-#       ],
-#       [
-#         &quot;Good-bye Tritonn&quot;,
-#         3,
-#         -2
-#       ],
-#       [
-#         &quot;Groonga&quot;,
-#         10,
-#         -9
-#       ],
-#       [
-#         &quot;Mroonga&quot;,
-#         15,
-#         -14
-#       ],
-#       [
-#         &quot;The first post!&quot;,
-#         5,
-#         -4
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">_key</span><span class="p">,</span><span class="n">n_likes</span><span class="p">,</span><span class="n">_score</span> <span class="o">--</span><span class="nb">filter</span> <span class="n">true</span> <span class="o">--</span><span class="n">scorer</span> <span class="s1">&#39;_score -= n_likes&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_score&quot;,</span>
+<span class="c1">#           &quot;Int32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Good-bye Senna&quot;,</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         -2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Good-bye Tritonn&quot;,</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         -2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Groonga&quot;,</span>
+<span class="c1">#         10,</span>
+<span class="c1">#         -9</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Mroonga&quot;,</span>
+<span class="c1">#         15,</span>
+<span class="c1">#         -14</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         5,</span>
+<span class="c1">#         -4</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">--filter</span></code> による <code class="docutils literal notranslate"><span class="pre">_score</span></code> の値はこの場合は常に1です。その後、'_score = _score - n_likes' という減算代入演算をそれぞれのレコードへ適用します。</p>
@@ -1571,60 +1570,60 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 <p>構文は <code class="docutils literal notranslate"><span class="pre">column1</span> <span class="pre">*=</span> <span class="pre">column2</span></code> です。</p>
 <p>この演算子は <code class="docutils literal notranslate"><span class="pre">column1</span></code> に <code class="docutils literal notranslate"><span class="pre">column2</span></code> を乗算演算する。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --output_columns _key,n_likes,_score --filter true --scorer &#39;_score *= n_likes&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         5
-#       ],
-#       [
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_score&quot;,
-#           &quot;Int32&quot;
-#         ]
-#       ],
-#       [
-#         &quot;Good-bye Senna&quot;,
-#         3,
-#         3
-#       ],
-#       [
-#         &quot;Good-bye Tritonn&quot;,
-#         3,
-#         3
-#       ],
-#       [
-#         &quot;Groonga&quot;,
-#         10,
-#         10
-#       ],
-#       [
-#         &quot;Mroonga&quot;,
-#         15,
-#         15
-#       ],
-#       [
-#         &quot;The first post!&quot;,
-#         5,
-#         5
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">_key</span><span class="p">,</span><span class="n">n_likes</span><span class="p">,</span><span class="n">_score</span> <span class="o">--</span><span class="nb">filter</span> <span class="n">true</span> <span class="o">--</span><span class="n">scorer</span> <span class="s1">&#39;_score *= n_likes&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_score&quot;,</span>
+<span class="c1">#           &quot;Int32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Good-bye Senna&quot;,</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         3</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Good-bye Tritonn&quot;,</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         3</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Groonga&quot;,</span>
+<span class="c1">#         10,</span>
+<span class="c1">#         10</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Mroonga&quot;,</span>
+<span class="c1">#         15,</span>
+<span class="c1">#         15</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         5,</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">--filter</span></code> による <code class="docutils literal notranslate"><span class="pre">_score</span></code> の値はこの場合は常に1です。その後、'_score = _score * n_likes' という乗算代入演算をそれぞれのレコードへ適用します。</p>
@@ -1636,60 +1635,60 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 <p>構文は <code class="docutils literal notranslate"><span class="pre">column1</span> <span class="pre">/=</span> <span class="pre">column2</span></code> です。</p>
 <p>この演算子は <code class="docutils literal notranslate"><span class="pre">column1</span></code> に <code class="docutils literal notranslate"><span class="pre">column2</span></code> を除算代入します。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --output_columns _key,n_likes,_score --filter true --scorer &#39;_score /= n_likes&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         5
-#       ],
-#       [
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_score&quot;,
-#           &quot;Int32&quot;
-#         ]
-#       ],
-#       [
-#         &quot;Good-bye Senna&quot;,
-#         3,
-#         0
-#       ],
-#       [
-#         &quot;Good-bye Tritonn&quot;,
-#         3,
-#         0
-#       ],
-#       [
-#         &quot;Groonga&quot;,
-#         10,
-#         0
-#       ],
-#       [
-#         &quot;Mroonga&quot;,
-#         15,
-#         0
-#       ],
-#       [
-#         &quot;The first post!&quot;,
-#         5,
-#         0
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">_key</span><span class="p">,</span><span class="n">n_likes</span><span class="p">,</span><span class="n">_score</span> <span class="o">--</span><span class="nb">filter</span> <span class="n">true</span> <span class="o">--</span><span class="n">scorer</span> <span class="s1">&#39;_score /= n_likes&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_score&quot;,</span>
+<span class="c1">#           &quot;Int32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Good-bye Senna&quot;,</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         0</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Good-bye Tritonn&quot;,</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         0</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Groonga&quot;,</span>
+<span class="c1">#         10,</span>
+<span class="c1">#         0</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Mroonga&quot;,</span>
+<span class="c1">#         15,</span>
+<span class="c1">#         0</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         5,</span>
+<span class="c1">#         0</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">--filter</span></code> による <code class="docutils literal notranslate"><span class="pre">_score</span></code> の値はこの場合は常に1です。その後、'_score = _score / n_likes' という除算代入演算をそれぞれのレコードへ適用します。</p>
@@ -1701,60 +1700,60 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 <p>構文は <code class="docutils literal notranslate"><span class="pre">column1</span> <span class="pre">%=</span> <span class="pre">column2</span></code> です。</p>
 <p>この演算子は <code class="docutils literal notranslate"><span class="pre">column1</span></code> に <code class="docutils literal notranslate"><span class="pre">column2</span></code> を剰余代入します。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --output_columns _key,n_likes,_score --filter true --scorer &#39;_score %= n_likes&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         5
-#       ],
-#       [
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_score&quot;,
-#           &quot;Int32&quot;
-#         ]
-#       ],
-#       [
-#         &quot;Good-bye Senna&quot;,
-#         3,
-#         1
-#       ],
-#       [
-#         &quot;Good-bye Tritonn&quot;,
-#         3,
-#         1
-#       ],
-#       [
-#         &quot;Groonga&quot;,
-#         10,
-#         1
-#       ],
-#       [
-#         &quot;Mroonga&quot;,
-#         15,
-#         1
-#       ],
-#       [
-#         &quot;The first post!&quot;,
-#         5,
-#         1
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">_key</span><span class="p">,</span><span class="n">n_likes</span><span class="p">,</span><span class="n">_score</span> <span class="o">--</span><span class="nb">filter</span> <span class="n">true</span> <span class="o">--</span><span class="n">scorer</span> <span class="s1">&#39;_score %= n_likes&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_score&quot;,</span>
+<span class="c1">#           &quot;Int32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Good-bye Senna&quot;,</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Good-bye Tritonn&quot;,</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Groonga&quot;,</span>
+<span class="c1">#         10,</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Mroonga&quot;,</span>
+<span class="c1">#         15,</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         5,</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">--filter</span></code> による <code class="docutils literal notranslate"><span class="pre">_score</span></code> の値はこの場合は常に1です。その後、'_score = _score % n_likes' という除算代入演算をそれぞれのレコードへ適用します。</p>
@@ -1766,60 +1765,60 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 <p>構文は <code class="docutils literal notranslate"><span class="pre">column1</span> <span class="pre">&lt;&lt;</span> <span class="pre">column2</span></code> です。</p>
 <p>この演算子は <code class="docutils literal notranslate"><span class="pre">column1</span></code> のビットを左に <code class="docutils literal notranslate"><span class="pre">column2</span></code> 左ビットシフト代入演算します。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --output_columns _key,n_likes,_score --filter true --scorer &#39;_score &lt;&lt;= n_likes&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         5
-#       ],
-#       [
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_score&quot;,
-#           &quot;Int32&quot;
-#         ]
-#       ],
-#       [
-#         &quot;Good-bye Senna&quot;,
-#         3,
-#         8
-#       ],
-#       [
-#         &quot;Good-bye Tritonn&quot;,
-#         3,
-#         8
-#       ],
-#       [
-#         &quot;Groonga&quot;,
-#         10,
-#         1024
-#       ],
-#       [
-#         &quot;Mroonga&quot;,
-#         15,
-#         32768
-#       ],
-#       [
-#         &quot;The first post!&quot;,
-#         5,
-#         32
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">_key</span><span class="p">,</span><span class="n">n_likes</span><span class="p">,</span><span class="n">_score</span> <span class="o">--</span><span class="nb">filter</span> <span class="n">true</span> <span class="o">--</span><span class="n">scorer</span> <span class="s1">&#39;_score &lt;&lt;= n_likes&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_score&quot;,</span>
+<span class="c1">#           &quot;Int32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Good-bye Senna&quot;,</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         8</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Good-bye Tritonn&quot;,</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         8</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Groonga&quot;,</span>
+<span class="c1">#         10,</span>
+<span class="c1">#         1024</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Mroonga&quot;,</span>
+<span class="c1">#         15,</span>
+<span class="c1">#         32768</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         5,</span>
+<span class="c1">#         32</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">--filter</span></code> による <code class="docutils literal notranslate"><span class="pre">_score</span></code> の値はこの場合は常に1です。その後、'_score = _score &lt;&lt; n_likes' という左ビットシフト代入演算をそれぞれのレコードへ適用します。</p>
@@ -1841,60 +1840,60 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 <p>構文は <code class="docutils literal notranslate"><span class="pre">column1</span> <span class="pre">&amp;=</span> <span class="pre">column2</span></code> です。</p>
 <p>この演算子は <code class="docutils literal notranslate"><span class="pre">column1</span></code> に <code class="docutils literal notranslate"><span class="pre">column2</span></code> をビット論理積代入演算します。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --output_columns _key,n_likes,_score --filter true --scorer &#39;_score &amp;= n_likes&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         5
-#       ],
-#       [
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_score&quot;,
-#           &quot;Int32&quot;
-#         ]
-#       ],
-#       [
-#         &quot;Good-bye Senna&quot;,
-#         3,
-#         1
-#       ],
-#       [
-#         &quot;Good-bye Tritonn&quot;,
-#         3,
-#         1
-#       ],
-#       [
-#         &quot;Groonga&quot;,
-#         10,
-#         0
-#       ],
-#       [
-#         &quot;Mroonga&quot;,
-#         15,
-#         1
-#       ],
-#       [
-#         &quot;The first post!&quot;,
-#         5,
-#         1
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">_key</span><span class="p">,</span><span class="n">n_likes</span><span class="p">,</span><span class="n">_score</span> <span class="o">--</span><span class="nb">filter</span> <span class="n">true</span> <span class="o">--</span><span class="n">scorer</span> <span class="s1">&#39;_score &amp;= n_likes&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_score&quot;,</span>
+<span class="c1">#           &quot;Int32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Good-bye Senna&quot;,</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Good-bye Tritonn&quot;,</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Groonga&quot;,</span>
+<span class="c1">#         10,</span>
+<span class="c1">#         0</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Mroonga&quot;,</span>
+<span class="c1">#         15,</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         5,</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">--filter</span></code> による <code class="docutils literal notranslate"><span class="pre">_score</span></code> の値はこの場合は常に1です。その後、'_score = _score &amp; n_likes' というビット論理積代入演算をそれぞれのレコードへ適用します。</p>
@@ -1906,60 +1905,60 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 <p>構文は <code class="docutils literal notranslate"><span class="pre">column1</span> <span class="pre">|=</span> <span class="pre">column2</span></code> です。</p>
 <p>この演算子は <code class="docutils literal notranslate"><span class="pre">column1</span></code> に <code class="docutils literal notranslate"><span class="pre">column2</span></code> をビット論理和代入演算する。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --output_columns _key,n_likes,_score --filter true --scorer &#39;_score |= n_likes&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         5
-#       ],
-#       [
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_score&quot;,
-#           &quot;Int32&quot;
-#         ]
-#       ],
-#       [
-#         &quot;Good-bye Senna&quot;,
-#         3,
-#         3
-#       ],
-#       [
-#         &quot;Good-bye Tritonn&quot;,
-#         3,
-#         3
-#       ],
-#       [
-#         &quot;Groonga&quot;,
-#         10,
-#         11
-#       ],
-#       [
-#         &quot;Mroonga&quot;,
-#         15,
-#         15
-#       ],
-#       [
-#         &quot;The first post!&quot;,
-#         5,
-#         5
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">_key</span><span class="p">,</span><span class="n">n_likes</span><span class="p">,</span><span class="n">_score</span> <span class="o">--</span><span class="nb">filter</span> <span class="n">true</span> <span class="o">--</span><span class="n">scorer</span> <span class="s1">&#39;_score |= n_likes&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_score&quot;,</span>
+<span class="c1">#           &quot;Int32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Good-bye Senna&quot;,</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         3</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Good-bye Tritonn&quot;,</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         3</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Groonga&quot;,</span>
+<span class="c1">#         10,</span>
+<span class="c1">#         11</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Mroonga&quot;,</span>
+<span class="c1">#         15,</span>
+<span class="c1">#         15</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         5,</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">--filter</span></code> による <code class="docutils literal notranslate"><span class="pre">_score</span></code> の値はこの場合は常に1です。その後、'_score = _score | n_likes' というビット論理和代入演算をそれぞれのレコードへ適用します。</p>
@@ -1971,60 +1970,60 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 <p>構文は <code class="docutils literal notranslate"><span class="pre">column1</span> <span class="pre">^=</span> <span class="pre">column2</span></code> です。</p>
 <p>この演算子は <code class="docutils literal notranslate"><span class="pre">column1</span></code> に <code class="docutils literal notranslate"><span class="pre">column2</span></code> をビット論理和代入演算する。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --output_columns _key,n_likes,_score --filter true --scorer &#39;_score ^= n_likes&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         5
-#       ],
-#       [
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_score&quot;,
-#           &quot;Int32&quot;
-#         ]
-#       ],
-#       [
-#         &quot;Good-bye Senna&quot;,
-#         3,
-#         2
-#       ],
-#       [
-#         &quot;Good-bye Tritonn&quot;,
-#         3,
-#         2
-#       ],
-#       [
-#         &quot;Groonga&quot;,
-#         10,
-#         11
-#       ],
-#       [
-#         &quot;Mroonga&quot;,
-#         15,
-#         14
-#       ],
-#       [
-#         &quot;The first post!&quot;,
-#         5,
-#         4
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">_key</span><span class="p">,</span><span class="n">n_likes</span><span class="p">,</span><span class="n">_score</span> <span class="o">--</span><span class="nb">filter</span> <span class="n">true</span> <span class="o">--</span><span class="n">scorer</span> <span class="s1">&#39;_score ^= n_likes&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_score&quot;,</span>
+<span class="c1">#           &quot;Int32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Good-bye Senna&quot;,</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Good-bye Tritonn&quot;,</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Groonga&quot;,</span>
+<span class="c1">#         10,</span>
+<span class="c1">#         11</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Mroonga&quot;,</span>
+<span class="c1">#         15,</span>
+<span class="c1">#         14</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         5,</span>
+<span class="c1">#         4</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">--filter</span></code> による <code class="docutils literal notranslate"><span class="pre">_score</span></code> の値はこの場合は常に1です。その後、'_score = _score ^ n_likes' という減算代入演算をそれぞれのレコードへ適用します。</p>
@@ -2042,33 +2041,33 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 <p><a class="reference internal" href="query_syntax.html"><span class="doc">クエリー構文</span></a> はデフォルトでこの演算子を使っています。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;content @ &quot;fast&quot;&#39; --output_columns content
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         2
-#       ],
-#       [
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ]
-#       ],
-#       [
-#         &quot;I started to use Groonga. It&#39;s very fast!&quot;
-#       ],
-#       [
-#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;content @ &quot;fast&quot;&#39;</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">content</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;I started to use Groonga. It&#39;s very fast!&quot;</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>この式は <code class="docutils literal notranslate"><span class="pre">content</span></code> カラムの値に <code class="docutils literal notranslate"><span class="pre">fast</span></code> という単語を含んでいるレコードにマッチします。</p>
@@ -2081,33 +2080,33 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 <p>他の種類のテーブルでも前方一致検索を使えますがレコード全件を処理します。レコード数が少ない場合には問題ありませんが、レコード数が多いと時間がかかります。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;_key @^ &quot;Goo&quot;&#39; --output_columns _key
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         2
-#       ],
-#       [
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ]
-#       ],
-#       [
-#         &quot;Good-bye Senna&quot;
-#       ],
-#       [
-#         &quot;Good-bye Tritonn&quot;
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;_key @^ &quot;Goo&quot;&#39;</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">_key</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Good-bye Senna&quot;</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Good-bye Tritonn&quot;</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>この式は <code class="docutils literal notranslate"><span class="pre">_key</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">Goo</span></code> で始まる単語を含むレコードにマッチします。この式には <code class="docutils literal notranslate"><span class="pre">Good-bye</span> <span class="pre">Senna</span></code> と <code class="docutils literal notranslate"><span class="pre">Good-bye</span> <span class="pre">Tritonn</span></code> がマッチします。</p>
@@ -2124,55 +2123,55 @@ select Entries --filter &#39;n_likes &lt; 5 &amp;&amp; (content @ &quot;senna&qu
 <p>後方一致検索は他の種類のテーブルもしくはパトリシアトライを <code class="docutils literal notranslate"><span class="pre">KEY_WITH_SIS</span></code> フラグなしで使用しているテーブルに対しても使えますが、レコード全件を処理します。レコード数が少ない場合には問題ありませんが、レコード数が多いと時間がかかります。</p>
 <p>簡単な例です。ASCII文字ではない文字である日本語のひらがなに対して高速な後方一致検索をしています。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>table_create Titles TABLE_NO_KEY
-# [[0, 1337566253.89858, 0.000355720520019531], true]
-column_create Titles content COLUMN_SCALAR ShortText
-# [[0, 1337566253.89858, 0.000355720520019531], true]
-table_create SuffixSearchTerms TABLE_PAT_KEY|KEY_WITH_SIS ShortText
-# [[0, 1337566253.89858, 0.000355720520019531], true]
-column_create SuffixSearchTerms index COLUMN_INDEX Titles content
-# [[0, 1337566253.89858, 0.000355720520019531], true]
-load --table Titles
-[
-{&quot;content&quot;: &quot;ぐるんが&quot;},
-{&quot;content&quot;: &quot;むるんが&quot;},
-{&quot;content&quot;: &quot;せな&quot;},
-{&quot;content&quot;: &quot;とりとん&quot;}
-]
-# [[0, 1337566253.89858, 0.000355720520019531], 4]
-select Titles --query &#39;content:$んが&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         2
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;ShortText&quot;
-#         ]
-#       ],
-#       [
-#         2,
-#         &quot;むるんが&quot;
-#       ],
-#       [
-#         1,
-#         &quot;ぐるんが&quot;
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">table_create</span> <span class="n">Titles</span> <span class="n">TABLE_NO_KEY</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">column_create</span> <span class="n">Titles</span> <span class="n">content</span> <span class="n">COLUMN_SCALAR</span> <span class="n">ShortText</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">table_create</span> <span class="n">SuffixSearchTerms</span> <span class="n">TABLE_PAT_KEY</span><span class="o">|</span><span class="n">KEY_WITH_SIS</span> <span class="n">ShortText</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">column_create</span> <span class="n">SuffixSearchTerms</span> <span class="n">index</span> <span class="n">COLUMN_INDEX</span> <span class="n">Titles</span> <span class="n">content</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">load</span> <span class="o">--</span><span class="n">table</span> <span class="n">Titles</span>
+<span class="p">[</span>
+<span class="p">{</span><span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;ぐるんが&quot;</span><span class="p">},</span>
+<span class="p">{</span><span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;むるんが&quot;</span><span class="p">},</span>
+<span class="p">{</span><span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;せな&quot;</span><span class="p">},</span>
+<span class="p">{</span><span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;とりとん&quot;</span><span class="p">}</span>
+<span class="p">]</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], 4]</span>
+<span class="n">select</span> <span class="n">Titles</span> <span class="o">--</span><span class="n">query</span> <span class="s1">&#39;content:$んが&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2,</span>
+<span class="c1">#         &quot;むるんが&quot;</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1,</span>
+<span class="c1">#         &quot;ぐるんが&quot;</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>この式は <code class="docutils literal notranslate"><span class="pre">content</span></code> カラムの値が <code class="docutils literal notranslate"><span class="pre">んが</span></code> で終わるレコードにマッチします。この場合は <code class="docutils literal notranslate"><span class="pre">ぐるんが</span></code> と <code class="docutils literal notranslate"><span class="pre">むるんが</span></code> にマッチします。</p>
@@ -2180,13 +2179,13 @@ select Titles --query &#39;content:$んが&#39;
 <div class="section" id="near-search-operator">
 <span id="script-syntax-near-search-operator"></span><h3><span class="section-number">7.13.2.9.4. </span>近傍検索演算子<a class="headerlink" href="#near-search-operator" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <p>構文は以下のどれかです。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>column *N &quot;word1 word2 ...&quot;
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>column *N &quot;word1 word2 ...&quot;
 column *N${MAX_INTERVAL} &quot;word1 word2 ...&quot;
 </pre></div>
 </div>
 <p>2つめの形式の例は次の通りです。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>column *N29 &quot;word1 word2 ...&quot;
-column *N-1 &quot;word1 word2 ...&quot;
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">column</span> <span class="o">*</span><span class="n">N29</span> <span class="s2">&quot;word1 word2 ...&quot;</span>
+<span class="n">column</span> <span class="o">*</span><span class="n">N</span><span class="o">-</span><span class="mi">1</span> <span class="s2">&quot;word1 word2 ...&quot;</span>
 </pre></div>
 </div>
 <p>最初の例は近いと判断する最大距離として <code class="docutils literal notranslate"><span class="pre">29</span></code> を使うという意味です。</p>
@@ -2198,56 +2197,56 @@ column *N-1 &quot;word1 word2 ...&quot;
 <p><code class="docutils literal notranslate"><span class="pre">column</span></code> 用の全文検索用インデックスカラムを定義しておく必要があることに注意してください。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;content *N &quot;I fast&quot;&#39;      --output_columns content
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         1
-#       ],
-#       [
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ]
-#       ],
-#       [
-#         &quot;I started to use Groonga. It&#39;s very fast!&quot;
-#       ]
-#     ]
-#   ]
-# ]
-select Entries --filter &#39;content *N &quot;I Really&quot;&#39;    --output_columns content
-# [[0, 1337566253.89858, 0.000355720520019531], [[[0], [[&quot;content&quot;, &quot;Text&quot;]]]]]
-select Entries --filter &#39;content *N &quot;also Really&quot;&#39; --output_columns content
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         1
-#       ],
-#       [
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ]
-#       ],
-#       [
-#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;content *N &quot;I fast&quot;&#39;</span>      <span class="o">--</span><span class="n">output_columns</span> <span class="n">content</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;I started to use Groonga. It&#39;s very fast!&quot;</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
+<span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;content *N &quot;I Really&quot;&#39;</span>    <span class="o">--</span><span class="n">output_columns</span> <span class="n">content</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], [[[0], [[&quot;content&quot;, &quot;Text&quot;]]]]]</span>
+<span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;content *N &quot;also Really&quot;&#39;</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">content</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>最初の式は <code class="docutils literal notranslate"><span class="pre">I</span></code> と <code class="docutils literal notranslate"><span class="pre">fast</span></code> が含まれていて、かつ、これらの単語が10単語以内近くにあるレコードにマッチします。そのため <code class="docutils literal notranslate"><span class="pre">I</span> <span class="pre">also</span> <span class="pre">started</span> <span class="pre">to</span> <span class="pre">use</span> <span class="pre">mroonga.</span> <span class="pre">It's</span> <span class="pre">also</span> <span class="pre">very</span> <span class="pre">fast!</span> <span class="pre">...</span></code> にマッチします。 <code class="docutils literal notranslate"><span class="pre">I</span></code> と <code class="docutils literal notranslate"><span class="pre">fast</span></code> の間の単語数はちょうど10です。</p>
@@ -2257,13 +2256,13 @@ select Entries --filter &#39;content *N &quot;also Really&quot;&#39; --output_co
 <div class="section" id="near-phrase-search-operator">
 <span id="script-syntax-near-phrase-search-operator"></span><h3><span class="section-number">7.13.2.9.5. </span>近傍フレーズ検索演算子<a class="headerlink" href="#near-phrase-search-operator" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <p>構文は以下のどれかです。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>column *NP &quot;phrase1 phrase2 ...&quot;
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>column *NP &quot;phrase1 phrase2 ...&quot;
 column *NP${MAX_INTERVAL} &quot;phrase1 phrase2 ...&quot;
 </pre></div>
 </div>
 <p>2つめの形式の例は次の通りです。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>column *NP29 &quot;phrase1 phrase2 ...&quot;
-column *NP-1 &quot;phrase1 phrase2 ...&quot;
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">column</span> <span class="o">*</span><span class="n">NP29</span> <span class="s2">&quot;phrase1 phrase2 ...&quot;</span>
+<span class="n">column</span> <span class="o">*</span><span class="n">NP</span><span class="o">-</span><span class="mi">1</span> <span class="s2">&quot;phrase1 phrase2 ...&quot;</span>
 </pre></div>
 </div>
 <p>最初の例は近いと判断する最大距離として <code class="docutils literal notranslate"><span class="pre">29</span></code> を使うという意味です。</p>
@@ -2277,56 +2276,56 @@ column *NP-1 &quot;phrase1 phrase2 ...&quot;
 tokenizer to show difference with near search with English text.</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;content *NP &quot;I fast&quot;&#39;      --output_columns content
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         1
-#       ],
-#       [
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ]
-#       ],
-#       [
-#         &quot;I started to use Groonga. It&#39;s very fast!&quot;
-#       ]
-#     ]
-#   ]
-# ]
-select Entries --filter &#39;content *NP &quot;I Really&quot;&#39;    --output_columns content
-# [[0, 1337566253.89858, 0.000355720520019531], [[[0], [[&quot;content&quot;, &quot;Text&quot;]]]]]
-select Entries --filter &#39;content *NP &quot;also Really&quot;&#39; --output_columns content
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         1
-#       ],
-#       [
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ]
-#       ],
-#       [
-#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;content *NP &quot;I fast&quot;&#39;</span>      <span class="o">--</span><span class="n">output_columns</span> <span class="n">content</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;I started to use Groonga. It&#39;s very fast!&quot;</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
+<span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;content *NP &quot;I Really&quot;&#39;</span>    <span class="o">--</span><span class="n">output_columns</span> <span class="n">content</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], [[[0], [[&quot;content&quot;, &quot;Text&quot;]]]]]</span>
+<span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;content *NP &quot;also Really&quot;&#39;</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">content</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>最初の式は <code class="docutils literal notranslate"><span class="pre">I</span></code> と <code class="docutils literal notranslate"><span class="pre">fast</span></code> が含まれていて、かつ、これらの単語が10単語以内近くにあるレコードにマッチします。そのため <code class="docutils literal notranslate"><span class="pre">I</span> <span class="pre">also</span> <span class="pre">started</span> <span class="pre">to</span> <span class="pre">use</span> <span class="pre">mroonga.</span> <span class="pre">It's</span> <span class="pre">also</span> <span class="pre">very</span> <span class="pre">fast!</span> <span class="pre">...</span></code> にマッチします。 <code class="docutils literal notranslate"><span class="pre">I</span></code> と <code class="docutils literal notranslate"><span class="pre">fast</span></code> の間の単語数はちょうど10です。</p>
@@ -2340,33 +2339,33 @@ select Entries --filter &#39;content *NP &quot;also Really&quot;&#39; --output_c
 <p><code class="docutils literal notranslate"><span class="pre">column</span></code> 用の全文検索用インデックスカラムを定義しておく必要があることに注意してください。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;content *S &quot;I migrated all Solr system!&quot;&#39; --output_columns content
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         2
-#       ],
-#       [
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ]
-#       ],
-#       [
-#         &quot;I migrated all Senna system!&quot;
-#       ],
-#       [
-#         &quot;I also migrated all Tritonn system!&quot;
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;content *S &quot;I migrated all Solr system!&quot;&#39;</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">content</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;I migrated all Senna system!&quot;</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;I also migrated all Tritonn system!&quot;</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>この式は <code class="docutils literal notranslate"><span class="pre">I</span> <span class="pre">migrated</span> <span class="pre">all</span> <span class="pre">Solr</span> <span class="pre">system!</span></code> と似た内容を持つレコードを検索します。この場合は、 <code class="docutils literal notranslate"><span class="pre">I</span> <span class="pre">migrated</span> <span class="pre">all</span> <span class="pre">XXX</span> <span class="pre">system!</span></code> という内容のレコードがマッチします。</p>
@@ -2379,43 +2378,43 @@ select Entries --filter &#39;content *NP &quot;also Really&quot;&#39; --output_c
 <p>テーブルはパトリシアトライ（ <code class="docutils literal notranslate"><span class="pre">TABLE_PAT_KEY</span></code> ）またはダブル配列トライ（ <code class="docutils literal notranslate"><span class="pre">TABLE_DAT_KEY</span></code> ）でなければいけません。ハッシュテーブル（ <code class="docutils literal notranslate"><span class="pre">TABLE_HASH_KEY</span></code> ）や配列（ <code class="docutils literal notranslate"><span class="pre">TABLE_NO_KEY</span></code> ）は最長共通接頭辞検索（Longest Common Prefix Search）できないため使えません。この演算子は最長共通接頭辞検索を使っています。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>table_create Words TABLE_PAT_KEY ShortText --normalizer NormalizerAuto
-# [[0, 1337566253.89858, 0.000355720520019531], true]
-load --table Words
-[
-{&quot;_key&quot;: &quot;groonga&quot;},
-{&quot;_key&quot;: &quot;mroonga&quot;},
-{&quot;_key&quot;: &quot;Senna&quot;},
-{&quot;_key&quot;: &quot;Tritonn&quot;}
-]
-# [[0, 1337566253.89858, 0.000355720520019531], 4]
-select Words --filter &#39;_key *T &quot;Groonga is the successor project to Senna.&quot;&#39; --output_columns _key
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         2
-#       ],
-#       [
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ]
-#       ],
-#       [
-#         &quot;groonga&quot;
-#       ],
-#       [
-#         &quot;senna&quot;
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">table_create</span> <span class="n">Words</span> <span class="n">TABLE_PAT_KEY</span> <span class="n">ShortText</span> <span class="o">--</span><span class="n">normalizer</span> <span class="n">NormalizerAuto</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">load</span> <span class="o">--</span><span class="n">table</span> <span class="n">Words</span>
+<span class="p">[</span>
+<span class="p">{</span><span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;groonga&quot;</span><span class="p">},</span>
+<span class="p">{</span><span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;mroonga&quot;</span><span class="p">},</span>
+<span class="p">{</span><span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;Senna&quot;</span><span class="p">},</span>
+<span class="p">{</span><span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;Tritonn&quot;</span><span class="p">}</span>
+<span class="p">]</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], 4]</span>
+<span class="n">select</span> <span class="n">Words</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;_key *T &quot;Groonga is the successor project to Senna.&quot;&#39;</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">_key</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;groonga&quot;</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;senna&quot;</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>この式は文書 <code class="docutils literal notranslate"><span class="pre">Groonga</span> <span class="pre">is</span> <span class="pre">the</span> <span class="pre">successor</span> <span class="pre">project</span> <span class="pre">to</span> <span class="pre">Senna.</span></code> に含まれている単語を抽出します。今回は <code class="docutils literal notranslate"><span class="pre">Words</span></code> に <code class="docutils literal notranslate"><span class="pre">NormalizerAuto</span></code> ノーマライザーが指定されています。そのため、 <code class="docutils literal notranslate"><span class="pre">Words</span></code> には <code class="docutils literal notranslate"><span class="pre">groonga</span></code> とロードしていますが <code class="docutils literal notranslate"><span class="pre">Groonga</span></code> も抽出できています。また、すべてての抽出された単語も正規化されています。</p>
@@ -2430,51 +2429,51 @@ select Words --filter &#39;_key *T &quot;Groonga is the successor project to Sen
 <p><code class="docutils literal notranslate"><span class="pre">pattern</span></code> は正規表現の構文になっていなければいけません。正規表現の構文の詳細は <a class="reference internal" href="../regular_expression.html"><span class="doc">正規表現</span></a> を参照してください。</p>
 <p>以下の例はパターンとして <code class="docutils literal notranslate"><span class="pre">.roonga</span></code> を使っています。このパターンは <code class="docutils literal notranslate"><span class="pre">Groonga</span></code> 、 <code class="docutils literal notranslate"><span class="pre">Mroonga</span></code> といった文字列にマッチします。</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Entries --filter &#39;content @~ &quot;.roonga&quot;&#39;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         2
-#       ],
-#       [
-#         [
-#           &quot;_id&quot;,
-#           &quot;UInt32&quot;
-#         ],
-#         [
-#           &quot;_key&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;n_likes&quot;,
-#           &quot;UInt32&quot;
-#         ]
-#       ],
-#       [
-#         2,
-#         &quot;Groonga&quot;,
-#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,
-#         10
-#       ],
-#       [
-#         3,
-#         &quot;Mroonga&quot;,
-#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,
-#         15
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;content @~ &quot;.roonga&quot;&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2,</span>
+<span class="c1">#         &quot;Groonga&quot;,</span>
+<span class="c1">#         &quot;I started to use Groonga. It&#39;s very fast!&quot;,</span>
+<span class="c1">#         10</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         &quot;Mroonga&quot;,</span>
+<span class="c1">#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;,</span>
+<span class="c1">#         15</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>多くの場合、各レコードに対して順に正規表現を評価します。そのため、多くのレコードがある場合は遅くなるかもしれません。</p>
@@ -2610,7 +2609,7 @@ select Words --filter &#39;_key *T &quot;Groonga is the successor project to Sen
         <li class="right" >
           <a href="query_syntax.html" title="7.13.1. クエリー構文"
              >前へ</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v11.0.2ドキュメント</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v11.0.3ドキュメント</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../reference.html" ><span class="section-number">7. </span>リファレンスマニュアル</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../grn_expr.html" ><span class="section-number">7.13. </span>grn_expr</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href=""><span class="section-number">7.13.2. </span>スクリプト構文</a></li> 

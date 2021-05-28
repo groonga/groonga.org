@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+  <head>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-7532323-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-7532323-1');
+    </script>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>7.15.22. string_slice &#8212; Groonga v11.0.3ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../../static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../static/groonga.css" />
+    
+    <script data-url_root="../../" id="documentation_options" src="../../static/documentation_options.js"></script>
+    <script src="../../static/jquery.js"></script>
+    <script src="../../static/underscore.js"></script>
+    <script src="../../static/doctools.js"></script>
+    <script src="../../static/translations.js"></script>
+    
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="検索" href="../../search.html" />
+    <link rel="next" title="7.15.23. string_substring" href="string_substring.html" />
+    <link rel="prev" title="7.15.21. string_length" href="string_length.html" /> 
+      <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
+    <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
+    <meta property="og:type" content="product" />
+    <meta property="og:image" content="http://groonga.org/images/logos/groonga-icon-full-size.png" />
+    <meta property="og:site_name" content="groonga" />
+
+    <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
+  </head>
+  <body>
+    <div id="fb-root"></div>
+
+<div class="header">
+  <h1 class="title">
+    <a id="top-link" href="../../../">
+      <span class="project">groonga</span>
+      <span class="separator">-</span>
+      <span class="description">オープンソースのカラムストア機能付き全文検索エンジン</span>
+    </a>
+  </h1>
+
+      <div class="facebook-buttons">
+      <fb:like href="http://www.facebook.com/pages/groonga/201193596592346"
+               layout="standard"
+               width="290"></fb:like>
+    </div>
+    <div class="other-language-links">
+
+    <ul>
+      <li><a href="../../../../docs/reference/functions/string_slice.html">English</a></li>
+    </ul>
+  </div>
+</div>
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="string_substring.html" title="7.15.23. string_substring"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="string_length.html" title="7.15.21. string_length"
+             accesskey="P">前へ</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v11.0.3ドキュメント</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../reference.html" ><span class="section-number">7. </span>リファレンスマニュアル</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../function.html" accesskey="U"><span class="section-number">7.15. </span>関数</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">7.15.22. </span><code class="docutils literal notranslate"><span class="pre">string_slice</span></code></a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="string-slice">
+<h1><span class="section-number">7.15.22. </span><code class="docutils literal notranslate"><span class="pre">string_slice</span></code><a class="headerlink" href="#string-slice" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<div class="versionadded">
+<p><span class="versionmodified added">バージョン 11.0.3 で追加.</span></p>
+</div>
+<div class="section" id="summary">
+<h2><span class="section-number">7.15.22.1. </span>概要<a class="headerlink" href="#summary" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">string_slice</span></code> は文字列の部分文字列を抽出します。引数によって部分文字列の抽出方法を使い分けることが出来ます。抽出方法は以下の2つがあります。</p>
+<ul class="simple">
+<li><p>位置による抽出</p></li>
+<li><p>正規表現による抽出</p></li>
+</ul>
+<p>Groongaでは正規表現にRubyと同じ構文を使います。</p>
+<p>この関数を有効にするには、以下のコマンドで <code class="docutils literal notranslate"><span class="pre">functions/string</span></code> プラグインを登録します:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plugin_register</span> <span class="n">functions</span><span class="o">/</span><span class="n">string</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="syntax">
+<h2><span class="section-number">7.15.22.2. </span>構文<a class="headerlink" href="#syntax" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">string_slice</span></code> は2つから4つの引数を指定できます。抽出方法によって指定可能な引数が変わります。</p>
+<div class="section" id="extraction-by-position">
+<h3><span class="section-number">7.15.22.2.1. </span>位置による抽出<a class="headerlink" href="#extraction-by-position" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>string_slice(target, nth[, options])``
+string_slice(target, nth, length[, options])``
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">options</span></code> には以下のキーを指定します。すべてのキー・値のペアは省略可能です。:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;default_value&quot;</span><span class="p">:</span> <span class="n">default_value</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="extraction-by-regular-expression">
+<h3><span class="section-number">7.15.22.2.2. </span>正規表現による抽出<a class="headerlink" href="#extraction-by-regular-expression" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">string_slice</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">regexp</span><span class="p">,</span> <span class="n">nth</span><span class="p">[,</span> <span class="n">options</span><span class="p">])</span>
+<span class="n">string_slice</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">regexp</span><span class="p">,</span> <span class="n">name</span><span class="p">[,</span> <span class="n">options</span><span class="p">])</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">options</span></code> には以下のキーを指定します。すべてのキー・値のペアは省略可能です。:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;default_value&quot;</span><span class="p">:</span> <span class="n">default_value</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="usage">
+<h2><span class="section-number">7.15.22.3. </span>使い方<a class="headerlink" href="#usage" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>使い方を示すために使うスキーマ定義とサンプルデータは以下の通りです。</p>
+<p>サンプルスキーマ:</p>
+<p>実行例:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plugin_register</span> <span class="n">functions</span><span class="o">/</span><span class="n">string</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">table_create</span> <span class="n">Memos</span> <span class="n">TABLE_HASH_KEY</span> <span class="n">ShortText</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+</pre></div>
+</div>
+<p>サンプルデータ:</p>
+<p>実行例:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">load</span> <span class="o">--</span><span class="n">table</span> <span class="n">Memos</span>
+<span class="p">[</span>
+<span class="p">{</span><span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;Groonga&quot;</span><span class="p">}</span>
+<span class="p">]</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], 1]</span>
+</pre></div>
+</div>
+<p>位置により抽出する場合の簡単な例です。</p>
+<p>実行例:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Memos</span> <span class="o">--</span><span class="n">output_columns</span> <span class="s1">&#39;_key, string_slice(_key, 2, 3)&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;string_slice&quot;,</span>
+<span class="c1">#           null</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Groonga&quot;,</span>
+<span class="c1">#         &quot;oon&quot;</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
+</pre></div>
+</div>
+<p>正規表現により抽出する場合の簡単な例です。</p>
+<p>以下の例では、捕獲式集合 <code class="docutils literal notranslate"><span class="pre">(式)</span></code> の番号を指定して抽出しています。</p>
+<p>実行例:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Memos</span> <span class="o">--</span><span class="n">output_columns</span> <span class="s1">&#39;_key, string_slice(_key, &quot;(Gro+)(.*)&quot;, 2)&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;string_slice&quot;,</span>
+<span class="c1">#           null</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Groonga&quot;,</span>
+<span class="c1">#         &quot;nga&quot;</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
+</pre></div>
+</div>
+<p>以下の例では、名前付き捕獲式集合 <code class="docutils literal notranslate"><span class="pre">(?&lt;name&gt;式)</span></code> の名前を指定して抽出しています。</p>
+<p>実行例:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Memos</span> <span class="o">--</span><span class="n">output_columns</span> <span class="s1">&#39;_key, string_slice(_key, &quot;(Gr)(?&lt;Name1&gt;o*)(?&lt;Name2&gt;.*)&quot;, &quot;Name1&quot;)&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;string_slice&quot;,</span>
+<span class="c1">#           null</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Groonga&quot;,</span>
+<span class="c1">#         &quot;oo&quot;</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
+</pre></div>
+</div>
+<p>以下の例では、マッチしなかった場合のデフォルト値を指定しています。</p>
+<p>実行例:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Memos</span> <span class="o">--</span><span class="n">output_columns</span> <span class="s1">&#39;_key, string_slice(_key, &quot;mismatch&quot;, 2, { &quot;default_value&quot; : &quot;default&quot; })&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;string_slice&quot;,</span>
+<span class="c1">#           null</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Groonga&quot;,</span>
+<span class="c1">#         {</span>
+<span class="c1">#           &quot;default_value&quot;: &quot;default&quot;</span>
+<span class="c1">#         }</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
+</pre></div>
+</div>
+<p>カラムの代わりに文字列リテラルを指定することもできます。</p>
+<p>実行例:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Memos</span> <span class="o">--</span><span class="n">output_columns</span> <span class="s1">&#39;string_slice(&quot;Groonga&quot;, &quot;(roon)(g)&quot;, 2)&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;string_slice&quot;,</span>
+<span class="c1">#           null</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;g&quot;</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="parameters">
+<h2><span class="section-number">7.15.22.4. </span>引数<a class="headerlink" href="#parameters" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<div class="section" id="id1">
+<h3><span class="section-number">7.15.22.4.1. </span>位置による抽出<a class="headerlink" href="#id1" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>必須引数は2つあります。 <code class="docutils literal notranslate"><span class="pre">target</span></code> と <code class="docutils literal notranslate"><span class="pre">nth</span></code> です。</p>
+<p>省略可能引数は2つあります。 <code class="docutils literal notranslate"><span class="pre">length</span></code> と <code class="docutils literal notranslate"><span class="pre">options</span></code> です。</p>
+<div class="section" id="target">
+<h4><span class="section-number">7.15.22.4.1.1. </span><code class="docutils literal notranslate"><span class="pre">target</span></code><a class="headerlink" href="#target" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>対象となる文字列または文字列型カラムを指定します。</p>
+</div>
+<div class="section" id="nth">
+<h4><span class="section-number">7.15.22.4.1.2. </span><code class="docutils literal notranslate"><span class="pre">nth</span></code><a class="headerlink" href="#nth" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">target</span></code> から抽出を開始する位置を0始まりの文字数単位で指定します。</p>
+<p>負の値を指定した場合は終端から数えます。</p>
+</div>
+<div class="section" id="length">
+<h4><span class="section-number">7.15.22.4.1.3. </span><code class="docutils literal notranslate"><span class="pre">length</span></code><a class="headerlink" href="#length" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">nth</span></code> から抽出する文字数を指定します。</p>
+<p>省略時は1です。</p>
+</div>
+<div class="section" id="options">
+<h4><span class="section-number">7.15.22.4.1.4. </span><code class="docutils literal notranslate"><span class="pre">options</span></code><a class="headerlink" href="#options" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>以下のキーを指定します。</p>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">default_value</span></code></dt><dd><p><code class="docutils literal notranslate"><span class="pre">length</span></code> に0を指定した場合を除いて、部分文字列が空文字列になった場合に返される文字列を指定します。</p>
+<p>省略時は空文字列です。</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="id2">
+<h3><span class="section-number">7.15.22.4.2. </span>正規表現による抽出<a class="headerlink" href="#id2" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>必須引数は3つあります。 <code class="docutils literal notranslate"><span class="pre">target</span></code> と <code class="docutils literal notranslate"><span class="pre">regexp</span></code> と <code class="docutils literal notranslate"><span class="pre">nth</span></code> または <code class="docutils literal notranslate"><span class="pre">name</span></code> です。 <code class="docutils literal notranslate"><span class="pre">nth</span></code> と <code class="docutils literal notranslate"><span class="pre">name</span></code> はいずれか一方のみを指定します。</p>
+<p>省略可能引数は1つあります。 <code class="docutils literal notranslate"><span class="pre">options</span></code> です。</p>
+<div class="section" id="id3">
+<h4><span class="section-number">7.15.22.4.2.1. </span><code class="docutils literal notranslate"><span class="pre">target</span></code><a class="headerlink" href="#id3" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>対象となる文字列または文字列型カラムを指定します。</p>
+</div>
+<div class="section" id="regexp">
+<h4><span class="section-number">7.15.22.4.2.2. </span><code class="docutils literal notranslate"><span class="pre">regexp</span></code><a class="headerlink" href="#regexp" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>正規表現文字列を指定します。</p>
+<p><code class="docutils literal notranslate"><span class="pre">nth</span></code> を使用し、かつ1以上の値を指定する場合は、捕獲式集合 <code class="docutils literal notranslate"><span class="pre">(式)</span></code> を使用する必要があります。</p>
+<p><code class="docutils literal notranslate"><span class="pre">name</span></code> を使用する場合は、名前付き捕獲式集合 <code class="docutils literal notranslate"><span class="pre">(?&lt;name&gt;式)</span></code> または <code class="docutils literal notranslate"><span class="pre">(?'name'式)</span></code> を使用する必要があります。</p>
+</div>
+<div class="section" id="id4">
+<h4><span class="section-number">7.15.22.4.2.3. </span><code class="docutils literal notranslate"><span class="pre">nth</span></code><a class="headerlink" href="#id4" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">regexp</span></code> の捕獲式集合の番号を指定します。</p>
+<p><code class="docutils literal notranslate"><span class="pre">regexp</span></code> で指定したパターンに一致した時、 <code class="docutils literal notranslate"><span class="pre">nth</span></code> 番目の捕獲式集合の文字列が返却されます。</p>
+<p>0を指定すると、 <code class="docutils literal notranslate"><span class="pre">regexp</span></code> で指定したパターンに一致した全体が返却されます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">nth</span></code> か <code class="docutils literal notranslate"><span class="pre">name</span></code> のいずれか一方のみを指定します。</p>
+</div>
+<div class="section" id="name">
+<h4><span class="section-number">7.15.22.4.2.4. </span><code class="docutils literal notranslate"><span class="pre">name</span></code><a class="headerlink" href="#name" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">regexp</span></code> の名前付き捕獲式集合の名前を指定します。</p>
+<p><code class="docutils literal notranslate"><span class="pre">regexp</span></code> で指定したパターンに一致した時、この名前に一致する名前付き捕獲式集合の文字列が返却されます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">nth</span></code> か <code class="docutils literal notranslate"><span class="pre">name</span></code> のいずれか一方のみを指定します。</p>
+</div>
+<div class="section" id="id5">
+<h4><span class="section-number">7.15.22.4.2.5. </span><code class="docutils literal notranslate"><span class="pre">options</span></code><a class="headerlink" href="#id5" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>以下のキーを指定します。</p>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">default_value</span></code></dt><dd><p><code class="docutils literal notranslate"><span class="pre">regexp</span></code> に一致しなかった場合に返却される文字列を指定します。 <code class="docutils literal notranslate"><span class="pre">nth</span></code> や <code class="docutils literal notranslate"><span class="pre">name</span></code> の値に誤りがある場合もこの値が返却されます。</p>
+<p>省略時は空文字列です。</p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="section" id="return-value">
+<h2><span class="section-number">7.15.22.5. </span>戻り値<a class="headerlink" href="#return-value" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">string_slice</span></code> は指定した条件で抽出された部分文字列を返却します。</p>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">7.15.22. <code class="docutils literal notranslate"><span class="pre">string_slice</span></code></a><ul>
+<li><a class="reference internal" href="#summary">7.15.22.1. 概要</a></li>
+<li><a class="reference internal" href="#syntax">7.15.22.2. 構文</a><ul>
+<li><a class="reference internal" href="#extraction-by-position">7.15.22.2.1. 位置による抽出</a></li>
+<li><a class="reference internal" href="#extraction-by-regular-expression">7.15.22.2.2. 正規表現による抽出</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#usage">7.15.22.3. 使い方</a></li>
+<li><a class="reference internal" href="#parameters">7.15.22.4. 引数</a><ul>
+<li><a class="reference internal" href="#id1">7.15.22.4.1. 位置による抽出</a><ul>
+<li><a class="reference internal" href="#target">7.15.22.4.1.1. <code class="docutils literal notranslate"><span class="pre">target</span></code></a></li>
+<li><a class="reference internal" href="#nth">7.15.22.4.1.2. <code class="docutils literal notranslate"><span class="pre">nth</span></code></a></li>
+<li><a class="reference internal" href="#length">7.15.22.4.1.3. <code class="docutils literal notranslate"><span class="pre">length</span></code></a></li>
+<li><a class="reference internal" href="#options">7.15.22.4.1.4. <code class="docutils literal notranslate"><span class="pre">options</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id2">7.15.22.4.2. 正規表現による抽出</a><ul>
+<li><a class="reference internal" href="#id3">7.15.22.4.2.1. <code class="docutils literal notranslate"><span class="pre">target</span></code></a></li>
+<li><a class="reference internal" href="#regexp">7.15.22.4.2.2. <code class="docutils literal notranslate"><span class="pre">regexp</span></code></a></li>
+<li><a class="reference internal" href="#id4">7.15.22.4.2.3. <code class="docutils literal notranslate"><span class="pre">nth</span></code></a></li>
+<li><a class="reference internal" href="#name">7.15.22.4.2.4. <code class="docutils literal notranslate"><span class="pre">name</span></code></a></li>
+<li><a class="reference internal" href="#id5">7.15.22.4.2.5. <code class="docutils literal notranslate"><span class="pre">options</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#return-value">7.15.22.5. 戻り値</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="string_length.html"
+                        title="前の章へ"><span class="section-number">7.15.21. </span><code class="docutils literal notranslate"><span class="pre">string_length</span></code></a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="string_substring.html"
+                        title="次の章へ"><span class="section-number">7.15.23. </span><code class="docutils literal notranslate"><span class="pre">string_substring</span></code></a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="string_substring.html" title="7.15.23. string_substring"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="string_length.html" title="7.15.21. string_length"
+             >前へ</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v11.0.3ドキュメント</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../reference.html" ><span class="section-number">7. </span>リファレンスマニュアル</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../function.html" ><span class="section-number">7.15. </span>関数</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">7.15.22. </span><code class="docutils literal notranslate"><span class="pre">string_slice</span></code></a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2009-2021, Brazil, Inc.
+    </div>
+      <script src="http://connect.facebook.net/ja_JP/all.js"></script>
+
+    <script>
+      FB.init({
+         appId  : null,
+         status : true, // check login status
+         cookie : true, // enable cookies to allow the server to access the session
+         xfbml  : true  // parse XFBML
+      });
+    </script>
+  </body>
+
+</html>

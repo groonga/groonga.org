@@ -15,17 +15,16 @@
 
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>7.11.3.2. scorer_tf_idf &#8212; Groonga v11.0.2ドキュメント</title>
-    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../static/groonga.css" type="text/css" />
+    <title>7.11.3.2. scorer_tf_idf &#8212; Groonga v11.0.3ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../../static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../static/groonga.css" />
     
-    <script id="documentation_options" data-url_root="../../" src="../../static/documentation_options.js"></script>
+    <script data-url_root="../../" id="documentation_options" src="../../static/documentation_options.js"></script>
     <script src="../../static/jquery.js"></script>
     <script src="../../static/underscore.js"></script>
     <script src="../../static/doctools.js"></script>
     <script src="../../static/translations.js"></script>
     
-    <link rel="shortcut icon" href="../../static/favicon.ico"/>
     <link rel="index" title="索引" href="../../genindex.html" />
     <link rel="search" title="検索" href="../../search.html" />
     <link rel="next" title="7.12. Cast" href="../cast.html" />
@@ -76,7 +75,7 @@
         <li class="right" >
           <a href="scorer_tf_at_most.html" title="7.11.3.1. scorer_tf_at_most"
              accesskey="P">前へ</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v11.0.2ドキュメント</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v11.0.3ドキュメント</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../reference.html" ><span class="section-number">7. </span>リファレンスマニュアル</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../scorer.html" accesskey="U"><span class="section-number">7.11. </span>スコアラー</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href=""><span class="section-number">7.11.3.2. </span><code class="docutils literal notranslate"><span class="pre">scorer_tf_idf</span></code></a></li> 
@@ -116,8 +115,8 @@
 <div class="section" id="syntax">
 <h2><span class="section-number">7.11.3.2.2. </span>構文<a class="headerlink" href="#syntax" title="このヘッドラインへのパーマリンク">¶</a></h2>
 <p>このスコアラーの引数は1つです。:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>scorer_tf_idf(column)
-scorer_tf_idf(index)
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">scorer_tf_idf</span><span class="p">(</span><span class="n">column</span><span class="p">)</span>
+<span class="n">scorer_tf_idf</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -127,90 +126,90 @@ scorer_tf_idf(index)
 <p>使い方を示すために使うスキーマ定義とサンプルデータは以下の通りです。</p>
 <p>サンプルスキーマ:</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>table_create Logs TABLE_NO_KEY
-# [[0, 1337566253.89858, 0.000355720520019531], true]
-column_create Logs message COLUMN_SCALAR Text
-# [[0, 1337566253.89858, 0.000355720520019531], true]
-table_create Terms TABLE_PAT_KEY ShortText \
-  --default_tokenizer TokenBigram \
-  --normalizer NormalizerAuto
-# [[0, 1337566253.89858, 0.000355720520019531], true]
-column_create Terms message_index COLUMN_INDEX|WITH_POSITION Logs message
-# [[0, 1337566253.89858, 0.000355720520019531], true]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">table_create</span> <span class="n">Logs</span> <span class="n">TABLE_NO_KEY</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">column_create</span> <span class="n">Logs</span> <span class="n">message</span> <span class="n">COLUMN_SCALAR</span> <span class="n">Text</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">table_create</span> <span class="n">Terms</span> <span class="n">TABLE_PAT_KEY</span> <span class="n">ShortText</span> \
+  <span class="o">--</span><span class="n">default_tokenizer</span> <span class="n">TokenBigram</span> \
+  <span class="o">--</span><span class="n">normalizer</span> <span class="n">NormalizerAuto</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">column_create</span> <span class="n">Terms</span> <span class="n">message_index</span> <span class="n">COLUMN_INDEX</span><span class="o">|</span><span class="n">WITH_POSITION</span> <span class="n">Logs</span> <span class="n">message</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
 </pre></div>
 </div>
 <p>サンプルデータ:</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>load --table Logs
-[
-{&quot;message&quot;: &quot;Error&quot;},
-{&quot;message&quot;: &quot;Warning&quot;},
-{&quot;message&quot;: &quot;Warning Warning&quot;},
-{&quot;message&quot;: &quot;Warning Warning Warning&quot;},
-{&quot;message&quot;: &quot;Info&quot;},
-{&quot;message&quot;: &quot;Info Info&quot;},
-{&quot;message&quot;: &quot;Info Info Info&quot;},
-{&quot;message&quot;: &quot;Info Info Info Info&quot;},
-{&quot;message&quot;: &quot;Notice&quot;},
-{&quot;message&quot;: &quot;Notice Notice&quot;},
-{&quot;message&quot;: &quot;Notice Notice Notice&quot;},
-{&quot;message&quot;: &quot;Notice Notice Notice Notice&quot;},
-{&quot;message&quot;: &quot;Notice Notice Notice Notice Notice&quot;}
-]
-# [[0, 1337566253.89858, 0.000355720520019531], 13]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">load</span> <span class="o">--</span><span class="n">table</span> <span class="n">Logs</span>
+<span class="p">[</span>
+<span class="p">{</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Error&quot;</span><span class="p">},</span>
+<span class="p">{</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Warning&quot;</span><span class="p">},</span>
+<span class="p">{</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Warning Warning&quot;</span><span class="p">},</span>
+<span class="p">{</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Warning Warning Warning&quot;</span><span class="p">},</span>
+<span class="p">{</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Info&quot;</span><span class="p">},</span>
+<span class="p">{</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Info Info&quot;</span><span class="p">},</span>
+<span class="p">{</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Info Info Info&quot;</span><span class="p">},</span>
+<span class="p">{</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Info Info Info Info&quot;</span><span class="p">},</span>
+<span class="p">{</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Notice&quot;</span><span class="p">},</span>
+<span class="p">{</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Notice Notice&quot;</span><span class="p">},</span>
+<span class="p">{</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Notice Notice Notice&quot;</span><span class="p">},</span>
+<span class="p">{</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Notice Notice Notice Notice&quot;</span><span class="p">},</span>
+<span class="p">{</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Notice Notice Notice Notice Notice&quot;</span><span class="p">}</span>
+<span class="p">]</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], 13]</span>
 </pre></div>
 </div>
 <p><a class="reference internal" href="../commands/select.html#select-match-columns"><span class="std std-ref">match_columns</span></a> の中で <code class="docutils literal notranslate"><span class="pre">scorer_tf_idf</span></code> を次のようにして指定できます:</p>
 <p>実行例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Logs \
-  --match_columns &quot;scorer_tf_idf(message)&quot; \
-  --query &quot;Error OR Info&quot; \
-  --output_columns &quot;message, _score&quot; \
-  --sort_keys &quot;-_score&quot;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         5
-#       ],
-#       [
-#         [
-#           &quot;message&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;_score&quot;,
-#           &quot;Int32&quot;
-#         ]
-#       ],
-#       [
-#         &quot;Info Info Info Info&quot;,
-#         3
-#       ],
-#       [
-#         &quot;Error&quot;,
-#         2
-#       ],
-#       [
-#         &quot;Info Info Info&quot;,
-#         2
-#       ],
-#       [
-#         &quot;Info Info&quot;,
-#         1
-#       ],
-#       [
-#         &quot;Info&quot;,
-#         1
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Logs</span> \
+  <span class="o">--</span><span class="n">match_columns</span> <span class="s2">&quot;scorer_tf_idf(message)&quot;</span> \
+  <span class="o">--</span><span class="n">query</span> <span class="s2">&quot;Error OR Info&quot;</span> \
+  <span class="o">--</span><span class="n">output_columns</span> <span class="s2">&quot;message, _score&quot;</span> \
+  <span class="o">--</span><span class="n">sort_keys</span> <span class="s2">&quot;-_score&quot;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;message&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_score&quot;,</span>
+<span class="c1">#           &quot;Int32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Info Info Info Info&quot;,</span>
+<span class="c1">#         3</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Error&quot;,</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Info Info Info&quot;,</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Info Info&quot;,</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Info&quot;,</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">Info</span> <span class="pre">Info</span> <span class="pre">Info</span></code> には <code class="docutils literal notranslate"><span class="pre">Info</span></code> という単語が3回もでてきますが、 <code class="docutils literal notranslate"><span class="pre">Info</span> <span class="pre">Info</span> <span class="pre">Info</span></code> も <code class="docutils literal notranslate"><span class="pre">Error</span></code> もどちらもスコアーは <code class="docutils literal notranslate"><span class="pre">2</span></code> です。なぜなら、 <code class="docutils literal notranslate"><span class="pre">Error</span></code> は <code class="docutils literal notranslate"><span class="pre">Info</span></code> よりもより重要な単語だからです。 <code class="docutils literal notranslate"><span class="pre">Info</span></code> を含むドキュメントの数は <code class="docutils literal notranslate"><span class="pre">4</span></code> です。 <code class="docutils literal notranslate"><span class="pre">Error</span></code> を含むドキュメントの数は <code class="docutils literal notranslate"><span class="pre">1</span></code> です。少しのドキュメントにしか含まれていない単語はより特徴的な単語です。特徴的な単語は重要な単語です。</p>
@@ -309,7 +308,7 @@ column_create Terms message_index COLUMN_INDEX|WITH_POSITION Logs message
         <li class="right" >
           <a href="scorer_tf_at_most.html" title="7.11.3.1. scorer_tf_at_most"
              >前へ</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v11.0.2ドキュメント</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v11.0.3ドキュメント</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../reference.html" ><span class="section-number">7. </span>リファレンスマニュアル</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../scorer.html" ><span class="section-number">7.11. </span>スコアラー</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href=""><span class="section-number">7.11.3.2. </span><code class="docutils literal notranslate"><span class="pre">scorer_tf_idf</span></code></a></li> 

@@ -15,16 +15,15 @@
 
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>7.11. Scorer &#8212; Groonga v11.0.2 documentation</title>
-    <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../static/groonga.css" type="text/css" />
+    <title>7.11. Scorer &#8212; Groonga v11.0.3 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../static/groonga.css" />
     
-    <script id="documentation_options" data-url_root="../" src="../static/documentation_options.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../static/documentation_options.js"></script>
     <script src="../static/jquery.js"></script>
     <script src="../static/underscore.js"></script>
     <script src="../static/doctools.js"></script>
     
-    <link rel="shortcut icon" href="../static/favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="7.11.3.1. scorer_tf_at_most" href="scorers/scorer_tf_at_most.html" />
@@ -75,7 +74,7 @@
         <li class="right" >
           <a href="query_expanders/tsv.html" title="7.10.1. QueryExpanderTSV"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Groonga v11.0.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Groonga v11.0.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../reference.html" accesskey="U"><span class="section-number">7. </span>Reference manual</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href=""><span class="section-number">7.11. </span>Scorer</a></li> 
       </ul>
@@ -128,132 +127,132 @@ able to use data type (“title” data are important rather than
 <p>Here are a schema definition and sample data to show usage.</p>
 <p>Sample schema:</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>table_create Memos TABLE_HASH_KEY ShortText
-# [[0, 1337566253.89858, 0.000355720520019531], true]
-column_create Memos title COLUMN_SCALAR ShortText
-# [[0, 1337566253.89858, 0.000355720520019531], true]
-column_create Memos content COLUMN_SCALAR Text
-# [[0, 1337566253.89858, 0.000355720520019531], true]
-table_create Terms TABLE_PAT_KEY ShortText \
-  --default_tokenizer TokenBigram \
-  --normalizer NormalizerAuto
-# [[0, 1337566253.89858, 0.000355720520019531], true]
-column_create Terms title_index COLUMN_INDEX|WITH_POSITION Memos title
-# [[0, 1337566253.89858, 0.000355720520019531], true]
-column_create Terms content_index COLUMN_INDEX|WITH_POSITION Memos content
-# [[0, 1337566253.89858, 0.000355720520019531], true]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">table_create</span> <span class="n">Memos</span> <span class="n">TABLE_HASH_KEY</span> <span class="n">ShortText</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">column_create</span> <span class="n">Memos</span> <span class="n">title</span> <span class="n">COLUMN_SCALAR</span> <span class="n">ShortText</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">column_create</span> <span class="n">Memos</span> <span class="n">content</span> <span class="n">COLUMN_SCALAR</span> <span class="n">Text</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">table_create</span> <span class="n">Terms</span> <span class="n">TABLE_PAT_KEY</span> <span class="n">ShortText</span> \
+  <span class="o">--</span><span class="n">default_tokenizer</span> <span class="n">TokenBigram</span> \
+  <span class="o">--</span><span class="n">normalizer</span> <span class="n">NormalizerAuto</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">column_create</span> <span class="n">Terms</span> <span class="n">title_index</span> <span class="n">COLUMN_INDEX</span><span class="o">|</span><span class="n">WITH_POSITION</span> <span class="n">Memos</span> <span class="n">title</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">column_create</span> <span class="n">Terms</span> <span class="n">content_index</span> <span class="n">COLUMN_INDEX</span><span class="o">|</span><span class="n">WITH_POSITION</span> <span class="n">Memos</span> <span class="n">content</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
 </pre></div>
 </div>
 <p>Sample data:</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>load --table Memos
-[
-{
-  &quot;_key&quot;: &quot;memo1&quot;,
-  &quot;title&quot;: &quot;Groonga is easy&quot;,
-  &quot;content&quot;: &quot;Groonga is very easy full text search engine!&quot;
-},
-{
-  &quot;_key&quot;: &quot;memo2&quot;,
-  &quot;title&quot;: &quot;Mroonga is easy&quot;,
-  &quot;content&quot;: &quot;Mroonga is more easier full text search engine!&quot;
-},
-{
-  &quot;_key&quot;: &quot;memo3&quot;,
-  &quot;title&quot;: &quot;Rroonga is easy&quot;,
-  &quot;content&quot;: &quot;Ruby is very helpful.&quot;
-},
-{
-  &quot;_key&quot;: &quot;memo4&quot;,
-  &quot;title&quot;: &quot;Groonga is fast&quot;,
-  &quot;content&quot;: &quot;Groonga! Groonga! Groonga! Groonga is very fast!&quot;
-},
-{
-  &quot;_key&quot;: &quot;memo5&quot;,
-  &quot;title&quot;: &quot;PGroonga is fast&quot;,
-  &quot;content&quot;: &quot;PGroonga is very fast!&quot;
-},
-{
-  &quot;_key&quot;: &quot;memo6&quot;,
-  &quot;title&quot;: &quot;PGroonga is useful&quot;,
-  &quot;content&quot;: &quot;SQL is easy because many client libraries exist.&quot;
-},
-{
-  &quot;_key&quot;: &quot;memo7&quot;,
-  &quot;title&quot;: &quot;Mroonga is also useful&quot;,
-  &quot;content&quot;: &quot;MySQL has replication feature. Mroonga can use it.&quot;
-}
-]
-# [[0, 1337566253.89858, 0.000355720520019531], 7]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">load</span> <span class="o">--</span><span class="n">table</span> <span class="n">Memos</span>
+<span class="p">[</span>
+<span class="p">{</span>
+  <span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;memo1&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Groonga is easy&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;Groonga is very easy full text search engine!&quot;</span>
+<span class="p">},</span>
+<span class="p">{</span>
+  <span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;memo2&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Mroonga is easy&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;Mroonga is more easier full text search engine!&quot;</span>
+<span class="p">},</span>
+<span class="p">{</span>
+  <span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;memo3&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Rroonga is easy&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;Ruby is very helpful.&quot;</span>
+<span class="p">},</span>
+<span class="p">{</span>
+  <span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;memo4&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Groonga is fast&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;Groonga! Groonga! Groonga! Groonga is very fast!&quot;</span>
+<span class="p">},</span>
+<span class="p">{</span>
+  <span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;memo5&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;PGroonga is fast&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;PGroonga is very fast!&quot;</span>
+<span class="p">},</span>
+<span class="p">{</span>
+  <span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;memo6&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;PGroonga is useful&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;SQL is easy because many client libraries exist.&quot;</span>
+<span class="p">},</span>
+<span class="p">{</span>
+  <span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;memo7&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Mroonga is also useful&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;MySQL has replication feature. Mroonga can use it.&quot;</span>
+<span class="p">}</span>
+<span class="p">]</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], 7]</span>
 </pre></div>
 </div>
 <p>You can specify custom score function in <a class="reference internal" href="commands/select.html#select-match-columns"><span class="std std-ref">match_columns</span></a>.
 There are some syntaxes.</p>
 <p>For score function that doesn’t require any parameter such as
 <a class="reference internal" href="scorers/scorer_tf_idf.html"><span class="doc">scorer_tf_idf</span></a>:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>SCORE_FUNCTION(COLUMN)
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SCORE_FUNCTION</span><span class="p">(</span><span class="n">COLUMN</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>You can specify weight:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>SCORE_FUNCTION(COLUMN) * WEIGHT
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SCORE_FUNCTION</span><span class="p">(</span><span class="n">COLUMN</span><span class="p">)</span> <span class="o">*</span> <span class="n">WEIGHT</span>
 </pre></div>
 </div>
 <p>For score function that requires one or more parameters such as
 <a class="reference internal" href="scorers/scorer_tf_at_most.html"><span class="doc">scorer_tf_at_most</span></a>:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>SCORE_FUNCTION(COLUMN, ARGUMENT1, ARGUMENT2, ...)
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SCORE_FUNCTION</span><span class="p">(</span><span class="n">COLUMN</span><span class="p">,</span> <span class="n">ARGUMENT1</span><span class="p">,</span> <span class="n">ARGUMENT2</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>You can specify weight:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>SCORE_FUNCTION(COLUMN, ARGUMENT1, ARGUMENT2, ...) * WEIGHT
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SCORE_FUNCTION</span><span class="p">(</span><span class="n">COLUMN</span><span class="p">,</span> <span class="n">ARGUMENT1</span><span class="p">,</span> <span class="n">ARGUMENT2</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span> <span class="o">*</span> <span class="n">WEIGHT</span>
 </pre></div>
 </div>
 <p>You can use different score function for each
 <a class="reference internal" href="commands/select.html#select-match-columns"><span class="std std-ref">match_columns</span></a>:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>SCORE_FUNCTION1(COLUMN1) ||
-  SCORE_FUNCTION2(COLUMN2) * WEIGHT ||
-  SCORE_FUNCTION3(COLUMN3, ARGUMENT1) ||
-  ...
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SCORE_FUNCTION1</span><span class="p">(</span><span class="n">COLUMN1</span><span class="p">)</span> <span class="o">||</span>
+  <span class="n">SCORE_FUNCTION2</span><span class="p">(</span><span class="n">COLUMN2</span><span class="p">)</span> <span class="o">*</span> <span class="n">WEIGHT</span> <span class="o">||</span>
+  <span class="n">SCORE_FUNCTION3</span><span class="p">(</span><span class="n">COLUMN3</span><span class="p">,</span> <span class="n">ARGUMENT1</span><span class="p">)</span> <span class="o">||</span>
+  <span class="o">...</span>
 </pre></div>
 </div>
 <p>Here is a simplest example:</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Memos \
-  --match_columns &quot;scorer_tf_idf(content)&quot; \
-  --query &quot;Groonga&quot; \
-  --output_columns &quot;content, _score&quot; \
-  --sort_keys &quot;-_score&quot;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         2
-#       ],
-#       [
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;_score&quot;,
-#           &quot;Int32&quot;
-#         ]
-#       ],
-#       [
-#         &quot;Groonga! Groonga! Groonga! Groonga is very fast!&quot;,
-#         2
-#       ],
-#       [
-#         &quot;Groonga is very easy full text search engine!&quot;,
-#         1
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Memos</span> \
+  <span class="o">--</span><span class="n">match_columns</span> <span class="s2">&quot;scorer_tf_idf(content)&quot;</span> \
+  <span class="o">--</span><span class="n">query</span> <span class="s2">&quot;Groonga&quot;</span> \
+  <span class="o">--</span><span class="n">output_columns</span> <span class="s2">&quot;content, _score&quot;</span> \
+  <span class="o">--</span><span class="n">sort_keys</span> <span class="s2">&quot;-_score&quot;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_score&quot;,</span>
+<span class="c1">#           &quot;Int32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Groonga! Groonga! Groonga! Groonga is very fast!&quot;,</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Groonga is very easy full text search engine!&quot;,</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">Groonga!</span> <span class="pre">Groonga!</span> <span class="pre">Groonga!</span> <span class="pre">Groonga</span> <span class="pre">is</span> <span class="pre">very</span> <span class="pre">fast!</span></code> contains 4
@@ -262,43 +261,43 @@ There are some syntaxes.</p>
 <code class="docutils literal notranslate"><span class="pre">select</span></code> command uses TF-IDF based scorer <code class="docutils literal notranslate"><span class="pre">scorer_tf_idf()</span></code>.</p>
 <p>Here is an example that uses weight:</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Memos \
-  --match_columns &quot;scorer_tf_idf(content) * 10&quot; \
-  --query &quot;Groonga&quot; \
-  --output_columns &quot;content, _score&quot; \
-  --sort_keys &quot;-_score&quot;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         2
-#       ],
-#       [
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;_score&quot;,
-#           &quot;Int32&quot;
-#         ]
-#       ],
-#       [
-#         &quot;Groonga! Groonga! Groonga! Groonga is very fast!&quot;,
-#         22
-#       ],
-#       [
-#         &quot;Groonga is very easy full text search engine!&quot;,
-#         10
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Memos</span> \
+  <span class="o">--</span><span class="n">match_columns</span> <span class="s2">&quot;scorer_tf_idf(content) * 10&quot;</span> \
+  <span class="o">--</span><span class="n">query</span> <span class="s2">&quot;Groonga&quot;</span> \
+  <span class="o">--</span><span class="n">output_columns</span> <span class="s2">&quot;content, _score&quot;</span> \
+  <span class="o">--</span><span class="n">sort_keys</span> <span class="s2">&quot;-_score&quot;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_score&quot;,</span>
+<span class="c1">#           &quot;Int32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Groonga! Groonga! Groonga! Groonga is very fast!&quot;,</span>
+<span class="c1">#         22</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Groonga is very easy full text search engine!&quot;,</span>
+<span class="c1">#         10</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">Groonga!</span> <span class="pre">Groonga!</span> <span class="pre">Groonga!</span> <span class="pre">Groonga</span> <span class="pre">is</span> <span class="pre">very</span> <span class="pre">fast!</span></code> has <code class="docutils literal notranslate"><span class="pre">22</span></code> as
@@ -308,43 +307,43 @@ doesn’t specify weight.</p>
 argument. <a class="reference internal" href="scorers/scorer_tf_at_most.html"><span class="doc">scorer_tf_at_most</span></a> scorer requires
 one argument. You can limit TF score by the scorer.</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Memos \
-  --match_columns &quot;scorer_tf_at_most(content, 2.0)&quot; \
-  --query &quot;Groonga&quot; \
-  --output_columns &quot;content, _score&quot; \
-  --sort_keys &quot;-_score&quot;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         2
-#       ],
-#       [
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;_score&quot;,
-#           &quot;Int32&quot;
-#         ]
-#       ],
-#       [
-#         &quot;Groonga! Groonga! Groonga! Groonga is very fast!&quot;,
-#         2
-#       ],
-#       [
-#         &quot;Groonga is very easy full text search engine!&quot;,
-#         1
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Memos</span> \
+  <span class="o">--</span><span class="n">match_columns</span> <span class="s2">&quot;scorer_tf_at_most(content, 2.0)&quot;</span> \
+  <span class="o">--</span><span class="n">query</span> <span class="s2">&quot;Groonga&quot;</span> \
+  <span class="o">--</span><span class="n">output_columns</span> <span class="s2">&quot;content, _score&quot;</span> \
+  <span class="o">--</span><span class="n">sort_keys</span> <span class="s2">&quot;-_score&quot;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_score&quot;,</span>
+<span class="c1">#           &quot;Int32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Groonga! Groonga! Groonga! Groonga is very fast!&quot;,</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Groonga is very easy full text search engine!&quot;,</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">Groonga!</span> <span class="pre">Groonga!</span> <span class="pre">Groonga!</span> <span class="pre">Groonga</span> <span class="pre">is</span> <span class="pre">very</span> <span class="pre">fast!</span></code> contains 4
@@ -354,49 +353,49 @@ Because the scorer used in the <code class="docutils literal notranslate"><span 
 score value to <code class="docutils literal notranslate"><span class="pre">2</span></code>.</p>
 <p>Here is an example that uses multiple scorers:</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Memos \
-  --match_columns &quot;scorer_tf_idf(title) || scorer_tf_at_most(content, 2.0)&quot; \
-  --query &quot;Groonga&quot; \
-  --output_columns &quot;title, content, _score&quot; \
-  --sort_keys &quot;-_score&quot;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         2
-#       ],
-#       [
-#         [
-#           &quot;title&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;_score&quot;,
-#           &quot;Int32&quot;
-#         ]
-#       ],
-#       [
-#         &quot;Groonga is fast&quot;,
-#         &quot;Groonga! Groonga! Groonga! Groonga is very fast!&quot;,
-#         3
-#       ],
-#       [
-#         &quot;Groonga is easy&quot;,
-#         &quot;Groonga is very easy full text search engine!&quot;,
-#         2
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Memos</span> \
+  <span class="o">--</span><span class="n">match_columns</span> <span class="s2">&quot;scorer_tf_idf(title) || scorer_tf_at_most(content, 2.0)&quot;</span> \
+  <span class="o">--</span><span class="n">query</span> <span class="s2">&quot;Groonga&quot;</span> \
+  <span class="o">--</span><span class="n">output_columns</span> <span class="s2">&quot;title, content, _score&quot;</span> \
+  <span class="o">--</span><span class="n">sort_keys</span> <span class="s2">&quot;-_score&quot;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;title&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_score&quot;,</span>
+<span class="c1">#           &quot;Int32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Groonga is fast&quot;,</span>
+<span class="c1">#         &quot;Groonga! Groonga! Groonga! Groonga is very fast!&quot;,</span>
+<span class="c1">#         3</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Groonga is easy&quot;,</span>
+<span class="c1">#         &quot;Groonga is very easy full text search engine!&quot;,</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>The <code class="docutils literal notranslate"><span class="pre">--match_columns</span></code> uses <code class="docutils literal notranslate"><span class="pre">scorer_tf_idf(title)</span></code> and
@@ -405,49 +404,49 @@ score value to <code class="docutils literal notranslate"><span class="pre">2</s
 <code class="docutils literal notranslate"><span class="pre">--match_columns</span></code>. You can use the default scorer by just specifying
 a match column:</p>
 <p>Execution example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>select Memos \
-  --match_columns &quot;title || scorer_tf_at_most(content, 2.0)&quot; \
-  --query &quot;Groonga&quot; \
-  --output_columns &quot;title, content, _score&quot; \
-  --sort_keys &quot;-_score&quot;
-# [
-#   [
-#     0,
-#     1337566253.89858,
-#     0.000355720520019531
-#   ],
-#   [
-#     [
-#       [
-#         2
-#       ],
-#       [
-#         [
-#           &quot;title&quot;,
-#           &quot;ShortText&quot;
-#         ],
-#         [
-#           &quot;content&quot;,
-#           &quot;Text&quot;
-#         ],
-#         [
-#           &quot;_score&quot;,
-#           &quot;Int32&quot;
-#         ]
-#       ],
-#       [
-#         &quot;Groonga is fast&quot;,
-#         &quot;Groonga! Groonga! Groonga! Groonga is very fast!&quot;,
-#         3
-#       ],
-#       [
-#         &quot;Groonga is easy&quot;,
-#         &quot;Groonga is very easy full text search engine!&quot;,
-#         2
-#       ]
-#     ]
-#   ]
-# ]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Memos</span> \
+  <span class="o">--</span><span class="n">match_columns</span> <span class="s2">&quot;title || scorer_tf_at_most(content, 2.0)&quot;</span> \
+  <span class="o">--</span><span class="n">query</span> <span class="s2">&quot;Groonga&quot;</span> \
+  <span class="o">--</span><span class="n">output_columns</span> <span class="s2">&quot;title, content, _score&quot;</span> \
+  <span class="o">--</span><span class="n">sort_keys</span> <span class="s2">&quot;-_score&quot;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;title&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_score&quot;,</span>
+<span class="c1">#           &quot;Int32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Groonga is fast&quot;,</span>
+<span class="c1">#         &quot;Groonga! Groonga! Groonga! Groonga is very fast!&quot;,</span>
+<span class="c1">#         3</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Groonga is easy&quot;,</span>
+<span class="c1">#         &quot;Groonga is very easy full text search engine!&quot;,</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 <p>The <code class="docutils literal notranslate"><span class="pre">--match_columns</span></code> uses the default scorer (TF) for <code class="docutils literal notranslate"><span class="pre">title</span></code> and
@@ -515,7 +514,7 @@ a match column:</p>
         <li class="right" >
           <a href="query_expanders/tsv.html" title="7.10.1. QueryExpanderTSV"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Groonga v11.0.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Groonga v11.0.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../reference.html" ><span class="section-number">7. </span>Reference manual</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href=""><span class="section-number">7.11. </span>Scorer</a></li> 
       </ul>

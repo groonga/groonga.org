@@ -95,9 +95,11 @@
 </div>
 <div class="section" id="syntax">
 <h2><span class="section-number">7.15.1.2. </span>構文<a class="headerlink" href="#syntax" title="このヘッドラインへのパーマリンク">¶</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">between</span></code> は3つもしくは5つの引数を受け取ります。</p>
+<p><code class="docutils literal notranslate"><span class="pre">between</span></code> は3つから6つの引数を受け取ります。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">between</span><span class="p">(</span><span class="n">column_or_value</span><span class="p">,</span> <span class="nb">min</span><span class="p">,</span> <span class="nb">max</span><span class="p">)</span>
+<span class="n">between</span><span class="p">(</span><span class="n">column_or_value</span><span class="p">,</span> <span class="nb">min</span><span class="p">,</span> <span class="nb">max</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;option&quot;</span><span class="p">:</span> <span class="s2">&quot;value of option&quot;</span><span class="p">})</span>
 <span class="n">between</span><span class="p">(</span><span class="n">column_or_value</span><span class="p">,</span> <span class="nb">min</span><span class="p">,</span> <span class="n">min_border</span><span class="p">,</span> <span class="nb">max</span><span class="p">,</span> <span class="n">max_border</span><span class="p">)</span>
+<span class="n">between</span><span class="p">(</span><span class="n">column_or_value</span><span class="p">,</span> <span class="nb">min</span><span class="p">,</span> <span class="n">min_border</span><span class="p">,</span> <span class="nb">max</span><span class="p">,</span> <span class="n">max_border</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;option&quot;</span><span class="p">:</span> <span class="s2">&quot;value of option&quot;</span><span class="p">})</span>
 </pre></div>
 </div>
 </div>
@@ -181,6 +183,78 @@
 </pre></div>
 </div>
 <p>上記の例では、すべてのレコードを返します。これは、14は指定した範囲である13から16の間にあるからです。この振舞いは指定した値がテーブルに存在するかどうかの確認に使えます。</p>
+<p>また、 <code class="docutils literal notranslate"><span class="pre">between</span></code> はオプションも指定できます。現在は、 <code class="docutils literal notranslate"><span class="pre">too_many_index_match_ratio</span></code> のみ指定できます。この値は、 <code class="docutils literal notranslate"><span class="pre">double</span></code> 型です。</p>
+<p><code class="docutils literal notranslate"><span class="pre">too_many_index_match_ratio</span></code> を使って、 <code class="docutils literal notranslate"><span class="pre">GRN_BETWEEN_TOO_MANY_INDEX_MATCH_RATIO</span></code> の値を変更できます。<code class="docutils literal notranslate"><span class="pre">GRN_BETWEEN_TOO_MANY_INDEX_MATCH_RATIO</span></code> のデフォルト値は <code class="docutils literal notranslate"><span class="pre">0.01</span></code> です。<code class="docutils literal notranslate"><span class="pre">GRN_BETWEEN_TOO_MANY_INDEX_MATCH_RATIO</span></code> は、 <code class="docutils literal notranslate"><span class="pre">between</span></code> がインデックスを使うかどうかを決定するために使います。</p>
+<p><code class="docutils literal notranslate"><span class="pre">between</span></code> とANDで絞り込むと予想されるレコード数よりも、絞り込んだレコード数が十分に小さい場合は、インデックスを使った検索より、シーケンシャルサーチの方が速いことがあります。</p>
+<p>例えば、 <code class="docutils literal notranslate"><span class="pre">--filter</span></code> でレコードを絞り込んだあと、さらに <code class="docutils literal notranslate"><span class="pre">between</span></code> で絞り込むとします。</p>
+<p>デフォルトでは、以下のケースでは、 <code class="docutils literal notranslate"><span class="pre">between</span></code> はシーケンシャルサーチを使います。</p>
+<blockquote>
+<div><ol class="arabic">
+<li><p><code class="docutils literal notranslate"><span class="pre">--filter</span></code> で絞り込んだレコード数が1000で``between`` 対象のレコード数が500,000の場合。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>1,000/500,000 = 0.002 &lt; 0.01(``GRN_BETWEEN_TOO_MANY_INDEX_MATCH_RATIO``) -&gt; ``between`` use sequential search.
+</pre></div>
+</div>
+</li>
+</ol>
+</div></blockquote>
+<p>一方、以下のケースでは、 <code class="docutils literal notranslate"><span class="pre">between</span></code> はインデックスを使います。</p>
+<blockquote>
+<div><ol class="arabic" start="2">
+<li><p><code class="docutils literal notranslate"><span class="pre">--filter</span></code> で絞り込んだレコード数が1000で``between`` 対象のレコード数が50,000の場合。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>1,000/50,000 = 0.02 &gt; 0.01(``GRN_BETWEEN_TOO_MANY_INDEX_MATCH_RATIO``) -&gt; ``between`` use index.
+</pre></div>
+</div>
+</li>
+</ol>
+</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">between</span></code> のオプションを設定するクエリーは以下の通りです。:</p>
+<p>実行例:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Users</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;between(age, 13, &quot;include&quot;, 16, &quot;include&quot;, {&quot;too_many_index_match_ratio&quot;:0.001})&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         3</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;age&quot;,</span>
+<span class="c1">#           &quot;Int32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2,</span>
+<span class="c1">#         &quot;Bob&quot;,</span>
+<span class="c1">#         13</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         &quot;Calros&quot;,</span>
+<span class="c1">#         15</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         4,</span>
+<span class="c1">#         &quot;Dave&quot;,</span>
+<span class="c1">#         16</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="parameters">
 <h2><span class="section-number">7.15.1.4. </span>引数<a class="headerlink" href="#parameters" title="このヘッドラインへのパーマリンク">¶</a></h2>
@@ -213,8 +287,12 @@
 <p><code class="docutils literal notranslate"><span class="pre">man</span></code> の値を含めた範囲となるかどうかを指定します。 <code class="docutils literal notranslate"><span class="pre">max_border</span></code> に指定できるのは &quot;include&quot; または &quot;exclude&quot; のどちらかです。
 &quot;include&quot; を指定すれば、<code class="docutils literal notranslate"><span class="pre">max</span></code> が含まれます。 &quot;exclude&quot; を指定すれば <code class="docutils literal notranslate"><span class="pre">max</span></code> は含まれません。</p>
 </div>
+<div class="section" id="option-value-of-option">
+<h4><span class="section-number">7.15.1.4.2.3. </span><code class="docutils literal notranslate"><span class="pre">{&quot;option&quot;:</span> <span class="pre">&quot;value</span> <span class="pre">of</span> <span class="pre">option&quot;}</span></code><a class="headerlink" href="#option-value-of-option" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">between</span></code> のオプションを指定します。現在は、 <code class="docutils literal notranslate"><span class="pre">too_many_index_match_ratio</span></code> のみ指定できます。この値は、 <code class="docutils literal notranslate"><span class="pre">double</span></code> 型です。</p>
+</div>
 <div class="section" id="return-value">
-<h4><span class="section-number">7.15.1.4.2.3. </span>戻り値<a class="headerlink" href="#return-value" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<h4><span class="section-number">7.15.1.4.2.4. </span>戻り値<a class="headerlink" href="#return-value" title="このヘッドラインへのパーマリンク">¶</a></h4>
 <p><code class="docutils literal notranslate"><span class="pre">between</span></code> は指定した範囲にカラムの値が含まれるかを返します。もし該当するレコードがあれば、 <code class="docutils literal notranslate"><span class="pre">true</span></code> を返します。そうでなければ <code class="docutils literal notranslate"><span class="pre">false</span></code> を返します。</p>
 </div>
 </div>
@@ -244,7 +322,8 @@
 <li><a class="reference internal" href="#optional-parameter">7.15.1.4.2. 省略可能引数</a><ul>
 <li><a class="reference internal" href="#min-border">7.15.1.4.2.1. <code class="docutils literal notranslate"><span class="pre">min_border</span></code></a></li>
 <li><a class="reference internal" href="#max-border">7.15.1.4.2.2. <code class="docutils literal notranslate"><span class="pre">max_border</span></code></a></li>
-<li><a class="reference internal" href="#return-value">7.15.1.4.2.3. 戻り値</a></li>
+<li><a class="reference internal" href="#option-value-of-option">7.15.1.4.2.3. <code class="docutils literal notranslate"><span class="pre">{&quot;option&quot;:</span> <span class="pre">&quot;value</span> <span class="pre">of</span> <span class="pre">option&quot;}</span></code></a></li>
+<li><a class="reference internal" href="#return-value">7.15.1.4.2.4. 戻り値</a></li>
 </ul>
 </li>
 </ul>

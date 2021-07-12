@@ -95,9 +95,11 @@ It is often used in combination with <a class="reference internal" href="../comm
 </div>
 <div class="section" id="syntax">
 <h2><span class="section-number">7.15.1.2. </span>Syntax<a class="headerlink" href="#syntax" title="Permalink to this headline">¶</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">between</span></code> has three or five parameters:</p>
+<p><code class="docutils literal notranslate"><span class="pre">between</span></code> has some parameters from three to six parameters:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">between</span><span class="p">(</span><span class="n">column_or_value</span><span class="p">,</span> <span class="nb">min</span><span class="p">,</span> <span class="nb">max</span><span class="p">)</span>
+<span class="n">between</span><span class="p">(</span><span class="n">column_or_value</span><span class="p">,</span> <span class="nb">min</span><span class="p">,</span> <span class="nb">max</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;option&quot;</span><span class="p">:</span> <span class="s2">&quot;value of option&quot;</span><span class="p">})</span>
 <span class="n">between</span><span class="p">(</span><span class="n">column_or_value</span><span class="p">,</span> <span class="nb">min</span><span class="p">,</span> <span class="n">min_border</span><span class="p">,</span> <span class="nb">max</span><span class="p">,</span> <span class="n">max_border</span><span class="p">)</span>
+<span class="n">between</span><span class="p">(</span><span class="n">column_or_value</span><span class="p">,</span> <span class="nb">min</span><span class="p">,</span> <span class="n">min_border</span><span class="p">,</span> <span class="nb">max</span><span class="p">,</span> <span class="n">max_border</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;option&quot;</span><span class="p">:</span> <span class="s2">&quot;value of option&quot;</span><span class="p">})</span>
 </pre></div>
 </div>
 </div>
@@ -183,6 +185,81 @@ If it doesn’t match the specified range, the <code class="docutils literal not
 </div>
 <p>In the above case, it returns all the records because 14 exists in between 13 and 16.
 This behavior is used for checking the specified value exists or not in the table.</p>
+<p>Then, you can also specify options of <code class="docutils literal notranslate"><span class="pre">between</span></code>.
+Currently, you can only specify <code class="docutils literal notranslate"><span class="pre">too_many_index_match_ratio</span></code>. The type of this value is <code class="docutils literal notranslate"><span class="pre">double</span></code>.</p>
+<p>You can change the value of <code class="docutils literal notranslate"><span class="pre">GRN_BETWEEN_TOO_MANY_INDEX_MATCH_RATIO</span></code> with <code class="docutils literal notranslate"><span class="pre">too_many_index_match_ratio</span></code>.
+The default value of <code class="docutils literal notranslate"><span class="pre">GRN_BETWEEN_TOO_MANY_INDEX_MATCH_RATIO</span></code> is <code class="docutils literal notranslate"><span class="pre">0.01</span></code>.
+<code class="docutils literal notranslate"><span class="pre">GRN_BETWEEN_TOO_MANY_INDEX_MATCH_RATIO</span></code> is used for deciding whether <code class="docutils literal notranslate"><span class="pre">between</span></code> use an index or not.</p>
+<p>There is a case that sequential search is faster than index search when the number of narrowed down records is small enough in contrast to the number of expected records to narrow down by <code class="docutils literal notranslate"><span class="pre">between</span></code> with AND operation which use indexes.</p>
+<p>For example, suppose you narrow down records by <code class="docutils literal notranslate"><span class="pre">--filter</span></code> and you narrow down them by <code class="docutils literal notranslate"><span class="pre">between</span></code>.</p>
+<p>In the default, <code class="docutils literal notranslate"><span class="pre">between</span></code> use sequential search in the following case.</p>
+<blockquote>
+<div><ol class="arabic">
+<li><p>If you narrow down records to 1,000 by <code class="docutils literal notranslate"><span class="pre">--filter</span></code> and records of the target of <code class="docutils literal notranslate"><span class="pre">between</span></code> are 500,000.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>1,000/500,000 = 0.002 &lt; 0.01(``GRN_BETWEEN_TOO_MANY_INDEX_MATCH_RATIO``) -&gt; ``between`` use sequential search.
+</pre></div>
+</div>
+</li>
+</ol>
+</div></blockquote>
+<p>On the other hand, <code class="docutils literal notranslate"><span class="pre">between</span></code> use index in the following case.</p>
+<blockquote>
+<div><ol class="arabic" start="2">
+<li><p>If you narrow down records to 1,000 by <code class="docutils literal notranslate"><span class="pre">--filter</span></code> and records of the target of <code class="docutils literal notranslate"><span class="pre">between</span></code> are 50,000.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>1,000/50,000 = 0.02 &gt; 0.01(``GRN_BETWEEN_TOO_MANY_INDEX_MATCH_RATIO``) -&gt; ``between`` use index.
+</pre></div>
+</div>
+</li>
+</ol>
+</div></blockquote>
+<p>Here is a query to set options of <code class="docutils literal notranslate"><span class="pre">between</span></code>:</p>
+<p>Execution example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Users</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;between(age, 13, &quot;include&quot;, 16, &quot;include&quot;, {&quot;too_many_index_match_ratio&quot;:0.001})&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         3</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;age&quot;,</span>
+<span class="c1">#           &quot;Int32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2,</span>
+<span class="c1">#         &quot;Bob&quot;,</span>
+<span class="c1">#         13</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         &quot;Calros&quot;,</span>
+<span class="c1">#         15</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         4,</span>
+<span class="c1">#         &quot;Dave&quot;,</span>
+<span class="c1">#         16</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="parameters">
 <h2><span class="section-number">7.15.1.4. </span>Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
@@ -217,8 +294,13 @@ The value of <code class="docutils literal notranslate"><span class="pre">min_bo
 <p>Specifies whether the specified range contains the value of <code class="docutils literal notranslate"><span class="pre">max</span></code> or not.
 The value of <code class="docutils literal notranslate"><span class="pre">max_border</span></code> must be either “include” or “exclude”. If it is “include”, <code class="docutils literal notranslate"><span class="pre">max</span></code> value is included. If it is “exclude”, <code class="docutils literal notranslate"><span class="pre">max</span></code> value is not included.</p>
 </div>
+<div class="section" id="option-value-of-option">
+<h4><span class="section-number">7.15.1.4.2.3. </span><code class="docutils literal notranslate"><span class="pre">{&quot;option&quot;:</span> <span class="pre">&quot;value</span> <span class="pre">of</span> <span class="pre">option&quot;}</span></code><a class="headerlink" href="#option-value-of-option" title="Permalink to this headline">¶</a></h4>
+<p>Specify between’s option.
+Currently, you can only specify <code class="docutils literal notranslate"><span class="pre">too_many_index_match_ratio</span></code>. The type of this value is <code class="docutils literal notranslate"><span class="pre">double</span></code>.</p>
+</div>
 <div class="section" id="return-value">
-<h4><span class="section-number">7.15.1.4.2.3. </span>Return value<a class="headerlink" href="#return-value" title="Permalink to this headline">¶</a></h4>
+<h4><span class="section-number">7.15.1.4.2.4. </span>Return value<a class="headerlink" href="#return-value" title="Permalink to this headline">¶</a></h4>
 <p><code class="docutils literal notranslate"><span class="pre">between</span></code> returns whether the column value exists in the specified range or not. If a record matches the specified range, it returns true. Otherwise, it returns false.</p>
 </div>
 </div>
@@ -248,7 +330,8 @@ The value of <code class="docutils literal notranslate"><span class="pre">max_bo
 <li><a class="reference internal" href="#optional-parameter">7.15.1.4.2. Optional parameter</a><ul>
 <li><a class="reference internal" href="#min-border">7.15.1.4.2.1. <code class="docutils literal notranslate"><span class="pre">min_border</span></code></a></li>
 <li><a class="reference internal" href="#max-border">7.15.1.4.2.2. <code class="docutils literal notranslate"><span class="pre">max_border</span></code></a></li>
-<li><a class="reference internal" href="#return-value">7.15.1.4.2.3. Return value</a></li>
+<li><a class="reference internal" href="#option-value-of-option">7.15.1.4.2.3. <code class="docutils literal notranslate"><span class="pre">{&quot;option&quot;:</span> <span class="pre">&quot;value</span> <span class="pre">of</span> <span class="pre">option&quot;}</span></code></a></li>
+<li><a class="reference internal" href="#return-value">7.15.1.4.2.4. Return value</a></li>
 </ul>
 </li>
 </ul>

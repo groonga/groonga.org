@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-7532323-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-7532323-1');
+    </script>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>7.15.20. snippet &#8212; Groonga v11.0.7 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../static/groonga.css" />
+    
+    <script data-url_root="../../" id="documentation_options" src="../../static/documentation_options.js"></script>
+    <script src="../../static/jquery.js"></script>
+    <script src="../../static/underscore.js"></script>
+    <script src="../../static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="7.15.21. snippet_html" href="snippet_html.html" />
+    <link rel="prev" title="7.15.19. rand" href="rand.html" /> 
+      <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
+    <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
+    <meta property="og:type" content="product" />
+    <meta property="og:image" content="http://groonga.org/images/logos/groonga-icon-full-size.png" />
+    <meta property="og:site_name" content="groonga" />
+
+    <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
+  </head>
+  <body>
+    <div id="fb-root"></div>
+
+<div class="header">
+  <h1 class="title">
+    <a id="top-link" href="../../../">
+      <span class="project">groonga</span>
+      <span class="separator">-</span>
+      <span class="description">An open-source fulltext search engine and column store.</span>
+    </a>
+  </h1>
+
+      <div class="facebook-buttons">
+      <fb:like href="http://www.facebook.com/pages/groonga/201193596592346"
+               layout="standard"
+               width="290"></fb:like>
+    </div>
+    <div class="other-language-links">
+
+    <ul>
+      <li><a href="../../../ja/docs/reference/functions/snippet.html">日本語</a></li>
+    </ul>
+  </div>
+</div>
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="snippet_html.html" title="7.15.21. snippet_html"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="rand.html" title="7.15.19. rand"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v11.0.7 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../reference.html" ><span class="section-number">7. </span>Reference manual</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../function.html" accesskey="U"><span class="section-number">7.15. </span>Function</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">7.15.20. </span><code class="docutils literal notranslate"><span class="pre">snippet</span></code></a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="snippet">
+<h1><span class="section-number">7.15.20. </span><code class="docutils literal notranslate"><span class="pre">snippet</span></code><a class="headerlink" href="#snippet" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="summary">
+<h2><span class="section-number">7.15.20.1. </span>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>This function extracts snippets of target text around search
+keywords (<code class="docutils literal notranslate"><span class="pre">KWIC</span></code>. <code class="docutils literal notranslate"><span class="pre">KeyWord</span> <span class="pre">In</span> <span class="pre">Context</span></code>).</p>
+<p>If you want to use this function for normal Web application,
+<a class="reference internal" href="snippet_html.html"><span class="doc">snippet_html</span></a> may be suitable. It’s a HTML specific version of
+this function.</p>
+</div>
+<div class="section" id="syntax">
+<h2><span class="section-number">7.15.20.2. </span>Syntax<a class="headerlink" href="#syntax" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">snippet</span></code> requires at least one parameter that is the snippet target
+text:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">snippet</span><span class="p">(</span><span class="n">column</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You can specify one ore more tuples of keyword, open tag and close tag:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">snippet</span><span class="p">(</span><span class="n">column</span><span class="p">,</span>
+        <span class="s2">&quot;keyword1&quot;</span><span class="p">,</span> <span class="s2">&quot;open-tag1&quot;</span><span class="p">,</span> <span class="s2">&quot;close-tag1&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;keyword2&quot;</span><span class="p">,</span> <span class="s2">&quot;open-tag2&quot;</span><span class="p">,</span> <span class="s2">&quot;close-tag2&quot;</span><span class="p">,</span>
+        <span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If you specify default open tag and default close tag, you can specify
+only keywords:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">snippet</span><span class="p">(</span><span class="n">column</span><span class="p">,</span>
+        <span class="s2">&quot;keyword1&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;keyword2&quot;</span><span class="p">,</span>
+        <span class="o">...</span><span class="p">,</span>
+        <span class="p">{</span>
+          <span class="s2">&quot;default_open_tag&quot;</span><span class="p">:</span> <span class="s2">&quot;open-tag&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;default_close_tag&quot;</span><span class="p">:</span> <span class="s2">&quot;close-tag&quot;</span>
+        <span class="p">})</span>
+</pre></div>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 11.0.8: </span>If you specify default open tag and default close tag and omit
+keywords, keywords are extracted from the current condition
+automatically like <a class="reference internal" href="snippet_html.html"><span class="doc">snippet_html</span></a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">snippet</span><span class="p">(</span><span class="n">column</span><span class="p">,</span>
+        <span class="p">{</span>
+          <span class="s2">&quot;default_open_tag&quot;</span><span class="p">:</span> <span class="s2">&quot;open-tag&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;default_close_tag&quot;</span><span class="p">:</span> <span class="s2">&quot;close-tag&quot;</span>
+        <span class="p">})</span>
+</pre></div>
+</div>
+</div>
+<p>You can specify options as the last argument with all syntaxes:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">snippet</span><span class="p">(</span><span class="n">column</span><span class="p">,</span>
+        <span class="o">...</span><span class="p">,</span>
+        <span class="p">{</span>
+          <span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
+          <span class="s2">&quot;max_n_results&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+          <span class="s2">&quot;skip_leading_spaces&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+          <span class="s2">&quot;html_escape&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+          <span class="s2">&quot;prefix&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span>
+          <span class="s2">&quot;suffix&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span>
+          <span class="s2">&quot;normalizer&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span>
+          <span class="s2">&quot;default_open_tag&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span>
+          <span class="s2">&quot;default_close_tag&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span>
+          <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span>
+          <span class="s2">&quot;delimiter_pattern&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span>
+        <span class="p">})</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="usage">
+<h2><span class="section-number">7.15.20.3. </span>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>Here are a schema definition and sample data to show usage.</p>
+<p>Execution example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">table_create</span> <span class="n">Documents</span> <span class="n">TABLE_NO_KEY</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">column_create</span> <span class="n">Documents</span> <span class="n">content</span> <span class="n">COLUMN_SCALAR</span> <span class="n">Text</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">table_create</span> <span class="n">Terms</span> <span class="n">TABLE_PAT_KEY</span> <span class="n">ShortText</span> <span class="o">--</span><span class="n">default_tokenizer</span> <span class="n">TokenBigram</span>  <span class="o">--</span><span class="n">normalizer</span> <span class="n">NormalizerAuto</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">column_create</span> <span class="n">Terms</span> <span class="n">documents_content_index</span> <span class="n">COLUMN_INDEX</span><span class="o">|</span><span class="n">WITH_POSITION</span> <span class="n">Documents</span> <span class="n">content</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">load</span> <span class="o">--</span><span class="n">table</span> <span class="n">Documents</span>
+<span class="p">[</span>
+<span class="p">[</span><span class="s2">&quot;content&quot;</span><span class="p">],</span>
+<span class="p">[</span><span class="s2">&quot;Groonga is a fast and accurate full text search engine based on inverted index. One of the characteristics of groonga is that a newly registered document instantly appears in search results. Also, groonga allows updates without read locks. These characteristics result in superior performance on real-time applications.&quot;</span><span class="p">],</span>
+<span class="p">[</span><span class="s2">&quot;Groonga is also a column-oriented database management system (DBMS). Compared with well-known row-oriented systems, such as MySQL and PostgreSQL, column-oriented systems are more suited for aggregate queries. Due to this advantage, groonga can cover weakness of row-oriented systems.&quot;</span><span class="p">]</span>
+<span class="p">]</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], 2]</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">snippet</span></code> extracts keywords from conditions specified in <code class="docutils literal notranslate"><span class="pre">--query</span></code>
+and/or <code class="docutils literal notranslate"><span class="pre">--filter</span></code> automatically when you specify
+<code class="docutils literal notranslate"><span class="pre">default_open_tag</span></code> option and <code class="docutils literal notranslate"><span class="pre">default_close_tag</span></code> and don’t
+specify keywords. It’s similar to <a class="reference internal" href="snippet_html.html"><span class="doc">snippet_html</span></a>.</p>
+<p>The following example uses <code class="docutils literal notranslate"><span class="pre">--query</span> <span class="pre">&quot;fast</span> <span class="pre">performance&quot;</span></code>. In this
+case, <code class="docutils literal notranslate"><span class="pre">fast</span></code> and <code class="docutils literal notranslate"><span class="pre">performance</span></code> are used as keywords.</p>
+<p>Execution example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Documents</span> \
+  <span class="o">--</span><span class="n">output_columns</span> <span class="s1">&#39;snippet(content, </span><span class="se">\</span>
+<span class="s1">                            { </span><span class="se">\</span>
+<span class="s1">                               &quot;default_open_tag&quot;: &quot;[&quot;, </span><span class="se">\</span>
+<span class="s1">                               &quot;default_close_tag&quot;: &quot;]&quot; </span><span class="se">\</span>
+<span class="s1">                            })&#39;</span> \
+  <span class="o">--</span><span class="n">match_columns</span> <span class="n">content</span> \
+  <span class="o">--</span><span class="n">query</span> <span class="s2">&quot;fast performance&quot;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;snippet&quot;,</span>
+<span class="c1">#           null</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;Groonga is a [fast] and accurate full text search engine based on inverted index. One of the characteristics of groonga is that a newly registered document instantly appears in search results. Also, gro&quot;,</span>
+<span class="c1">#           &quot;onga allows updates without read locks. These characteristics result in superior [performance] on real-time applications.&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">--query</span> <span class="pre">&quot;fast</span> <span class="pre">performance&quot;</span></code> matches to only the first record’s
+content. This <code class="docutils literal notranslate"><span class="pre">snippet</span></code> extracts two text parts that include the
+keywords <code class="docutils literal notranslate"><span class="pre">fast</span></code> or <code class="docutils literal notranslate"><span class="pre">performance</span></code> and surrounds the keywords with
+<code class="docutils literal notranslate"><span class="pre">[</span></code> and <code class="docutils literal notranslate"><span class="pre">]</span></code>.</p>
+<p>The max number of text parts is 3 by default. You can change it by
+<code class="docutils literal notranslate"><span class="pre">max_n_results</span></code> option:</p>
+<p>Execution example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Documents</span> \
+  <span class="o">--</span><span class="n">output_columns</span> <span class="s1">&#39;snippet(content, </span><span class="se">\</span>
+<span class="s1">                            { </span><span class="se">\</span>
+<span class="s1">                               &quot;default_open_tag&quot;: &quot;[&quot;, </span><span class="se">\</span>
+<span class="s1">                               &quot;default_close_tag&quot;: &quot;]&quot;, </span><span class="se">\</span>
+<span class="s1">                               &quot;delimiter_regexp&quot;: &quot;</span><span class="se">\\\\</span><span class="s1">.</span><span class="se">\\\\</span><span class="s1">s*&quot; </span><span class="se">\</span>
+<span class="s1">                            })&#39;</span> \
+  <span class="o">--</span><span class="n">match_columns</span> <span class="n">content</span> \
+  <span class="o">--</span><span class="n">query</span> <span class="s2">&quot;fast performance&quot;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;snippet&quot;,</span>
+<span class="c1">#           null</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;Groonga is a [fast] and accurate full text search engine based on inverted index&quot;,</span>
+<span class="c1">#           &quot;These characteristics result in superior [performance] on real-time applications&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
+</pre></div>
+</div>
+<p>It returns only one snippet because <code class="docutils literal notranslate"><span class="pre">&quot;max_n_results&quot;:</span> <span class="pre">1</span></code> is specified.</p>
+<p>The max size of a text part is 200byte by default. The unit is bytes
+not characters. The size doesn’t include inserted <code class="docutils literal notranslate"><span class="pre">[</span></code> and <code class="docutils literal notranslate"><span class="pre">[</span></code>. You
+can change it by <code class="docutils literal notranslate"><span class="pre">width</span></code> option:</p>
+<p>Execution example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Documents</span> \
+  <span class="o">--</span><span class="n">output_columns</span> <span class="s1">&#39;snippet(content, </span><span class="se">\</span>
+<span class="s1">                            { </span><span class="se">\</span>
+<span class="s1">                               &quot;default_open_tag&quot;: &quot;[&quot;, </span><span class="se">\</span>
+<span class="s1">                               &quot;default_close_tag&quot;: &quot;]&quot;, </span><span class="se">\</span>
+<span class="s1">                               &quot;delimiter_regexp&quot;: &quot;</span><span class="se">\\\\</span><span class="s1">.</span><span class="se">\\\\</span><span class="s1">s*&quot; </span><span class="se">\</span>
+<span class="s1">                            })&#39;</span> \
+  <span class="o">--</span><span class="n">match_columns</span> <span class="n">content</span> \
+  <span class="o">--</span><span class="n">query</span> <span class="s2">&quot;fast performance&quot;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;snippet&quot;,</span>
+<span class="c1">#           null</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;Groonga is a [fast] and accurate full text search engine based on inverted index&quot;,</span>
+<span class="c1">#           &quot;These characteristics result in superior [performance] on real-time applications&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
+</pre></div>
+</div>
+<p>You can detect snippet delimiter with regular expression by
+<code class="docutils literal notranslate"><span class="pre">delimiter_regexp</span></code> option. You can use <code class="docutils literal notranslate"><span class="pre">\.\s*</span></code> to use only text in
+the target sentence. Note that you need to escape <code class="docutils literal notranslate"><span class="pre">\</span></code> in string:</p>
+<p>Execution example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Documents</span> \
+  <span class="o">--</span><span class="n">output_columns</span> <span class="s1">&#39;snippet(content, </span><span class="se">\</span>
+<span class="s1">                            { </span><span class="se">\</span>
+<span class="s1">                               &quot;default_open_tag&quot;: &quot;[&quot;, </span><span class="se">\</span>
+<span class="s1">                               &quot;default_close_tag&quot;: &quot;]&quot;, </span><span class="se">\</span>
+<span class="s1">                               &quot;delimiter_regexp&quot;: &quot;</span><span class="se">\\\\</span><span class="s1">.</span><span class="se">\\\\</span><span class="s1">s*&quot; </span><span class="se">\</span>
+<span class="s1">                            })&#39;</span> \
+  <span class="o">--</span><span class="n">match_columns</span> <span class="n">content</span> \
+  <span class="o">--</span><span class="n">query</span> <span class="s2">&quot;fast performance&quot;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;snippet&quot;,</span>
+<span class="c1">#           null</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;Groonga is a [fast] and accurate full text search engine based on inverted index&quot;,</span>
+<span class="c1">#           &quot;These characteristics result in superior [performance] on real-time applications&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
+</pre></div>
+</div>
+<p>You can see the detected delimiters (<code class="docutils literal notranslate"><span class="pre">.</span></code> and following white spaces)
+aren’t included in the result snippets. This is intentional behavior.</p>
+<p>You can specify keywords explicitly instead of extracting keywords
+from the current condition:</p>
+<p>Execution example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Documents</span> \
+  <span class="o">--</span><span class="n">output_columns</span> <span class="s1">&#39;snippet(content, </span><span class="se">\</span>
+<span class="s1">                            &quot;fast&quot;, </span><span class="se">\</span>
+<span class="s1">                            &quot;performance&quot;, </span><span class="se">\</span>
+<span class="s1">                            { </span><span class="se">\</span>
+<span class="s1">                               &quot;default_open_tag&quot;: &quot;[&quot;, </span><span class="se">\</span>
+<span class="s1">                               &quot;default_close_tag&quot;: &quot;]&quot; </span><span class="se">\</span>
+<span class="s1">                            })&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;snippet&quot;,</span>
+<span class="c1">#           null</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;Groonga is a [fast] and accurate full text search engine based on inverted index. One of the characteristics of groonga is that a newly registered document instantly appears in search results. Also, gro&quot;,</span>
+<span class="c1">#           &quot;onga allows updates without read locks. These characteristics result in superior [performance] on real-time applications.&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         null</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
+</pre></div>
+</div>
+<p>This <code class="docutils literal notranslate"><span class="pre">snippet</span></code> returns two snippets for the first record and
+<code class="docutils literal notranslate"><span class="pre">null</span></code> for the second record. Because the second record doesn’t have
+any specified keywords.</p>
+<p>You can specify open tag and close tag for each keyword:</p>
+<p>Execution example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Documents</span> \
+  <span class="o">--</span><span class="n">output_columns</span> <span class="s1">&#39;snippet(content, </span><span class="se">\</span>
+<span class="s1">                            &quot;fast&quot;, &quot;[&quot;, &quot;]&quot;, </span><span class="se">\</span>
+<span class="s1">                            &quot;performance&quot;, &quot;(&quot;, &quot;)&quot;)&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;snippet&quot;,</span>
+<span class="c1">#           null</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;Groonga is a [fast] and accurate full text search engine based on inverted index. One of the characteristics of groonga is that a newly registered document instantly appears in search results. Also, gro&quot;,</span>
+<span class="c1">#           &quot;onga allows updates without read locks. These characteristics result in superior (performance) on real-time applications.&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         null</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
+</pre></div>
+</div>
+<p>This <code class="docutils literal notranslate"><span class="pre">snippet</span></code> surrounds <code class="docutils literal notranslate"><span class="pre">fast</span></code> with <code class="docutils literal notranslate"><span class="pre">[</span></code> and <code class="docutils literal notranslate"><span class="pre">]]</span></code> and
+<code class="docutils literal notranslate"><span class="pre">performance</span></code> with <code class="docutils literal notranslate"><span class="pre">(</span></code> and <code class="docutils literal notranslate"><span class="pre">)</span></code>.</p>
+<p>TODO: <code class="docutils literal notranslate"><span class="pre">html_escape</span></code> option and so on</p>
+</div>
+<div class="section" id="parameters">
+<h2><span class="section-number">7.15.20.4. </span>Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="required-parameters">
+<h3><span class="section-number">7.15.20.4.1. </span>Required parameters<a class="headerlink" href="#required-parameters" title="Permalink to this headline">¶</a></h3>
+<p>TODO</p>
+</div>
+<div class="section" id="id1">
+<h3><span class="section-number">7.15.20.4.2. </span>Required parameters<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>TODO</p>
+</div>
+<div class="section" id="optional-parameters">
+<h3><span class="section-number">7.15.20.4.3. </span>Optional parameters<a class="headerlink" href="#optional-parameters" title="Permalink to this headline">¶</a></h3>
+<p>TODO</p>
+<div class="section" id="max-n-results">
+<span id="snippet-max-n-results"></span><h4><span class="section-number">7.15.20.4.3.1. </span><code class="docutils literal notranslate"><span class="pre">max_n_results</span></code><a class="headerlink" href="#max-n-results" title="Permalink to this headline">¶</a></h4>
+<p>TODO</p>
+</div>
+<div class="section" id="width">
+<span id="snippet-width"></span><h4><span class="section-number">7.15.20.4.3.2. </span><code class="docutils literal notranslate"><span class="pre">width</span></code><a class="headerlink" href="#width" title="Permalink to this headline">¶</a></h4>
+<p>TODO</p>
+</div>
+</div>
+</div>
+<div class="section" id="return-value">
+<h2><span class="section-number">7.15.20.5. </span>Return value<a class="headerlink" href="#return-value" title="Permalink to this headline">¶</a></h2>
+<p>This function returns an array of string or <code class="docutils literal notranslate"><span class="pre">null</span></code>. If This function
+can’t find any snippets, it returns <code class="docutils literal notranslate"><span class="pre">null</span></code>.</p>
+<p>An element of array is a snippet:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">SNIPPET1</span><span class="p">,</span> <span class="n">SNIPPET2</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>A snippet includes one or more keywords. The max byte size of a
+snippet except open tag and close tag is 200byte. The unit isn’t the
+number of characters.</p>
+<p>You can change this by <a class="reference internal" href="#snippet-width"><span class="std std-ref">width</span></a> option.</p>
+<p>The array size is larger than or equal to 1 and less than or equal
+to 3.</p>
+<p>You can change this by <a class="reference internal" href="#snippet-max-n-results"><span class="std std-ref">max_n_results</span></a> option.</p>
+</div>
+<div class="section" id="see-also">
+<h2><span class="section-number">7.15.20.6. </span>See also<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="snippet_html.html"><span class="doc">snippet_html</span></a></p></li>
+<li><p><a class="reference internal" href="../commands/select.html"><span class="doc">select</span></a></p></li>
+</ul>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">7.15.20. <code class="docutils literal notranslate"><span class="pre">snippet</span></code></a><ul>
+<li><a class="reference internal" href="#summary">7.15.20.1. Summary</a></li>
+<li><a class="reference internal" href="#syntax">7.15.20.2. Syntax</a></li>
+<li><a class="reference internal" href="#usage">7.15.20.3. Usage</a></li>
+<li><a class="reference internal" href="#parameters">7.15.20.4. Parameters</a><ul>
+<li><a class="reference internal" href="#required-parameters">7.15.20.4.1. Required parameters</a></li>
+<li><a class="reference internal" href="#id1">7.15.20.4.2. Required parameters</a></li>
+<li><a class="reference internal" href="#optional-parameters">7.15.20.4.3. Optional parameters</a><ul>
+<li><a class="reference internal" href="#max-n-results">7.15.20.4.3.1. <code class="docutils literal notranslate"><span class="pre">max_n_results</span></code></a></li>
+<li><a class="reference internal" href="#width">7.15.20.4.3.2. <code class="docutils literal notranslate"><span class="pre">width</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#return-value">7.15.20.5. Return value</a></li>
+<li><a class="reference internal" href="#see-also">7.15.20.6. See also</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="rand.html"
+                        title="previous chapter"><span class="section-number">7.15.19. </span>rand</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="snippet_html.html"
+                        title="next chapter"><span class="section-number">7.15.21. </span><code class="docutils literal notranslate"><span class="pre">snippet_html</span></code></a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="snippet_html.html" title="7.15.21. snippet_html"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="rand.html" title="7.15.19. rand"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v11.0.7 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../reference.html" ><span class="section-number">7. </span>Reference manual</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../function.html" ><span class="section-number">7.15. </span>Function</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">7.15.20. </span><code class="docutils literal notranslate"><span class="pre">snippet</span></code></a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2009-2021, Brazil, Inc.
+    </div>
+      <script src="http://connect.facebook.net/en_US/all.js"></script>
+
+    <script>
+      FB.init({
+         appId  : null,
+         status : true, // check login status
+         cookie : true, // enable cookies to allow the server to access the session
+         xfbml  : true  // parse XFBML
+      });
+    </script>
+  </body>
+
+</html>

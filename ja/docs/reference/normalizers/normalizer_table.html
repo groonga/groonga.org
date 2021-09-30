@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+  <head>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-7532323-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-7532323-1');
+    </script>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>7.7.2.6. NormalizerTable &#8212; Groonga v11.0.7ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../../static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../static/groonga.css" />
+    
+    <script data-url_root="../../" id="documentation_options" src="../../static/documentation_options.js"></script>
+    <script src="../../static/jquery.js"></script>
+    <script src="../../static/underscore.js"></script>
+    <script src="../../static/doctools.js"></script>
+    <script src="../../static/translations.js"></script>
+    
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="検索" href="../../search.html" />
+    <link rel="next" title="7.8. トークナイザー" href="../tokenizers.html" />
+    <link rel="prev" title="7.7.2.5. NormalizerNFKC51" href="normalizer_nfkc51.html" /> 
+      <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
+    <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
+    <meta property="og:type" content="product" />
+    <meta property="og:image" content="http://groonga.org/images/logos/groonga-icon-full-size.png" />
+    <meta property="og:site_name" content="groonga" />
+
+    <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
+  </head>
+  <body>
+    <div id="fb-root"></div>
+
+<div class="header">
+  <h1 class="title">
+    <a id="top-link" href="../../../">
+      <span class="project">groonga</span>
+      <span class="separator">-</span>
+      <span class="description">オープンソースのカラムストア機能付き全文検索エンジン</span>
+    </a>
+  </h1>
+
+      <div class="facebook-buttons">
+      <fb:like href="http://www.facebook.com/pages/groonga/201193596592346"
+               layout="standard"
+               width="290"></fb:like>
+    </div>
+    <div class="other-language-links">
+
+    <ul>
+      <li><a href="../../../../docs/reference/normalizers/normalizer_table.html">English</a></li>
+    </ul>
+  </div>
+</div>
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../tokenizers.html" title="7.8. トークナイザー"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="normalizer_nfkc51.html" title="7.7.2.5. NormalizerNFKC51"
+             accesskey="P">前へ</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v11.0.7ドキュメント</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../reference.html" ><span class="section-number">7. </span>リファレンスマニュアル</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../normalizers.html" accesskey="U"><span class="section-number">7.7. </span>ノーマライザー</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">7.7.2.6. </span><code class="docutils literal notranslate"><span class="pre">NormalizerTable</span></code></a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="normalizertable">
+<span id="normalizer-table"></span><h1><span class="section-number">7.7.2.6. </span><code class="docutils literal notranslate"><span class="pre">NormalizerTable</span></code><a class="headerlink" href="#normalizertable" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<div class="section" id="summary">
+<h2><span class="section-number">7.7.2.6.1. </span>概要<a class="headerlink" href="#summary" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified added">バージョン 11.0.4 で追加.</span></p>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">NormalizerTable</span></code> はユーザー定義正規化テーブルを使ってテキストを正規化します。ユーザ定義正規化テーブルはただのテーブルですが、いくつか条件を満たす必要があります。条件は後で説明します。</p>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>正規化されたテキストはユーザー定義正規化テーブルの内容に依存します。このノーマライザーを語彙表で使う場合、ユーザ定義正規化テーブルの内容を更新したらインデックスを作り直す必要があることに注意してください。</p>
+</div>
+</div>
+<div class="section" id="syntax">
+<h2><span class="section-number">7.7.2.6.2. </span>構文<a class="headerlink" href="#syntax" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>必須な引数と省略可能な引数があります。</p>
+<p>必須引数</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">NormalizerTable</span><span class="p">(</span><span class="s2">&quot;normalized&quot;</span><span class="p">,</span> <span class="s2">&quot;UserDefinedTable.normalized_column&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>省略可能引数</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">NormalizerTable</span><span class="p">(</span><span class="s2">&quot;normalized&quot;</span><span class="p">,</span> <span class="s2">&quot;UserDefinedTable.normalized_column&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;target&quot;</span><span class="p">,</span> <span class="s2">&quot;target_column&quot;</span><span class="p">)</span>
+
+<span class="n">NormalizerTable</span><span class="p">(</span><span class="s2">&quot;normalized&quot;</span><span class="p">,</span> <span class="s2">&quot;UserDefinedTable.normalized_column&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;unicode_version&quot;</span><span class="p">,</span> <span class="s2">&quot;13.0.0&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="usage">
+<h2><span class="section-number">7.7.2.6.3. </span>使い方<a class="headerlink" href="#usage" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<div class="section" id="simple-usage">
+<span id="normalizer-table-simple-usage"></span><h3><span class="section-number">7.7.2.6.3.1. </span>簡単な使い方<a class="headerlink" href="#simple-usage" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>以下は <code class="docutils literal notranslate"><span class="pre">NormalizerTable</span></code> の例です。</p>
+<p><code class="docutils literal notranslate"><span class="pre">NormalizerTable</span></code> はユーザー定義正規化テーブルを使ってテキストを正規化します。ここでは次のユーザー定義正規化テーブルを使います。</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">TABLE_PAT_KEY</span></code> 型でなければいけません。</p></li>
+<li><p>テーブルのキーの型は <code class="docutils literal notranslate"><span class="pre">ShortText</span></code> でなければいけません。</p></li>
+<li><p>テーブルは少なくとも1つ <code class="docutils literal notranslate"><span class="pre">ShortText</span></code> 型のカラムを持っていなければいけません。</p></li>
+</ul>
+</div></blockquote>
+<p>この例で使うスキーマ定義とサンプルデータは以下の通りです。</p>
+<p>実行例:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">table_create</span> <span class="n">Normalizations</span> <span class="n">TABLE_PAT_KEY</span> <span class="n">ShortText</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">column_create</span> <span class="n">Normalizations</span> <span class="n">normalized</span> <span class="n">COLUMN_SCALAR</span> <span class="n">ShortText</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">load</span> <span class="o">--</span><span class="n">table</span> <span class="n">Normalizations</span>
+<span class="p">[</span>
+<span class="p">{</span><span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;normalized&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;A&gt;&quot;</span><span class="p">},</span>
+<span class="p">{</span><span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;ac&quot;</span><span class="p">,</span> <span class="s2">&quot;normalized&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;AC&gt;&quot;</span><span class="p">}</span>
+<span class="p">]</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], 2]</span>
+</pre></div>
+</div>
+<p>このユーザー定義正規化テーブルを使うと <code class="docutils literal notranslate"><span class="pre">a</span></code> を <code class="docutils literal notranslate"><span class="pre">&lt;A&gt;</span></code> に、 <code class="docutils literal notranslate"><span class="pre">oo</span></code> を <code class="docutils literal notranslate"><span class="pre">&lt;OO&gt;</span></code> に正規化します。例：</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Groonga</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Groong&lt;A&gt;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hack</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">h&lt;AC&gt;k</span></code></p></li>
+</ul>
+</div></blockquote>
+<p>このユーザー定義正規化テーブルを使った <code class="docutils literal notranslate"><span class="pre">NormalizerTable</span></code> の使用例です。</p>
+<p>実行例:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">normalize</span> <span class="s1">&#39;NormalizerTable(&quot;normalized&quot;, &quot;ColumnNormalizations.normalized&quot;, &quot;target&quot;, &quot;target_column&quot;)&#39;</span> <span class="s2">&quot;Groonga&quot;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   {</span>
+<span class="c1">#     &quot;normalized&quot;: &quot;Groong&lt;A&gt;&quot;,</span>
+<span class="c1">#     &quot;types&quot;: [],</span>
+<span class="c1">#     &quot;checks&quot;: []</span>
+<span class="c1">#   }</span>
+<span class="c1"># ]</span>
+<span class="n">normalize</span> <span class="s1">&#39;NormalizerTable(&quot;normalized&quot;, &quot;ColumnNormalizations.normalized&quot;, &quot;target&quot;, &quot;target_column&quot;)&#39;</span> <span class="s2">&quot;hack&quot;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   {</span>
+<span class="c1">#     &quot;normalized&quot;: &quot;h&lt;AC&gt;k&quot;,</span>
+<span class="c1">#     &quot;types&quot;: [],</span>
+<span class="c1">#     &quot;checks&quot;: []</span>
+<span class="c1">#   }</span>
+<span class="c1"># ]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="unicode-version">
+<span id="normalizer-table-usage-unicode-version"></span><h3><span class="section-number">7.7.2.6.3.2. </span>Unicodeのバージョン<a class="headerlink" href="#unicode-version" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>トークナイズやハイライトといったいくつかの内部処理では文字の種類を使います。 <code class="docutils literal notranslate"><span class="pre">NormalizerTable</span></code> はUnicodeを使って文字の種類を提供します。使用するUnicodeのバージョンは <a class="reference internal" href="#normalizer-table-unicode-version"><span class="std std-ref">unicode_version</span></a> オプションで指定できます。</p>
+<p>以下はUnicode 13.0.0を使う例です。</p>
+<p>実行例:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">normalize</span> <span class="s1">&#39;NormalizerTable(&quot;normalized&quot;, &quot;Normalizations.normalized&quot;)&#39;</span> <span class="s2">&quot;Groonga&quot;</span> <span class="n">WITH_TYPES</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   {</span>
+<span class="c1">#     &quot;normalized&quot;: &quot;Groong&lt;A&gt;&quot;,</span>
+<span class="c1">#     &quot;types&quot;: [</span>
+<span class="c1">#       &quot;alpha&quot;,</span>
+<span class="c1">#       &quot;alpha&quot;,</span>
+<span class="c1">#       &quot;alpha&quot;,</span>
+<span class="c1">#       &quot;alpha&quot;,</span>
+<span class="c1">#       &quot;alpha&quot;,</span>
+<span class="c1">#       &quot;alpha&quot;,</span>
+<span class="c1">#       &quot;symbol&quot;,</span>
+<span class="c1">#       &quot;alpha&quot;,</span>
+<span class="c1">#       &quot;symbol&quot;</span>
+<span class="c1">#     ],</span>
+<span class="c1">#     &quot;checks&quot;: []</span>
+<span class="c1">#   }</span>
+<span class="c1"># ]</span>
+</pre></div>
+</div>
+<p>デフォルトのUnicodeのバージョンは5.0.0です。</p>
+</div>
+<div class="section" id="advanced-usage">
+<span id="normalizer-table-advanced-usage"></span><h3><span class="section-number">7.7.2.6.3.3. </span>高度な使い方<a class="headerlink" href="#advanced-usage" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>正規化対象の文字列を <code class="docutils literal notranslate"><span class="pre">_key</span></code> ではなくカラムに入れることもできます。この場合は対象のカラムに次のようなインデックスカラムを作る必要があります。</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>このインデックスカラムの語彙表の種類は <code class="docutils literal notranslate"><span class="pre">TABLE_PAT_KEY</span></code> でなければいけません。</p></li>
+<li><p>このインデックスカラムの語彙表のキーの型は <code class="docutils literal notranslate"><span class="pre">ShortText</span></code> でなければいけません。</p></li>
+<li><p>このインデックスカラムの語彙表にトークナイザーが設定されていてはいけません。</p></li>
+</ul>
+</div></blockquote>
+<p>この使い方の場合はユーザー定義正規化テーブルには <code class="docutils literal notranslate"><span class="pre">TABLE_NO_KEY</span></code> などどんな種類のテーブルを使っても構いません。テーブルの種類をコントロールできない時はこの使い方が便利です。たとえば、PGroongaユーザーはこの使い方しかできません。</p>
+<p>この例で使うスキーマ定義とサンプルデータは以下の通りです。</p>
+<p>実行例:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">table_create</span> <span class="n">ColumnNormalizations</span> <span class="n">TABLE_NO_KEY</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">column_create</span> <span class="n">ColumnNormalizations</span> <span class="n">target_column</span> <span class="n">COLUMN_SCALAR</span> <span class="n">ShortText</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">column_create</span> <span class="n">ColumnNormalizations</span> <span class="n">normalized</span> <span class="n">COLUMN_SCALAR</span> <span class="n">ShortText</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">table_create</span> <span class="n">Targets</span> <span class="n">TABLE_PAT_KEY</span> <span class="n">ShortText</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">column_create</span> <span class="n">Targets</span> <span class="n">column_normalizations_target_column</span> \
+   <span class="n">COLUMN_INDEX</span> <span class="n">ColumnNormalizations</span> <span class="n">target_column</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">load</span> <span class="o">--</span><span class="n">table</span> <span class="n">ColumnNormalizations</span>
+<span class="p">[</span>
+<span class="p">{</span><span class="s2">&quot;target_column&quot;</span><span class="p">:</span> <span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;normalized&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;A&gt;&quot;</span><span class="p">},</span>
+<span class="p">{</span><span class="s2">&quot;target_column&quot;</span><span class="p">:</span> <span class="s2">&quot;ac&quot;</span><span class="p">,</span> <span class="s2">&quot;normalized&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;AC&gt;&quot;</span><span class="p">}</span>
+<span class="p">]</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], 2]</span>
+</pre></div>
+</div>
+<p>このユーザー定義正規化テーブルを使うには <a class="reference internal" href="#normalizer-table-target"><span class="std std-ref">target</span></a> オプションを使う必要があります。前述のスキーマは説明のために <code class="docutils literal notranslate"><span class="pre">target_column</span></code> という名前を使っています。一般的に <code class="docutils literal notranslate"><span class="pre">target_column</span></code> の <code class="docutils literal notranslate"><span class="pre">_column</span></code> の部分は冗長です。しかし、引数の名前と値を区別しやすいようにつけてあります。</p>
+<p>このユーザー定義正規化テーブルを使った <code class="docutils literal notranslate"><span class="pre">NormalizerTable</span></code> の使用例です。</p>
+<p>実行例:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">normalize</span> <span class="s1">&#39;NormalizerTable(&quot;normalized&quot;, &quot;ColumnNormalizations.normalized&quot;, &quot;target&quot;, &quot;target_column&quot;)&#39;</span> <span class="s2">&quot;Groonga&quot;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   {</span>
+<span class="c1">#     &quot;normalized&quot;: &quot;Groong&lt;A&gt;&quot;,</span>
+<span class="c1">#     &quot;types&quot;: [],</span>
+<span class="c1">#     &quot;checks&quot;: []</span>
+<span class="c1">#   }</span>
+<span class="c1"># ]</span>
+<span class="n">normalize</span> <span class="s1">&#39;NormalizerTable(&quot;normalized&quot;, &quot;ColumnNormalizations.normalized&quot;, &quot;target&quot;, &quot;target_column&quot;)&#39;</span> <span class="s2">&quot;hack&quot;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   {</span>
+<span class="c1">#     &quot;normalized&quot;: &quot;h&lt;AC&gt;k&quot;,</span>
+<span class="c1">#     &quot;types&quot;: [],</span>
+<span class="c1">#     &quot;checks&quot;: []</span>
+<span class="c1">#   }</span>
+<span class="c1"># ]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="parameters">
+<h2><span class="section-number">7.7.2.6.4. </span>引数<a class="headerlink" href="#parameters" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<div class="section" id="required-parameter">
+<h3><span class="section-number">7.7.2.6.4.1. </span>必須引数<a class="headerlink" href="#required-parameter" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="normalized">
+<span id="normalizer-table-normalized"></span><h4><span class="section-number">7.7.2.6.4.1.1. </span><code class="docutils literal notranslate"><span class="pre">normalized</span></code><a class="headerlink" href="#normalized" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>このオプションは正規化後のテキストが入っているカラムを指定します。正規化対象のテキストは対応する <code class="docutils literal notranslate"><span class="pre">_key</span></code> カラムに入っているテキストあるいは <a class="reference internal" href="#normalizer-table-target"><span class="std std-ref">target</span></a> で指定したカラムに入っているテキストになります。</p>
+<p>このオプションに指定したカラムの値の型は <code class="docutils literal notranslate"><span class="pre">ShortText</span></code> か <code class="docutils literal notranslate"><span class="pre">Text</span></code> か <code class="docutils literal notranslate"><span class="pre">LongText</span></code> でなければいけません。</p>
+<p><a class="reference internal" href="#normalizer-table-target"><span class="std std-ref">target</span></a> を使わない場合、このオプションに指定したカラムのテーブルは次の条件を満たす必要があります。</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>テーブルの種類は <code class="docutils literal notranslate"><span class="pre">TABLE_PAT_KEY</span></code> でなければいけません。</p></li>
+<li><p>テーブルのキーの型は <code class="docutils literal notranslate"><span class="pre">ShortText</span></code> 型でなければいけません。</p></li>
+</ul>
+</div></blockquote>
+<p>この場合の使い方は <a class="reference internal" href="#normalizer-table-simple-usage"><span class="std std-ref">簡単な使い方</span></a> を参照してください。</p>
+</div>
+</div>
+<div class="section" id="optional-parameters">
+<h3><span class="section-number">7.7.2.6.4.2. </span>省略可能引数<a class="headerlink" href="#optional-parameters" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="section" id="target">
+<span id="normalizer-table-target"></span><h4><span class="section-number">7.7.2.6.4.2.1. </span><code class="docutils literal notranslate"><span class="pre">target</span></code><a class="headerlink" href="#target" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>このオプションは正規化対象のテキストを持つカラムを指定します。</p>
+<p>このオプションに指定したカラムの値の型は <code class="docutils literal notranslate"><span class="pre">ShortText</span></code> か <code class="docutils literal notranslate"><span class="pre">Text</span></code> か <code class="docutils literal notranslate"><span class="pre">LongText</span></code> でなければいけません。</p>
+<p>このオプションで指定したカラムのインデックスカラムを作らないといけません。このインデックスカラムとその語彙表は次の条件を満たさないといけません。</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>インデックスカラムはシングルカラムインデックスでもマルチカラムインデックスでもいいです。</p></li>
+<li><p>このインデックスカラムの語彙表の種類は <code class="docutils literal notranslate"><span class="pre">TABLE_PAT_KEY</span></code> でなければいけません。</p></li>
+<li><p>このインデックスカラムの語彙表のキーの型は <code class="docutils literal notranslate"><span class="pre">ShortText</span></code> でなければいけません。</p></li>
+<li><p>このインデックスカラムの語彙表にトークナイザーが設定されていてはいけません。</p></li>
+</ul>
+</div></blockquote>
+<p>この場合の使い方は <a class="reference internal" href="#normalizer-table-advanced-usage"><span class="std std-ref">高度な使い方</span></a> を参照してください。</p>
+</div>
+<div class="section" id="normalizer-table-unicode-version">
+<span id="id1"></span><h4><span class="section-number">7.7.2.6.4.2.2. </span><code class="docutils literal notranslate"><span class="pre">unicode_version</span></code><a class="headerlink" href="#normalizer-table-unicode-version" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>このオプションは文字の種類を判断するときに使うUnicodeのバージョンを指定します。</p>
+<p>デフォルトのUnicodeのバージョンは5.0.0です。</p>
+<p>使い方は <a class="reference internal" href="#normalizer-table-usage-unicode-version"><span class="std std-ref">Unicodeのバージョン</span></a> を参照してください。</p>
+</div>
+</div>
+</div>
+<div class="section" id="see-also">
+<h2><span class="section-number">7.7.2.6.5. </span>参考<a class="headerlink" href="#see-also" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="../commands/normalize.html"><span class="doc">normalize</span></a></p></li>
+</ul>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">7.7.2.6. <code class="docutils literal notranslate"><span class="pre">NormalizerTable</span></code></a><ul>
+<li><a class="reference internal" href="#summary">7.7.2.6.1. 概要</a></li>
+<li><a class="reference internal" href="#syntax">7.7.2.6.2. 構文</a></li>
+<li><a class="reference internal" href="#usage">7.7.2.6.3. 使い方</a><ul>
+<li><a class="reference internal" href="#simple-usage">7.7.2.6.3.1. 簡単な使い方</a></li>
+<li><a class="reference internal" href="#unicode-version">7.7.2.6.3.2. Unicodeのバージョン</a></li>
+<li><a class="reference internal" href="#advanced-usage">7.7.2.6.3.3. 高度な使い方</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#parameters">7.7.2.6.4. 引数</a><ul>
+<li><a class="reference internal" href="#required-parameter">7.7.2.6.4.1. 必須引数</a><ul>
+<li><a class="reference internal" href="#normalized">7.7.2.6.4.1.1. <code class="docutils literal notranslate"><span class="pre">normalized</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#optional-parameters">7.7.2.6.4.2. 省略可能引数</a><ul>
+<li><a class="reference internal" href="#target">7.7.2.6.4.2.1. <code class="docutils literal notranslate"><span class="pre">target</span></code></a></li>
+<li><a class="reference internal" href="#normalizer-table-unicode-version">7.7.2.6.4.2.2. <code class="docutils literal notranslate"><span class="pre">unicode_version</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#see-also">7.7.2.6.5. 参考</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="normalizer_nfkc51.html"
+                        title="前の章へ"><span class="section-number">7.7.2.5. </span><code class="docutils literal notranslate"><span class="pre">NormalizerNFKC51</span></code></a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="../tokenizers.html"
+                        title="次の章へ"><span class="section-number">7.8. </span>トークナイザー</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../tokenizers.html" title="7.8. トークナイザー"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="normalizer_nfkc51.html" title="7.7.2.5. NormalizerNFKC51"
+             >前へ</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v11.0.7ドキュメント</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../reference.html" ><span class="section-number">7. </span>リファレンスマニュアル</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../normalizers.html" ><span class="section-number">7.7. </span>ノーマライザー</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">7.7.2.6. </span><code class="docutils literal notranslate"><span class="pre">NormalizerTable</span></code></a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2009-2021, Brazil, Inc.
+    </div>
+      <script src="http://connect.facebook.net/ja_JP/all.js"></script>
+
+    <script>
+      FB.init({
+         appId  : null,
+         status : true, // check login status
+         cookie : true, // enable cookies to allow the server to access the session
+         xfbml  : true  // parse XFBML
+      });
+    </script>
+  </body>
+
+</html>

@@ -1,92 +1,480 @@
+
 <!DOCTYPE html>
 
 <html lang="ja">
   <head>
-
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-7532323-1"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'UA-7532323-1');
-    </script>
-
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>12.3.5. クエリの実現 &#8212; Groonga v11.1.3ドキュメント</title>
-    <link rel="stylesheet" type="text/css" href="../../static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../static/groonga.css" />
     
-    <script data-url_root="../../" id="documentation_options" src="../../static/documentation_options.js"></script>
-    <script src="../../static/jquery.js"></script>
-    <script src="../../static/underscore.js"></script>
-    <script src="../../static/doctools.js"></script>
-    <script src="../../static/translations.js"></script>
+    <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+  
     
+    <link rel="stylesheet"
+      href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+    <link rel="preload" as="font" type="font/woff2" crossorigin
+      href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+    <link rel="preload" as="font" type="font/woff2" crossorigin
+      href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+  
+    
+      
+  
+    
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/pydata-sphinx-theme.css" />
+    
+    <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+  
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/translations.js"></script>
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
     <link rel="index" title="索引" href="../../genindex.html" />
     <link rel="search" title="検索" href="../../search.html" />
     <link rel="next" title="12.3.7. リリース手順" href="release.html" />
-    <link rel="prev" title="12.3.4. ユーザーと協力して開発をうまく進めていくための指針" href="cooperation.html" /> 
-      <meta property="fb:page_id" content="201193596592346" /><!-- groonga -->
-    <meta property="fb:admins" content="664204556" /><!-- kouhei.sutou -->
-    <meta property="og:type" content="product" />
-    <meta property="og:image" content="http://groonga.org/images/logos/groonga-icon-full-size.png" />
-    <meta property="og:site_name" content="groonga" />
+    <link rel="prev" title="12.3.4. ユーザーと協力して開発をうまく進めていくための指針" href="cooperation.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="ja">
+    
 
-    <link rel="stylesheet" href="/css/sphinx.css" type="text/css" />
+    <!-- Google Analytics -->
+    
+<script async="" src="https://www.google-analytics.com/analytics.js"></script>
+<script>
+                        window.ga = window.ga || function () {
+                            (ga.q = ga.q || []).push(arguments) };
+                        ga.l = +new Date;
+                        ga('create', 'UA-7532323-1', 'auto');
+                        ga('set', 'anonymizeIp', true);
+                        ga('send', 'pageview');
+                    </script>
+
   </head>
-  <body>
-    <div id="fb-root"></div>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
 
-<div class="header">
-  <h1 class="title">
-    <a id="top-link" href="../../../">
-      <span class="project">groonga</span>
-      <span class="separator">-</span>
-      <span class="description">オープンソースのカラムストア機能付き全文検索エンジン</span>
-    </a>
-  </h1>
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
 
-      <div class="facebook-buttons">
-      <fb:like href="http://www.facebook.com/pages/groonga/201193596592346"
-               layout="standard"
-               width="290"></fb:like>
+  <div id="navbar-start">
+    
+    
+
+<a class="navbar-brand" href="https://groonga.org/ja/">
+  <img src="../../_static/groonga.png" class="logo" alt="logo">
+</a>
+
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
     </div>
-    <div class="other-language-links">
 
-    <ul>
-      <li><a href="../../../../docs/contribution/development/query.html">English</a></li>
-    </ul>
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/groonga/groonga" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://twitter.com/groonga" rel="noopener" target="_blank" title="Twitter"><span><i class="fab fa-twitter-square"></i></span>
+            <label class="sr-only">Twitter</label></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/ja/blog" rel="noopener" target="_blank" title="Blog"><span><i class="fas fa-blog"></i></span>
+            <label class="sr-only">Blog</label></a>
+        </li>
+      </ul>
+      </div>
+      
+      <div class="navbar-end-item">
+        <div class="dropdown" id="version_switcher">
+    <button type="button" class="btn btn-primary btn-sm navbar-btn dropdown-toggle" id="version_switcher_button" data-toggle="dropdown">
+        日本語  <!-- this text may get changed later by javascript -->
+        <span class="caret"></span>
+    </button>
+    <div id="version_switcher_menu" class="dropdown-menu list-group-flush py-0" aria-labelledby="version_switcher_button">
+    <!-- dropdown will be populated by javascript on page load -->
+    </div>
+</div>
+
+<!-- NOTE: this JS must live here (not in our global JS file) because it relies
+     on being processed by Jinja before it is run (specifically for replacing
+     variables contribution/development/query and {'json_url': 'https://groonga.org/docs/_static/switcher.json', 'url_template': 'https://groonga.org/{version}docs', 'version_match': '日本語'}.
+-->
+
+<script type="text/javascript">
+// Construct the target URL from the JSON components
+function buildURL(entry) {
+    var template = "https://groonga.org/{version}docs";  // supplied by jinja
+    template = template.replace("{version}", entry.version);
+    return template;
+}
+
+// Check if corresponding page path exists in other version of docs
+// and, if so, go there instead of the homepage of the other docs version
+function checkPageExistsAndRedirect(event) {
+    const currentFilePath = "contribution/development/query.html",
+          tryUrl = event.target.getAttribute("href");
+    let otherDocsHomepage = tryUrl.replace(currentFilePath, "");
+    $.ajax({
+        type: 'HEAD',
+        url: tryUrl,
+        // if the page exists, go there
+        success: function() {
+            location.href = tryUrl;
+        }
+    }).fail(function() {
+        location.href = otherDocsHomepage;
+    });
+    // this prevents the browser from following the href of the clicked node
+    // (which is fine because this function takes care of redirecting)
+    return false;
+}
+
+// Populate the version switcher from the JSON config file
+(function () {
+    $.getJSON("https://groonga.org/docs/_static/switcher.json", function(data, textStatus, jqXHR) {
+        const currentFilePath = "contribution/development/query.html";
+        // create links to the corresponding page in the other docs versions
+        $.each(data, function(index, entry) {
+            // if no custom name specified (e.g., "latest"), use version string
+            if (!("name" in entry)) {
+                entry.name = entry.version;
+            }
+            // create the node
+            const node = document.createElement("a");
+            node.setAttribute("class", "list-group-item list-group-item-action py-1");
+            node.textContent = `${entry.name}`;
+            // get the base URL for that doc version, add the current page's
+            // path to it, and set as `href`
+            entry.url = buildURL(entry);
+            node.setAttribute("href", `${entry.url}${currentFilePath}`);
+            // on click, AJAX calls will check if the linked page exists before
+            // trying to redirect, and if not, will redirect to the homepage
+            // for that version of the docs.
+            node.onclick = checkPageExistsAndRedirect;
+            $("#version_switcher_menu").append(node);
+            // replace dropdown button text with the preferred display name of
+            // this version, rather than using sphinx's 11.1.3 variable.
+            // also highlight the dropdown entry for the currently-viewed
+            // version's entry
+            if (entry.version == "日本語") {
+                node.classList.add("active");
+                $("#version_switcher_button").text(entry.name);
+            }
+        });
+    });
+})();
+</script>
+      </div>
+      
+    </div>
   </div>
 </div>
-  
+    </nav>
+    
 
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>ナビゲーション</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="総合索引"
-             accesskey="I">索引</a></li>
-        <li class="right" >
-          <a href="release.html" title="12.3.7. リリース手順"
-             accesskey="N">次へ</a> |</li>
-        <li class="right" >
-          <a href="cooperation.html" title="12.3.4. ユーザーと協力して開発をうまく進めていくための指針"
-             accesskey="P">前へ</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v11.1.3ドキュメント</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../contribution.html" ><span class="section-number">12. </span>Groongaへのコントリビュート方法</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="../development.html" accesskey="U"><span class="section-number">12.3. </span>Groonga開発者向け情報</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href=""><span class="section-number">12.3.5. </span>クエリの実現</a></li> 
-      </ul>
-    </div>  
-
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+    <div class="container-xl">
+      <div class="row">
+          
             
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <ul class="current nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../report.html">
+   12.1. バグレポートの送り方
+  </a>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../documentation.html">
+   12.2. ドキュメント関連のコントリビュート方法
+  </a>
+  <input checked class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../documentation/introduction.html">
+     12.2.1. 導入
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../documentation/i18n.html">
+     12.2.2. 国際化
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../documentation/c-api.html">
+     12.2.3. C API
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 current active has-children">
+  <a class="reference internal" href="../development.html">
+   12.3. Groonga開発者向け情報
+  </a>
+  <input checked class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+  <label for="toctree-checkbox-2">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul class="current">
+   <li class="toctree-l2">
+    <a class="reference internal" href="repository.html">
+     12.3.1. リポジトリ
+    </a>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="build.html">
+     12.3.2. リポジトリーのGroongaをビルドする方法
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+    <label for="toctree-checkbox-3">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="build/unix_autotools.html">
+       12.3.2.1. GNU Autotoolsを使ってリポジトリーのGroongaをビルドする方法
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="build/unix_cmake.html">
+       12.3.2.2. GNU/LinuxまたはUnix上でCMakeを使ってリポジトリーのGroongaをビルドする方法
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="build/windows_cmake.html">
+       12.3.2.3. Windows上でCMakeを使ってリポジトリーのGroongaをビルドする方法
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="com.html">
+     12.3.3. Groonga 通信アーキテクチャ
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="cooperation.html">
+     12.3.4. ユーザーと協力して開発をうまく進めていくための指針
+    </a>
+   </li>
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
+     12.3.5. クエリの実現
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="release.html">
+     12.3.7. リリース手順
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="test.html">
+     12.3.8. テスト方法
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+  </div>
+</nav>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+<div class="tocsection onthispage pt-5 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#">
+   12.3.5. クエリの実現
+  </a>
+  <ul class="visible nav section-nav flex-column">
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id2">
+     12.3.5.1. クエリ実行のためのインタフェース
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h3 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#db-api">
+       12.3.5.1.1. DB_API
+      </a>
+     </li>
+     <li class="toc-h3 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#grn-expr">
+       12.3.5.1.2. grn_expr
+      </a>
+     </li>
+     <li class="toc-h3 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#groonga">
+       12.3.5.1.3. Groonga実行ファイル
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id3">
+     12.3.5.2. grn_exprで表現できるクエリ
+    </a>
+   </li>
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#grn-table-select">
+     12.3.5.3. grn_table_select()
+    </a>
+   </li>
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id4">
+     12.3.5.4. 関係式
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h3 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#equal-v1-v2-arg-callback">
+       12.3.5.4.1. equal(v1, v2, arg, callback)
+      </a>
+     </li>
+     <li class="toc-h3 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#not-equal-v1-v2-arg-callback">
+       12.3.5.4.2. not_equal(v1, v2, arg, callback)
+      </a>
+     </li>
+     <li class="toc-h3 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#less-v1-v2-arg-callback">
+       12.3.5.4.3. less(v1, v2, arg, callback)
+      </a>
+     </li>
+     <li class="toc-h3 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#greater-v1-v2-arg-callback">
+       12.3.5.4.4. greater(v1, v2, arg, callback)
+      </a>
+     </li>
+     <li class="toc-h3 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#less-equal-v1-v2-arg-callback">
+       12.3.5.4.5. less_equal(v1, v2, arg, callback)
+      </a>
+     </li>
+     <li class="toc-h3 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#greater-equal-v1-v2-arg-callback">
+       12.3.5.4.6. greater_equal(v1, v2, arg, callback)
+      </a>
+     </li>
+     <li class="toc-h3 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#contain-v1-v2-mode-arg-callback">
+       12.3.5.4.7. contain(v1, v2, mode, arg, callback)
+      </a>
+     </li>
+     <li class="toc-h3 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#near-v1-v2-arg-callback">
+       12.3.5.4.8. near(v1, v2, arg, callback)
+      </a>
+     </li>
+     <li class="toc-h3 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#similar-v1-v2-arg-callback">
+       12.3.5.4.9. similar(v1, v2, arg, callback)
+      </a>
+     </li>
+     <li class="toc-h3 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#prefix-v1-v2-arg-callback">
+       12.3.5.4.10. prefix(v1, v2, arg, callback)
+      </a>
+     </li>
+     <li class="toc-h3 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#suffix-v1-v2-arg-callback">
+       12.3.5.4.11. suffix(v1, v2, arg, callback)
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id5">
+   12.3.6. クエリの実例
+  </a>
+  <ul class="visible nav section-nav flex-column">
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id6">
+     12.3.6.1. 検索例1
+    </a>
+   </li>
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id7">
+     12.3.6.2. 検索例2
+    </a>
+   </li>
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id8">
+     12.3.6.3. 検索例3
+    </a>
+   </li>
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id9">
+     12.3.6.4. 検索例4
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
   <div class="section" id="id1">
 <h1><span class="section-number">12.3.5. </span>クエリの実現<a class="headerlink" href="#id1" title="このヘッドラインへのパーマリンク">¶</a></h1>
 <p>Groongaのデータベースには大量のデータを格納し、その中から必要な部分を高速に取り出すことができます。必要な部分をGroongaのデータベースに問い合わせるためのクエリの表現と実行に関して、Groongaは複数の手段を用意しています。</p>
@@ -280,99 +668,50 @@ columnの値が'needle'であるレコードr1と、columnの値が'haystack'で
 </div>
 
 
-            <div class="clearer"></div>
-          </div>
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="cooperation.html" title="前へ ページ">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">前へ</p>
+            <p class="prev-next-title"><span class="section-number">12.3.4. </span>ユーザーと協力して開発をうまく進めていくための指針</p>
         </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <h3><a href="../../index.html">目次</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">12.3.5. クエリの実現</a><ul>
-<li><a class="reference internal" href="#id2">12.3.5.1. クエリ実行のためのインタフェース</a><ul>
-<li><a class="reference internal" href="#db-api">12.3.5.1.1. DB_API</a></li>
-<li><a class="reference internal" href="#grn-expr">12.3.5.1.2. grn_expr</a></li>
-<li><a class="reference internal" href="#groonga">12.3.5.1.3. Groonga実行ファイル</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#id3">12.3.5.2. grn_exprで表現できるクエリ</a></li>
-<li><a class="reference internal" href="#grn-table-select">12.3.5.3. grn_table_select()</a></li>
-<li><a class="reference internal" href="#id4">12.3.5.4. 関係式</a><ul>
-<li><a class="reference internal" href="#equal-v1-v2-arg-callback">12.3.5.4.1. equal(v1, v2, arg, callback)</a></li>
-<li><a class="reference internal" href="#not-equal-v1-v2-arg-callback">12.3.5.4.2. not_equal(v1, v2, arg, callback)</a></li>
-<li><a class="reference internal" href="#less-v1-v2-arg-callback">12.3.5.4.3. less(v1, v2, arg, callback)</a></li>
-<li><a class="reference internal" href="#greater-v1-v2-arg-callback">12.3.5.4.4. greater(v1, v2, arg, callback)</a></li>
-<li><a class="reference internal" href="#less-equal-v1-v2-arg-callback">12.3.5.4.5. less_equal(v1, v2, arg, callback)</a></li>
-<li><a class="reference internal" href="#greater-equal-v1-v2-arg-callback">12.3.5.4.6. greater_equal(v1, v2, arg, callback)</a></li>
-<li><a class="reference internal" href="#contain-v1-v2-mode-arg-callback">12.3.5.4.7. contain(v1, v2, mode, arg, callback)</a></li>
-<li><a class="reference internal" href="#near-v1-v2-arg-callback">12.3.5.4.8. near(v1, v2, arg, callback)</a></li>
-<li><a class="reference internal" href="#similar-v1-v2-arg-callback">12.3.5.4.9. similar(v1, v2, arg, callback)</a></li>
-<li><a class="reference internal" href="#prefix-v1-v2-arg-callback">12.3.5.4.10. prefix(v1, v2, arg, callback)</a></li>
-<li><a class="reference internal" href="#suffix-v1-v2-arg-callback">12.3.5.4.11. suffix(v1, v2, arg, callback)</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="reference internal" href="#id5">12.3.6. クエリの実例</a><ul>
-<li><a class="reference internal" href="#id6">12.3.6.1. 検索例1</a></li>
-<li><a class="reference internal" href="#id7">12.3.6.2. 検索例2</a></li>
-<li><a class="reference internal" href="#id8">12.3.6.3. 検索例3</a></li>
-<li><a class="reference internal" href="#id9">12.3.6.4. 検索例4</a></li>
-</ul>
-</li>
-</ul>
-
-  <h4>前のトピックへ</h4>
-  <p class="topless"><a href="cooperation.html"
-                        title="前の章へ"><span class="section-number">12.3.4. </span>ユーザーと協力して開発をうまく進めていくための指針</a></p>
-  <h4>次のトピックへ</h4>
-  <p class="topless"><a href="release.html"
-                        title="次の章へ"><span class="section-number">12.3.7. </span>リリース手順</a></p>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">クイック検索</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="検索" />
-    </form>
+    </a>
+    <a class='right-next' id="next-link" href="release.html" title="次へ ページ">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">次へ</p>
+        <p class="prev-next-title"><span class="section-number">12.3.7. </span>リリース手順</p>
     </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
 </div>
-<script>$('#searchbox').show(0);</script>
-        </div>
+              
+          </main>
+          
+
       </div>
-      <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>ナビゲーション</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="総合索引"
-             >索引</a></li>
-        <li class="right" >
-          <a href="release.html" title="12.3.7. リリース手順"
-             >次へ</a> |</li>
-        <li class="right" >
-          <a href="cooperation.html" title="12.3.4. ユーザーと協力して開発をうまく進めていくための指針"
-             >前へ</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Groonga v11.1.3ドキュメント</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../contribution.html" ><span class="section-number">12. </span>Groongaへのコントリビュート方法</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="../development.html" ><span class="section-number">12.3. </span>Groonga開発者向け情報</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href=""><span class="section-number">12.3.5. </span>クエリの実現</a></li> 
-      </ul>
+  
+    <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+  <footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2009-2022 Groonga Project.<br>
+</p>
     </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2009-2022, Brazil, Inc.
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
+</p>
     </div>
-      <script src="http://connect.facebook.net/ja_JP/all.js"></script>
-
-    <script>
-      FB.init({
-         appId  : null,
-         status : true, // check login status
-         cookie : true, // enable cookies to allow the server to access the session
-         xfbml  : true  // parse XFBML
-      });
-    </script>
+    
+  </div>
+</footer>
   </body>
-
 </html>

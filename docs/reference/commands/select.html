@@ -2625,11 +2625,11 @@ function checkPageExistsAndRedirect(event) {
       </a>
      </li>
      <li class="toc-h4 nav-item toc-entry">
-      <a class="reference internal nav-link" href="#drilldown-if-max-n-records">
+      <a class="reference internal nav-link" href="#drilldown-max-n-target-records">
        7.3.56.4.7.10.
        <code class="docutils literal notranslate">
         <span class="pre">
-         drilldown_if_max_n_records
+         drilldown_max_n_target_records
         </span>
        </code>
       </a>
@@ -2908,7 +2908,7 @@ optional:</p>
        <span class="p">[</span><span class="n">load_table</span><span class="o">=</span><span class="n">null</span><span class="p">]</span>
        <span class="p">[</span><span class="n">load_columns</span><span class="o">=</span><span class="n">null</span><span class="p">]</span>
        <span class="p">[</span><span class="n">load_values</span><span class="o">=</span><span class="n">null</span><span class="p">]</span>
-       <span class="p">[</span><span class="n">drilldown_if_max_n_records</span><span class="o">=-</span><span class="mi">1</span><span class="p">]</span>
+       <span class="p">[</span><span class="n">drilldown_max_n_target_records</span><span class="o">=-</span><span class="mi">1</span><span class="p">]</span>
 </pre></div>
 </div>
 <p>This command has the following named parameters for dynamic columns:</p>
@@ -2956,7 +2956,7 @@ normal column. See also <a class="reference internal" href="column_create.html#c
 <li><p><code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].calc_types=NONE</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].calc_target=null</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].filter=null</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].if_max_n_records=-1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].max_n_target_records=-1</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].columns[${NAME}].stage=null</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].columns[${NAME}].flags=COLUMN_SCALAR</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].columns[${NAME}].type=null</span></code></p></li>
@@ -3801,7 +3801,7 @@ of each group but it puts sums to each group not record.</p>
 <span class="c1">#       [</span>
 <span class="c1">#         &quot;grn_select&quot;,</span>
 <span class="c1">#         &quot;lib/proc/proc_select.c&quot;,</span>
-<span class="c1">#         4473</span>
+<span class="c1">#         4452</span>
 <span class="c1">#       ]</span>
 <span class="c1">#     ]</span>
 <span class="c1">#   ]</span>
@@ -8339,29 +8339,31 @@ as <a class="reference internal" href="#select-filter"><span class="std std-ref"
 </pre></div>
 </div>
 </div>
-<div class="section" id="drilldown-if-max-n-records">
-<span id="select-drilldown-if-max-n-records"></span><h4><span class="section-number">7.3.56.4.7.10. </span><code class="docutils literal notranslate"><span class="pre">drilldown_if_max_n_records</span></code><a class="headerlink" href="#drilldown-if-max-n-records" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="drilldown-max-n-target-records">
+<span id="select-drilldown-max-n-target-records"></span><h4><span class="section-number">7.3.56.4.7.10. </span><code class="docutils literal notranslate"><span class="pre">drilldown_max_n_target_records</span></code><a class="headerlink" href="#drilldown-max-n-target-records" title="Permalink to this headline">¶</a></h4>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 12.0.0.</span></p>
 </div>
-<p>Specifies the max number of records as a threshold whether drilldown
-is executed or not. A drilldown is executed only if the number of
-records of the drilldown target table (filtered result) is less than
-or equal to the specified value. If a drilldown isn’t executed,
-empty drilldown result is returned.</p>
-<p>If this value is negative, a drilldown is executed. The default
-value is <code class="docutils literal notranslate"><span class="pre">-1</span></code>. It means that all drilldowns are executed by default.</p>
+<p>Specifies the max number of records of the drilldown target table
+(filtered result) to use drilldown. If the number of filtered result
+is larger than the specified value, some records in filtered result
+aren’t used for drilldown.</p>
+<p>If the specified value is negative, it’s processed same as
+<a class="reference internal" href="#select-limit"><span class="std std-ref">limit</span></a>. For example, <code class="docutils literal notranslate"><span class="pre">-1</span></code> uses all records. The default
+value is <code class="docutils literal notranslate"><span class="pre">-1</span></code>. It means that all filtered records are used by
+default.</p>
 <p>This feature is useful when filtered result may be very large. A
-drilldown against large filtered result may be slow. You can omit
-drilldown execution dynamically based on the number of records in
-filtered result by this feature.</p>
-<p>Here is an example to omit drilldown execution:</p>
+drilldown against large filtered result may be slow. You can limit the
+max number of records to be used for drilldown by this feature.</p>
+<p>Here is an example to limit the max number of records to be used for
+drilldown. The last 2 records, <code class="docutils literal notranslate"><span class="pre">{&quot;_id&quot;:</span> <span class="pre">4,</span> <span class="pre">&quot;tag&quot;:</span> <span class="pre">&quot;Senna&quot;}</span></code> and
+<code class="docutils literal notranslate"><span class="pre">{&quot;_id&quot;:</span> <span class="pre">5,</span> <span class="pre">&quot;tag&quot;:</span> <span class="pre">&quot;Senna&quot;}</span></code>, aren’t used:</p>
 <p>Execution example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> \
   <span class="o">--</span><span class="n">limit</span> <span class="o">-</span><span class="mi">1</span> \
   <span class="o">--</span><span class="n">output_columns</span> <span class="n">_id</span><span class="p">,</span><span class="n">tag</span> \
   <span class="o">--</span><span class="n">drilldown</span> <span class="n">tag</span> \
-  <span class="o">--</span><span class="n">drilldown_if_max_n_records</span> <span class="mi">4</span>
+  <span class="o">--</span><span class="n">drilldown_max_n_target_records</span> <span class="mi">3</span>
 <span class="c1"># [</span>
 <span class="c1">#   [</span>
 <span class="c1">#     0,</span>
@@ -8406,7 +8408,7 @@ filtered result by this feature.</p>
 <span class="c1">#     ],</span>
 <span class="c1">#     [</span>
 <span class="c1">#       [</span>
-<span class="c1">#         0</span>
+<span class="c1">#         2</span>
 <span class="c1">#       ],</span>
 <span class="c1">#       [</span>
 <span class="c1">#         [</span>
@@ -8417,6 +8419,14 @@ filtered result by this feature.</p>
 <span class="c1">#           &quot;_nsubrecs&quot;,</span>
 <span class="c1">#           &quot;Int32&quot;</span>
 <span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Hello&quot;,</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Groonga&quot;,</span>
+<span class="c1">#         2</span>
 <span class="c1">#       ]</span>
 <span class="c1">#     ]</span>
 <span class="c1">#   ]</span>
@@ -8446,7 +8456,7 @@ parameters:</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].calc_types</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].calc_target</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].filter</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].if_max_n_records</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].max_n_target_records</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].columns[${NAME}].stage=null</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].columns[${NAME}].flags=COLUMN_SCALAR</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].columns[${NAME}].type=null</span></code></p></li>
@@ -8507,7 +8517,7 @@ to use it for the following parameters:</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].calc_types</span></code>: <a class="reference internal" href="#select-drilldown-calc-types"><span class="std std-ref">drilldown_calc_types</span></a></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].calc_target</span></code>: <a class="reference internal" href="#select-drilldown-calc-target"><span class="std std-ref">drilldown_calc_target</span></a></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].filter</span></code>: <a class="reference internal" href="#select-drilldown-filter"><span class="std std-ref">drilldown_filter</span></a></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].if_max_n_records</span></code>: <a class="reference internal" href="#select-drilldown-if-max-n-records"><span class="std std-ref">drilldown_if_max_n_records</span></a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].max_n_target_records</span></code>: <a class="reference internal" href="#select-drilldown-max-n-target-records"><span class="std std-ref">drilldown_max_n_target_records</span></a></p></li>
 </ul>
 </div></blockquote>
 <p>See document for corresponding <code class="docutils literal notranslate"><span class="pre">columns[${NAME}].XXX</span></code> parameter to
@@ -9709,7 +9719,7 @@ pairs):</p>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.4.0.<br>
 </p>
     </div>
     

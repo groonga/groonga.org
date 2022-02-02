@@ -2626,11 +2626,11 @@ function checkPageExistsAndRedirect(event) {
       </a>
      </li>
      <li class="toc-h4 nav-item toc-entry">
-      <a class="reference internal nav-link" href="#drilldown-if-max-n-records">
+      <a class="reference internal nav-link" href="#drilldown-max-n-target-records">
        7.3.56.4.7.10.
        <code class="docutils literal notranslate">
         <span class="pre">
-         drilldown_if_max_n_records
+         drilldown_max_n_target_records
         </span>
        </code>
       </a>
@@ -2899,7 +2899,7 @@ function checkPageExistsAndRedirect(event) {
        <span class="p">[</span><span class="n">load_table</span><span class="o">=</span><span class="n">null</span><span class="p">]</span>
        <span class="p">[</span><span class="n">load_columns</span><span class="o">=</span><span class="n">null</span><span class="p">]</span>
        <span class="p">[</span><span class="n">load_values</span><span class="o">=</span><span class="n">null</span><span class="p">]</span>
-       <span class="p">[</span><span class="n">drilldown_if_max_n_records</span><span class="o">=-</span><span class="mi">1</span><span class="p">]</span>
+       <span class="p">[</span><span class="n">drilldown_max_n_target_records</span><span class="o">=-</span><span class="mi">1</span><span class="p">]</span>
 </pre></div>
 </div>
 <p>以下の名前付き引数で動的カラム機能を使うことができます。</p>
@@ -2945,7 +2945,7 @@ function checkPageExistsAndRedirect(event) {
 <li><p><code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].calc_types=NONE</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].calc_target=null</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].filter=null</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].if_max_n_records=-1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].max_n_target_records=-1</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].columns[${NAME}].stage=null</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].columns[${NAME}].flags=COLUMN_SCALAR</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].columns[${NAME}].type=null</span></code></p></li>
@@ -3715,7 +3715,7 @@ function checkPageExistsAndRedirect(event) {
 <span class="c1">#       [</span>
 <span class="c1">#         &quot;grn_select&quot;,</span>
 <span class="c1">#         &quot;lib/proc/proc_select.c&quot;,</span>
-<span class="c1">#         4473</span>
+<span class="c1">#         4452</span>
 <span class="c1">#       ]</span>
 <span class="c1">#     ]</span>
 <span class="c1">#   ]</span>
@@ -7872,21 +7872,21 @@ function checkPageExistsAndRedirect(event) {
 </pre></div>
 </div>
 </div>
-<div class="section" id="drilldown-if-max-n-records">
-<span id="select-drilldown-if-max-n-records"></span><h4><span class="section-number">7.3.56.4.7.10. </span><code class="docutils literal notranslate"><span class="pre">drilldown_if_max_n_records</span></code><a class="headerlink" href="#drilldown-if-max-n-records" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<div class="section" id="drilldown-max-n-target-records">
+<span id="select-drilldown-max-n-target-records"></span><h4><span class="section-number">7.3.56.4.7.10. </span><code class="docutils literal notranslate"><span class="pre">drilldown_max_n_target_records</span></code><a class="headerlink" href="#drilldown-max-n-target-records" title="このヘッドラインへのパーマリンク">¶</a></h4>
 <div class="versionadded">
 <p><span class="versionmodified added">バージョン 12.0.0 で追加.</span></p>
 </div>
-<p>ドリルダウンを実行するかどうかのしきい値となる最大レコード数を指定します。ドリルダウン対象のテーブル（フィルター済みの結果）のレコード数が指定した値以下の場合だけドリルダウンは実行されます。もし、ドリルダウンが実行されない場合、空のドリルダウン結果が返ります。</p>
-<p>この値が負の場合はドリルダウンは実行されます。デフォルト値は <code class="docutils literal notranslate"><span class="pre">-1</span></code> です。つまり、デフォルトではすべてのドリルダウンは実行されます。</p>
-<p>この機能はフィルター結果が非常に大きくなるかもしれない場合に有用です。大きなフィルター結果に対するドリルダウンは遅くなることがあります。この機能を使うことでフィルター結果のレコード数に応じて動的にドリルダウンの実行を省略できます。</p>
-<p>以下はドリルダウンの実行を省略する例です。</p>
+<p>ドリルダウン対象のテーブル（フィルター結果）の中のうち最大で何レコードをドリルダウンに使うかを指定します。もし、フィルター結果のレコード数が指定した値より大きかったらフィルターした結果内のいくつかのレコードはドリルダウンには使われません。</p>
+<p>指定した値が負の場合は <a class="reference internal" href="#select-limit"><span class="std std-ref">limit</span></a> と同じように処理されます。たとえば、 <code class="docutils literal notranslate"><span class="pre">-1</span></code> はすべてのレコードを使います。デフォルト値は <code class="docutils literal notranslate"><span class="pre">-1</span></code> です。つまり、デフォルトではフィルター結果のすべてのレコードを使ってドリルダウンを実行します。</p>
+<p>この機能はフィルター結果が非常に大きくなるかもしれない場合に有用です。大きなフィルター結果に対するドリルダウンは遅くなることがあります。この機能を使うことでドリルダウンに使うレコード数を制限できます。</p>
+<p>以下はドリルダウンに使う最大レコード数を制限する例です。最後の2レコード（ <code class="docutils literal notranslate"><span class="pre">{&quot;_id&quot;:</span> <span class="pre">4,</span> <span class="pre">&quot;tag&quot;:</span> <span class="pre">&quot;Senna&quot;}</span></code> と <code class="docutils literal notranslate"><span class="pre">{&quot;_id&quot;:</span> <span class="pre">5,</span> <span class="pre">&quot;tag&quot;:</span> <span class="pre">&quot;Senna&quot;}</span></code> ）は使われていません。</p>
 <p>実行例:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> \
   <span class="o">--</span><span class="n">limit</span> <span class="o">-</span><span class="mi">1</span> \
   <span class="o">--</span><span class="n">output_columns</span> <span class="n">_id</span><span class="p">,</span><span class="n">tag</span> \
   <span class="o">--</span><span class="n">drilldown</span> <span class="n">tag</span> \
-  <span class="o">--</span><span class="n">drilldown_if_max_n_records</span> <span class="mi">4</span>
+  <span class="o">--</span><span class="n">drilldown_max_n_target_records</span> <span class="mi">3</span>
 <span class="c1"># [</span>
 <span class="c1">#   [</span>
 <span class="c1">#     0,</span>
@@ -7931,7 +7931,7 @@ function checkPageExistsAndRedirect(event) {
 <span class="c1">#     ],</span>
 <span class="c1">#     [</span>
 <span class="c1">#       [</span>
-<span class="c1">#         0</span>
+<span class="c1">#         2</span>
 <span class="c1">#       ],</span>
 <span class="c1">#       [</span>
 <span class="c1">#         [</span>
@@ -7942,6 +7942,14 @@ function checkPageExistsAndRedirect(event) {
 <span class="c1">#           &quot;_nsubrecs&quot;,</span>
 <span class="c1">#           &quot;Int32&quot;</span>
 <span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Hello&quot;,</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;Groonga&quot;,</span>
+<span class="c1">#         2</span>
 <span class="c1">#       ]</span>
 <span class="c1">#     ]</span>
 <span class="c1">#   ]</span>
@@ -7967,7 +7975,7 @@ function checkPageExistsAndRedirect(event) {
 <li><p><code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].calc_types</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].calc_target</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].filter</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].if_max_n_records</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].max_n_target_records</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].columns[${NAME}].stage=null</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].columns[${NAME}].flags=COLUMN_SCALAR</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].columns[${NAME}].type=null</span></code></p></li>
@@ -8019,7 +8027,7 @@ function checkPageExistsAndRedirect(event) {
 <li><p><code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].calc_types</span></code>: <a class="reference internal" href="#select-drilldown-calc-types"><span class="std std-ref">drilldown_calc_types</span></a></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].calc_target</span></code>: <a class="reference internal" href="#select-drilldown-calc-target"><span class="std std-ref">drilldown_calc_target</span></a></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].filter</span></code>: <a class="reference internal" href="#select-drilldown-filter"><span class="std std-ref">drilldown_filter</span></a></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].if_max_n_records</span></code>: <a class="reference internal" href="#select-drilldown-if-max-n-records"><span class="std std-ref">drilldown_if_max_n_records</span></a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].max_n_target_records</span></code>: <a class="reference internal" href="#select-drilldown-max-n-target-records"><span class="std std-ref">drilldown_max_n_target_records</span></a></p></li>
 </ul>
 </div></blockquote>
 <p>以下の引数の使い方は対応する <code class="docutils literal notranslate"><span class="pre">columns[${NAME}].XXX</span></code> 引数のドキュメントを参照してください。</p>
@@ -9121,7 +9129,7 @@ function checkPageExistsAndRedirect(event) {
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.4.0.<br>
 </p>
     </div>
     

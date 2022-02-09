@@ -1558,29 +1558,32 @@ function checkPageExistsAndRedirect(event) {
 <ul>
 <li><p>[<a class="reference internal" href="reference/functions/snippet.html"><span class="doc">snippet</span></a>] 32個以上のキーワードを使えるようにしました。</p>
 <p>いままで、 <code class="docutils literal notranslate"><span class="pre">snippet</span></code> は32個以上のキーワードを指定できませんでしたが、この改良によって、32個以上のキーワードを指定できます。</p>
+<p>通常の使用では、 <code class="docutils literal notranslate"><span class="pre">snippet</span></code> に32以上のキーワードは指定しませんが、 <code class="docutils literal notranslate"><span class="pre">query_expand</span></code> などを使うことによって自動的にキーワードが増加したときに対象のキーワードが32以上になることがあります。</p>
+<p>今までは、このようなケースでは、Groongaはエラーになっていましたが、この改良によって、エラーが発生しなくなります。</p>
 <p>詳細は、 <a class="reference internal" href="#release-11-1-3"><span class="std std-ref">release 11.1.3</span></a> を参照してください。</p>
 </li>
 <li><p>[<a class="reference internal" href="reference/normalizers/normalizer_nfkc130.html"><span class="doc">NormalizerNFKC130</span></a>] 新しいオプション <code class="docutils literal notranslate"><span class="pre">remove_symbol</span></code> を追加しました。</p>
-<p>このオプションは、正規化対象の文字列から記号(例えば #, !, &quot;, &amp;, % 等)を削除します。</p>
+<p>このオプションは、正規化対象の文字列から記号(例えば #, !, &quot;, &amp;, % 等)を削除します。例えば、歌のタイトルやアーティスト名、お店の名前等の表記ゆれの防止に使えます。</p>
 <p>詳細は、 <a class="reference internal" href="#release-11-1-3"><span class="std std-ref">release 11.1.3</span></a> を参照してください。</p>
 </li>
 <li><p>[<a class="reference internal" href="reference/commands/load.html"><span class="doc">load</span></a>] ISO 8601 形式をサポートしました。</p>
+<p>ISO 8601形式は一般的なフォーマットです。より一般的な形式をサポートしたことによって <code class="docutils literal notranslate"><span class="pre">load</span></code> の使い勝手が良くなりました。</p>
 <p>詳細は、 <a class="reference internal" href="#release-11-1-0"><span class="std std-ref">release 11.1.0</span></a> を参照してください。</p>
 </li>
 <li><p>[<a class="reference internal" href="reference/functions/snippet.html"><span class="doc">snippet</span></a>] 正規表現を使ってスニペットの区切り文字を見つける新しいオプション <code class="docutils literal notranslate"><span class="pre">delimiter_regexp</span></code> を追加しました。</p>
+<p>この機能は検索結果を文で表示したい時に便利です。</p>
 <p><a class="reference internal" href="reference/functions/snippet.html"><span class="doc">snippet</span></a> は、検索キーワードの周辺のテキストを抽出します。 <a class="reference internal" href="reference/functions/snippet.html"><span class="doc">snippet</span></a> で抽出したテキストをスニペットと呼びます。</p>
 <p>通常、 <a class="reference internal" href="reference/functions/snippet.html"><span class="doc">snippet</span></a> は、検索キーワードの周辺の200byteのテキストを返しますが、 <a class="reference internal" href="reference/functions/snippet.html"><span class="doc">snippet</span></a> は、センテンスの区切りを考慮しません。スニペットは、複数のセンテンスで構成されることがあります。</p>
 <p><code class="docutils literal notranslate"><span class="pre">delimiter_regexp</span></code> オプションは、検索キーワードと同じセンテンスのテキストのみを抽出したいときに便利です。例えば、 <code class="docutils literal notranslate"><span class="pre">\.\s*</span></code> を使って対象のセンテンス内のテキストのみを抽出できます。文字列は、 <code class="docutils literal notranslate"><span class="pre">\</span></code> でエスケープする必要があることに注意してください。</p>
 <p>詳細は、 <a class="reference internal" href="#release-11-0-9"><span class="std std-ref">release 11.0.9</span></a> を参照してください。</p>
 </li>
 <li><p>[<a class="reference internal" href="reference/commands/cache_limit.html"><span class="doc">cache_limit</span></a>] <code class="docutils literal notranslate"><span class="pre">cache_limit</span> <span class="pre">0</span></code> を実行したときにクエリーキャッシュを削除するようにしました。</p>
+<p>Groongaは内部的なテーブルにクエリーキャッシュを保存しています。このテーブルは、ハッシュテーブルなので、トータルのキーサイズは最大で4GiBです。そのため、もし多くの巨大なクエリーを実行した場合、トータルのキーサイズの最大値4GiBを超え、Groongaがクエリーをキャッシュできない可能性があります。このようなケースで、 <code class="docutils literal notranslate"><span class="pre">cache_limit</span> <span class="pre">0</span></code> を実行することで、クエリーキャッシュ用のテーブルをクリアーし、Groongaがクエリーキャッシュを保存できるようにします。</p>
+<p>今まではこの問題を解消するには、Groongaを再起動する必要がありましたが、この改良によって、 <code class="docutils literal notranslate"><span class="pre">cache_limit</span> <span class="pre">0</span></code> を実行するだけで問題を解消できます。</p>
 <p>詳細は、 <a class="reference internal" href="#release-11-0-6"><span class="std std-ref">release 11.0.6</span></a> を参照してください。</p>
 </li>
 <li><p>[<a class="reference internal" href="reference/functions/between.html"><span class="doc">between</span></a>] <code class="docutils literal notranslate"><span class="pre">between()</span></code> で、条件式の評価順序の最適化をサポートしました。</p>
-<p><code class="docutils literal notranslate"><span class="pre">GRN_EXPR_OPTIMIZE=yes</span></code> を設定することで、 <code class="docutils literal notranslate"><span class="pre">between()</span></code> で条件式の評価順序の最適化を使えます。</p>
-</li>
-<li><p>[<a class="reference internal" href="reference/commands/select.html"><span class="doc">select</span></a>] <code class="docutils literal notranslate"><span class="pre">--filter</span></code> 内で特定のレコードのスコアーを調整できるようにしました。</p>
-<p>詳細は、 <a class="reference internal" href="#release-11-0-4"><span class="std std-ref">release 11.0.4</span></a> を参照してください。</p>
+<p><code class="docutils literal notranslate"><span class="pre">GRN_EXPR_OPTIMIZE=yes</span></code> を設定することで、 <code class="docutils literal notranslate"><span class="pre">between()</span></code> で条件式の評価順序の最適化を使えます。この最適化は、 <code class="docutils literal notranslate"><span class="pre">between()</span></code> で十分にレコードを絞り込めるか、 <code class="docutils literal notranslate"><span class="pre">between()</span></code> でほとんどレコードを絞り込めない時に効果があります。</p>
 </li>
 <li><p>[<a class="reference internal" href="reference/log.html"><span class="doc">ログ</span></a>] 標準出力、標準エラー出力への出力をサポートしました。</p>
 <p>この機能はDocker上でGroongaを実行する際に有用です。Dockerは標準で標準出力と標準エラー出力を記録する機能を持っています。したがって、Groongaのログを取得するために、Dockerの環境にログインする必要がなくなります。</p>
@@ -1588,10 +1591,13 @@ function checkPageExistsAndRedirect(event) {
 </li>
 <li><p>[<a class="reference internal" href="reference/functions/query.html"><span class="doc">query</span></a>] クエリー毎に <code class="docutils literal notranslate"><span class="pre">TokenFilterStem</span></code> と <code class="docutils literal notranslate"><span class="pre">TokenFilterStopWord</span></code> を無効にできるようになりました。</p>
 <p>特定のクエリーでのみ <code class="docutils literal notranslate"><span class="pre">TokenFilterStem</span></code> と <code class="docutils literal notranslate"><span class="pre">TokenFilterStopWord</span></code> を無効にして検索できるようになりました。</p>
+<p>この機能は、検索キーワードと正確に同じ語を検索したい時に便利です。通常、ステミングやストップワードの除去を有効にしたほうが良い結果を得られますが、検索キーワードと正確に同じ語を検索したい場合は、これらの機能は不要です。</p>
+<p>今までは、検索キーワードと正確に同じ語を検索したい場合は、専用のインデックスを作る必要がありましたが、この改良によって、専用のインデックスを作らずに検索キーワードと正確に同じ語を検索できます。</p>
 <p>詳細は、 <a class="reference internal" href="#release-11-0-3"><span class="std std-ref">release 11.0.3</span></a> を参照してください。</p>
 </li>
 <li><p>[<a class="reference internal" href="reference/functions/string_slice.html"><span class="doc">string_slice</span></a>] 新しい関数 <code class="docutils literal notranslate"><span class="pre">string_slice</span></code> を追加しました。</p>
 <p><code class="docutils literal notranslate"><span class="pre">string_slice()</span></code> は、検索結果の文字列から文字の位置や正規表現を使って、部分文字列を抽出します。この機能は、検索結果を編集したい時に便利です。</p>
+<p>例えば、この機能は、検索結果からタグを除去するのに使えます。</p>
 </li>
 <li><p>[<a class="reference internal" href="reference/functions/query_parallel_or.html"><span class="doc">query_parallel_or</span></a>] クエリーを並行して実行できる新しい関数を追加しました。</p>
 <p><code class="docutils literal notranslate"><span class="pre">query_parallel_or</span></code> は query と似ていますが、 <code class="docutils literal notranslate"><span class="pre">query_parallel_or</span></code> は複数の OR 条件を並列に処理します。この機能を使うことで、大量のOR条件の実行速度を向上できます。</p>
@@ -1604,9 +1610,9 @@ function checkPageExistsAndRedirect(event) {
 </div>
 </li>
 <li><p>[<a class="reference internal" href="reference/commands/select.html"><span class="doc">select</span></a>] <code class="docutils literal notranslate"><span class="pre">--post_filter</span></code> と <code class="docutils literal notranslate"><span class="pre">--slices[].post_filter</span></code> をサポートしました。</p>
-<p><code class="docutils literal notranslate"><span class="pre">--post-filter</span></code> と <code class="docutils literal notranslate"><span class="pre">--slices[].post_filter</span></code> を使うことで、 <code class="docutils literal notranslate"><span class="pre">--filter</span></code> 実行後に再度フィルタリングすることができます。<code class="docutils literal notranslate"><span class="pre">--post-filter</span></code> と <code class="docutils literal notranslate"><span class="pre">--slices[].post_filter</span></code> の違いは応答フォーマットです。</p>
+<p><code class="docutils literal notranslate"><span class="pre">--post_filter</span></code> と <code class="docutils literal notranslate"><span class="pre">--slices[].post_filter</span></code> を使うことで、 <code class="docutils literal notranslate"><span class="pre">--filter</span></code> 実行後に再度フィルタリングすることができます。<code class="docutils literal notranslate"><span class="pre">--post_filter</span></code> と <code class="docutils literal notranslate"><span class="pre">--slices[].post_filter</span></code> の違いは応答フォーマットです。</p>
 <p><code class="docutils literal notranslate"><span class="pre">--post_filter</span></code> の応答フォーマットは、 <code class="docutils literal notranslate"><span class="pre">--filter</span></code> と同じです。<code class="docutils literal notranslate"><span class="pre">--slices[].post_filter</span></code> の応答フォーマットは <code class="docutils literal notranslate"><span class="pre">--slices[].post_filter</span></code> の実行前後の結果を出力します。</p>
-<p><code class="docutils literal notranslate"><span class="pre">--slices[].post_filter``の応答フォーマットは、通常の</span> <span class="pre">``select</span></code> の応答と異なることに注意してください。</p>
+<p><code class="docutils literal notranslate"><span class="pre">--slices[].post_filter</span></code> の応答フォーマットは、通常の <code class="docutils literal notranslate"><span class="pre">select</span></code> の応答と異なることに注意してください。</p>
 </li>
 </ul>
 </div>
@@ -1615,17 +1621,8 @@ function checkPageExistsAndRedirect(event) {
 <ul>
 <li><p>Groongaが依存している arrow-libs がバージョンアップしたことによって、Groongaのバージョンアップが失敗する問題を修正しました。</p>
 <p>ただし、 arrow-libs がメジャーバージョンアップした場合は、この問題は再発します。その場合は、Groongaパッケージを再構築して対応する予定です。</p>
+<p>This bug only occurs AlmaLinux 8 and CentOS 7.</p>
 </li>
-<li><p>[<a class="reference internal" href="reference/commands/load.html"><span class="doc">load</span></a>] 存在しないカラムを指定してロードした時にクラッシュする問題を修正しました。</p>
-<p>この問題は、 <code class="docutils literal notranslate"><span class="pre">load</span></code> の引数として、 <code class="docutils literal notranslate"><span class="pre">input_type</span></code> に <code class="docutils literal notranslate"><span class="pre">apache-arrow</span></code> を指定したときのみ発生します。</p>
-</li>
-<li><p>無効なパラメータを持つインデックスカラムを削除できない問題を修正しました。</p>
-<p>例えば、 <code class="docutils literal notranslate"><span class="pre">column_create</span></code> を使って無効なインデックスカラムを作成した時、テーブルが削除できなくなります。</p>
-</li>
-<li><p>Groongaがコマンドエラー(例えば、filterのシンタックスエラー)発生時に応答を返さない問題を修正しました。</p>
-<p>これは、 <code class="docutils literal notranslate"><span class="pre">--output_type</span> <span class="pre">apache-arrow</span></code> を使っているときのみ発生します。</p>
-</li>
-<li><p>テーブル作成時に無効なオプションを持つトークナイザーを指定するとメモリーリークする問題を修正しました。</p></li>
 <li><p>[Windows] メモリー不足によって、新しくファイルのオープンに失敗した時にリソースリークする問題を修正しました。</p></li>
 <li><p>オプションをサポートしているトークナイザーやノーマライザー、トークンフィルターが使われている際、多くの検索クエリーを送信するとGroongaが応答を返さなくなることがある問題を修正しました。</p></li>
 <li><p>インデックス内のデータを大量に追加、削除、更新した際にインデックスが破損することがある問題を修正しました。</p>
@@ -1639,8 +1636,8 @@ function checkPageExistsAndRedirect(event) {
 <ul class="simple">
 <li><p>[<a class="reference internal" href="install/almalinux.html"><span class="doc">AlmaLinux</span></a>] AlmaLinux 8 向けのパッケージをサポートしました。</p></li>
 <li><p>[<a class="reference internal" href="install/almalinux.html"><span class="doc">AlmaLinux</span></a>] ARM64版 AlmaLinux 8 向けのパッケージをサポートしました。</p></li>
-<li><p>[<a class="reference internal" href="install/debian.html"><span class="doc">Debian GNU/Linux</span></a>] Debian 11(Bullseye) をサポートしました。</p></li>
-<li><p>[<a class="reference internal" href="install/debian.html"><span class="doc">Debian GNU/Linux</span></a>] ARM64版 Debian 11(Bullseye) と ARM64版 Debian 10(buster) をサポートしました。</p></li>
+<li><p>[<a class="reference internal" href="install/debian.html"><span class="doc">Debian GNU/Linux</span></a>] Debian 11 (Bullseye) をサポートしました。</p></li>
+<li><p>[<a class="reference internal" href="install/debian.html"><span class="doc">Debian GNU/Linux</span></a>] ARM64版 Debian 11 (Bullseye) と ARM64版 Debian 10 (buster) をサポートしました。</p></li>
 <li><p>[<a class="reference internal" href="install/ubuntu.html"><span class="doc">Ubuntu</span></a>] Ubuntu 21.10 (Impish Indri)をサポートしました。</p></li>
 </ul>
 </div>

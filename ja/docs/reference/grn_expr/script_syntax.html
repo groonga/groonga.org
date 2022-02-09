@@ -2486,18 +2486,33 @@ function checkPageExistsAndRedirect(event) {
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#similar-search">
-     7.13.2.9.6. 類似文書検索
+    <a class="reference internal nav-link" href="#near-phrase-product-search-operator">
+     7.13.2.9.6. 近傍フレーズ直積検索演算子
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#ordered-near-phrase-search-operator">
+     7.13.2.9.7. 順序付き近傍フレーズ検索演算子
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#ordered-near-phrase-product-search-operator">
+     7.13.2.9.8. 順序付き近傍フレーズ直積検索演算子
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#similar-search-operator">
+     7.13.2.9.9. 類似文書検索演算子
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#term-extract-operator">
-     7.13.2.9.7. 単語抽出演算子
+     7.13.2.9.10. 単語抽出演算子
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#regular-expression-operator">
-     7.13.2.9.8. 正規表現演算子
+     7.13.2.9.11. 正規表現演算子
     </a>
    </li>
   </ul>
@@ -4694,6 +4709,7 @@ column *N${MAX_INTERVAL} &quot;word1 word2 ...&quot;
 <p>構文は以下のどれかです。:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>column *NP &quot;phrase1 phrase2 ...&quot;
 column *NP${MAX_INTERVAL} &quot;phrase1 phrase2 ...&quot;
+column *NP${MAX_INTERVAL},${ADDITIONAL_LAST_INTERVAL} &quot;phrase1 phrase2 ...&quot;
 </pre></div>
 </div>
 <p>2つめの形式の例は次の通りです。</p>
@@ -4702,7 +4718,16 @@ column *NP${MAX_INTERVAL} &quot;phrase1 phrase2 ...&quot;
 </pre></div>
 </div>
 <p>最初の例は近いと判断する最大距離として <code class="docutils literal notranslate"><span class="pre">29</span></code> を使うという意味です。</p>
-<p>2つめの例は近いと判断する最大距離として <code class="docutils literal notranslate"><span class="pre">-1</span></code> を使うという意味です。 <code class="docutils literal notranslate"><span class="pre">-1</span></code> はどれだけ離れていてもよいという意味です。</p>
+<p>2つめの例は近いと判断する最大距離として <code class="docutils literal notranslate"><span class="pre">-1</span></code> を使うという意味です。</p>
+<p>最大距離は後で説明します。</p>
+<p>3つめの形式の例は次の通りです。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">column</span> <span class="o">*</span><span class="n">NP10</span><span class="p">,</span><span class="mi">29</span> <span class="s2">&quot;phrase1 phrase2 ...&quot;</span>
+<span class="n">column</span> <span class="o">*</span><span class="n">NP10</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span> <span class="s2">&quot;phrase1 phrase2 ...&quot;</span>
+</pre></div>
+</div>
+<p>最初の例は最後の追加距離として <code class="docutils literal notranslate"><span class="pre">29</span></code> を使うという意味です。</p>
+<p>2つめの例は最後の追加距離として <code class="docutils literal notranslate"><span class="pre">-1</span></code> を使うという意味です。</p>
+<p>最後の追加距離は後で説明します。</p>
 <p>この演算子は <code class="docutils literal notranslate"><span class="pre">phrase1</span> <span class="pre">phrase2</span> <span class="pre">...</span></code> というフレーズで近傍フレーズ検索します。近傍フレーズ検索はすべてのフレーズが含まれていてかつそれぞれが指定した順番で出現していてかつそれぞれのフレーズが指定した距離以内にあるレコードを検索します。</p>
 <p>近いと判断する最大距離のデフォルトは <code class="docutils literal notranslate"><span class="pre">10</span></code> です。距離の単位はN-gram系のトークナイザーでは文字数で、形態素解析系のトークナイザーでは単語数です。</p>
 <p>しかし、<code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code> はASCIIだけの単語はトークンに分割しません。このケースでは、 <code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code> はASCIIの文字には空白区切りのようなトークナイズ方法を使うためです。</p>
@@ -4765,11 +4790,313 @@ tokenizer to show difference with near search with English text.</p>
 </pre></div>
 </div>
 <p>最初の式は <code class="docutils literal notranslate"><span class="pre">I</span></code> と <code class="docutils literal notranslate"><span class="pre">fast</span></code> が含まれていて、かつ、これらの単語が10単語以内近くにあるレコードにマッチします。そのため <code class="docutils literal notranslate"><span class="pre">I</span> <span class="pre">also</span> <span class="pre">started</span> <span class="pre">to</span> <span class="pre">use</span> <span class="pre">mroonga.</span> <span class="pre">It's</span> <span class="pre">also</span> <span class="pre">very</span> <span class="pre">fast!</span> <span class="pre">...</span></code> にマッチします。 <code class="docutils literal notranslate"><span class="pre">I</span></code> と <code class="docutils literal notranslate"><span class="pre">fast</span></code> の間の単語数はちょうど10です。</p>
-<p>二番目の式は <code class="docutils literal notranslate"><span class="pre">I</span></code> と <code class="docutils literal notranslate"><span class="pre">Really</span></code> が含まれていて、かつ、これらの単語が10単語以内近くにあるレコードにマッチします。そのため、 <code class="docutils literal notranslate"><span class="pre">I</span> <span class="pre">also</span> <span class="pre">st</span> <span class="pre">arted</span> <span class="pre">to</span> <span class="pre">use</span> <span class="pre">mroonga.</span> <span class="pre">It's</span> <span class="pre">also</span> <span class="pre">very</span> <span class="pre">fast!</span> <span class="pre">Really</span> <span class="pre">fast!</span></code> はマッチしません。 <code class="docutils literal notranslate"><span class="pre">I</span></code> と <code class="docutils literal notranslate"><span class="pre">Really</span></code> の間の単語数は11です。</p>
+<p>2番目の式は <code class="docutils literal notranslate"><span class="pre">I</span></code> と <code class="docutils literal notranslate"><span class="pre">Really</span></code> が含まれていて、かつ、これらの単語が10単語以内近くにあるレコードにマッチします。そのため、 <code class="docutils literal notranslate"><span class="pre">I</span> <span class="pre">also</span> <span class="pre">st</span> <span class="pre">arted</span> <span class="pre">to</span> <span class="pre">use</span> <span class="pre">mroonga.</span> <span class="pre">It's</span> <span class="pre">also</span> <span class="pre">very</span> <span class="pre">fast!</span> <span class="pre">Really</span> <span class="pre">fast!</span></code> はマッチしません。 <code class="docutils literal notranslate"><span class="pre">I</span></code> と <code class="docutils literal notranslate"><span class="pre">Really</span></code> の間の単語数は14です。</p>
 <p>三番目の式は <code class="docutils literal notranslate"><span class="pre">also</span></code> と <code class="docutils literal notranslate"><span class="pre">Really</span></code> が含まれていて、かつ、これらの単語が10単語以内近くにあるレコードにマッチします。そのため、 <code class="docutils literal notranslate"><span class="pre">I</span> <span class="pre">also</span> <span class="pre">started</span> <span class="pre">to</span> <span class="pre">use</span> <span class="pre">mroonga.</span> <span class="pre">It's</span> <span class="pre">also</span> <span class="pre">very</span> <span class="pre">fast!</span> <span class="pre">Really</span> <span class="pre">fast!</span></code> にマッチします。 <code class="docutils literal notranslate"><span class="pre">also</span></code> と <code class="docutils literal notranslate"><span class="pre">Really</span></code> の間の単語数は10です。</p>
+<p>以下は最大距離を変更する例です。</p>
+<p>実行例:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;content *NP14 &quot;I Really&quot;&#39;</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">content</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
+<span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;content *NP-1 &quot;I Really&quot;&#39;</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">content</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
+</pre></div>
 </div>
-<div class="section" id="similar-search">
-<span id="script-syntax-similar-search-operator"></span><h3><span class="section-number">7.13.2.9.6. </span>類似文書検索<a class="headerlink" href="#similar-search" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>最初の式は <code class="docutils literal notranslate"><span class="pre">I</span> <span class="pre">also</span> <span class="pre">st</span> <span class="pre">arted</span> <span class="pre">to</span> <span class="pre">use</span> <span class="pre">mroonga.</span> <span class="pre">It's</span> <span class="pre">also</span> <span class="pre">very</span> <span class="pre">fast!</span> <span class="pre">Really</span> <span class="pre">fast!</span></code> にマッチします。なぜなら <code class="docutils literal notranslate"><span class="pre">I</span></code> と <code class="docutils literal notranslate"><span class="pre">Really</span></code> の間の単語数が14だからです。</p>
+<p>2番目の式も <code class="docutils literal notranslate"><span class="pre">I</span> <span class="pre">also</span> <span class="pre">st</span> <span class="pre">arted</span> <span class="pre">to</span> <span class="pre">use</span> <span class="pre">mroonga.</span> <span class="pre">It's</span> <span class="pre">also</span> <span class="pre">very</span> <span class="pre">fast!</span> <span class="pre">Really</span> <span class="pre">fast!</span></code> にマッチします。なぜなら <code class="docutils literal notranslate"><span class="pre">-1</span></code> は <code class="docutils literal notranslate"><span class="pre">I</span></code> と <code class="docutils literal notranslate"><span class="pre">Really</span></code> の間にうくつ単語があってもよいという意味だからです。</p>
+<p>最後のフレーズにだけ距離を追加することができます。つまり、最後から2番目のフレーズと最後のフレーズの間だけより多くの距離を許容できるということです。これは同一文内での近傍フレーズ検索を実装するときに便利です。最後のフレーズとして <code class="docutils literal notranslate"><span class="pre">。</span></code> （文末のフレーズ）を指定し、最後の追加距離として <code class="docutils literal notranslate"><span class="pre">-1</span></code> を指定すると、 <code class="docutils literal notranslate"><span class="pre">。</span></code> の前に他のすべてのフレーズが出現しなければいけません。最後のフレーズには <code class="docutils literal notranslate"><span class="pre">。$</span></code> というように最後に <code class="docutils literal notranslate"><span class="pre">$</span></code> をつけなければいけません。</p>
+<p>以下は指定されたフレーズ群の最後の追加距離として <code class="docutils literal notranslate"><span class="pre">-1</span></code> を使う例です。:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">column</span> <span class="o">*</span><span class="n">NP10</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span> <span class="s2">&quot;a b .$&quot;</span>
+</pre></div>
+</div>
+<p>以下は指定したフレーズ群の最後の追加距離をカスタマイズする例です。</p>
+<p>実行例:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;content *NP1,-1 &quot;I started .$&quot;&#39;</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">content</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;I started to use Groonga. It&#39;s very fast!&quot;</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
+</pre></div>
+</div>
+<p>最後の追加距離に正の数を指定することもできます。最後の追加距離に正の数を指定した場合、次のすべての条件を満たす必要があります。</p>
+<ol class="arabic simple">
+<li><p>最初のフレーズと最後から2番目のフレーズの距離は <code class="docutils literal notranslate"><span class="pre">最大距離</span></code> 以下でなければいけない。</p></li>
+<li><p>最初のフレーズと最後のフレーズの距離は <code class="docutils literal notranslate"><span class="pre">最大距離</span></code> + <code class="docutils literal notranslate"><span class="pre">最後の追加距離</span></code> 以下でなければいけない。</p></li>
+</ol>
+<p>最後の追加距離に負の数を指定した場合は2番目の条件を満たさなくてもよいです。最後のフレーズが出現するだけでよいです。</p>
+<p>以下は最後の追加距離として正の数を指定する例です。</p>
+<p>実行例:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;content *NP1,4 &quot;I started .$&quot;&#39;</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">content</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;I started to use Groonga. It&#39;s very fast!&quot;</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="near-phrase-product-search-operator">
+<span id="script-syntax-near-phrase-product-search-operator"></span><h3><span class="section-number">7.13.2.9.6. </span>近傍フレーズ直積検索演算子<a class="headerlink" href="#near-phrase-product-search-operator" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="versionadded">
+<p><span class="versionmodified added">バージョン 11.1.1 で追加.</span></p>
+</div>
+<p>構文は以下のどれかです。:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>column *NPP &quot;(phrase1-1 phrase1-2 ...) (phrase2-1 phrase2-2 ...) ...&quot;
+column *NPP${MAX_INTERVAL} &quot;(phrase1-1 phrase1-2 ...) (phrase2-1 phrase2-2 ...) ...&quot;
+column *NPP${MAX_INTERVAL},${ADDITIONAL_LAST_INTERVAL} &quot;(phrase1-1 phrase1-2 ...) (phrase2-1 phrase2-2 ...) ...&quot;
+</pre></div>
+</div>
+<p>2つめの形式の例は次の通りです。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">column</span> <span class="o">*</span><span class="n">NPP29</span> <span class="s2">&quot;(phrase1-1 phrase1-2 ...) (phrase2-1 phrase2-2 ...) ...&quot;</span>
+<span class="n">column</span> <span class="o">*</span><span class="n">NPP</span><span class="o">-</span><span class="mi">1</span> <span class="s2">&quot;(phrase1-1 phrase1-2 ...) (phrase2-1 phrase2-2 ...) ...&quot;</span>
+</pre></div>
+</div>
+<p>最初の例は近いと判断する最大距離として <code class="docutils literal notranslate"><span class="pre">29</span></code> を使うという意味です。</p>
+<p>2つめの例は近いと判断する最大距離として <code class="docutils literal notranslate"><span class="pre">-1</span></code> を使うという意味です。</p>
+<p>3つめの形式の例は次の通りです。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">column</span> <span class="o">*</span><span class="n">NPP10</span><span class="p">,</span><span class="mi">29</span> <span class="s2">&quot;(phrase1-1 phrase1-2 ...) (phrase2-1 phrase2-2 ...) ...&quot;</span>
+<span class="n">column</span> <span class="o">*</span><span class="n">NPP10</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span> <span class="s2">&quot;(phrase1-1 phrase1-2 ...) (phrase2-1 phrase2-2 ...) ...&quot;</span>
+</pre></div>
+</div>
+<p>最初の例は最後の追加距離として <code class="docutils literal notranslate"><span class="pre">29</span></code> を使うという意味です。</p>
+<p>2つめの例は最後の追加距離として <code class="docutils literal notranslate"><span class="pre">-1</span></code> を使うという意味です。</p>
+<p>この演算子は複数の <a class="reference internal" href="#script-syntax-near-phrase-search-operator"><span class="std std-ref">近傍フレーズ検索演算子</span></a> を使います。各 <a class="reference internal" href="#script-syntax-near-phrase-search-operator"><span class="std std-ref">近傍フレーズ検索演算子</span></a> が使うフレーズ群は <code class="docutils literal notranslate"><span class="pre">{フレーズ1-1,</span> <span class="pre">フレーズ1-2,</span> <span class="pre">...}</span></code> と <code class="docutils literal notranslate"><span class="pre">{フレーズ2-1,</span> <span class="pre">フレーズ2-2,</span> <span class="pre">...}</span></code> と <code class="docutils literal notranslate"><span class="pre">...</span></code> の直積として計算します。たとえば、 <code class="docutils literal notranslate"><span class="pre">column</span> <span class="pre">*NPP</span> <span class="pre">&quot;(a</span> <span class="pre">b</span> <span class="pre">c)</span> <span class="pre">(d</span> <span class="pre">e)&quot;</span></code> は以下のフレーズ群のリストで近傍フレーズ検索をします。</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">d</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">e</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">b</span> <span class="pre">d</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">b</span> <span class="pre">e</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">c</span> <span class="pre">d</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">c</span> <span class="pre">e</span></code></p></li>
+</ul>
+<p>以下は簡単な使用例です。</p>
+<p>実行例:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> \
+  <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;content *NPP &quot;(I It) (migrated fast)&quot;&#39;</span> \
+  <span class="o">--</span><span class="n">output_columns</span> <span class="n">content</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         4</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;I started to use Groonga. It&#39;s very fast!&quot;</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;I also started to use Mroonga. It&#39;s also very fast! Really fast!&quot;</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;I migrated all Senna system!&quot;</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;I also migrated all Tritonn system!&quot;</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
+</pre></div>
+</div>
+<p>最大距離や <code class="docutils literal notranslate"><span class="pre">$</span></code> による最後のフレーズ指定や最後の追加距離など <a class="reference internal" href="#script-syntax-near-phrase-search-operator"><span class="std std-ref">近傍フレーズ検索演算子</span></a> のすべての機能を使うことができます。</p>
+<p>実行例:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> \
+  <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;content *NPP2,-1 &quot;(I It) (migrated fast) (.$)&quot;&#39;</span> \
+  <span class="o">--</span><span class="n">output_columns</span> <span class="n">content</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], [[[0], [[&quot;content&quot;, &quot;Text&quot;]]]]]</span>
+</pre></div>
+</div>
+<p>これは複数の <a class="reference internal" href="#script-syntax-near-phrase-search-operator"><span class="std std-ref">近傍フレーズ検索演算子</span></a> よりも効率的です。</p>
+</div>
+<div class="section" id="ordered-near-phrase-search-operator">
+<span id="script-syntax-ordered-near-phrase-search-operator"></span><h3><span class="section-number">7.13.2.9.7. </span>順序付き近傍フレーズ検索演算子<a class="headerlink" href="#ordered-near-phrase-search-operator" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="versionadded">
+<p><span class="versionmodified added">バージョン 11.0.9 で追加.</span></p>
+</div>
+<p>構文は以下のどれかです。:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>column *ONP &quot;phrase1 phrase2 ...&quot;
+column *ONP${MAX_INTERVAL} &quot;phrase1 phrase2 ...&quot;
+column *ONP${MAX_INTERVAL},${ADDITIONAL_LAST_INTERVAL} &quot;phrase1 phrase2 ...&quot;
+</pre></div>
+</div>
+<p>2つめの形式の例は次の通りです。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">column</span> <span class="o">*</span><span class="n">ONP29</span> <span class="s2">&quot;phrase1 phrase2 ...&quot;</span>
+<span class="n">column</span> <span class="o">*</span><span class="n">ONP</span><span class="o">-</span><span class="mi">1</span> <span class="s2">&quot;phrase1 phrase2 ...&quot;</span>
+</pre></div>
+</div>
+<p>最初の例は近いと判断する最大距離として <code class="docutils literal notranslate"><span class="pre">29</span></code> を使うという意味です。</p>
+<p>2つめの例は近いと判断する最大距離として <code class="docutils literal notranslate"><span class="pre">-1</span></code> を使うという意味です。</p>
+<p>3つめの形式の例は次の通りです。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">column</span> <span class="o">*</span><span class="n">ONP10</span><span class="p">,</span><span class="mi">29</span> <span class="s2">&quot;phrase1 phrase2 ...&quot;</span>
+<span class="n">column</span> <span class="o">*</span><span class="n">ONP10</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span> <span class="s2">&quot;phrase1 phrase2 ...&quot;</span>
+</pre></div>
+</div>
+<p>最初の例は最後の追加距離として <code class="docutils literal notranslate"><span class="pre">29</span></code> を使うという意味です。</p>
+<p>2つめの例は最後の追加距離として <code class="docutils literal notranslate"><span class="pre">-1</span></code> を使うという意味です。</p>
+<p>この演算子は <code class="docutils literal notranslate"><span class="pre">フレーズ1</span></code> と <code class="docutils literal notranslate"><span class="pre">フレーズ2</span></code> と <code class="docutils literal notranslate"><span class="pre">...</span></code> で順序付き近傍フレーズ検索をします。順序付き近傍フレーズ検索は <a class="reference internal" href="#script-syntax-near-phrase-search-operator"><span class="std std-ref">近傍フレーズ検索演算子</span></a> と似ていますが順序付き近傍フレーズ検索はフレーズの順番をチェックします。たとえば、 <code class="docutils literal notranslate"><span class="pre">column</span> <span class="pre">*ONP</span> <span class="pre">&quot;groonga</span> <span class="pre">mroonga</span> <span class="pre">pgroonga&quot;</span></code> は <code class="docutils literal notranslate"><span class="pre">groonga</span> <span class="pre">mroonga</span> <span class="pre">rroonga</span> <span class="pre">pgroonga</span></code> にマッチしますが <code class="docutils literal notranslate"><span class="pre">groonga</span> <span class="pre">rroonga</span> <span class="pre">pgroonga</span> <span class="pre">mroonga</span></code> にはマッチしません。なぜなら後者は順序が違うからです。</p>
+<p>以下は簡単な使用例です。</p>
+<p>実行例:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> \
+  <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;content *ONP &quot;I Groonga&quot;&#39;</span> \
+  <span class="o">--</span><span class="n">output_columns</span> <span class="n">content</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;I started to use Groonga. It&#39;s very fast!&quot;</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
+<span class="n">select</span> <span class="n">Entries</span> \
+  <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;content *ONP &quot;Groonga I&quot;&#39;</span> \
+  <span class="o">--</span><span class="n">output_columns</span> <span class="n">content</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], [[[0], [[&quot;content&quot;, &quot;Text&quot;]]]]]</span>
+</pre></div>
+</div>
+<p>最大距離や最後の追加距離といった <a class="reference internal" href="#script-syntax-near-phrase-search-operator"><span class="std std-ref">近傍フレーズ検索演算子</span></a> のすべての機能を使えます。しかし、最後のフレーズに <code class="docutils literal notranslate"><span class="pre">$</span></code> を指定する必要はありません。クエリー内の最後のフレーズが最後のフレーズになるからです。</p>
+</div>
+<div class="section" id="ordered-near-phrase-product-search-operator">
+<span id="script-syntax-ordered-near-phrase-product-search-operator"></span><h3><span class="section-number">7.13.2.9.8. </span>順序付き近傍フレーズ直積検索演算子<a class="headerlink" href="#ordered-near-phrase-product-search-operator" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="versionadded">
+<p><span class="versionmodified added">バージョン 11.1.1 で追加.</span></p>
+</div>
+<p>構文は以下のどれかです。:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>column *ONPP &quot;(phrase1-1 phrase1-2 ...) (phrase2-1 phrase2-2 ...) ...&quot;
+column *ONPP${MAX_INTERVAL} &quot;(phrase1-1 phrase1-2 ...) (phrase2-1 phrase2-2 ...) ...&quot;
+column *ONPP${MAX_INTERVAL},${ADDITIONAL_LAST_INTERVAL} &quot;(phrase1-1 phrase1-2 ...) (phrase2-1 phrase2-2 ...) ...&quot;
+</pre></div>
+</div>
+<p>2つめの形式の例は次の通りです。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">column</span> <span class="o">*</span><span class="n">ONPP29</span> <span class="s2">&quot;(phrase1-1 phrase1-2 ...) (phrase2-1 phrase2-2 ...) ...&quot;</span>
+<span class="n">column</span> <span class="o">*</span><span class="n">ONPP</span><span class="o">-</span><span class="mi">1</span> <span class="s2">&quot;(phrase1-1 phrase1-2 ...) (phrase2-1 phrase2-2 ...) ...&quot;</span>
+</pre></div>
+</div>
+<p>最初の例は近いと判断する最大距離として <code class="docutils literal notranslate"><span class="pre">29</span></code> を使うという意味です。</p>
+<p>2つめの例は近いと判断する最大距離として <code class="docutils literal notranslate"><span class="pre">-1</span></code> を使うという意味です。</p>
+<p>3つめの形式の例は次の通りです。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">column</span> <span class="o">*</span><span class="n">ONPP10</span><span class="p">,</span><span class="mi">29</span> <span class="s2">&quot;(phrase1-1 phrase1-2 ...) (phrase2-1 phrase2-2 ...) ...&quot;</span>
+<span class="n">column</span> <span class="o">*</span><span class="n">ONPP10</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span> <span class="s2">&quot;(phrase1-1 phrase1-2 ...) (phrase2-1 phrase2-2 ...) ...&quot;</span>
+</pre></div>
+</div>
+<p>最初の例は最後の追加距離として <code class="docutils literal notranslate"><span class="pre">29</span></code> を使うという意味です。</p>
+<p>2つめの例は最後の追加距離として <code class="docutils literal notranslate"><span class="pre">-1</span></code> を使うという意味です。</p>
+<p>この演算子は順序付き近傍フレーズ直積検索をします。順序付き近傍フレーズ直積検索は <a class="reference internal" href="#script-syntax-near-phrase-product-search-operator"><span class="std std-ref">近傍フレーズ直積検索演算子</span></a> と似ていますが、順序付き近傍フレーズ直積検索はフレーズの順序をチェックします。たとえば、 <code class="docutils literal notranslate"><span class="pre">column</span> <span class="pre">*ONPP</span> <span class="pre">&quot;(a</span> <span class="pre">b</span> <span class="pre">c)</span> <span class="pre">(d</span> <span class="pre">e)&quot;</span></code> は <code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">1</span> <span class="pre">d</span></code> にマッチしますが、 <code class="docutils literal notranslate"><span class="pre">d</span> <span class="pre">1</span> <span class="pre">a</span></code> にはマッチしません。なぜなら後者は順序が違うからです。</p>
+<p>以下は簡単な使用例です。</p>
+<p>実行例:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> \
+  <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;content *ONPP &quot;(I It) (migrated fast) (.)&quot;&#39;</span> \
+  <span class="o">--</span><span class="n">output_columns</span> <span class="n">content</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], [[[0], [[&quot;content&quot;, &quot;Text&quot;]]]]]</span>
+</pre></div>
+</div>
+<p>最大距離や最後の追加距離といった <a class="reference internal" href="#script-syntax-near-phrase-search-operator"><span class="std std-ref">近傍フレーズ検索演算子</span></a> のすべての機能を使えます。しかし、最後のフレーズに <code class="docutils literal notranslate"><span class="pre">$</span></code> を指定する必要はありません。クエリー内の最後のフレーズが最後のフレーズになるからです。</p>
+</div>
+<div class="section" id="similar-search-operator">
+<span id="script-syntax-similar-search-operator"></span><h3><span class="section-number">7.13.2.9.9. </span>類似文書検索演算子<a class="headerlink" href="#similar-search-operator" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <p>構文は <code class="docutils literal notranslate"><span class="pre">column</span> <span class="pre">*S</span> <span class="pre">&quot;document&quot;</span></code> です。</p>
 <p>この演算子は <code class="docutils literal notranslate"><span class="pre">document</span></code> という文書で類似文書検索します。類似文書検索は <code class="docutils literal notranslate"><span class="pre">document</span></code> と似た内容を持つレコードを検索します。</p>
 <p><code class="docutils literal notranslate"><span class="pre">column</span></code> 用の全文検索用インデックスカラムを定義しておく必要があることに注意してください。</p>
@@ -4808,7 +5135,7 @@ tokenizer to show difference with near search with English text.</p>
 <p>日本語の文書に対して類似文書検索を行う場合は、 <code class="docutils literal notranslate"><span class="pre">TokenMecab</span></code> を使う方が良いです。<code class="docutils literal notranslate"><span class="pre">TokenMecab</span></code> は、対象の文書をほぼ単語にトークナイズするので、類似文書検索の精度が向上するためです。</p>
 </div>
 <div class="section" id="term-extract-operator">
-<span id="script-syntax-term-extract-operator"></span><h3><span class="section-number">7.13.2.9.7. </span>単語抽出演算子<a class="headerlink" href="#term-extract-operator" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<span id="script-syntax-term-extract-operator"></span><h3><span class="section-number">7.13.2.9.10. </span>単語抽出演算子<a class="headerlink" href="#term-extract-operator" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <p>構文は <code class="docutils literal notranslate"><span class="pre">_key</span> <span class="pre">*T</span> <span class="pre">&quot;document&quot;</span></code> です。</p>
 <p>この演算子は <code class="docutils literal notranslate"><span class="pre">document</span></code> から単語を抽出します。単語は <code class="docutils literal notranslate"><span class="pre">_key</span></code> のテーブルのキーとして登録されていなければいけません。</p>
 <p>テーブルはパトリシアトライ（ <code class="docutils literal notranslate"><span class="pre">TABLE_PAT_KEY</span></code> ）またはダブル配列トライ（ <code class="docutils literal notranslate"><span class="pre">TABLE_DAT_KEY</span></code> ）でなければいけません。ハッシュテーブル（ <code class="docutils literal notranslate"><span class="pre">TABLE_HASH_KEY</span></code> ）や配列（ <code class="docutils literal notranslate"><span class="pre">TABLE_NO_KEY</span></code> ）は最長共通接頭辞検索（Longest Common Prefix Search）できないため使えません。この演算子は最長共通接頭辞検索を使っています。</p>
@@ -4856,7 +5183,7 @@ tokenizer to show difference with near search with English text.</p>
 <p>この式は文書 <code class="docutils literal notranslate"><span class="pre">Groonga</span> <span class="pre">is</span> <span class="pre">the</span> <span class="pre">successor</span> <span class="pre">project</span> <span class="pre">to</span> <span class="pre">Senna.</span></code> に含まれている単語を抽出します。今回は <code class="docutils literal notranslate"><span class="pre">Words</span></code> に <code class="docutils literal notranslate"><span class="pre">NormalizerAuto</span></code> ノーマライザーが指定されています。そのため、 <code class="docutils literal notranslate"><span class="pre">Words</span></code> には <code class="docutils literal notranslate"><span class="pre">groonga</span></code> とロードしていますが <code class="docutils literal notranslate"><span class="pre">Groonga</span></code> も抽出できています。また、すべてての抽出された単語も正規化されています。</p>
 </div>
 <div class="section" id="regular-expression-operator">
-<span id="script-syntax-regular-expression-operator"></span><h3><span class="section-number">7.13.2.9.8. </span>正規表現演算子<a class="headerlink" href="#regular-expression-operator" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<span id="script-syntax-regular-expression-operator"></span><h3><span class="section-number">7.13.2.9.11. </span>正規表現演算子<a class="headerlink" href="#regular-expression-operator" title="このヘッドラインへのパーマリンク">¶</a></h3>
 <div class="versionadded">
 <p><span class="versionmodified added">バージョン 5.0.1 で追加.</span></p>
 </div>

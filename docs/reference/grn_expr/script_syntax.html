@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>7.13.2. Script syntax &#8212; Groonga v12.0.0 documentation</title>
+    <title>7.13.2. Script syntax &#8212; Groonga v12.0.1 documentation</title>
     
     <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 <link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -170,7 +170,7 @@ function checkPageExistsAndRedirect(event) {
             node.onclick = checkPageExistsAndRedirect;
             $("#version_switcher_menu").append(node);
             // replace dropdown button text with the preferred display name of
-            // this version, rather than using sphinx's 12.0.0 variable.
+            // this version, rather than using sphinx's 12.0.1 variable.
             // also highlight the dropdown entry for the currently-viewed
             // version's entry
             if (entry.version == "English") {
@@ -4794,6 +4794,7 @@ with the expression.</p>
 <p>Its syntax is one of them:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>column *N &quot;word1 word2 ...&quot;
 column *N${MAX_INTERVAL} &quot;word1 word2 ...&quot;
+column *N${MAX_INTERVAL},${MAX_TOKEN_INTERVAL_1}|${MAX_TOKEN_INTERVAL_2}|... &quot;word1 word2 ...&quot;
 </pre></div>
 </div>
 <p>Here are the examples of the second form:</p>
@@ -4804,6 +4805,19 @@ column *N${MAX_INTERVAL} &quot;word1 word2 ...&quot;
 <p>The first example means that <code class="docutils literal notranslate"><span class="pre">29</span></code> is used for the max interval.</p>
 <p>The second example means that <code class="docutils literal notranslate"><span class="pre">-1</span></code> is used for the max interval.
 <code class="docutils literal notranslate"><span class="pre">-1</span></code> max interval means no limit.</p>
+<p>Here are examples of the third form:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">column</span> <span class="o">*</span><span class="n">N10</span><span class="p">,</span><span class="mi">2</span><span class="o">|</span><span class="mi">3</span> <span class="s2">&quot;word1 word2 word3&quot;</span>
+<span class="n">column</span> <span class="o">*</span><span class="n">N10</span><span class="p">,</span><span class="mi">2</span> <span class="s2">&quot;word1 word2 word3&quot;</span>
+</pre></div>
+</div>
+<p>The first example means that <code class="docutils literal notranslate"><span class="pre">2</span></code> is used for the max interval of the
+first interval and <code class="docutils literal notranslate"><span class="pre">3</span></code> is used for the max interval of the second
+interval.</p>
+<p>The second example means that <code class="docutils literal notranslate"><span class="pre">2</span></code> is used for the first max interval
+of the first interval and <code class="docutils literal notranslate"><span class="pre">-1</span></code> is used for the max interval of the
+second interval. Because the omitted max interval is treated as
+<code class="docutils literal notranslate"><span class="pre">-1</span></code>.</p>
+<p>The max intervals of each token (word) are described later.</p>
 <p>The operator does near search with words <code class="docutils literal notranslate"><span class="pre">word1</span> <span class="pre">word2</span> <span class="pre">...</span></code>. Near
 search searches records that contain the words and the words are
 appeared in the specified order and the max interval.</p>
@@ -4886,6 +4900,266 @@ record that its content is <code class="docutils literal notranslate"><span clas
 the record that its content is <code class="docutils literal notranslate"><span class="pre">I</span> <span class="pre">also</span> <span class="pre">st</span> <span class="pre">arted</span> <span class="pre">to</span> <span class="pre">use</span> <span class="pre">mroonga.</span> <span class="pre">It's</span>
 <span class="pre">also</span> <span class="pre">very</span> <span class="pre">fast!</span> <span class="pre">Really</span> <span class="pre">fast!</span></code> is matched. The number of words between
 <code class="docutils literal notranslate"><span class="pre">also</span></code> and <code class="docutils literal notranslate"><span class="pre">Really</span></code> is 10.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 12.0.1: </span>The max intervals of each token.</p>
+</div>
+<p>You can specify the max intervals of each token. The default is no
+limit. It means that all intervals of each token are valid as long as
+the max interval is satisfied.</p>
+<p>Here is an example that use <code class="docutils literal notranslate"><span class="pre">2</span></code> for the max interval of the first
+interval and <code class="docutils literal notranslate"><span class="pre">4</span></code> for the max interval of the second interval:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">content</span> <span class="o">*</span><span class="n">N10</span><span class="p">,</span><span class="mi">2</span><span class="o">|</span><span class="mi">4</span> <span class="s2">&quot;a b c&quot;</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">10</span></code> is the max interval.</p>
+<p><code class="docutils literal notranslate"><span class="pre">|</span></code> is the separator of the max intervals of each token.</p>
+<p>This matches <code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">x</span> <span class="pre">b</span> <span class="pre">x</span> <span class="pre">x</span> <span class="pre">x</span> <span class="pre">c</span></code>. But this doesn’t match <code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">x</span> <span class="pre">x</span> <span class="pre">b</span> <span class="pre">c</span></code>,
+<code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">b</span> <span class="pre">x</span> <span class="pre">x</span> <span class="pre">x</span> <span class="pre">x</span> <span class="pre">c</span></code> and so on because the former has <code class="docutils literal notranslate"><span class="pre">3</span></code> interval for
+the first interval that is larger than <code class="docutils literal notranslate"><span class="pre">2</span></code> and the latter has <code class="docutils literal notranslate"><span class="pre">5</span></code>
+interval for the second interval that is later than <code class="docutils literal notranslate"><span class="pre">4</span></code>.</p>
+<p>Here is an example that specifies the max intervals of each token:</p>
+<p>Execution example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;content *N11,5|3 &quot;first welcome post&quot;&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1,</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         &quot;Welcome! This is my first post!&quot;,</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
+<span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;content *N11,4|3 &quot;first welcome post&quot;&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         0</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
+</pre></div>
+</div>
+<p>You can omit one or more intervals. Omitted intervals are treated as
+<code class="docutils literal notranslate"><span class="pre">-1</span></code>. It means that <code class="docutils literal notranslate"><span class="pre">*N11,5</span></code> equals <code class="docutils literal notranslate"><span class="pre">*N11,5|-1</span></code>. <code class="docutils literal notranslate"><span class="pre">-1</span></code> means
+that no limit.</p>
+<p>Here is an example that omits an interval:</p>
+<p>Execution example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;content *N11,5 &quot;first welcome post&quot;&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1,</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         &quot;Welcome! This is my first post!&quot;,</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
+<span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;content *N11,5|-1 &quot;first welcome post&quot;&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1,</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         &quot;Welcome! This is my first post!&quot;,</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
+</pre></div>
+</div>
+<p>You can specify extra intervals. They are just ignored:</p>
+<p>Execution example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;content *N11,5|6|1|2|3 &quot;first welcome post&quot;&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1,</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         &quot;Welcome! This is my first post!&quot;,</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
+<span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;content *N11,5|6 &quot;first welcome post&quot;&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1,</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         &quot;Welcome! This is my first post!&quot;,</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="near-phrase-search-operator">
 <span id="script-syntax-near-phrase-search-operator"></span><h3><span class="section-number">7.13.2.9.5. </span>Near phrase search operator<a class="headerlink" href="#near-phrase-search-operator" title="Permalink to this headline">¶</a></h3>
@@ -4893,6 +5167,7 @@ the record that its content is <code class="docutils literal notranslate"><span 
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>column *NP &quot;phrase1 phrase2 ...&quot;
 column *NP${MAX_INTERVAL} &quot;phrase1 phrase2 ...&quot;
 column *NP${MAX_INTERVAL},${ADDITIONAL_LAST_INTERVAL} &quot;phrase1 phrase2 ...&quot;
+column *NP${MAX_INTERVAL},${ADDITIONAL_LAST_INTERVAL},${MAX_PHRASE_INTERVAL_1}|${MAX_PHRASE_INTERVAL_2}|... &quot;phrase1 phrase2 ...&quot;
 </pre></div>
 </div>
 <p>Here are examples of the second form:</p>
@@ -4913,6 +5188,23 @@ interval.</p>
 <p>The second example means that <code class="docutils literal notranslate"><span class="pre">-1</span></code> is used for the additional last
 interval.</p>
 <p>The additional last interval is described later.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 12.0.1: </span>The max intervals of each phrase.</p>
+</div>
+<p>Here are examples of the forth form:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">column</span> <span class="o">*</span><span class="n">NP10</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="o">|</span><span class="mi">3</span> <span class="s2">&quot;phrase1 phrase2 phrase3&quot;</span>
+<span class="n">column</span> <span class="o">*</span><span class="n">NP10</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span> <span class="s2">&quot;phrase1 phrase2 phrase3&quot;</span>
+</pre></div>
+</div>
+<p>The first example means that <code class="docutils literal notranslate"><span class="pre">2</span></code> is used for the max interval of the
+first interval and <code class="docutils literal notranslate"><span class="pre">3</span></code> is used for the max interval of the second
+interval.</p>
+<p>The second example means that <code class="docutils literal notranslate"><span class="pre">2</span></code> is used for the first max interval
+of the first interval and <code class="docutils literal notranslate"><span class="pre">-1</span></code> is used for the max interval of the
+second interval. Because the omitted max interval is treated as
+<code class="docutils literal notranslate"><span class="pre">-1</span></code>.</p>
+<p>See <a class="reference internal" href="#script-syntax-near-phrase-search-operator"><span class="std std-ref">Near phrase search operator</span></a> for the max
+intervals of each phrase.</p>
 <p>The operator does near phrase search with phrases <code class="docutils literal notranslate"><span class="pre">phrase1</span> <span class="pre">phrase2</span>
 <span class="pre">...</span></code>. Near phrase search searches records that contain the phrases
 and the phrases are appeared in the specified order and the max
@@ -5149,6 +5441,7 @@ needed.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>column *NPP &quot;(phrase1-1 phrase1-2 ...) (phrase2-1 phrase2-2 ...) ...&quot;
 column *NPP${MAX_INTERVAL} &quot;(phrase1-1 phrase1-2 ...) (phrase2-1 phrase2-2 ...) ...&quot;
 column *NPP${MAX_INTERVAL},${ADDITIONAL_LAST_INTERVAL} &quot;(phrase1-1 phrase1-2 ...) (phrase2-1 phrase2-2 ...) ...&quot;
+column *NPP${MAX_INTERVAL},${ADDITIONAL_LAST_INTERVAL},${MAX_PHRASE_INTERVAL_1}|${MAX_PHRASE_INTERVAL_2}|... &quot;(phrase1-1 phrase1-2 ...) (phrase2-1 phrase2-2 ...) ...&quot;
 </pre></div>
 </div>
 <p>Here are examples of the second form:</p>
@@ -5167,6 +5460,23 @@ column *NPP${MAX_INTERVAL},${ADDITIONAL_LAST_INTERVAL} &quot;(phrase1-1 phrase1-
 interval.</p>
 <p>The second example means that <code class="docutils literal notranslate"><span class="pre">-1</span></code> is used for the additional last
 interval.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 12.0.1: </span>The max intervals of each phrase.</p>
+</div>
+<p>Here are examples of the forth form:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">column</span> <span class="o">*</span><span class="n">NPP10</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="o">|</span><span class="mi">3</span> <span class="s2">&quot;(phrase1-1 phrase1-2 ...) (phrase2-1 phrase2-2 ...) (phrase3-1 phrase3-2 ...)&quot;</span>
+<span class="n">column</span> <span class="o">*</span><span class="n">NPP10</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span> <span class="s2">&quot;(phrase1-1 phrase1-2 ...) (phrase2-1 phrase2-2 ...) (phrase3-1 phrase3-2 ...)&quot;</span>
+</pre></div>
+</div>
+<p>The first example means that <code class="docutils literal notranslate"><span class="pre">2</span></code> is used for the max interval of the
+first interval and <code class="docutils literal notranslate"><span class="pre">3</span></code> is used for the max interval of the second
+interval.</p>
+<p>The second example means that <code class="docutils literal notranslate"><span class="pre">2</span></code> is used for the first max interval
+of the first interval and <code class="docutils literal notranslate"><span class="pre">-1</span></code> is used for the max interval of the
+second interval. Because the omitted max interval is treated as
+<code class="docutils literal notranslate"><span class="pre">-1</span></code>.</p>
+<p>See <a class="reference internal" href="#script-syntax-near-phrase-search-operator"><span class="std std-ref">Near phrase search operator</span></a> for the max
+intervals of each phrase.</p>
 <p>This operator does multiple
 <a class="reference internal" href="#script-syntax-near-phrase-search-operator"><span class="std std-ref">Near phrase search operator</span></a>. Phrases for each
 <a class="reference internal" href="#script-syntax-near-phrase-search-operator"><span class="std std-ref">Near phrase search operator</span></a> are computed as
@@ -5242,6 +5552,7 @@ interval, <code class="docutils literal notranslate"><span class="pre">$</span><
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>column *ONP &quot;phrase1 phrase2 ...&quot;
 column *ONP${MAX_INTERVAL} &quot;phrase1 phrase2 ...&quot;
 column *ONP${MAX_INTERVAL},${ADDITIONAL_LAST_INTERVAL} &quot;phrase1 phrase2 ...&quot;
+column *ONP${MAX_INTERVAL},${ADDITIONAL_LAST_INTERVAL},${MAX_PHRASE_INTERVAL_1}|${MAX_PHRASE_INTERVAL_2}|... &quot;phrase1 phrase2 ...&quot;
 </pre></div>
 </div>
 <p>Here are examples of the second form:</p>
@@ -5260,6 +5571,23 @@ column *ONP${MAX_INTERVAL},${ADDITIONAL_LAST_INTERVAL} &quot;phrase1 phrase2 ...
 interval.</p>
 <p>The second example means that <code class="docutils literal notranslate"><span class="pre">-1</span></code> is used for the additional last
 interval.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 12.0.1: </span>The max intervals of each phrase.</p>
+</div>
+<p>Here are examples of the forth form:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">column</span> <span class="o">*</span><span class="n">ONP10</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="o">|</span><span class="mi">3</span> <span class="s2">&quot;phrase1 phrase2 phrase3&quot;</span>
+<span class="n">column</span> <span class="o">*</span><span class="n">ONP10</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span> <span class="s2">&quot;phrase1 phrase2 phrase3&quot;</span>
+</pre></div>
+</div>
+<p>The first example means that <code class="docutils literal notranslate"><span class="pre">2</span></code> is used for the max interval of the
+first interval and <code class="docutils literal notranslate"><span class="pre">3</span></code> is used for the max interval of the second
+interval.</p>
+<p>The second example means that <code class="docutils literal notranslate"><span class="pre">2</span></code> is used for the first max interval
+of the first interval and <code class="docutils literal notranslate"><span class="pre">-1</span></code> is used for the max interval of the
+second interval. Because the omitted max interval is treated as
+<code class="docutils literal notranslate"><span class="pre">-1</span></code>.</p>
+<p>See <a class="reference internal" href="#script-syntax-near-phrase-search-operator"><span class="std std-ref">Near phrase search operator</span></a> for the max
+intervals of each phrase.</p>
 <p>This operator does ordered near phrase search with <code class="docutils literal notranslate"><span class="pre">phrase1</span></code>,
 <code class="docutils literal notranslate"><span class="pre">phrase2</span></code> and <code class="docutils literal notranslate"><span class="pre">...</span></code>. Ordered near phrase search is similar to
 <a class="reference internal" href="#script-syntax-near-phrase-search-operator"><span class="std std-ref">Near phrase search operator</span></a> but ordered near
@@ -5316,6 +5644,7 @@ the last phrase.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>column *ONPP &quot;(phrase1-1 phrase1-2 ...) (phrase2-1 phrase2-2 ...) ...&quot;
 column *ONPP${MAX_INTERVAL} &quot;(phrase1-1 phrase1-2 ...) (phrase2-1 phrase2-2 ...) ...&quot;
 column *ONPP${MAX_INTERVAL},${ADDITIONAL_LAST_INTERVAL} &quot;(phrase1-1 phrase1-2 ...) (phrase2-1 phrase2-2 ...) ...&quot;
+column *ONPP${MAX_INTERVAL},${ADDITIONAL_LAST_INTERVAL},${MAX_PHRASE_INTERVAL_1}|${MAX_PHRASE_INTERVAL_2}|... &quot;(phrase1-1 phrase1-2 ...) (phrase2-1 phrase2-2 ...) ...&quot;
 </pre></div>
 </div>
 <p>Here are examples of the second form:</p>
@@ -5334,6 +5663,23 @@ column *ONPP${MAX_INTERVAL},${ADDITIONAL_LAST_INTERVAL} &quot;(phrase1-1 phrase1
 interval.</p>
 <p>The second example means that <code class="docutils literal notranslate"><span class="pre">-1</span></code> is used for the additional last
 interval.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 12.0.1: </span>The max intervals of each phrase.</p>
+</div>
+<p>Here are examples of the forth form:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">column</span> <span class="o">*</span><span class="n">ONPP10</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="o">|</span><span class="mi">3</span> <span class="s2">&quot;(phrase1-1 phrase1-2 ...) (phrase2-1 phrase2-2 ...) (phrase3-1 phrase3-2 ...)&quot;</span>
+<span class="n">column</span> <span class="o">*</span><span class="n">ONPP10</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span> <span class="s2">&quot;(phrase1-1 phrase1-2 ...) (phrase2-1 phrase2-2 ...) (phrase3-1 phrase3-2 ...)&quot;</span>
+</pre></div>
+</div>
+<p>The first example means that <code class="docutils literal notranslate"><span class="pre">2</span></code> is used for the max interval of the
+first interval and <code class="docutils literal notranslate"><span class="pre">3</span></code> is used for the max interval of the second
+interval.</p>
+<p>The second example means that <code class="docutils literal notranslate"><span class="pre">2</span></code> is used for the first max interval
+of the first interval and <code class="docutils literal notranslate"><span class="pre">-1</span></code> is used for the max interval of the
+second interval. Because the omitted max interval is treated as
+<code class="docutils literal notranslate"><span class="pre">-1</span></code>.</p>
+<p>See <a class="reference internal" href="#script-syntax-near-phrase-search-operator"><span class="std std-ref">Near phrase search operator</span></a> for the max
+intervals of each phrase.</p>
 <p>This operator does ordered near phrase product search. Ordered near
 phrase product search is similar to
 <a class="reference internal" href="#script-syntax-near-phrase-product-search-operator"><span class="std std-ref">Near phrase product search operator</span></a> but ordered

@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>7.13.2. スクリプト構文 &#8212; Groonga v12.0.0ドキュメント</title>
+    <title>7.13.2. スクリプト構文 &#8212; Groonga v12.0.1ドキュメント</title>
     
     <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 <link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -171,7 +171,7 @@ function checkPageExistsAndRedirect(event) {
             node.onclick = checkPageExistsAndRedirect;
             $("#version_switcher_menu").append(node);
             // replace dropdown button text with the preferred display name of
-            // this version, rather than using sphinx's 12.0.0 variable.
+            // this version, rather than using sphinx's 12.0.1 variable.
             // also highlight the dropdown entry for the currently-viewed
             // version's entry
             if (entry.version == "日本語") {
@@ -4632,6 +4632,7 @@ function checkPageExistsAndRedirect(event) {
 <p>構文は以下のどれかです。:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>column *N &quot;word1 word2 ...&quot;
 column *N${MAX_INTERVAL} &quot;word1 word2 ...&quot;
+column *N${MAX_INTERVAL},${MAX_TOKEN_INTERVAL_1}|${MAX_TOKEN_INTERVAL_2}|... &quot;word1 word2 ...&quot;
 </pre></div>
 </div>
 <p>2つめの形式の例は次の通りです。</p>
@@ -4641,6 +4642,14 @@ column *N${MAX_INTERVAL} &quot;word1 word2 ...&quot;
 </div>
 <p>最初の例は近いと判断する最大距離として <code class="docutils literal notranslate"><span class="pre">29</span></code> を使うという意味です。</p>
 <p>2つめの例は近いと判断する最大距離として <code class="docutils literal notranslate"><span class="pre">-1</span></code> を使うという意味です。 <code class="docutils literal notranslate"><span class="pre">-1</span></code> はどれだけ離れていてもよいという意味です。</p>
+<p>3つめの形式の例は次の通りです。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">column</span> <span class="o">*</span><span class="n">N10</span><span class="p">,</span><span class="mi">2</span><span class="o">|</span><span class="mi">3</span> <span class="s2">&quot;word1 word2 word3&quot;</span>
+<span class="n">column</span> <span class="o">*</span><span class="n">N10</span><span class="p">,</span><span class="mi">2</span> <span class="s2">&quot;word1 word2 word3&quot;</span>
+</pre></div>
+</div>
+<p>最初の例は最初のトークン間の最大距離として <code class="docutils literal notranslate"><span class="pre">2</span></code> を使い、2番目のトークン間の最大距離として <code class="docutils literal notranslate"><span class="pre">3</span></code> を使うという意味です。</p>
+<p>2番目の例は最初のトークン間の最大距離として <code class="docutils literal notranslate"><span class="pre">2</span></code> を使い、2番目のトークン間の最大距離として <code class="docutils literal notranslate"><span class="pre">-1</span></code> を使うという意味です。なぜなら省略された最大距離は <code class="docutils literal notranslate"><span class="pre">-1</span></code> として処理されるからです。</p>
+<p>トークン（単語）間の最大距離は後で説明します。</p>
 <p>この演算子は <code class="docutils literal notranslate"><span class="pre">word1</span> <span class="pre">word2</span> <span class="pre">...</span></code> という単語で近傍検索します。近傍検索はすべての単語が含まれていてかつそれぞれが指定した順番で出現していてかつそれぞれの単語が指定した距離以内にあるレコードを検索します。</p>
 <p>近いと判断する最大距離のデフォルトは <code class="docutils literal notranslate"><span class="pre">10</span></code> です。距離の単位はN-gram系のトークナイザーでは文字数で、形態素解析系のトークナイザーでは単語数です。</p>
 <p>しかし、<code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code> はASCIIだけの単語はトークンに分割しません。このケースでは、 <code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code> はASCIIの文字には空白区切りのようなトークナイズ方法を使うためです。</p>
@@ -4703,6 +4712,258 @@ column *N${MAX_INTERVAL} &quot;word1 word2 ...&quot;
 <p>最初の式は <code class="docutils literal notranslate"><span class="pre">I</span></code> と <code class="docutils literal notranslate"><span class="pre">fast</span></code> が含まれていて、かつ、これらの単語が10単語以内近くにあるレコードにマッチします。そのため <code class="docutils literal notranslate"><span class="pre">I</span> <span class="pre">also</span> <span class="pre">started</span> <span class="pre">to</span> <span class="pre">use</span> <span class="pre">mroonga.</span> <span class="pre">It's</span> <span class="pre">also</span> <span class="pre">very</span> <span class="pre">fast!</span> <span class="pre">...</span></code> にマッチします。 <code class="docutils literal notranslate"><span class="pre">I</span></code> と <code class="docutils literal notranslate"><span class="pre">fast</span></code> の間の単語数はちょうど10です。</p>
 <p>二番目の式は <code class="docutils literal notranslate"><span class="pre">I</span></code> と <code class="docutils literal notranslate"><span class="pre">Really</span></code> が含まれていて、かつ、これらの単語が10単語以内近くにあるレコードにマッチします。そのため、 <code class="docutils literal notranslate"><span class="pre">I</span> <span class="pre">also</span> <span class="pre">st</span> <span class="pre">arted</span> <span class="pre">to</span> <span class="pre">use</span> <span class="pre">mroonga.</span> <span class="pre">It's</span> <span class="pre">also</span> <span class="pre">very</span> <span class="pre">fast!</span> <span class="pre">Really</span> <span class="pre">fast!</span></code> はマッチしません。 <code class="docutils literal notranslate"><span class="pre">I</span></code> と <code class="docutils literal notranslate"><span class="pre">Really</span></code> の間の単語数は11です。</p>
 <p>三番目の式は <code class="docutils literal notranslate"><span class="pre">also</span></code> と <code class="docutils literal notranslate"><span class="pre">Really</span></code> が含まれていて、かつ、これらの単語が10単語以内近くにあるレコードにマッチします。そのため、 <code class="docutils literal notranslate"><span class="pre">I</span> <span class="pre">also</span> <span class="pre">started</span> <span class="pre">to</span> <span class="pre">use</span> <span class="pre">mroonga.</span> <span class="pre">It's</span> <span class="pre">also</span> <span class="pre">very</span> <span class="pre">fast!</span> <span class="pre">Really</span> <span class="pre">fast!</span></code> にマッチします。 <code class="docutils literal notranslate"><span class="pre">also</span></code> と <code class="docutils literal notranslate"><span class="pre">Really</span></code> の間の単語数は10です。</p>
+<div class="versionadded">
+<p><span class="versionmodified added">バージョン 12.0.1 で追加: </span>各トークン間の最大距離。</p>
+</div>
+<p>各トークン間の最大距離を指定することができます。デフォルトでは制限はありません。これは全体の最大距離が満たされていれば各トークン間の距離は問わないということです。</p>
+<p>以下は最初のトークン間の最大距離として <code class="docutils literal notranslate"><span class="pre">2</span></code> を使い、2番目のトークン間の最大距離として <code class="docutils literal notranslate"><span class="pre">4</span></code> を使う例です。:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">content</span> <span class="o">*</span><span class="n">N10</span><span class="p">,</span><span class="mi">2</span><span class="o">|</span><span class="mi">4</span> <span class="s2">&quot;a b c&quot;</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">10</span></code> は最大距離です。</p>
+<p>トークン間の最大距離は <code class="docutils literal notranslate"><span class="pre">|</span></code> で区切ります。</p>
+<p>これは <code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">x</span> <span class="pre">b</span> <span class="pre">x</span> <span class="pre">x</span> <span class="pre">x</span> <span class="pre">c</span></code> にマッチします。しかし、これは <code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">x</span> <span class="pre">x</span> <span class="pre">b</span> <span class="pre">c</span></code> や <code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">b</span> <span class="pre">x</span> <span class="pre">x</span> <span class="pre">x</span> <span class="pre">x</span> <span class="pre">c</span></code> にはマッチしません。なぜなら、前者は最初のトークン間の距離が <code class="docutils literal notranslate"><span class="pre">3</span></code> で <code class="docutils literal notranslate"><span class="pre">2</span></code> より大きいからです。後者は2番目のトークン間の距離が <code class="docutils literal notranslate"><span class="pre">5</span></code> で <code class="docutils literal notranslate"><span class="pre">4</span></code> より大きいからです。</p>
+<p>以下は各トークン間の最大距離を指定する例です。</p>
+<p>実行例:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;content *N11,5|3 &quot;first welcome post&quot;&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1,</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         &quot;Welcome! This is my first post!&quot;,</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
+<span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;content *N11,4|3 &quot;first welcome post&quot;&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         0</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
+</pre></div>
+</div>
+<p>1つ以上のトークン間の最大距離を省略することができます。省略されたトークン間の最大距離は <code class="docutils literal notranslate"><span class="pre">-1</span></code> として扱われます。これは <code class="docutils literal notranslate"><span class="pre">*N11,5</span></code> と <code class="docutils literal notranslate"><span class="pre">*N11,5|-1</span></code> は等しいということです。 <code class="docutils literal notranslate"><span class="pre">-1</span></code> は最大距離の制限がないという意味です。</p>
+<p>以下は1つのトークン間の最大距離を省略する例です。</p>
+<p>実行例:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;content *N11,5 &quot;first welcome post&quot;&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1,</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         &quot;Welcome! This is my first post!&quot;,</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
+<span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;content *N11,5|-1 &quot;first welcome post&quot;&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1,</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         &quot;Welcome! This is my first post!&quot;,</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
+</pre></div>
+</div>
+<p>トークン間の最大距離を余分に指定することもできます。余分な最大距離は単に無視されます。</p>
+<p>実行例:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;content *N11,5|6|1|2|3 &quot;first welcome post&quot;&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1,</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         &quot;Welcome! This is my first post!&quot;,</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
+<span class="n">select</span> <span class="n">Entries</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;content *N11,5|6 &quot;first welcome post&quot;&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;content&quot;,</span>
+<span class="c1">#           &quot;Text&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;n_likes&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1,</span>
+<span class="c1">#         &quot;The first post!&quot;,</span>
+<span class="c1">#         &quot;Welcome! This is my first post!&quot;,</span>
+<span class="c1">#         5</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="near-phrase-search-operator">
 <span id="script-syntax-near-phrase-search-operator"></span><h3><span class="section-number">7.13.2.9.5. </span>近傍フレーズ検索演算子<a class="headerlink" href="#near-phrase-search-operator" title="このヘッドラインへのパーマリンク">¶</a></h3>
@@ -4710,6 +4971,7 @@ column *N${MAX_INTERVAL} &quot;word1 word2 ...&quot;
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>column *NP &quot;phrase1 phrase2 ...&quot;
 column *NP${MAX_INTERVAL} &quot;phrase1 phrase2 ...&quot;
 column *NP${MAX_INTERVAL},${ADDITIONAL_LAST_INTERVAL} &quot;phrase1 phrase2 ...&quot;
+column *NP${MAX_INTERVAL},${ADDITIONAL_LAST_INTERVAL},${MAX_PHRASE_INTERVAL_1}|${MAX_PHRASE_INTERVAL_2}|... &quot;phrase1 phrase2 ...&quot;
 </pre></div>
 </div>
 <p>2つめの形式の例は次の通りです。</p>
@@ -4728,6 +4990,17 @@ column *NP${MAX_INTERVAL},${ADDITIONAL_LAST_INTERVAL} &quot;phrase1 phrase2 ...&
 <p>最初の例は最後の追加距離として <code class="docutils literal notranslate"><span class="pre">29</span></code> を使うという意味です。</p>
 <p>2つめの例は最後の追加距離として <code class="docutils literal notranslate"><span class="pre">-1</span></code> を使うという意味です。</p>
 <p>最後の追加距離は後で説明します。</p>
+<div class="versionadded">
+<p><span class="versionmodified added">バージョン 12.0.1 で追加: </span>各フレーズ間の最大距離。</p>
+</div>
+<p>4つめの形式の例は次の通りです。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">column</span> <span class="o">*</span><span class="n">NP10</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="o">|</span><span class="mi">3</span> <span class="s2">&quot;phrase1 phrase2 phrase3&quot;</span>
+<span class="n">column</span> <span class="o">*</span><span class="n">NP10</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span> <span class="s2">&quot;phrase1 phrase2 phrase3&quot;</span>
+</pre></div>
+</div>
+<p>最初の例は最初のトークン間の最大距離として <code class="docutils literal notranslate"><span class="pre">2</span></code> を使い、2番目のトークン間の最大距離として <code class="docutils literal notranslate"><span class="pre">3</span></code> を使うという意味です。</p>
+<p>2番目の例は最初のトークン間の最大距離として <code class="docutils literal notranslate"><span class="pre">2</span></code> を使い、2番目のトークン間の最大距離として <code class="docutils literal notranslate"><span class="pre">-1</span></code> を使うという意味です。なぜなら省略された最大距離は <code class="docutils literal notranslate"><span class="pre">-1</span></code> として処理されるからです。</p>
+<p>各フレーズ間の最大距離については <a class="reference internal" href="#script-syntax-near-phrase-search-operator"><span class="std std-ref">近傍フレーズ検索演算子</span></a> を参照してください。</p>
 <p>この演算子は <code class="docutils literal notranslate"><span class="pre">phrase1</span> <span class="pre">phrase2</span> <span class="pre">...</span></code> というフレーズで近傍フレーズ検索します。近傍フレーズ検索はすべてのフレーズが含まれていてかつそれぞれが指定した順番で出現していてかつそれぞれのフレーズが指定した距離以内にあるレコードを検索します。</p>
 <p>近いと判断する最大距離のデフォルトは <code class="docutils literal notranslate"><span class="pre">10</span></code> です。距離の単位はN-gram系のトークナイザーでは文字数で、形態素解析系のトークナイザーでは単語数です。</p>
 <p>しかし、<code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code> はASCIIだけの単語はトークンに分割しません。このケースでは、 <code class="docutils literal notranslate"><span class="pre">TokenBigram</span></code> はASCIIの文字には空白区切りのようなトークナイズ方法を使うためです。</p>
@@ -4923,6 +5196,7 @@ tokenizer to show difference with near search with English text.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>column *NPP &quot;(phrase1-1 phrase1-2 ...) (phrase2-1 phrase2-2 ...) ...&quot;
 column *NPP${MAX_INTERVAL} &quot;(phrase1-1 phrase1-2 ...) (phrase2-1 phrase2-2 ...) ...&quot;
 column *NPP${MAX_INTERVAL},${ADDITIONAL_LAST_INTERVAL} &quot;(phrase1-1 phrase1-2 ...) (phrase2-1 phrase2-2 ...) ...&quot;
+column *NPP${MAX_INTERVAL},${ADDITIONAL_LAST_INTERVAL},${MAX_PHRASE_INTERVAL_1}|${MAX_PHRASE_INTERVAL_2}|... &quot;(phrase1-1 phrase1-2 ...) (phrase2-1 phrase2-2 ...) ...&quot;
 </pre></div>
 </div>
 <p>2つめの形式の例は次の通りです。</p>
@@ -4939,6 +5213,17 @@ column *NPP${MAX_INTERVAL},${ADDITIONAL_LAST_INTERVAL} &quot;(phrase1-1 phrase1-
 </div>
 <p>最初の例は最後の追加距離として <code class="docutils literal notranslate"><span class="pre">29</span></code> を使うという意味です。</p>
 <p>2つめの例は最後の追加距離として <code class="docutils literal notranslate"><span class="pre">-1</span></code> を使うという意味です。</p>
+<div class="versionadded">
+<p><span class="versionmodified added">バージョン 12.0.1 で追加: </span>各フレーズ間の最大距離。</p>
+</div>
+<p>4つめの形式の例は次の通りです。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">column</span> <span class="o">*</span><span class="n">NPP10</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="o">|</span><span class="mi">3</span> <span class="s2">&quot;(phrase1-1 phrase1-2 ...) (phrase2-1 phrase2-2 ...) (phrase3-1 phrase3-2 ...)&quot;</span>
+<span class="n">column</span> <span class="o">*</span><span class="n">NPP10</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span> <span class="s2">&quot;(phrase1-1 phrase1-2 ...) (phrase2-1 phrase2-2 ...) (phrase3-1 phrase3-2 ...)&quot;</span>
+</pre></div>
+</div>
+<p>最初の例は最初のトークン間の最大距離として <code class="docutils literal notranslate"><span class="pre">2</span></code> を使い、2番目のトークン間の最大距離として <code class="docutils literal notranslate"><span class="pre">3</span></code> を使うという意味です。</p>
+<p>2番目の例は最初のトークン間の最大距離として <code class="docutils literal notranslate"><span class="pre">2</span></code> を使い、2番目のトークン間の最大距離として <code class="docutils literal notranslate"><span class="pre">-1</span></code> を使うという意味です。なぜなら省略された最大距離は <code class="docutils literal notranslate"><span class="pre">-1</span></code> として処理されるからです。</p>
+<p>各フレーズ間の最大距離については <a class="reference internal" href="#script-syntax-near-phrase-search-operator"><span class="std std-ref">近傍フレーズ検索演算子</span></a> を参照してください。</p>
 <p>この演算子は複数の <a class="reference internal" href="#script-syntax-near-phrase-search-operator"><span class="std std-ref">近傍フレーズ検索演算子</span></a> を使います。各 <a class="reference internal" href="#script-syntax-near-phrase-search-operator"><span class="std std-ref">近傍フレーズ検索演算子</span></a> が使うフレーズ群は <code class="docutils literal notranslate"><span class="pre">{フレーズ1-1,</span> <span class="pre">フレーズ1-2,</span> <span class="pre">...}</span></code> と <code class="docutils literal notranslate"><span class="pre">{フレーズ2-1,</span> <span class="pre">フレーズ2-2,</span> <span class="pre">...}</span></code> と <code class="docutils literal notranslate"><span class="pre">...</span></code> の直積として計算します。たとえば、 <code class="docutils literal notranslate"><span class="pre">column</span> <span class="pre">*NPP</span> <span class="pre">&quot;(a</span> <span class="pre">b</span> <span class="pre">c)</span> <span class="pre">(d</span> <span class="pre">e)&quot;</span></code> は以下のフレーズ群のリストで近傍フレーズ検索をします。</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">d</span></code></p></li>
@@ -5006,6 +5291,7 @@ column *NPP${MAX_INTERVAL},${ADDITIONAL_LAST_INTERVAL} &quot;(phrase1-1 phrase1-
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>column *ONP &quot;phrase1 phrase2 ...&quot;
 column *ONP${MAX_INTERVAL} &quot;phrase1 phrase2 ...&quot;
 column *ONP${MAX_INTERVAL},${ADDITIONAL_LAST_INTERVAL} &quot;phrase1 phrase2 ...&quot;
+column *ONP${MAX_INTERVAL},${ADDITIONAL_LAST_INTERVAL},${MAX_PHRASE_INTERVAL_1}|${MAX_PHRASE_INTERVAL_2}|... &quot;phrase1 phrase2 ...&quot;
 </pre></div>
 </div>
 <p>2つめの形式の例は次の通りです。</p>
@@ -5022,6 +5308,17 @@ column *ONP${MAX_INTERVAL},${ADDITIONAL_LAST_INTERVAL} &quot;phrase1 phrase2 ...
 </div>
 <p>最初の例は最後の追加距離として <code class="docutils literal notranslate"><span class="pre">29</span></code> を使うという意味です。</p>
 <p>2つめの例は最後の追加距離として <code class="docutils literal notranslate"><span class="pre">-1</span></code> を使うという意味です。</p>
+<div class="versionadded">
+<p><span class="versionmodified added">バージョン 12.0.1 で追加: </span>各フレーズ間の最大距離。</p>
+</div>
+<p>4つめの形式の例は次の通りです。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">column</span> <span class="o">*</span><span class="n">ONP10</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="o">|</span><span class="mi">3</span> <span class="s2">&quot;phrase1 phrase2 phrase3&quot;</span>
+<span class="n">column</span> <span class="o">*</span><span class="n">ONP10</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span> <span class="s2">&quot;phrase1 phrase2 phrase3&quot;</span>
+</pre></div>
+</div>
+<p>最初の例は最初のトークン間の最大距離として <code class="docutils literal notranslate"><span class="pre">2</span></code> を使い、2番目のトークン間の最大距離として <code class="docutils literal notranslate"><span class="pre">3</span></code> を使うという意味です。</p>
+<p>2番目の例は最初のトークン間の最大距離として <code class="docutils literal notranslate"><span class="pre">2</span></code> を使い、2番目のトークン間の最大距離として <code class="docutils literal notranslate"><span class="pre">-1</span></code> を使うという意味です。なぜなら省略された最大距離は <code class="docutils literal notranslate"><span class="pre">-1</span></code> として処理されるからです。</p>
+<p>各フレーズ間の最大距離については <a class="reference internal" href="#script-syntax-near-phrase-search-operator"><span class="std std-ref">近傍フレーズ検索演算子</span></a> を参照してください。</p>
 <p>この演算子は <code class="docutils literal notranslate"><span class="pre">フレーズ1</span></code> と <code class="docutils literal notranslate"><span class="pre">フレーズ2</span></code> と <code class="docutils literal notranslate"><span class="pre">...</span></code> で順序付き近傍フレーズ検索をします。順序付き近傍フレーズ検索は <a class="reference internal" href="#script-syntax-near-phrase-search-operator"><span class="std std-ref">近傍フレーズ検索演算子</span></a> と似ていますが順序付き近傍フレーズ検索はフレーズの順番をチェックします。たとえば、 <code class="docutils literal notranslate"><span class="pre">column</span> <span class="pre">*ONP</span> <span class="pre">&quot;groonga</span> <span class="pre">mroonga</span> <span class="pre">pgroonga&quot;</span></code> は <code class="docutils literal notranslate"><span class="pre">groonga</span> <span class="pre">mroonga</span> <span class="pre">rroonga</span> <span class="pre">pgroonga</span></code> にマッチしますが <code class="docutils literal notranslate"><span class="pre">groonga</span> <span class="pre">rroonga</span> <span class="pre">pgroonga</span> <span class="pre">mroonga</span></code> にはマッチしません。なぜなら後者は順序が違うからです。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
@@ -5068,6 +5365,7 @@ column *ONP${MAX_INTERVAL},${ADDITIONAL_LAST_INTERVAL} &quot;phrase1 phrase2 ...
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>column *ONPP &quot;(phrase1-1 phrase1-2 ...) (phrase2-1 phrase2-2 ...) ...&quot;
 column *ONPP${MAX_INTERVAL} &quot;(phrase1-1 phrase1-2 ...) (phrase2-1 phrase2-2 ...) ...&quot;
 column *ONPP${MAX_INTERVAL},${ADDITIONAL_LAST_INTERVAL} &quot;(phrase1-1 phrase1-2 ...) (phrase2-1 phrase2-2 ...) ...&quot;
+column *ONPP${MAX_INTERVAL},${ADDITIONAL_LAST_INTERVAL},${MAX_PHRASE_INTERVAL_1}|${MAX_PHRASE_INTERVAL_2}|... &quot;(phrase1-1 phrase1-2 ...) (phrase2-1 phrase2-2 ...) ...&quot;
 </pre></div>
 </div>
 <p>2つめの形式の例は次の通りです。</p>
@@ -5084,7 +5382,18 @@ column *ONPP${MAX_INTERVAL},${ADDITIONAL_LAST_INTERVAL} &quot;(phrase1-1 phrase1
 </div>
 <p>最初の例は最後の追加距離として <code class="docutils literal notranslate"><span class="pre">29</span></code> を使うという意味です。</p>
 <p>2つめの例は最後の追加距離として <code class="docutils literal notranslate"><span class="pre">-1</span></code> を使うという意味です。</p>
-<p>この演算子は順序付き近傍フレーズ直積検索をします。順序付き近傍フレーズ直積検索は <a class="reference internal" href="#script-syntax-near-phrase-product-search-operator"><span class="std std-ref">近傍フレーズ直積検索演算子</span></a> と似ていますが、順序付き近傍フレーズ直積検索はフレーズの順序をチェックします。たとえば、 <code class="docutils literal notranslate"><span class="pre">column</span> <span class="pre">*ONPP</span> <span class="pre">&quot;(a</span> <span class="pre">b</span> <span class="pre">c)</span> <span class="pre">(d</span> <span class="pre">e)&quot;</span></code> は <code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">1</span> <span class="pre">d</span></code> にマッチしますが、 <code class="docutils literal notranslate"><span class="pre">d</span> <span class="pre">1</span> <span class="pre">a</span></code> にはマッチしません。なぜなら後者は順序が違うからです。</p>
+<div class="versionadded">
+<p><span class="versionmodified added">バージョン 12.0.1 で追加: </span>各フレーズ間の最大距離。</p>
+</div>
+<p>4つめの形式の例は次の通りです。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">column</span> <span class="o">*</span><span class="n">ONPP10</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="o">|</span><span class="mi">3</span> <span class="s2">&quot;(phrase1-1 phrase1-2 ...) (phrase2-1 phrase2-2 ...) (phrase3-1 phrase3-2 ...)&quot;</span>
+<span class="n">column</span> <span class="o">*</span><span class="n">ONPP10</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span> <span class="s2">&quot;(phrase1-1 phrase1-2 ...) (phrase2-1 phrase2-2 ...) (phrase3-1 phrase3-2 ...)&quot;</span>
+</pre></div>
+</div>
+<p>最初の例は最初のトークン間の最大距離として <code class="docutils literal notranslate"><span class="pre">2</span></code> を使い、2番目のトークン間の最大距離として <code class="docutils literal notranslate"><span class="pre">3</span></code> を使うという意味です。</p>
+<p>2番目の例は最初のトークン間の最大距離として <code class="docutils literal notranslate"><span class="pre">2</span></code> を使い、2番目のトークン間の最大距離として <code class="docutils literal notranslate"><span class="pre">-1</span></code> を使うという意味です。なぜなら省略された最大距離は <code class="docutils literal notranslate"><span class="pre">-1</span></code> として処理されるからです。</p>
+<p>各フレーズ間の最大距離については <a class="reference internal" href="#script-syntax-near-phrase-search-operator"><span class="std std-ref">近傍フレーズ検索演算子</span></a> を参照してください。</p>
+<p>この演算子は順序付き近傍フレーズ直積検索をします。順序付き近傍フレーズ直積検索は <a class="reference internal" href="#script-syntax-near-phrase-product-search-operator"><span class="std std-ref">近傍フレーズ直積検索演算子</span></a> と似ていますが、順序付き近傍フレーズ直積検索は <a class="reference internal" href="query_syntax.html#query-syntax-ordered-near-phrase-search-condition"><span class="std std-ref">順序付き近傍フレーズ検索条件</span></a> のようにフレーズの順序をチェックします。たとえば、 <code class="docutils literal notranslate"><span class="pre">column</span> <span class="pre">*ONPP</span> <span class="pre">&quot;(a</span> <span class="pre">b</span> <span class="pre">c)</span> <span class="pre">(d</span> <span class="pre">e)&quot;</span></code> は <code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">1</span> <span class="pre">d</span></code> にマッチしますが、 <code class="docutils literal notranslate"><span class="pre">d</span> <span class="pre">1</span> <span class="pre">a</span></code> にはマッチしません。なぜなら後者は順序が違うからです。</p>
 <p>以下は簡単な使用例です。</p>
 <p>実行例:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Entries</span> \

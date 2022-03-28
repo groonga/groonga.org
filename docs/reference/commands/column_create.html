@@ -2233,6 +2233,16 @@ function checkPageExistsAndRedirect(event) {
      7.3.11.3.10. Create a large index column
     </a>
    </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#missing-mode">
+     7.3.11.3.11. Missing mode
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#invalid-mode">
+     7.3.11.3.12. Invalid mode
+    </a>
+   </li>
   </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
@@ -2395,6 +2405,8 @@ metadata to each token.</p>
 <li><p><a class="reference internal" href="#column-create-index-small"><span class="std std-ref">Create a small index column</span></a></p></li>
 <li><p><a class="reference internal" href="#column-create-index-medium"><span class="std std-ref">Create a medium index column</span></a></p></li>
 <li><p><a class="reference internal" href="#column-create-index-large"><span class="std std-ref">Create a large index column</span></a></p></li>
+<li><p><a class="reference internal" href="#column-create-missing-mode"><span class="std std-ref">Missing mode</span></a></p></li>
+<li><p><a class="reference internal" href="#column-create-invalid-mode"><span class="std std-ref">Invalid mode</span></a></p></li>
 </ul>
 </div></blockquote>
 <p>Here is the <code class="docutils literal notranslate"><span class="pre">People</span></code> table definition. The <code class="docutils literal notranslate"><span class="pre">People</span></code> table is used
@@ -2761,7 +2773,7 @@ level dynamically by <a class="reference internal" href="log_level.html"><span c
 <span class="c1">#     ]</span>
 <span class="c1">#   ]</span>
 <span class="c1"># ]</span>
-<span class="c1"># log: 2019-04-02 18:35:32.349471|i| [table][select][index][range] &lt;Ages.people_age_index&gt;</span>
+<span class="c1"># log: 2022-03-28 15:41:00.299778|i| [table-selector][select][index][range] &lt;Ages.people_age_index&gt;</span>
 <span class="n">log_level</span> <span class="o">--</span><span class="n">level</span> <span class="n">notice</span>
 <span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
 </pre></div>
@@ -2865,11 +2877,11 @@ in <code class="docutils literal notranslate"><span class="pre">info</span></cod
 <span class="c1">#     ]</span>
 <span class="c1">#   ]</span>
 <span class="c1"># ]</span>
-<span class="c1"># log: 2019-04-02 18:35:33.044069|i| [object][search][index][key][exact] &lt;Terms.people_key_index&gt;</span>
-<span class="c1"># log: 2019-04-02 18:35:33.044114|i| grn_ii_sel &gt; (Alice)</span>
-<span class="c1"># log: 2019-04-02 18:35:33.044226|i| n=1 (Alice)</span>
-<span class="c1"># log: 2019-04-02 18:35:33.044305|i| exact: 1</span>
-<span class="c1"># log: 2019-04-02 18:35:33.044318|i| hits=1</span>
+<span class="c1"># log: 2022-03-28 15:41:00.809971|i| [object][search][index][key][exact] &lt;Terms.people_key_index&gt;</span>
+<span class="c1"># log: 2022-03-28 15:41:00.809998|i| grn_ii_sel &gt; (Alice)</span>
+<span class="c1"># log: 2022-03-28 15:41:00.810064|i| [ii][select] n=1 (Alice)</span>
+<span class="c1"># log: 2022-03-28 15:41:00.810116|i| exact: 1</span>
+<span class="c1"># log: 2022-03-28 15:41:00.810125|i| hits=1</span>
 <span class="n">log_level</span> <span class="o">--</span><span class="n">level</span> <span class="n">notice</span>
 <span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
 </pre></div>
@@ -2994,7 +3006,7 @@ command.</p>
 <span class="c1">#     ]</span>
 <span class="c1">#   ]</span>
 <span class="c1"># ]</span>
-<span class="c1"># log: 2019-04-02 18:35:33.728665|i| [table][select][index][prefix] &lt;Names.people_key_roles_index&gt;</span>
+<span class="c1"># log: 2022-03-28 15:41:01.320091|i| [table-selector][select][index][prefix] &lt;Names.people_key_roles_index&gt;</span>
 <span class="n">log_level</span> <span class="o">--</span><span class="n">level</span> <span class="n">notice</span>
 <span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
 </pre></div>
@@ -3143,6 +3155,818 @@ table.</p>
   <span class="o">--</span><span class="nb">type</span> <span class="n">People</span> \
   <span class="o">--</span><span class="n">source</span> <span class="n">roles</span>
 <span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="missing-mode">
+<span id="column-create-missing-mode"></span><h3><span class="section-number">7.3.11.3.11. </span>Missing mode<a class="headerlink" href="#missing-mode" title="Permalink to this headline">¶</a></h3>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 12.0.2.</span></p>
+</div>
+<p>You can control how to process a nonexistent key in the specified new
+value of a reference column by a <code class="docutils literal notranslate"><span class="pre">MISSING_*</span></code> flag. Here are
+available <code class="docutils literal notranslate"><span class="pre">MISSING_*</span></code> flags:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">MISSING_ADD</span></code> (default)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MISSING_IGNORE</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MISSING_NIL</span></code></p></li>
+</ul>
+<p>You can’t specify multiple <code class="docutils literal notranslate"><span class="pre">MISSING_*</span></code> flags for a column.</p>
+<p><code class="docutils literal notranslate"><span class="pre">MISSING_*</span></code> flags are meaningful only for a reference column.</p>
+<p>The following table describes the differences between <code class="docutils literal notranslate"><span class="pre">MISSING_*</span></code>
+flags when a nonexistent key is specified to a reference scalar
+column:</p>
+<table class="table">
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Flag</p></th>
+<th class="head"><p>Description</p></th>
+<th class="head"><p>An example given value</p></th>
+<th class="head"><p>An example set value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MISSING_ADD</span></code></p></td>
+<td><p>The given nonexistent key is added to the referred table
+automatically and the ID of the newly added record is set.</p>
+<p>This is the default.</p>
+</td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&quot;nonexistent&quot;</span></code></p></td>
+<td><p>The record ID of the newly added record whose key is
+<code class="docutils literal notranslate"><span class="pre">&quot;nonexistent&quot;</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MISSING_IGNORE</span></code></p></td>
+<td><p>The given nonexistent key is ignored and <code class="docutils literal notranslate"><span class="pre">0</span></code> is set.</p>
+<p>There is no difference between <code class="docutils literal notranslate"><span class="pre">MISSING_IGNORE</span></code> and
+<code class="docutils literal notranslate"><span class="pre">MISSING_NIL</span></code> for a reference scalar column.</p>
+</td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&quot;nonexistent&quot;</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MISSING_NIL</span></code></p></td>
+<td><p>The given nonexistent key is ignored and <code class="docutils literal notranslate"><span class="pre">0</span></code> is set.</p>
+<p>There is no difference between <code class="docutils literal notranslate"><span class="pre">MISSING_IGNORE</span></code> and
+<code class="docutils literal notranslate"><span class="pre">MISSING_NIL</span></code> for a reference scalar column.</p>
+</td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&quot;nonexistent&quot;</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p>Here is an example to show differences between <code class="docutils literal notranslate"><span class="pre">MISSING_*</span></code> flags for
+a reference scalar column.</p>
+<p>First this example defines columns for all <code class="docutils literal notranslate"><span class="pre">MISSING_*</span></code> flags:</p>
+<p>Execution example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">table_create</span> \
+  <span class="o">--</span><span class="n">name</span> <span class="n">MissingModeScalarReferred</span> \
+  <span class="o">--</span><span class="n">flags</span> <span class="n">TABLE_HASH_KEY</span> \
+  <span class="o">--</span><span class="n">key_type</span> <span class="n">ShortText</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">table_create</span> \
+  <span class="o">--</span><span class="n">name</span> <span class="n">MissingModeScalar</span> \
+  <span class="o">--</span><span class="n">flags</span> <span class="n">TABLE_HASH_KEY</span> \
+  <span class="o">--</span><span class="n">key_type</span> <span class="n">ShortText</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">column_create</span> \
+  <span class="o">--</span><span class="n">table</span> <span class="n">MissingModeScalar</span> \
+  <span class="o">--</span><span class="n">name</span> <span class="n">missing_add</span> \
+  <span class="o">--</span><span class="n">flags</span> <span class="n">COLUMN_SCALAR</span><span class="o">|</span><span class="n">MISSING_ADD</span> \
+  <span class="o">--</span><span class="nb">type</span> <span class="n">MissingModeScalarReferred</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">column_create</span> \
+  <span class="o">--</span><span class="n">table</span> <span class="n">MissingModeScalar</span> \
+  <span class="o">--</span><span class="n">name</span> <span class="n">missing_ignore</span> \
+  <span class="o">--</span><span class="n">flags</span> <span class="n">COLUMN_SCALAR</span><span class="o">|</span><span class="n">MISSING_IGNORE</span> \
+  <span class="o">--</span><span class="nb">type</span> <span class="n">MissingModeScalarReferred</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">column_create</span> \
+  <span class="o">--</span><span class="n">table</span> <span class="n">MissingModeScalar</span> \
+  <span class="o">--</span><span class="n">name</span> <span class="n">missing_nil</span> \
+  <span class="o">--</span><span class="n">flags</span> <span class="n">COLUMN_SCALAR</span><span class="o">|</span><span class="n">MISSING_NIL</span> \
+  <span class="o">--</span><span class="nb">type</span> <span class="n">MissingModeScalarReferred</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+</pre></div>
+</div>
+<p>Then this example loads nonexistent keys to all columns. The specified
+nonexistent key for <code class="docutils literal notranslate"><span class="pre">MISSING_ADD</span></code> is only added to
+<code class="docutils literal notranslate"><span class="pre">MissingModeScalarReferred</span></code> automatically and the specified
+nonexistent keys for <code class="docutils literal notranslate"><span class="pre">MISSING_IGNORE</span></code> and <code class="docutils literal notranslate"><span class="pre">MISSING_NIL</span></code> aren’t
+added to <code class="docutils literal notranslate"><span class="pre">MissingModeScalarReferred</span></code>. <code class="docutils literal notranslate"><span class="pre">missing_ignore</span></code>’s value and
+<code class="docutils literal notranslate"><span class="pre">missing_nil</span></code>’s value are showed as <code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code> because they refer a
+record whose ID is <code class="docutils literal notranslate"><span class="pre">0</span></code> and record whose ID is <code class="docutils literal notranslate"><span class="pre">0</span></code> never exist:</p>
+<p>Execution example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">load</span> <span class="o">--</span><span class="n">table</span> <span class="n">MissingModeScalar</span>
+<span class="p">[</span>
+<span class="p">{</span><span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;key&quot;</span><span class="p">,</span> <span class="s2">&quot;missing_add&quot;</span><span class="p">:</span>    <span class="s2">&quot;nonexistent1&quot;</span><span class="p">}</span>
+<span class="p">]</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], 1]</span>
+<span class="n">load</span> <span class="o">--</span><span class="n">table</span> <span class="n">MissingModeScalar</span>
+<span class="p">[</span>
+<span class="p">{</span><span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;key&quot;</span><span class="p">,</span> <span class="s2">&quot;missing_ignore&quot;</span><span class="p">:</span> <span class="s2">&quot;nonexistent2&quot;</span><span class="p">}</span>
+<span class="p">]</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     -22,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531,</span>
+<span class="c1">#     &quot;&lt;MissingModeScalar.missing_ignore&gt;: failed to cast to &lt;MissingModeScalarReferred&gt;: &lt;\&quot;nonexistent2\&quot;&gt;&quot;,</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;grn_ra_cast_value&quot;,</span>
+<span class="c1">#         &quot;lib/store.c&quot;,</span>
+<span class="c1">#         494</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   1</span>
+<span class="c1"># ]</span>
+<span class="n">load</span> <span class="o">--</span><span class="n">table</span> <span class="n">MissingModeScalar</span>
+<span class="p">[</span>
+<span class="p">{</span><span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;key&quot;</span><span class="p">,</span> <span class="s2">&quot;missing_nil&quot;</span><span class="p">:</span>    <span class="s2">&quot;nonexistent3&quot;</span><span class="p">}</span>
+<span class="p">]</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     -22,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531,</span>
+<span class="c1">#     &quot;&lt;MissingModeScalar.missing_nil&gt;: failed to cast to &lt;MissingModeScalarReferred&gt;: &lt;\&quot;nonexistent3\&quot;&gt;&quot;,</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;grn_ra_cast_value&quot;,</span>
+<span class="c1">#         &quot;lib/store.c&quot;,</span>
+<span class="c1">#         494</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   1</span>
+<span class="c1"># ]</span>
+<span class="n">select</span> <span class="o">--</span><span class="n">table</span> <span class="n">MissingModeScalar</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;missing_add&quot;,</span>
+<span class="c1">#           &quot;MissingModeScalarReferred&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;missing_ignore&quot;,</span>
+<span class="c1">#           &quot;MissingModeScalarReferred&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;missing_nil&quot;,</span>
+<span class="c1">#           &quot;MissingModeScalarReferred&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1,</span>
+<span class="c1">#         &quot;key&quot;,</span>
+<span class="c1">#         &quot;nonexistent1&quot;,</span>
+<span class="c1">#         &quot;&quot;,</span>
+<span class="c1">#         &quot;&quot;</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
+<span class="n">select</span> <span class="o">--</span><span class="n">table</span> <span class="n">MissingModeScalarReferred</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1,</span>
+<span class="c1">#         &quot;nonexistent1&quot;</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
+</pre></div>
+</div>
+<p>The following table describes the differences between <code class="docutils literal notranslate"><span class="pre">MISSING_*</span></code>
+flags when a vector value that has a nonexistent key element is
+specified to a reference vector column:</p>
+<table class="table">
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Flag</p></th>
+<th class="head"><p>Description</p></th>
+<th class="head"><p>An example given value</p></th>
+<th class="head"><p>An example set value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MISSING_ADD</span></code></p></td>
+<td><p>The given nonexistent key is added to the referred table
+automatically and the ID of the newly added record is used for
+the element.</p>
+<p>This is the default.</p>
+</td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[&quot;existent1&quot;,</span> <span class="pre">&quot;nonexistent&quot;,</span> <span class="pre">&quot;existent2&quot;]</span></code></p></td>
+<td><p>The record IDs of <code class="docutils literal notranslate"><span class="pre">&quot;existent1&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;nonexistent&quot;</span></code> and
+<code class="docutils literal notranslate"><span class="pre">&quot;existent2&quot;</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MISSING_IGNORE</span></code></p></td>
+<td><p>The given nonexistent key element is ignored.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[&quot;existent1&quot;,</span> <span class="pre">&quot;nonexistent&quot;,</span> <span class="pre">&quot;existent2&quot;]</span></code></p></td>
+<td><p>The record IDs of <code class="docutils literal notranslate"><span class="pre">&quot;existent1&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;existent2&quot;</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MISSING_NIL</span></code></p></td>
+<td><p>The given nonexistent key element is ignored.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">INVALID_WARN</span></code> or <code class="docutils literal notranslate"><span class="pre">INVALID_IGNORE</span></code> are also specified,
+the element is replaced with <code class="docutils literal notranslate"><span class="pre">0</span></code>. If <code class="docutils literal notranslate"><span class="pre">INVALID_ERROR</span></code> is
+specified or no <code class="docutils literal notranslate"><span class="pre">INVALID_*</span></code> are specified, the element is
+ignored.</p>
+<p>See also <a class="reference internal" href="#column-create-invalid-mode"><span class="std std-ref">Invalid mode</span></a>.</p>
+</td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[&quot;existent1&quot;,</span> <span class="pre">&quot;nonexistent&quot;,</span> <span class="pre">&quot;existent2&quot;]</span></code></p></td>
+<td><p>The record ID of <code class="docutils literal notranslate"><span class="pre">&quot;existent1&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">0</span></code> and the record ID of
+<code class="docutils literal notranslate"><span class="pre">&quot;existent2&quot;</span></code> for <code class="docutils literal notranslate"><span class="pre">INVALID_WARN</span></code> and <code class="docutils literal notranslate"><span class="pre">INVALID_IGNORE</span></code>.</p>
+<p>The record IDs of <code class="docutils literal notranslate"><span class="pre">&quot;existent1&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;existent2&quot;</span></code> for
+<code class="docutils literal notranslate"><span class="pre">INVALID_ERROR</span></code> and no <code class="docutils literal notranslate"><span class="pre">INVALID_*</span></code>.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Here is an example to show differences between <code class="docutils literal notranslate"><span class="pre">MISSING_*</span></code> flags for
+a reference vector column.</p>
+<p>First this example defines columns for all <code class="docutils literal notranslate"><span class="pre">MISSING_*</span></code> flags:</p>
+<p>Execution example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">table_create</span> \
+  <span class="o">--</span><span class="n">name</span> <span class="n">MissingModeVectorReferred</span> \
+  <span class="o">--</span><span class="n">flags</span> <span class="n">TABLE_HASH_KEY</span> \
+  <span class="o">--</span><span class="n">key_type</span> <span class="n">ShortText</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">table_create</span> \
+  <span class="o">--</span><span class="n">name</span> <span class="n">MissingModeVector</span> \
+  <span class="o">--</span><span class="n">flags</span> <span class="n">TABLE_HASH_KEY</span> \
+  <span class="o">--</span><span class="n">key_type</span> <span class="n">ShortText</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">column_create</span> \
+  <span class="o">--</span><span class="n">table</span> <span class="n">MissingModeVector</span> \
+  <span class="o">--</span><span class="n">name</span> <span class="n">missing_add</span> \
+  <span class="o">--</span><span class="n">flags</span> <span class="n">COLUMN_VECTOR</span><span class="o">|</span><span class="n">MISSING_ADD</span> \
+  <span class="o">--</span><span class="nb">type</span> <span class="n">MissingModeVectorReferred</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">column_create</span> \
+  <span class="o">--</span><span class="n">table</span> <span class="n">MissingModeVector</span> \
+  <span class="o">--</span><span class="n">name</span> <span class="n">missing_ignore</span> \
+  <span class="o">--</span><span class="n">flags</span> <span class="n">COLUMN_VECTOR</span><span class="o">|</span><span class="n">MISSING_IGNORE</span><span class="o">|</span><span class="n">INVALID_IGNORE</span> \
+  <span class="o">--</span><span class="nb">type</span> <span class="n">MissingModeVectorReferred</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">column_create</span> \
+  <span class="o">--</span><span class="n">table</span> <span class="n">MissingModeVector</span> \
+  <span class="o">--</span><span class="n">name</span> <span class="n">missing_nil</span> \
+  <span class="o">--</span><span class="n">flags</span> <span class="n">COLUMN_VECTOR</span><span class="o">|</span><span class="n">MISSING_NIL</span><span class="o">|</span><span class="n">INVALID_IGNORE</span> \
+  <span class="o">--</span><span class="nb">type</span> <span class="n">MissingModeVectorReferred</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+</pre></div>
+</div>
+<p>Then this example loads a vector that includes a nonexistent key to
+all columns. The specified nonexistent key for <code class="docutils literal notranslate"><span class="pre">MISSING_ADD</span></code> is only
+added to <code class="docutils literal notranslate"><span class="pre">MissingModeVectorReferred</span></code> automatically and the specified
+nonexistent keys for <code class="docutils literal notranslate"><span class="pre">MISSING_IGNORE</span></code> and <code class="docutils literal notranslate"><span class="pre">MISSING_NIL</span></code> aren’t
+added to <code class="docutils literal notranslate"><span class="pre">MissingModeVectorReferred</span></code>. The specified nonexistent key
+element is removed from <code class="docutils literal notranslate"><span class="pre">missing_ignore</span></code>’s value. The specified
+nonexistent key element is replaced with <code class="docutils literal notranslate"><span class="pre">0</span></code> in <code class="docutils literal notranslate"><span class="pre">missing_nil</span></code>’s
+value because <code class="docutils literal notranslate"><span class="pre">INVALID_IGNORE</span></code> is also specified. And the element
+replaced with <code class="docutils literal notranslate"><span class="pre">0</span></code> is showed as <code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code> because it refers a record
+whose ID is <code class="docutils literal notranslate"><span class="pre">0</span></code> and record whose ID is <code class="docutils literal notranslate"><span class="pre">0</span></code> never exist:</p>
+<p>Execution example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">load</span> <span class="o">--</span><span class="n">table</span> <span class="n">MissingModeVectorReferred</span>
+<span class="p">[</span>
+<span class="p">{</span><span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;existent1&quot;</span><span class="p">},</span>
+<span class="p">{</span><span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;existent2&quot;</span><span class="p">}</span>
+<span class="p">]</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], 2]</span>
+<span class="n">load</span> <span class="o">--</span><span class="n">table</span> <span class="n">MissingModeVector</span>
+<span class="p">[</span>
+<span class="p">{</span><span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;key&quot;</span><span class="p">,</span> <span class="s2">&quot;missing_add&quot;</span><span class="p">:</span>    <span class="p">[</span><span class="s2">&quot;existent1&quot;</span><span class="p">,</span> <span class="s2">&quot;nonexistent1&quot;</span><span class="p">,</span> <span class="s2">&quot;existent2&quot;</span><span class="p">]}</span>
+<span class="p">]</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], 1]</span>
+<span class="n">load</span> <span class="o">--</span><span class="n">table</span> <span class="n">MissingModeVector</span>
+<span class="p">[</span>
+<span class="p">{</span><span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;key&quot;</span><span class="p">,</span> <span class="s2">&quot;missing_ignore&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;existent1&quot;</span><span class="p">,</span> <span class="s2">&quot;nonexistent2&quot;</span><span class="p">,</span> <span class="s2">&quot;existent2&quot;</span><span class="p">]}</span>
+<span class="p">]</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], 1]</span>
+<span class="n">load</span> <span class="o">--</span><span class="n">table</span> <span class="n">MissingModeVector</span>
+<span class="p">[</span>
+<span class="p">{</span><span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;key&quot;</span><span class="p">,</span> <span class="s2">&quot;missing_nil&quot;</span><span class="p">:</span>    <span class="p">[</span><span class="s2">&quot;existent1&quot;</span><span class="p">,</span> <span class="s2">&quot;nonexistent3&quot;</span><span class="p">,</span> <span class="s2">&quot;existent2&quot;</span><span class="p">]}</span>
+<span class="p">]</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], 1]</span>
+<span class="n">select</span> <span class="o">--</span><span class="n">table</span> <span class="n">MissingModeVector</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;missing_add&quot;,</span>
+<span class="c1">#           &quot;MissingModeVectorReferred&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;missing_ignore&quot;,</span>
+<span class="c1">#           &quot;MissingModeVectorReferred&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;missing_nil&quot;,</span>
+<span class="c1">#           &quot;MissingModeVectorReferred&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1,</span>
+<span class="c1">#         &quot;key&quot;,</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;existent1&quot;,</span>
+<span class="c1">#           &quot;nonexistent1&quot;,</span>
+<span class="c1">#           &quot;existent2&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;existent1&quot;,</span>
+<span class="c1">#           &quot;existent2&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;existent1&quot;,</span>
+<span class="c1">#           &quot;&quot;,</span>
+<span class="c1">#           &quot;existent2&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
+<span class="n">select</span> <span class="o">--</span><span class="n">table</span> <span class="n">MissingModeVectorReferred</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         3</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_key&quot;,</span>
+<span class="c1">#           &quot;ShortText&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1,</span>
+<span class="c1">#         &quot;existent1&quot;</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2,</span>
+<span class="c1">#         &quot;existent2&quot;</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         3,</span>
+<span class="c1">#         &quot;nonexistent1&quot;</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="invalid-mode">
+<span id="column-create-invalid-mode"></span><h3><span class="section-number">7.3.11.3.12. </span>Invalid mode<a class="headerlink" href="#invalid-mode" title="Permalink to this headline">¶</a></h3>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 12.0.2.</span></p>
+</div>
+<p>You can control how to process an invalid value in the specified new
+value of a data column by a <code class="docutils literal notranslate"><span class="pre">INVALID_*</span></code> flag. Here are available
+<code class="docutils literal notranslate"><span class="pre">INVALID_*</span></code> flags:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">INVALID_ERROR</span></code> (default)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">INVALID_WARN</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">INVALID_IGNORE</span></code></p></li>
+</ul>
+<p>You can’t specify multiple <code class="docutils literal notranslate"><span class="pre">INVALID_*</span></code> flags for a column.</p>
+<p><code class="docutils literal notranslate"><span class="pre">INVALID_*</span></code> flags are meaningful only for a <code class="docutils literal notranslate"><span class="pre">COLUMN_SCALAR</span></code> column
+and a <code class="docutils literal notranslate"><span class="pre">COLUMN_VECTOR</span></code> column.</p>
+<p>If the target column is a reference column, an invalid value depends
+on <a class="reference internal" href="#column-create-missing-mode"><span class="std std-ref">Missing mode</span></a>. If you specify
+<code class="docutils literal notranslate"><span class="pre">MISSING_IGNORE</span></code> or <code class="docutils literal notranslate"><span class="pre">MISSING_NIL</span></code>, a nonexistent key is an invalid
+value. Note that an empty string key and string keys that are empty
+strings by normalization aren’t an invalid value with all
+<code class="docutils literal notranslate"><span class="pre">MISSING_*</span></code> flags. They are special.</p>
+<p>If the target column isn’t a reference column, an invalid value
+depends on column’s value type. For example, <code class="docutils literal notranslate"><span class="pre">&quot;invalid&quot;</span></code> is an
+invalid value for an <code class="docutils literal notranslate"><span class="pre">Int32</span></code> scalar column.</p>
+<p>The following table describes the differences between <code class="docutils literal notranslate"><span class="pre">INVALID_*</span></code>
+flags when an invalid value is specified to an <code class="docutils literal notranslate"><span class="pre">Int32</span></code> scalar column:</p>
+<table class="table">
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Flag</p></th>
+<th class="head"><p>Description</p></th>
+<th class="head"><p>An example given value</p></th>
+<th class="head"><p>An example set value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">INVALID_ERROR</span></code></p></td>
+<td><p>The given invalid value is reported as an error in
+<a class="reference internal" href="../log.html#process-log"><span class="std std-ref">Process log</span></a> and by <a class="reference internal" href="load.html"><span class="doc">load</span></a>.</p>
+<p>The given invalid value isn’t set.</p>
+<p>This is the default.</p>
+</td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&quot;invalid&quot;</span></code></p></td>
+<td><p>The column isn’t updated.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">INVALID_WARN</span></code></p></td>
+<td><p>The given invalid value is reported as a warning in
+<a class="reference internal" href="../log.html#process-log"><span class="std std-ref">Process log</span></a>.</p>
+<p>The given invalid value is replaced with the default value of
+the target scalar column. For example, <code class="docutils literal notranslate"><span class="pre">0</span></code> is the default
+value for an <code class="docutils literal notranslate"><span class="pre">Int32</span></code> scalar column.</p>
+</td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&quot;nonexistent&quot;</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">INVALID_IGNORE</span></code></p></td>
+<td><p>The given invalid value is ignored.</p>
+<p>The given invalid value is replaced with the default value of
+the target scalar column. For example, <code class="docutils literal notranslate"><span class="pre">0</span></code> is the default
+value for an <code class="docutils literal notranslate"><span class="pre">Int32</span></code> scalar column.</p>
+</td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&quot;invalid&quot;</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p>Here is an example to show differences between <code class="docutils literal notranslate"><span class="pre">INVALID_*</span></code> flags for
+an <code class="docutils literal notranslate"><span class="pre">Int32</span></code> scalar column.</p>
+<p>First this example defines columns for all <code class="docutils literal notranslate"><span class="pre">INVALID_*</span></code> flags:</p>
+<p>Execution example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">table_create</span> \
+  <span class="o">--</span><span class="n">name</span> <span class="n">InvalidModeScalar</span> \
+  <span class="o">--</span><span class="n">flags</span> <span class="n">TABLE_HASH_KEY</span> \
+  <span class="o">--</span><span class="n">key_type</span> <span class="n">ShortText</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">column_create</span> \
+  <span class="o">--</span><span class="n">table</span> <span class="n">InvalidModeScalar</span> \
+  <span class="o">--</span><span class="n">name</span> <span class="n">invalid_error</span> \
+  <span class="o">--</span><span class="n">flags</span> <span class="n">COLUMN_SCALAR</span><span class="o">|</span><span class="n">INVALID_ERROR</span> \
+  <span class="o">--</span><span class="nb">type</span> <span class="n">Int32</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">column_create</span> \
+  <span class="o">--</span><span class="n">table</span> <span class="n">InvalidModeScalar</span> \
+  <span class="o">--</span><span class="n">name</span> <span class="n">invalid_warn</span> \
+  <span class="o">--</span><span class="n">flags</span> <span class="n">COLUMN_SCALAR</span><span class="o">|</span><span class="n">INVALID_WARN</span> \
+  <span class="o">--</span><span class="nb">type</span> <span class="n">Int32</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">column_create</span> \
+  <span class="o">--</span><span class="n">table</span> <span class="n">InvalidModeScalar</span> \
+  <span class="o">--</span><span class="n">name</span> <span class="n">invalid_ignore</span> \
+  <span class="o">--</span><span class="n">flags</span> <span class="n">COLUMN_SCALAR</span><span class="o">|</span><span class="n">INVALID_IGNORE</span> \
+  <span class="o">--</span><span class="nb">type</span> <span class="n">Int32</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+</pre></div>
+</div>
+<p>Then this example loads <code class="docutils literal notranslate"><span class="pre">29</span></code> as initial values for all columns to
+show differences between them on update:</p>
+<p>Execution example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">load</span> <span class="o">--</span><span class="n">table</span> <span class="n">InvalidModeScalar</span>
+<span class="p">[</span>
+  <span class="p">{</span>
+    <span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;key&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;invalid_error&quot;</span><span class="p">:</span>  <span class="mi">29</span><span class="p">,</span>
+    <span class="s2">&quot;invalid_warn&quot;</span><span class="p">:</span>   <span class="mi">29</span><span class="p">,</span>
+    <span class="s2">&quot;invalid_ignore&quot;</span><span class="p">:</span> <span class="mi">29</span>
+  <span class="p">}</span>
+<span class="p">]</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], 1]</span>
+<span class="n">select</span> \
+  <span class="o">--</span><span class="n">table</span> <span class="n">InvalidModeScalar</span> \
+  <span class="o">--</span><span class="n">output_columns</span> <span class="n">invalid_error</span><span class="p">,</span><span class="n">invalid_warn</span><span class="p">,</span><span class="n">invalid_ignore</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;invalid_error&quot;,</span>
+<span class="c1">#           &quot;Int32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;invalid_warn&quot;,</span>
+<span class="c1">#           &quot;Int32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;invalid_ignore&quot;,</span>
+<span class="c1">#           &quot;Int32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         29,</span>
+<span class="c1">#         29,</span>
+<span class="c1">#         29</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
+</pre></div>
+</div>
+<p>Then this example update existing column values with invalid values.
+The specified invalid value is reported as an error by <a class="reference internal" href="load.html"><span class="doc">load</span></a>
+only with <code class="docutils literal notranslate"><span class="pre">INVALID_ERROR</span></code>. And the existing value isn’t updated only
+with <code class="docutils literal notranslate"><span class="pre">INVALID_ERROR</span></code>. The existing value is updated with <code class="docutils literal notranslate"><span class="pre">0</span></code> with
+<code class="docutils literal notranslate"><span class="pre">INVALID_WARN</span></code> and <code class="docutils literal notranslate"><span class="pre">INVALID_IGNORE</span></code>. You can’t see differences
+between <code class="docutils literal notranslate"><span class="pre">INVALID_WARN</span></code> and <code class="docutils literal notranslate"><span class="pre">INVALID_IGNORE</span></code> with this example but
+a warning message is logged in <a class="reference internal" href="../log.html#process-log"><span class="std std-ref">Process log</span></a> only with
+<code class="docutils literal notranslate"><span class="pre">INVALID_WARN</span></code>:</p>
+<p>Execution example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">load</span> <span class="o">--</span><span class="n">table</span> <span class="n">InvalidModeScalar</span>
+<span class="p">[</span>
+<span class="p">{</span><span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;key&quot;</span><span class="p">,</span> <span class="s2">&quot;invalid_error&quot;</span><span class="p">:</span>  <span class="s2">&quot;invalid&quot;</span><span class="p">},</span>
+<span class="p">]</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     -22,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531,</span>
+<span class="c1">#     &quot;&lt;InvalidModeScalar.invalid_error&gt;: failed to cast to &lt;Int32&gt;: &lt;\&quot;invalid\&quot;&gt;&quot;,</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         &quot;grn_ra_cast_value&quot;,</span>
+<span class="c1">#         &quot;lib/store.c&quot;,</span>
+<span class="c1">#         494</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   1</span>
+<span class="c1"># ]</span>
+<span class="n">load</span> <span class="o">--</span><span class="n">table</span> <span class="n">InvalidModeScalar</span>
+<span class="p">[</span>
+<span class="p">{</span><span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;key&quot;</span><span class="p">,</span> <span class="s2">&quot;invalid_warn&quot;</span><span class="p">:</span>   <span class="s2">&quot;invalid&quot;</span><span class="p">},</span>
+<span class="p">]</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], 1]</span>
+<span class="n">load</span> <span class="o">--</span><span class="n">table</span> <span class="n">InvalidModeScalar</span>
+<span class="p">[</span>
+<span class="p">{</span><span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;key&quot;</span><span class="p">,</span> <span class="s2">&quot;invalid_ignore&quot;</span><span class="p">:</span> <span class="s2">&quot;invalid&quot;</span><span class="p">},</span>
+<span class="p">]</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], 1]</span>
+<span class="n">select</span> \
+  <span class="o">--</span><span class="n">table</span> <span class="n">InvalidModeScalar</span> \
+  <span class="o">--</span><span class="n">output_columns</span> <span class="n">invalid_error</span><span class="p">,</span><span class="n">invalid_warn</span><span class="p">,</span><span class="n">invalid_ignore</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;invalid_error&quot;,</span>
+<span class="c1">#           &quot;Int32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;invalid_warn&quot;,</span>
+<span class="c1">#           &quot;Int32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;invalid_ignore&quot;,</span>
+<span class="c1">#           &quot;Int32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         29,</span>
+<span class="c1">#         0,</span>
+<span class="c1">#         0</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
+</pre></div>
+</div>
+<p>The following table describes the differences between <code class="docutils literal notranslate"><span class="pre">INVALID_*</span></code>
+flags when a vector value that has an invalid element is specified to
+an <code class="docutils literal notranslate"><span class="pre">Int32</span></code> vector column:</p>
+<table class="table">
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Flag</p></th>
+<th class="head"><p>Description</p></th>
+<th class="head"><p>An example given value</p></th>
+<th class="head"><p>An example set value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">INVALID_ERROR</span></code></p></td>
+<td><p>The given invalid element is reported as an error in
+<a class="reference internal" href="../log.html#process-log"><span class="std std-ref">Process log</span></a> but <a class="reference internal" href="load.html"><span class="doc">load</span></a> doesn’t report an error.</p>
+<p>If the target column is a reference vector column and
+<code class="docutils literal notranslate"><span class="pre">MISSING_NIL</span></code> flag is specified, invalid elements are
+replaced with <code class="docutils literal notranslate"><span class="pre">0</span></code>. Invalid elements are ignored otherwise.</p>
+</td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">&quot;invalid&quot;,</span> <span class="pre">3]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">3]</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">INVALID_WARN</span></code></p></td>
+<td><p>The given invalid element is reported as a warning in
+<a class="reference internal" href="../log.html#process-log"><span class="std std-ref">Process log</span></a>.</p>
+<p>If the target column is a reference vector column and
+<code class="docutils literal notranslate"><span class="pre">MISSING_NIL</span></code> flag is specified, invalid elements are
+replaced with <code class="docutils literal notranslate"><span class="pre">0</span></code>. Invalid elements are ignored otherwise.</p>
+</td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">&quot;invalid&quot;,</span> <span class="pre">3]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">3]</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">INVALID_IGNORE</span></code></p></td>
+<td><p>The given invalid element is ignored.</p>
+<p>If the target column is a reference vector column and
+<code class="docutils literal notranslate"><span class="pre">MISSING_NIL</span></code> flag is specified, invalid elements are
+replaced with <code class="docutils literal notranslate"><span class="pre">0</span></code>. Invalid elements are ignored otherwise.</p>
+</td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">&quot;invalid&quot;,</span> <span class="pre">3]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">3]</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p>Here is an example to show differences between <code class="docutils literal notranslate"><span class="pre">INVALID_*</span></code> flags for
+a reference vector column.</p>
+<p>First this example defines columns for all <code class="docutils literal notranslate"><span class="pre">INVALID_*</span></code> flags:</p>
+<p>Execution example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">table_create</span> \
+  <span class="o">--</span><span class="n">name</span> <span class="n">InvalidModeVector</span> \
+  <span class="o">--</span><span class="n">flags</span> <span class="n">TABLE_HASH_KEY</span> \
+  <span class="o">--</span><span class="n">key_type</span> <span class="n">ShortText</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">column_create</span> \
+  <span class="o">--</span><span class="n">table</span> <span class="n">InvalidModeVector</span> \
+  <span class="o">--</span><span class="n">name</span> <span class="n">invalid_error</span> \
+  <span class="o">--</span><span class="n">flags</span> <span class="n">COLUMN_VECTOR</span><span class="o">|</span><span class="n">INVALID_ERROR</span> \
+  <span class="o">--</span><span class="nb">type</span> <span class="n">Int32</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">column_create</span> \
+  <span class="o">--</span><span class="n">table</span> <span class="n">InvalidModeVector</span> \
+  <span class="o">--</span><span class="n">name</span> <span class="n">invalid_warn</span> \
+  <span class="o">--</span><span class="n">flags</span> <span class="n">COLUMN_VECTOR</span><span class="o">|</span><span class="n">INVALID_WARN</span> \
+  <span class="o">--</span><span class="nb">type</span> <span class="n">Int32</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+<span class="n">column_create</span> \
+  <span class="o">--</span><span class="n">table</span> <span class="n">InvalidModeVector</span> \
+  <span class="o">--</span><span class="n">name</span> <span class="n">invalid_ignore</span> \
+  <span class="o">--</span><span class="n">flags</span> <span class="n">COLUMN_VECTOR</span><span class="o">|</span><span class="n">INVALID_IGNORE</span> \
+  <span class="o">--</span><span class="nb">type</span> <span class="n">Int32</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
+</pre></div>
+</div>
+<p>Then this example loads a vector that includes an invalid element to
+all columns. The all specified invalid elements are ignored regardless
+of <code class="docutils literal notranslate"><span class="pre">INVALID_*</span></code> flags. Messages in <a class="reference internal" href="../log.html#process-log"><span class="std std-ref">Process log</span></a> are different
+by <code class="docutils literal notranslate"><span class="pre">INVALID_*</span></code> flags. If <code class="docutils literal notranslate"><span class="pre">INVALID_ERROR</span></code> is specified, an error
+message is logged in <a class="reference internal" href="../log.html#process-log"><span class="std std-ref">Process log</span></a>. If <code class="docutils literal notranslate"><span class="pre">INVALID_WARN</span></code> is
+specified, a warning message is logged in
+<a class="reference internal" href="../log.html#process-log"><span class="std std-ref">Process log</span></a>. <code class="docutils literal notranslate"><span class="pre">INVALID_IGNORE</span></code> is specified, no message is
+logged in <a class="reference internal" href="../log.html#process-log"><span class="std std-ref">Process log</span></a>:</p>
+<p>Execution example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">load</span> <span class="o">--</span><span class="n">table</span> <span class="n">InvalidModeVector</span>
+<span class="p">[</span>
+<span class="p">{</span><span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;key&quot;</span><span class="p">,</span> <span class="s2">&quot;invalid_error&quot;</span><span class="p">:</span>  <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;invalid&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">]}</span>
+<span class="p">]</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], 1]</span>
+<span class="n">load</span> <span class="o">--</span><span class="n">table</span> <span class="n">InvalidModeVector</span>
+<span class="p">[</span>
+<span class="p">{</span><span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;key&quot;</span><span class="p">,</span> <span class="s2">&quot;invalid_warn&quot;</span><span class="p">:</span>   <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;invalid&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">]}</span>
+<span class="p">]</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], 1]</span>
+<span class="n">load</span> <span class="o">--</span><span class="n">table</span> <span class="n">InvalidModeVector</span>
+<span class="p">[</span>
+<span class="p">{</span><span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;key&quot;</span><span class="p">,</span> <span class="s2">&quot;invalid_ignore&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;invalid&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">]}</span>
+<span class="p">]</span>
+<span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], 1]</span>
+<span class="n">select</span> \
+  <span class="o">--</span><span class="n">table</span> <span class="n">InvalidModeVector</span> \
+  <span class="o">--</span><span class="n">output_columns</span> <span class="n">invalid_error</span><span class="p">,</span><span class="n">invalid_warn</span><span class="p">,</span><span class="n">invalid_ignore</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;invalid_error&quot;,</span>
+<span class="c1">#           &quot;Int32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;invalid_warn&quot;,</span>
+<span class="c1">#           &quot;Int32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;invalid_ignore&quot;,</span>
+<span class="c1">#           &quot;Int32&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           1,</span>
+<span class="c1">#           3</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           1,</span>
+<span class="c1">#           3</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           1,</span>
+<span class="c1">#           3</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
 </pre></div>
 </div>
 </div>
@@ -3324,6 +4148,127 @@ column but accepts more data than a normal index column. See
 also <a class="reference internal" href="#column-create-index-large"><span class="std std-ref">Create a large index column</span></a> for knowing what are
 “large data” and how to use this flag.</p>
 <p>This flag is available only for <code class="docutils literal notranslate"><span class="pre">COLUMN_INDEX</span></code>.</p>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MISSING_ADD</span></code></p></td>
+<td><div class="versionadded">
+<p><span class="versionmodified added">New in version 12.0.2.</span></p>
+</div>
+<p>You can’t specify multiple <code class="docutils literal notranslate"><span class="pre">MISSING_*</span></code> flags. They are
+exclusive.</p>
+<p>This is meaningful only for reference scalar and vector
+columns.</p>
+<p>If this flag is specified and nonexistent key in the referred
+table is specified to the column’s value, a new record is
+created in the referred table automatically.</p>
+<p>If you don’t specify any <code class="docutils literal notranslate"><span class="pre">MISSING_*</span></code> flag, <code class="docutils literal notranslate"><span class="pre">MISSING_ADD</span></code> is
+used as the default.</p>
+<p>See also <a class="reference internal" href="#column-create-missing-mode"><span class="std std-ref">Missing mode</span></a>.</p>
+<p>This flag is available only for <code class="docutils literal notranslate"><span class="pre">COLUMN_SCALAR</span></code> and
+<code class="docutils literal notranslate"><span class="pre">COLUMN_VECTOR</span></code>.</p>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MISSING_IGNORE</span></code></p></td>
+<td><div class="versionadded">
+<p><span class="versionmodified added">New in version 12.0.2.</span></p>
+</div>
+<p>You can’t specify multiple <code class="docutils literal notranslate"><span class="pre">MISSING_*</span></code> flags. They are
+exclusive.</p>
+<p>This is meaningful only for reference scalar and vector
+columns.</p>
+<p>If this flag is specified and nonexistent key in the referred
+table is specified to the column’s value, the value is just
+ignored. If the column is a scalar column, <code class="docutils literal notranslate"><span class="pre">GRN_ID_NIL</span></code>
+(<code class="docutils literal notranslate"><span class="pre">0</span></code>) is stored because Groonga doesn’t support the NULL
+value. If the column is a vector column, the element is just
+removed from the value. For example, <code class="docutils literal notranslate"><span class="pre">[&quot;existent1&quot;,</span>
+<span class="pre">&quot;nonexistent&quot;,</span> <span class="pre">&quot;existent2&quot;]</span></code> is set to the vector column and
+<code class="docutils literal notranslate"><span class="pre">&quot;nonexistent&quot;</span></code> record doesn’t exist in the referred table,
+<code class="docutils literal notranslate"><span class="pre">[&quot;existent1&quot;,</span> <span class="pre">&quot;existent2&quot;]</span></code> are set to the vector column.</p>
+<p>See also <a class="reference internal" href="#column-create-missing-mode"><span class="std std-ref">Missing mode</span></a>.</p>
+<p>This flag is available only for <code class="docutils literal notranslate"><span class="pre">COLUMN_SCALAR</span></code> and
+<code class="docutils literal notranslate"><span class="pre">COLUMN_VECTOR</span></code>.</p>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MISSING_NIL</span></code></p></td>
+<td><div class="versionadded">
+<p><span class="versionmodified added">New in version 12.0.2.</span></p>
+</div>
+<p>You can’t specify multiple <code class="docutils literal notranslate"><span class="pre">MISSING_*</span></code> flags. They are
+exclusive.</p>
+<p>This is meaningful only for reference scalar and vector
+columns.</p>
+<p>If this flag is specified and nonexistent key in the referred
+table is specified to the column’s value, the value is replaced
+with <code class="docutils literal notranslate"><span class="pre">GRN_ID_NIL</span></code> (<code class="docutils literal notranslate"><span class="pre">0</span></code>).</p>
+<p>See also <a class="reference internal" href="#column-create-missing-mode"><span class="std std-ref">Missing mode</span></a>.</p>
+<p>This flag is available only for <code class="docutils literal notranslate"><span class="pre">COLUMN_SCALAR</span></code> and
+<code class="docutils literal notranslate"><span class="pre">COLUMN_VECTOR</span></code>.</p>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">INVALID_ERROR</span></code></p></td>
+<td><div class="versionadded">
+<p><span class="versionmodified added">New in version 12.0.2.</span></p>
+</div>
+<p>You can’t specify multiple <code class="docutils literal notranslate"><span class="pre">INVALID_*</span></code> flags. They are
+exclusive.</p>
+<p>If this flag is specified and an invalid value is specified, an
+error is reported to <a class="reference internal" href="../log.html#process-log"><span class="std std-ref">Process log</span></a>.</p>
+<p>For example, <code class="docutils literal notranslate"><span class="pre">&quot;STRING&quot;</span></code> for <code class="docutils literal notranslate"><span class="pre">Int32</span></code> column is an invalid
+value.</p>
+<p>If the column is a scalar column, <a class="reference internal" href="load.html"><span class="doc">load</span></a> also reports an
+error.</p>
+<p>If the column is a vector column, <a class="reference internal" href="load.html"><span class="doc">load</span></a> doesn’t reports
+an error but invalid values in a vector value are removed or
+replaced with <code class="docutils literal notranslate"><span class="pre">GRN_ID_NIL</span></code> (<code class="docutils literal notranslate"><span class="pre">0</span></code>) depending on <code class="docutils literal notranslate"><span class="pre">MISSING_*</span></code>
+flag of the column.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is an incompatible change at 12.0.2. <a class="reference internal" href="load.html"><span class="doc">load</span></a>
+also reports an error for a vector column before 12.0.2.</p>
+</div>
+<p>If you don’t specify any <code class="docutils literal notranslate"><span class="pre">INVALID_*</span></code> flag, <code class="docutils literal notranslate"><span class="pre">INVALID_ERROR</span></code> is
+used as the default.</p>
+<p>See also <a class="reference internal" href="#column-create-invalid-mode"><span class="std std-ref">Invalid mode</span></a>.</p>
+<p>This flag is available only for <code class="docutils literal notranslate"><span class="pre">COLUMN_SCALAR</span></code> and
+<code class="docutils literal notranslate"><span class="pre">COLUMN_VECTOR</span></code>.</p>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">INVALID_WARN</span></code></p></td>
+<td><div class="versionadded">
+<p><span class="versionmodified added">New in version 12.0.2.</span></p>
+</div>
+<p>You can’t specify multiple <code class="docutils literal notranslate"><span class="pre">INVALID_*</span></code> flags. They are
+exclusive.</p>
+<p>If this flag is specified and an invalid value is specified, a
+warning is reported to <a class="reference internal" href="../log.html#process-log"><span class="std std-ref">Process log</span></a> but no error is
+reported.</p>
+<p>For example, <code class="docutils literal notranslate"><span class="pre">&quot;STRING&quot;</span></code> for <code class="docutils literal notranslate"><span class="pre">Int32</span></code> column is an invalid
+value.</p>
+<p>If the column is a vector column, invalid values in a vector
+value are removed or replaced with <code class="docutils literal notranslate"><span class="pre">GRN_ID_NIL</span></code> (<code class="docutils literal notranslate"><span class="pre">0</span></code>)
+depending on <code class="docutils literal notranslate"><span class="pre">MISSING_*</span></code> flag of the column.</p>
+<p>See also <a class="reference internal" href="#column-create-invalid-mode"><span class="std std-ref">Invalid mode</span></a>.</p>
+<p>This flag is available only for <code class="docutils literal notranslate"><span class="pre">COLUMN_SCALAR</span></code> and
+<code class="docutils literal notranslate"><span class="pre">COLUMN_VECTOR</span></code>.</p>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">INVALID_IGNORE</span></code></p></td>
+<td><div class="versionadded">
+<p><span class="versionmodified added">New in version 12.0.2.</span></p>
+</div>
+<p>You can’t specify multiple <code class="docutils literal notranslate"><span class="pre">INVALID_*</span></code> flags. They are
+exclusive.</p>
+<p>If this flag is specified and an invalid value is specified,
+it’s just ignored.</p>
+<p>For example, <code class="docutils literal notranslate"><span class="pre">&quot;STRING&quot;</span></code> for <code class="docutils literal notranslate"><span class="pre">Int32</span></code> column is an invalid
+value.</p>
+<p>If the column is a vector column, invalid values in a vector
+value are removed or replaced with <code class="docutils literal notranslate"><span class="pre">GRN_ID_NIL</span></code> (<code class="docutils literal notranslate"><span class="pre">0</span></code>)
+depending on <code class="docutils literal notranslate"><span class="pre">MISSING_*</span></code> flag of the column.</p>
+<p>See also <a class="reference internal" href="#column-create-invalid-mode"><span class="std std-ref">Invalid mode</span></a>.</p>
+<p>This flag is available only for <code class="docutils literal notranslate"><span class="pre">COLUMN_SCALAR</span></code> and
+<code class="docutils literal notranslate"><span class="pre">COLUMN_VECTOR</span></code>.</p>
 </td>
 </tr>
 </tbody>

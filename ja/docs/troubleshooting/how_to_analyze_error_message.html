@@ -4,9 +4,8 @@
 <html lang="ja">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
-    <title>10.2. エラーメッセージの解析方法 &#8212; Groonga v12.0.5ドキュメント</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>10.2. エラーメッセージの解析方法 &#8212; Groonga v12.0.6ドキュメント</title>
     
     <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 <link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -173,7 +172,7 @@ function checkPageExistsAndRedirect(event) {
             node.onclick = checkPageExistsAndRedirect;
             $("#version_switcher_menu").append(node);
             // replace dropdown button text with the preferred display name of
-            // this version, rather than using sphinx's 12.0.5 variable.
+            // this version, rather than using sphinx's 12.0.6 variable.
             // also highlight the dropdown entry for the currently-viewed
             // version's entry
             if (entry.version == "japanese") {
@@ -280,20 +279,20 @@ function checkPageExistsAndRedirect(event) {
               
               <div>
                 
-  <section id="how-to-analyze-error-messages">
+  <div class="section" id="how-to-analyze-error-messages">
 <h1><span class="section-number">10.2. </span>エラーメッセージの解析方法<a class="headerlink" href="#how-to-analyze-error-messages" title="Permalink to this heading">¶</a></h1>
 <p>Groongaは様々なエラーメッセージを出力しますが、出力されたエラーメッセージ をもとに、原因を解析する方法はいままで、明文化していませんでした。 ここでは、エラーメッセージごとの解析方法を記載します。</p>
-<section id="how-to-analyze-socket-errors">
+<div class="section" id="how-to-analyze-socket-errors">
 <h2><span class="section-number">10.2.1. </span>ソケットエラーの解析方法<a class="headerlink" href="#how-to-analyze-socket-errors" title="Permalink to this heading">¶</a></h2>
 <p>ここでは、Groongaで発生するソケットエラーの解析方法について説明します。</p>
-<section id="example">
+<div class="section" id="example">
 <h3><span class="section-number">10.2.1.1. </span>例<a class="headerlink" href="#example" title="Permalink to this heading">¶</a></h3>
 <p>Groongaのエラーログで以下のようなエラーログがあります。(xxxxxには任意の数字が入ります。):</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">socket</span> <span class="n">error</span><span class="p">[</span><span class="n">xxxxx</span><span class="p">]:</span> <span class="n">no</span> <span class="n">buffer</span><span class="p">:</span> <span class="n">accept</span>
 </pre></div>
 </div>
-</section>
-<section id="how-to-analyze">
+</div>
+<div class="section" id="how-to-analyze">
 <h3><span class="section-number">10.2.1.2. </span>解析方法<a class="headerlink" href="#how-to-analyze" title="Permalink to this heading">¶</a></h3>
 <p>まず、ソケットエラーを扱うマクロである、SOERR というキーワードでGroongaのソースコードをgrepします。</p>
 <p>次に見つかったSOERRの引数にacceptが入っているSOERRをさがします。 すると次のSOERRが見つかります。:</p>
@@ -322,7 +321,7 @@ function checkPageExistsAndRedirect(event) {
 </div>
 <p>から追うことができます。 10055はWindowsのソケットエラーコードを表しています。また、no bufferはSOERRマクロ内でGroongaが用意しているメッセージです。 Windowsのシステムエラーコードから調査しても良いですし、Groongaが出力しているエラーメッセージから調査しても良いです。</p>
 <p>Windowsのシステムエラーコードは以下のページに一覧があります。:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">msdn</span><span class="o">.</span><span class="n">microsoft</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">ja</span><span class="o">-</span><span class="n">jp</span><span class="o">/</span><span class="n">library</span><span class="o">/</span><span class="n">windows</span><span class="o">/</span><span class="n">desktop</span><span class="o">/</span><span class="n">ms740668</span><span class="p">(</span><span class="n">v</span><span class="o">=</span><span class="n">vs</span><span class="mf">.85</span><span class="p">)</span><span class="o">.</span><span class="n">aspx</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">msdn</span><span class="o">.</span><span class="n">microsoft</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">ja</span><span class="o">-</span><span class="n">jp</span><span class="o">/</span><span class="n">library</span><span class="o">/</span><span class="n">windows</span><span class="o">/</span><span class="n">desktop</span><span class="o">/</span><span class="n">ms740668</span><span class="p">(</span><span class="n">v</span><span class="o">=</span><span class="n">vs</span><span class="o">.</span><span class="mi">85</span><span class="p">)</span><span class="o">.</span><span class="n">aspx</span>
 </pre></div>
 </div>
 <p>システムエラーコードまたは、エラーメッセージから調査すると、acceptが失敗した理由は、WSAENOBUFSであることがわかります。さらに、WSAENOBUFSが発生する原因を調査するとWSAENOBUFSが発生する原因は以下であることがわかります。:</p>
@@ -332,9 +331,9 @@ function checkPageExistsAndRedirect(event) {
 </pre></div>
 </div>
 <p>上記のメッセージから、acceptが失敗する原因は、メモリー不足または、接続数が多すぎる場合であることがわかりました。 あとは、エラーメッセージが出た際の状況から、接続数が多かったのか、メモリ不足だったのかを判断します。</p>
-</section>
-</section>
-</section>
+</div>
+</div>
+</div>
 
 
               </div>

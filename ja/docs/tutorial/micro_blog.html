@@ -4,7 +4,8 @@
 <html lang="ja">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>4.10. マイクロブログ検索システムの作成 &#8212; Groonga v12.0.6ドキュメント</title>
     
     <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -396,11 +397,11 @@ function checkPageExistsAndRedirect(event) {
               
               <div>
                 
-  <div class="section" id="let-s-create-micro-blog">
-<h1><span class="section-number">4.10. </span>マイクロブログ検索システムの作成<a class="headerlink" href="#let-s-create-micro-blog" title="Permalink to this heading">¶</a></h1>
+  <section id="let-s-create-micro-blog">
+<h1><span class="section-number">4.10. </span>マイクロブログ検索システムの作成<a class="headerlink" href="#let-s-create-micro-blog" title="この見出しへのパーマリンク">¶</a></h1>
 <p>これまで学んだGroongaの機能を用いて、マイクロブログの検索システムを作成してみましょう。マイクロブログとは、Twitterのような短いメッセージを投稿するブログです。</p>
-<div class="section" id="create-a-table">
-<h2><span class="section-number">4.10.1. </span>テーブルの作成<a class="headerlink" href="#create-a-table" title="Permalink to this heading">¶</a></h2>
+<section id="create-a-table">
+<h2><span class="section-number">4.10.1. </span>テーブルの作成<a class="headerlink" href="#create-a-table" title="この見出しへのパーマリンク">¶</a></h2>
 <p>まずは、テーブルを作成します。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">table_create</span> <span class="o">--</span><span class="n">name</span> <span class="n">Users</span> <span class="o">--</span><span class="n">flags</span> <span class="n">TABLE_HASH_KEY</span> <span class="o">--</span><span class="n">key_type</span> <span class="n">ShortText</span>
 <span class="n">table_create</span> <span class="o">--</span><span class="n">name</span> <span class="n">Comments</span> <span class="o">--</span><span class="n">flags</span> <span class="n">TABLE_HASH_KEY</span> <span class="o">--</span><span class="n">key_type</span> <span class="n">ShortText</span>
@@ -434,8 +435,8 @@ function checkPageExistsAndRedirect(event) {
 <span class="n">column_create</span> <span class="o">--</span><span class="n">table</span> <span class="n">GeoIndex</span> <span class="o">--</span><span class="n">name</span> <span class="n">comments_location</span> <span class="o">--</span><span class="nb">type</span> <span class="n">Comments</span> <span class="o">--</span><span class="n">flags</span> <span class="n">COLUMN_INDEX</span> <span class="o">--</span><span class="n">source</span> <span class="n">location</span>
 </pre></div>
 </div>
-<div class="section" id="users-table">
-<h3><span class="section-number">4.10.1.1. </span>Usersテーブル<a class="headerlink" href="#users-table" title="Permalink to this heading">¶</a></h3>
+<section id="users-table">
+<h3><span class="section-number">4.10.1.1. </span>Usersテーブル<a class="headerlink" href="#users-table" title="この見出しへのパーマリンク">¶</a></h3>
 <p>ユーザーの名前や自己紹介文、フォローしているユーザー一覧など、ユーザー情報を格納するためのテーブルです。</p>
 <dl class="simple">
 <dt><code class="docutils literal notranslate"><span class="pre">_key</span></code></dt><dd><p>ユーザーID</p>
@@ -455,9 +456,9 @@ function checkPageExistsAndRedirect(event) {
 <dt><code class="docutils literal notranslate"><span class="pre">followee</span></code></dt><dd><p><code class="docutils literal notranslate"><span class="pre">Users</span></code> テーブルの <code class="docutils literal notranslate"><span class="pre">follower</span></code> カラムに対するインデックス。 このインデックスを作ることで、あるユーザーをフォローしているユーザーを検索できるようになります。</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="comments-table">
-<h3><span class="section-number">4.10.1.2. </span>Commentsテーブル<a class="headerlink" href="#comments-table" title="Permalink to this heading">¶</a></h3>
+</section>
+<section id="comments-table">
+<h3><span class="section-number">4.10.1.2. </span>Commentsテーブル<a class="headerlink" href="#comments-table" title="この見出しへのパーマリンク">¶</a></h3>
 <p>コメント内容や投稿日時、返信先情報など、コメントに関する内容を格納するテーブルです。</p>
 <dl class="simple">
 <dt><code class="docutils literal notranslate"><span class="pre">_key</span></code></dt><dd><p>コメントID</p>
@@ -479,9 +480,9 @@ function checkPageExistsAndRedirect(event) {
 <dt><code class="docutils literal notranslate"><span class="pre">favorited_by</span></code></dt><dd><p><code class="docutils literal notranslate"><span class="pre">Users</span></code> テーブルの <code class="docutils literal notranslate"><span class="pre">favorites</span></code> カラムに対するインデックス。 このインデックスを作ることで、指定したコメントを誰がお気に入りに入れているのかを検索できるようになります。</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="hashtags-table">
-<h3><span class="section-number">4.10.1.3. </span>HashTagsテーブル<a class="headerlink" href="#hashtags-table" title="Permalink to this heading">¶</a></h3>
+</section>
+<section id="hashtags-table">
+<h3><span class="section-number">4.10.1.3. </span>HashTagsテーブル<a class="headerlink" href="#hashtags-table" title="この見出しへのパーマリンク">¶</a></h3>
 <p>コメントのハッシュタグを一覧で保存するためのテーブルです。</p>
 <dl class="simple">
 <dt><code class="docutils literal notranslate"><span class="pre">_key</span></code></dt><dd><p>ハッシュタグ</p>
@@ -489,9 +490,9 @@ function checkPageExistsAndRedirect(event) {
 <dt><code class="docutils literal notranslate"><span class="pre">hash_index</span></code></dt><dd><p>「Comments.hash_tags」のインデックス。 このインデックスを作ることで、指定したハッシュタグのついているコメントの一覧を出すことが出来るようになります。</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="bigram-table">
-<h3><span class="section-number">4.10.1.4. </span>Bigramテーブル<a class="headerlink" href="#bigram-table" title="Permalink to this heading">¶</a></h3>
+</section>
+<section id="bigram-table">
+<h3><span class="section-number">4.10.1.4. </span>Bigramテーブル<a class="headerlink" href="#bigram-table" title="この見出しへのパーマリンク">¶</a></h3>
 <p>ユーザー情報・コメントで全文検索が出来るようにするためのインデックスを格納するテーブルです。</p>
 <dl class="simple">
 <dt><code class="docutils literal notranslate"><span class="pre">_key</span></code></dt><dd><p>単語</p>
@@ -501,9 +502,9 @@ function checkPageExistsAndRedirect(event) {
 <dt><code class="docutils literal notranslate"><span class="pre">comment_index</span></code></dt><dd><p>コメント内容「Comments.comment」のインデックス</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="geoindex-table">
-<h3><span class="section-number">4.10.1.5. </span>GeoIndexテーブル<a class="headerlink" href="#geoindex-table" title="Permalink to this heading">¶</a></h3>
+</section>
+<section id="geoindex-table">
+<h3><span class="section-number">4.10.1.5. </span>GeoIndexテーブル<a class="headerlink" href="#geoindex-table" title="この見出しへのパーマリンク">¶</a></h3>
 <p>位置情報検索を効果的に行うための locationカラムのインデックスを保持するテーブルです。</p>
 <dl class="simple">
 <dt><code class="docutils literal notranslate"><span class="pre">users_location</span></code></dt><dd><p>Usersテーブルのlocationカラムに対するインデックス</p>
@@ -511,10 +512,10 @@ function checkPageExistsAndRedirect(event) {
 <dt><code class="docutils literal notranslate"><span class="pre">comments_location</span></code></dt><dd><p>Commentsテーブルのlocationカラムに対するインデックス</p>
 </dd>
 </dl>
-</div>
-</div>
-<div class="section" id="loading-data">
-<h2><span class="section-number">4.10.2. </span>データのロード<a class="headerlink" href="#loading-data" title="Permalink to this heading">¶</a></h2>
+</section>
+</section>
+<section id="loading-data">
+<h2><span class="section-number">4.10.2. </span>データのロード<a class="headerlink" href="#loading-data" title="この見出しへのパーマリンク">¶</a></h2>
 <p>つづいて、テスト用データをロードします。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">load</span> <span class="o">--</span><span class="n">table</span> <span class="n">Users</span>
 <span class="p">[</span>
@@ -615,12 +616,12 @@ function checkPageExistsAndRedirect(event) {
 <p><code class="docutils literal notranslate"><span class="pre">Users</span></code> テーブルの <code class="docutils literal notranslate"><span class="pre">location</span></code> カラムと、<code class="docutils literal notranslate"><span class="pre">Comments</span></code> テーブルの <code class="docutils literal notranslate"><span class="pre">location</span></code> カラムは、 <code class="docutils literal notranslate"><span class="pre">GeoPoint</span></code> 型です。この型での値の指定は、&quot;[緯度]x[経度]&quot;と記述して指定します。</p>
 <p><code class="docutils literal notranslate"><span class="pre">Comments</span></code> テーブルの <code class="docutils literal notranslate"><span class="pre">last_modified</span></code> カラムは、Time型です。</p>
 <p>この型での値を指定する方法は2つあります。1つ目の方法は、1970年1月1日0時0分0秒からの経過秒数の値を直接指定する方法です。このとき、小数部分を指定することでマイクロ秒数での指定が可能です。指定した値は、データのロードの際にマイクロ秒を単位とする整数値に変換後、格納されます。 2つ目の方法は、文字列で日時と時刻を指定する方法です。&quot;年/月/日 時:分:秒&quot;というフォーマットで記述することで、データロードの際に文字列からキャストされ、マイクロ秒数の値が格納されます。</p>
-</div>
-<div class="section" id="search">
-<h2><span class="section-number">4.10.3. </span>検索<a class="headerlink" href="#search" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="search">
+<h2><span class="section-number">4.10.3. </span>検索<a class="headerlink" href="#search" title="この見出しへのパーマリンク">¶</a></h2>
 <p>マイクロブログを検索してみましょう。</p>
-<div class="section" id="search-users-by-keyword">
-<h3><span class="section-number">4.10.3.1. </span>キーワードでユーザー検索<a class="headerlink" href="#search-users-by-keyword" title="Permalink to this heading">¶</a></h3>
+<section id="search-users-by-keyword">
+<h3><span class="section-number">4.10.3.1. </span>キーワードでユーザー検索<a class="headerlink" href="#search-users-by-keyword" title="この見出しへのパーマリンク">¶</a></h3>
 <p>ここでは、 <a class="reference internal" href="match_columns.html"><span class="doc">match_columnsパラメータ</span></a> で扱った、複数カラムを対象とした検索を行います。</p>
 <p>指定された文字列で、ユーザー名・現在地・自己紹介文を対象に検索をします。</p>
 <p>実行例:</p>
@@ -656,9 +657,9 @@ function checkPageExistsAndRedirect(event) {
 </pre></div>
 </div>
 <p>「New York」をキーワードにユーザー検索した結果、New Yorkに住んでいる「Bob」がヒットしました。</p>
-</div>
-<div class="section" id="search-users-by-geolocation-data-geopoint">
-<h3><span class="section-number">4.10.3.2. </span>位置情報(GeoPoint)でユーザー検索<a class="headerlink" href="#search-users-by-geolocation-data-geopoint" title="Permalink to this heading">¶</a></h3>
+</section>
+<section id="search-users-by-geolocation-data-geopoint">
+<h3><span class="section-number">4.10.3.2. </span>位置情報(GeoPoint)でユーザー検索<a class="headerlink" href="#search-users-by-geolocation-data-geopoint" title="この見出しへのパーマリンク">¶</a></h3>
 <p>ここでは、GeoPoint型のカラムで検索をします。GeoPoint型については <a class="reference internal" href="search.html"><span class="doc">さまざまな検索条件</span></a> を参照してください。</p>
 <p>次の例では、特定の場所から20km以内に住んでいる人を検索します。</p>
 <p>実行例:</p>
@@ -698,9 +699,9 @@ function checkPageExistsAndRedirect(event) {
 </pre></div>
 </div>
 <p>「Bob」と「Charlie」が「Grand Central Terminal」から20km以内に住んでいることがわかります。</p>
-</div>
-<div class="section" id="search-users-who-follows-specific-user">
-<h3><span class="section-number">4.10.3.3. </span>あるユーザーをフォローしてるユーザーの検索<a class="headerlink" href="#search-users-who-follows-specific-user" title="Permalink to this heading">¶</a></h3>
+</section>
+<section id="search-users-who-follows-specific-user">
+<h3><span class="section-number">4.10.3.3. </span>あるユーザーをフォローしてるユーザーの検索<a class="headerlink" href="#search-users-who-follows-specific-user" title="この見出しへのパーマリンク">¶</a></h3>
 <p>ここでは、 <a class="reference internal" href="index.html"><span class="doc">タグ検索・参照関係の逆引き</span></a> の参照関係の逆引きをします。</p>
 <p>次の例は、 <code class="docutils literal notranslate"><span class="pre">Users</span></code> テーブルの <code class="docutils literal notranslate"><span class="pre">follower</span></code> カラムにあるフォローリストを逆引きします。</p>
 <p>実行例:</p>
@@ -740,9 +741,9 @@ function checkPageExistsAndRedirect(event) {
 </pre></div>
 </div>
 <p>「Alice」と「Charlie」が「Bob」をフォローしていることがわかります。</p>
-</div>
-<div class="section" id="search-comments-by-using-the-value-of-geopoint-type">
-<h3><span class="section-number">4.10.3.4. </span>GeoPointでコメント検索<a class="headerlink" href="#search-comments-by-using-the-value-of-geopoint-type" title="Permalink to this heading">¶</a></h3>
+</section>
+<section id="search-comments-by-using-the-value-of-geopoint-type">
+<h3><span class="section-number">4.10.3.4. </span>GeoPointでコメント検索<a class="headerlink" href="#search-comments-by-using-the-value-of-geopoint-type" title="この見出しへのパーマリンク">¶</a></h3>
 <p>ある範囲内で書かれたコメントを検索します。</p>
 <p>また、 <a class="reference internal" href="drilldown.html"><span class="doc">ドリルダウン</span></a> をおこないます。検索結果をハッシュタグとユーザーでドリルダウンし、ユーザー別・ハッシュタグ別のカウントを出します。</p>
 <p>実行例:</p>
@@ -837,9 +838,9 @@ function checkPageExistsAndRedirect(event) {
 </div>
 <p>このクエリは、ニューヨークのセントラルパークから20km圏内で投稿されたコメントを検索します。</p>
 <p>指定した範囲が20kmなので、位置情報を含むすべてのコメントが検索されました。#groongaというハッシュタグが2件、#travelというハッシュタグが1件で、BobとCharlieがコメントしているのは2件あります。</p>
-</div>
-<div class="section" id="search-comments-by-keyword">
-<h3><span class="section-number">4.10.3.5. </span>キーワードでコメント検索<a class="headerlink" href="#search-comments-by-keyword" title="Permalink to this heading">¶</a></h3>
+</section>
+<section id="search-comments-by-keyword">
+<h3><span class="section-number">4.10.3.5. </span>キーワードでコメント検索<a class="headerlink" href="#search-comments-by-keyword" title="この見出しへのパーマリンク">¶</a></h3>
 <p>あるキーワードを含むコメントを検索します。そして、 <a class="reference internal" href="search.html"><span class="doc">さまざまな検索条件</span></a> で言及している <cite>_score</cite> を出してみます。</p>
 <p>実行例:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="o">--</span><span class="n">table</span> <span class="n">Comments</span> <span class="o">--</span><span class="n">query</span> <span class="n">comment</span><span class="p">:</span><span class="nd">@Now</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">comment</span><span class="p">,</span><span class="n">_score</span>
@@ -878,9 +879,9 @@ function checkPageExistsAndRedirect(event) {
 </pre></div>
 </div>
 <p>'Now'をキーワードに使っているので、このクエリは2件のコメントを返します。 <cite>_score</cite> の値として 'Now'のカウントを含んでいます。</p>
-</div>
-<div class="section" id="search-comments-by-keyword-and-geolocation">
-<h3><span class="section-number">4.10.3.6. </span>キーワードと位置情報で検索<a class="headerlink" href="#search-comments-by-keyword-and-geolocation" title="Permalink to this heading">¶</a></h3>
+</section>
+<section id="search-comments-by-keyword-and-geolocation">
+<h3><span class="section-number">4.10.3.6. </span>キーワードと位置情報で検索<a class="headerlink" href="#search-comments-by-keyword-and-geolocation" title="この見出しへのパーマリンク">¶</a></h3>
 <p>あるキーワードと位置情報の両方でコメントを検索します。 <cite>--query</cite> と <cite>--filter</cite> オプションの両方を使用した場合、両方の条件に一致するレコードを返します。</p>
 <p>実行例:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="o">--</span><span class="n">table</span> <span class="n">Comments</span> <span class="o">--</span><span class="n">query</span> <span class="n">comment</span><span class="p">:</span><span class="nd">@New</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;geo_in_circle(location,&quot;146867000x-266280000&quot;,20000)&#39;</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">posted_by</span><span class="o">.</span><span class="n">name</span><span class="p">,</span><span class="n">comment</span> <span class="o">--</span><span class="n">drilldown</span> <span class="n">hash_tags</span><span class="p">,</span><span class="n">posted_by</span>
@@ -957,9 +958,9 @@ function checkPageExistsAndRedirect(event) {
 </pre></div>
 </div>
 <p>両方の条件をみたすコメントが1件あります。ドリルダウンの結果も含まれ、Bobによるコメントであることがわかります。</p>
-</div>
-<div class="section" id="search-comments-by-hash-tags">
-<h3><span class="section-number">4.10.3.7. </span>ハッシュタグでコメントを検索<a class="headerlink" href="#search-comments-by-hash-tags" title="Permalink to this heading">¶</a></h3>
+</section>
+<section id="search-comments-by-hash-tags">
+<h3><span class="section-number">4.10.3.7. </span>ハッシュタグでコメントを検索<a class="headerlink" href="#search-comments-by-hash-tags" title="この見出しへのパーマリンク">¶</a></h3>
 <p>あるハッシュタグのついているコメントを検索します。テーブルの参照関係を逆にたどってみましょう。</p>
 <p>実行例:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="o">--</span><span class="n">table</span> <span class="n">Comments</span> <span class="o">--</span><span class="n">query</span> <span class="n">hash_tags</span><span class="p">:</span><span class="nd">@groonga</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">posted_by</span><span class="o">.</span><span class="n">name</span><span class="p">,</span><span class="n">comment</span> <span class="o">--</span><span class="n">drilldown</span> <span class="n">posted_by</span>
@@ -1017,9 +1018,9 @@ function checkPageExistsAndRedirect(event) {
 </pre></div>
 </div>
 <p>このクエリは#groongaハッシュタグを含む2件のコメントを返します。投稿者のドリルダウン結果を2件含んでいて、Bobが投稿したことがわかります。</p>
-</div>
-<div class="section" id="search-comments-by-user-id">
-<h3><span class="section-number">4.10.3.8. </span>ユーザーIDでコメントを検索<a class="headerlink" href="#search-comments-by-user-id" title="Permalink to this heading">¶</a></h3>
+</section>
+<section id="search-comments-by-user-id">
+<h3><span class="section-number">4.10.3.8. </span>ユーザーIDでコメントを検索<a class="headerlink" href="#search-comments-by-user-id" title="この見出しへのパーマリンク">¶</a></h3>
 <p>あるユーザーが投稿したコメントを検索します。</p>
 <p>実行例:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="o">--</span><span class="n">table</span> <span class="n">Comments</span> <span class="o">--</span><span class="n">query</span> <span class="n">posted_by</span><span class="p">:</span><span class="n">bob</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">comment</span> <span class="o">--</span><span class="n">drilldown</span> <span class="n">hash_tags</span>
@@ -1081,9 +1082,9 @@ function checkPageExistsAndRedirect(event) {
 </pre></div>
 </div>
 <p>このクエリはBobによる4件のコメントを返します。ハッシュタグによるドリルダウン結果も含まれ、#groongaが2件、#travelが1件であることがわかります。</p>
-</div>
-<div class="section" id="search-user-s-favorite-comments">
-<h3><span class="section-number">4.10.3.9. </span>ユーザーのお気に入りのコメント一覧<a class="headerlink" href="#search-user-s-favorite-comments" title="Permalink to this heading">¶</a></h3>
+</section>
+<section id="search-user-s-favorite-comments">
+<h3><span class="section-number">4.10.3.9. </span>ユーザーのお気に入りのコメント一覧<a class="headerlink" href="#search-user-s-favorite-comments" title="この見出しへのパーマリンク">¶</a></h3>
 <p>あるユーザーのお気に入りコメントを検索します。</p>
 <p>実行例:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="o">--</span><span class="n">table</span> <span class="n">Users</span> <span class="o">--</span><span class="n">query</span> <span class="n">_key</span><span class="p">:</span><span class="n">bob</span> <span class="o">--</span><span class="n">output_columns</span> <span class="n">favorites</span><span class="o">.</span><span class="n">posted_by</span><span class="p">,</span><span class="n">favorites</span><span class="o">.</span><span class="n">comment</span>
@@ -1124,9 +1125,9 @@ function checkPageExistsAndRedirect(event) {
 </pre></div>
 </div>
 <p>このクエリはBobのお気に入りのコメント一覧を返します。</p>
-</div>
-<div class="section" id="search-comments-by-posted-time">
-<h3><span class="section-number">4.10.3.10. </span>投稿時間でコメントを検索<a class="headerlink" href="#search-comments-by-posted-time" title="Permalink to this heading">¶</a></h3>
+</section>
+<section id="search-comments-by-posted-time">
+<h3><span class="section-number">4.10.3.10. </span>投稿時間でコメントを検索<a class="headerlink" href="#search-comments-by-posted-time" title="この見出しへのパーマリンク">¶</a></h3>
 <p>コメントの投稿時間で検索をします。<cite>Time</cite> 型については <a class="reference internal" href="data.html"><span class="doc">いろいろなデータの保存</span></a> を参照してください。</p>
 <p>ある時刻よりも古いコメントを検索します。</p>
 <p>実行例:</p>
@@ -1229,9 +1230,9 @@ function checkPageExistsAndRedirect(event) {
 </pre></div>
 </div>
 <p>このクエリは2010/03/17 14:00:00以前の5件のコメントを返します。投稿者によるドリルダウン結果も含まれ、Aliceが2件、Bobが3件であることがわかります。</p>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
               </div>
@@ -1273,7 +1274,7 @@ function checkPageExistsAndRedirect(event) {
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.0.1.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.1.1.<br>
 </p>
     </div>
     

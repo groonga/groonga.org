@@ -4,8 +4,9 @@
 <html lang="ja">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>7.25.24. grn_thread_* &#8212; Groonga v12.0.7ドキュメント</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>7.25.24. grn_thread_* &#8212; Groonga v12.0.8-1-g40d1766ドキュメント</title>
   <script>
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
@@ -2339,63 +2340,63 @@
             
             <article class="bd-article" role="main">
               
-  <div class="section" id="grn-thread">
+  <section id="grn-thread">
 <h1><span class="section-number">7.25.24. </span><code class="docutils literal notranslate"><span class="pre">grn_thread_*</span></code><a class="headerlink" href="#grn-thread" title="この見出しへのパーマリンク">#</a></h1>
-<div class="section" id="summary">
+<section id="summary">
 <h2><span class="section-number">7.25.24.1. </span>概要<a class="headerlink" href="#summary" title="この見出しへのパーマリンク">#</a></h2>
 <p>スレッド関連のAPIには <code class="docutils literal notranslate"><span class="pre">grn_thread_</span></code> プレフィックスがついています。</p>
 <p>通常、このAPIを使う必要はありません。</p>
 <p>Groongaサーバーを実装するときにこのAPIを使いたくなるかもしれません。</p>
-</div>
-<div class="section" id="example">
+</section>
+<section id="example">
 <h2><span class="section-number">7.25.24.2. </span>例<a class="headerlink" href="#example" title="この見出しへのパーマリンク">#</a></h2>
 <p>以下は、 <a class="reference internal" href="../executables/groonga.html"><span class="doc">groonga 実行ファイル</span></a> が実際に使っている <code class="docutils literal notranslate"><span class="pre">grn_thread_*</span></code> APIの使い方です。 <a class="reference internal" href="../executables/groonga.html"><span class="doc">groonga 実行ファイル</span></a> は最大スレッド数を増やすと、スレッドプールのサイズを増やします。一方、 <a class="reference internal" href="../executables/groonga.html"><span class="doc">groonga 実行ファイル</span></a> は最大スレッド数を減らすと、スレッドプールのサイズを減らします。もし、すでに減少後のスレッドプールのサイズ以上のスレッドが動いていたらそれらを止めます。</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">static</span> <span class="n">grn_mutex</span> <span class="n">q_mutex</span><span class="p">;</span>
-<span class="k">static</span> <span class="n">grn_cond</span> <span class="n">q_cond</span><span class="p">;</span>
-<span class="k">static</span> <span class="kt">uint32_t</span> <span class="n">nfthreads</span><span class="p">;</span>
-<span class="k">static</span> <span class="kt">uint32_t</span> <span class="n">max_nfthreads</span><span class="p">;</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="n">grn_mutex</span><span class="w"> </span><span class="n">q_mutex</span><span class="p">;</span><span class="w"></span>
+<span class="k">static</span><span class="w"> </span><span class="n">grn_cond</span><span class="w"> </span><span class="n">q_cond</span><span class="p">;</span><span class="w"></span>
+<span class="k">static</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">nfthreads</span><span class="p">;</span><span class="w"></span>
+<span class="k">static</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">max_nfthreads</span><span class="p">;</span><span class="w"></span>
 
-<span class="k">static</span> <span class="kt">uint32_t</span>
-<span class="n">groonga_get_thread_limit</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">data</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="k">return</span> <span class="n">max_nfthreads</span><span class="p">;</span>
-<span class="p">}</span>
+<span class="k">static</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"></span>
+<span class="nf">groonga_get_thread_limit</span><span class="p">(</span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="n">data</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">max_nfthreads</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 
-<span class="k">static</span> <span class="kt">void</span>
-<span class="n">groonga_set_thread_limit</span><span class="p">(</span><span class="kt">uint32_t</span> <span class="n">new_limit</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">data</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="kt">uint32_t</span> <span class="n">i</span><span class="p">;</span>
-  <span class="kt">uint32_t</span> <span class="n">current_nfthreads</span><span class="p">;</span>
+<span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"></span>
+<span class="nf">groonga_set_thread_limit</span><span class="p">(</span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">new_limit</span><span class="p">,</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="n">data</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">current_nfthreads</span><span class="p">;</span><span class="w"></span>
 
-  <span class="n">MUTEX_LOCK</span><span class="p">(</span><span class="n">q_mutex</span><span class="p">);</span>
-  <span class="n">current_nfthreads</span> <span class="o">=</span> <span class="n">nfthreads</span><span class="p">;</span>
-  <span class="n">max_nfthreads</span> <span class="o">=</span> <span class="n">new_limit</span><span class="p">;</span>
-  <span class="n">MUTEX_UNLOCK</span><span class="p">(</span><span class="n">q_mutex</span><span class="p">);</span>
+<span class="w">  </span><span class="n">MUTEX_LOCK</span><span class="p">(</span><span class="n">q_mutex</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">current_nfthreads</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nfthreads</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="n">max_nfthreads</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">new_limit</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="n">MUTEX_UNLOCK</span><span class="p">(</span><span class="n">q_mutex</span><span class="p">);</span><span class="w"></span>
 
-  <span class="k">if</span> <span class="p">(</span><span class="n">current_nfthreads</span> <span class="o">&gt;</span> <span class="n">new_limit</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">current_nfthreads</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">MUTEX_LOCK</span><span class="p">(</span><span class="n">q_mutex</span><span class="p">);</span>
-      <span class="n">COND_SIGNAL</span><span class="p">(</span><span class="n">q_cond</span><span class="p">);</span>
-      <span class="n">MUTEX_UNLOCK</span><span class="p">(</span><span class="n">q_mutex</span><span class="p">);</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-<span class="p">}</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">current_nfthreads</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">new_limit</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">current_nfthreads</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="n">MUTEX_LOCK</span><span class="p">(</span><span class="n">q_mutex</span><span class="p">);</span><span class="w"></span>
+<span class="w">      </span><span class="n">COND_SIGNAL</span><span class="p">(</span><span class="n">q_cond</span><span class="p">);</span><span class="w"></span>
+<span class="w">      </span><span class="n">MUTEX_UNLOCK</span><span class="p">(</span><span class="n">q_mutex</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 
-<span class="kt">int</span>
-<span class="n">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="cm">/* ... */</span>
-  <span class="n">grn_thread_set_get_limit_func</span><span class="p">(</span><span class="n">groonga_get_thread_limit</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
-  <span class="n">grn_thread_set_set_limit_func</span><span class="p">(</span><span class="n">groonga_set_thread_limit</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+<span class="kt">int</span><span class="w"></span>
+<span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">argv</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="cm">/* ... */</span><span class="w"></span>
+<span class="w">  </span><span class="n">grn_thread_set_get_limit_func</span><span class="p">(</span><span class="n">groonga_get_thread_limit</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">grn_thread_set_set_limit_func</span><span class="p">(</span><span class="n">groonga_set_thread_limit</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">);</span><span class="w"></span>
 
-  <span class="n">grn_init</span><span class="p">();</span>
+<span class="w">  </span><span class="n">grn_init</span><span class="p">();</span><span class="w"></span>
 
-  <span class="cm">/* ... */</span>
-<span class="p">}</span>
+<span class="w">  </span><span class="cm">/* ... */</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="reference">
+</section>
+<section id="reference">
 <h2><span class="section-number">7.25.24.3. </span>リファレンス<a class="headerlink" href="#reference" title="この見出しへのパーマリンク">#</a></h2>
 <dl class="c type">
 <dt class="sig sig-object c" id="c.grn_thread_get_limit_func">
@@ -2415,7 +2416,7 @@
 <dd><p>最大スレッド数を返します。</p>
 <p><a class="reference internal" href="#c.grn_thread_set_get_limit_func" title="grn_thread_set_get_limit_func"><code class="xref c c-func docutils literal notranslate"><span class="pre">grn_thread_set_get_limit_func()</span></code></a> で <a class="reference internal" href="#c.grn_thread_get_limit_func" title="grn_thread_get_limit_func"><code class="xref c c-type docutils literal notranslate"><span class="pre">grn_thread_get_limit_func</span></code></a> を設定していない場合は、常に <code class="docutils literal notranslate"><span class="pre">0</span></code> を返します。</p>
 <dl class="field-list simple">
-<dt class="field-odd">戻り値</dt>
+<dt class="field-odd">戻り値<span class="colon">:</span></dt>
 <dd class="field-odd"><p>最大スレッド数または <code class="docutils literal notranslate"><span class="pre">0</span></code> 。</p>
 </dd>
 </dl>
@@ -2427,7 +2428,7 @@
 <dd><p>最大スレッド数を設定します。</p>
 <p><a class="reference internal" href="#c.grn_thread_set_set_limit_func" title="grn_thread_set_set_limit_func"><code class="xref c c-func docutils literal notranslate"><span class="pre">grn_thread_set_set_limit_func()</span></code></a> で <a class="reference internal" href="#c.grn_thread_set_limit_func" title="grn_thread_set_limit_func"><code class="xref c c-type docutils literal notranslate"><span class="pre">grn_thread_set_limit_func</span></code></a> を設定していない場合はなにもしません。</p>
 <dl class="field-list simple">
-<dt class="field-odd">パラメータ</dt>
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>new_limit</strong> -- 新しい最大スレッド数。</p></li>
 </ul>
@@ -2441,7 +2442,7 @@
 <dd><p>最大スレッド数を返すカスタム関数を設定します。</p>
 <p><code class="docutils literal notranslate"><span class="pre">data</span></code> は <a class="reference internal" href="#c.grn_thread_get_limit" title="grn_thread_get_limit"><code class="xref c c-func docutils literal notranslate"><span class="pre">grn_thread_get_limit()</span></code></a> が <code class="docutils literal notranslate"><span class="pre">func</span></code> を呼ぶときに <code class="docutils literal notranslate"><span class="pre">func</span></code> に渡されます。</p>
 <dl class="field-list simple">
-<dt class="field-odd">パラメータ</dt>
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>func</strong> -- 最大スレッド数を返すカスタム関数。</p></li>
 <li><p><strong>data</strong> -- <code class="docutils literal notranslate"><span class="pre">func</span></code> が呼ばれるときに <code class="docutils literal notranslate"><span class="pre">func</span></code> に渡されるユーザーのためのデータ。</p></li>
@@ -2456,7 +2457,7 @@
 <dd><p>最大スレッド数を設定するカスタム関数を設定します。</p>
 <p><code class="docutils literal notranslate"><span class="pre">data</span></code> は <a class="reference internal" href="#c.grn_thread_set_limit" title="grn_thread_set_limit"><code class="xref c c-func docutils literal notranslate"><span class="pre">grn_thread_set_limit()</span></code></a> が <code class="docutils literal notranslate"><span class="pre">func</span></code> を呼ぶときに <code class="docutils literal notranslate"><span class="pre">func</span></code> に渡されます。</p>
 <dl class="field-list simple">
-<dt class="field-odd">パラメータ</dt>
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>func</strong> -- 最大スレッド数を設定するカスタム関数。</p></li>
 <li><p><strong>data</strong> -- <code class="docutils literal notranslate"><span class="pre">func</span></code> が呼ばれるときに <code class="docutils literal notranslate"><span class="pre">func</span></code> に渡されるユーザーのためのデータ。</p></li>
@@ -2465,8 +2466,8 @@
 </dl>
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
             </article>

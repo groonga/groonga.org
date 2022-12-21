@@ -6,7 +6,7 @@ description: PGroonga is supported on Supabase!
 
 ## PGroonga is supported on Supabase!
 
-[Supabase](https://supabase.com/) is an open source Firebase alternative that provides all the backend features such as a Postgres database,
+[Supabase](https://supabase.com/) is an open source Firebase alternative that provides all the backend features such as a Postgres database.
 
 Now, [PGroonga](https://pgroonga.github.io/) is happy to announce that it works natively on Supabase!
 

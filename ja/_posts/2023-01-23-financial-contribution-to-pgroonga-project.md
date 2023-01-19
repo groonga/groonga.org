@@ -31,4 +31,3 @@ PGroonga開発チームと上記のような協力関係を築きたい企業は
 また、この事例では [Open Collective](https://opencollective.com/pgroonga) という仕組みを使ってサポート頂いていますが
 Open Collective 以外の GitHub Sponsors などの仕組みでも対応可能です。
 
-* [PGroongaのOpen Collectiveページ](https://opencollective.com/pgroonga)

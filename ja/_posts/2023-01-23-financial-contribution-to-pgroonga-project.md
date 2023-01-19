@@ -27,7 +27,7 @@ PGroongaユーザーが増えることにつながるのでSupabaseにとって�
 したがって、日々のメンテナンスに対してお金を支払ってメンテナンスを継続しやすくすることは、PGroongaのユーザーには安定利用できるメリットがあります。
 そのため、このような形の契約が増えるとよりPGroongaの価値を高められるのではないかと考えています。
 
-PGroonga開発チームと上記のような協力関係を築きたい企業は是非[お問い合わせ]({% link contact/index.md %})ください。
+PGroonga開発チームと上記のような協力関係を築きたい企業は是非[お問い合わせ](https://www.clear-code.com/contact/)ください。
 また、この事例では [Open Collective](https://opencollective.com/pgroonga) という仕組みを使ってサポート頂いていますが
 Open Collective 以外の GitHub Sponsors などの仕組みでも対応可能です。
 

@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>7.3.56. select &#8212; Groonga v12.1.1 documentation</title>
+    <title>7.3.56. select &#8212; Groonga v12.1.2 documentation</title>
   
   
   
@@ -6592,13 +6592,13 @@ Thus the result of <code class="docutils literal notranslate"><span class="pre">
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 12.1.1.</span></p>
 </div>
-<p>ドリルダウン対象のキーがベクター(vector)のときの、キーの展開方法を指定します。現状は <code class="docutils literal notranslate"><span class="pre">NONE</span></code> または <code class="docutils literal notranslate"><span class="pre">POWER_SET</span></code> が指定可能です。</p>
-<p>ドリルダウン対象のキーが1つの場合にのみ使用可能です。キーが2つ以上の場合は無視されます。</p>
+<p>This specifies how to expand key when keys for drilldown are vector. Currently, <code class="docutils literal notranslate"><span class="pre">NONE</span></code> or <code class="docutils literal notranslate"><span class="pre">POWER_SET</span></code> are able to be specified.</p>
+<p>This work only time when one key is target for drilldown. This doesn’t work time when more than 2 keys are target for drilldown.</p>
 <section id="none">
 <span id="select-drilldowns-label-key-vector-expansions-none"></span><h5><span class="section-number">7.3.56.4.8.3.1. </span><code class="docutils literal notranslate"><span class="pre">NONE</span></code><a class="headerlink" href="#none" title="Permalink to this heading">#</a></h5>
-<p><code class="docutils literal notranslate"><span class="pre">key_vector_expansion</span></code> に何も指定しない場合と同じ動作です。</p>
-<p>キーを展開しません。ベクター内の各要素がそれぞれキーとなります。</p>
-<p>以下は <code class="docutils literal notranslate"><span class="pre">Groonga</span></code> 、 <code class="docutils literal notranslate"><span class="pre">Mroonga</span></code> 、 <code class="docutils literal notranslate"><span class="pre">PGroonga</span></code> という３つのタグに対して、これらのタグの登場回数を集計する例です。</p>
+<p>This works as same as <code class="docutils literal notranslate"><span class="pre">key_vector_expansion</span></code> is not specified.</p>
+<p>Keys would not be expanded. Each element within a vector works as each key.</p>
+<p>Following is a sample to aggregate total number of individual and combination occurrence for 3 tags, <code class="docutils literal notranslate"><span class="pre">Groonga</span></code>, <code class="docutils literal notranslate"><span class="pre">Mroonga</span></code>, and <code class="docutils literal notranslate"><span class="pre">PGroonga</span></code>.</p>
 <p>Execution example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">table_create</span> <span class="n">NoneExpantionDrilldownMemos</span> <span class="n">TABLE_HASH_KEY</span> <span class="n">ShortText</span>
 <span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
@@ -6686,15 +6686,15 @@ Thus the result of <code class="docutils literal notranslate"><span class="pre">
 <span class="c1"># ]</span>
 </pre></div>
 </div>
-<p>実行結果から以下のことがわかります。</p>
+<p>Following are facts from the results.</p>
 <table class="table">
 <colgroup>
 <col style="width: 50%" />
 <col style="width: 50%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p>タグ</p></td>
-<td><p>登場回数（ <code class="docutils literal notranslate"><span class="pre">_nsubrecs</span></code> ）</p></td>
+<tr class="row-odd"><td><p>tag</p></td>
+<td><p>number of occurrence（ <code class="docutils literal notranslate"><span class="pre">_nsubrecs</span></code> ）</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Groonga</span></code></p></td>
 <td><p>4</p></td>
@@ -6710,49 +6710,49 @@ Thus the result of <code class="docutils literal notranslate"><span class="pre">
 </section>
 <section id="power-set">
 <span id="select-drilldowns-label-key-vector-expansions-power-set"></span><h5><span class="section-number">7.3.56.4.8.3.2. </span><code class="docutils literal notranslate"><span class="pre">POWER_SET</span></code><a class="headerlink" href="#power-set" title="Permalink to this heading">#</a></h5>
-<p>ベクターをべき集合(power set)に展開して集計(aggregate)します。
-このとき、対象のベクターを多重集合(multiset)とみなします。
-多重集合とみなすので、同じ値の要素が複数ある場合、それぞれ別の要素とみなします。</p>
-<p>ベクター <code class="docutils literal notranslate"><span class="pre">[A,</span> <span class="pre">B,</span> <span class="pre">C]</span></code> を例に考えます。この場合、対象となる集合は <code class="docutils literal notranslate"><span class="pre">{A,</span> <span class="pre">B,</span> <span class="pre">C}</span></code> です。
-べき集合は、集合のすべての部分集合(subset)の集合なので、まず、 <code class="docutils literal notranslate"><span class="pre">{A,</span> <span class="pre">B,</span> <span class="pre">C}</span></code> のすべての部分集合を以下に示します。
-ただし、Groongaは要素数(number of elements)が0の集合（空集合(empty set)）は使いません。ドリルダウン結果に使うには有益ではないからです。
-空集合も使ったほうがよいユースケースがある場合は <a class="reference external" href="https://github.com/groonga/groonga/issues">issue</a> で報告してください。</p>
+<p>This aggregates total with expanding vectors to the power set.
+In this case, a target vector is considered as multi set.
+Thus, each element is considered as an individual element when there are multiple elements with same value.</p>
+<p>For example, there is a vector <code class="docutils literal notranslate"><span class="pre">[A,</span> <span class="pre">B,</span> <span class="pre">C]</span></code>. In this case, a target set is <code class="docutils literal notranslate"><span class="pre">{A,</span> <span class="pre">B,</span> <span class="pre">C}</span></code>.
+The power set is aggrigation for all of subsets within a set. Following shows all of subset within a set <code class="docutils literal notranslate"><span class="pre">{A,</span> <span class="pre">B,</span> <span class="pre">C}</span></code>.
+However, Groonga does not use empty set, that number of elements is 0. It is because empty set is not useful for results of drilldown.
+Please report at <a class="reference external" href="https://github.com/groonga/groonga/issues">issue</a>, if you find a case to use empty set.</p>
 <ul class="simple">
-<li><p>要素数が1の部分集合</p>
+<li><p>Subset with 1 element</p>
 <ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">{A}</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">{B}</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">{C}</span></code></p></li>
 </ul>
 </li>
-<li><p>要素数が2の部分集合</p>
+<li><p>Subset with 2 elements</p>
 <ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">{A,</span> <span class="pre">B}</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">{B,</span> <span class="pre">C}</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">{A,</span> <span class="pre">C}</span></code></p></li>
 </ul>
 </li>
-<li><p>要素数が3の部分集合</p>
+<li><p>Subset with 3 elements</p>
 <ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">{A,</span> <span class="pre">B,</span> <span class="pre">C}</span></code></p></li>
 </ul>
 </li>
 </ul>
-<p>以上が <code class="docutils literal notranslate"><span class="pre">{A,</span> <span class="pre">B,</span> <span class="pre">C}</span></code> のすべての部分集合です。
-べき集合は、これらの部分集合の集合なので、 <code class="docutils literal notranslate"><span class="pre">{{A},</span> <span class="pre">{B},</span> <span class="pre">{C},</span> <span class="pre">{A,</span> <span class="pre">B},</span> <span class="pre">{B,</span> <span class="pre">C},</span> <span class="pre">{A,</span> <span class="pre">C},</span> <span class="pre">{A,</span> <span class="pre">B,</span> <span class="pre">C}}</span></code> がこのベクターのべき集合となります。</p>
-<p><code class="docutils literal notranslate"><span class="pre">POWER_SET</span></code> は、この <code class="docutils literal notranslate"><span class="pre">{{A},</span> <span class="pre">{B},</span> <span class="pre">{C},</span> <span class="pre">{A,</span> <span class="pre">B},</span> <span class="pre">{B,</span> <span class="pre">C},</span> <span class="pre">{A,</span> <span class="pre">C},</span> <span class="pre">{A,</span> <span class="pre">B,</span> <span class="pre">C}}</span></code> の各部分集合で集計します。</p>
-<p>例として、 <code class="docutils literal notranslate"><span class="pre">[A,</span> <span class="pre">B,</span> <span class="pre">C]</span></code> と <code class="docutils literal notranslate"><span class="pre">[B,</span> <span class="pre">C,</span> <span class="pre">D]</span></code> をべき集合で集計する場合を考えます。</p>
-<p><code class="docutils literal notranslate"><span class="pre">[A,</span> <span class="pre">B,</span> <span class="pre">C]</span></code> のべき集合は前述の通り <code class="docutils literal notranslate"><span class="pre">{{A},</span> <span class="pre">{B},</span> <span class="pre">{C},</span> <span class="pre">{A,</span> <span class="pre">B},</span> <span class="pre">{B,</span> <span class="pre">C},</span> <span class="pre">{A,</span> <span class="pre">C},</span> <span class="pre">{A,</span> <span class="pre">B,</span> <span class="pre">C}}</span></code>  で、
-<code class="docutils literal notranslate"><span class="pre">[B,</span> <span class="pre">C,</span> <span class="pre">D]</span></code> のべき集合は同様に <code class="docutils literal notranslate"><span class="pre">{{B},</span> <span class="pre">{C},</span> <span class="pre">{D},</span> <span class="pre">{B,</span> <span class="pre">C},</span> <span class="pre">{C,</span> <span class="pre">D},</span> <span class="pre">{B,</span> <span class="pre">D},</span> <span class="pre">{B,</span> <span class="pre">C,</span> <span class="pre">D}}</span></code>  となります。</p>
-<p>この各べき集合で登場した部分集合ごとに集計します。登場回数を集計した場合は以下の結果になります。</p>
+<p>Those are all subsets for <code class="docutils literal notranslate"><span class="pre">{A,</span> <span class="pre">B,</span> <span class="pre">C}</span></code>.
+Since the power set is aggregation of those subsets, <code class="docutils literal notranslate"><span class="pre">{{A},</span> <span class="pre">{B},</span> <span class="pre">{C},</span> <span class="pre">{A,</span> <span class="pre">B},</span> <span class="pre">{B,</span> <span class="pre">C},</span> <span class="pre">{A,</span> <span class="pre">C},</span> <span class="pre">{A,</span> <span class="pre">B,</span> <span class="pre">C}}</span></code> is a power set for the vector.</p>
+<p><code class="docutils literal notranslate"><span class="pre">POWER_SET</span></code> aggregates with each subset for <code class="docutils literal notranslate"><span class="pre">{{A},</span> <span class="pre">{B},</span> <span class="pre">{C},</span> <span class="pre">{A,</span> <span class="pre">B},</span> <span class="pre">{B,</span> <span class="pre">C},</span> <span class="pre">{A,</span> <span class="pre">C},</span> <span class="pre">{A,</span> <span class="pre">B,</span> <span class="pre">C}}</span></code>.</p>
+<p>For example, there is a case to aggregate <code class="docutils literal notranslate"><span class="pre">[A,</span> <span class="pre">B,</span> <span class="pre">C]</span></code> and <code class="docutils literal notranslate"><span class="pre">[B,</span> <span class="pre">C,</span> <span class="pre">D]</span></code> with the power set.</p>
+<p>A power set for <code class="docutils literal notranslate"><span class="pre">[A,</span> <span class="pre">B,</span> <span class="pre">C]</span></code> is <code class="docutils literal notranslate"><span class="pre">{{A},</span> <span class="pre">{B},</span> <span class="pre">{C},</span> <span class="pre">{A,</span> <span class="pre">B},</span> <span class="pre">{B,</span> <span class="pre">C},</span> <span class="pre">{A,</span> <span class="pre">C},</span> <span class="pre">{A,</span> <span class="pre">B,</span> <span class="pre">C}}</span></code> as previously explained.
+Likewise a power set for <code class="docutils literal notranslate"><span class="pre">[B,</span> <span class="pre">C,</span> <span class="pre">D]</span></code> is <code class="docutils literal notranslate"><span class="pre">{{B},</span> <span class="pre">{C},</span> <span class="pre">{D},</span> <span class="pre">{B,</span> <span class="pre">C},</span> <span class="pre">{C,</span> <span class="pre">D},</span> <span class="pre">{B,</span> <span class="pre">D},</span> <span class="pre">{B,</span> <span class="pre">C,</span> <span class="pre">D}}</span></code>.</p>
+<p>Aggregating occurrence of each subset in each power set is shown in result as follows.</p>
 <table class="table">
 <colgroup>
 <col style="width: 50%" />
 <col style="width: 50%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p>部分集合</p></td>
-<td><p>登場回数（ <code class="docutils literal notranslate"><span class="pre">_nsubrecs</span></code> ）</p></td>
+<tr class="row-odd"><td><p>subset</p></td>
+<td><p>number of occurrence（ <code class="docutils literal notranslate"><span class="pre">_nsubrecs</span></code> ）</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">{A}</span></code></p></td>
 <td><p>1</p></td>
@@ -6789,9 +6789,8 @@ Thus the result of <code class="docutils literal notranslate"><span class="pre">
 </tr>
 </tbody>
 </table>
-<p>この集計方法は、例えばタグの登場回数と、タグの組み合わせの登場回数を一度に集計したい場合に便利です。</p>
-<p>以下は <code class="docutils literal notranslate"><span class="pre">Groonga</span></code> 、 <code class="docutils literal notranslate"><span class="pre">Mroonga</span></code> 、 <code class="docutils literal notranslate"><span class="pre">PGroonga</span></code> という３つのタグに対して、これらのタグの登場回数と、
-これらの組み合わせの登場回数を集計する例です。</p>
+<p>This aggregating methods is useful when it is requirement to sum total number of occurrence for individual tags and combination of tags at once.</p>
+<p>Following is an example to aggregate total occurrence for individual and combination of 3 tags, <code class="docutils literal notranslate"><span class="pre">Groonga</span></code>, <code class="docutils literal notranslate"><span class="pre">Mroonga</span></code>, and <code class="docutils literal notranslate"><span class="pre">PGroonga</span></code>.</p>
 <p>Execution example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">table_create</span> <span class="n">PowerSetDrilldownMemos</span> <span class="n">TABLE_HASH_KEY</span> <span class="n">ShortText</span>
 <span class="c1"># [[0, 1337566253.89858, 0.000355720520019531], true]</span>
@@ -6908,15 +6907,15 @@ Thus the result of <code class="docutils literal notranslate"><span class="pre">
 <span class="c1"># ]</span>
 </pre></div>
 </div>
-<p>この集計結果から、以下のことがわかります。</p>
+<p>With this aggregation result, following information would be known.</p>
 <table class="table">
 <colgroup>
 <col style="width: 50%" />
 <col style="width: 50%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p>タグ</p></td>
-<td><p>登場回数</p></td>
+<tr class="row-odd"><td><p>tag</p></td>
+<td><p>number of occurrence（ <code class="docutils literal notranslate"><span class="pre">_nsubrecs</span></code> ）</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Groonga</span></code></p></td>
 <td><p>4</p></td>
@@ -6927,22 +6926,23 @@ Thus the result of <code class="docutils literal notranslate"><span class="pre">
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">PGroonga</span></code></p></td>
 <td><p>2</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Groonga</span></code> かつ <code class="docutils literal notranslate"><span class="pre">Mroonga</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Groonga</span></code> and <code class="docutils literal notranslate"><span class="pre">Mroonga</span></code></p></td>
 <td><p>2</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Groonga</span></code> かつ <code class="docutils literal notranslate"><span class="pre">PGroonga</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Groonga</span></code> and <code class="docutils literal notranslate"><span class="pre">PGroonga</span></code></p></td>
 <td><p>2</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Mroonga</span></code> かつ <code class="docutils literal notranslate"><span class="pre">PGroonga</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Mroonga</span></code> and <code class="docutils literal notranslate"><span class="pre">PGroonga</span></code></p></td>
 <td><p>1</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Groonga</span></code> かつ <code class="docutils literal notranslate"><span class="pre">Mroonga</span></code> かつ <code class="docutils literal notranslate"><span class="pre">PGroonga</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Groonga</span></code> and <code class="docutils literal notranslate"><span class="pre">Mroonga</span></code> and <code class="docutils literal notranslate"><span class="pre">PGroonga</span></code></p></td>
 <td><p>1</p></td>
 </tr>
 </tbody>
 </table>
-<p>この結果から、どのタグの組み合わせがよく使われているか・使われていないかといった相関関係を分析できます。
-例えば、 <code class="docutils literal notranslate"><span class="pre">Groonga</span></code> と <code class="docutils literal notranslate"><span class="pre">Mroonga</span></code> が同時に使われている回数は2回で、そのうち更に <code class="docutils literal notranslate"><span class="pre">PGroonga</span></code> が同時に使われている回数が1回、というような分析ができます。</p>
+<p>This result allows to analyze correlation between each tag and combination such as whether often used.
+For example with this sample, it can be analyzed that <code class="docutils literal notranslate"><span class="pre">Groonga</span></code> and <code class="docutils literal notranslate"><span class="pre">Mroonga</span></code> are used twice at same time and within those twice,
+<code class="docutils literal notranslate"><span class="pre">PGroonga</span></code> is also used at same time for once.</p>
 </section>
 </section>
 <section id="drilldowns-label-output-columns">

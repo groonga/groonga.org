@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>News - 13 series &#8212; Groonga v13.0.5 documentation</title>
+    <title>News - 13 series &#8212; Groonga v13.0.6 documentation</title>
   
   
   
@@ -370,10 +370,121 @@ document.write(`
                   
   <section class="tex2jax_ignore mathjax_ignore" id="news-13-series">
 <h1>News - 13 series<a class="headerlink" href="#news-13-series" title="Permalink to this heading">#</a></h1>
-<section id="release-13-0-5-2023-08-02">
-<span id="release-13-0-5"></span><h2>Release 13.0.5 - 2023-08-02<a class="headerlink" href="#release-13-0-5-2023-08-02" title="Permalink to this heading">#</a></h2>
+<section id="release-13-0-6-2023-08-31">
+<span id="release-13-0-6"></span><h2>Release 13.0.6 - 2023-08-31<a class="headerlink" href="#release-13-0-6-2023-08-31" title="Permalink to this heading">#</a></h2>
+<section id="improvements">
+<h3>Improvements<a class="headerlink" href="#improvements" title="Permalink to this heading">#</a></h3>
+<ul>
+<li><p>[<a class="reference internal" href="../reference/functions/highlight_html.html"><span class="doc">highlight_html</span></a>] Don’t report error when we specify empty string into <code class="docutils literal notranslate"><span class="pre">highlight_html()</span></code> as below.</p>
+<p><code class="docutils literal notranslate"><span class="pre">highlight_html()</span></code> just returns an empty text.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">table_create</span> <span class="n">Entries</span> <span class="n">TABLE_NO_KEY</span>
+<span class="n">column_create</span> <span class="n">Entries</span> <span class="n">body</span> <span class="n">COLUMN_SCALAR</span> <span class="n">ShortText</span>
+
+<span class="n">table_create</span> <span class="n">Terms</span> <span class="n">TABLE_PAT_KEY</span> <span class="n">ShortText</span> \
+  <span class="o">--</span><span class="n">default_tokenizer</span> <span class="s1">&#39;TokenNgram(&quot;report_source_location&quot;, true)&#39;</span> \
+  <span class="o">--</span><span class="n">normalizer</span> <span class="s1">&#39;NormalizerNFKC150&#39;</span>
+<span class="n">column_create</span> <span class="n">Terms</span> <span class="n">document_index</span> <span class="n">COLUMN_INDEX</span><span class="o">|</span><span class="n">WITH_POSITION</span> <span class="n">Entries</span> <span class="n">body</span>
+
+<span class="n">load</span> <span class="o">--</span><span class="n">table</span> <span class="n">Entries</span>
+<span class="p">[</span>
+<span class="p">{</span><span class="s2">&quot;body&quot;</span><span class="p">:</span> <span class="s2">&quot;ab cd ed gh&quot;</span><span class="p">}</span>
+<span class="p">]</span>
+
+<span class="n">select</span> <span class="n">Entries</span> \
+  <span class="o">--</span><span class="n">match_columns</span> <span class="n">body</span> \
+  <span class="o">--</span><span class="n">query</span> <span class="s1">&#39;ab&#39;</span> \
+  <span class="o">--</span><span class="n">output_columns</span> <span class="s1">&#39;highlight_html(&quot;&quot;, Terms)&#39;</span>
+<span class="p">[</span>
+  <span class="p">[</span>
+    <span class="mi">0</span><span class="p">,</span>
+    <span class="mf">0.0</span><span class="p">,</span>
+    <span class="mf">0.0</span>
+  <span class="p">],</span>
+  <span class="p">[</span>
+    <span class="p">[</span>
+      <span class="p">[</span>
+        <span class="mi">1</span>
+      <span class="p">],</span>
+      <span class="p">[</span>
+        <span class="p">[</span>
+          <span class="s2">&quot;highlight_html&quot;</span><span class="p">,</span><span class="n">null</span>
+        <span class="p">]</span>
+      <span class="p">],</span>
+      <span class="p">[</span>
+        <span class="s2">&quot;&quot;</span>
+      <span class="p">]</span>
+    <span class="p">]</span>
+  <span class="p">]</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</li>
+<li><p>Added support <code class="docutils literal notranslate"><span class="pre">aggregator_*</span></code> for dynamic columns and pseudo columns.</p>
+<p>Pseudo column is a column with <code class="docutils literal notranslate"><span class="pre">_</span></code> prefix.(e.g. <code class="docutils literal notranslate"><span class="pre">_id</span></code>, <code class="docutils literal notranslate"><span class="pre">_nsubrecs</span></code>, …).</p>
+</li>
+</ul>
+</section>
 <section id="fixes">
 <h3>Fixes<a class="headerlink" href="#fixes" title="Permalink to this heading">#</a></h3>
+<ul>
+<li><p>[CMake] Fixed a build error with CMake when both of msgpack and msgpackc-cxx are installed.</p>
+<p>Please refer the comment of <a class="github reference external" href="https://github.com/groonga/groonga/pull/1601">groonga/groonga#1601</a> about details.</p>
+</li>
+<li><p>Fixed a parse bug when we use <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">OR</span> <span class="pre">&lt;0.0y</span></code> with <code class="docutils literal notranslate"><span class="pre">QUERY_NO_SYNTAX_ERROR</span></code>.</p>
+<p>Records that should match may be not matched.</p>
+<p>For example, if we execute the following query, <code class="docutils literal notranslate"><span class="pre">{&quot;_key&quot;:</span> <span class="pre">&quot;name</span> <span class="pre">yyy&quot;}</span></code> should match but <code class="docutils literal notranslate"><span class="pre">{&quot;_key&quot;:</span> <span class="pre">&quot;name</span> <span class="pre">yyy&quot;}</span></code> is not match.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">table_create</span> <span class="n">Names</span> <span class="n">TABLE_PAT_KEY</span> <span class="n">ShortText</span>
+<span class="n">table_create</span> <span class="n">Tokens</span> <span class="n">TABLE_PAT_KEY</span> <span class="n">ShortText</span> \
+  <span class="o">--</span><span class="n">default_tokenizer</span> <span class="n">TokenBigram</span> \
+  <span class="o">--</span><span class="n">normalizer</span> <span class="n">NormalizerAuto</span>
+<span class="n">column_create</span> <span class="n">Tokens</span> <span class="n">names_key</span> <span class="n">COLUMN_INDEX</span><span class="o">|</span><span class="n">WITH_POSITION</span> <span class="n">Names</span> <span class="n">_key</span>
+
+<span class="n">load</span> <span class="o">--</span><span class="n">table</span> <span class="n">Names</span>
+<span class="p">[</span>
+<span class="p">{</span><span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;name yyy&quot;</span><span class="p">}</span>
+<span class="p">]</span>
+
+<span class="n">select</span> <span class="n">Names</span> \
+  <span class="o">--</span><span class="n">match_columns</span> <span class="s2">&quot;_key&quot;</span> \
+  <span class="o">--</span><span class="n">query</span> <span class="s2">&quot;xxx OR &lt;0.0yyy&quot;</span> \
+  <span class="o">--</span><span class="n">query_flags</span> <span class="n">ALLOW_PRAGMA</span><span class="o">|</span><span class="n">ALLOW_COLUMN</span><span class="o">|</span><span class="n">QUERY_NO_SYNTAX_ERROR</span>
+<span class="p">[</span>
+  <span class="p">[</span>
+    <span class="mi">0</span><span class="p">,</span>
+    <span class="mf">0.0</span><span class="p">,</span>
+    <span class="mf">0.0</span>
+  <span class="p">],</span>
+  <span class="p">[</span>
+    <span class="p">[</span>
+      <span class="p">[</span>
+        <span class="mi">0</span>
+      <span class="p">],</span>
+      <span class="p">[</span>
+        <span class="p">[</span>
+          <span class="s2">&quot;_id&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;UInt32&quot;</span>
+        <span class="p">],</span>
+        <span class="p">[</span>
+          <span class="s2">&quot;_key&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;ShortText&quot;</span>
+        <span class="p">]</span>
+      <span class="p">]</span>
+    <span class="p">]</span>
+  <span class="p">]</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</li>
+<li><p>[<a class="reference internal" href="../reference/functions/highlight_html.html"><span class="doc">highlight_html</span></a>] Fixed a bug that highlight position may be incorrect.</p>
+<p>For example, this bug occures when we specify as highlight target both of keyword with the number of characters is one and keyword with the number of characters is two.</p>
+</li>
+</ul>
+</section>
+</section>
+<section id="release-13-0-5-2023-08-02">
+<span id="release-13-0-5"></span><h2>Release 13.0.5 - 2023-08-02<a class="headerlink" href="#release-13-0-5-2023-08-02" title="Permalink to this heading">#</a></h2>
+<section id="id1">
+<h3>Fixes<a class="headerlink" href="#id1" title="Permalink to this heading">#</a></h3>
 <ul>
 <li><p>Fixed a bug that index creation may be failed.</p>
 <p>Groonga v13.0.2, v13.0.3, and v13.0.4 have this bug.
@@ -404,14 +515,14 @@ Therefore, If you already have used the above version, we highly recommend that 
 </section>
 <section id="release-13-0-4-2023-07-26">
 <span id="release-13-0-4"></span><h2>Release 13.0.4 - 2023-07-26<a class="headerlink" href="#release-13-0-4-2023-07-26" title="Permalink to this heading">#</a></h2>
-<section id="improvements">
-<h3>Improvements<a class="headerlink" href="#improvements" title="Permalink to this heading">#</a></h3>
+<section id="id2">
+<h3>Improvements<a class="headerlink" href="#id2" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p>[<a class="reference internal" href="../install/windows.html"><span class="doc">Windows</span></a>] Stopped providing 32-bit packages.</p></li>
 </ul>
 </section>
-<section id="id1">
-<h3>Fixes<a class="headerlink" href="#id1" title="Permalink to this heading">#</a></h3>
+<section id="id3">
+<h3>Fixes<a class="headerlink" href="#id3" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p>[<a class="reference internal" href="../install/debian.html"><span class="doc">Debian GNU/Linux</span></a>] [<a class="reference internal" href="../install/ubuntu.html"><span class="doc">Ubuntu</span></a>] Fixed the default
 configuration file path for <a class="reference internal" href="../reference/query_expanders/tsv.html"><span class="doc">QueryExpanderTSV</span></a>.</p></li>
@@ -422,8 +533,8 @@ or 3.17 are used.</p></li>
 </section>
 <section id="release-13-0-3-2023-07-24">
 <span id="release-13-0-3"></span><h2>Release 13.0.3 - 2023-07-24<a class="headerlink" href="#release-13-0-3-2023-07-24" title="Permalink to this heading">#</a></h2>
-<section id="id2">
-<h3>Improvements<a class="headerlink" href="#id2" title="Permalink to this heading">#</a></h3>
+<section id="id4">
+<h3>Improvements<a class="headerlink" href="#id4" title="Permalink to this heading">#</a></h3>
 <ul>
 <li><p>[<a class="reference internal" href="../reference/executables/groonga-httpd.html"><span class="doc">groonga-httpd</span></a>] Extracted to
 <a class="reference external" href="https://github.com/groonga/groonga-nginx">groonga-nginx</a>. We
@@ -447,8 +558,8 @@ your use case.</p>
 <li><p>[<a class="reference internal" href="../install/ubuntu.html"><span class="doc">Ubuntu</span></a>] Enabled xxHash support.</p></li>
 </ul>
 </section>
-<section id="id3">
-<h3>Fixes<a class="headerlink" href="#id3" title="Permalink to this heading">#</a></h3>
+<section id="id5">
+<h3>Fixes<a class="headerlink" href="#id5" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Fixed a bug that the source archive can’t be built with CMake.</p></li>
 </ul>
@@ -456,8 +567,8 @@ your use case.</p>
 </section>
 <section id="release-13-0-2-2023-07-12">
 <span id="release-13-0-2"></span><h2>Release 13.0.2 - 2023-07-12<a class="headerlink" href="#release-13-0-2-2023-07-12" title="Permalink to this heading">#</a></h2>
-<section id="id4">
-<h3>Improvements<a class="headerlink" href="#id4" title="Permalink to this heading">#</a></h3>
+<section id="id6">
+<h3>Improvements<a class="headerlink" href="#id6" title="Permalink to this heading">#</a></h3>
 <ul>
 <li><p>[<a class="reference internal" href="../install/ubuntu.html"><span class="doc">Ubuntu</span></a>] Dropped support for Ubuntu 18.04 (Bionic Beaver).</p></li>
 <li><p>[<a class="reference internal" href="../install/ubuntu.html"><span class="doc">Ubuntu</span></a>] Added support for Ubuntu 23.04 (Lunar Lobster).</p></li>
@@ -500,8 +611,8 @@ count implementation for built-in objects.</p></li>
 <li><p>Added support for logging backtrace on <code class="docutils literal notranslate"><span class="pre">SIGABRT</span></code>.</p></li>
 </ul>
 </section>
-<section id="id5">
-<h3>Fixes<a class="headerlink" href="#id5" title="Permalink to this heading">#</a></h3>
+<section id="id7">
+<h3>Fixes<a class="headerlink" href="#id7" title="Permalink to this heading">#</a></h3>
 <ul>
 <li><p>[<a class="reference internal" href="../reference/grn_expr/query_syntax.html#query-syntax-ordered-near-phrase-product-search-condition"><span class="std std-ref">Ordered near phrase product search condition</span></a>]
 [<a class="reference internal" href="../reference/grn_expr/script_syntax.html#script-syntax-ordered-near-phrase-product-search-operator"><span class="std std-ref">Ordered near phrase product search operator</span></a>]
@@ -559,8 +670,8 @@ problem.</p></li>
 </section>
 <section id="release-13-0-1-2023-03-24">
 <span id="release-13-0-1"></span><h2>Release 13.0.1 - 2023-03-24<a class="headerlink" href="#release-13-0-1-2023-03-24" title="Permalink to this heading">#</a></h2>
-<section id="id6">
-<h3>Improvements<a class="headerlink" href="#id6" title="Permalink to this heading">#</a></h3>
+<section id="id8">
+<h3>Improvements<a class="headerlink" href="#id8" title="Permalink to this heading">#</a></h3>
 <ul>
 <li><p>[<a class="reference internal" href="../reference/functions/highlight_html.html"><span class="doc">highlight_html</span></a>] Added support for prefix search.</p>
 <p>We can now use prefix search in <code class="docutils literal notranslate"><span class="pre">highlight_html</span></code>.</p>
@@ -913,8 +1024,8 @@ Groonga can found MessagePack since this release even if the version of MessageP
 </li>
 </ul>
 </section>
-<section id="id7">
-<h3>Fixes<a class="headerlink" href="#id7" title="Permalink to this heading">#</a></h3>
+<section id="id9">
+<h3>Fixes<a class="headerlink" href="#id9" title="Permalink to this heading">#</a></h3>
 <ul>
 <li><p>[<a class="reference internal" href="../reference/normalizers.html"><span class="doc">Normalizers</span></a>] Fixed a bug that NormalizerNFKC* did incorrect normalization.</p>
 <p>This bug occured when <code class="docutils literal notranslate"><span class="pre">unify_kana_case</span></code> and <code class="docutils literal notranslate"><span class="pre">unify_katakana_v_sounds</span></code> used at the same time.</p>
@@ -1119,8 +1230,8 @@ So it should be matched, but isn’t.</p>
 <li><p>[<a class="reference internal" href="../reference/functions/highlight_html.html"><span class="doc">highlight_html</span></a>] Fixed a bug that highlight position may move over when we use <code class="docutils literal notranslate"><span class="pre">loose_symbol=true</span></code>.</p></li>
 </ul>
 </section>
-<section id="id8">
-<h3>Thanks<a class="headerlink" href="#id8" title="Permalink to this heading">#</a></h3>
+<section id="id10">
+<h3>Thanks<a class="headerlink" href="#id10" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Carlo Cabrera</p></li>
 </ul>
@@ -1132,8 +1243,8 @@ So it should be matched, but isn’t.</p>
 But It keeps backward compatibility. We can upgrade to 13.0.0 without rebuilding database.</p>
 <p>First of all, we introduce the main changes in 13.0.0.
 Then, we introduce the hilight and summary of changes from Groonga 12.0.0 to 12.1.2.</p>
-<section id="id9">
-<h3>Improvements<a class="headerlink" href="#id9" title="Permalink to this heading">#</a></h3>
+<section id="id11">
+<h3>Improvements<a class="headerlink" href="#id11" title="Permalink to this heading">#</a></h3>
 <ul>
 <li><p>[<a class="reference internal" href="../reference/normalizers.html"><span class="doc">Normalizers</span></a>] Added a new Normalizer <code class="docutils literal notranslate"><span class="pre">NormalizerNFKC150</span></code> based on Unicode NFKC (Normalization Form Compatibility Composition) for Unicode 15.0.</p></li>
 <li><p>[<a class="reference internal" href="../reference/token_filters.html"><span class="doc">Token filters</span></a>] Added a new TokenFilter <code class="docutils literal notranslate"><span class="pre">TokenFilterNFKC150</span></code> based on Unicode NFKC (Normalization Form Compatibility Composition) for Unicode 15.0.</p></li>
@@ -1551,8 +1662,8 @@ select --table Airports --query name:@ニコスカザンザキス
 <li><p>[Oracle Linux] Added newly support for Oracle Linux 8 and 9.</p></li>
 </ul>
 </section>
-<section id="id10">
-<h3>Thanks<a class="headerlink" href="#id10" title="Permalink to this heading">#</a></h3>
+<section id="id12">
+<h3>Thanks<a class="headerlink" href="#id12" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Atsushi Shinoda</p></li>
 <li><p>i10a</p></li>
@@ -1883,8 +1994,8 @@ The last 2 records, <code class="docutils literal notranslate"><span class="pre"
 </section>
 <section id="summary">
 <h3>Summary<a class="headerlink" href="#summary" title="Permalink to this heading">#</a></h3>
-<section id="id11">
-<h4>Improvements<a class="headerlink" href="#id11" title="Permalink to this heading">#</a></h4>
+<section id="id13">
+<h4>Improvements<a class="headerlink" href="#id13" title="Permalink to this heading">#</a></h4>
 <p>[<a class="reference internal" href="12.html#release-12-1-2"><span class="std std-ref">Release 12.1.2 - 2023-01-29</span></a>]</p>
 <ul class="simple">
 <li><p>[httpd] Updated bundled nginx to 1.23.3.</p></li>
@@ -1981,8 +2092,8 @@ The last 2 records, <code class="docutils literal notranslate"><span class="pre"
 <li><p>[httpd] Updated bundled nginx to 1.21.6.</p></li>
 </ul>
 </section>
-<section id="id12">
-<h4>Fixes<a class="headerlink" href="#id12" title="Permalink to this heading">#</a></h4>
+<section id="id14">
+<h4>Fixes<a class="headerlink" href="#id14" title="Permalink to this heading">#</a></h4>
 <p>[<a class="reference internal" href="12.html#release-12-1-1"><span class="std std-ref">Release 12.1.1 - 2023-01-06</span></a>]</p>
 <ul class="simple">
 <li><p>[<a class="reference internal" href="../reference/commands/select.html"><span class="doc">select</span></a>] Fix a bug displaying a wrong label in <code class="docutils literal notranslate"><span class="pre">drilldown</span></code> results when <code class="docutils literal notranslate"><span class="pre">command_version</span></code> is <code class="docutils literal notranslate"><span class="pre">3</span></code>.</p></li>
@@ -2053,42 +2164,47 @@ The last 2 records, <code class="docutils literal notranslate"><span class="pre"
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-13-0-5-2023-08-02">Release 13.0.5 - 2023-08-02</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-13-0-6-2023-08-31">Release 13.0.6 - 2023-08-31</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#improvements">Improvements</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fixes">Fixes</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-13-0-4-2023-07-26">Release 13.0.4 - 2023-07-26</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#improvements">Improvements</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-13-0-5-2023-08-02">Release 13.0.5 - 2023-08-02</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Fixes</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-13-0-3-2023-07-24">Release 13.0.3 - 2023-07-24</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-13-0-4-2023-07-26">Release 13.0.4 - 2023-07-26</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Improvements</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">Fixes</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-13-0-2-2023-07-12">Release 13.0.2 - 2023-07-12</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-13-0-3-2023-07-24">Release 13.0.3 - 2023-07-24</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">Improvements</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">Fixes</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-13-0-2-2023-07-12">Release 13.0.2 - 2023-07-12</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">Improvements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">Fixes</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thanks">Thanks</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-13-0-1-2023-03-24">Release 13.0.1 - 2023-03-24</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">Improvements</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">Fixes</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">Thanks</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">Improvements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">Fixes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">Thanks</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-13-0-0-2023-02-09">Release 13.0.0 - 2023-02-09</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">Improvements</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">Thanks</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">Improvements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id12">Thanks</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#higlight-and-summary-of-changes-from-12-0-0-to-12-1-2">Higlight and Summary of changes from 12.0.0 to 12.1.2</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#higlight">Higlight</a></li>
 </ul>
 </li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">Improvements</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id12">Fixes</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id13">Improvements</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id14">Fixes</a></li>
 </ul>
 </li>
 </ul>

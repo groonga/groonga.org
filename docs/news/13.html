@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>News - 13 series &#8212; Groonga v13.0.6 documentation</title>
+    <title>News - 13 series &#8212; Groonga v13.0.7 documentation</title>
   
   
   
@@ -370,6 +370,172 @@ document.write(`
                   
   <section class="tex2jax_ignore mathjax_ignore" id="news-13-series">
 <h1>News - 13 series<a class="headerlink" href="#news-13-series" title="Permalink to this heading">#</a></h1>
+<section id="release-13-0-7-2023-09-12">
+<span id="release-13-0-7"></span><h2>Release 13.0.7 - 2023-09-12<a class="headerlink" href="#release-13-0-7-2023-09-12" title="Permalink to this heading">#</a></h2>
+<section id="fixes">
+<h3>Fixes<a class="headerlink" href="#fixes" title="Permalink to this heading">#</a></h3>
+<ul>
+<li><p>[<a class="reference internal" href="../reference/commands/normalize.html"><span class="doc">normalize</span></a>] Fixed a bug that <code class="docutils literal notranslate"><span class="pre">normalize</span></code> command doesn’t output last offset and type.</p>
+<p><code class="docutils literal notranslate"><span class="pre">normalize</span></code> command can output offset and type of string after normalize as below, but <code class="docutils literal notranslate"><span class="pre">normalize</span></code> command doesn’t output the last offset and type by this bug.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">table_create</span> <span class="n">Normalizations</span> <span class="n">TABLE_PAT_KEY</span> <span class="n">ShortText</span>
+<span class="n">column_create</span> <span class="n">Normalizations</span> <span class="n">normalized</span> <span class="n">COLUMN_SCALAR</span> <span class="n">ShortText</span>
+<span class="n">load</span> <span class="o">--</span><span class="n">table</span> <span class="n">Normalizations</span>
+<span class="p">[</span>
+<span class="p">{</span><span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;あ&quot;</span><span class="p">,</span> <span class="s2">&quot;normalized&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;あ&gt;&quot;</span><span class="p">}</span>
+<span class="p">]</span>
+
+<span class="n">normalize</span>   <span class="s1">&#39;NormalizerNFKC130(&quot;unify_kana&quot;, true, &quot;report_source_offset&quot;, true),    NormalizerTable(&quot;normalized&quot;, &quot;Normalizations.normalized&quot;,                    &quot;report_source_offset&quot;, true)&#39;</span>   <span class="s2">&quot;お あ ａ ア ｉ ｱ オ&quot;</span>   <span class="n">REMOVE_BLANK</span><span class="o">|</span><span class="n">WITH_TYPES</span><span class="o">|</span><span class="n">WITH_CHECKS</span>
+<span class="p">[</span>
+  <span class="p">[</span>
+    <span class="mi">0</span><span class="p">,</span>
+    <span class="mf">0.0</span><span class="p">,</span>
+    <span class="mf">0.0</span>
+  <span class="p">],</span>
+  <span class="p">{</span>
+    <span class="s2">&quot;normalized&quot;</span><span class="p">:</span> <span class="s2">&quot;お&lt;あ&gt;a&lt;あ&gt;i&lt;あ&gt;お&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;types&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="s2">&quot;hiragana&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;symbol&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;hiragana&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;symbol&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;alpha&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;symbol&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;hiragana&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;symbol&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;alpha&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;symbol&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;hiragana&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;symbol&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;hiragana&quot;</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;checks&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="mi">3</span><span class="p">,</span>
+      <span class="mi">0</span><span class="p">,</span>
+      <span class="mi">0</span><span class="p">,</span>
+      <span class="mi">4</span><span class="p">,</span>
+      <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+      <span class="mi">0</span><span class="p">,</span>
+      <span class="mi">0</span><span class="p">,</span>
+      <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+      <span class="mi">4</span><span class="p">,</span>
+      <span class="mi">4</span><span class="p">,</span>
+      <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+      <span class="mi">0</span><span class="p">,</span>
+      <span class="mi">0</span><span class="p">,</span>
+      <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+      <span class="mi">4</span><span class="p">,</span>
+      <span class="mi">4</span><span class="p">,</span>
+      <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+      <span class="mi">0</span><span class="p">,</span>
+      <span class="mi">0</span><span class="p">,</span>
+      <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+      <span class="mi">4</span><span class="p">,</span>
+      <span class="mi">0</span><span class="p">,</span>
+      <span class="mi">0</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;offsets&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="mi">0</span><span class="p">,</span>
+      <span class="mi">4</span><span class="p">,</span>
+      <span class="mi">4</span><span class="p">,</span>
+      <span class="mi">4</span><span class="p">,</span>
+      <span class="mi">8</span><span class="p">,</span>
+      <span class="mi">12</span><span class="p">,</span>
+      <span class="mi">12</span><span class="p">,</span>
+      <span class="mi">12</span><span class="p">,</span>
+      <span class="mi">16</span><span class="p">,</span>
+      <span class="mi">20</span><span class="p">,</span>
+      <span class="mi">20</span><span class="p">,</span>
+      <span class="mi">20</span><span class="p">,</span>
+      <span class="mi">24</span>
+    <span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</li>
+<li><p>[<a class="reference internal" href="../reference/normalizers.html"><span class="doc">Normalizers</span></a>] Fixed a bug that the last offset value may be invalid when we use multiple normalizers.</p>
+<p>For the following example, the last offset value is 27 correctly, but it is 17 in the following example by this bug.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">table_create</span> <span class="n">Normalizations</span> <span class="n">TABLE_PAT_KEY</span> <span class="n">ShortText</span>
+<span class="n">column_create</span> <span class="n">Normalizations</span> <span class="n">normalized</span> <span class="n">COLUMN_SCALAR</span> <span class="n">ShortText</span>
+<span class="n">load</span> <span class="o">--</span><span class="n">table</span> <span class="n">Normalizations</span>
+<span class="p">[</span>
+<span class="p">{</span><span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;あ&quot;</span><span class="p">,</span> <span class="s2">&quot;normalized&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;あ&gt;&quot;</span><span class="p">}</span>
+<span class="p">]</span>
+
+<span class="n">normalize</span>   <span class="s1">&#39;NormalizerNFKC130(&quot;unify_kana&quot;, true, &quot;report_source_offset&quot;, true),    NormalizerTable(&quot;normalized&quot;, &quot;Normalizations.normalized&quot;,                    &quot;report_source_offset&quot;, true)&#39;</span>   <span class="s2">&quot;お あ ａ ア ｉ ｱ オ&quot;</span>   <span class="n">REMOVE_BLANK</span><span class="o">|</span><span class="n">WITH_TYPES</span><span class="o">|</span><span class="n">WITH_CHECKS</span>
+<span class="p">[</span>
+  <span class="p">[</span>
+    <span class="mi">0</span><span class="p">,</span>
+    <span class="mf">0.0</span><span class="p">,</span>
+    <span class="mf">0.0</span>
+  <span class="p">],</span>
+  <span class="p">{</span>
+    <span class="s2">&quot;normalized&quot;</span><span class="p">:</span> <span class="s2">&quot;お&lt;あ&gt;a&lt;あ&gt;i&lt;あ&gt;お&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;types&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="s2">&quot;hiragana&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;symbol&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;hiragana&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;symbol&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;alpha&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;symbol&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;hiragana&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;symbol&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;alpha&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;symbol&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;hiragana&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;symbol&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;hiragana&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;null&quot;</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;checks&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="mi">3</span><span class="p">,</span>
+      <span class="mi">0</span><span class="p">,</span>
+      <span class="mi">0</span><span class="p">,</span>
+      <span class="mi">4</span><span class="p">,</span>
+      <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+      <span class="mi">0</span><span class="p">,</span>
+      <span class="mi">0</span><span class="p">,</span>
+      <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+      <span class="mi">4</span><span class="p">,</span>
+      <span class="mi">4</span><span class="p">,</span>
+      <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+      <span class="mi">0</span><span class="p">,</span>
+      <span class="mi">0</span><span class="p">,</span>
+      <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+      <span class="mi">4</span><span class="p">,</span>
+      <span class="mi">4</span><span class="p">,</span>
+      <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+      <span class="mi">0</span><span class="p">,</span>
+      <span class="mi">0</span><span class="p">,</span>
+      <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+      <span class="mi">4</span><span class="p">,</span>
+      <span class="mi">0</span><span class="p">,</span>
+      <span class="mi">0</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;offsets&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="mi">0</span><span class="p">,</span>
+      <span class="mi">4</span><span class="p">,</span>
+      <span class="mi">4</span><span class="p">,</span>
+      <span class="mi">4</span><span class="p">,</span>
+      <span class="mi">8</span><span class="p">,</span>
+      <span class="mi">12</span><span class="p">,</span>
+      <span class="mi">12</span><span class="p">,</span>
+      <span class="mi">12</span><span class="p">,</span>
+      <span class="mi">16</span><span class="p">,</span>
+      <span class="mi">20</span><span class="p">,</span>
+      <span class="mi">20</span><span class="p">,</span>
+      <span class="mi">20</span><span class="p">,</span>
+      <span class="mi">24</span><span class="p">,</span>
+      <span class="mi">17</span>
+    <span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+</section>
 <section id="release-13-0-6-2023-08-31">
 <span id="release-13-0-6"></span><h2>Release 13.0.6 - 2023-08-31<a class="headerlink" href="#release-13-0-6-2023-08-31" title="Permalink to this heading">#</a></h2>
 <section id="improvements">
@@ -424,8 +590,8 @@ document.write(`
 </li>
 </ul>
 </section>
-<section id="fixes">
-<h3>Fixes<a class="headerlink" href="#fixes" title="Permalink to this heading">#</a></h3>
+<section id="id1">
+<h3>Fixes<a class="headerlink" href="#id1" title="Permalink to this heading">#</a></h3>
 <ul>
 <li><p>[CMake] Fixed a build error with CMake when both of msgpack and msgpackc-cxx are installed.</p>
 <p>Please refer the comment of <a class="github reference external" href="https://github.com/groonga/groonga/pull/1601">groonga/groonga#1601</a> about details.</p>
@@ -483,8 +649,8 @@ document.write(`
 </section>
 <section id="release-13-0-5-2023-08-02">
 <span id="release-13-0-5"></span><h2>Release 13.0.5 - 2023-08-02<a class="headerlink" href="#release-13-0-5-2023-08-02" title="Permalink to this heading">#</a></h2>
-<section id="id1">
-<h3>Fixes<a class="headerlink" href="#id1" title="Permalink to this heading">#</a></h3>
+<section id="id2">
+<h3>Fixes<a class="headerlink" href="#id2" title="Permalink to this heading">#</a></h3>
 <ul>
 <li><p>Fixed a bug that index creation may be failed.</p>
 <p>Groonga v13.0.2, v13.0.3, and v13.0.4 have this bug.
@@ -515,14 +681,14 @@ Therefore, If you already have used the above version, we highly recommend that 
 </section>
 <section id="release-13-0-4-2023-07-26">
 <span id="release-13-0-4"></span><h2>Release 13.0.4 - 2023-07-26<a class="headerlink" href="#release-13-0-4-2023-07-26" title="Permalink to this heading">#</a></h2>
-<section id="id2">
-<h3>Improvements<a class="headerlink" href="#id2" title="Permalink to this heading">#</a></h3>
+<section id="id3">
+<h3>Improvements<a class="headerlink" href="#id3" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p>[<a class="reference internal" href="../install/windows.html"><span class="doc">Windows</span></a>] Stopped providing 32-bit packages.</p></li>
 </ul>
 </section>
-<section id="id3">
-<h3>Fixes<a class="headerlink" href="#id3" title="Permalink to this heading">#</a></h3>
+<section id="id4">
+<h3>Fixes<a class="headerlink" href="#id4" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p>[<a class="reference internal" href="../install/debian.html"><span class="doc">Debian GNU/Linux</span></a>] [<a class="reference internal" href="../install/ubuntu.html"><span class="doc">Ubuntu</span></a>] Fixed the default
 configuration file path for <a class="reference internal" href="../reference/query_expanders/tsv.html"><span class="doc">QueryExpanderTSV</span></a>.</p></li>
@@ -533,8 +699,8 @@ or 3.17 are used.</p></li>
 </section>
 <section id="release-13-0-3-2023-07-24">
 <span id="release-13-0-3"></span><h2>Release 13.0.3 - 2023-07-24<a class="headerlink" href="#release-13-0-3-2023-07-24" title="Permalink to this heading">#</a></h2>
-<section id="id4">
-<h3>Improvements<a class="headerlink" href="#id4" title="Permalink to this heading">#</a></h3>
+<section id="id5">
+<h3>Improvements<a class="headerlink" href="#id5" title="Permalink to this heading">#</a></h3>
 <ul>
 <li><p>[<a class="reference internal" href="../reference/executables/groonga-httpd.html"><span class="doc">groonga-httpd</span></a>] Extracted to
 <a class="reference external" href="https://github.com/groonga/groonga-nginx">groonga-nginx</a>. We
@@ -558,8 +724,8 @@ your use case.</p>
 <li><p>[<a class="reference internal" href="../install/ubuntu.html"><span class="doc">Ubuntu</span></a>] Enabled xxHash support.</p></li>
 </ul>
 </section>
-<section id="id5">
-<h3>Fixes<a class="headerlink" href="#id5" title="Permalink to this heading">#</a></h3>
+<section id="id6">
+<h3>Fixes<a class="headerlink" href="#id6" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Fixed a bug that the source archive can’t be built with CMake.</p></li>
 </ul>
@@ -567,8 +733,8 @@ your use case.</p>
 </section>
 <section id="release-13-0-2-2023-07-12">
 <span id="release-13-0-2"></span><h2>Release 13.0.2 - 2023-07-12<a class="headerlink" href="#release-13-0-2-2023-07-12" title="Permalink to this heading">#</a></h2>
-<section id="id6">
-<h3>Improvements<a class="headerlink" href="#id6" title="Permalink to this heading">#</a></h3>
+<section id="id7">
+<h3>Improvements<a class="headerlink" href="#id7" title="Permalink to this heading">#</a></h3>
 <ul>
 <li><p>[<a class="reference internal" href="../install/ubuntu.html"><span class="doc">Ubuntu</span></a>] Dropped support for Ubuntu 18.04 (Bionic Beaver).</p></li>
 <li><p>[<a class="reference internal" href="../install/ubuntu.html"><span class="doc">Ubuntu</span></a>] Added support for Ubuntu 23.04 (Lunar Lobster).</p></li>
@@ -611,8 +777,8 @@ count implementation for built-in objects.</p></li>
 <li><p>Added support for logging backtrace on <code class="docutils literal notranslate"><span class="pre">SIGABRT</span></code>.</p></li>
 </ul>
 </section>
-<section id="id7">
-<h3>Fixes<a class="headerlink" href="#id7" title="Permalink to this heading">#</a></h3>
+<section id="id8">
+<h3>Fixes<a class="headerlink" href="#id8" title="Permalink to this heading">#</a></h3>
 <ul>
 <li><p>[<a class="reference internal" href="../reference/grn_expr/query_syntax.html#query-syntax-ordered-near-phrase-product-search-condition"><span class="std std-ref">Ordered near phrase product search condition</span></a>]
 [<a class="reference internal" href="../reference/grn_expr/script_syntax.html#script-syntax-ordered-near-phrase-product-search-operator"><span class="std std-ref">Ordered near phrase product search operator</span></a>]
@@ -670,8 +836,8 @@ problem.</p></li>
 </section>
 <section id="release-13-0-1-2023-03-24">
 <span id="release-13-0-1"></span><h2>Release 13.0.1 - 2023-03-24<a class="headerlink" href="#release-13-0-1-2023-03-24" title="Permalink to this heading">#</a></h2>
-<section id="id8">
-<h3>Improvements<a class="headerlink" href="#id8" title="Permalink to this heading">#</a></h3>
+<section id="id9">
+<h3>Improvements<a class="headerlink" href="#id9" title="Permalink to this heading">#</a></h3>
 <ul>
 <li><p>[<a class="reference internal" href="../reference/functions/highlight_html.html"><span class="doc">highlight_html</span></a>] Added support for prefix search.</p>
 <p>We can now use prefix search in <code class="docutils literal notranslate"><span class="pre">highlight_html</span></code>.</p>
@@ -1024,8 +1190,8 @@ Groonga can found MessagePack since this release even if the version of MessageP
 </li>
 </ul>
 </section>
-<section id="id9">
-<h3>Fixes<a class="headerlink" href="#id9" title="Permalink to this heading">#</a></h3>
+<section id="id10">
+<h3>Fixes<a class="headerlink" href="#id10" title="Permalink to this heading">#</a></h3>
 <ul>
 <li><p>[<a class="reference internal" href="../reference/normalizers.html"><span class="doc">Normalizers</span></a>] Fixed a bug that NormalizerNFKC* did incorrect normalization.</p>
 <p>This bug occured when <code class="docutils literal notranslate"><span class="pre">unify_kana_case</span></code> and <code class="docutils literal notranslate"><span class="pre">unify_katakana_v_sounds</span></code> used at the same time.</p>
@@ -1230,8 +1396,8 @@ So it should be matched, but isn’t.</p>
 <li><p>[<a class="reference internal" href="../reference/functions/highlight_html.html"><span class="doc">highlight_html</span></a>] Fixed a bug that highlight position may move over when we use <code class="docutils literal notranslate"><span class="pre">loose_symbol=true</span></code>.</p></li>
 </ul>
 </section>
-<section id="id10">
-<h3>Thanks<a class="headerlink" href="#id10" title="Permalink to this heading">#</a></h3>
+<section id="id11">
+<h3>Thanks<a class="headerlink" href="#id11" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Carlo Cabrera</p></li>
 </ul>
@@ -1243,8 +1409,8 @@ So it should be matched, but isn’t.</p>
 But It keeps backward compatibility. We can upgrade to 13.0.0 without rebuilding database.</p>
 <p>First of all, we introduce the main changes in 13.0.0.
 Then, we introduce the hilight and summary of changes from Groonga 12.0.0 to 12.1.2.</p>
-<section id="id11">
-<h3>Improvements<a class="headerlink" href="#id11" title="Permalink to this heading">#</a></h3>
+<section id="id12">
+<h3>Improvements<a class="headerlink" href="#id12" title="Permalink to this heading">#</a></h3>
 <ul>
 <li><p>[<a class="reference internal" href="../reference/normalizers.html"><span class="doc">Normalizers</span></a>] Added a new Normalizer <code class="docutils literal notranslate"><span class="pre">NormalizerNFKC150</span></code> based on Unicode NFKC (Normalization Form Compatibility Composition) for Unicode 15.0.</p></li>
 <li><p>[<a class="reference internal" href="../reference/token_filters.html"><span class="doc">Token filters</span></a>] Added a new TokenFilter <code class="docutils literal notranslate"><span class="pre">TokenFilterNFKC150</span></code> based on Unicode NFKC (Normalization Form Compatibility Composition) for Unicode 15.0.</p></li>
@@ -1662,8 +1828,8 @@ select --table Airports --query name:@ニコスカザンザキス
 <li><p>[Oracle Linux] Added newly support for Oracle Linux 8 and 9.</p></li>
 </ul>
 </section>
-<section id="id12">
-<h3>Thanks<a class="headerlink" href="#id12" title="Permalink to this heading">#</a></h3>
+<section id="id13">
+<h3>Thanks<a class="headerlink" href="#id13" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Atsushi Shinoda</p></li>
 <li><p>i10a</p></li>
@@ -1994,8 +2160,8 @@ The last 2 records, <code class="docutils literal notranslate"><span class="pre"
 </section>
 <section id="summary">
 <h3>Summary<a class="headerlink" href="#summary" title="Permalink to this heading">#</a></h3>
-<section id="id13">
-<h4>Improvements<a class="headerlink" href="#id13" title="Permalink to this heading">#</a></h4>
+<section id="id14">
+<h4>Improvements<a class="headerlink" href="#id14" title="Permalink to this heading">#</a></h4>
 <p>[<a class="reference internal" href="12.html#release-12-1-2"><span class="std std-ref">Release 12.1.2 - 2023-01-29</span></a>]</p>
 <ul class="simple">
 <li><p>[httpd] Updated bundled nginx to 1.23.3.</p></li>
@@ -2092,8 +2258,8 @@ The last 2 records, <code class="docutils literal notranslate"><span class="pre"
 <li><p>[httpd] Updated bundled nginx to 1.21.6.</p></li>
 </ul>
 </section>
-<section id="id14">
-<h4>Fixes<a class="headerlink" href="#id14" title="Permalink to this heading">#</a></h4>
+<section id="id15">
+<h4>Fixes<a class="headerlink" href="#id15" title="Permalink to this heading">#</a></h4>
 <p>[<a class="reference internal" href="12.html#release-12-1-1"><span class="std std-ref">Release 12.1.1 - 2023-01-06</span></a>]</p>
 <ul class="simple">
 <li><p>[<a class="reference internal" href="../reference/commands/select.html"><span class="doc">select</span></a>] Fix a bug displaying a wrong label in <code class="docutils literal notranslate"><span class="pre">drilldown</span></code> results when <code class="docutils literal notranslate"><span class="pre">command_version</span></code> is <code class="docutils literal notranslate"><span class="pre">3</span></code>.</p></li>
@@ -2164,47 +2330,51 @@ The last 2 records, <code class="docutils literal notranslate"><span class="pre"
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-13-0-6-2023-08-31">Release 13.0.6 - 2023-08-31</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#improvements">Improvements</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-13-0-7-2023-09-12">Release 13.0.7 - 2023-09-12</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fixes">Fixes</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-13-0-5-2023-08-02">Release 13.0.5 - 2023-08-02</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-13-0-6-2023-08-31">Release 13.0.6 - 2023-08-31</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#improvements">Improvements</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Fixes</a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-13-0-5-2023-08-02">Release 13.0.5 - 2023-08-02</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Fixes</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-13-0-4-2023-07-26">Release 13.0.4 - 2023-07-26</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Improvements</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">Fixes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">Improvements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">Fixes</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-13-0-3-2023-07-24">Release 13.0.3 - 2023-07-24</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">Improvements</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">Fixes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">Improvements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">Fixes</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-13-0-2-2023-07-12">Release 13.0.2 - 2023-07-12</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">Improvements</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">Fixes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">Improvements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">Fixes</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thanks">Thanks</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-13-0-1-2023-03-24">Release 13.0.1 - 2023-03-24</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">Improvements</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">Fixes</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">Thanks</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">Improvements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">Fixes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">Thanks</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-13-0-0-2023-02-09">Release 13.0.0 - 2023-02-09</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">Improvements</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id12">Thanks</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id12">Improvements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id13">Thanks</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#higlight-and-summary-of-changes-from-12-0-0-to-12-1-2">Higlight and Summary of changes from 12.0.0 to 12.1.2</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#higlight">Higlight</a></li>
 </ul>
 </li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id13">Improvements</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id14">Fixes</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id14">Improvements</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id15">Fixes</a></li>
 </ul>
 </li>
 </ul>

@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 
 
@@ -9,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>10.3. mmap Cannot allocate memoryエラーを回避するには &#8212; Groonga v13.0.8ドキュメント</title>
+    <title>10.3. How to avoid mmap Cannot allocate memory error &#8212; Groonga v13.0.8 documentation</title>
   
   
   
@@ -29,17 +28,23 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=362ab14a" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
-    <script src="../_static/translations.js"></script>
+    <script src="../_static/documentation_options.js?v=3744756e"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=4dbe4bdc"></script>
     <script async="async" src="https://www.googletagmanager.com/gtag/js?id=UA-7532323-1"></script>
+    <script>
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){ dataLayer.push(arguments); }
+                gtag('js', new Date());
+                gtag('config', 'UA-7532323-1');
+            </script>
     <script>
                 window.dataLayer = window.dataLayer || [];
                 function gtag(){ dataLayer.push(arguments); }
@@ -51,11 +56,11 @@
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://groonga.org/docs/_static/switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'japanese';
         </script>
-    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="icon" href="../_static/favicon.ico"/>
     <link rel="index" title="索引" href="../genindex.html" />
     <link rel="search" title="検索" href="../search.html" />
-    <link rel="next" title="11. 開発" href="../development.html" />
-    <link rel="prev" title="10.2. エラーメッセージの解析方法" href="how_to_analyze_error_message.html" />
+    <link rel="next" title="11. Development" href="../development.html" />
+    <link rel="prev" title="10.2. How to analyze error messages" href="how_to_analyze_error_message.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="ja"/>
   </head>
@@ -328,8 +333,8 @@ document.write(`
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="different_results_with_the_same_keyword.html">10.1. 同じ検索キーワードなのに全文検索結果が異なる</a></li>
-<li class="toctree-l1"><a class="reference internal" href="how_to_analyze_error_message.html">10.2. エラーメッセージの解析方法</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">10.3. mmap Cannot allocate memoryエラーを回避するには</a></li>
+<li class="toctree-l1"><a class="reference internal" href="how_to_analyze_error_message.html">10.2. How to analyze error messages</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">10.3. How to avoid mmap Cannot allocate memory error</a></li>
 </ul>
 </div>
 </nav></div>
@@ -368,9 +373,9 @@ document.write(`
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="../troubleshooting.html" class="nav-link"><span class="section-number">10. </span>トラブルシューティング</a></li>
+    <li class="breadcrumb-item"><a href="../troubleshooting.html" class="nav-link"><span class="section-number">10. </span>Troubleshooting</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="section-number">10.3. </span>mmap Cannot allocate memoryエラーを回避するには</li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="section-number">10.3. </span>How to avoid mmap Cannot allocate memory error</li>
   </ul>
 </nav>
 </div>
@@ -388,36 +393,36 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <section id="how-to-avoid-mmap-cannot-allocate-memory-error">
-<h1><span class="section-number">10.3. </span>mmap Cannot allocate memoryエラーを回避するには<a class="headerlink" href="#how-to-avoid-mmap-cannot-allocate-memory-error" title="この見出しへのパーマリンク">#</a></h1>
+<h1><span class="section-number">10.3. </span>How to avoid mmap Cannot allocate memory error<a class="headerlink" href="#how-to-avoid-mmap-cannot-allocate-memory-error" title="Link to this heading">#</a></h1>
 <section id="example">
-<h2><span class="section-number">10.3.1. </span>例<a class="headerlink" href="#example" title="この見出しへのパーマリンク">#</a></h2>
-<p>ログファイルに以下のようなmmapエラーが存在する場合があります。:</p>
+<h2><span class="section-number">10.3.1. </span>Example<a class="headerlink" href="#example" title="Link to this heading">#</a></h2>
+<p>There is a case following mmap error in log file:</p>
 <blockquote>
 <div><p>2013-06-04 08:19:34.835218|A|4e86e700|mmap(4194304,551,432017408)=Cannot allocate memory &lt;13036498944&gt;</p>
 </div></blockquote>
-<p>&lt;13036498944&gt; はこの場合mmapの合計サイズ(約12GB)です。</p>
+<p>Note that &lt;13036498944&gt; means total size of mmap (almost 12GB) in this case.</p>
 </section>
 <section id="solution">
-<h2><span class="section-number">10.3.2. </span>対策方法<a class="headerlink" href="#solution" title="この見出しへのパーマリンク">#</a></h2>
-<p>以下の観点を確認する必要があります。</p>
+<h2><span class="section-number">10.3.2. </span>Solution<a class="headerlink" href="#solution" title="Link to this heading">#</a></h2>
+<p>So you need to confirm following point of views.</p>
 <ul class="simple">
-<li><p>十分なメモリの空きが存在するか？</p></li>
-<li><p>マッピング最大数を超過していないか？</p></li>
+<li><p>Are there enough free memory?</p></li>
+<li><p>Are maximum number of mappings exceeded?</p></li>
 </ul>
-<p>十分な空きメモリがあるかを調べるために、vmstat コマンドを使うことができます。</p>
-<p>最大マッピング数を超過しているかどうかを確認するために、 vm.max_map_count の値を調べることができます。</p>
-<p>もしこの問題が vm.max_map_count の値を調整することで解決するなら、これが原因です。</p>
-<p>groongaはメモリを256KBごとに確保するので、扱えるデータベースのサイズを以下の式で見積ることができます:</p>
+<p>To check there are enough free memory, you can use vmstat command.</p>
+<p>To check whether maximum number of mappings are exceeded, you can investigate the value of vm.max_map_count.</p>
+<p>If this issue is fixed by modifying the value of vm.max_map_count, it's exactly the reason.</p>
+<p>As groonga allocates memory chunks each 256KB, you can estimate the size of database you can handle by following formula:</p>
 <blockquote>
 <div><p>(database size) = vm.max_map_count * (memory chunks)</p>
 </div></blockquote>
-<p>16GBを超えるデータベースを扱うには、少くとも65536を vm.max_map_count の値として設定しないといけません。</p>
+<p>If you want to handle over 16GB groonga database, you must specify at least 65536 as the value of vm.max_map_count:</p>
 <blockquote>
 <div><p>database size (16GB) = vm.max_map_count (65536) * memory chunks (256KB)</p>
 </div></blockquote>
-<p>sudo sysctl -w vm.max_map_count=65536 で一時的に vm.max_map_count を調整することができます。</p>
-<p>その後、設定値を <code class="docutils literal notranslate"><span class="pre">/etc/sysctl.conf</span></code> もしくは <code class="docutils literal notranslate"><span class="pre">/etc/sysctl.d/*.conf</span></code> へと保存します。</p>
-<p>チューニング関連のパラメータについては、 <a class="reference internal" href="../reference/tuning.html"><span class="doc">チューニング</span></a> のドキュメントを参照してください。</p>
+<p>You can modify vm.max_map_count temporary by sudo sysctl -w vm.max_map_count=65536.</p>
+<p>Then save the configuration value to <code class="docutils literal notranslate"><span class="pre">/etc/sysctl.conf</span></code> or <code class="docutils literal notranslate"><span class="pre">/etc/sysctl.d/*.conf</span></code>.</p>
+<p>See <a class="reference internal" href="../reference/tuning.html"><span class="doc">Tuning</span></a> documentation about tuning related parameters.</p>
 </section>
 </section>
 
@@ -438,7 +443,7 @@ document.write(`
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">前へ</p>
-        <p class="prev-next-title"><span class="section-number">10.2. </span>エラーメッセージの解析方法</p>
+        <p class="prev-next-title"><span class="section-number">10.2. </span>How to analyze error messages</p>
       </div>
     </a>
     <a class="right-next"
@@ -446,7 +451,7 @@ document.write(`
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">次へ</p>
-        <p class="prev-next-title"><span class="section-number">11. </span>開発</p>
+        <p class="prev-next-title"><span class="section-number">11. </span>Development</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -468,8 +473,8 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example">10.3.1. 例</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#solution">10.3.2. 対策方法</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example">10.3.1. Example</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#solution">10.3.2. Solution</a></li>
 </ul>
   </nav></div>
 

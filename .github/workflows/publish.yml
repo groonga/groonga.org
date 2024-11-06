@@ -1,0 +1,35 @@
+name: Publish
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - '*'
+  pull_request:
+  schedule:
+    - cron: 0 0 * * *
+jobs:
+  build:
+    name: Build and Publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: groonga/groonga
+          path: groonga
+          submodules: recursive
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ruby
+      - name: Install dependencies
+        run: |
+          groonga/setup.sh
+          pip install -r groonga/doc/requirements.txt
+          (cd groonga/doc && bundle install)
+      - name: Build documents
+        run: |
+          cmake -S groonga -B /tmp/groonga.build --preset=doc
+          (cd groonga && rake release:document:update BUILD_DIR=/tmp/groonga.build GROONGA_ORG_DIR=../)
+      # todo Publish (Commit changes).
+

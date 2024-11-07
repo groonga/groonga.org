@@ -1,4 +1,4 @@
-name: Publish
+name: Document
 on:
   push:
     branches:
@@ -9,8 +9,8 @@ on:
   schedule:
     - cron: 0 0 * * *
 jobs:
-  build:
-    name: Build and Publish
+  publish:
+    name: Publish
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -19,6 +19,15 @@ jobs:
           repository: groonga/groonga
           path: groonga
           submodules: recursive
+      - name: Prepare ccache
+        run: |
+          echo "CCACHE_DIR=${PWD}/ccache" >> ${GITHUB_ENV}
+      - name: Cache ccache
+        uses: actions/cache@v4
+        with:
+          path: ccache
+          key: document-linux-ccache-${{ hashFiles('lib/**', 'src/**', 'plugins/**', 'include/**') }}
+          restore-keys: document-linux-ccache-
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: ruby
@@ -27,8 +36,10 @@ jobs:
           groonga/setup.sh
           pip install -r groonga/doc/requirements.txt
           (cd groonga/doc && bundle install)
-      - name: Build documents
+      - name: Build document
         run: |
+          ccache --show-stats --verbose --version || :
           cmake -S groonga -B /tmp/groonga.build --preset=doc
           rake -C groonga release:document:update BUILD_DIR=/tmp/groonga.build GROONGA_ORG_DIR=../
+          ccache --show-stats --verbose --version || :
       # todo Publish (Commit changes).

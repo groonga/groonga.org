@@ -18,8 +18,10 @@
 class ReleaseTask
   include Rake::DSL
 
-  def initialize(package)
+  def initialize(package, version, jekyll_path)
     @package = package
+    @version = version
+    @jekyll_path = jekyll_path
   end
 
   def define
@@ -33,8 +35,26 @@ class ReleaseTask
       namespace :blog do
         desc "Generate release announce posts from a release note"
         task :generate do
-          puts "TODO: Generate release announce posts for #{@package}"
+          generate_blog_posts
         end
+      end
+    end
+  end
+
+  def post_filename
+    "#{Time.now.strftime("%F")}-#{@package}-#{@version}.md"
+  end
+
+  def post_content(locale)
+    # TODO: We will write blog post contents here.
+    # After writing contents, we will remove this TODO comment.
+    "#{locale}, #{@package}, #{@version}"
+  end
+
+  def generate_blog_posts
+    ["ja", "en"].each do |locale|
+      File.open("#{@jekyll_path}/#{locale}/_posts/#{post_filename}", "w") do |post|
+        post.write(post_content(locale))
       end
     end
   end

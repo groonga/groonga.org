@@ -17,5 +17,11 @@
 
 require_relative "release_task"
 
-release_task = ReleaseTask.new("groonga")
+def env_var(name, default=nil)
+  value = ENV[name] || default
+  raise "${#{name}} is missing" if value.nil?
+  value
+end
+
+release_task = ReleaseTask.new("groonga", env_var("VERSION"), __dir__)
 release_task.define

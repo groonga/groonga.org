@@ -21,5 +21,5 @@ def version
   File.read(File.join(__dir__, "_config.yml"))[/^groonga_version: (.+)$/, 1]
 end
 
-release_task = ReleaseTask.new("groonga", version, __dir__)
+release_task = ReleaseTask.new("Groonga", version, __dir__)
 release_task.define

@@ -42,7 +42,7 @@ class ReleaseTask
   end
 
   def post_filename
-    "#{Time.now.strftime("%F")}-#{@package}-#{@version}.md"
+    "#{Time.now.strftime("%F")}-#{@package.downcase}-#{@version}.md"
   end
 
   def post_content(locale)

@@ -63,10 +63,56 @@ class ReleaseTask
     "#{@release_date.strftime("%F")}-#{@product_id}-#{@version}.md"
   end
 
+  def release_note_url
+    major_version = @version.split(".")[0];
+    "/docs/news/#{major_version}.html#release-#{@version.gsub(".", "-")}"
+  end
+
+  def post_ja_content
+    <<-CONTENT
+---
+layout: post.ja
+title: #{@product} #{@version}リリース
+description: #{@product} #{@version}をリリースしました！
+---
+
+## #{@product} #{@version}リリース
+
+#{@product} #{@version}をリリースしました！
+
+それぞれの環境毎のインストール方法は、[インストール](/ja/docs/install.html)をご確認ください。
+
+主な変更点のついては、[リリースノート](/ja#{release_note_url})をご確認ください。
+    CONTENT
+  end
+
+  def post_en_content
+    <<-CONTENT
+---
+layout: post.en
+title: #{@product} #{@version} has been released
+description: #{@product} #{@version} has been released!
+---
+
+## #{@product} #{@version} has been released
+
+#{@product} #{@version} has been released!
+
+For installation instructions on your environments, please see the [Installation Guide](/docs/install.html).
+
+For the information on the changes, please see the [Release Note](#{release_note_url}).
+    CONTENT
+  end
+
   def post_content(locale)
-    # TODO: We will write blog post contents here.
-    # After writing contents, we will remove this TODO comment.
-    "#{locale}, #{@product}, #{@version}"
+    case locale
+    when "ja"
+      post_ja_content
+    when "en"
+      post_en_content
+    else
+      raise "#{locale} isn't supported for release announce posts in blog."
+    end
   end
 
   def generate_blog_posts

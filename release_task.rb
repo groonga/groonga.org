@@ -21,8 +21,8 @@ require "yaml"
 class ReleaseTask
   include Rake::DSL
 
-  def initialize(package, jekyll_path)
-    @package = package
+  def initialize(product, jekyll_path)
+    @product = product
     @jekyll_path = jekyll_path
     @jekyll_config = load_jekyll_config
     @version = detect_version
@@ -35,16 +35,20 @@ class ReleaseTask
 
   private
 
+  def product_id
+    @product.downcase
+  end
+
   def load_jekyll_config
     YAML.safe_load_file(File.join(@jekyll_path, "_config.yml"), permitted_classes: [Date])
   end
 
   def detect_version
-    @jekyll_config["#{@package.downcase}_version"]
+    @jekyll_config["#{product_id}_version"]
   end
 
   def detect_release_date
-    @jekyll_config["#{@package.downcase}_release_date"]
+    @jekyll_config["#{product_id}_release_date"]
   end
 
   def define_generate_blog_task
@@ -59,13 +63,13 @@ class ReleaseTask
   end
 
   def post_filename
-    "#{@release_date.strftime("%F")}-#{@package.downcase}-#{@version}.md"
+    "#{@release_date.strftime("%F")}-#{product_id}-#{@version}.md"
   end
 
   def post_content(locale)
     # TODO: We will write blog post contents here.
     # After writing contents, we will remove this TODO comment.
-    "#{locale}, #{@package}, #{@version}"
+    "#{locale}, #{@product}, #{@version}"
   end
 
   def generate_blog_posts

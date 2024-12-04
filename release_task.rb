@@ -36,7 +36,7 @@ class ReleaseTask
   private
 
   def load_jekyll_config
-    YAML.safe_load_file("_config.yml", permitted_classes: [Date])
+    YAML.safe_load_file(File.join(@jekyll_path, "_config.yml"), permitted_classes: [Date])
   end
 
   def detect_version

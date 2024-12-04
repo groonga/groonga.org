@@ -23,8 +23,9 @@ class ReleaseTask
 
   def initialize(package, jekyll_path)
     @package = package
-    @version = detect_version
     @jekyll_path = jekyll_path
+    @version = detect_version
+    @release_date = detect_release_date
   end
 
   def define
@@ -41,6 +42,10 @@ class ReleaseTask
     jekyll_config["#{@package.downcase}_version"]
   end
 
+  def detect_release_date
+    jekyll_config["#{@package.downcase}_release_date"]
+  end
+
   def define_generate_blog_task
     namespace :release do
       namespace :blog do
@@ -53,7 +58,7 @@ class ReleaseTask
   end
 
   def post_filename
-    "#{Time.now.strftime("%F")}-#{@package.downcase}-#{@version}.md"
+    "#{@release_date.strftime("%F")}-#{@package.downcase}-#{@version}.md"
   end
 
   def post_content(locale)

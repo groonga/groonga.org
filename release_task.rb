@@ -24,6 +24,7 @@ class ReleaseTask
   def initialize(package, jekyll_path)
     @package = package
     @jekyll_path = jekyll_path
+    @jekyll_config = load_jekyll_config
     @version = detect_version
     @release_date = detect_release_date
   end
@@ -34,16 +35,16 @@ class ReleaseTask
 
   private
 
-  def jekyll_config
+  def load_jekyll_config
     YAML.safe_load_file("_config.yml", permitted_classes: [Date])
   end
 
   def detect_version
-    jekyll_config["#{@package.downcase}_version"]
+    @jekyll_config["#{@package.downcase}_version"]
   end
 
   def detect_release_date
-    jekyll_config["#{@package.downcase}_release_date"]
+    @jekyll_config["#{@package.downcase}_release_date"]
   end
 
   def define_generate_blog_task

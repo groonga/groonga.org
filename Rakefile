@@ -15,11 +15,9 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
+require "yaml"
+require "date"
 require_relative "release_task"
 
-def version
-  File.read(File.join(__dir__, "_config.yml"))[/^groonga_version: (.+)$/, 1]
-end
-
-release_task = ReleaseTask.new("Groonga", version, __dir__)
+release_task = ReleaseTask.new("Groonga", __dir__)
 release_task.define

@@ -15,12 +15,15 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
+require "yaml"
+require "date"
+
 class ReleaseTask
   include Rake::DSL
 
-  def initialize(package, version, jekyll_path)
+  def initialize(package, jekyll_path)
     @package = package
-    @version = version
+    @version = detect_version
     @jekyll_path = jekyll_path
   end
 
@@ -29,6 +32,14 @@ class ReleaseTask
   end
 
   private
+
+  def jekyll_config
+    YAML.safe_load_file("_config.yml", permitted_classes: [Date])
+  end
+
+  def detect_version
+    jekyll_config["#{@package.downcase}_version"]
+  end
 
   def define_generate_blog_task
     namespace :release do

@@ -68,7 +68,7 @@ class ReleaseTask
   end
 
   def product_release_note_url
-    major_version = @version.split(".")[0];
+    major_version = @version.split(".")[0]
     "/docs/news/#{major_version}.html#release-#{@version.gsub(".", "-")}"
   end
 

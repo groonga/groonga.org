@@ -1,0 +1,26 @@
+name: Release
+
+on:
+  push:
+    tags:
+    - '*'
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch and extract the archive
+        run: |
+          tag_name="${GITHUB_REF_NAME}"
+          archive_name="document-${tag_name:1}"
+          wget --quiet "https://github.com/groonga/groonga/releases/download/${tag_name}/${archive_name}.tar.gz"
+          tar -xzf "${archive_name}.tar.gz"
+          mv "${archive_name}/ja" "${archive_name}/docs" .
+      - name: Update docs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add ja docs
+          git commit -m "${GITHUB_REF_NAME:1} has been released!!!"
+          git push

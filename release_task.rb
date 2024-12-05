@@ -63,6 +63,10 @@ class ReleaseTask
     "#{@release_date.strftime("%F")}-#{@product_id}-#{@version}.md"
   end
 
+  def product_install_url
+    "/docs/install.html"
+  end
+
   def release_note_url
     major_version = @version.split(".")[0];
     "/docs/news/#{major_version}.html#release-#{@version.gsub(".", "-")}"
@@ -80,7 +84,7 @@ description: #{@product} #{@version}をリリースしました！
 
 #{@product} #{@version}をリリースしました！
 
-それぞれの環境毎のインストール方法は、[インストール](/ja/docs/install.html)をご確認ください。
+それぞれの環境毎のインストール方法は、[インストール](/ja#{product_install_url})をご確認ください。
 
 主な変更点のついては、[リリースノート](/ja#{release_note_url})をご確認ください。
     CONTENT
@@ -98,7 +102,7 @@ description: #{@product} #{@version} has been released!
 
 #{@product} #{@version} has been released!
 
-For installation instructions on your environments, please see the [Installation Guide](/docs/install.html).
+For installation instructions on your environments, please see the [Installation Guide](#{product_install_url}).
 
 For the information on the changes, please see the [Release Note](#{release_note_url}).
     CONTENT

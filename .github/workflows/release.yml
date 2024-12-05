@@ -25,3 +25,20 @@ jobs:
           git add ja docs
           git commit -m "${GITHUB_REF_NAME} has been released!!!"
           git push
+  blog:
+    name: Blog
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ruby
+      - name: Update blog
+        run: |
+          tag_name="${GITHUB_REF_NAME}"
+          rake release:blog:generate
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add "*/_posts/*-groonga-${tag_name}.md"
+          git commit -m "blog: add an article about Groonga ${tag_name}"
+          git push

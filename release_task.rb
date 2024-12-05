@@ -72,7 +72,7 @@ class ReleaseTask
     "/docs/news/#{major_version}.html#release-#{@version.gsub(".", "-")}"
   end
 
-  def post_ja_content
+  def post_content_ja
     <<-CONTENT
 ---
 layout: post.ja
@@ -90,7 +90,7 @@ description: #{@product} #{@version}をリリースしました！
     CONTENT
   end
 
-  def post_en_content
+  def post_content_en
     <<-CONTENT
 ---
 layout: post.en
@@ -108,21 +108,10 @@ For the information on the changes in this release, please see the [Release Note
     CONTENT
   end
 
-  def post_content(locale)
-    case locale
-    when "ja"
-      post_ja_content
-    when "en"
-      post_en_content
-    else
-      raise "#{locale} isn't supported for release announce posts in blog."
-    end
-  end
-
   def generate_blog_posts
     ["ja", "en"].each do |locale|
       File.open("#{@jekyll_path}/#{locale}/_posts/#{post_filename}", "w") do |post|
-        post.write(post_content(locale))
+        post.write(__send__("post_content_#{locale}"))
       end
     end
   end

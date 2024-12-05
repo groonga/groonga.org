@@ -67,7 +67,7 @@ class ReleaseTask
     "/docs/install.html"
   end
 
-  def release_note_url
+  def product_release_note_url
     major_version = @version.split(".")[0];
     "/docs/news/#{major_version}.html#release-#{@version.gsub(".", "-")}"
   end
@@ -86,7 +86,7 @@ description: #{@product} #{@version}をリリースしました！
 
 それぞれの環境毎のインストール方法は、[インストール](/ja#{product_install_url})をご確認ください。
 
-主な変更点のついては、[リリースノート](/ja#{release_note_url})をご確認ください。
+主な変更点のついては、[リリースノート](/ja#{product_release_note_url})をご確認ください。
     CONTENT
   end
 
@@ -104,7 +104,7 @@ description: #{@product} #{@version} has been released!
 
 For installation instructions on your environments, please see the [Installation Guide](#{product_install_url}).
 
-For the information on the changes, please see the [Release Note](#{release_note_url}).
+For the information on the changes, please see the [Release Note](#{product_release_note_url}).
     CONTENT
   end
 

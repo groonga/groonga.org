@@ -86,7 +86,7 @@ description: #{@product} #{@version}をリリースしました！
 
 それぞれの環境毎のインストール方法は、[インストール](/ja#{product_install_url})をご確認ください。
 
-主な変更点のついては、[リリースノート](/ja#{product_release_note_url})をご確認ください。
+主な変更点は、[リリースノート](/ja#{product_release_note_url})をご確認ください。
     CONTENT
   end
 
@@ -104,7 +104,7 @@ description: #{@product} #{@version} has been released!
 
 For installation instructions on your environments, please see the [Installation Guide](#{product_install_url}).
 
-For the information on the changes, please see the [Release Note](#{product_release_note_url}).
+For the information on the changes in this release, please see the [Release Note](#{product_release_note_url}).
     CONTENT
   end
 

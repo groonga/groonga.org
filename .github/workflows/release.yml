@@ -14,7 +14,12 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-      # todo: Wait for the archive file to be uploaded to Groonga's release page.
+      - name: Wait for upload of `groonga/groonga` asset
+        run: |
+          while ! (gh release view "v${GITHUB_REF_NAME}" --repo groonga/groonga 2>&1 | \
+                   grep -E "asset:\s+document-${GITHUB_REF_NAME}\.tar\.gz"); do
+            sleep 10
+          done
       - name: Update docs
         run: |
           set -x

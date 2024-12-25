@@ -18,10 +18,11 @@ jobs:
         run: |
           run_id=$(gh run list \
                      --repo groonga/groonga \
-                     --workflow=document.yml \
-                     --limit 1 \
-                     --json "databaseId,event,headBranch" \
-                     --jq ".[] | select(.event == \"push\" and .headBranch == \"v${GITHUB_REF_NAME}\") | .databaseId")
+                     --workflow document.yml \
+                     --branch "v${GITHUB_REF_NAME}" \
+                     --status success \
+                     --json databaseId \
+                     --jq ".[].databaseId")
           gh run watch "${run_id}" --repo groonga/groonga --exit-status
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

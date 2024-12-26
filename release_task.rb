@@ -146,8 +146,8 @@ For the information on the changes in this release, please see the [Release Note
         latest_release = GitHubClient.new(@product, @product).latest_release
         # "Groonga 14.1.1 - 2024-12-03"
         release_name = latest_release["name"]
-        # "14.1.1"
-        latest_version = release_name[/\d+\.\d+\.\d+/, 0]
+        # "14.1.1" or "14.11"
+        latest_version = release_name[/\d+(\.\d+){1,2}/, 0]
         # "2024-12-03"
         latest_release_date = release_name[/\d+-\d+-\d+/, 0]
         jekyll_config = File.read(@jekyll_config_path)

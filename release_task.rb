@@ -144,7 +144,7 @@ For the information on the changes in this release, please see the [Release Note
       desc "Update version"
       task :update do
         latest_release = GitHubClient.new(@product, @product).latest_release
-        # "Groonga 14.1.1 - 2024-12-03"
+        # "Groonga 14.1.1 - 2024-12-03" or "Mroonga 14.11 - 2024-12-03"
         release_name = latest_release["name"]
         # "14.1.1" or "14.11"
         latest_version = release_name[/\d+(\.\d+){1,2}/, 0]

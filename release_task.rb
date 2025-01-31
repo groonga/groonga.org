@@ -152,8 +152,8 @@ For the information on the changes in this release, please see the [Release Note
         latest_release_date = release_name[/\d+-\d+-\d+/, 0]
         jekyll_config = File.read(@jekyll_config_path)
         escaped_product_id = Regexp.escape(@product_id)
-        jekyll_config.gsub!(/\A(#{escaped_product_id}_version: )("?)[^"]+("?)\z/) do
-          "#{$1}#{$2}#{latest_version}#{$3}"
+        jekyll_config.gsub!(/^(#{escaped_product_id}_version: ).+$/) do
+          "#{$1}\"#{latest_version}\""
         end
         jekyll_config.gsub!(/^(#{escaped_product_id}_release_date: ).+$/) do
           "#{$1}#{latest_release_date}"

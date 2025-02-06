@@ -39,6 +39,12 @@ class ReleaseTask
       end
     end
 
+    def find_commit_by(commit_sha)
+      api_uri("commits/#{commit_sha}").open do |input|
+        JSON.parse(input.read)
+      end
+    end
+
     private
     def api_uri(path)
       URI("https://api.github.com/repos/#{@user}/#{@repository}/#{path}")
@@ -149,13 +155,15 @@ For the information on the changes in this release, please see the [Release Note
     namespace :version do
       desc "Update version"
       task :update do
-        latest_tag = GitHubClient.new(@product, @product).latest_tag
+        github_client = GitHubClient.new(@product, @product)
+        latest_tag = github_client.latest_tag
+        tag_commit = github_client.find_commit_by(latest_tag["commit"]["sha"])
         # "v14.1.3"(Groonga), "v14.14"(Mroonga) or "3.2.5"(PGroonga)
         release_tag_name = latest_tag["name"]
         # "14.1.3", "14.14" or "3.2.5"
         latest_version = release_tag_name[/\d+(\.\d+){1,2}/, 0]
         # "2024-12-03"
-        latest_release_date = Date.today.to_s
+        latest_release_date = Date.parse(tag_commit["commit"]["committer"]["date"]).to_s
         jekyll_config = File.read(@jekyll_config_path)
         escaped_product_id = Regexp.escape(@product_id)
         jekyll_config.gsub!(/^(#{escaped_product_id}_version: ).+$/) do

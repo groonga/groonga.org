@@ -33,6 +33,12 @@ class ReleaseTask
       end
     end
 
+    def latest_tag
+      api_uri("tags").open do |input|
+        JSON.parse(input.read)[0]
+      end
+    end
+
     private
     def api_uri(path)
       URI("https://api.github.com/repos/#{@user}/#{@repository}/#{path}")
@@ -143,13 +149,13 @@ For the information on the changes in this release, please see the [Release Note
     namespace :version do
       desc "Update version"
       task :update do
-        latest_release = GitHubClient.new(@product, @product).latest_release
-        # "Groonga 14.1.1 - 2024-12-03" or "Mroonga 14.11 - 2024-12-03"
-        release_name = latest_release["name"]
-        # "14.1.1" or "14.11"
-        latest_version = release_name[/\d+(\.\d+){1,2}/, 0]
+        latest_tag = GitHubClient.new(@product, @product).latest_tag
+        # "v14.1.3"(Groonga), "v14.14"(Mroonga) or "3.2.5"(PGroonga)
+        release_tag_name = latest_tag["name"]
+        # "14.1.3", "14.14" or "3.2.5"
+        latest_version = release_tag_name[/\d+(\.\d+){1,2}/, 0]
         # "2024-12-03"
-        latest_release_date = release_name[/\d+-\d+-\d+/, 0]
+        latest_release_date = Date.today.to_s
         jekyll_config = File.read(@jekyll_config_path)
         escaped_product_id = Regexp.escape(@product_id)
         jekyll_config.gsub!(/^(#{escaped_product_id}_version: ).+$/) do

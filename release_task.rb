@@ -162,8 +162,10 @@ For the information on the changes in this release, please see the [Release Note
         release_tag_name = latest_tag["name"]
         # "14.1.3", "14.14" or "3.2.5"
         latest_version = release_tag_name[/\d+(\.\d+){1,2}/, 0]
-        # "2024-12-03"
-        latest_release_date = Date.parse(tag_commit["commit"]["committer"]["date"]).to_s
+        # "2025-01-29T03:03:15Z(UTC)" -> "2025-01-30(JST)"
+        latest_release_date = Time.parse(tag_commit["commit"]["committer"]["date"])
+                                  .getlocal("+09:00")
+                                  .strftime("%Y-%m-%d")
         jekyll_config = File.read(@jekyll_config_path)
         escaped_product_id = Regexp.escape(@product_id)
         jekyll_config.gsub!(/^(#{escaped_product_id}_version: ).+$/) do

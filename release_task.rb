@@ -27,6 +27,12 @@ class ReleaseTask
       @repository = repository
     end
 
+    def fetch_by(uri)
+      URI(uri).open do |input|
+        JSON.parse(input.read)
+      end
+    end
+
     def latest_release
       api_uri("releases").open do |input|
         JSON.parse(input.read)[0]
@@ -36,12 +42,6 @@ class ReleaseTask
     def latest_tag
       api_uri("tags").open do |input|
         JSON.parse(input.read)[0]
-      end
-    end
-
-    def find_commit_by(commit_sha)
-      api_uri("commits/#{commit_sha}").open do |input|
-        JSON.parse(input.read)
       end
     end
 
@@ -157,7 +157,7 @@ For the information on the changes in this release, please see the [Release Note
       task :update do
         github_client = GitHubClient.new(@product, @product)
         latest_tag = github_client.latest_tag
-        tag_commit = github_client.find_commit_by(latest_tag["commit"]["sha"])
+        tag_commit = github_client.fetch_by(latest_tag["commit"]["url"])
         # "v14.1.3"(Groonga), "v14.14"(Mroonga) or "3.2.5"(PGroonga)
         release_tag_name = latest_tag["name"]
         # "14.1.3", "14.14" or "3.2.5"

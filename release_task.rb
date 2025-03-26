@@ -68,6 +68,8 @@ class ReleaseTask
       define_generate_blog_task
       define_version_update_task
     end
+
+    define_release_task
   end
 
   private
@@ -183,5 +185,12 @@ For the information on the changes in this release, please see the [Release Note
         sh("git", "push", "--tags")
       end
     end
+  end
+
+  def define_release_task
+    desc "Release"
+    task release: [
+      "release:version:update"
+    ]
   end
 end

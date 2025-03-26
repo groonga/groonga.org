@@ -68,8 +68,3 @@ namespace :pgroonga do
     end
   end
 end
-
-desc "Release"
-task release: [
-  "release:version:update"
-]

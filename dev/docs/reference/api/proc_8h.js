@@ -26,7 +26,8 @@ var proc_8h =
       [ "GRN_PROC_TOKEN_FILTER", "proc_8h.html#ad4a51cd892a13807d3b779c4b572dc98ad927e79519a18db428b568af06adcf64", null ],
       [ "GRN_PROC_SCORER", "proc_8h.html#ad4a51cd892a13807d3b779c4b572dc98aacf50f6fe517de301339a42ade6b3eed", null ],
       [ "GRN_PROC_WINDOW_FUNCTION", "proc_8h.html#ad4a51cd892a13807d3b779c4b572dc98ae8e0c64d184d5be0938ec02f5b47ca6f", null ],
-      [ "GRN_PROC_AGGREGATOR", "proc_8h.html#ad4a51cd892a13807d3b779c4b572dc98a15daab71bc76aaf697dbdf5185d4d1fc", null ]
+      [ "GRN_PROC_AGGREGATOR", "proc_8h.html#ad4a51cd892a13807d3b779c4b572dc98a15daab71bc76aaf697dbdf5185d4d1fc", null ],
+      [ "GRN_PROC_EXTRACTOR", "proc_8h.html#ad4a51cd892a13807d3b779c4b572dc98a9d0e625f5cef42acef7aca09866cc291", null ]
     ] ],
     [ "grn_proc_create", "proc_8h.html#a6a6ddd23294192034e3ada4e31ecb0b5", null ],
     [ "grn_proc_func_generate_cache_key", "proc_8h.html#a73cbe8775385fd1c9c18abec47ed4ef9", null ],

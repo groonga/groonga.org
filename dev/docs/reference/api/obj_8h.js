@@ -27,6 +27,7 @@ var obj_8h =
     [ "grn_obj_is_dirty", "obj_8h.html#a016a8241bcff942af0fe8e82fe89574b", null ],
     [ "grn_obj_is_empty", "obj_8h.html#a79fb6a6e0d8bc23f45313d8dcf181ebb", null ],
     [ "grn_obj_is_expr", "obj_8h.html#a13888e0442edacc774c3f5c0684eff4b", null ],
+    [ "grn_obj_is_extractor_proc", "obj_8h.html#a71646479766f1dc384a66a2d9001e5dd", null ],
     [ "grn_obj_is_function_proc", "obj_8h.html#a49d88f5a3e2dbcde887f3bf57d1f5163", null ],
     [ "grn_obj_is_generated_column", "obj_8h.html#a560a44f919491611fd3709e3f946d22f", null ],
     [ "grn_obj_is_id_accessor", "obj_8h.html#a5c85e6a7124ab0cbe5e8370a70614e78", null ],

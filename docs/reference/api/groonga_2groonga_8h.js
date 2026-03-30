@@ -513,7 +513,8 @@ var groonga_2groonga_8h =
       [ "GRN_INFO_NORMALIZERS", "groonga_2groonga_8h.html#a09c3b8a18fe15be1e4c4ceac04dfc01da910faedd59b3f1bc2908cc278b0a3343", null ],
       [ "GRN_INFO_GENERATOR", "groonga_2groonga_8h.html#a09c3b8a18fe15be1e4c4ceac04dfc01da47f3c2eafa298ca5309aee4e8de55f8d", null ],
       [ "GRN_INFO_SUPPORT_LLAMA_CPP", "groonga_2groonga_8h.html#a09c3b8a18fe15be1e4c4ceac04dfc01da8a72f964e494d4c783f1ae104109bd03", null ],
-      [ "GRN_INFO_SUPPORT_FAISS", "groonga_2groonga_8h.html#a09c3b8a18fe15be1e4c4ceac04dfc01da556d4690ac42b2863bbdd44a5c13500a", null ]
+      [ "GRN_INFO_SUPPORT_FAISS", "groonga_2groonga_8h.html#a09c3b8a18fe15be1e4c4ceac04dfc01da556d4690ac42b2863bbdd44a5c13500a", null ],
+      [ "GRN_INFO_EXTRACTORS", "groonga_2groonga_8h.html#a09c3b8a18fe15be1e4c4ceac04dfc01dad6d5f159c39af3a86c01a9057045017a", null ]
     ] ],
     [ "grn_log_level", "groonga_2groonga_8h.html#a8dda5231f18477c8b5e8236e7a9429d4", [
       [ "GRN_LOG_NONE", "groonga_2groonga_8h.html#a8dda5231f18477c8b5e8236e7a9429d4a5eadd6e738d8175054e2fcd2aaa5248a", null ],
@@ -697,7 +698,8 @@ var groonga_2groonga_8h =
       [ "GRN_ZSTD_ERROR", "groonga_2groonga_8h.html#a277a68a6f6f9499ce5d85ae3409606c0ab864ae22fdf4e3425e3ed0495bec2572", null ],
       [ "GRN_CONNECTION_RESET", "groonga_2groonga_8h.html#a277a68a6f6f9499ce5d85ae3409606c0a49867458353d42f93d91ddb1e5724357", null ],
       [ "GRN_BLOSC_ERROR", "groonga_2groonga_8h.html#a277a68a6f6f9499ce5d85ae3409606c0a95c34ad9a076ee8569b88d4ccaeb0f33", null ],
-      [ "GRN_OPENZL_ERROR", "groonga_2groonga_8h.html#a277a68a6f6f9499ce5d85ae3409606c0a35475fef65b1adecab872d787c3ef885", null ]
+      [ "GRN_OPENZL_ERROR", "groonga_2groonga_8h.html#a277a68a6f6f9499ce5d85ae3409606c0a35475fef65b1adecab872d787c3ef885", null ],
+      [ "GRN_EXTRACTOR_ERROR", "groonga_2groonga_8h.html#a277a68a6f6f9499ce5d85ae3409606c0a4a52337582e32633ca286501311806f1", null ]
     ] ],
     [ "grn_bulk_detach", "groonga_2groonga_8h.html#a8f7adcd463af95dc18da112bafedc86e", null ],
     [ "grn_bulk_fin", "groonga_2groonga_8h.html#a053560eca6356df980118a36c3c7e0a1", null ],

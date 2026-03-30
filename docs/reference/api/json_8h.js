@@ -22,5 +22,6 @@ var json_8h =
     [ "grn_json_reader_get_value", "json_8h.html#a039eb07a8820e319dcfafb73e68faf20", null ],
     [ "grn_json_reader_next", "json_8h.html#af417f4fe486ff125388d88a2345e336b", null ],
     [ "grn_json_reader_open", "json_8h.html#a1c8bd5ca1958bea352a16217090c09b8", null ],
-    [ "grn_json_to_string", "json_8h.html#a9a176bdde4a7656cd71c00afe389a65b", null ]
+    [ "grn_json_to_string", "json_8h.html#a9a176bdde4a7656cd71c00afe389a65b", null ],
+    [ "grn_json_value_type_to_string", "json_8h.html#adb39247004e14c7f626be224c3fde391", null ]
 ];

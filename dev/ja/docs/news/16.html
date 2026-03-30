@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>お知らせ - 16系 &#8212; Groonga v16.0.1 documentation</title>
+    <title>お知らせ - 16系 &#8212; Groonga v16.0.2 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=8ea097b9"></script>
+    <script src="../_static/documentation_options.js?v=23f0e775"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/translations.js?v=4755f45a"></script>
@@ -62,7 +62,7 @@
     <link rel="search" title="検索" href="../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="ja"/>
-  <meta name="docsearch:version" content="16.0.1" />
+  <meta name="docsearch:version" content="16.0.2" />
   </head>
   
   
@@ -128,8 +128,8 @@
       
     
     
-    <img src="../_static/groonga.png" class="logo__image only-light" alt="Groonga v16.0.1 documentation - Home"/>
-    <img src="../_static/groonga.png" class="logo__image only-dark pst-js-only" alt="Groonga v16.0.1 documentation - Home"/>
+    <img src="../_static/groonga.png" class="logo__image only-light" alt="Groonga v16.0.2 documentation - Home"/>
+    <img src="../_static/groonga.png" class="logo__image only-dark pst-js-only" alt="Groonga v16.0.2 documentation - Home"/>
   
   
 </a></div>
@@ -397,11 +397,89 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="news-16-series">
 <h1>お知らせ - 16系<a class="headerlink" href="#news-16-series" title="Link to this heading">#</a></h1>
+<section id="release-16-0-1-2026-03-30">
+<span id="release-16-0-1"></span><h2>16.0.1リリース - 2026-03-30<a class="headerlink" href="#release-16-0-1-2026-03-30" title="Link to this heading">#</a></h2>
+<section id="improvements">
+<h3>改良<a class="headerlink" href="#improvements" title="Link to this heading">#</a></h3>
+<section id="reference-functions-language-model-vectorize-added-prefix-option">
+<h4>[<a class="reference internal" href="../reference/functions/language_model_vectorize.html"><span class="doc">language_model_vectorize</span></a>] <code class="docutils literal notranslate"><span class="pre">prefix</span></code>オプションを追加しました。<a class="headerlink" href="#reference-functions-language-model-vectorize-added-prefix-option" title="Link to this heading">#</a></h4>
+<p>入力テキストにプレフィックスを追加できるようになりました。これは<code class="docutils literal notranslate"><span class="pre">TokenLanguageModelKNN</span></code>の<code class="docutils literal notranslate"><span class="pre">passage_prefix</span></code>や<code class="docutils literal notranslate"><span class="pre">query_prefix</span></code>オプションと同様にプレフィックスを必要とするモデルに便利です。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">language_model_vectorize</span><span class="p">(</span><span class="s2">&quot;hf:///groonga/multilingual-e5-base-Q4_K_M-GGUF&quot;</span><span class="p">,</span> \
+                         <span class="s2">&quot;male child&quot;</span><span class="p">,</span> \
+                         <span class="p">{</span><span class="s2">&quot;prefix&quot;</span><span class="p">:</span> <span class="s2">&quot;query: &quot;</span><span class="p">})</span>
+</pre></div>
+</div>
+</section>
+<section id="reference-commands-object-list-added-normalizer-information-to-the-output">
+<h4>[<a class="reference internal" href="../reference/commands/object_list.html"><span class="doc">object_list</span></a>] 出力にノーマライザーの情報を追加しました。<a class="headerlink" href="#reference-commands-object-list-added-normalizer-information-to-the-output" title="Link to this heading">#</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">object_list</span></code>コマンドの出力に、<code class="docutils literal notranslate"><span class="pre">normalizers</span></code>フィールドが追加され、ノーマライザーの情報を出力するようにしました。</p>
+</section>
+</section>
+<section id="fixes">
+<h3>修正<a class="headerlink" href="#fixes" title="Link to this heading">#</a></h3>
+<section id="http-fixed-a-false-error-for-chunked-http-requests">
+<h4>[HTTP] chunkedリクエストに関する誤ったエラー判定を修正しました。<a class="headerlink" href="#http-fixed-a-false-error-for-chunked-http-requests" title="Link to this heading">#</a></h4>
+<p>特定の条件において、有効なHTTPのchunkedリクエストを受け付けたにもかかわらず、エラーで失敗する可能性があるバグを修正しました。</p>
+<p>この問題はchunkedリクエストが通信状況などで特定の条件で分割された場合にのみ発生していました。このバグによるエラーが<code class="docutils literal notranslate"><span class="pre">load</span></code>コマンドの実行中に発生した場合、データのロードがすべて完了しないので、再実行が必要になります。</p>
+<p>このバグによりインデックスの破損はおこりません。</p>
+</section>
+<section id="fixed-a-bug-that-caused-a-crash-due-to-using-the-wrong-free-function">
+<h4>誤ったfree関数を使用したためにクラッシュが発生するバグを修正しました。<a class="headerlink" href="#fixed-a-bug-that-caused-a-crash-due-to-using-the-wrong-free-function" title="Link to this heading">#</a></h4>
+<p>バルクオブジェクトに対して<code class="docutils literal notranslate"><span class="pre">GRN_OBJ_FIN()</span></code>の代わりに<code class="docutils literal notranslate"><span class="pre">grn_obj_unlink()</span></code>を使用していたバグを修正しました。このバグによりクラッシュする可能性がありました。</p>
+<p>Daniel Blackさんが報告</p>
+<p>関連: <a class="reference external" href="https://jira.mariadb.org/browse/MDEV-39098">https://jira.mariadb.org/browse/MDEV-39098</a></p>
+</section>
+</section>
+<section id="experimental-features">
+<h3>実験的な機能<a class="headerlink" href="#experimental-features" title="Link to this heading">#</a></h3>
+<blockquote>
+<div><p>これらの機能はまだ実験的で安定していません。これらの機能は、絶対に実運用環境では使わないでください。</p>
+</div></blockquote>
+<section id="reference-types-added-support-for-arrays-and-objects-in-json-type">
+<h4>[<a class="reference internal" href="../reference/types.html"><span class="doc">データ型</span></a>] <code class="docutils literal notranslate"><span class="pre">JSON</span></code>型における配列とオブジェクトのサポートを追加しました。<a class="headerlink" href="#reference-types-added-support-for-arrays-and-objects-in-json-type" title="Link to this heading">#</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">JSON</span></code>型はネストされたデータを含む配列とオブジェクトをサポートするようになりました。これによりすべてのJSONのデータ型がサポートされています。</p>
+</section>
+<section id="added-support-for-openzl-compression-and-decompression-for-scalar-columns-and-float32-vector-columns">
+<h4>スカラーカラムとFloat32ベクトルカラムに対するOpenZLによる圧縮をサポートしました。<a class="headerlink" href="#added-support-for-openzl-compression-and-decompression-for-scalar-columns-and-float32-vector-columns" title="Link to this heading">#</a></h4>
+<p><a class="reference external" href="https://openzl.org/">OpenZL</a> によるスカラーカラムとFloat32ベクトルカラムの圧縮をサポートしました。OpenZLはZstandardよりも高い圧縮率を実現できます。</p>
+<p>圧縮率の例を示します。</p>
+<p>検証に使ったfloat32の配列のデータは次のとおりです:</p>
+<ul class="simple">
+<li><p>配列の要素数は40,960。</p></li>
+<li><p>レコード数は10,000。</p></li>
+</ul>
+<p>圧縮後のサイズ:</p>
+<ul class="simple">
+<li><p>OpenZLによる圧縮: 1.3GB</p></li>
+<li><p>Zstandardによる圧縮: 1.5GB</p></li>
+<li><p>圧縮なし: 1.6GB</p></li>
+</ul>
+</section>
+<section id="added-extractor-support">
+<h4>エクストラクターを追加しました。<a class="headerlink" href="#added-extractor-support" title="Link to this heading">#</a></h4>
+<p>エクストラクターはGroongaの新しい種類のモジュールのタイプで、トークン化前に構造化データからプレーンテキストを抽出します。</p>
+<p>今は<code class="docutils literal notranslate"><span class="pre">ExtractorHTML</span></code>エクストラクターが組み込まれており、それはHTMLタグとHTMLエンティティを削除し、テキストコンテンツのみを抽出します。</p>
+<p>次の例は<code class="docutils literal notranslate"><span class="pre">extract</span></code>コマンドを使用して<code class="docutils literal notranslate"><span class="pre">ExtractorHTML</span></code>でテキストを抽出する例です。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">extract</span> \
+  <span class="o">--</span><span class="n">extractors</span> <span class="s1">&#39;ExtractorHTML&#39;</span> \
+  <span class="o">--</span><span class="n">value</span> <span class="s2">&quot;&lt;html&gt;&lt;body&gt;He&amp;lt;ll&amp;gt;o&lt;/body&gt;&lt;/html&gt;&quot;</span>
+<span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">0.0</span><span class="p">],{</span><span class="s2">&quot;extracted&quot;</span><span class="p">:</span><span class="s2">&quot;He&lt;ll&gt;o&quot;</span><span class="p">}]</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="thanks">
+<h3>感謝<a class="headerlink" href="#thanks" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Daniel Blackさん</p></li>
+</ul>
+</section>
+</section>
 <section id="release-16-0-0-2026-02-09">
 <span id="release-16-0-0"></span><h2>16.0.0リリース - 2026-02-09<a class="headerlink" href="#release-16-0-0-2026-02-09" title="Link to this heading">#</a></h2>
 <p>毎年恒例の肉の日メジャーリリースです！このリリースには後方互換性が壊れる変更はありません！既存のデータベースを移行せずにGroongaをアップグレードできます。既存のデータベースをそのまま使い続けることができます。</p>
-<section id="fixes">
-<h3>修正<a class="headerlink" href="#fixes" title="Link to this heading">#</a></h3>
+<section id="id1">
+<h3>修正<a class="headerlink" href="#id1" title="Link to this heading">#</a></h3>
 <section id="fixed-a-bug-that-causes-overflow-in-the-key-of-table-dat-key-tables">
 <h4><code class="docutils literal notranslate"><span class="pre">TABLE_DAT_KEY</span></code>のテーブルでキーでオーバーフローを引き起こす問題を修正<a class="headerlink" href="#fixed-a-bug-that-causes-overflow-in-the-key-of-table-dat-key-tables" title="Link to this heading">#</a></h4>
 <p>4096byteのキーをセットすると、<code class="docutils literal notranslate"><span class="pre">TABLE_DAT_KEY</span></code>のテーブルが壊れることがあります。</p>
@@ -439,8 +517,28 @@
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-16-0-0-2026-02-09">16.0.0リリース - 2026-02-09</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-16-0-1-2026-03-30">16.0.1リリース - 2026-03-30</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#improvements">改良</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#reference-functions-language-model-vectorize-added-prefix-option">[<span class="xref std std-doc">/reference/functions/language_model_vectorize</span>] <code class="docutils literal notranslate"><span class="pre">prefix</span></code>オプションを追加しました。</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#reference-commands-object-list-added-normalizer-information-to-the-output">[<span class="xref std std-doc">/reference/commands/object_list</span>] 出力にノーマライザーの情報を追加しました。</a></li>
+</ul>
+</li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fixes">修正</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#http-fixed-a-false-error-for-chunked-http-requests">[HTTP] chunkedリクエストに関する誤ったエラー判定を修正しました。</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#fixed-a-bug-that-caused-a-crash-due-to-using-the-wrong-free-function">誤ったfree関数を使用したためにクラッシュが発生するバグを修正しました。</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#experimental-features">実験的な機能</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#reference-types-added-support-for-arrays-and-objects-in-json-type">[<span class="xref std std-doc">/reference/types</span>] <code class="docutils literal notranslate"><span class="pre">JSON</span></code>型における配列とオブジェクトのサポートを追加しました。</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#added-support-for-openzl-compression-and-decompression-for-scalar-columns-and-float32-vector-columns">スカラーカラムとFloat32ベクトルカラムに対するOpenZLによる圧縮をサポートしました。</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#added-extractor-support">エクストラクターを追加しました。</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thanks">感謝</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-16-0-0-2026-02-09">16.0.0リリース - 2026-02-09</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">修正</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#fixed-a-bug-that-causes-overflow-in-the-key-of-table-dat-key-tables"><code class="docutils literal notranslate"><span class="pre">TABLE_DAT_KEY</span></code>のテーブルでキーでオーバーフローを引き起こす問題を修正</a></li>
 </ul>
 </li>

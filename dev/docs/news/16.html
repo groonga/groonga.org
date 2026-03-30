@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>News - 16 series &#8212; Groonga v16.0.1 documentation</title>
+    <title>News - 16 series &#8212; Groonga v16.0.2 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=bf5703ed"></script>
+    <script src="../_static/documentation_options.js?v=12077321"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script async="async" src="https://www.googletagmanager.com/gtag/js?id=UA-7532323-1"></script>
@@ -61,7 +61,7 @@
     <link rel="search" title="Search" href="../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="16.0.1" />
+  <meta name="docsearch:version" content="16.0.2" />
   </head>
   
   
@@ -127,8 +127,8 @@
       
     
     
-    <img src="../_static/groonga.png" class="logo__image only-light" alt="Groonga v16.0.1 documentation - Home"/>
-    <img src="../_static/groonga.png" class="logo__image only-dark pst-js-only" alt="Groonga v16.0.1 documentation - Home"/>
+    <img src="../_static/groonga.png" class="logo__image only-light" alt="Groonga v16.0.2 documentation - Home"/>
+    <img src="../_static/groonga.png" class="logo__image only-dark pst-js-only" alt="Groonga v16.0.2 documentation - Home"/>
   
   
 </a></div>
@@ -396,14 +396,98 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="news-16-series">
 <h1>News - 16 series<a class="headerlink" href="#news-16-series" title="Link to this heading">#</a></h1>
+<section id="release-16-0-1-2026-03-30">
+<span id="release-16-0-1"></span><h2>Release 16.0.1 - 2026-03-30<a class="headerlink" href="#release-16-0-1-2026-03-30" title="Link to this heading">#</a></h2>
+<section id="improvements">
+<h3>Improvements<a class="headerlink" href="#improvements" title="Link to this heading">#</a></h3>
+<section id="reference-functions-language-model-vectorize-added-prefix-option">
+<h4>[<a class="reference internal" href="../reference/functions/language_model_vectorize.html"><span class="doc">language_model_vectorize</span></a>] Added <code class="docutils literal notranslate"><span class="pre">prefix</span></code> option<a class="headerlink" href="#reference-functions-language-model-vectorize-added-prefix-option" title="Link to this heading">#</a></h4>
+<p>You can now add a prefix to the input text.
+This is useful for models that require a prefix, similar to the <code class="docutils literal notranslate"><span class="pre">passage_prefix</span></code> and <code class="docutils literal notranslate"><span class="pre">query_prefix</span></code> options of <code class="docutils literal notranslate"><span class="pre">TokenLanguageModelKNN</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">language_model_vectorize</span><span class="p">(</span><span class="s2">&quot;hf:///groonga/multilingual-e5-base-Q4_K_M-GGUF&quot;</span><span class="p">,</span> \
+                         <span class="s2">&quot;male child&quot;</span><span class="p">,</span> \
+                         <span class="p">{</span><span class="s2">&quot;prefix&quot;</span><span class="p">:</span> <span class="s2">&quot;query: &quot;</span><span class="p">})</span>
+</pre></div>
+</div>
+</section>
+<section id="reference-commands-object-list-added-normalizer-information-to-the-output">
+<h4>[<a class="reference internal" href="../reference/commands/object_list.html"><span class="doc">object_list</span></a>] Added normalizer information to the output<a class="headerlink" href="#reference-commands-object-list-added-normalizer-information-to-the-output" title="Link to this heading">#</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">object_list</span></code> command now includes a <code class="docutils literal notranslate"><span class="pre">normalizers</span></code> field in the output for each table.</p>
+</section>
+</section>
+<section id="fixes">
+<h3>Fixes<a class="headerlink" href="#fixes" title="Link to this heading">#</a></h3>
+<section id="http-fixed-a-false-error-for-chunked-http-requests">
+<h4>[HTTP] Fixed a false error for chunked HTTP requests<a class="headerlink" href="#http-fixed-a-false-error-for-chunked-http-requests" title="Link to this heading">#</a></h4>
+<p>Fixed a bug where valid chunked HTTP requests could fail with an error under certain conditions.</p>
+<p>This issue could only occur when a chunked request body was split across multiple receives in a very specific pattern, so most users would never encounter it.
+If it did occur during a <code class="docutils literal notranslate"><span class="pre">load</span></code> command, the load would only be partially completed and would need to be re-executed.</p>
+<p>No index corruption occurs due to this bug.</p>
+</section>
+<section id="fixed-a-bug-that-caused-a-crash-due-to-using-the-wrong-free-function">
+<h4>Fixed a bug that caused a crash due to using the wrong free function<a class="headerlink" href="#fixed-a-bug-that-caused-a-crash-due-to-using-the-wrong-free-function" title="Link to this heading">#</a></h4>
+<p>Fixed a bug where <code class="docutils literal notranslate"><span class="pre">grn_obj_unlink()</span></code> was used instead of <code class="docutils literal notranslate"><span class="pre">GRN_OBJ_FIN()</span></code> for bulk objects.
+This could cause a crash in some cases.</p>
+<p>Reported by Daniel Black</p>
+<p>See also: <a class="reference external" href="https://jira.mariadb.org/browse/MDEV-39098">https://jira.mariadb.org/browse/MDEV-39098</a></p>
+</section>
+</section>
+<section id="experimental-features">
+<h3>Experimental features<a class="headerlink" href="#experimental-features" title="Link to this heading">#</a></h3>
+<blockquote>
+<div><p>These features are still experimental and unstable.
+We must not use these features in production.</p>
+</div></blockquote>
+<section id="reference-types-added-support-for-arrays-and-objects-in-json-type">
+<h4>[<a class="reference internal" href="../reference/types.html"><span class="doc">Data types</span></a>] Added support for arrays and objects in <code class="docutils literal notranslate"><span class="pre">JSON</span></code> type<a class="headerlink" href="#reference-types-added-support-for-arrays-and-objects-in-json-type" title="Link to this heading">#</a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">JSON</span></code> type now supports arrays and objects, including nested ones.
+All JSON value types are now supported.</p>
+</section>
+<section id="added-support-for-openzl-compression-and-decompression-for-scalar-columns-and-float32-vector-columns">
+<h4>Added support for OpenZL compression and decompression for scalar columns and Float32 vector columns<a class="headerlink" href="#added-support-for-openzl-compression-and-decompression-for-scalar-columns-and-float32-vector-columns" title="Link to this heading">#</a></h4>
+<p><a class="reference external" href="https://openzl.org/">OpenZL</a> compression and decompression are now supported for scalar columns and Float32 vector columns.
+OpenZL can achieve better compression ratios than Zstandard.</p>
+<p>Examples of compression:</p>
+<p>The compression of float32 array results for the following data:</p>
+<ul class="simple">
+<li><p>The number of array elements is 40,960.</p></li>
+<li><p>The number of records is 10,000.</p></li>
+</ul>
+<p>Results:</p>
+<ul class="simple">
+<li><p>Compress with OpenZL: 1.3GB</p></li>
+<li><p>Compress with Zstandard: 1.5GB</p></li>
+<li><p>No compress: 1.6GB</p></li>
+</ul>
+</section>
+<section id="added-extractor-support">
+<h4>Added extractor support<a class="headerlink" href="#added-extractor-support" title="Link to this heading">#</a></h4>
+<p>Extractors are a new type of module in Groonga that extract plain text from structured data before tokenization.</p>
+<p>The built-in <code class="docutils literal notranslate"><span class="pre">ExtractorHTML</span></code> extractor strips HTML tags and decodes HTML entities from a value, leaving only the text content.</p>
+<p>Here is an example of using <code class="docutils literal notranslate"><span class="pre">ExtractorHTML</span></code> with the <code class="docutils literal notranslate"><span class="pre">extract</span></code> command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">extract</span> \
+  <span class="o">--</span><span class="n">extractors</span> <span class="s1">&#39;ExtractorHTML&#39;</span> \
+  <span class="o">--</span><span class="n">value</span> <span class="s2">&quot;&lt;html&gt;&lt;body&gt;He&amp;lt;ll&amp;gt;o&lt;/body&gt;&lt;/html&gt;&quot;</span>
+<span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">0.0</span><span class="p">],{</span><span class="s2">&quot;extracted&quot;</span><span class="p">:</span><span class="s2">&quot;He&lt;ll&gt;o&quot;</span><span class="p">}]</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="thanks">
+<h3>Thanks<a class="headerlink" href="#thanks" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Daniel Black</p></li>
+</ul>
+</section>
+</section>
 <section id="release-16-0-0-2026-02-09">
 <span id="release-16-0-0"></span><h2>Release 16.0.0 - 2026-02-09<a class="headerlink" href="#release-16-0-0-2026-02-09" title="Link to this heading">#</a></h2>
 <p>This is our annual major release! This release doesn’t have any
 backward incompatible changes! So you can upgrade Groonga without
 migrating your existing databases. You can still use your existing
 databases as-is.</p>
-<section id="fixes">
-<h3>Fixes<a class="headerlink" href="#fixes" title="Link to this heading">#</a></h3>
+<section id="id1">
+<h3>Fixes<a class="headerlink" href="#id1" title="Link to this heading">#</a></h3>
 <section id="fixed-a-bug-that-causes-overflow-in-the-key-of-table-dat-key-tables">
 <h4>Fixed a bug that causes overflow in the key of <code class="docutils literal notranslate"><span class="pre">TABLE_DAT_KEY</span></code> tables<a class="headerlink" href="#fixed-a-bug-that-causes-overflow-in-the-key-of-table-dat-key-tables" title="Link to this heading">#</a></h4>
 <p>If you set a value of 4096 byte against a key, a <code class="docutils literal notranslate"><span class="pre">TABLE_DAT_KEY</span></code> table may be broken.</p>
@@ -441,8 +525,28 @@ databases as-is.</p>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-16-0-0-2026-02-09">Release 16.0.0 - 2026-02-09</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-16-0-1-2026-03-30">Release 16.0.1 - 2026-03-30</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#improvements">Improvements</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#reference-functions-language-model-vectorize-added-prefix-option">[<span class="xref std std-doc">/reference/functions/language_model_vectorize</span>] Added <code class="docutils literal notranslate"><span class="pre">prefix</span></code> option</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#reference-commands-object-list-added-normalizer-information-to-the-output">[<span class="xref std std-doc">/reference/commands/object_list</span>] Added normalizer information to the output</a></li>
+</ul>
+</li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fixes">Fixes</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#http-fixed-a-false-error-for-chunked-http-requests">[HTTP] Fixed a false error for chunked HTTP requests</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#fixed-a-bug-that-caused-a-crash-due-to-using-the-wrong-free-function">Fixed a bug that caused a crash due to using the wrong free function</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#experimental-features">Experimental features</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#reference-types-added-support-for-arrays-and-objects-in-json-type">[<span class="xref std std-doc">/reference/types</span>] Added support for arrays and objects in <code class="docutils literal notranslate"><span class="pre">JSON</span></code> type</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#added-support-for-openzl-compression-and-decompression-for-scalar-columns-and-float32-vector-columns">Added support for OpenZL compression and decompression for scalar columns and Float32 vector columns</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#added-extractor-support">Added extractor support</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thanks">Thanks</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-16-0-0-2026-02-09">Release 16.0.0 - 2026-02-09</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Fixes</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#fixed-a-bug-that-causes-overflow-in-the-key-of-table-dat-key-tables">Fixed a bug that causes overflow in the key of <code class="docutils literal notranslate"><span class="pre">TABLE_DAT_KEY</span></code> tables</a></li>
 </ul>
 </li>

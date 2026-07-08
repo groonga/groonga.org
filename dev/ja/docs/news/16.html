@@ -625,6 +625,86 @@
 </pre></div>
 </div>
 </section>
+<section id="reference-extractors-extractor-json-added-support-for-extractorjson">
+<h4>[<a class="reference internal" href="../reference/extractors/extractor_json.html"><span class="doc">ExtractorJSON</span></a>] <code class="docutils literal notranslate"><span class="pre">ExtractorJSON</span></code>をサポート<a class="headerlink" href="#reference-extractors-extractor-json-added-support-for-extractorjson" title="Link to this heading">#</a></h4>
+<blockquote>
+<div><p>これは実験的な機能です。現時点ではまだ安定しきっていません。</p>
+</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">ExtractorJSON</span></code> は<code class="docutils literal notranslate"><span class="pre">json_extract()</span></code>と同様、JSONPath式を使ってJSONデータから値を抽出します。このエクストラクターを使うと、JSONテキスト全体をインデックスすることなく、必要な値だけをJSONからインデックスできます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">ExtractorJSON</span></code> を語彙表に割り当てると、語彙表は抽出された値をインデックスします。元のJSONはデータカラムに保持されます。</p>
+<p>以下の例では、JSONカラム中の整数をインデックスします。抽出される値が整数なので、語彙表のキーの型は Int32 です。JSONカラムがロードされるときにインデックスが自動的に使われるため、抽出された値で元のレコードを検索できます。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">table_create</span> <span class="n">Data</span> <span class="n">TABLE_NO_KEY</span>
+<span class="c1"># [[0,1337566253.89858,0.000355720520019531],true]</span>
+<span class="n">column_create</span> <span class="n">Data</span> <span class="n">value</span> <span class="n">COLUMN_SCALAR</span> <span class="n">JSON</span>
+<span class="c1"># [[0,1337566253.89858,0.000355720520019531],true]</span>
+<span class="n">table_create</span> <span class="n">Numbers</span> <span class="n">TABLE_PAT_KEY</span> <span class="n">Int32</span> \
+  <span class="o">--</span><span class="n">extractors</span> <span class="s1">&#39;ExtractorJSON(&quot;path&quot;, &quot;$.value[*][*]&quot;)&#39;</span>
+<span class="c1"># [[0,1337566253.89858,0.000355720520019531],true]</span>
+<span class="n">column_create</span> <span class="n">Numbers</span> <span class="n">data_value</span> <span class="n">COLUMN_INDEX</span> <span class="n">Data</span> <span class="n">value</span>
+<span class="c1"># [[0,1337566253.89858,0.000355720520019531],true]</span>
+<span class="n">load</span> <span class="o">--</span><span class="n">table</span> <span class="n">Data</span>
+<span class="p">[</span>
+<span class="p">{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;{</span><span class="se">\&quot;</span><span class="s2">value</span><span class="se">\&quot;</span><span class="s2">: [[1, 10], [100]]}&quot;</span><span class="p">},</span>
+<span class="p">{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;{</span><span class="se">\&quot;</span><span class="s2">value</span><span class="se">\&quot;</span><span class="s2">: [[2], [20, 200]]}&quot;</span><span class="p">},</span>
+<span class="p">{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;{</span><span class="se">\&quot;</span><span class="s2">value</span><span class="se">\&quot;</span><span class="s2">: [[-1, -10], [-100]]}&quot;</span><span class="p">}</span>
+<span class="p">]</span>
+<span class="c1"># [[0,1337566253.89858,0.000355720520019531],3]</span>
+<span class="n">select</span> <span class="n">Data</span> <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;between(Numbers.data_value, 10, 20)&#39;</span>
+<span class="c1"># [</span>
+<span class="c1">#   [</span>
+<span class="c1">#     0,</span>
+<span class="c1">#     1337566253.89858,</span>
+<span class="c1">#     0.000355720520019531</span>
+<span class="c1">#   ],</span>
+<span class="c1">#   [</span>
+<span class="c1">#     [</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;_id&quot;,</span>
+<span class="c1">#           &quot;UInt32&quot;</span>
+<span class="c1">#         ],</span>
+<span class="c1">#         [</span>
+<span class="c1">#           &quot;value&quot;,</span>
+<span class="c1">#           &quot;JSON&quot;</span>
+<span class="c1">#         ]</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         1,</span>
+<span class="c1">#         {</span>
+<span class="c1">#           &quot;value&quot;: [</span>
+<span class="c1">#             [</span>
+<span class="c1">#               1,</span>
+<span class="c1">#               10</span>
+<span class="c1">#             ],</span>
+<span class="c1">#             [</span>
+<span class="c1">#               100</span>
+<span class="c1">#             ]</span>
+<span class="c1">#           ]</span>
+<span class="c1">#         }</span>
+<span class="c1">#       ],</span>
+<span class="c1">#       [</span>
+<span class="c1">#         2,</span>
+<span class="c1">#         {</span>
+<span class="c1">#           &quot;value&quot;: [</span>
+<span class="c1">#             [</span>
+<span class="c1">#               2</span>
+<span class="c1">#             ],</span>
+<span class="c1">#             [</span>
+<span class="c1">#               20,</span>
+<span class="c1">#               200</span>
+<span class="c1">#             ]</span>
+<span class="c1">#           ]</span>
+<span class="c1">#         }</span>
+<span class="c1">#       ]</span>
+<span class="c1">#     ]</span>
+<span class="c1">#   ]</span>
+<span class="c1"># ]</span>
+</pre></div>
+</div>
+</section>
 </section>
 </section>
 <section id="release-16-0-5-2026-05-22">
@@ -813,6 +893,7 @@
 </li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#experimental-features">実験的な機能</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#reference-functions-json-extract-added-support-for-json-extract">[<span class="xref std std-doc">/reference/functions/json_extract</span>] <code class="docutils literal notranslate"><span class="pre">json_extract()</span></code>をサポート</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#reference-extractors-extractor-json-added-support-for-extractorjson">[<span class="xref std std-doc">/reference/extractors/extractor_json</span>] <code class="docutils literal notranslate"><span class="pre">ExtractorJSON</span></code>をサポート</a></li>
 </ul>
 </li>
 </ul>

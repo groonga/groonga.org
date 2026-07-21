@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>7.16.28. string_slice &#8212; Groonga v16.0.9 documentation</title>
+    <title>7.16.30. string_truncate &#8212; Groonga v16.0.9 documentation</title>
   
   
   
@@ -59,7 +59,7 @@
                 gtag('js', new Date());
                 gtag('config', 'UA-7532323-1');
             </script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'reference/functions/string_slice';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'reference/functions/string_truncate';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://groonga.org/docs/_static/switcher.json';
@@ -71,8 +71,8 @@
     <link rel="icon" href="../../_static/favicon.ico"/>
     <link rel="index" title="索引" href="../../genindex.html" />
     <link rel="search" title="検索" href="../../search.html" />
-    <link rel="next" title="7.16.29. string_substring" href="string_substring.html" />
-    <link rel="prev" title="7.16.27. string_length" href="string_length.html" />
+    <link rel="next" title="7.16.31. sub_filter" href="sub_filter.html" />
+    <link rel="prev" title="7.16.29. string_substring" href="string_substring.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="ja"/>
   <meta name="docsearch:version" content="16.0.9" />
@@ -572,9 +572,9 @@
 <li class="toctree-l2"><a class="reference internal" href="snippet.html">7.16.25. <code class="docutils literal notranslate"><span class="pre">snippet</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="snippet_html.html">7.16.26. <code class="docutils literal notranslate"><span class="pre">snippet_html</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="string_length.html">7.16.27. <code class="docutils literal notranslate"><span class="pre">string_length</span></code></a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">7.16.28. <code class="docutils literal notranslate"><span class="pre">string_slice</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="string_slice.html">7.16.28. <code class="docutils literal notranslate"><span class="pre">string_slice</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="string_substring.html">7.16.29. <code class="docutils literal notranslate"><span class="pre">string_substring</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="string_truncate.html">7.16.30. <code class="docutils literal notranslate"><span class="pre">string_truncate</span></code></a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">7.16.30. <code class="docutils literal notranslate"><span class="pre">string_truncate</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="sub_filter.html">7.16.31. <code class="docutils literal notranslate"><span class="pre">sub_filter</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="time_classify_day.html">7.16.32. <code class="docutils literal notranslate"><span class="pre">time_classify_day</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="time_classify_day_of_week.html">7.16.33. <code class="docutils literal notranslate"><span class="pre">time_classify_day_of_week</span></code></a></li>
@@ -692,7 +692,7 @@
     
     <li class="breadcrumb-item"><a href="../function.html" class="nav-link"><span class="section-number">7.16. </span>関数</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">7.16.28. </span><code class="docutils literal notranslate"><span class="pre">string_slice</span></code></span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">7.16.30. </span><code class="docutils literal notranslate"><span class="pre">string_truncate</span></code></span></li>
   </ul>
 </nav>
 </div>
@@ -709,77 +709,61 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="string-slice">
-<h1><span class="section-number">7.16.28. </span><code class="docutils literal notranslate"><span class="pre">string_slice</span></code><a class="headerlink" href="#string-slice" title="Link to this heading">#</a></h1>
+  <!-- groonga-command -->
+<!-- database: functions_string_truncate -->
+<section class="tex2jax_ignore mathjax_ignore" id="string-truncate">
+<h1><span class="section-number">7.16.30. </span><code class="docutils literal notranslate"><span class="pre">string_truncate</span></code><a class="headerlink" href="#string-truncate" title="Link to this heading">#</a></h1>
 <div class="versionadded">
-<p><span class="versionmodified added">Added in version 11.0.3.</span></p>
+<p><span class="versionmodified added">Added in version 16.0.9.</span></p>
 </div>
 <section id="summary">
-<h2><span class="section-number">7.16.28.1. </span>概要<a class="headerlink" href="#summary" title="Link to this heading">#</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">string_slice</span></code> は文字列の部分文字列を抽出します。引数によって部分文字列の抽出方法を使い分けることが出来ます。抽出方法は以下の2つがあります。</p>
-<ul class="simple">
-<li><p>位置による抽出</p></li>
-<li><p>正規表現による抽出</p></li>
-</ul>
-<p>Groongaでは正規表現にRubyと同じ構文を使います。</p>
-<p>この関数を有効にするには、以下のコマンドで <code class="docutils literal notranslate"><span class="pre">functions/string</span></code> プラグインを登録します:</p>
+<h2><span class="section-number">7.16.30.1. </span>概要<a class="headerlink" href="#summary" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">string_truncate</span></code>は、文字列を指定された文字数以下に切り詰めます。文字列が切り詰められた場合、残された文字の末尾を省略記号に置き換えます。その結果、省略記号を含めて<code class="docutils literal notranslate"><span class="pre">length</span></code>文字の長さになります。これはRuby on Railsの<code class="docutils literal notranslate"><span class="pre">String#truncate</span></code>と同様の動作です。</p>
+<p>この関数を有効にするには、以下のコマンドで<code class="docutils literal notranslate"><span class="pre">functions/string</span></code>プラグインを登録します:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plugin_register</span> <span class="n">functions</span><span class="o">/</span><span class="n">string</span>
 </pre></div>
 </div>
 </section>
 <section id="syntax">
-<h2><span class="section-number">7.16.28.2. </span>構文<a class="headerlink" href="#syntax" title="Link to this heading">#</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">string_slice</span></code> は2つから4つの引数を指定できます。抽出方法によって指定可能な引数が変わります。</p>
-<section id="extraction-by-position">
-<h3><span class="section-number">7.16.28.2.1. </span>位置による抽出<a class="headerlink" href="#extraction-by-position" title="Link to this heading">#</a></h3>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">string_slice</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">nth</span><span class="p">[,</span> <span class="n">options</span><span class="p">])</span>
-<span class="n">string_slice</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">nth</span><span class="p">,</span> <span class="n">length</span><span class="p">[,</span> <span class="n">options</span><span class="p">])</span>
+<h2><span class="section-number">7.16.30.2. </span>構文<a class="headerlink" href="#syntax" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">string_truncate</span></code>は2つから3つの引数を指定できます。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">string_truncate</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">length</span><span class="p">[,</span> <span class="n">options</span><span class="p">])</span>
 </pre></div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">options</span></code> には以下のキーを指定します。すべてのキー・値のペアは省略可能です。:</p>
+<p><code class="docutils literal notranslate"><span class="pre">options</span></code>には以下のキーを指定します。すべてのキー・値のペアは省略可能です:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-  <span class="s2">&quot;default_value&quot;</span><span class="p">:</span> <span class="n">default_value</span>
+  <span class="s2">&quot;omission&quot;</span><span class="p">:</span> <span class="n">omission</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-</section>
-<section id="extraction-by-regular-expression">
-<h3><span class="section-number">7.16.28.2.2. </span>正規表現による抽出<a class="headerlink" href="#extraction-by-regular-expression" title="Link to this heading">#</a></h3>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">string_slice</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">regexp</span><span class="p">,</span> <span class="n">nth</span><span class="p">[,</span> <span class="n">options</span><span class="p">])</span>
-<span class="n">string_slice</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">regexp</span><span class="p">,</span> <span class="n">name</span><span class="p">[,</span> <span class="n">options</span><span class="p">])</span>
-</pre></div>
-</div>
-<p><code class="docutils literal notranslate"><span class="pre">options</span></code> には以下のキーを指定します。すべてのキー・値のペアは省略可能です。:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-  <span class="s2">&quot;default_value&quot;</span><span class="p">:</span> <span class="n">default_value</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-</section>
 </section>
 <section id="usage">
-<h2><span class="section-number">7.16.28.3. </span>使い方<a class="headerlink" href="#usage" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">7.16.30.3. </span>使い方<a class="headerlink" href="#usage" title="Link to this heading">#</a></h2>
 <p>使い方を示すために使うスキーマ定義とサンプルデータは以下の通りです。</p>
 <p>サンプルスキーマ:</p>
-<p>実行例:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plugin_register</span> <span class="n">functions</span><span class="o">/</span><span class="n">string</span>
+<!-- groonga-command -->
+<p>実行例：</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>plugin_register<span class="w"> </span>functions/string
 <span class="c1"># [[0,1337566253.89858,0.000355720520019531],true]</span>
-<span class="n">table_create</span> <span class="n">Memos</span> <span class="n">TABLE_HASH_KEY</span> <span class="n">ShortText</span>
+table_create<span class="w"> </span>Memos<span class="w"> </span>TABLE_HASH_KEY<span class="w"> </span>ShortText
 <span class="c1"># [[0,1337566253.89858,0.000355720520019531],true]</span>
 </pre></div>
 </div>
 <p>サンプルデータ:</p>
-<p>実行例:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">load</span> <span class="o">--</span><span class="n">table</span> <span class="n">Memos</span>
-<span class="p">[</span>
-<span class="p">{</span><span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;Groonga&quot;</span><span class="p">}</span>
-<span class="p">]</span>
+<!-- groonga-command -->
+<p>実行例：</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>load<span class="w"> </span>--table<span class="w"> </span>Memos
+<span class="o">[</span>
+<span class="o">{</span><span class="s2">&quot;_key&quot;</span>:<span class="w"> </span><span class="s2">&quot;Groonga is a full text search engine&quot;</span><span class="o">}</span>
+<span class="o">]</span>
 <span class="c1"># [[0,1337566253.89858,0.000355720520019531],1]</span>
 </pre></div>
 </div>
-<p>位置により抽出する場合の簡単な例です。</p>
-<p>実行例:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Memos</span> <span class="o">--</span><span class="n">output_columns</span> <span class="s1">&#39;_key, string_slice(_key, 2, 3)&#39;</span>
+<p>以下は簡単な使用例です。文字列が指定された<code class="docutils literal notranslate"><span class="pre">length</span></code>より長いため、切り詰められ<code class="docutils literal notranslate"><span class="pre">&quot;...&quot;</span></code>が追加されて、結果として15文字になります。</p>
+<!-- groonga-command -->
+<p>実行例：</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="k">select</span><span class="w"> </span>Memos<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--output_columns<span class="w"> </span><span class="s1">&#39;_key, string_truncate(_key, 15)&#39;</span>
 <span class="c1"># [</span>
 <span class="c1">#   [</span>
 <span class="c1">#     0,</span>
@@ -797,23 +781,24 @@
 <span class="c1">#           &quot;ShortText&quot;</span>
 <span class="c1">#         ],</span>
 <span class="c1">#         [</span>
-<span class="c1">#           &quot;string_slice&quot;,</span>
+<span class="c1">#           &quot;string_truncate&quot;,</span>
 <span class="c1">#           null</span>
 <span class="c1">#         ]</span>
 <span class="c1">#       ],</span>
 <span class="c1">#       [</span>
-<span class="c1">#         &quot;Groonga&quot;,</span>
-<span class="c1">#         &quot;oon&quot;</span>
+<span class="c1">#         &quot;Groonga is a full text search engine&quot;,</span>
+<span class="c1">#         &quot;Groonga is a...&quot;</span>
 <span class="c1">#       ]</span>
 <span class="c1">#     ]</span>
 <span class="c1">#   ]</span>
 <span class="c1"># ]</span>
 </pre></div>
 </div>
-<p>正規表現により抽出する場合の簡単な例です。</p>
-<p>以下の例では、捕獲式集合 <code class="docutils literal notranslate"><span class="pre">(式)</span></code> の番号を指定して抽出しています。</p>
-<p>実行例:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Memos</span> <span class="o">--</span><span class="n">output_columns</span> <span class="s1">&#39;_key, string_slice(_key, &quot;(Gro+)(.*)&quot;, 2)&#39;</span>
+<p>文字列の長さが<code class="docutils literal notranslate"><span class="pre">length</span></code>以下である場合、省略記号を付けずにそのまま返されます。</p>
+<!-- groonga-command -->
+<p>実行例：</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="k">select</span><span class="w"> </span>Memos<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--output_columns<span class="w"> </span><span class="s1">&#39;_key, string_truncate(_key, 100)&#39;</span>
 <span class="c1"># [</span>
 <span class="c1">#   [</span>
 <span class="c1">#     0,</span>
@@ -831,22 +816,24 @@
 <span class="c1">#           &quot;ShortText&quot;</span>
 <span class="c1">#         ],</span>
 <span class="c1">#         [</span>
-<span class="c1">#           &quot;string_slice&quot;,</span>
+<span class="c1">#           &quot;string_truncate&quot;,</span>
 <span class="c1">#           null</span>
 <span class="c1">#         ]</span>
 <span class="c1">#       ],</span>
 <span class="c1">#       [</span>
-<span class="c1">#         &quot;Groonga&quot;,</span>
-<span class="c1">#         &quot;nga&quot;</span>
+<span class="c1">#         &quot;Groonga is a full text search engine&quot;,</span>
+<span class="c1">#         &quot;Groonga is a full text search engine&quot;</span>
 <span class="c1">#       ]</span>
 <span class="c1">#     ]</span>
 <span class="c1">#   ]</span>
 <span class="c1"># ]</span>
 </pre></div>
 </div>
-<p>以下の例では、名前付き捕獲式集合 <code class="docutils literal notranslate"><span class="pre">(?&lt;name&gt;式)</span></code> の名前を指定して抽出しています。</p>
-<p>実行例:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Memos</span> <span class="o">--</span><span class="n">output_columns</span> <span class="s1">&#39;_key, string_slice(_key, &quot;(Gr)(?&lt;Name1&gt;o*)(?&lt;Name2&gt;.*)&quot;, &quot;Name1&quot;)&#39;</span>
+<p>次の例では、<code class="docutils literal notranslate"><span class="pre">options</span></code>で<code class="docutils literal notranslate"><span class="pre">omission</span></code>を指定しています。</p>
+<!-- groonga-command -->
+<p>実行例：</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="k">select</span><span class="w"> </span>Memos<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--output_columns<span class="w"> </span><span class="s1">&#39;_key, string_truncate(_key, 15, { &quot;omission&quot; : &quot;＊＊＊&quot; })&#39;</span>
 <span class="c1"># [</span>
 <span class="c1">#   [</span>
 <span class="c1">#     0,</span>
@@ -864,22 +851,24 @@
 <span class="c1">#           &quot;ShortText&quot;</span>
 <span class="c1">#         ],</span>
 <span class="c1">#         [</span>
-<span class="c1">#           &quot;string_slice&quot;,</span>
+<span class="c1">#           &quot;string_truncate&quot;,</span>
 <span class="c1">#           null</span>
 <span class="c1">#         ]</span>
 <span class="c1">#       ],</span>
 <span class="c1">#       [</span>
-<span class="c1">#         &quot;Groonga&quot;,</span>
-<span class="c1">#         &quot;oo&quot;</span>
+<span class="c1">#         &quot;Groonga is a full text search engine&quot;,</span>
+<span class="c1">#         &quot;Groonga is a＊＊＊&quot;</span>
 <span class="c1">#       ]</span>
 <span class="c1">#     ]</span>
 <span class="c1">#   ]</span>
 <span class="c1"># ]</span>
 </pre></div>
 </div>
-<p>以下の例では、デフォルト値を指定しています。</p>
-<p>実行例:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Memos</span> <span class="o">--</span><span class="n">output_columns</span> <span class="s1">&#39;_key, string_slice(_key, &quot;mismatch&quot;, 2, { &quot;default_value&quot; : &quot;default&quot; })&#39;</span>
+<p><code class="docutils literal notranslate"><span class="pre">length</span></code>が<code class="docutils literal notranslate"><span class="pre">omission</span></code>の文字数よりも小さい状態で切り詰められた場合、<code class="docutils literal notranslate"><span class="pre">omission</span></code>の文字数が<code class="docutils literal notranslate"><span class="pre">length</span></code>より多くても、結果は<code class="docutils literal notranslate"><span class="pre">omission</span></code>のみとなります。</p>
+<!-- groonga-command -->
+<p>実行例：</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="k">select</span><span class="w"> </span>Memos<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--output_columns<span class="w"> </span><span class="s1">&#39;_key, string_truncate(_key, 2)&#39;</span>
 <span class="c1"># [</span>
 <span class="c1">#   [</span>
 <span class="c1">#     0,</span>
@@ -897,13 +886,13 @@
 <span class="c1">#           &quot;ShortText&quot;</span>
 <span class="c1">#         ],</span>
 <span class="c1">#         [</span>
-<span class="c1">#           &quot;string_slice&quot;,</span>
+<span class="c1">#           &quot;string_truncate&quot;,</span>
 <span class="c1">#           null</span>
 <span class="c1">#         ]</span>
 <span class="c1">#       ],</span>
 <span class="c1">#       [</span>
-<span class="c1">#         &quot;Groonga&quot;,</span>
-<span class="c1">#         &quot;default&quot;</span>
+<span class="c1">#         &quot;Groonga is a full text search engine&quot;,</span>
+<span class="c1">#         &quot;...&quot;</span>
 <span class="c1">#       ]</span>
 <span class="c1">#     ]</span>
 <span class="c1">#   ]</span>
@@ -911,8 +900,10 @@
 </pre></div>
 </div>
 <p>カラムの代わりに文字列リテラルを指定することもできます。</p>
-<p>実行例:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Memos</span> <span class="o">--</span><span class="n">output_columns</span> <span class="s1">&#39;string_slice(&quot;Groonga&quot;, &quot;(roon)(g)&quot;, 2)&#39;</span>
+<!-- groonga-command -->
+<p>実行例：</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="k">select</span><span class="w"> </span>Memos<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--output_columns<span class="w"> </span><span class="s1">&#39;string_truncate(&quot;Groonga is a fast fulltext search engine&quot;, 15)&#39;</span>
 <span class="c1"># [</span>
 <span class="c1">#   [</span>
 <span class="c1">#     0,</span>
@@ -926,12 +917,12 @@
 <span class="c1">#       ],</span>
 <span class="c1">#       [</span>
 <span class="c1">#         [</span>
-<span class="c1">#           &quot;string_slice&quot;,</span>
+<span class="c1">#           &quot;string_truncate&quot;,</span>
 <span class="c1">#           null</span>
 <span class="c1">#         ]</span>
 <span class="c1">#       ],</span>
 <span class="c1">#       [</span>
-<span class="c1">#         &quot;g&quot;</span>
+<span class="c1">#         &quot;Groonga is a...&quot;</span>
 <span class="c1">#       ]</span>
 <span class="c1">#     ]</span>
 <span class="c1">#   ]</span>
@@ -940,76 +931,45 @@
 </div>
 </section>
 <section id="parameters">
-<h2><span class="section-number">7.16.28.4. </span>引数<a class="headerlink" href="#parameters" title="Link to this heading">#</a></h2>
-<section id="id1">
-<h3><span class="section-number">7.16.28.4.1. </span>位置による抽出<a class="headerlink" href="#id1" title="Link to this heading">#</a></h3>
-<p>必須引数は2つあります。 <code class="docutils literal notranslate"><span class="pre">target</span></code> と <code class="docutils literal notranslate"><span class="pre">nth</span></code> です。</p>
-<p>省略可能引数は2つあります。 <code class="docutils literal notranslate"><span class="pre">length</span></code> と <code class="docutils literal notranslate"><span class="pre">options</span></code> です。</p>
+<h2><span class="section-number">7.16.30.4. </span>引数<a class="headerlink" href="#parameters" title="Link to this heading">#</a></h2>
+<section id="required-parameters">
+<h3><span class="section-number">7.16.30.4.1. </span>必須引数<a class="headerlink" href="#required-parameters" title="Link to this heading">#</a></h3>
 <section id="target">
-<h4><span class="section-number">7.16.28.4.1.1. </span><code class="docutils literal notranslate"><span class="pre">target</span></code><a class="headerlink" href="#target" title="Link to this heading">#</a></h4>
+<h4><span class="section-number">7.16.30.4.1.1. </span><code class="docutils literal notranslate"><span class="pre">target</span></code><a class="headerlink" href="#target" title="Link to this heading">#</a></h4>
 <p>対象となる文字列または文字列型カラムを指定します。</p>
-</section>
-<section id="nth">
-<h4><span class="section-number">7.16.28.4.1.2. </span><code class="docutils literal notranslate"><span class="pre">nth</span></code><a class="headerlink" href="#nth" title="Link to this heading">#</a></h4>
-<p><code class="docutils literal notranslate"><span class="pre">target</span></code> から抽出を開始する位置を0始まりの文字数単位で指定します。</p>
-<p>負の値を指定した場合は終端から数えます。</p>
 </section>
 <section id="length">
-<h4><span class="section-number">7.16.28.4.1.3. </span><code class="docutils literal notranslate"><span class="pre">length</span></code><a class="headerlink" href="#length" title="Link to this heading">#</a></h4>
-<p><code class="docutils literal notranslate"><span class="pre">nth</span></code> から抽出する文字数を指定します。</p>
-<p>省略時は1です。</p>
+<h4><span class="section-number">7.16.30.4.1.2. </span><code class="docutils literal notranslate"><span class="pre">length</span></code><a class="headerlink" href="#length" title="Link to this heading">#</a></h4>
+<p>切り詰めが発生した場合の<code class="docutils literal notranslate"><span class="pre">omission</span></code>の文字数を含め、結果の最大文字数を指定します。<code class="docutils literal notranslate"><span class="pre">target</span></code>の文字数が<code class="docutils literal notranslate"><span class="pre">length</span></code>以下である場合、<code class="docutils literal notranslate"><span class="pre">target</span></code>はそのまま返されます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">target</span></code>の長さが<code class="docutils literal notranslate"><span class="pre">length</span></code>より長い場合、<code class="docutils literal notranslate"><span class="pre">string_truncate</span></code>は<code class="docutils literal notranslate"><span class="pre">target</span></code>の先頭から「<code class="docutils literal notranslate"><span class="pre">length</span></code> - <code class="docutils literal notranslate"><span class="pre">omission</span></code>の文字数」分を切り出し、末尾に<code class="docutils literal notranslate"><span class="pre">omission</span></code>を追加します。<code class="docutils literal notranslate"><span class="pre">omission</span></code>が<code class="docutils literal notranslate"><span class="pre">length</span></code>より長い場合や<code class="docutils literal notranslate"><span class="pre">length</span></code>が負の場合は、<code class="docutils literal notranslate"><span class="pre">omission</span></code>のみになります。</p>
 </section>
+</section>
+<section id="optional-parameters">
+<h3><span class="section-number">7.16.30.4.2. </span>省略可能引数<a class="headerlink" href="#optional-parameters" title="Link to this heading">#</a></h3>
 <section id="options">
-<h4><span class="section-number">7.16.28.4.1.4. </span><code class="docutils literal notranslate"><span class="pre">options</span></code><a class="headerlink" href="#options" title="Link to this heading">#</a></h4>
+<h4><span class="section-number">7.16.30.4.2.1. </span><code class="docutils literal notranslate"><span class="pre">options</span></code><a class="headerlink" href="#options" title="Link to this heading">#</a></h4>
 <p>以下のキーを指定します。</p>
-<dl>
-<dt><code class="docutils literal notranslate"><span class="pre">default_value</span></code></dt><dd><p><code class="docutils literal notranslate"><span class="pre">length</span></code> に0を指定した場合を除いて、部分文字列が空文字列になった場合に返される文字列を指定します。</p>
-<p>省略時は空文字列です。</p>
-</dd>
-</dl>
-</section>
-</section>
-<section id="id2">
-<h3><span class="section-number">7.16.28.4.2. </span>正規表現による抽出<a class="headerlink" href="#id2" title="Link to this heading">#</a></h3>
-<p>必須引数は3つあります。 <code class="docutils literal notranslate"><span class="pre">target</span></code> と <code class="docutils literal notranslate"><span class="pre">regexp</span></code> と <code class="docutils literal notranslate"><span class="pre">nth</span></code> または <code class="docutils literal notranslate"><span class="pre">name</span></code> です。 <code class="docutils literal notranslate"><span class="pre">nth</span></code> と <code class="docutils literal notranslate"><span class="pre">name</span></code> はいずれか一方のみを指定します。</p>
-<p>省略可能引数は1つあります。 <code class="docutils literal notranslate"><span class="pre">options</span></code> です。</p>
-<section id="id3">
-<h4><span class="section-number">7.16.28.4.2.1. </span><code class="docutils literal notranslate"><span class="pre">target</span></code><a class="headerlink" href="#id3" title="Link to this heading">#</a></h4>
-<p>対象となる文字列または文字列型カラムを指定します。</p>
-</section>
-<section id="regexp">
-<h4><span class="section-number">7.16.28.4.2.2. </span><code class="docutils literal notranslate"><span class="pre">regexp</span></code><a class="headerlink" href="#regexp" title="Link to this heading">#</a></h4>
-<p>正規表現文字列を指定します。</p>
-<p><code class="docutils literal notranslate"><span class="pre">nth</span></code> を使用し、かつ1以上の値を指定する場合は、捕獲式集合 <code class="docutils literal notranslate"><span class="pre">(式)</span></code> を使用する必要があります。</p>
-<p><code class="docutils literal notranslate"><span class="pre">name</span></code> を使用する場合は、名前付き捕獲式集合 <code class="docutils literal notranslate"><span class="pre">(?&lt;name&gt;式)</span></code> または <code class="docutils literal notranslate"><span class="pre">(?'name'式)</span></code> を使用する必要があります。</p>
-</section>
-<section id="id4">
-<h4><span class="section-number">7.16.28.4.2.3. </span><code class="docutils literal notranslate"><span class="pre">nth</span></code><a class="headerlink" href="#id4" title="Link to this heading">#</a></h4>
-<p><code class="docutils literal notranslate"><span class="pre">regexp</span></code> の捕獲式集合の番号を指定します。</p>
-<p><code class="docutils literal notranslate"><span class="pre">regexp</span></code> で指定したパターンに一致した時、 <code class="docutils literal notranslate"><span class="pre">nth</span></code> 番目の捕獲式集合の文字列が返却されます。</p>
-<p>0を指定すると、 <code class="docutils literal notranslate"><span class="pre">regexp</span></code> で指定したパターンに一致した全体が返却されます。</p>
-<p><code class="docutils literal notranslate"><span class="pre">nth</span></code> か <code class="docutils literal notranslate"><span class="pre">name</span></code> のいずれか一方のみを指定します。</p>
-</section>
-<section id="name">
-<h4><span class="section-number">7.16.28.4.2.4. </span><code class="docutils literal notranslate"><span class="pre">name</span></code><a class="headerlink" href="#name" title="Link to this heading">#</a></h4>
-<p><code class="docutils literal notranslate"><span class="pre">regexp</span></code> の名前付き捕獲式集合の名前を指定します。</p>
-<p><code class="docutils literal notranslate"><span class="pre">regexp</span></code> で指定したパターンに一致した時、この名前に一致する名前付き捕獲式集合の文字列が返却されます。</p>
-<p><code class="docutils literal notranslate"><span class="pre">nth</span></code> か <code class="docutils literal notranslate"><span class="pre">name</span></code> のいずれか一方のみを指定します。</p>
-</section>
-<section id="id5">
-<h4><span class="section-number">7.16.28.4.2.5. </span><code class="docutils literal notranslate"><span class="pre">options</span></code><a class="headerlink" href="#id5" title="Link to this heading">#</a></h4>
-<p>以下のキーを指定します。</p>
-<dl>
-<dt><code class="docutils literal notranslate"><span class="pre">default_value</span></code></dt><dd><p><code class="docutils literal notranslate"><span class="pre">regexp</span></code> に一致しなかった場合に返却される文字列を指定します。 <code class="docutils literal notranslate"><span class="pre">nth</span></code> や <code class="docutils literal notranslate"><span class="pre">name</span></code> の値に誤りがある場合もこの値が返却されます。</p>
-<p>省略時は空文字列です。</p>
-</dd>
-</dl>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">omission</span></code></p>
+<ul>
+<li><p>切り詰められたことを示す文字列を指定します。</p></li>
+<li><p>デフォルトは<code class="docutils literal notranslate"><span class="pre">&quot;...&quot;</span></code>です。</p></li>
+</ul>
+</li>
+</ul>
 </section>
 </section>
 </section>
 <section id="return-value">
-<h2><span class="section-number">7.16.28.5. </span>戻り値<a class="headerlink" href="#return-value" title="Link to this heading">#</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">string_slice</span></code> は指定した条件で抽出された部分文字列を返却します。</p>
+<h2><span class="section-number">7.16.30.5. </span>戻り値<a class="headerlink" href="#return-value" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">string_truncate</span></code>は<code class="docutils literal notranslate"><span class="pre">target</span></code>を切り詰めた結果を返します。切り詰めが行われた場合、結果（保持された部分と<code class="docutils literal notranslate"><span class="pre">omission</span></code>の合計）の長さは<code class="docutils literal notranslate"><span class="pre">length</span></code>文字になります。ただし、<code class="docutils literal notranslate"><span class="pre">omission</span></code>が<code class="docutils literal notranslate"><span class="pre">length</span></code>より長い場合や<code class="docutils literal notranslate"><span class="pre">length</span></code>が負の値の場合は、<code class="docutils literal notranslate"><span class="pre">omission</span></code>のみになります。</p>
+</section>
+<section id="see-also">
+<h2><span class="section-number">7.16.30.6. </span>参考<a class="headerlink" href="#see-also" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="snippet.html"><span class="doc">snippet</span></a></p></li>
+<li><p><a class="reference internal" href="string_substring.html"><span class="doc">string_substring</span></a></p></li>
+</ul>
 </section>
 </section>
 
@@ -1024,20 +984,20 @@
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="string_length.html"
+       href="string_substring.html"
        title="前のページ">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">前へ</p>
-        <p class="prev-next-title"><span class="section-number">7.16.27. </span><code class="docutils literal notranslate"><span class="pre">string_length</span></code></p>
+        <p class="prev-next-title"><span class="section-number">7.16.29. </span><code class="docutils literal notranslate"><span class="pre">string_substring</span></code></p>
       </div>
     </a>
     <a class="right-next"
-       href="string_substring.html"
+       href="sub_filter.html"
        title="次ページ">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">次へ</p>
-        <p class="prev-next-title"><span class="section-number">7.16.29. </span><code class="docutils literal notranslate"><span class="pre">string_substring</span></code></p>
+        <p class="prev-next-title"><span class="section-number">7.16.31. </span><code class="docutils literal notranslate"><span class="pre">sub_filter</span></code></p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -1060,32 +1020,23 @@
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">7.16.28.1. 概要</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#syntax">7.16.28.2. 構文</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#extraction-by-position">7.16.28.2.1. 位置による抽出</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#extraction-by-regular-expression">7.16.28.2.2. 正規表現による抽出</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">7.16.30.1. 概要</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#syntax">7.16.30.2. 構文</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#usage">7.16.30.3. 使い方</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#parameters">7.16.30.4. 引数</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#required-parameters">7.16.30.4.1. 必須引数</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#target">7.16.30.4.1.1. <code class="docutils literal notranslate"><span class="pre">target</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#length">7.16.30.4.1.2. <code class="docutils literal notranslate"><span class="pre">length</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#usage">7.16.28.3. 使い方</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#parameters">7.16.28.4. 引数</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">7.16.28.4.1. 位置による抽出</a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#target">7.16.28.4.1.1. <code class="docutils literal notranslate"><span class="pre">target</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#nth">7.16.28.4.1.2. <code class="docutils literal notranslate"><span class="pre">nth</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#length">7.16.28.4.1.3. <code class="docutils literal notranslate"><span class="pre">length</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#options">7.16.28.4.1.4. <code class="docutils literal notranslate"><span class="pre">options</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">7.16.28.4.2. 正規表現による抽出</a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">7.16.28.4.2.1. <code class="docutils literal notranslate"><span class="pre">target</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#regexp">7.16.28.4.2.2. <code class="docutils literal notranslate"><span class="pre">regexp</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">7.16.28.4.2.3. <code class="docutils literal notranslate"><span class="pre">nth</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#name">7.16.28.4.2.4. <code class="docutils literal notranslate"><span class="pre">name</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">7.16.28.4.2.5. <code class="docutils literal notranslate"><span class="pre">options</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-parameters">7.16.30.4.2. 省略可能引数</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#options">7.16.30.4.2.1. <code class="docutils literal notranslate"><span class="pre">options</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#return-value">7.16.28.5. 戻り値</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#return-value">7.16.30.5. 戻り値</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#see-also">7.16.30.6. 参考</a></li>
 </ul>
   </nav></div>
 

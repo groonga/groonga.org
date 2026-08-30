@@ -184,6 +184,7 @@ var groonga_2groonga_8h =
     [ "GRN_N_HOOK_ENTRIES", "groonga_2groonga_8h.html#aad79e7190742d25bb8e899696fb7e39f", null ],
     [ "GRN_OBJ_APPEND", "groonga_2groonga_8h.html#a2b24293039a9935c4a8113c0fcd23b6c", null ],
     [ "GRN_OBJ_COLUMN_INDEX", "groonga_2groonga_8h.html#a4f6098da279faacd9c202e9420fb659c", null ],
+    [ "GRN_OBJ_COLUMN_LARGE", "groonga_2groonga_8h.html#a2193d2d5baf402496a28e1f0fb8c0650", null ],
     [ "GRN_OBJ_COLUMN_SCALAR", "groonga_2groonga_8h.html#a39a6a39e005a65704b2479a7498d5f73", null ],
     [ "GRN_OBJ_COLUMN_TYPE_MASK", "groonga_2groonga_8h.html#aed7baf3a8dfba3568d5fa0070b524d97", null ],
     [ "GRN_OBJ_COLUMN_VECTOR", "groonga_2groonga_8h.html#a136f7e1f96d62c711006563b09da572d", null ],

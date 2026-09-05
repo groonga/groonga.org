@@ -1,5 +1,7 @@
 var NAVTREEINDEX4 =
 {
+"groonga_2groonga_8h.html#a7f6482247a513171057221c14765ca9c":[5,0,1,0,23,83],
+"groonga_2groonga_8h.html#a7fc4b1f929e3ab5970c52138c27a4050":[5,0,1,0,23,203],
 "groonga_2groonga_8h.html#a7fdd2258b671c49529a5a62adb63b41b":[5,0,1,0,23,99],
 "groonga_2groonga_8h.html#a80f5402cf957a05191c49e300017bc57":[5,0,1,0,23,46],
 "groonga_2groonga_8h.html#a81ca315813aca61e7ca28af9faa49154":[5,0,1,0,23,248],
@@ -247,7 +249,5 @@ var NAVTREEINDEX4 =
 "groonga_2groonga_8h.html#acdc68283d90789a73ae362437db67dc8":[5,0,1,0,23,552],
 "groonga_2groonga_8h.html#ace09a9444520b6154cf419333d971b1d":[5,0,1,0,23,177],
 "groonga_2groonga_8h.html#aced5e8b3f9148ee36b4960a49a7a23a6":[5,0,1,0,23,143],
-"groonga_2groonga_8h.html#acf191a10ce2c9a7ddb6651bb2b67c818":[5,0,1,0,23,69],
-"groonga_2groonga_8h.html#acf6277db14e10dce0ef9ab8bfb2177c7":[5,0,1,0,23,37],
-"groonga_2groonga_8h.html#acf6b42d252bb60814e8b3512e0f31c99":[5,0,1,0,23,36]
+"groonga_2groonga_8h.html#acf191a10ce2c9a7ddb6651bb2b67c818":[5,0,1,0,23,69]
 };

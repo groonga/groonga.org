@@ -750,6 +750,7 @@
                <span class="p">[</span><span class="n">load_table</span><span class="o">=</span><span class="n">null</span><span class="p">]</span>
                <span class="p">[</span><span class="n">load_columns</span><span class="o">=</span><span class="n">null</span><span class="p">]</span>
                <span class="p">[</span><span class="n">load_values</span><span class="o">=</span><span class="n">null</span><span class="p">]</span>
+               <span class="p">[</span><span class="n">n_workers</span><span class="o">=</span><span class="mi">0</span><span class="p">]</span>
 </pre></div>
 </div>
 <p>いくつか名前付き引数としてしか使えない引数があります。これらの引数を「○番目の引数」として使うことはできません。必ず名前を指定する必要があります。</p>
@@ -1920,6 +1921,20 @@
 <p><code class="docutils literal notranslate"><span class="pre">logical_select</span></code> の結果のカラムを指定します。 <a class="reference internal" href="#logical-select-load-columns"><span class="std std-ref">load_columns</span></a> で指定したカラムに値を格納するカラムを指定します。既に存在するカラムを指定する必要があります。</p>
 <p>この引数は、 <a class="reference internal" href="#logical-select-load-table"><span class="std std-ref">load_table</span></a> と <a class="reference internal" href="#logical-select-load-columns"><span class="std std-ref">load_columns</span></a> と一緒に使う必要があります。</p>
 <p>この引数の使い方は、 <code class="docutils literal notranslate"><span class="pre">--load_table</span></code> の例を参照してください。</p>
+</section>
+<section id="n-workers">
+<span id="logical-select-n-workers"></span><h4><span class="section-number">7.3.38.5.3.8. </span><code class="docutils literal notranslate"><span class="pre">n_workers</span></code><a class="headerlink" href="#n-workers" title="Link to this heading">#</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 16.1.1.</span></p>
+</div>
+<p>並列実行するスレッド数を指定します。指定できる値と注意点は <a class="reference internal" href="../command/n_workers.html"><span class="doc">並列実行</span></a> を参照してください。</p>
+<p>このパラメーターに <code class="docutils literal notranslate"><span class="pre">-1</span></code> または <code class="docutils literal notranslate"><span class="pre">2</span></code> 以上を指定すると、次の処理を並列に実行します。</p>
+<ul class="simple">
+<li><p>各シャードの検索</p></li>
+<li><p><a class="reference internal" href="#logical-select-drilldown"><span class="std std-ref">drilldown</span></a> の各キー</p></li>
+<li><p>依存関係のない <a class="reference internal" href="#logical-select-advanced-drilldown-related-parameters"><span class="std std-ref">drilldowns</span></a></p></li>
+</ul>
+<p>依存関係がないとは、 <code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].table</span></code> を使用して他のドリルダウンの結果を参照していないことです。他のドリルダウンの結果を参照しているドリルダウンは、参照先のドリルダウンが終わってから実行します。そのため、依存関係があると並列度が下がります。</p>
 </section>
 </section>
 <section id="advanced-search-parameters">
@@ -4482,6 +4497,7 @@
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#load-table">7.3.38.5.3.5. <code class="docutils literal notranslate"><span class="pre">load_table</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#load-columns">7.3.38.5.3.6. <code class="docutils literal notranslate"><span class="pre">load_columns</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#load-values">7.3.38.5.3.7. <code class="docutils literal notranslate"><span class="pre">load_values</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#n-workers">7.3.38.5.3.8. <code class="docutils literal notranslate"><span class="pre">n_workers</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#advanced-search-parameters">7.3.38.5.4. 高度な検索のための引数</a><ul class="nav section-nav flex-column">

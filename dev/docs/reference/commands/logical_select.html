@@ -753,6 +753,7 @@ parameters are optional:</p>
                <span class="p">[</span><span class="n">load_table</span><span class="o">=</span><span class="n">null</span><span class="p">]</span>
                <span class="p">[</span><span class="n">load_columns</span><span class="o">=</span><span class="n">null</span><span class="p">]</span>
                <span class="p">[</span><span class="n">load_values</span><span class="o">=</span><span class="n">null</span><span class="p">]</span>
+               <span class="p">[</span><span class="n">n_workers</span><span class="o">=</span><span class="mi">0</span><span class="p">]</span>
 </pre></div>
 </div>
 <p>There are some parameters that can be only used as named
@@ -1991,6 +1992,26 @@ Specifies columns for storing values into columns that specified with <a class="
 You must specify columns that already exists.</p>
 <p>This argument must use with <a class="reference internal" href="#logical-select-load-table"><span class="std std-ref">load_table</span></a> and <a class="reference internal" href="#logical-select-load-columns"><span class="std std-ref">load_columns</span></a>.</p>
 <p>See example of <code class="docutils literal notranslate"><span class="pre">--load_table</span></code> for how to use this argument.</p>
+</section>
+<section id="n-workers">
+<span id="logical-select-n-workers"></span><h4><span class="section-number">7.3.38.5.3.8. </span><code class="docutils literal notranslate"><span class="pre">n_workers</span></code><a class="headerlink" href="#n-workers" title="Link to this heading">#</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 16.1.1.</span></p>
+</div>
+<p>Specifies the number of threads for parallel execution. See
+<a class="reference internal" href="../command/n_workers.html"><span class="doc">Parallel execution</span></a> for available values and notes.</p>
+<p>The following processes are executed in parallel when this parameter
+is <code class="docutils literal notranslate"><span class="pre">-1</span></code> or <code class="docutils literal notranslate"><span class="pre">2</span></code> or more:</p>
+<ul class="simple">
+<li><p>Searching each shard</p></li>
+<li><p>Each key of <a class="reference internal" href="#logical-select-drilldown"><span class="std std-ref">drilldown</span></a></p></li>
+<li><p>Independent <a class="reference internal" href="#logical-select-advanced-drilldown-related-parameters"><span class="std std-ref">drilldowns</span></a></p></li>
+</ul>
+<p>“independent” means not using <code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].table</span></code> to
+refer the result of another drilldown. A drilldown that refers the
+result of another drilldown is executed after the referred drilldown
+is finished. Therefore, the degree of parallelism is reduced if
+drilldowns have dependencies.</p>
 </section>
 </section>
 <section id="advanced-search-parameters">
@@ -4661,6 +4682,7 @@ It’s the default value.</p></td>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#load-table">7.3.38.5.3.5. <code class="docutils literal notranslate"><span class="pre">load_table</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#load-columns">7.3.38.5.3.6. <code class="docutils literal notranslate"><span class="pre">load_columns</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#load-values">7.3.38.5.3.7. <code class="docutils literal notranslate"><span class="pre">load_values</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#n-workers">7.3.38.5.3.8. <code class="docutils literal notranslate"><span class="pre">n_workers</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#advanced-search-parameters">7.3.38.5.4. Advanced search parameters</a><ul class="nav section-nav flex-column">

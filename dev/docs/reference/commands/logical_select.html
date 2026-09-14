@@ -724,8 +724,10 @@ this command is included in <code class="docutils literal notranslate"><span cla
 <section id="syntax">
 <h2><span class="section-number">7.3.38.2. </span>Syntax<a class="headerlink" href="#syntax" title="Link to this heading">#</a></h2>
 <p>This command takes many parameters.</p>
-<p>The required parameters are <code class="docutils literal notranslate"><span class="pre">logical_table</span></code> and <code class="docutils literal notranslate"><span class="pre">shard_key</span></code>. Other
-parameters are optional:</p>
+<p><code class="docutils literal notranslate"><span class="pre">shard_key</span></code> is a required parameter. <code class="docutils literal notranslate"><span class="pre">logical_table</span></code> is also
+required unless you use <a class="reference internal" href="#logical-select-shard-label-table"><span class="std std-ref">shard[${LABEL}].table</span></a>.
+If you omit <code class="docutils literal notranslate"><span class="pre">logical_table</span></code>, specify <code class="docutils literal notranslate"><span class="pre">shard_key</span></code> as a named parameter.
+Other parameters are optional:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">logical_select</span> <span class="n">logical_table</span>
                <span class="n">shard_key</span>
                <span class="p">[</span><span class="nb">min</span><span class="o">=</span><span class="n">null</span><span class="p">]</span>
@@ -846,6 +848,13 @@ Use <a class="reference internal" href="#logical-select-drilldowns-label-sort-ke
 <li><p><code class="docutils literal notranslate"><span class="pre">--drilldowns[label2].sort_keys</span> <span class="pre">_key</span></code></p></li>
 </ul>
 </div></blockquote>
+<p>This command has the following named parameters for specifying actual
+tables explicitly:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">shard[${LABEL}].table=null</span></code></p></li>
+</ul>
+</div></blockquote>
 </section>
 <section id="differences-from-select">
 <h2><span class="section-number">7.3.38.3. </span>Differences from <code class="docutils literal notranslate"><span class="pre">select</span></code><a class="headerlink" href="#differences-from-select" title="Link to this heading">#</a></h2>
@@ -855,8 +864,9 @@ format is same and so on.</p>
 <p>But there are some differences from <a class="reference internal" href="select.html"><span class="doc">select</span></a>:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">logical_table</span></code> and <code class="docutils literal notranslate"><span class="pre">shard_key</span></code> parameters are required
-instead of <code class="docutils literal notranslate"><span class="pre">table</span></code> parameter.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">shard_key</span></code> and either <code class="docutils literal notranslate"><span class="pre">logical_table</span></code> or one or more
+<code class="docutils literal notranslate"><span class="pre">shard[${LABEL}].table</span></code> are required instead of <code class="docutils literal notranslate"><span class="pre">table</span></code>
+parameter.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">sort_keys</span></code> isn’t supported when multiple shards are used. (Only
 one shard is used, they are supported. There is one exception
 about <code class="docutils literal notranslate"><span class="pre">sort_keys</span></code> for multiple shards. When <code class="docutils literal notranslate"><span class="pre">shard_keys</span></code> and
@@ -1074,7 +1084,8 @@ fulltext search ready.</p>
 <p>This section describes parameters of <code class="docutils literal notranslate"><span class="pre">logical_select</span></code>.</p>
 <section id="required-parameters">
 <h3><span class="section-number">7.3.38.5.1. </span>Required parameters<a class="headerlink" href="#required-parameters" title="Link to this heading">#</a></h3>
-<p>There are required parameters, <code class="docutils literal notranslate"><span class="pre">logical_table</span></code> and <code class="docutils literal notranslate"><span class="pre">shard_key</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">shard_key</span></code> is always required. You must also specify either <code class="docutils literal notranslate"><span class="pre">logical_table</span></code>
+or one or more <a class="reference internal" href="#logical-select-shard-label-table"><span class="std std-ref">shard[${LABEL}].table</span></a>.</p>
 <section id="logical-table">
 <span id="logical-select-logical-table"></span><h4><span class="section-number">7.3.38.5.1.1. </span><code class="docutils literal notranslate"><span class="pre">logical_table</span></code><a class="headerlink" href="#logical-table" title="Link to this heading">#</a></h4>
 <p>Specifies logical table name. It means table name without
@@ -1082,7 +1093,7 @@ fulltext search ready.</p>
 <code class="docutils literal notranslate"><span class="pre">Entries_20150708</span></code>, <code class="docutils literal notranslate"><span class="pre">Entries_20150709</span></code> and so on, logical table
 name is <code class="docutils literal notranslate"><span class="pre">Entries</span></code>.</p>
 <p>You can show 5 records by specifying <code class="docutils literal notranslate"><span class="pre">logical_table</span></code> and
-<code class="docutils literal notranslate"><span class="pre">shard_key</span></code> parameters. They are required parameters.</p>
+<code class="docutils literal notranslate"><span class="pre">shard_key</span></code> parameters.</p>
 <p>Execution example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">logical_select</span> <span class="o">--</span><span class="n">logical_table</span> <span class="n">Entries</span> <span class="o">--</span><span class="n">shard_key</span> <span class="n">created_at</span>
 <span class="c1"># [</span>
@@ -1195,6 +1206,37 @@ column that stores data that is used for distributing records to
 suitable shards.</p>
 <p>Shard key must be <code class="docutils literal notranslate"><span class="pre">Time</span></code> type for now.</p>
 <p>See <a class="reference internal" href="#logical-select-logical-table"><span class="std std-ref">logical_table</span></a> how to specify <code class="docutils literal notranslate"><span class="pre">shard_key</span></code>.</p>
+</section>
+<section id="shard-label-table">
+<span id="logical-select-shard-label-table"></span><h4><span class="section-number">7.3.38.5.1.3. </span><code class="docutils literal notranslate"><span class="pre">shard[${LABEL}].table</span></code><a class="headerlink" href="#shard-label-table" title="Link to this heading">#</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 16.1.1.</span></p>
+</div>
+<p>Specifies an actual table explicitly.</p>
+<p>Normally, <code class="docutils literal notranslate"><span class="pre">logical_select</span></code> finds actual tables automatically by
+<code class="docutils literal notranslate"><span class="pre">${LOGICAL_TABLE}_${YYYYMMDD}</span></code> naming rule. If your actual tables
+don’t follow the naming rule, you can specify them explicitly by this
+parameter:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">logical_select</span> \
+  <span class="o">--</span><span class="n">shard_key</span> <span class="n">timestamp</span> \
+  <span class="o">--</span><span class="n">shard</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">table</span> <span class="n">Logs_host1</span> \
+  <span class="o">--</span><span class="n">shard</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">table</span> <span class="n">Logs_host2</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">${LABEL}</span></code> is just a label. It’s used only for sorting the specified
+actual tables. If all labels consist of only digits such as <code class="docutils literal notranslate"><span class="pre">1</span></code>,
+<code class="docutils literal notranslate"><span class="pre">2</span></code> and <code class="docutils literal notranslate"><span class="pre">10</span></code>, they are sorted numerically. Otherwise, they are
+sorted as strings.</p>
+<p>Note that a label isn’t used for choosing shards to be searched with
+<a class="reference internal" href="#logical-select-min"><span class="std std-ref">min</span></a> and <a class="reference internal" href="#logical-select-max"><span class="std std-ref">max</span></a> even when it
+looks like <code class="docutils literal notranslate"><span class="pre">YYYYMM</span></code> or <code class="docutils literal notranslate"><span class="pre">YYYYMMDD</span></code>. All of the specified actual
+tables are searched.</p>
+<p>You don’t need to specify <a class="reference internal" href="#logical-select-logical-table"><span class="std std-ref">logical_table</span></a> when you
+specify one or more <code class="docutils literal notranslate"><span class="pre">shard[${LABEL}].table</span></code>. If both of them are
+specified, <code class="docutils literal notranslate"><span class="pre">shard[${LABEL}].table</span></code> is used and
+<a class="reference internal" href="#logical-select-logical-table"><span class="std std-ref">logical_table</span></a> is ignored.</p>
+<p><a class="reference internal" href="#logical-select-shard-key"><span class="std std-ref">shard_key</span></a> is still required. All of the
+specified actual tables must have the column that is specified by it.</p>
 </section>
 </section>
 <section id="optional-parameters">
@@ -4665,6 +4707,7 @@ It’s the default value.</p></td>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#required-parameters">7.3.38.5.1. Required parameters</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#logical-table">7.3.38.5.1.1. <code class="docutils literal notranslate"><span class="pre">logical_table</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#shard-key">7.3.38.5.1.2. <code class="docutils literal notranslate"><span class="pre">shard_key</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#shard-label-table">7.3.38.5.1.3. <code class="docutils literal notranslate"><span class="pre">shard[${LABEL}].table</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-parameters">7.3.38.5.2. Optional parameters</a><ul class="nav section-nav flex-column">

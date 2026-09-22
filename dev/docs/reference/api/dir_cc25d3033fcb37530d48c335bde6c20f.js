@@ -21,6 +21,7 @@ var dir_cc25d3033fcb37530d48c335bde6c20f =
     [ "expr.h", "expr_8h.html", "expr_8h" ],
     [ "extractor.h", "extractor_8h.html", "extractor_8h" ],
     [ "file_reader.h", "file__reader_8h.html", "file__reader_8h" ],
+    [ "float.h", "float_8h.html", null ],
     [ "geo.h", "geo_8h.html", "geo_8h" ],
     [ "groonga.h", "groonga_2groonga_8h.html", "groonga_2groonga_8h" ],
     [ "h3.h", "h3_8h.html", "h3_8h" ],

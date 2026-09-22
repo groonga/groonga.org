@@ -868,11 +868,6 @@ format is same and so on.</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">shard_key</span></code> and either <code class="docutils literal notranslate"><span class="pre">logical_table</span></code> or one or more
 <code class="docutils literal notranslate"><span class="pre">shard[${LABEL}].table</span></code> are required instead of <code class="docutils literal notranslate"><span class="pre">table</span></code>
 parameter.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">sort_keys</span></code> isn’t supported when multiple shards are used. (Only
-one shard is used, they are supported. There is one exception
-about <code class="docutils literal notranslate"><span class="pre">sort_keys</span></code> for multiple shards. When <code class="docutils literal notranslate"><span class="pre">shard_keys</span></code> and
-<code class="docutils literal notranslate"><span class="pre">sort_keys</span></code> are same, they are supported. See
-<a class="reference internal" href="#logical-select-sort-keys"><span class="std std-ref">sort_keys</span></a> about details)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">_value.${KEY_NAME}</span></code> in <code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].sort_keys</span></code>
 doesn’t work with multiple shards. It works with one
 shard. <code class="docutils literal notranslate"><span class="pre">_key</span></code> in <code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].sort_keys</span></code> work with
@@ -2174,19 +2169,17 @@ drilldowns have dependencies.</p>
 <span id="logical-select-sort-keys"></span><h4><span class="section-number">7.3.38.5.5.3. </span><code class="docutils literal notranslate"><span class="pre">sort_keys</span></code><a class="headerlink" href="#sort-keys" title="Link to this heading">#</a></h4>
 <p>Corresponds to <a class="reference internal" href="select.html#select-sort-keys"><span class="std std-ref">sort_keys</span></a> in <a class="reference internal" href="select.html"><span class="doc">select</span></a>. See
 <a class="reference internal" href="select.html#select-sort-keys"><span class="std std-ref">sort_keys</span></a> for details.</p>
-<p><code class="docutils literal notranslate"><span class="pre">sort_keys</span></code> has a limitation. It works only when the number of
-search target shards is one. If the number of search target shards is
-larger than one, <code class="docutils literal notranslate"><span class="pre">sort_keys</span></code> doesn’t work.</p>
+<p><code class="docutils literal notranslate"><span class="pre">sort_keys</span></code> also works with multiple shards since 16.1.1.
+Records of all search target shards are sorted as one result set.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>There is one exception for multiple shards. When the same value is
-specified for <code class="docutils literal notranslate"><span class="pre">shard_key</span></code> and <code class="docutils literal notranslate"><span class="pre">sort_keys</span></code>, they are supported.
-This command processes target shards one by one by ascending
-order. Thus, in this process, magnitude correlation about the value
-of <code class="docutils literal notranslate"><span class="pre">shard_key</span></code> is kept among them. This is because <code class="docutils literal notranslate"><span class="pre">sort_keys</span></code>
-is supported when <code class="docutils literal notranslate"><span class="pre">shard_key</span></code> and <code class="docutils literal notranslate"><span class="pre">sort_keys</span></code> is same.</p>
+<p>You can’t use a vector column in <code class="docutils literal notranslate"><span class="pre">sort_keys</span></code> with multiple shards.</p>
+<p><a class="reference internal" href="../scorers/scorer_tf_idf.html"><span class="doc">scorer_tf_idf</span></a> should use the number of records in all shards but it uses the number of records in each shard.
+So its score isn’t accurate with multiple shards.</p>
+<p>The cost of sorting depends on <code class="docutils literal notranslate"><span class="pre">offset</span> <span class="pre">+</span> <span class="pre">limit</span></code> because each shard sorts the top <code class="docutils literal notranslate"><span class="pre">offset</span> <span class="pre">+</span> <span class="pre">limit</span></code> records.
+Sorting with a large <code class="docutils literal notranslate"><span class="pre">offset</span></code> is slow.</p>
 </div>
-<p>Here is an example that uses only one shard:</p>
+<p>Here is an example:</p>
 <p>Execution example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">logical_select</span> \
   <span class="o">--</span><span class="n">logical_table</span> <span class="n">Entries</span> \
@@ -4530,10 +4523,33 @@ for each the same number of sub records:</p>
 </div>
 </section>
 </section>
+<section id="slice-related-parameters">
+<span id="logical-select-slice-related-parameters"></span><h3><span class="section-number">7.3.38.5.10. </span>Slice related parameters<a class="headerlink" href="#slice-related-parameters" title="Link to this heading">#</a></h3>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 16.1.1.</span></p>
+</div>
+<p>Here are slice related parameters that are supported:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].match_columns</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].query</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].query_flags</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].filter</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].sort_keys</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].output_columns</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].offset</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].limit</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].columns[${NAME}]</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].drilldowns[${LABEL}]</span></code></p></li>
+</ul>
+</div></blockquote>
+<p>See <a class="reference internal" href="select.html#select-slice-related-parameters"><span class="std std-ref">Slice related parameters</span></a> for details.</p>
+<p><code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].sort_keys</span></code> has the same limitation as <a class="reference internal" href="#logical-select-sort-keys"><span class="std std-ref">sort_keys</span></a>.</p>
+</section>
 <section id="cache-related-parameter">
-<h3><span class="section-number">7.3.38.5.10. </span>Cache related parameter<a class="headerlink" href="#cache-related-parameter" title="Link to this heading">#</a></h3>
+<h3><span class="section-number">7.3.38.5.11. </span>Cache related parameter<a class="headerlink" href="#cache-related-parameter" title="Link to this heading">#</a></h3>
 <section id="cache">
-<span id="logical-select-cache"></span><h4><span class="section-number">7.3.38.5.10.1. </span><code class="docutils literal notranslate"><span class="pre">cache</span></code><a class="headerlink" href="#cache" title="Link to this heading">#</a></h4>
+<span id="logical-select-cache"></span><h4><span class="section-number">7.3.38.5.11.1. </span><code class="docutils literal notranslate"><span class="pre">cache</span></code><a class="headerlink" href="#cache" title="Link to this heading">#</a></h4>
 <p>Specifies whether caching the result of this query or not.</p>
 <p>If the result of this query is cached, the next same query returns
 response quickly by using the cache.</p>
@@ -4791,8 +4807,9 @@ It’s the default value.</p></td>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#drilldowns-label-columns-name-window-group-keys">7.3.38.5.9.15. <code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].columns[${NAME}].window.group_keys</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cache-related-parameter">7.3.38.5.10. Cache related parameter</a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#cache">7.3.38.5.10.1. <code class="docutils literal notranslate"><span class="pre">cache</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#slice-related-parameters">7.3.38.5.10. Slice related parameters</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cache-related-parameter">7.3.38.5.11. Cache related parameter</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#cache">7.3.38.5.11.1. <code class="docutils literal notranslate"><span class="pre">cache</span></code></a></li>
 </ul>
 </li>
 </ul>

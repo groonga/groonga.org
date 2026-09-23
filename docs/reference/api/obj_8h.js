@@ -10,6 +10,7 @@ var obj_8h =
     [ "grn_obj_is_aggregator_proc", "obj_8h.html#a78175a698a828c8892fb4cecd12e4cba", null ],
     [ "grn_obj_is_applier_proc", "obj_8h.html#aa8f8d4acf78ee70a840b0bfb3d7129b9", null ],
     [ "grn_obj_is_avg_accessor", "obj_8h.html#a5fa0854adfac3c2e149b5faa8a153a4d", null ],
+    [ "grn_obj_is_bfloat16_weight_uvector", "obj_8h.html#a1a8f87e2aedd9e11607f46564f05906d", null ],
     [ "grn_obj_is_binary_family_bulk", "obj_8h.html#a9c3d2be7ad146fc75cf5abfb2e68f423", null ],
     [ "grn_obj_is_binary_family_scalar_accessor", "obj_8h.html#aba698836e608d614a2d4e4b1589bbb98", null ],
     [ "grn_obj_is_binary_family_scalar_column", "obj_8h.html#a9b2b143dbfb8f0378f5e52efae0fe543", null ],

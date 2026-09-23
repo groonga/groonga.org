@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>7.3.38. logical_select &#8212; Groonga v16.1.0 documentation</title>
+    <title>7.3.38. logical_select &#8212; Groonga v16.1.1 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
 
-    <script src="../../_static/documentation_options.js?v=f8a97be7"></script>
+    <script src="../../_static/documentation_options.js?v=9c66aba3"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/translations.js?v=4755f45a"></script>
@@ -75,7 +75,7 @@
     <link rel="prev" title="7.3.37. logical_range_filter" href="logical_range_filter.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="ja"/>
-  <meta name="docsearch:version" content="16.1.0" />
+  <meta name="docsearch:version" content="16.1.1" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -147,8 +147,8 @@
       
     
     
-    <img src="../../_static/groonga.png" class="logo__image only-light" alt="Groonga v16.1.0 documentation - Home"/>
-    <img src="../../_static/groonga.png" class="logo__image only-dark pst-js-only" alt="Groonga v16.1.0 documentation - Home"/>
+    <img src="../../_static/groonga.png" class="logo__image only-light" alt="Groonga v16.1.1 documentation - Home"/>
+    <img src="../../_static/groonga.png" class="logo__image only-dark pst-js-only" alt="Groonga v16.1.1 documentation - Home"/>
   
   
 </a></div>
@@ -722,7 +722,7 @@
 <section id="syntax">
 <h2><span class="section-number">7.3.38.2. </span>構文<a class="headerlink" href="#syntax" title="Link to this heading">#</a></h2>
 <p>このコマンドにはたくさんの引数があります。</p>
-<p>必須の引数は <code class="docutils literal notranslate"><span class="pre">logical_table</span></code> と <code class="docutils literal notranslate"><span class="pre">shard_key</span></code> です。それ以外の引数は省略可能です:</p>
+<p><code class="docutils literal notranslate"><span class="pre">shard_key</span></code> は必須の引数です。 <a class="reference internal" href="#logical-select-shard-label-table"><span class="std std-ref">shard[${LABEL}].table</span></a> を使わない場合は <code class="docutils literal notranslate"><span class="pre">logical_table</span></code> も必須です。 <code class="docutils literal notranslate"><span class="pre">logical_table</span></code> を省略する場合は、<code class="docutils literal notranslate"><span class="pre">shard_key</span></code> を名前付き引数として指定してください。それ以外の引数は省略可能です:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">logical_select</span> <span class="n">logical_table</span>
                <span class="n">shard_key</span>
                <span class="p">[</span><span class="nb">min</span><span class="o">=</span><span class="n">null</span><span class="p">]</span>
@@ -745,11 +745,13 @@
                <span class="p">[</span><span class="n">drilldown_sort_keys</span><span class="o">=</span><span class="n">null</span><span class="p">]</span>
                <span class="p">[</span><span class="n">match_columns</span><span class="o">=</span><span class="n">null</span><span class="p">]</span>
                <span class="p">[</span><span class="n">query</span><span class="o">=</span><span class="n">null</span><span class="p">]</span>
+               <span class="p">[</span><span class="n">query_flags</span><span class="o">=</span><span class="n">ALLOW_PRAGMA</span><span class="o">|</span><span class="n">ALLOW_COLUMN</span><span class="p">]</span>
                <span class="p">[</span><span class="n">drilldown_filter</span><span class="o">=</span><span class="n">null</span><span class="p">]</span>
                <span class="p">[</span><span class="n">post_filter</span><span class="o">=</span><span class="n">null</span><span class="p">]</span>
                <span class="p">[</span><span class="n">load_table</span><span class="o">=</span><span class="n">null</span><span class="p">]</span>
                <span class="p">[</span><span class="n">load_columns</span><span class="o">=</span><span class="n">null</span><span class="p">]</span>
                <span class="p">[</span><span class="n">load_values</span><span class="o">=</span><span class="n">null</span><span class="p">]</span>
+               <span class="p">[</span><span class="n">n_workers</span><span class="o">=</span><span class="mi">0</span><span class="p">]</span>
 </pre></div>
 </div>
 <p>いくつか名前付き引数としてしか使えない引数があります。これらの引数を「○番目の引数」として使うことはできません。必ず名前を指定する必要があります。</p>
@@ -834,6 +836,12 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">--drilldowns[label2].sort_keys</span> <span class="pre">_key</span></code></p></li>
 </ul>
 </div></blockquote>
+<p>このコマンドには実際のテーブルを明示的に指定するために以下の名前付き引数があります。</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">shard[${LABEL}].table=null</span></code></p></li>
+</ul>
+</div></blockquote>
 </section>
 <section id="differences-from-select">
 <h2><span class="section-number">7.3.38.3. </span><code class="docutils literal notranslate"><span class="pre">select</span></code> との違い<a class="headerlink" href="#differences-from-select" title="Link to this heading">#</a></h2>
@@ -841,12 +849,10 @@
 <p>しかし、いくつか <a class="reference internal" href="select.html"><span class="doc">select</span></a> と違うところもあります。</p>
 <blockquote>
 <div><ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">table</span></code> 引数ではなく、 <code class="docutils literal notranslate"><span class="pre">logical_table</span></code> と <code class="docutils literal notranslate"><span class="pre">shard_key</span></code> 引数が必須です。</p></li>
-<li><p>複数のシャードを使った場合の <code class="docutils literal notranslate"><span class="pre">sort_keys</span></code> はサポートしていません。（1つのシャードのみを使った場合はサポートしています。複数のシャードについては1つ例外があります。<code class="docutils literal notranslate"><span class="pre">shard_key</span></code> と <code class="docutils literal notranslate"><span class="pre">sort_keys</span></code> が同じ場合です。その場合はサポートしています。詳細は <a class="reference internal" href="#logical-select-sort-keys"><span class="std std-ref">sort_keys</span></a> を参照してください。）</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">table</span></code> 引数ではなく、 <code class="docutils literal notranslate"><span class="pre">shard_key</span></code> と、 <code class="docutils literal notranslate"><span class="pre">logical_table</span></code> か1つ以上の <code class="docutils literal notranslate"><span class="pre">shard[${LABEL}].table</span></code> が必須です。</p></li>
 <li><p>複数のシャードを使った場合、 <code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].sort_keys</span></code> の中で <code class="docutils literal notranslate"><span class="pre">_value.${KEY_NAME}</span></code> を使えません。1つのシャードのみを使った場合は使えます。複数のシャードを使った場合、<code class="docutils literal notranslate"><span class="pre">_key</span></code> は、<code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].sort_keys</span></code> の中で使えます。</p></li>
 <li><p>複数のシャードを使った場合、 <code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].output_columns</span></code> の中でも <code class="docutils literal notranslate"><span class="pre">_value.${KEY_NAME}</span></code> を使えません。1つのシャードのみを使った場合は使えます。</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">match_escalation_threshold</span></code> はまだサポートしていません。</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">query_flags</span></code> はまだサポートしていません。</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">query_expander</span></code> はまだサポートしていません。</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">adjuster</span></code> はまだサポートしていません。</p></li>
 </ul>
@@ -1037,11 +1043,11 @@
 <p>このセクションでは <code class="docutils literal notranslate"><span class="pre">logical_select</span></code> の引数について説明します。</p>
 <section id="required-parameters">
 <h3><span class="section-number">7.3.38.5.1. </span>必須引数<a class="headerlink" href="#required-parameters" title="Link to this heading">#</a></h3>
-<p>必須引数は二つあります。 <code class="docutils literal notranslate"><span class="pre">logical_table</span></code> と <code class="docutils literal notranslate"><span class="pre">shard_key</span></code> です。</p>
+<p><code class="docutils literal notranslate"><span class="pre">shard_key</span></code> は常に必須です。加えて、 <code class="docutils literal notranslate"><span class="pre">logical_table</span></code> または1つ以上の <a class="reference internal" href="#logical-select-shard-label-table"><span class="std std-ref">shard[${LABEL}].table</span></a> のどちらかを指定する必要があります。</p>
 <section id="logical-table">
 <span id="logical-select-logical-table"></span><h4><span class="section-number">7.3.38.5.1.1. </span><code class="docutils literal notranslate"><span class="pre">logical_table</span></code><a class="headerlink" href="#logical-table" title="Link to this heading">#</a></h4>
 <p>論理テーブル名を指定します。これは <code class="docutils literal notranslate"><span class="pre">_YYYYMMDD</span></code> をテーブル名からのぞいたものです。実際のテーブルが <code class="docutils literal notranslate"><span class="pre">Entries_20150708</span></code> や <code class="docutils literal notranslate"><span class="pre">Entries_20150709</span></code> といったものなら、論理テーブル名は <code class="docutils literal notranslate"><span class="pre">Entries</span></code> です。</p>
-<p><code class="docutils literal notranslate"><span class="pre">logical_table</span></code> と <code class="docutils literal notranslate"><span class="pre">shard_key</span></code> 引数を指定すると5レコード表示できます。これらの引数は必須の引数です。</p>
+<p><code class="docutils literal notranslate"><span class="pre">logical_table</span></code> と <code class="docutils literal notranslate"><span class="pre">shard_key</span></code> 引数を指定すると5レコード表示できます。</p>
 <p>実行例:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">logical_select</span> <span class="o">--</span><span class="n">logical_table</span> <span class="n">Entries</span> <span class="o">--</span><span class="n">shard_key</span> <span class="n">created_at</span>
 <span class="c1"># [</span>
@@ -1152,6 +1158,24 @@
 <p>シャードキーとして使うカラム名を指定します。シャードキーは適切なシャードへレコードを分配するために使う値を保存しているカラムです。</p>
 <p>今のところ、シャードキーは <code class="docutils literal notranslate"><span class="pre">Time</span></code> 型でなければいけません。</p>
 <p><code class="docutils literal notranslate"><span class="pre">shard_key</span></code> の指定方法は <a class="reference internal" href="#logical-select-logical-table"><span class="std std-ref">logical_table</span></a> を見てください。</p>
+</section>
+<section id="shard-label-table">
+<span id="logical-select-shard-label-table"></span><h4><span class="section-number">7.3.38.5.1.3. </span><code class="docutils literal notranslate"><span class="pre">shard[${LABEL}].table</span></code><a class="headerlink" href="#shard-label-table" title="Link to this heading">#</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 16.1.1.</span></p>
+</div>
+<p>実際のテーブルを明示的に指定します。</p>
+<p>通常、<code class="docutils literal notranslate"><span class="pre">logical_select</span></code> は <code class="docutils literal notranslate"><span class="pre">${LOGICAL_TABLE}_${YYYYMMDD}</span></code> という命名規則に基づいて実際のテーブルを自動的に特定します。実際のテーブルがこの命名規則に従っていない場合は、このパラメータを使用して明示的に指定することができます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">logical_select</span> \
+  <span class="o">--</span><span class="n">shard_key</span> <span class="n">timestamp</span> \
+  <span class="o">--</span><span class="n">shard</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">table</span> <span class="n">Logs_host1</span> \
+  <span class="o">--</span><span class="n">shard</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">table</span> <span class="n">Logs_host2</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">${LABEL}</span></code> は単なるラベルです。これは、指定された実際のテーブルを並べ替えるためにのみ使用されます。すべてのラベルが <code class="docutils literal notranslate"><span class="pre">1</span></code>、<code class="docutils literal notranslate"><span class="pre">2</span></code>、<code class="docutils literal notranslate"><span class="pre">10</span></code> のように数字のみで構成されている場合は数値順に、それ以外の場合は文字列として並べ替えます。</p>
+<p>注意： <a class="reference internal" href="#logical-select-min"><span class="std std-ref">min</span></a> や <a class="reference internal" href="#logical-select-max"><span class="std std-ref">max</span></a> と一緒に使うとき、ラベルが <code class="docutils literal notranslate"><span class="pre">YYYYMM</span></code> や <code class="docutils literal notranslate"><span class="pre">YYYYMMDD</span></code> であっても、シャードの取捨選択には使いません。指定された実際のテーブルをすべて検索します。</p>
+<p>1つ以上の <code class="docutils literal notranslate"><span class="pre">shard[${LABEL}].table</span></code> を指定した場合、<a class="reference internal" href="#logical-select-logical-table"><span class="std std-ref">logical_table</span></a> を指定する必要はありません。両方が指定された場合、 <code class="docutils literal notranslate"><span class="pre">shard[${LABEL}].table</span></code> が使用され、<a class="reference internal" href="#logical-select-logical-table"><span class="std std-ref">logical_table</span></a> は無視されます。</p>
+<p><a class="reference internal" href="#logical-select-shard-key"><span class="std std-ref">shard_key</span></a> は必須です。指定されたすべての実際のテーブルは、指定されたカラムを含んでいる必要があります。</p>
 </section>
 </section>
 <section id="optional-parameters">
@@ -1921,17 +1945,35 @@
 <p>この引数は、 <a class="reference internal" href="#logical-select-load-table"><span class="std std-ref">load_table</span></a> と <a class="reference internal" href="#logical-select-load-columns"><span class="std std-ref">load_columns</span></a> と一緒に使う必要があります。</p>
 <p>この引数の使い方は、 <code class="docutils literal notranslate"><span class="pre">--load_table</span></code> の例を参照してください。</p>
 </section>
+<section id="n-workers">
+<span id="logical-select-n-workers"></span><h4><span class="section-number">7.3.38.5.3.8. </span><code class="docutils literal notranslate"><span class="pre">n_workers</span></code><a class="headerlink" href="#n-workers" title="Link to this heading">#</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 16.1.1.</span></p>
+</div>
+<p>並列実行するスレッド数を指定します。指定できる値と注意点は <a class="reference internal" href="../command/n_workers.html"><span class="doc">並列実行</span></a> を参照してください。</p>
+<p>このパラメーターに <code class="docutils literal notranslate"><span class="pre">-1</span></code> または <code class="docutils literal notranslate"><span class="pre">2</span></code> 以上を指定すると、次の処理を並列に実行します。</p>
+<ul class="simple">
+<li><p>各シャードの検索</p></li>
+<li><p><a class="reference internal" href="#logical-select-drilldown"><span class="std std-ref">drilldown</span></a> の各キー</p></li>
+<li><p>依存関係のない <a class="reference internal" href="#logical-select-advanced-drilldown-related-parameters"><span class="std std-ref">drilldowns</span></a></p></li>
+</ul>
+<p>依存関係がないとは、 <code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].table</span></code> を使用して他のドリルダウンの結果を参照していないことです。他のドリルダウンの結果を参照しているドリルダウンは、参照先のドリルダウンが終わってから実行します。そのため、依存関係があると並列度が下がります。</p>
+</section>
 </section>
 <section id="advanced-search-parameters">
 <span id="logical-select-advanced-search-parameters"></span><h3><span class="section-number">7.3.38.5.4. </span>高度な検索のための引数<a class="headerlink" href="#advanced-search-parameters" title="Link to this heading">#</a></h3>
-<p><code class="docutils literal notranslate"><span class="pre">logical_select</span></code> は高度な検索パラメーターをまだ実装していません。</p>
+<p>高度な検索パラメーターはほとんど実装されていません。</p>
 <section id="match-escalation-threshold">
 <span id="logical-select-match-escalation-threshold"></span><h4><span class="section-number">7.3.38.5.4.1. </span><code class="docutils literal notranslate"><span class="pre">match_escalation_threshold</span></code><a class="headerlink" href="#match-escalation-threshold" title="Link to this heading">#</a></h4>
 <p>未実装です。</p>
 </section>
 <section id="query-flags">
 <span id="logical-select-query-flags"></span><h4><span class="section-number">7.3.38.5.4.2. </span><code class="docutils literal notranslate"><span class="pre">query_flags</span></code><a class="headerlink" href="#query-flags" title="Link to this heading">#</a></h4>
-<p>未実装です。</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 16.1.1.</span></p>
+</div>
+<p><a class="reference internal" href="select.html"><span class="doc">select</span></a> の <a class="reference internal" href="select.html#select-query-flags"><span class="std std-ref">query_flags</span></a> に対応しています。詳細は <a class="reference internal" href="select.html#select-query-flags"><span class="std std-ref">query_flags</span></a> を見てください。</p>
+<p>デフォルト値は <code class="docutils literal notranslate"><span class="pre">ALLOW_PRAGMA|ALLOW_COLUMN</span></code> です。 <a class="reference internal" href="select.html"><span class="doc">select</span></a> と同じです。</p>
 </section>
 <section id="query-expander">
 <span id="logical-select-query-expander"></span><h4><span class="section-number">7.3.38.5.4.3. </span><code class="docutils literal notranslate"><span class="pre">query_expander</span></code><a class="headerlink" href="#query-expander" title="Link to this heading">#</a></h4>
@@ -2032,12 +2074,14 @@
 <section id="sort-keys">
 <span id="logical-select-sort-keys"></span><h4><span class="section-number">7.3.38.5.5.3. </span><code class="docutils literal notranslate"><span class="pre">sort_keys</span></code><a class="headerlink" href="#sort-keys" title="Link to this heading">#</a></h4>
 <p><a class="reference internal" href="select.html"><span class="doc">select</span></a> の <a class="reference internal" href="select.html#select-sort-keys"><span class="std std-ref">sort_keys</span></a> に対応しています。詳細は <a class="reference internal" href="select.html#select-sort-keys"><span class="std std-ref">sort_keys</span></a> を見てください。</p>
-<p><code class="docutils literal notranslate"><span class="pre">sort_keys</span></code> には制限があります。検索対象のシャードが1つの場合のみ動作します。もし、検索対象のシャードが複数ある場合、 <code class="docutils literal notranslate"><span class="pre">sort_keys</span></code> は正常な動作をしません。</p>
+<p>16.1.1 から <code class="docutils literal notranslate"><span class="pre">sort_keys</span></code> は複数のシャードでも動作します。検索対象のすべてのシャードのレコードを1つの結果セットとしてソートします。</p>
 <div class="admonition note">
 <p class="admonition-title">注釈</p>
-<p>複数のシャードに関して例外があります。<code class="docutils literal notranslate"><span class="pre">shard_key</span></code> と <code class="docutils literal notranslate"><span class="pre">sort_keys</span></code> に同じ値が指定された場合です。その場合はサポートしています。このコマンドはシャードを昇順で順番に処理します。そのため、<code class="docutils literal notranslate"><span class="pre">shard_key</span></code> の大小関係は保たれるので、正しくソートできます。</p>
+<p>複数のシャードでは <code class="docutils literal notranslate"><span class="pre">sort_keys</span></code> にベクターカラムを使えません。</p>
+<p><a class="reference internal" href="../scorers/scorer_tf_idf.html"><span class="doc">scorer_tf_idf</span></a> は本来すべてのシャードのレコード数を使って計算すべきですが、各シャード内のレコード数で計算されます。そのため、複数のシャードでは正確なスコアになりません。</p>
+<p>各シャードの上位 <code class="docutils literal notranslate"><span class="pre">offset</span> <span class="pre">+</span> <span class="pre">limit</span></code> 件を使ってソートするため、ソートのコストは <code class="docutils literal notranslate"><span class="pre">offset</span> <span class="pre">+</span> <span class="pre">limit</span></code> に依存します。大きな <code class="docutils literal notranslate"><span class="pre">offset</span></code> を指定したソートは遅くなります。</p>
 </div>
-<p>以下は1つのシャードのみを使っている例です。</p>
+<p>以下は例です。</p>
 <p>実行例:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">logical_select</span> \
   <span class="o">--</span><span class="n">logical_table</span> <span class="n">Entries</span> \
@@ -4285,10 +4329,33 @@
 </div>
 </section>
 </section>
+<section id="slice-related-parameters">
+<span id="logical-select-slice-related-parameters"></span><h3><span class="section-number">7.3.38.5.10. </span>スライス関連の引数<a class="headerlink" href="#slice-related-parameters" title="Link to this heading">#</a></h3>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 16.1.1.</span></p>
+</div>
+<p>サポートしているスライス関連の引数は以下の通りです。</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].match_columns</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].query</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].query_flags</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].filter</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].sort_keys</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].output_columns</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].offset</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].limit</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].columns[${NAME}]</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].drilldowns[${LABEL}]</span></code></p></li>
+</ul>
+</div></blockquote>
+<p>詳細は <a class="reference internal" href="select.html#select-slice-related-parameters"><span class="std std-ref">スライス関連の引数</span></a> を見てください。</p>
+<p><code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].sort_keys</span></code> には <a class="reference internal" href="#logical-select-sort-keys"><span class="std std-ref">sort_keys</span></a> と同じ制限があります。</p>
+</section>
 <section id="cache-related-parameter">
-<h3><span class="section-number">7.3.38.5.10. </span>キャッシュ関連の引数<a class="headerlink" href="#cache-related-parameter" title="Link to this heading">#</a></h3>
+<h3><span class="section-number">7.3.38.5.11. </span>キャッシュ関連の引数<a class="headerlink" href="#cache-related-parameter" title="Link to this heading">#</a></h3>
 <section id="cache">
-<span id="logical-select-cache"></span><h4><span class="section-number">7.3.38.5.10.1. </span><code class="docutils literal notranslate"><span class="pre">cache</span></code><a class="headerlink" href="#cache" title="Link to this heading">#</a></h4>
+<span id="logical-select-cache"></span><h4><span class="section-number">7.3.38.5.11.1. </span><code class="docutils literal notranslate"><span class="pre">cache</span></code><a class="headerlink" href="#cache" title="Link to this heading">#</a></h4>
 <p>このクエリーの結果をキャッシュするかどうかを指定します。</p>
 <p>このクエリーの結果がキャッシュしてあると、次に同じクエリーを実行するときはキャッシュを使って高速にレスポンスを返すことができます。</p>
 <p>これは既存のキャッシュされた結果を使うかどうかを指定するものではありません。</p>
@@ -4465,6 +4532,7 @@
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#required-parameters">7.3.38.5.1. 必須引数</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#logical-table">7.3.38.5.1.1. <code class="docutils literal notranslate"><span class="pre">logical_table</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#shard-key">7.3.38.5.1.2. <code class="docutils literal notranslate"><span class="pre">shard_key</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#shard-label-table">7.3.38.5.1.3. <code class="docutils literal notranslate"><span class="pre">shard[${LABEL}].table</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-parameters">7.3.38.5.2. 省略可能引数</a><ul class="nav section-nav flex-column">
@@ -4482,6 +4550,7 @@
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#load-table">7.3.38.5.3.5. <code class="docutils literal notranslate"><span class="pre">load_table</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#load-columns">7.3.38.5.3.6. <code class="docutils literal notranslate"><span class="pre">load_columns</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#load-values">7.3.38.5.3.7. <code class="docutils literal notranslate"><span class="pre">load_values</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#n-workers">7.3.38.5.3.8. <code class="docutils literal notranslate"><span class="pre">n_workers</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#advanced-search-parameters">7.3.38.5.4. 高度な検索のための引数</a><ul class="nav section-nav flex-column">
@@ -4541,8 +4610,9 @@
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#drilldowns-label-columns-name-window-group-keys">7.3.38.5.9.15. <code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].columns[${NAME}].window.group_keys</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cache-related-parameter">7.3.38.5.10. キャッシュ関連の引数</a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#cache">7.3.38.5.10.1. <code class="docutils literal notranslate"><span class="pre">cache</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#slice-related-parameters">7.3.38.5.10. スライス関連の引数</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cache-related-parameter">7.3.38.5.11. キャッシュ関連の引数</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#cache">7.3.38.5.11.1. <code class="docutils literal notranslate"><span class="pre">cache</span></code></a></li>
 </ul>
 </li>
 </ul>

@@ -62,15 +62,16 @@ var NAVTREEINDEX =
 [
 "accessor_8h.html",
 "column_8h.html#af3bbe24fc3216c265e6f76489fb027b4",
-"groonga_2groonga_8h.html#a08cb90a7907cebcf5b2de8d3f4f1ba4e",
-"groonga_2groonga_8h.html#a3fcab8b46478fcc653a6febe1f563208",
-"groonga_2groonga_8h.html#a7fdd2258b671c49529a5a62adb63b41b",
-"groonga_2groonga_8h.html#acfa3bf40ddb32cef301db67cd98e84e8",
-"language__model_8h.html#a49da82bcaeee3d8a3cbcb37761c0d28c",
-"pat_8h.html#a4c52752aca4940849182a84c7e0a790b",
-"selector_8h.html#a29a1f12001b84f515f5d39f0aeeffcec",
-"structgrn__expr__var.html#a3da66156cc989386a1385dc1dbd512ee",
-"token_8h.html#a7b938ac12df6ff753f1ad33497c91644"
+"groonga_2groonga_8h.html#a085fb579dc5c9a62b1abf7dd57e0aa5c",
+"groonga_2groonga_8h.html#a3c6d36bf6891b45d1b369a246cbde2a3",
+"groonga_2groonga_8h.html#a7d0b0ecbe395cd8c2a47dca1a077c946",
+"groonga_2groonga_8h.html#acd9dfc4ac072cee2729ef4116f8a4560",
+"json_8h.html#afeb6d737668175545b7a1315584e4301",
+"pat_8h.html#a2a5ca9137d3b84ce5e3aa3dddbe0dd76",
+"scorer_8h.html#aabdd3048b63a64a327d7a9ce4a3029bd",
+"structgrn_1_1CommandArgument.html#a3a42fc1ce899f8dc99a4e97367d3a29b",
+"token_8h.html#a41c5c56067c85fb28d860f1ec9610992",
+"window__function__executor_8h.html#ac2e711d179c026eef09f4b42c2c06917"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

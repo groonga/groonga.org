@@ -1,5 +1,7 @@
 var NAVTREEINDEX8 =
 {
+"scorer_8h.html#aabdd3048b63a64a327d7a9ce4a3029bd":[5,0,1,0,52,14],
+"scorer_8h.html#ab88190fe1b4804dd055fd506e09934ab":[5,0,1,0,52,3],
 "scorer_8h.html#adc3fe594e49b427e9d3f513ba78bdde9":[5,0,1,0,52,12],
 "scorer_8h_source.html":[5,0,1,0,52],
 "selector_8h.html":[5,0,1,0,53],
@@ -244,10 +246,8 @@ var NAVTREEINDEX8 =
 "struct__grn__window__definition.html#a9b71e87f7ff55b4640ca42b6a20264f3":[4,0,23,3],
 "struct__grn__window__definition.html#aac2cd1385f62b986946ff7bfba45254b":[4,0,23,1],
 "struct__grn__window__definition.html#af0a7aafaff3ee6aa1e208d99df58af7d":[4,0,23,2],
-"structgrn_1_1CommandArgument.html":[3,0,0,3],
 "structgrn_1_1CommandArgument.html":[4,0,0,1],
+"structgrn_1_1CommandArgument.html":[3,0,0,3],
 "structgrn_1_1CommandArgument.html#a1c06f6e731893f02b58ee43d7512e767":[4,0,0,1,0],
-"structgrn_1_1CommandArgument.html#a1c06f6e731893f02b58ee43d7512e767":[3,0,0,3,0],
-"structgrn_1_1CommandArgument.html#a3a42fc1ce899f8dc99a4e97367d3a29b":[3,0,0,3,2],
-"structgrn_1_1CommandArgument.html#a3a42fc1ce899f8dc99a4e97367d3a29b":[4,0,0,1,2]
+"structgrn_1_1CommandArgument.html#a1c06f6e731893f02b58ee43d7512e767":[3,0,0,3,0]
 };

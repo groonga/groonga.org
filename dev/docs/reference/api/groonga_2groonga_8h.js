@@ -709,6 +709,8 @@ var groonga_2groonga_8h =
     [ "grn_bulk_reinit", "groonga_2groonga_8h.html#a663aa9002efbcb6ef0f04ba481491597", null ],
     [ "grn_bulk_reserve", "groonga_2groonga_8h.html#a2860e235543e0a53c87db7e4ff000b6e", null ],
     [ "grn_bulk_resize", "groonga_2groonga_8h.html#a0b430bb33458fc80720e0977cc9ecb1d", null ],
+    [ "grn_bulk_rewind", "groonga_2groonga_8h.html#aebce30b7ce28a78331dbade6fedd66db", null ],
+    [ "grn_bulk_set", "groonga_2groonga_8h.html#ad82f52f87ce804a92d814c19dae7d23e", null ],
     [ "grn_bulk_space", "groonga_2groonga_8h.html#adcee99d3dba8c2f53ed209c0841a51f6", null ],
     [ "grn_bulk_truncate", "groonga_2groonga_8h.html#abe6d406d6747b5354d6cbfa522c385c8", null ],
     [ "grn_bulk_write", "groonga_2groonga_8h.html#a9528b0a0ed8e196113ef0ac288a2073d", null ],

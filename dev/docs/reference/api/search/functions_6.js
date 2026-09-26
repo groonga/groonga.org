@@ -700,7 +700,7 @@ var searchData=
   ['grn_5fplugin_5fproc_5fget_5fvar_5fstring_697',['grn_plugin_proc_get_var_string',['../plugin_8h.html#a0b01a4a690631436a65d30f0a0efea31',1,'plugin.h']]],
   ['grn_5fplugin_5fproc_5fget_5fvars_698',['grn_plugin_proc_get_vars',['../plugin_8h.html#a5970e16f309d71c2532c813e355de135',1,'plugin.h']]],
   ['grn_5fplugin_5frealloc_699',['grn_plugin_realloc',['../plugin_8h.html#abc4a5a23bff12f48d9f406bafba7fa15',1,'plugin.h']]],
-  ['grn_5fplugin_5fregister_700',['grn_plugin_register',['../plugin_8h.html#a4ce3bb0afd15ac738c4afa53306f0f01',1,'GRN_PLUGIN_REGISTER(grn_ctx *ctx):&#160;plugin.h'],['../groonga_2groonga_8h.html#a2c6da302dd350eaf6e95429889ca9bac',1,'grn_plugin_register(grn_ctx *ctx, const char *name):&#160;groonga.h']]],
+  ['grn_5fplugin_5fregister_700',['grn_plugin_register',['../groonga_2groonga_8h.html#a2c6da302dd350eaf6e95429889ca9bac',1,'grn_plugin_register(grn_ctx *ctx, const char *name):&#160;groonga.h'],['../plugin_8h.html#a4ce3bb0afd15ac738c4afa53306f0f01',1,'GRN_PLUGIN_REGISTER(grn_ctx *ctx):&#160;plugin.h']]],
   ['grn_5fplugin_5fregister_5fby_5fpath_701',['grn_plugin_register_by_path',['../groonga_2groonga_8h.html#a0e8da8658001490424fd1063222a063c',1,'groonga.h']]],
   ['grn_5fplugin_5fset_5ferror_702',['grn_plugin_set_error',['../plugin_8h.html#a0e656791039091281b7d1170c5256b2b',1,'plugin.h']]],
   ['grn_5fplugin_5funregister_703',['grn_plugin_unregister',['../groonga_2groonga_8h.html#afed07fb11a9133b51059eb7f2fe25872',1,'groonga.h']]],

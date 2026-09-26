@@ -1,5 +1,7 @@
 var NAVTREEINDEX8 =
 {
+"scorer_8h.html#a9270cb41b1ac1f405c7220474cfeaf28":[5,0,1,0,52,0],
+"scorer_8h.html#aa24ea3e97be27f82928021c8ebdff2d9":[5,0,1,0,52,1],
 "scorer_8h.html#aabdd3048b63a64a327d7a9ce4a3029bd":[5,0,1,0,52,14],
 "scorer_8h.html#ab88190fe1b4804dd055fd506e09934ab":[5,0,1,0,52,3],
 "scorer_8h.html#adc3fe594e49b427e9d3f513ba78bdde9":[5,0,1,0,52,12],
@@ -247,7 +249,5 @@ var NAVTREEINDEX8 =
 "struct__grn__window__definition.html#aac2cd1385f62b986946ff7bfba45254b":[4,0,23,1],
 "struct__grn__window__definition.html#af0a7aafaff3ee6aa1e208d99df58af7d":[4,0,23,2],
 "structgrn_1_1CommandArgument.html":[4,0,0,1],
-"structgrn_1_1CommandArgument.html":[3,0,0,3],
-"structgrn_1_1CommandArgument.html#a1c06f6e731893f02b58ee43d7512e767":[4,0,0,1,0],
-"structgrn_1_1CommandArgument.html#a1c06f6e731893f02b58ee43d7512e767":[3,0,0,3,0]
+"structgrn_1_1CommandArgument.html":[3,0,0,3]
 };

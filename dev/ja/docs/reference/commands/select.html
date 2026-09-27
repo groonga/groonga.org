@@ -7354,7 +7354,40 @@
 <p><span class="versionmodified added">Added in version 6.0.3.</span></p>
 </div>
 <p>このセクションではスライス関連のパラメーターについて説明します。</p>
-<p>TODO</p>
+<p>スライスは本体の検索の結果からレコードを絞り込む機能です。スライスを使えば、1回の <code class="docutils literal notranslate"><span class="pre">select</span></code> で複数の検索結果を取得できます。検索結果全体と、絞り込んだ結果を一緒に表示したい場合に便利です。</p>
+<p>各スライスには <code class="docutils literal notranslate"><span class="pre">${LABEL}</span></code> があります。スライスの結果はレスポンスの追加要素として出力されます。これは <code class="docutils literal notranslate"><span class="pre">${LABEL}</span></code> とスライスの結果のペアの集まりです。スライスの結果は本体の検索結果と同じフォーマットです。</p>
+<p>スライスの出力フォーマットは以下の通りです:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
+  <span class="n">HEADER</span><span class="p">,</span>
+  <span class="p">[</span>
+    <span class="n">SEARCH_RESULT</span><span class="p">,</span>
+    <span class="p">{</span>
+      <span class="s2">&quot;LABEL1&quot;</span><span class="p">:</span> <span class="n">SLICE_RESULT1</span><span class="p">,</span>
+      <span class="s2">&quot;LABEL2&quot;</span><span class="p">:</span> <span class="n">SLICE_RESULT2</span><span class="p">,</span>
+      <span class="o">...</span>
+    <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">${LABEL}</span></code> には1つ以上のアルファベット、数字、 <code class="docutils literal notranslate"><span class="pre">_</span></code> 、 <code class="docutils literal notranslate"><span class="pre">.</span></code> を使うことができます。たとえば、 <code class="docutils literal notranslate"><span class="pre">parent.sub1</span></code> は有効な <code class="docutils literal notranslate"><span class="pre">${LABEL}</span></code> です。</p>
+<p>同じ <code class="docutils literal notranslate"><span class="pre">${LABEL}</span></code> も持つ引数は同じグループになります。</p>
+<p>たとえば、以下の引数は1つのスライスを指定しています。</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">--slices[label].filter</span> <span class="pre">'column</span> <span class="pre">&gt;</span> <span class="pre">100'</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--slices[label].sort_keys</span> <span class="pre">-column</span></code></p></li>
+</ul>
+</div></blockquote>
+<p>以下の引数は2つのスライスを指定しています。</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">--slices[label1].filter</span> <span class="pre">'column</span> <span class="pre">&gt;</span> <span class="pre">100'</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--slices[label1].sort_keys</span> <span class="pre">-column</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--slices[label2].filter</span> <span class="pre">'column</span> <span class="pre">&lt;</span> <span class="pre">10'</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--slices[label2].sort_keys</span> <span class="pre">column</span></code></p></li>
+</ul>
+</div></blockquote>
 <p>スライスのパラメーターは以下の通りです。</p>
 <div class="pst-scrollable-table-container"><table class="table">
 <thead>
@@ -7378,16 +7411,25 @@
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--slices[${LABEL}].query_flags</span></code></p></td>
 <td><p>省略可能</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--slices[${LABEL}].sort_keys</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--slices[${LABEL}].post_filter</span></code></p></td>
 <td><p>省略可能</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--slices[${LABEL}].output_columns</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--slices[${LABEL}].sort_keys</span></code></p></td>
 <td><p>省略可能</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--slices[${LABEL}].offset</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--slices[${LABEL}].output_columns</span></code></p></td>
 <td><p>省略可能</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--slices[${LABEL}].limit</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--slices[${LABEL}].offset</span></code></p></td>
+<td><p>省略可能</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--slices[${LABEL}].limit</span></code></p></td>
+<td><p>省略可能</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--slices[${LABEL}].columns[${NAME}].*</span></code></p></td>
+<td><p>省略可能</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--slices[${LABEL}].drilldowns[${LABEL}].*</span></code></p></td>
 <td><p>省略可能</p></td>
 </tr>
 </tbody>
@@ -7395,39 +7437,74 @@
 </div>
 <section id="slices-label-match-columns">
 <span id="select-slices-label-match-columns"></span><h4><span class="section-number">7.3.59.4.10.1. </span><code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].match_columns</span></code><a class="headerlink" href="#slices-label-match-columns" title="Link to this heading">#</a></h4>
-<p>TODO</p>
+<p><a class="reference internal" href="#select-match-columns"><span class="std std-ref">match_columns</span></a> に対応しています。</p>
+<p>本体の検索ではなくスライスに適用されます。</p>
+<p>詳細は <a class="reference internal" href="#select-match-columns"><span class="std std-ref">match_columns</span></a> を参照してください。</p>
 </section>
 <section id="slices-label-query">
 <span id="select-slices-label-query"></span><h4><span class="section-number">7.3.59.4.10.2. </span><code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].query</span></code><a class="headerlink" href="#slices-label-query" title="Link to this heading">#</a></h4>
-<p>TODO</p>
+<p><a class="reference internal" href="#select-query"><span class="std std-ref">query</span></a> に対応しています。</p>
+<p>本体の検索ではなくスライスに適用されます。</p>
+<p>詳細は <a class="reference internal" href="#select-query"><span class="std std-ref">query</span></a> を参照してください。</p>
 </section>
 <section id="slices-label-filter">
 <span id="select-slices-label-filter"></span><h4><span class="section-number">7.3.59.4.10.3. </span><code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].filter</span></code><a class="headerlink" href="#slices-label-filter" title="Link to this heading">#</a></h4>
-<p>TODO</p>
+<p><a class="reference internal" href="#select-filter"><span class="std std-ref">filter</span></a> に対応しています。</p>
+<p>本体の検索ではなくスライスに適用されます。</p>
+<p>詳細は <a class="reference internal" href="#select-filter"><span class="std std-ref">filter</span></a> を参照してください。</p>
 </section>
 <section id="slices-label-query-expander">
 <span id="select-slices-label-query-expander"></span><h4><span class="section-number">7.3.59.4.10.4. </span><code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].query_expander</span></code><a class="headerlink" href="#slices-label-query-expander" title="Link to this heading">#</a></h4>
-<p>TODO</p>
+<p><a class="reference internal" href="#select-query-expander"><span class="std std-ref">query_expander</span></a> に対応しています。</p>
+<p>本体の検索ではなくスライスに適用されます。</p>
+<p>詳細は <a class="reference internal" href="#select-query-expander"><span class="std std-ref">query_expander</span></a> を参照してください。</p>
 </section>
 <section id="slices-label-query-flags">
 <span id="select-slices-label-query-flags"></span><h4><span class="section-number">7.3.59.4.10.5. </span><code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].query_flags</span></code><a class="headerlink" href="#slices-label-query-flags" title="Link to this heading">#</a></h4>
-<p>TODO</p>
+<p><a class="reference internal" href="#select-query-flags"><span class="std std-ref">query_flags</span></a> に対応しています。</p>
+<p>本体の検索ではなくスライスに適用されます。</p>
+<p>詳細は <a class="reference internal" href="#select-query-flags"><span class="std std-ref">query_flags</span></a> を参照してください。</p>
+</section>
+<section id="slices-label-post-filter">
+<span id="select-slices-label-post-filter"></span><h4><span class="section-number">7.3.59.4.10.6. </span><code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].post_filter</span></code><a class="headerlink" href="#slices-label-post-filter" title="Link to this heading">#</a></h4>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 11.0.2.</span></p>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">filtered</span></code> ステージの動的カラムが生成されてから実行するフィルターを指定します。 <code class="docutils literal notranslate"><span class="pre">post_filter</span></code> を使うと <code class="docutils literal notranslate"><span class="pre">filtered</span></code> ステージの動的カラムを使って絞り込むことができます。他は <a class="reference internal" href="#select-slices-label-filter"><span class="std std-ref">slices[${LABEL}].filter</span></a> と同じです。</p>
 </section>
 <section id="slices-label-sort-keys">
-<span id="select-slices-label-sort-keys"></span><h4><span class="section-number">7.3.59.4.10.6. </span><code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].sort_keys</span></code><a class="headerlink" href="#slices-label-sort-keys" title="Link to this heading">#</a></h4>
-<p>TODO</p>
+<span id="select-slices-label-sort-keys"></span><h4><span class="section-number">7.3.59.4.10.7. </span><code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].sort_keys</span></code><a class="headerlink" href="#slices-label-sort-keys" title="Link to this heading">#</a></h4>
+<p><a class="reference internal" href="#select-sort-keys"><span class="std std-ref">sort_keys</span></a> に対応しています。</p>
+<p>本体の検索ではなくスライスに適用されます。</p>
+<p>詳細は <a class="reference internal" href="#select-sort-keys"><span class="std std-ref">sort_keys</span></a> を参照してください。</p>
 </section>
 <section id="slices-label-output-columns">
-<span id="select-slices-label-output-columns"></span><h4><span class="section-number">7.3.59.4.10.7. </span><code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].output_columns</span></code><a class="headerlink" href="#slices-label-output-columns" title="Link to this heading">#</a></h4>
-<p>TODO</p>
+<span id="select-slices-label-output-columns"></span><h4><span class="section-number">7.3.59.4.10.8. </span><code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].output_columns</span></code><a class="headerlink" href="#slices-label-output-columns" title="Link to this heading">#</a></h4>
+<p><a class="reference internal" href="#select-output-columns"><span class="std std-ref">output_columns</span></a> に対応しています。</p>
+<p>本体の検索ではなくスライスに適用されます。</p>
+<p>詳細は <a class="reference internal" href="#select-output-columns"><span class="std std-ref">output_columns</span></a> を参照してください。</p>
 </section>
 <section id="slices-label-offset">
-<span id="select-slices-label-offset"></span><h4><span class="section-number">7.3.59.4.10.8. </span><code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].offset</span></code><a class="headerlink" href="#slices-label-offset" title="Link to this heading">#</a></h4>
-<p>TODO</p>
+<span id="select-slices-label-offset"></span><h4><span class="section-number">7.3.59.4.10.9. </span><code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].offset</span></code><a class="headerlink" href="#slices-label-offset" title="Link to this heading">#</a></h4>
+<p><a class="reference internal" href="#select-offset"><span class="std std-ref">offset</span></a> に対応しています。</p>
+<p>本体の検索ではなくスライスに適用されます。</p>
+<p>詳細は <a class="reference internal" href="#select-offset"><span class="std std-ref">offset</span></a> を参照してください。</p>
 </section>
 <section id="slices-label-limit">
-<span id="select-slices-label-limit"></span><h4><span class="section-number">7.3.59.4.10.9. </span><code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].limit</span></code><a class="headerlink" href="#slices-label-limit" title="Link to this heading">#</a></h4>
-<p>TODO</p>
+<span id="select-slices-label-limit"></span><h4><span class="section-number">7.3.59.4.10.10. </span><code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].limit</span></code><a class="headerlink" href="#slices-label-limit" title="Link to this heading">#</a></h4>
+<p><a class="reference internal" href="#select-limit"><span class="std std-ref">limit</span></a> に対応しています。</p>
+<p>本体の検索ではなくスライスに適用されます。</p>
+<p>詳細は <a class="reference internal" href="#select-limit"><span class="std std-ref">limit</span></a> を参照してください。</p>
+</section>
+<section id="slices-label-columns-name">
+<span id="select-slices-label-columns-name"></span><h4><span class="section-number">7.3.59.4.10.11. </span><code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].columns[${NAME}]</span></code><a class="headerlink" href="#slices-label-columns-name" title="Link to this heading">#</a></h4>
+<p>スライスの動的カラムを指定します。引数は <code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].</span></code> が付く以外は <a class="reference internal" href="#select-dynamic-column-related-parameters"><span class="std std-ref">動的カラム関連の引数</span></a> と同じです。</p>
+<p>スライスの動的カラムはそのスライスの結果に追加します。そのスライスの中だけで動的カラムが必要な場合に使ってください。</p>
+</section>
+<section id="slices-label-drilldowns-label">
+<span id="select-slices-label-drilldowns-label"></span><h4><span class="section-number">7.3.59.4.10.12. </span><code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].drilldowns[${LABEL}]</span></code><a class="headerlink" href="#slices-label-drilldowns-label" title="Link to this heading">#</a></h4>
+<p>スライスのドリルダウンを指定します。引数は <code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].</span></code> が付く以外は <a class="reference internal" href="#select-advanced-drilldown-related-parameters"><span class="std std-ref">高度なドリルダウン関連のパラメーター</span></a> と同じです。</p>
+<p>スライスのドリルダウンはそのスライスの結果の追加の要素として出力します。</p>
 </section>
 </section>
 <section id="cache-related-parameter">
@@ -8091,10 +8168,13 @@
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#slices-label-filter">7.3.59.4.10.3. <code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].filter</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#slices-label-query-expander">7.3.59.4.10.4. <code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].query_expander</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#slices-label-query-flags">7.3.59.4.10.5. <code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].query_flags</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#slices-label-sort-keys">7.3.59.4.10.6. <code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].sort_keys</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#slices-label-output-columns">7.3.59.4.10.7. <code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].output_columns</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#slices-label-offset">7.3.59.4.10.8. <code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].offset</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#slices-label-limit">7.3.59.4.10.9. <code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].limit</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#slices-label-post-filter">7.3.59.4.10.6. <code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].post_filter</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#slices-label-sort-keys">7.3.59.4.10.7. <code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].sort_keys</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#slices-label-output-columns">7.3.59.4.10.8. <code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].output_columns</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#slices-label-offset">7.3.59.4.10.9. <code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].offset</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#slices-label-limit">7.3.59.4.10.10. <code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].limit</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#slices-label-columns-name">7.3.59.4.10.11. <code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].columns[${NAME}]</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#slices-label-drilldowns-label">7.3.59.4.10.12. <code class="docutils literal notranslate"><span class="pre">slices[${LABEL}].drilldowns[${LABEL}]</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cache-related-parameter">7.3.59.4.11. キャッシュ関連の引数</a><ul class="nav section-nav flex-column">

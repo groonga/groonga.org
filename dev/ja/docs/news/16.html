@@ -7,7 +7,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>お知らせ - 16系 &#8212; Groonga v16.1.3 documentation</title>
+    <title>お知らせ - 16系 &#8212; Groonga v16.1.4 documentation</title>
   
   
   
@@ -37,7 +37,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0" />
 
-    <script src="../_static/documentation_options.js?v=55f90b2b"></script>
+    <script src="../_static/documentation_options.js?v=b0e73cb6"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/translations.js?v=4755f45a"></script>
@@ -72,7 +72,7 @@
     <link rel="search" title="検索" href="../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="ja"/>
-  <meta name="docsearch:version" content="16.1.3" />
+  <meta name="docsearch:version" content="16.1.4" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -144,8 +144,8 @@
       
     
     
-    <img src="../_static/groonga.png" class="logo__image only-light" alt="Groonga v16.1.3 documentation - Home"/>
-    <img src="../_static/groonga.png" class="logo__image only-dark pst-js-only" alt="Groonga v16.1.3 documentation - Home"/>
+    <img src="../_static/groonga.png" class="logo__image only-light" alt="Groonga v16.1.4 documentation - Home"/>
+    <img src="../_static/groonga.png" class="logo__image only-dark pst-js-only" alt="Groonga v16.1.4 documentation - Home"/>
   
   
 </a></div>
@@ -429,6 +429,42 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="news-16-series">
 <h1>お知らせ - 16系<a class="headerlink" href="#news-16-series" title="Link to this heading">#</a></h1>
+<section id="release-16-1-3-2026-10-08">
+<span id="release-16-1-3"></span><h2>16.1.3リリース - 2026-10-08<a class="headerlink" href="#release-16-1-3-2026-10-08" title="Link to this heading">#</a></h2>
+<section id="fixes">
+<h3>修正<a class="headerlink" href="#fixes" title="Link to this heading">#</a></h3>
+<section id="reference-alias-fixed-a-crash-when-an-alias-to-an-accessor-such-as-key-is-used">
+<h4>[<a class="reference internal" href="../reference/alias.html"><span class="doc">エイリアス</span></a>] <code class="docutils literal notranslate"><span class="pre">_key</span></code> のようなアクセサーへのエイリアスを使うとクラッシュする問題を修正<a class="headerlink" href="#reference-alias-fixed-a-crash-when-an-alias-to-an-accessor-such-as-key-is-used" title="Link to this heading">#</a></h4>
+<p>これはエイリアスを設定したテーブルを参照している別のテーブル経由で名前を解決したときに発生していました。例えば、<a class="reference internal" href="../reference/commands/select.html"><span class="doc">select</span></a> の <code class="docutils literal notranslate"><span class="pre">--post_filter</span></code> が使う結果セットは検索対象のテーブルを参照しているので、このケースです。</p>
+<p>次のデータでは <code class="docutils literal notranslate"><span class="pre">Sources.ctid</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Sources._key</span></code> の参照でクラッシュしていました。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">config_set</span> <span class="n">alias</span><span class="o">.</span><span class="n">column</span> <span class="n">Aliases</span><span class="o">.</span><span class="n">real_name</span>
+
+<span class="n">table_create</span> <span class="n">Aliases</span> <span class="n">TABLE_HASH_KEY</span> <span class="n">ShortText</span>
+<span class="n">column_create</span> <span class="n">Aliases</span> <span class="n">real_name</span> <span class="n">COLUMN_SCALAR</span> <span class="n">ShortText</span>
+<span class="n">table_create</span> <span class="n">Sources</span> <span class="n">TABLE_HASH_KEY</span> <span class="n">UInt64</span>
+
+<span class="n">load</span> <span class="o">--</span><span class="n">table</span> <span class="n">Aliases</span>
+<span class="p">[</span>
+<span class="p">{</span><span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="s2">&quot;Sources.ctid&quot;</span><span class="p">,</span> <span class="s2">&quot;real_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Sources._key&quot;</span><span class="p">}</span>
+<span class="p">]</span>
+<span class="n">load</span> <span class="o">--</span><span class="n">table</span> <span class="n">Sources</span>
+<span class="p">[</span>
+<span class="p">{</span><span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+<span class="p">{</span><span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+<span class="p">{</span><span class="s2">&quot;_key&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>このデータの場合、次の <code class="docutils literal notranslate"><span class="pre">select</span></code> コマンドがクラッシュしていました。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">Sources</span> \
+  <span class="o">--</span><span class="nb">filter</span> <span class="s1">&#39;_key &gt;= 2&#39;</span> \
+  <span class="o">--</span><span class="n">post_filter</span> <span class="s1">&#39;ctid &gt; 2&#39;</span>
+</pre></div>
+</div>
+<p>このバグは v8.0.1 から存在していました。</p>
+</section>
+</section>
+</section>
 <section id="release-16-1-2-2026-09-29">
 <span id="release-16-1-2"></span><h2>16.1.2リリース - 2026-09-29<a class="headerlink" href="#release-16-1-2-2026-09-29" title="Link to this heading">#</a></h2>
 <section id="improvements">
@@ -444,8 +480,8 @@
 <p>WebブラウザはWASIもファイルシステムも提供しません。 そこで <code class="docutils literal notranslate"><span class="pre">libgroonga-web.mjs</span></code> にはインメモリのファイルシステムで必要なWASI関数を実装しています。データベースは必要に応じてHTTP経由でダウンロードします。<code class="docutils literal notranslate"><span class="pre">examples/web/</span></code> に例があるので参照してください。</p>
 </section>
 </section>
-<section id="fixes">
-<h3>修正<a class="headerlink" href="#fixes" title="Link to this heading">#</a></h3>
+<section id="id1">
+<h3>修正<a class="headerlink" href="#id1" title="Link to this heading">#</a></h3>
 <section id="reference-commands-select-fixed-a-bug-that-drilldowns-label-columns-name-with-stage-output-used-offset-limit-of-the-main-search">
 <h4>[<a class="reference internal" href="../reference/commands/select.html"><span class="doc">select</span></a>] <code class="docutils literal notranslate"><span class="pre">stage=output</span></code> を指定した <code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].columns[${NAME}]</span></code> が本体検索の <code class="docutils literal notranslate"><span class="pre">offset</span></code>/<code class="docutils literal notranslate"><span class="pre">limit</span></code> を使っていた問題を修正<a class="headerlink" href="#reference-commands-select-fixed-a-bug-that-drilldowns-label-columns-name-with-stage-output-used-offset-limit-of-the-main-search" title="Link to this heading">#</a></h4>
 <p>本体検索ではなく、ドリルダウンで指定されたパラメーターの <code class="docutils literal notranslate"><span class="pre">offset</span></code>/<code class="docutils literal notranslate"><span class="pre">limit</span></code> を使うべきでした。</p>
@@ -468,8 +504,8 @@
 </section>
 <section id="release-16-1-1-2026-09-23">
 <span id="release-16-1-1"></span><h2>16.1.1リリース - 2026-09-23<a class="headerlink" href="#release-16-1-1-2026-09-23" title="Link to this heading">#</a></h2>
-<section id="id1">
-<h3>改良<a class="headerlink" href="#id1" title="Link to this heading">#</a></h3>
+<section id="id2">
+<h3>改良<a class="headerlink" href="#id2" title="Link to this heading">#</a></h3>
 <section id="reference-commands-logical-select-added-support-for-parallel-execution-by-n-workers">
 <h4>[<a class="reference internal" href="../reference/commands/logical_select.html"><span class="doc">logical_select</span></a>] <code class="docutils literal notranslate"><span class="pre">n_workers</span></code> による並列実行に対応<a class="headerlink" href="#reference-commands-logical-select-added-support-for-parallel-execution-by-n-workers" title="Link to this heading">#</a></h4>
 <p><code class="docutils literal notranslate"><span class="pre">--n_workers</span></code> に <code class="docutils literal notranslate"><span class="pre">-1</span></code> または <code class="docutils literal notranslate"><span class="pre">2</span></code> 以上を指定すると、 <code class="docutils literal notranslate"><span class="pre">logical_select</span></code> は次の処理を並列に実行します。</p>
@@ -549,8 +585,8 @@
 <p>パイプに書き込むプログラムは、自分で <code class="docutils literal notranslate"><span class="pre">SIGPIPE</span></code> を処理する必要があります。</p>
 </section>
 </section>
-<section id="id2">
-<h3>修正<a class="headerlink" href="#id2" title="Link to this heading">#</a></h3>
+<section id="id3">
+<h3>修正<a class="headerlink" href="#id3" title="Link to this heading">#</a></h3>
 <section id="reference-commands-logical-select-fixed-a-bug-that-a-persistent-column-specified-by-drilldown-calc-target-was-closed-after-grouping">
 <h4>[<a class="reference internal" href="../reference/commands/logical_select.html"><span class="doc">logical_select</span></a>] <code class="docutils literal notranslate"><span class="pre">drilldown_calc_target</span></code> に指定した永続カラムをグループ化後にクローズしていた問題を修正<a class="headerlink" href="#reference-commands-logical-select-fixed-a-bug-that-a-persistent-column-specified-by-drilldown-calc-target-was-closed-after-grouping" title="Link to this heading">#</a></h4>
 <p>永続カラムは他のコンテキストと共有しています。そのため、クラッシュする可能性がありました。</p>
@@ -581,8 +617,8 @@
 </section>
 <section id="release-16-1-0-2026-08-28">
 <span id="release-16-1-0"></span><h2>16.1.0リリース - 2026-08-28<a class="headerlink" href="#release-16-1-0-2026-08-28" title="Link to this heading">#</a></h2>
-<section id="id3">
-<h3>修正<a class="headerlink" href="#id3" title="Link to this heading">#</a></h3>
+<section id="id4">
+<h3>修正<a class="headerlink" href="#id4" title="Link to this heading">#</a></h3>
 <section id="fixed-a-crash-bug-when-allocation-of-a-new-segment-fails">
 <h4>新しいセグメントの確保に失敗した時にクラッシュする問題を修正<a class="headerlink" href="#fixed-a-crash-bug-when-allocation-of-a-new-segment-fails" title="Link to this heading">#</a></h4>
 <p>この問題は、メモリー不足や、メモリーマップ数の上限に到達しているような環境で、インデックスの更新時に発生することがあります。</p>
@@ -593,8 +629,8 @@
 </section>
 <section id="release-16-0-9-2026-08-07">
 <span id="release-16-0-9"></span><h2>16.0.9リリース - 2026-08-07<a class="headerlink" href="#release-16-0-9-2026-08-07" title="Link to this heading">#</a></h2>
-<section id="id4">
-<h3>改良<a class="headerlink" href="#id4" title="Link to this heading">#</a></h3>
+<section id="id5">
+<h3>改良<a class="headerlink" href="#id5" title="Link to this heading">#</a></h3>
 <section id="benchmark-remove-incorrect-g-gnuc-const-usage">
 <h4>[benchmark] <code class="docutils literal notranslate"><span class="pre">G_GNUC_CONST</span></code>の誤った使い方を削除<a class="headerlink" href="#benchmark-remove-incorrect-g-gnuc-const-usage" title="Link to this heading">#</a></h4>
 <p><a class="reference external" href="https://github.com/groonga/groonga/issues/2857">GH-2857</a> correctmostさんの報告。</p>
@@ -700,8 +736,8 @@
 <h4>[normalizers] Unicode 17.0.0をサポート<a class="headerlink" href="#normalizers-added-support-for-unicode-17-0-0" title="Link to this heading">#</a></h4>
 </section>
 </section>
-<section id="id5">
-<h3>修正<a class="headerlink" href="#id5" title="Link to this heading">#</a></h3>
+<section id="id6">
+<h3>修正<a class="headerlink" href="#id6" title="Link to this heading">#</a></h3>
 <section id="fixed-a-bug-where-input-was-unintentionally-tokenized-while-ignoring-whitespace-when-using-multiple-normalizers">
 <h4>ノーマライザーを複数使用したときに、意図せず空白が無視されてトークナイズされてしまう問題を修正<a class="headerlink" href="#fixed-a-bug-where-input-was-unintentionally-tokenized-while-ignoring-whitespace-when-using-multiple-normalizers" title="Link to this heading">#</a></h4>
 <p><a class="reference external" href="https://github.com/groonga/groonga/issues/2853">GH-2853</a> askdkcさんの報告。</p>
@@ -777,8 +813,8 @@
 </section>
 <section id="release-16-0-8-2026-07-13">
 <span id="release-16-0-8"></span><h2>16.0.8リリース - 2026-07-13<a class="headerlink" href="#release-16-0-8-2026-07-13" title="Link to this heading">#</a></h2>
-<section id="id6">
-<h3>改良<a class="headerlink" href="#id6" title="Link to this heading">#</a></h3>
+<section id="id7">
+<h3>改良<a class="headerlink" href="#id7" title="Link to this heading">#</a></h3>
 <section id="reference-functions-between-added-support-for-vector-type-value-as-the-1st-parameter">
 <h4>[<a class="reference internal" href="../reference/functions/between.html"><span class="doc">between</span></a>] 最初の引数にベクター型の値をサポート<a class="headerlink" href="#reference-functions-between-added-support-for-vector-type-value-as-the-1st-parameter" title="Link to this heading">#</a></h4>
 <blockquote>
@@ -855,8 +891,8 @@
 <p>2026-06-10にEOLになったためです。</p>
 </section>
 </section>
-<section id="id7">
-<h3>修正<a class="headerlink" href="#id7" title="Link to this heading">#</a></h3>
+<section id="id8">
+<h3>修正<a class="headerlink" href="#id8" title="Link to this heading">#</a></h3>
 <section id="fixed-a-crash-bug-when-we-specify-language-model-knn-as-sort-keys">
 <h4><code class="docutils literal notranslate"><span class="pre">sort_keys</span></code>として<code class="docutils literal notranslate"><span class="pre">language_model_knn(...)</span></code>を指定するとクラッシュする問題を修正<a class="headerlink" href="#fixed-a-crash-bug-when-we-specify-language-model-knn-as-sort-keys" title="Link to this heading">#</a></h4>
 <p>例えば、<code class="docutils literal notranslate"><span class="pre">sort_keys</span></code>に<code class="docutils literal notranslate"><span class="pre">language_model_knn(text,</span> <span class="pre">&quot;male</span> <span class="pre">child&quot;,</span> <span class="pre">{&quot;k&quot;</span> <span class="pre">:</span> <span class="pre">2</span> <span class="pre">})</span></code>を指定すると、<code class="docutils literal notranslate"><span class="pre">{</span> <span class="pre">&quot;k&quot;</span> <span class="pre">:</span> <span class="pre">2</span> <span class="pre">}</span></code>がソート処理内で二重解放されてGroongaがクラッシュします。</p>
@@ -1055,8 +1091,8 @@
 </section>
 <section id="release-16-0-5-2026-05-22">
 <span id="release-16-0-5"></span><h2>16.0.5リリース - 2026-05-22<a class="headerlink" href="#release-16-0-5-2026-05-22" title="Link to this heading">#</a></h2>
-<section id="id8">
-<h3>修正<a class="headerlink" href="#id8" title="Link to this heading">#</a></h3>
+<section id="id9">
+<h3>修正<a class="headerlink" href="#id9" title="Link to this heading">#</a></h3>
 <section id="fixed-a-bug-where-groonga-for-windows-failed-to-run-due-to-a-missing-required-dll">
 <h4>Windows版のGroongaに必要なDLLが不足していたため起動に失敗する問題を修正<a class="headerlink" href="#fixed-a-bug-where-groonga-for-windows-failed-to-run-due-to-a-missing-required-dll" title="Link to this heading">#</a></h4>
 <p>Windows版のGroongaに必要なDLL(<code class="docutils literal notranslate"><span class="pre">msvcp140_atomic_wait.dll</span></code>)を<code class="docutils literal notranslate"><span class="pre">groonga-16.0.2-x64-vs2022-with-vcruntime.zip</span></code>に同梱していませんでした。</p>
@@ -1066,14 +1102,14 @@
 </section>
 <section id="release-16-0-2-2026-05-07">
 <span id="release-16-0-2"></span><h2>16.0.2リリース - 2026-05-07<a class="headerlink" href="#release-16-0-2-2026-05-07" title="Link to this heading">#</a></h2>
-<section id="id9">
-<h3>改良<a class="headerlink" href="#id9" title="Link to this heading">#</a></h3>
+<section id="id10">
+<h3>改良<a class="headerlink" href="#id10" title="Link to this heading">#</a></h3>
 <section id="added-support-for-ubuntu-26-04-lts">
 <h4>Ubuntu 26.04 LTSをサポート<a class="headerlink" href="#added-support-for-ubuntu-26-04-lts" title="Link to this heading">#</a></h4>
 </section>
 </section>
-<section id="id10">
-<h3>修正<a class="headerlink" href="#id10" title="Link to this heading">#</a></h3>
+<section id="id11">
+<h3>修正<a class="headerlink" href="#id11" title="Link to this heading">#</a></h3>
 <section id="fixed-the-odr-one-definition-rule-violation">
 <h4>ODR(One Definition Rule)違反を修正<a class="headerlink" href="#fixed-the-odr-one-definition-rule-violation" title="Link to this heading">#</a></h4>
 <p><a class="reference external" href="https://github.com/groonga/groonga/issues/2787">GH-2787</a> Nicolas PARLANTさんの報告。</p>
@@ -1098,8 +1134,8 @@
 </div>
 </section>
 </section>
-<section id="id11">
-<h3>感謝<a class="headerlink" href="#id11" title="Link to this heading">#</a></h3>
+<section id="id12">
+<h3>感謝<a class="headerlink" href="#id12" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Nicolas PARLANTさん</p></li>
 <li><p>Kentaro Hayashiさん</p></li>
@@ -1108,8 +1144,8 @@
 </section>
 <section id="release-16-0-1-2026-03-30">
 <span id="release-16-0-1"></span><h2>16.0.1リリース - 2026-03-30<a class="headerlink" href="#release-16-0-1-2026-03-30" title="Link to this heading">#</a></h2>
-<section id="id12">
-<h3>改良<a class="headerlink" href="#id12" title="Link to this heading">#</a></h3>
+<section id="id13">
+<h3>改良<a class="headerlink" href="#id13" title="Link to this heading">#</a></h3>
 <section id="reference-functions-language-model-vectorize-added-prefix-option">
 <h4>[<a class="reference internal" href="../reference/functions/language_model_vectorize.html"><span class="doc">language_model_vectorize</span></a>] <code class="docutils literal notranslate"><span class="pre">prefix</span></code>オプションを追加しました。<a class="headerlink" href="#reference-functions-language-model-vectorize-added-prefix-option" title="Link to this heading">#</a></h4>
 <p>入力テキストにプレフィックスを追加できるようになりました。これは<code class="docutils literal notranslate"><span class="pre">TokenLanguageModelKNN</span></code>の<code class="docutils literal notranslate"><span class="pre">passage_prefix</span></code>や<code class="docutils literal notranslate"><span class="pre">query_prefix</span></code>オプションと同様にプレフィックスを必要とするモデルに便利です。</p>
@@ -1124,8 +1160,8 @@
 <p><code class="docutils literal notranslate"><span class="pre">object_list</span></code>コマンドの出力に、<code class="docutils literal notranslate"><span class="pre">normalizers</span></code>フィールドが追加され、ノーマライザーの情報を出力するようにしました。</p>
 </section>
 </section>
-<section id="id13">
-<h3>修正<a class="headerlink" href="#id13" title="Link to this heading">#</a></h3>
+<section id="id14">
+<h3>修正<a class="headerlink" href="#id14" title="Link to this heading">#</a></h3>
 <section id="http-fixed-a-false-error-for-chunked-http-requests">
 <h4>[HTTP] chunkedリクエストに関する誤ったエラー判定を修正しました。<a class="headerlink" href="#http-fixed-a-false-error-for-chunked-http-requests" title="Link to this heading">#</a></h4>
 <p>特定の条件において、有効なHTTPのchunkedリクエストを受け付けたにもかかわらず、エラーで失敗する可能性があるバグを修正しました。</p>
@@ -1139,8 +1175,8 @@
 <p>関連: <a class="reference external" href="https://jira.mariadb.org/browse/MDEV-39098">https://jira.mariadb.org/browse/MDEV-39098</a></p>
 </section>
 </section>
-<section id="id14">
-<h3>実験的な機能<a class="headerlink" href="#id14" title="Link to this heading">#</a></h3>
+<section id="id15">
+<h3>実験的な機能<a class="headerlink" href="#id15" title="Link to this heading">#</a></h3>
 <blockquote>
 <div><p>これらの機能はまだ実験的で安定していません。これらの機能は、絶対に実運用環境では使わないでください。</p>
 </div></blockquote>
@@ -1177,8 +1213,8 @@
 </div>
 </section>
 </section>
-<section id="id15">
-<h3>感謝<a class="headerlink" href="#id15" title="Link to this heading">#</a></h3>
+<section id="id16">
+<h3>感謝<a class="headerlink" href="#id16" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Daniel Blackさん</p></li>
 </ul>
@@ -1187,8 +1223,8 @@
 <section id="release-16-0-0-2026-02-09">
 <span id="release-16-0-0"></span><h2>16.0.0リリース - 2026-02-09<a class="headerlink" href="#release-16-0-0-2026-02-09" title="Link to this heading">#</a></h2>
 <p>毎年恒例の肉の日メジャーリリースです！このリリースには後方互換性が壊れる変更はありません！既存のデータベースを移行せずにGroongaをアップグレードできます。既存のデータベースをそのまま使い続けることができます。</p>
-<section id="id16">
-<h3>修正<a class="headerlink" href="#id16" title="Link to this heading">#</a></h3>
+<section id="id17">
+<h3>修正<a class="headerlink" href="#id17" title="Link to this heading">#</a></h3>
 <section id="fixed-a-bug-that-causes-overflow-in-the-key-of-table-dat-key-tables">
 <h4><code class="docutils literal notranslate"><span class="pre">TABLE_DAT_KEY</span></code>のテーブルでキーでオーバーフローを引き起こす問題を修正<a class="headerlink" href="#fixed-a-bug-that-causes-overflow-in-the-key-of-table-dat-key-tables" title="Link to this heading">#</a></h4>
 <p>4096byteのキーをセットすると、<code class="docutils literal notranslate"><span class="pre">TABLE_DAT_KEY</span></code>のテーブルが壊れることがあります。</p>
@@ -1226,13 +1262,20 @@
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-16-1-3-2026-10-08">16.1.3リリース - 2026-10-08</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fixes">修正</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#reference-alias-fixed-a-crash-when-an-alias-to-an-accessor-such-as-key-is-used">[<span class="xref std std-doc">/reference/alias</span>] <code class="docutils literal notranslate"><span class="pre">_key</span></code> のようなアクセサーへのエイリアスを使うとクラッシュする問題を修正</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-16-1-2-2026-09-29">16.1.2リリース - 2026-09-29</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#improvements">改良</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#wasi-added-the-groonga-command">[WASI] <code class="docutils literal notranslate"><span class="pre">groonga</span></code> コマンドを追加</a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#wasi-added-support-for-running-on-a-web-browser">[WASI] Webブラウザ上での実行に対応</a></li>
 </ul>
 </li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fixes">修正</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">修正</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#reference-commands-select-fixed-a-bug-that-drilldowns-label-columns-name-with-stage-output-used-offset-limit-of-the-main-search">[<span class="xref std std-doc">/reference/commands/select</span>] <code class="docutils literal notranslate"><span class="pre">stage=output</span></code> を指定した <code class="docutils literal notranslate"><span class="pre">drilldowns[${LABEL}].columns[${NAME}]</span></code> が本体検索の <code class="docutils literal notranslate"><span class="pre">offset</span></code>/<code class="docutils literal notranslate"><span class="pre">limit</span></code> を使っていた問題を修正</a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#reference-commands-logical-select-fixed-a-bug-that-the-response-of-command-version-3-was-wrapped-by-an-unnecessary-array">[<span class="xref std std-doc">/reference/commands/logical_select</span>] コマンドバージョン3のレスポンスが不要な配列になっていた問題を修正</a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#reference-commands-logical-select-fixed-a-bug-that-a-plain-drilldown-with-command-version-3-was-output-in-command-version-1-format">[<span class="xref std std-doc">/reference/commands/logical_select</span>] コマンドバージョン3で <code class="docutils literal notranslate"><span class="pre">drilldown</span></code> （ラベル無し）を指定した際、コマンドバージョン1の形式で出力していた問題を修正</a></li>
@@ -1242,7 +1285,7 @@
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-16-1-1-2026-09-23">16.1.1リリース - 2026-09-23</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">改良</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">改良</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#reference-commands-logical-select-added-support-for-parallel-execution-by-n-workers">[<span class="xref std std-doc">/reference/commands/logical_select</span>] <code class="docutils literal notranslate"><span class="pre">n_workers</span></code> による並列実行に対応</a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#reference-commands-logical-select-added-shard-label-table">[<span class="xref std std-doc">/reference/commands/logical_select</span>] <code class="docutils literal notranslate"><span class="pre">shard[${LABEL}].table</span></code> を追加</a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#reference-commands-logical-select-added-support-for-keys-other-than-shard-key-in-sort-keys">[<span class="xref std std-doc">/reference/commands/logical_select</span>] <code class="docutils literal notranslate"><span class="pre">sort_keys</span></code> で <code class="docutils literal notranslate"><span class="pre">shard_key</span></code> 以外のキーをサポート</a></li>
@@ -1255,7 +1298,7 @@
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#grn-init-doesn-t-ignore-sigpipe-anymore"><code class="docutils literal notranslate"><span class="pre">grn_init()</span></code> は <code class="docutils literal notranslate"><span class="pre">SIGPIPE</span></code> を無視しなくなりました</a></li>
 </ul>
 </li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">修正</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">修正</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#reference-commands-logical-select-fixed-a-bug-that-a-persistent-column-specified-by-drilldown-calc-target-was-closed-after-grouping">[<span class="xref std std-doc">/reference/commands/logical_select</span>] <code class="docutils literal notranslate"><span class="pre">drilldown_calc_target</span></code> に指定した永続カラムをグループ化後にクローズしていた問題を修正</a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#reference-commands-logical-select-fixed-a-bug-that-records-was-duplicated-in-command-version-3">[<span class="xref std std-doc">/reference/commands/logical_select</span>] コマンドバージョン3で <code class="docutils literal notranslate"><span class="pre">records</span></code> が重複していた問題を修正</a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#fixed-a-bug-that-a-floating-point-number-was-treated-as-an-inverted-boolean-value">浮動小数点数の真偽値が反転して扱われていた問題を修正</a></li>
@@ -1267,21 +1310,21 @@
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-16-1-0-2026-08-28">16.1.0リリース - 2026-08-28</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">修正</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">修正</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#fixed-a-crash-bug-when-allocation-of-a-new-segment-fails">新しいセグメントの確保に失敗した時にクラッシュする問題を修正</a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-16-0-9-2026-08-07">16.0.9リリース - 2026-08-07</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">改良</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">改良</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#benchmark-remove-incorrect-g-gnuc-const-usage">[benchmark] <code class="docutils literal notranslate"><span class="pre">G_GNUC_CONST</span></code>の誤った使い方を削除</a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#reference-functions-string-truncate-added-new-function-string-truncate">[<span class="xref std std-doc">/reference/functions/string_truncate</span>] 新しい関数 <code class="docutils literal notranslate"><span class="pre">string_truncate()</span></code> を追加</a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#added-new-function-binary-length">新しい関数 <code class="docutils literal notranslate"><span class="pre">binary_length()</span></code> を追加</a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#normalizers-added-support-for-unicode-17-0-0">[normalizers] Unicode 17.0.0をサポート</a></li>
 </ul>
 </li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">修正</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">修正</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#fixed-a-bug-where-input-was-unintentionally-tokenized-while-ignoring-whitespace-when-using-multiple-normalizers">ノーマライザーを複数使用したときに、意図せず空白が無視されてトークナイズされてしまう問題を修正</a></li>
 </ul>
 </li>
@@ -1289,12 +1332,12 @@
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-16-0-8-2026-07-13">16.0.8リリース - 2026-07-13</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">改良</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">改良</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#reference-functions-between-added-support-for-vector-type-value-as-the-1st-parameter">[<span class="xref std std-doc">/reference/functions/between</span>] 最初の引数にベクター型の値をサポート</a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#dropped-support-for-debian-12-bookworm">Debian 12 (bookworm)のサポートをやめました</a></li>
 </ul>
 </li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">修正</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">修正</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#fixed-a-crash-bug-when-we-specify-language-model-knn-as-sort-keys"><code class="docutils literal notranslate"><span class="pre">sort_keys</span></code>として<code class="docutils literal notranslate"><span class="pre">language_model_knn(...)</span></code>を指定するとクラッシュする問題を修正</a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#fixed-a-crash-bug-when-we-use-language-model-knn-with-empty-value">空の値に対して<code class="docutils literal notranslate"><span class="pre">language_model_knn()</span></code>を使用した時にクラッシュする問題を修正</a></li>
 </ul>
@@ -1307,48 +1350,48 @@
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-16-0-5-2026-05-22">16.0.5リリース - 2026-05-22</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">修正</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">修正</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#fixed-a-bug-where-groonga-for-windows-failed-to-run-due-to-a-missing-required-dll">Windows版のGroongaに必要なDLLが不足していたため起動に失敗する問題を修正</a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-16-0-2-2026-05-07">16.0.2リリース - 2026-05-07</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">改良</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">改良</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#added-support-for-ubuntu-26-04-lts">Ubuntu 26.04 LTSをサポート</a></li>
 </ul>
 </li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">修正</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">修正</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#fixed-the-odr-one-definition-rule-violation">ODR(One Definition Rule)違反を修正</a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#fixed-missing-files-in-benchmark-directory-of-source-archive">ソースアーカイブのbenchmarkディレクトリーに不足していたファイルを追加</a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#fixed-a-bug-where-duplicate-tools-directories-were-created">"tools"ディレクトリーが重複して作成される問題を修正</a></li>
 </ul>
 </li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">感謝</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id12">感謝</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-16-0-1-2026-03-30">16.0.1リリース - 2026-03-30</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id12">改良</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id13">改良</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#reference-functions-language-model-vectorize-added-prefix-option">[<span class="xref std std-doc">/reference/functions/language_model_vectorize</span>] <code class="docutils literal notranslate"><span class="pre">prefix</span></code>オプションを追加しました。</a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#reference-commands-object-list-added-normalizer-information-to-the-output">[<span class="xref std std-doc">/reference/commands/object_list</span>] 出力にノーマライザーの情報を追加しました。</a></li>
 </ul>
 </li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id13">修正</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id14">修正</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#http-fixed-a-false-error-for-chunked-http-requests">[HTTP] chunkedリクエストに関する誤ったエラー判定を修正しました。</a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#fixed-a-bug-that-caused-a-crash-due-to-using-the-wrong-free-function">誤ったfree関数を使用したためにクラッシュが発生するバグを修正しました。</a></li>
 </ul>
 </li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id14">実験的な機能</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id15">実験的な機能</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#reference-types-added-support-for-arrays-and-objects-in-json-type">[<span class="xref std std-doc">/reference/types</span>] <code class="docutils literal notranslate"><span class="pre">JSON</span></code>型における配列とオブジェクトのサポートを追加しました。</a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#added-support-for-openzl-compression-and-decompression-for-scalar-columns-and-float32-vector-columns">スカラーカラムとFloat32ベクトルカラムに対するOpenZLによる圧縮をサポートしました。</a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#added-extractor-support">エクストラクターを追加しました。</a></li>
 </ul>
 </li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id15">感謝</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id16">感謝</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-16-0-0-2026-02-09">16.0.0リリース - 2026-02-09</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id16">修正</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id17">修正</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#fixed-a-bug-that-causes-overflow-in-the-key-of-table-dat-key-tables"><code class="docutils literal notranslate"><span class="pre">TABLE_DAT_KEY</span></code>のテーブルでキーでオーバーフローを引き起こす問題を修正</a></li>
 </ul>
 </li>

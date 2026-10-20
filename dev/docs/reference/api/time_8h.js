@@ -17,8 +17,10 @@ var time_8h =
     [ "GRN_TIME_USEC_TO_SEC", "time_8h.html#a14258011fa0f592da4ba4dfcd1672eaa", null ],
     [ "GRN_TIMEVAL_TO_MSEC", "time_8h.html#ad9c67b499be30b059d58c5f62e2e7e18", null ],
     [ "GRN_TIMEVAL_TO_NSEC", "time_8h.html#a2ded6033146af899d2fd87856d2623c2", null ],
+    [ "grn_time_utc_offset_func", "time_8h.html#ad8cb5fba772c610d35cd28d5202bd79b", null ],
     [ "grn_time_from_tm", "time_8h.html#a2bfec5fcaee6cd90b68d53dc1eac47f0", null ],
     [ "grn_time_now", "time_8h.html#a0d404d1109d9cd66439d9bd385093202", null ],
+    [ "grn_time_set_utc_offset_func", "time_8h.html#a3378fa66582035daa069bc58e8c88938", null ],
     [ "grn_time_to_tm", "time_8h.html#a93defb1e8daec7be7992b97c8c8f342a", null ],
     [ "grn_timeval_from_double", "time_8h.html#af10395c547074ba8d03a3f4a0376670a", null ],
     [ "grn_timeval_now", "time_8h.html#ac454b709a946111c5effa0c8eda34caf", null ]

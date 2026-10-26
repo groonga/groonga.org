@@ -1,10 +1,5 @@
 var NAVTREEINDEX6 =
 {
-"json_8h.html#adb39247004e14c7f626be224c3fde391":[5,0,1,0,30,17],
-"json_8h.html#af417f4fe486ff125388d88a2345e336b":[5,0,1,0,30,14],
-"json_8h.html#afeb6d737668175545b7a1315584e4301":[5,0,1,0,30,1],
-"json_8h_source.html":[5,0,1,0,30],
-"language__model_8h.html":[5,0,1,0,31],
 "language__model_8h.html#a0c816e1d78161e3be463b52ac565a512":[5,0,1,0,31,7],
 "language__model_8h.html#a12c55176f625226f53d47e9ac3be0697":[5,0,1,0,31,5],
 "language__model_8h.html#a21b2ec7f3e3f306e857b7c5750fb694e":[5,0,1,0,31,12],
@@ -45,13 +40,13 @@ var NAVTREEINDEX6 =
 "msgpack_8h_source.html":[5,0,1,0,34],
 "namespacegrn.html":[3,0,0],
 "namespacegrn_1_1arrow.html":[3,0,0,0],
-"namespacegrn_1_1bulk.html":[3,0,0,1],
-"namespacegrn_1_1bulk.html#a484af5f20c08e64fc63cef6d87850fad":[3,0,0,1,2],
-"namespacegrn_1_1bulk.html#aa3f359f2c2e06ab6c753a9704141a8ca":[3,0,0,1,1],
-"namespacegrn_1_1bulk.html#ae65c6f2d1a5dce30baf36dace3a986aa":[3,0,0,1,0],
-"namespacegrn_1_1numeric.html":[3,0,0,2],
-"namespacegrn_1_1numeric.html#a5d29aefcf270e4826c91992baeef6c52":[3,0,0,2,1],
-"namespacegrn_1_1numeric.html#a8df7f5fdbb5ec5d699e200db77b476f1":[3,0,0,2,0],
+"namespacegrn_1_1bulk.html":[3,0,0,2],
+"namespacegrn_1_1bulk.html#a484af5f20c08e64fc63cef6d87850fad":[3,0,0,2,2],
+"namespacegrn_1_1bulk.html#aa3f359f2c2e06ab6c753a9704141a8ca":[3,0,0,2,1],
+"namespacegrn_1_1bulk.html#ae65c6f2d1a5dce30baf36dace3a986aa":[3,0,0,2,0],
+"namespacegrn_1_1numeric.html":[3,0,0,1],
+"namespacegrn_1_1numeric.html#a5d29aefcf270e4826c91992baeef6c52":[3,0,0,1,0],
+"namespacegrn_1_1numeric.html#a8df7f5fdbb5ec5d699e200db77b476f1":[3,0,0,1,1],
 "namespacemembers.html":[3,1,0],
 "namespacemembers_func.html":[3,1,1],
 "namespaces.html":[3,0],
@@ -249,5 +244,10 @@ var NAVTREEINDEX6 =
 "output__columns_8h.html#a93b8a7dc1ee773419566adb492a52f33":[5,0,1,0,41,0],
 "output__columns_8h.html#ad3dfa16aea25d37363e5c6fc424501a8":[5,0,1,0,41,1],
 "output__columns_8h_source.html":[5,0,1,0,41],
-"pages.html":[]
+"pages.html":[],
+"pat_8h.html":[5,0,1,0,42],
+"pat_8h.html#a042f453f1436084af7d576eff6727281":[5,0,1,0,42,29],
+"pat_8h.html#a2a5ca9137d3b84ce5e3aa3dddbe0dd76":[5,0,1,0,42,25],
+"pat_8h.html#a2a6c38d7f10815bc07c96cf139acb421":[5,0,1,0,42,8],
+"pat_8h.html#a2b811e43b136e7df7fb0316968bbe90f":[5,0,1,0,42,17]
 };

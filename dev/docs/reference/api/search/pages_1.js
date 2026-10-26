@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['introduction_0',['Introduction',['../index.html',1,'']]]
+  ['buffer_0',['Buffer',['../groonga_2groonga_8h.html#autotoc_md5',1,'']]]
 ];

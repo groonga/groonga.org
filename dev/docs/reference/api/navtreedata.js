@@ -61,18 +61,19 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "accessor_8h.html",
-"column_8h.html#af3bbe24fc3216c265e6f76489fb027b4",
-"groonga_2groonga_8h.html#a085fb579dc5c9a62b1abf7dd57e0aa5c",
-"groonga_2groonga_8h.html#a3c6d36bf6891b45d1b369a246cbde2a3",
-"groonga_2groonga_8h.html#a7c112ab4939fcbdf919204b41bff5c23",
-"groonga_2groonga_8h.html#acc538caaaac17b30129c442aa85f4c55",
-"json_8h.html#adb39247004e14c7f626be224c3fde391",
-"pat_8h.html",
-"scorer_8h.html#a9270cb41b1ac1f405c7220474cfeaf28",
-"structgrn_1_1CommandArgument.html#a1c06f6e731893f02b58ee43d7512e767",
-"token_8h.html#a17005474d68a85807258f6f1d8e05138",
-"window__function__executor_8h.html#a80e191bf95a9ed43975f85785cd61f61"
+"command_8h.html#a5e646f03d8e9316a6546149a3fbf4d75",
+"groonga_2groonga_8h.html#a09c38c543c349c50dbc7a911bfcb0a0e",
+"groonga_2groonga_8h.html#a409d9768d9ca4f43c59cc9a3e1c79e24",
+"groonga_2groonga_8h.html#a7daee1d5a36bba35641babe3d74e54fa",
+"groonga_2groonga_8h.html#aced5e8b3f9148ee36b4960a49a7a23a6",
+"language__model_8h.html#a0c816e1d78161e3be463b52ac565a512",
+"pat_8h.html#a2cf8597b214b0aca47932a2d5a74cc66",
+"scorer_8h_source.html",
+"structgrn_1_1CommandArgument.html#a66b04d8333a77dd1a4a738f3d5c82071",
+"token_8h.html#a451b16131f7a5c64a60539936dff11c0",
+"window__function__executor_8h.html#ac4a89246c5d9258eab0a5a2f3ef85f38"
 ];
 
-var SYNCONMSG = 'click to disable panel synchronisation';
-var SYNCOFFMSG = 'click to enable panel synchronisation';
+var SYNCONMSG = 'click to disable panel synchronization';
+var SYNCOFFMSG = 'click to enable panel synchronization';
+var LISTOFALLMEMBERS = 'List of all members';

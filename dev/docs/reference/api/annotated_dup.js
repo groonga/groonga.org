@@ -4,10 +4,10 @@ var annotated_dup =
       [ "arrow", "namespacegrn_1_1arrow.html", [
         [ "ArrayBuilder", "classgrn_1_1arrow_1_1ArrayBuilder.html", "classgrn_1_1arrow_1_1ArrayBuilder" ]
       ] ],
+      [ "TextBulk", "classgrn_1_1TextBulk.html", "classgrn_1_1TextBulk" ],
       [ "CommandArgument", "structgrn_1_1CommandArgument.html", "structgrn_1_1CommandArgument" ],
       [ "CommandArguments", "classgrn_1_1CommandArguments.html", "classgrn_1_1CommandArguments" ],
       [ "SharedObj", "classgrn_1_1SharedObj.html", "classgrn_1_1SharedObj" ],
-      [ "TextBulk", "classgrn_1_1TextBulk.html", "classgrn_1_1TextBulk" ],
       [ "UniqueObj", "classgrn_1_1UniqueObj.html", "classgrn_1_1UniqueObj" ]
     ] ],
     [ "_grn_ctx", "struct__grn__ctx.html", "struct__grn__ctx" ],

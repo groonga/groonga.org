@@ -5,7 +5,7 @@ var searchData=
   ['table_5fmodule_2eh_2',['table_module.h',['../table__module_8h.html',1,'']]],
   ['tail_3',['tail',['../struct__grn__obj.html#a05240ce1ef6afe746081a62f71785c72',1,'_grn_obj']]],
   ['target_4',['target',['../structgrn__caster.html#a896df346123a339af2615d748c1ba536',1,'grn_caster']]],
-  ['textbulk_5',['textbulk',['../classgrn_1_1TextBulk.html#a6c2da067b725c377f5cd32289f4aa397',1,'grn::TextBulk::TextBulk()'],['../classgrn_1_1TextBulk.html',1,'grn::TextBulk']]],
+  ['textbulk_5',['TextBulk',['../classgrn_1_1TextBulk.html',1,'grn::TextBulk'],['../classgrn_1_1TextBulk.html#a6c2da067b725c377f5cd32289f4aa397',1,'grn::TextBulk::TextBulk()']]],
   ['tf_6',['tf',['../structgrn__posting.html#a36502c27154850f0058afd16e98228ec',1,'grn_posting']]],
   ['thread_2eh_7',['thread.h',['../thread_8h.html',1,'']]],
   ['time_2eh_8',['time.h',['../time_8h.html',1,'']]],

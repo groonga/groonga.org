@@ -8,7 +8,7 @@ var searchData=
   ['api_5',['C API',['../cache_8h.html#autotoc_md4',1,'']]],
   ['applier_2eh_6',['applier.h',['../applier_8h.html',1,'']]],
   ['array_2eh_7',['array.h',['../array_8h.html',1,'']]],
-  ['arraybuilder_8',['arraybuilder',['../classgrn_1_1arrow_1_1ArrayBuilder.html',1,'grn::arrow::ArrayBuilder'],['../classgrn_1_1arrow_1_1ArrayBuilder.html#aa3b0bab791d6202ba7b852a441146098',1,'grn::arrow::ArrayBuilder::ArrayBuilder()']]],
+  ['arraybuilder_8',['ArrayBuilder',['../classgrn_1_1arrow_1_1ArrayBuilder.html',1,'grn::arrow::ArrayBuilder'],['../classgrn_1_1arrow_1_1ArrayBuilder.html#aa3b0bab791d6202ba7b852a441146098',1,'grn::arrow::ArrayBuilder::ArrayBuilder()']]],
   ['arrow_2eh_9',['arrow.h',['../arrow_8h.html',1,'']]],
   ['arrow_2ehpp_10',['arrow.hpp',['../arrow_8hpp.html',1,'']]]
 ];

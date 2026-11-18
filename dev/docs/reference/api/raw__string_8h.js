@@ -3,6 +3,7 @@ var raw__string_8h =
     [ "grn_raw_string", "structgrn__raw__string.html", "structgrn__raw__string" ],
     [ "GRN_RAW_STRING_END_WITH_CSTRING", "raw__string_8h.html#a5013a2fbc7aebc760e2d8a36755b58a0", null ],
     [ "GRN_RAW_STRING_EQUAL", "raw__string_8h.html#a733b0b9a0b61f8a323a6b161f94bd251", null ],
+    [ "GRN_RAW_STRING_EQUAL_CI", "raw__string_8h.html#a60c3695452ea88aa4bfd443853965388", null ],
     [ "GRN_RAW_STRING_EQUAL_CSTRING", "raw__string_8h.html#a4d4f23234b0f9d0a803e32cd93cda012", null ],
     [ "GRN_RAW_STRING_EQUAL_CSTRING_CI", "raw__string_8h.html#a7327626382940131964ccf85cc9495c0", null ],
     [ "GRN_RAW_STRING_FILL", "raw__string_8h.html#a22871307f03024bad9347a284bbacc90", null ],

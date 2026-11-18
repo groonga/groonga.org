@@ -1,5 +1,6 @@
 var NAVTREEINDEX8 =
 {
+"scorer_8h.html#adc3fe594e49b427e9d3f513ba78bdde9":[5,0,1,0,52,12],
 "scorer_8h_source.html":[5,0,1,0,52],
 "selector_8h.html":[5,0,1,0,53],
 "selector_8h.html#a0789529c19fe6af372839e454085fd98":[5,0,1,0,53,5],
@@ -248,6 +249,5 @@ var NAVTREEINDEX8 =
 "structgrn_1_1CommandArgument.html#a1c06f6e731893f02b58ee43d7512e767":[3,0,0,4,0],
 "structgrn_1_1CommandArgument.html#a1c06f6e731893f02b58ee43d7512e767":[4,0,0,2,0],
 "structgrn_1_1CommandArgument.html#a3a42fc1ce899f8dc99a4e97367d3a29b":[3,0,0,4,2],
-"structgrn_1_1CommandArgument.html#a3a42fc1ce899f8dc99a4e97367d3a29b":[4,0,0,2,2],
-"structgrn_1_1CommandArgument.html#a66b04d8333a77dd1a4a738f3d5c82071":[3,0,0,4,1]
+"structgrn_1_1CommandArgument.html#a3a42fc1ce899f8dc99a4e97367d3a29b":[4,0,0,2,2]
 };
